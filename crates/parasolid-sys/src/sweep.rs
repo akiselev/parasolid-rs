@@ -1016,6 +1016,18 @@ pub struct PK_FACE_emboss_o_t {
 }
 
 // =============================================================================
+// Opaque options/result types for new sweep functions
+// =============================================================================
+
+/// Options for `PK_BODY_make_swept_profiles`.
+#[repr(C)]
+pub struct PK_BODY_make_swept_profiles_o_t { _private: [u8; 0] }
+
+/// Results from tracked sweep operations.
+#[repr(C)]
+pub struct PK_BODY_tracked_sweep_2_r_t { _private: [u8; 0] }
+
+// =============================================================================
 // Extern "C" function declarations
 // =============================================================================
 
@@ -1208,4 +1220,28 @@ unsafe extern "C" {
         options: *const PK_FACE_emboss_o_t,
         tracking: *mut PK_TOPOL_tracking_t,
     ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Ch. 36 — Additional sweep functions
+    // =========================================================================
+
+    /// Create swept body from profiles along path.
+    pub fn PK_BODY_make_swept_profiles(
+        n_profiles: c_int,
+        profiles: *const PK_BODY_t,
+        path: PK_BODY_t,
+        options: *const PK_BODY_make_swept_profiles_o_t,
+        results: *mut PK_BODY_tracked_sweep_2_r_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Result-free functions
+    // =========================================================================
+
+    /// Free results from `PK_BODY_make_swept_profiles`.
+    pub fn PK_BODY_make_swept_profiles_r_f(results: *mut PK_BODY_tracked_sweep_2_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_BODY_make_swept_body_2`.
+    pub fn PK_BODY_make_swept_body_2_r_f(results: *mut PK_BODY_tracked_sweep_2_r_t) -> PK_ERROR_code_t;
+
 }

@@ -815,4 +815,9 @@ unsafe extern "C" {
     pub fn PK_MARK_delete_r_f(
         mark: PK_MARK_t,
     ) -> PK_ERROR_code_t;
+
+    /// Free memory block.
+    pub fn PK_MEMORY_block_f(
+        block: *mut PK_MEMORY_block_t,
+    ) -> PK_ERROR_code_t;
 }

@@ -1213,6 +1213,46 @@ pub struct PK_FACE_imprint_cus_normal_o_t {
 }
 
 // =============================================================================
+// Opaque options/result types for obsolete V1 boolean/section/imprint/pattern
+// =============================================================================
+
+/// Options for `PK_BODY_section_with_sheet`.
+#[repr(C)]
+pub struct PK_BODY_section_o_t { _private: [u8; 0] }
+
+/// Results from section operations.
+#[repr(C)]
+pub struct PK_section_r_t { _private: [u8; 0] }
+
+/// Options for `PK_FACE_section_with_sheet`.
+#[repr(C)]
+pub struct PK_FACE_section_o_t { _private: [u8; 0] }
+
+/// Options for `PK_FACE_imprint_faces`.
+#[repr(C)]
+pub struct PK_FACE_imprint_o_t { _private: [u8; 0] }
+
+/// Results from face imprint operations.
+#[repr(C)]
+pub struct PK_imprint_r_t { _private: [u8; 0] }
+
+/// Results from `PK_FACE_pattern`.
+#[repr(C)]
+pub struct PK_FACE_pattern_r_t { _private: [u8; 0] }
+
+/// Options for `PK_FACE_pattern_2`.
+#[repr(C)]
+pub struct PK_FACE_pattern_2_o_t { _private: [u8; 0] }
+
+/// Results from `PK_FACE_pattern_2`.
+#[repr(C)]
+pub struct PK_FACE_pattern_2_r_t { _private: [u8; 0] }
+
+/// Options for `PK_FACE_imprint_cus_vector`.
+#[repr(C)]
+pub struct PK_FACE_imprint_cus_vector_o_t { _private: [u8; 0] }
+
+// =============================================================================
 // Extern "C" function declarations
 // =============================================================================
 
@@ -1598,4 +1638,103 @@ unsafe extern "C" {
         options: *const PK_FACE_pattern_o_t,
         status: *mut PK_pattern_status_t,
     ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Obsolete V1 boolean/section/imprint/pattern functions
+    // =========================================================================
+
+    /// Boolean operation (obsolete, superseded by _2).
+    pub fn PK_BODY_boolean(
+        target: PK_BODY_t,
+        n_tools: c_int,
+        tools: *const PK_BODY_t,
+        options: *const PK_BODY_boolean_o_t,
+        n_bodies: *mut c_int,
+        bodies: *mut *mut PK_BODY_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Boolean on face subsets (obsolete, superseded by _2).
+    pub fn PK_FACE_boolean(
+        n_targets: c_int,
+        targets: *const PK_FACE_t,
+        n_tools: c_int,
+        tools: *const PK_FACE_t,
+        options: *const PK_FACE_boolean_o_t,
+        n_bodies: *mut c_int,
+        bodies: *mut *mut PK_BODY_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Section body with sheet (obsolete, superseded by _2).
+    pub fn PK_BODY_section_with_sheet(
+        target: PK_BODY_t,
+        sheet: PK_BODY_t,
+        options: *const PK_BODY_section_o_t,
+        results: *mut PK_section_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Section faces with sheet (obsolete, superseded by _2).
+    pub fn PK_FACE_section_with_sheet(
+        n_targets: c_int,
+        targets: *const PK_FACE_t,
+        n_tools: c_int,
+        tools: *const PK_FACE_t,
+        options: *const PK_FACE_section_o_t,
+        results: *mut PK_section_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Imprint edges on target and tool faces.
+    pub fn PK_FACE_imprint_faces(
+        n_targets: c_int,
+        targets: *const PK_FACE_t,
+        n_tools: c_int,
+        tools: *const PK_FACE_t,
+        options: *const PK_FACE_imprint_o_t,
+        results: *mut PK_imprint_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Pattern faces by transforms (V2).
+    pub fn PK_FACE_pattern_2(
+        n_pattern_faces: c_int,
+        pattern_faces: *const PK_FACE_t,
+        n_transforms: c_int,
+        transforms: *const PK_TRANSF_t,
+        options: *const PK_FACE_pattern_2_o_t,
+        results: *mut PK_FACE_pattern_2_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Imprint curves on faces by vector projection.
+    pub fn PK_FACE_imprint_cus_vector(
+        n_targets: c_int,
+        targets: *const PK_FACE_t,
+        n_curves: c_int,
+        curves: *const PK_CURVE_t,
+        intervals: *const PK_INTERVAL_t,
+        direction: PK_VECTOR_t,
+        tol: c_double,
+        options: *const PK_FACE_imprint_cus_vector_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Result-free functions
+    // =========================================================================
+
+    /// Free results from `PK_FACE_imprint_faces`.
+    pub fn PK_FACE_imprint_faces_r_f(results: *mut PK_imprint_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_FACE_pattern`.
+    pub fn PK_FACE_pattern_r_f(results: *mut PK_FACE_pattern_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_FACE_pattern_2`.
+    pub fn PK_FACE_pattern_2_r_f(results: *mut PK_FACE_pattern_2_r_t) -> PK_ERROR_code_t;
+
+    /// Free section results from `PK_BODY_section_with_sheet`.
+    pub fn PK_BODY_section_with_sheet_r_f(results: *mut PK_section_r_t) -> PK_ERROR_code_t;
+
+    /// Free section results from `PK_FACE_section_with_sheet`.
+    pub fn PK_FACE_section_with_sheet_r_f(results: *mut PK_section_r_t) -> PK_ERROR_code_t;
+
+    /// Free tracking results from `PK_FACE_imprint_cus_vector`.
+    pub fn PK_FACE_imprint_cus_vector_r_f(results: *mut PK_TOPOL_track_r_t) -> PK_ERROR_code_t;
+
 }

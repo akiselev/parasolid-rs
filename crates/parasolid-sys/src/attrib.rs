@@ -232,6 +232,9 @@ pub type PK_del_attrib_cb_fn_t = Option<
     ),
 >;
 
+/// Attribute filter callback function type.
+pub type PK_ATTRIB_filter_f_t = Option<unsafe extern "C" fn(PK_ATTRIB_t, PK_POINTER_t) -> PK_LOGICAL_t>;
+
 // =============================================================================
 // Bulletin board setup structure
 // =============================================================================
@@ -931,5 +934,49 @@ unsafe extern "C" {
         entities: *mut *mut PK_ENTITY_t,
         event_types: *mut *mut PK_BB_event_t,
         classes: *mut *mut PK_CLASS_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Ensure no duplicate/invalid identifiers.
+    pub fn PK_PART_rectify_identifiers(
+        part: PK_PART_t,
+        n_entities: *mut c_int,
+        entities: *mut *mut PK_ENTITY_t,
+        old_idents: *mut *mut c_int,
+        new_idents: *mut *mut c_int,
+    ) -> PK_ERROR_code_t;
+
+    /// Find entities with matching attribute fields.
+    pub fn PK_PART_ask_attrib_owners(
+        part: PK_PART_t,
+        attdef: PK_ATTDEF_t,
+        n_fields: c_int,
+        fields: *const c_int,
+        indices: *const c_int,
+        values: *const c_int,
+        filter: PK_ATTRIB_filter_f_t,
+        context: PK_POINTER_t,
+        n_entities: *mut c_int,
+        entities: *mut *mut PK_ENTITY_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Find attributes matching field values.
+    pub fn PK_PART_ask_attribs_filter(
+        part: PK_PART_t,
+        attdef: PK_ATTDEF_t,
+        n_fields: c_int,
+        fields: *const c_int,
+        indices: *const c_int,
+        values: *const c_int,
+        filter: PK_ATTRIB_filter_f_t,
+        context: PK_POINTER_t,
+        n_attribs: *mut c_int,
+        attribs: *mut *mut PK_ATTRIB_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Construction lattices on a part.
+    pub fn PK_PART_ask_con_lattices(
+        part: PK_PART_t,
+        n_con_lattices: *mut c_int,
+        con_lattices: *mut *mut PK_LATTICE_t,
     ) -> PK_ERROR_code_t;
 }

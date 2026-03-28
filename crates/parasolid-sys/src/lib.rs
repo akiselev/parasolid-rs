@@ -121,3 +121,11 @@ pub use partition::*;
 // Debug and version control
 mod debug;
 pub use debug::*;
+
+// Frame operations
+mod frame;
+pub use frame::*;
+
+// Lattice geometry
+mod lattice;
+pub use lattice::*;

@@ -29,6 +29,6 @@ mod entity;
 pub use error::{BadArg, ErrorDetails, PsError, PsResult, Severity};
 pub use memory::PkArray;
 pub use frustrum::FrustrumConfig;
-pub use session::{Behaviour, Session, SessionConfig};
-pub use partition::Partition;
+pub use session::{Behaviour, Mark, Session, SessionConfig, SmpInfo};
+pub use partition::{Partition, Pmark, RollbackResult};
 pub use entity::{Entity, PkClass};

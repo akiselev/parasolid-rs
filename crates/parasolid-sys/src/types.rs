@@ -72,6 +72,18 @@ pub type PK_MFIN_t = PK_ENTITY_t;
 pub type PK_MVERTEX_t = PK_ENTITY_t;
 pub type PK_MTOPOL_t = PK_ENTITY_t;
 
+// SP-curve (surface-parametric curve) tag
+pub type PK_SPCURVE_t = PK_ENTITY_t;
+
+// Frame tag (coordinate frame attached to topology, class 0xe6)
+pub type PK_FRAME_t = PK_ENTITY_t;
+
+// Lattice geometry tags (V35 construction geometry)
+pub type PK_LATTICE_t = PK_ENTITY_t;
+pub type PK_LBALL_t = PK_ENTITY_t;
+pub type PK_LROD_t = PK_ENTITY_t;
+pub type PK_LTOPOL_t = PK_ENTITY_t;
+
 // Application items
 pub type PK_APPITEM_t = PK_ENTITY_t;
 
@@ -192,3 +204,70 @@ pub const PK_CLASS_mfacet: PK_CLASS_t = 120;
 pub const PK_CLASS_mfin: PK_CLASS_t = 121;
 pub const PK_CLASS_mvertex: PK_CLASS_t = 122;
 pub const PK_CLASS_mtopol: PK_CLASS_t = 123;
+
+// Lattice classes
+pub const PK_CLASS_lattice: PK_CLASS_t = 200;
+pub const PK_CLASS_lball: PK_CLASS_t = 201;
+pub const PK_CLASS_lrod: PK_CLASS_t = 202;
+
+// Frame class
+pub const PK_CLASS_frame: PK_CLASS_t = 0xe6;
+
+// =============================================================================
+// Unit vector type — same representation as PK_VECTOR_t but semantically normalised
+// =============================================================================
+
+pub type PK_VECTOR1_t = [c_double; 3];
+
+// =============================================================================
+// Scale factor type
+// =============================================================================
+
+pub type PK_scale_factor_t = c_double;
+
+// =============================================================================
+// Topology sense — direction relative to geometry
+// =============================================================================
+
+pub type PK_TOPOL_sense_t = c_int;
+pub const PK_TOPOL_sense_positive_c: PK_TOPOL_sense_t = 0;
+pub const PK_TOPOL_sense_negative_c: PK_TOPOL_sense_t = 1;
+
+// =============================================================================
+// Memory block — opaque transmit/receive buffer
+// =============================================================================
+
+/// Opaque memory block used by PK_PARTITION_transmit_b / PK_PART_transmit_b.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_MEMORY_block_t {
+    pub data: *mut u8,
+    pub length: c_int,
+    pub next: *mut PK_MEMORY_block_t,
+}
+
+// =============================================================================
+// Neutral sheet helper types
+// =============================================================================
+
+/// Pair of face sets for neutral sheet trimming.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_FACE_set_pair_t {
+    pub n_faces_1: c_int,
+    pub faces_1: *const PK_FACE_t,
+    pub n_faces_2: c_int,
+    pub faces_2: *const PK_FACE_t,
+}
+
+/// Error code from neutral sheet operations.
+pub type PK_neutral_error_t = c_int;
+
+/// Per-face causes array from neutral sheet trimming.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_FACE_neutral_causes_array_t {
+    pub n_causes: c_int,
+    pub causes: *mut c_int,
+}
+

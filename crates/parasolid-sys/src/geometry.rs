@@ -314,6 +314,46 @@ pub const PK_ERROR_bad_tolerance_c: PK_ERROR_code_t = 404;
 pub const PK_ERROR_edge_too_short: PK_ERROR_code_t = 405;
 
 // =============================================================================
+// Opaque options/result structs for geometry operations
+// =============================================================================
+
+/// Options for `PK_GEOM_copy`.
+#[repr(C)]
+pub struct PK_GEOM_copy_o_t { _private: [u8; 0] }
+
+/// Results from `PK_GEOM_copy`.
+#[repr(C)]
+pub struct PK_GEOM_copy_r_t { _private: [u8; 0] }
+
+/// Options for `PK_GEOM_enlarge`.
+#[repr(C)]
+pub struct PK_GEOM_enlarge_o_t { _private: [u8; 0] }
+
+/// Results from `PK_GEOM_enlarge`.
+#[repr(C)]
+pub struct PK_GEOM_enlarge_r_t { _private: [u8; 0] }
+
+/// Options for `PK_VECTOR_make_lsq_plane`.
+#[repr(C)]
+pub struct PK_VECTOR_make_lsq_plane_o_t { _private: [u8; 0] }
+
+/// Opaque result type for curve degeneracies.
+#[repr(C)]
+pub struct PK_CURVE_degens_t { _private: [u8; 0] }
+
+/// Opaque result type for curve self-intersections.
+#[repr(C)]
+pub struct PK_CURVE_self_ints_t { _private: [u8; 0] }
+
+/// Opaque result type for surface degeneracies.
+#[repr(C)]
+pub struct PK_SURF_degens_t { _private: [u8; 0] }
+
+/// Opaque result type for surface self-intersections.
+#[repr(C)]
+pub struct PK_SURF_self_ints_t { _private: [u8; 0] }
+
+// =============================================================================
 // extern "C" — Surface create/ask functions
 // =============================================================================
 
@@ -716,6 +756,105 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
+    // Geometry operations
+    // =========================================================================
+
+    /// Copy geometric entities with options.
+    pub fn PK_GEOM_copy(
+        n_geoms: c_int,
+        geoms: *const PK_GEOM_t,
+        options: *const PK_GEOM_copy_o_t,
+        copies: *mut PK_GEOM_copy_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Transform geometric entity.
+    pub fn PK_GEOM_transform(
+        in_geom: PK_GEOM_t,
+        transf: PK_TRANSF_t,
+        tolerance: c_double,
+        out_geom: *mut PK_GEOM_t,
+        exact: *mut PK_LOGICAL_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Delete single geometric entity.
+    pub fn PK_GEOM_delete_single(geom: PK_GEOM_t) -> PK_ERROR_code_t;
+
+    /// Enlarge geometries by scale factor.
+    pub fn PK_GEOM_enlarge(
+        n_geoms: c_int,
+        geoms: *const PK_GEOM_t,
+        transfs: *const PK_TRANSF_t,
+        factor: PK_scale_factor_t,
+        options: *const PK_GEOM_enlarge_o_t,
+        results: *mut PK_GEOM_enlarge_r_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Vector utilities
+    // =========================================================================
+
+    /// Least-squares plane fit to positions.
+    pub fn PK_VECTOR_make_lsq_plane(
+        n_positions: c_int,
+        positions: *const PK_VECTOR_t,
+        options: *const PK_VECTOR_make_lsq_plane_o_t,
+        plane: *mut PK_PLANE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create viewing transform from direction (deprecated).
+    pub fn PK_VECTOR_make_view_transf(
+        direct: PK_VECTOR1_t,
+        transf: *mut PK_TRANSF_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Compute perpendicular vector.
+    pub fn PK_VECTOR_perpendicular(
+        vector1: PK_VECTOR1_t,
+        vector2: PK_VECTOR_t,
+        perpendicular_vector: *mut PK_VECTOR1_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Foreign geometry
+    // =========================================================================
+
+    /// Create foreign curve from standard form.
+    pub fn PK_FCURVE_create(
+        fcurve_sf: *const PK_FCURVE_sf_t,
+        fcurve: *mut PK_FCURVE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create foreign surface from standard form.
+    pub fn PK_FSURF_create(
+        fsurf_sf: *const PK_FSURF_sf_t,
+        fsurf: *mut PK_FSURF_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Result-free functions
+    // =========================================================================
+
+    /// Free curve degeneracies result.
+    pub fn PK_CURVE_degens_f(
+        result: *mut PK_CURVE_degens_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Free curve self-intersections result.
+    pub fn PK_CURVE_self_ints_f(
+        result: *mut PK_CURVE_self_ints_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Free surface degeneracies result.
+    pub fn PK_SURF_degens_f(
+        result: *mut PK_SURF_degens_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Free surface self-intersections result.
+    pub fn PK_SURF_self_ints_f(
+        result: *mut PK_SURF_self_ints_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
     // Geometry attach/detach
     // =========================================================================
 
@@ -777,5 +916,21 @@ unsafe extern "C" {
         n_geoms: c_int,
         geoms: *const PK_GEOM_t,
     ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Result-free functions
+    // =========================================================================
+
+    /// Free results from `PK_GEOM_copy`.
+    pub fn PK_GEOM_copy_r_f(results: *mut PK_GEOM_copy_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_GEOM_enlarge`.
+    pub fn PK_GEOM_enlarge_r_f(results: *mut PK_GEOM_enlarge_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_VECTOR_make_lsq_plane`.
+    pub fn PK_VECTOR_make_lsq_plane_r_f(results: *mut PK_PLANE_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_SWEPT_ask`.
+    pub fn PK_SWEPT_ask_r_f(results: *mut PK_SWEPT_sf_t) -> PK_ERROR_code_t;
 
 }

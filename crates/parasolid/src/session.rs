@@ -12,7 +12,7 @@ use parasolid_sys::*;
 use crate::error::{PsError, PsResult};
 use crate::frustrum::{self, FrustrumConfig};
 use crate::memory::PkArray;
-use crate::partition::{Partition, RollbackResult};
+use crate::partition::{Partition, Pmark, RollbackResult};
 
 // =============================================================================
 // Singleton guard
@@ -34,6 +34,133 @@ pub enum Behaviour {
     /// Format: `MMmmpp` where `MM` = major, `mm` = minor, `pp` = patch.
     /// For example, `280103` means version 28.01.03.
     Version(i32),
+}
+
+// =============================================================================
+// SmpInfo
+// =============================================================================
+
+/// SMP configuration returned by [`Session::smp`].
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SmpInfo {
+    /// Thread format identifier returned by Parasolid.
+    pub thread_format: i32,
+    /// Number of SMP worker threads currently configured.
+    pub n_threads: i32,
+    /// Number of processors reported by the kernel.
+    pub n_processors: i32,
+}
+
+// =============================================================================
+// Mark
+// =============================================================================
+
+/// A session mark — a rollback checkpoint spanning all partitions.
+///
+/// Session marks are created with [`Session::create_mark`] and roll the entire
+/// session (all partitions) back to the state when the mark was set.
+///
+/// # Design note
+///
+/// `Mark` carries no session lifetime (`'s`), for the same reasons as
+/// [`Entity`](crate::Entity) and [`Partition`](crate::Partition): lifetime
+/// threading through returned values was deemed too ergonomically burdensome
+/// for v0.1. Using a mark tag after the session has stopped is a PK-level
+/// error caught by argument checking in dev builds. Revisit before v1.0.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct Mark {
+    tag: PK_MARK_t,
+}
+
+impl Mark {
+    /// Wrap a raw PK mark tag.
+    pub(crate) fn from_tag(tag: PK_MARK_t) -> Self {
+        Mark { tag }
+    }
+
+    /// Returns the raw PK tag for this mark.
+    #[inline]
+    pub fn tag(&self) -> i32 {
+        self.tag
+    }
+
+    /// Roll the session back to this mark.
+    pub fn goto(&self) -> PsResult<()> {
+        pk_call!(PK_MARK_goto(self.tag));
+        Ok(())
+    }
+
+    /// Roll the session back to this mark, tracking which entities changed.
+    pub fn goto_with_tracking(&self) -> PsResult<RollbackResult> {
+        let opts = PK_MARK_goto_2_o_t {
+            want_new_entities: PK_LOGICAL_true,
+            want_mod_entities: PK_LOGICAL_true,
+            want_del_entities: PK_LOGICAL_true,
+            want_logged_mod: PK_LOGICAL_false,
+            want_attrib_mod: PK_LOGICAL_false,
+            del_attrib_cb: None,
+            del_context: std::ptr::null_mut(),
+            n_del_attdefs: 0,
+            del_attdefs: std::ptr::null(),
+            n_new_entities_classes: 0,
+            new_entities_classes: std::ptr::null(),
+            n_mod_entities_classes: 0,
+            mod_entities_classes: std::ptr::null(),
+            n_del_entities_classes: 0,
+            del_entities_classes: std::ptr::null(),
+            no_roll_diff: PK_LOGICAL_false,
+        };
+        let mut result: PK_MARK_goto_2_r_t = unsafe { std::mem::zeroed() };
+        pk_call!(PK_MARK_goto_2(self.tag, &opts, &mut result));
+        let new_entities = unsafe { PkArray::from_raw(result.new_entities, result.n_new_entities) }
+            .iter()
+            .map(|&tag| crate::Entity::from_tag(tag))
+            .collect();
+        let modified_entities =
+            unsafe { PkArray::from_raw(result.mod_entities, result.n_mod_entities) }
+                .iter()
+                .map(|&tag| crate::Entity::from_tag(tag))
+                .collect();
+        let deleted_entities =
+            unsafe { PkArray::from_raw(result.del_entities, result.n_del_entities) }
+                .iter()
+                .map(|&tag| crate::Entity::from_tag(tag))
+                .collect();
+        Ok(RollbackResult {
+            new_entities,
+            modified_entities,
+            deleted_entities,
+        })
+    }
+
+    /// Delete this session mark.
+    pub fn delete(self) -> PsResult<()> {
+        pk_call!(PK_MARK_delete(self.tag));
+        Ok(())
+    }
+
+    /// Return the mark preceding this one in the session mark chain.
+    pub fn preceding(&self) -> PsResult<Mark> {
+        let mut tag: PK_MARK_t = 0;
+        pk_call!(PK_MARK_ask_preceding(self.tag, &mut tag));
+        Ok(Mark::from_tag(tag))
+    }
+
+    /// Return the mark following this one in the session mark chain.
+    pub fn following(&self) -> PsResult<Mark> {
+        let mut tag: PK_MARK_t = 0;
+        pk_call!(PK_MARK_ask_following(self.tag, &mut tag));
+        Ok(Mark::from_tag(tag))
+    }
+
+    /// Return the pmarks that would be current if this mark were rolled to.
+    pub fn pmarks(&self) -> PsResult<Vec<Pmark>> {
+        let mut n = 0;
+        let mut ptr = std::ptr::null_mut();
+        pk_call!(PK_MARK_ask_pmarks(self.tag, &mut n, &mut ptr));
+        let array = unsafe { PkArray::from_raw(ptr, n) };
+        Ok(array.iter().map(|&tag| Pmark::from_tag(tag)).collect())
+    }
 }
 
 // =============================================================================
@@ -413,8 +540,56 @@ impl Session {
         }
     }
 
-    /// Returns the SMP configuration as `(n_threads, n_processors)`.
-    pub fn smp(&self) -> PsResult<(i32, i32)> {
+    /// Returns whether self-intersection checking is enabled.
+    pub fn check_self_int(&self) -> PsResult<bool> {
+        let mut check: PK_LOGICAL_t = PK_LOGICAL_false;
+        pk_call!(PK_SESSION_ask_check_self_int(&mut check));
+        Ok(check == PK_LOGICAL_true)
+    }
+
+    /// Returns the continuity checking level (0 = none, 1 = G1, 2 = G1+G2).
+    pub fn check_continuity(&self) -> PsResult<i32> {
+        let mut level = 0;
+        pk_call!(PK_SESSION_ask_check_continuity(&mut level));
+        Ok(level)
+    }
+
+    /// Returns whether roll-forward capability is enabled.
+    pub fn roll_forward(&self) -> PsResult<bool> {
+        let mut is_on: PK_LOGICAL_t = PK_LOGICAL_false;
+        pk_call!(PK_SESSION_is_roll_forward_on(&mut is_on));
+        Ok(is_on == PK_LOGICAL_true)
+    }
+
+    /// Returns whether journaling is currently enabled.
+    pub fn journalling(&self) -> PsResult<bool> {
+        let mut enabled: PK_LOGICAL_t = PK_LOGICAL_false;
+        pk_call!(PK_SESSION_ask_journalling(&mut enabled));
+        Ok(enabled == PK_LOGICAL_true)
+    }
+
+    /// Returns the user-field byte length attached to every entity.
+    pub fn user_field_len(&self) -> PsResult<i32> {
+        let mut len = 0;
+        pk_call!(PK_SESSION_ask_user_field_len(&mut len));
+        Ok(len)
+    }
+
+    /// Returns the latest supported session behaviour version.
+    pub fn latest_behaviour(&self) -> PsResult<Behaviour> {
+        let mut beh = PK_SESSION_behaviour_t::default();
+        pk_call!(PK_SESSION_ask_latest_behaviour(&mut beh));
+        match beh.behaviour_type {
+            PK_SESSION_behave_as_latest_c => Ok(Behaviour::Latest),
+            PK_SESSION_behave_as_value_c => Ok(Behaviour::Version(beh.behaviour_value)),
+            other => Err(PsError::Session(format!(
+                "unknown behaviour type {other}"
+            ))),
+        }
+    }
+
+    /// Returns the SMP configuration.
+    pub fn smp(&self) -> PsResult<SmpInfo> {
         let mut thread_format = 0;
         let mut n_threads = 0;
         let mut n_processors = 0;
@@ -423,7 +598,29 @@ impl Session {
             &mut n_threads,
             &mut n_processors
         ));
-        Ok((n_threads, n_processors))
+        Ok(SmpInfo {
+            thread_format,
+            n_threads,
+            n_processors,
+        })
+    }
+
+    // =========================================================================
+    // Mark access
+    // =========================================================================
+
+    /// Create a session mark — checkpoints all partitions.
+    pub fn create_mark(&self) -> PsResult<Mark> {
+        let mut tag: PK_MARK_t = 0;
+        pk_call!(PK_MARK_create(&mut tag));
+        Ok(Mark::from_tag(tag))
+    }
+
+    /// Return the current session mark.
+    pub fn current_mark(&self) -> PsResult<Mark> {
+        let mut tag: PK_MARK_t = 0;
+        pk_call!(PK_SESSION_ask_mark(&mut tag));
+        Ok(Mark::from_tag(tag))
     }
 
     // =========================================================================

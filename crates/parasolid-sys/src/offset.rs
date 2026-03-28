@@ -530,6 +530,10 @@ impl Default for PK_EDGE_offset_on_body_o_t {
     }
 }
 
+/// Results from `PK_BODY_thicken_2`.
+#[repr(C)]
+pub struct PK_BODY_thicken_r_t { _private: [u8; 0] }
+
 // =============================================================================
 // Extern "C" function declarations
 // =============================================================================
@@ -667,5 +671,73 @@ unsafe extern "C" {
         back_default: c_double,
         tolerance: c_double,
         options: *const PK_BODY_thicken_o_t,
+    ) -> PK_ERROR_code_t;
+
+    // -------------------------------------------------------------------------
+    // Obsolete V1 offset/hollow/thicken functions
+    // -------------------------------------------------------------------------
+
+    /// Offset faces of solid/sheet body (obsolete V1).
+    pub fn PK_BODY_offset(
+        body: PK_BODY_t,
+        offset: c_double,
+        tolerance: c_double,
+        face_face_check: PK_LOGICAL_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Hollow solid body by offsetting all faces (obsolete V1).
+    pub fn PK_BODY_hollow(
+        body: PK_BODY_t,
+        offset: c_double,
+        tolerance: c_double,
+        face_face_check: PK_LOGICAL_t,
+        n_faces: *mut c_int,
+        old_faces: *mut *mut PK_FACE_t,
+        new_faces: *mut *mut PK_FACE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Thicken sheet body into solid (obsolete V1).
+    pub fn PK_BODY_thicken(
+        body: PK_BODY_t,
+        front: c_double,
+        back: c_double,
+        tolerance: c_double,
+        face_face_check: PK_LOGICAL_t,
+        n_topols: *mut c_int,
+        old_topols: *mut *mut PK_TOPOL_t,
+        new_topols: *mut *mut PK_TOPOL_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Thicken sheet body into solid (current V2).
+    pub fn PK_BODY_thicken_2(
+        body: PK_BODY_t,
+        front_default: c_double,
+        back_default: c_double,
+        tolerance: c_double,
+        options: *const PK_BODY_thicken_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_BODY_thicken_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Hollow body by offsetting specific faces (obsolete V1).
+    pub fn PK_FACE_hollow(
+        n_faces: c_int,
+        faces: *mut PK_FACE_t,
+        offsets: *mut c_double,
+        tolerance: c_double,
+        face_face_check: PK_LOGICAL_t,
+        new_faces: *mut PK_FACE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Hollow body by offsetting specific faces (current V2).
+    pub fn PK_FACE_hollow_2(
+        n_faces: c_int,
+        faces: *mut PK_FACE_t,
+        offsets: *mut c_double,
+        tolerance: c_double,
+        face_face_check: PK_LOGICAL_t,
+        n_new_faces: *mut c_int,
+        old_faces: *mut *mut PK_FACE_t,
+        new_faces: *mut *mut PK_FACE_t,
     ) -> PK_ERROR_code_t;
 }

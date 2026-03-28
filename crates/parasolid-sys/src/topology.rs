@@ -104,6 +104,14 @@ pub const PK_REGION_type_void_c: PK_REGION_type_t = 1;
 // =============================================================================
 
 // =============================================================================
+// Opaque options types for topology creation
+// =============================================================================
+
+/// Options for `PK_BODY_create_topology`.
+#[repr(C)]
+pub struct PK_BODY_create_topology_o_t { _private: [u8; 0] }
+
+// =============================================================================
 // Extern functions
 // =============================================================================
 
@@ -1028,5 +1036,93 @@ unsafe extern "C" {
     pub fn PK_EDGE_make_wire_body(
         edge: PK_EDGE_t,
         body: *mut PK_BODY_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create topology of a minimum body.
+    pub fn PK_BODY_create_minimum_topology(
+        n_topols: c_int,
+        classes: *const PK_CLASS_t,
+        n_relations: c_int,
+        parents: *const c_int,
+        children: *const c_int,
+        senses: *const PK_TOPOL_sense_t,
+        body: *mut PK_BODY_t,
+        topols: *mut PK_TOPOL_t,
+        fault: *mut PK_BODY_fault_t,
+        fault_index: *mut c_int,
+    ) -> PK_ERROR_code_t;
+
+    /// Create topology of a sheet body.
+    pub fn PK_BODY_create_sheet_topology(
+        n_topols: c_int,
+        classes: *const PK_CLASS_t,
+        n_relations: c_int,
+        parents: *const c_int,
+        children: *const c_int,
+        senses: *const PK_TOPOL_sense_t,
+        body: *mut PK_BODY_t,
+        topols: *mut PK_TOPOL_t,
+        fault: *mut PK_BODY_fault_t,
+        fault_index: *mut c_int,
+    ) -> PK_ERROR_code_t;
+
+    /// Create topology of a solid body.
+    pub fn PK_BODY_create_solid_topology(
+        n_topols: c_int,
+        classes: *const PK_CLASS_t,
+        n_relations: c_int,
+        parents: *const c_int,
+        children: *const c_int,
+        senses: *const PK_TOPOL_sense_t,
+        body: *mut PK_BODY_t,
+        topols: *mut PK_TOPOL_t,
+        fault: *mut PK_BODY_fault_t,
+        fault_index: *mut c_int,
+    ) -> PK_ERROR_code_t;
+
+    /// Create topology of a wire body.
+    pub fn PK_BODY_create_wire_topology(
+        n_topols: c_int,
+        classes: *const PK_CLASS_t,
+        n_relations: c_int,
+        parents: *const c_int,
+        children: *const c_int,
+        senses: *const PK_TOPOL_sense_t,
+        body: *mut PK_BODY_t,
+        topols: *mut PK_TOPOL_t,
+        fault: *mut PK_BODY_fault_t,
+        fault_index: *mut c_int,
+    ) -> PK_ERROR_code_t;
+
+    /// Create body topology with options.
+    pub fn PK_BODY_create_topology(
+        n_topols: c_int,
+        classes: *const PK_CLASS_t,
+        n_relations: c_int,
+        parents: *const c_int,
+        children: *const c_int,
+        senses: *const PK_TOPOL_sense_t,
+        options: *const PK_BODY_create_topology_o_t,
+        body: *mut PK_BODY_t,
+        topols: *mut PK_TOPOL_t,
+        fault: *mut PK_BODY_fault_t,
+        fault_index: *mut c_int,
+    ) -> PK_ERROR_code_t;
+
+    /// Transform body by transformation matrix.
+    pub fn PK_BODY_transform(
+        body: PK_BODY_t,
+        transf: PK_TRANSF_t,
+        tolerance: c_double,
+        n_replaces: *mut c_int,
+        replaces: *mut *mut PK_GEOM_t,
+        exact: *mut *mut PK_LOGICAL_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Return all frames belonging to a body.
+    pub fn PK_BODY_ask_frames(
+        body: PK_BODY_t,
+        n_frames: *mut c_int,
+        frames: *mut *mut PK_FRAME_t,
     ) -> PK_ERROR_code_t;
 }

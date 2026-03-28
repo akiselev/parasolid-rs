@@ -409,6 +409,70 @@ pub struct PK_BODY_topology_t {
 }
 
 // =============================================================================
+// Opaque options/result structs
+// =============================================================================
+
+/// Options for `PK_TOPOL_find_box_2`.
+#[repr(C)]
+pub struct PK_TOPOL_find_box_2_o_t { _private: [u8; 0] }
+
+/// Results from `PK_TOPOL_find_box_2`.
+#[repr(C)]
+pub struct PK_TOPOL_find_box_2_r_t { _private: [u8; 0] }
+
+/// Options for `PK_TOPOL_find_connected`.
+#[repr(C)]
+pub struct PK_TOPOL_find_connected_o_t { _private: [u8; 0] }
+
+/// Results from `PK_TOPOL_find_connected`.
+#[repr(C)]
+pub struct PK_TOPOL_find_connected_r_t { _private: [u8; 0] }
+
+/// Options for `PK_TOPOL_is_connected`.
+#[repr(C)]
+pub struct PK_TOPOL_is_connected_o_t { _private: [u8; 0] }
+
+/// Results from `PK_TOPOL_is_connected`.
+#[repr(C)]
+pub struct PK_TOPOL_is_connected_r_t { _private: [u8; 0] }
+
+/// Options for `PK_TOPOL_make_new`.
+#[repr(C)]
+pub struct PK_TOPOL_make_new_o_t { _private: [u8; 0] }
+
+/// Options for `PK_ENTITY_copy_2`.
+#[repr(C)]
+pub struct PK_ENTITY_copy_o_t { _private: [u8; 0] }
+
+/// Options for `PK_ENTITY_ask_description`.
+#[repr(C)]
+pub struct PK_ENTITY_ask_description_o_t { _private: [u8; 0] }
+
+/// Options for `PK_ENTITY_range`.
+#[repr(C)]
+pub struct PK_ENTITY_range_o_t { _private: [u8; 0] }
+
+/// Results from `PK_ENTITY_range`.
+#[repr(C)]
+pub struct PK_ENTITY_range_r_t { _private: [u8; 0] }
+
+/// Options for `PK_ENTITY_range_vector`.
+#[repr(C)]
+pub struct PK_ENTITY_range_vector_o_t { _private: [u8; 0] }
+
+/// Results from `PK_ENTITY_range_vector`.
+#[repr(C)]
+pub struct PK_ENTITY_range_vector_r_t { _private: [u8; 0] }
+
+/// Options for `PK_LOOP_offset_planar`.
+#[repr(C)]
+pub struct PK_LOOP_offset_planar_o_t { _private: [u8; 0] }
+
+/// Results from `PK_LOOP_offset_planar`.
+#[repr(C)]
+pub struct PK_LOOP_offset_planar_r_t { _private: [u8; 0] }
+
+// =============================================================================
 // FFI function declarations
 // =============================================================================
 
@@ -974,5 +1038,317 @@ unsafe extern "C" {
         options: *const PK_SURF_find_vectors_o_t,
         vectors: *mut c_double,
     ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Edge operations
+    // =========================================================================
+
+    /// Reverse edge and its geometry.
+    pub fn PK_EDGE_reverse(edge: PK_EDGE_t) -> PK_ERROR_code_t;
+
+    /// Compute distances between two edges (deprecated by _2).
+    pub fn PK_EDGE_find_deviation(
+        edge1: PK_EDGE_t,
+        edge2: PK_EDGE_t,
+        how_many: c_int,
+        n_distances: *mut c_int,
+        distances: *mut *mut c_double,
+        edge1_vecs: *mut *mut PK_VECTOR_t,
+        edge2_vecs: *mut *mut PK_VECTOR_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Test if position coincides with edge.
+    pub fn PK_EDGE_contains_vector(
+        edge: PK_EDGE_t,
+        vector: PK_VECTOR_t,
+        topol: *mut PK_TOPOL_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Find end positions and tangent directions of edge.
+    pub fn PK_EDGE_find_end_tangents(
+        edge: PK_EDGE_t,
+        start: *mut PK_VECTOR_t,
+        start_tangent: *mut PK_VECTOR_t,
+        end: *mut PK_VECTOR_t,
+        end_tangent: *mut PK_VECTOR_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Entity operations
+    // =========================================================================
+
+    /// Copy entity with tracking.
+    pub fn PK_ENTITY_copy_2(
+        entity: PK_ENTITY_t,
+        options: *const PK_ENTITY_copy_o_t,
+        entity_copy: *mut PK_ENTITY_t,
+        tracking: *mut PK_ENTITY_track_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Return textual description of entity internals.
+    pub fn PK_ENTITY_ask_description(
+        tag: c_int,
+        options: *const PK_ENTITY_ask_description_o_t,
+        description: *mut *mut std::os::raw::c_char,
+    ) -> PK_ERROR_code_t;
+
+    /// Min/max separation between two entity arrays.
+    pub fn PK_ENTITY_range(
+        n_entities_1: c_int,
+        entities_1: *const PK_ENTITY_t,
+        tf_1: *const PK_TRANSF_t,
+        n_entities_2: c_int,
+        entities_2: *const PK_ENTITY_t,
+        tf_2: *const PK_TRANSF_t,
+        options: *const PK_ENTITY_range_o_t,
+        results: *mut PK_ENTITY_range_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Min separation between entities and positions.
+    pub fn PK_ENTITY_range_vector(
+        n_entities: c_int,
+        entities: *const PK_ENTITY_t,
+        tf: *const PK_TRANSF_t,
+        n_vectors: c_int,
+        vectors: *const PK_VECTOR_t,
+        options: *const PK_ENTITY_range_vector_o_t,
+        results: *mut PK_ENTITY_range_vector_r_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Curve operations
+    // =========================================================================
+
+    /// Arc length over parametric interval.
+    pub fn PK_CURVE_find_length(
+        curve: PK_CURVE_t,
+        interval: PK_INTERVAL_t,
+        length: *mut c_double,
+        range: *mut PK_INTERVAL_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Check if PK vs KI parametrisation differs.
+    pub fn PK_CURVE_ask_parm_different(
+        curve: PK_CURVE_t,
+        different: *mut PK_LOGICAL_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Embed curve in surface parameter space.
+    pub fn PK_CURVE_embed_in_surf(
+        curve: PK_CURVE_t,
+        surf: PK_SURF_t,
+        n_spcurves: *mut c_int,
+        spcurves: *mut *mut PK_SPCURVE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create spcurve representation on surface.
+    pub fn PK_CURVE_make_spcurves(
+        curve: PK_CURVE_t,
+        range: PK_INTERVAL_t,
+        surf: PK_SURF_t,
+        degenerate: PK_LOGICAL_t,
+        sense: PK_LOGICAL_t,
+        tolerance: c_double,
+        n_spcurves: *mut c_int,
+        spcurves: *mut *mut PK_SPCURVE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create wire body from curve (obsolete, superseded by _2).
+    pub fn PK_CURVE_make_wire_body(
+        curve: PK_CURVE_t,
+        range: PK_INTERVAL_t,
+        body: *mut PK_BODY_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create reversed copy of curve.
+    pub fn PK_CURVE_make_curve_reversed(
+        curve: PK_CURVE_t,
+        reverse: *mut PK_CURVE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Convert PK parameter to KI parameter.
+    pub fn PK_CURVE_convert_parm_to_ki(
+        curve: PK_CURVE_t,
+        pk_t: c_double,
+        ki_t: *mut c_double,
+    ) -> PK_ERROR_code_t;
+
+    /// Convert KI parameter to PK parameter.
+    pub fn PK_CURVE_convert_parm_to_pk(
+        curve: PK_CURVE_t,
+        ki_t: c_double,
+        pk_t: *mut c_double,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Surface operations
+    // =========================================================================
+
+    /// Create offset surface.
+    pub fn PK_SURF_offset(
+        underlying_surf: PK_SURF_t,
+        offset_distance: c_double,
+        surf: *mut PK_SURF_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Evaluate surface points on rectangular parameter grid.
+    pub fn PK_SURF_eval_grid(
+        surf: PK_SURF_t,
+        n_u: c_int,
+        u: *const c_double,
+        n_v: c_int,
+        v: *const c_double,
+        n_u_derivs: c_int,
+        n_v_derivs: c_int,
+        triangular: PK_LOGICAL_t,
+        p: *mut PK_VECTOR_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create isocline curves on surface (obsolete).
+    pub fn PK_SURF_make_curves_isocline(
+        surf: PK_SURF_t,
+        uvbox: PK_UVBOX_t,
+        direction: PK_VECTOR1_t,
+        angle: c_double,
+        tolerance: c_double,
+        n_curves: *mut c_int,
+        curves: *mut *mut PK_CURVE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create curve at constant u parameter.
+    pub fn PK_SURF_make_curve_u_isoparam(
+        surf: PK_SURF_t,
+        param: c_double,
+        curve: *mut PK_CURVE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create curve at constant v parameter.
+    pub fn PK_SURF_make_curve_v_isoparam(
+        surf: PK_SURF_t,
+        param: c_double,
+        curve: *mut PK_CURVE_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Topology operations
+    // =========================================================================
+
+    /// Axis-aligned bounding box with per-topology boxes.
+    pub fn PK_TOPOL_find_box_2(
+        n_topols: c_int,
+        topols: *const PK_TOPOL_t,
+        transfs: *const PK_TRANSF_t,
+        options: *const PK_TOPOL_find_box_2_o_t,
+        results: *mut PK_TOPOL_find_box_2_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Find all connected topologies.
+    pub fn PK_TOPOL_find_connected(
+        n_topols: c_int,
+        topols: *const PK_TOPOL_t,
+        options: *const PK_TOPOL_find_connected_o_t,
+        results: *mut PK_TOPOL_find_connected_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Test mutual connectivity of topologies.
+    pub fn PK_TOPOL_is_connected(
+        n_topols: c_int,
+        topols: *const PK_TOPOL_t,
+        options: *const PK_TOPOL_is_connected_o_t,
+        results: *mut PK_TOPOL_is_connected_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Replace topology with new tag (strips attributes/groups).
+    pub fn PK_TOPOL_make_new(
+        topol: PK_TOPOL_t,
+        options: *const PK_TOPOL_make_new_o_t,
+        new_topol: *mut PK_TOPOL_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Filter entities by class and attribute ownership.
+    pub fn PK_TOPOL_ask_entities_by_attdef(
+        topol: PK_TOPOL_t,
+        class: PK_CLASS_t,
+        have_attrib: PK_LOGICAL_t,
+        attdef: PK_ATTDEF_t,
+        n_entities: *mut c_int,
+        entities: *mut *mut PK_ENTITY_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Find frames on a topology entity.
+    pub fn PK_TOPOL_find_frames(
+        topol: PK_TOPOL_t,
+        n_frames: *mut c_int,
+        frames: *mut *mut PK_FRAME_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Imprint frames onto topology entities.
+    pub fn PK_TOPOL_imprint_frames(
+        n_topols: c_int,
+        topols: *const PK_TOPOL_t,
+        options: *mut c_int,
+        results: *mut c_int,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // SP-curve operations
+    // =========================================================================
+
+    /// Approximate evaluation of surface-parametric curve.
+    pub fn PK_SPCURVE_eval_approx(
+        spcurve: PK_SPCURVE_t,
+        t: c_double,
+        n_derivs: c_int,
+        p_derivs: *mut PK_VECTOR_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Query polyline standard form.
+    pub fn PK_PLINE_ask(
+        pline: PK_PLINE_t,
+        pline_sf: *mut PK_PLINE_sf_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Loop operations
+    // =========================================================================
+
+    /// Offset planar loop by distance.
+    pub fn PK_LOOP_offset_planar(
+        loop_: PK_LOOP_t,
+        distance: c_double,
+        options: *const PK_LOOP_offset_planar_o_t,
+        results: *mut PK_LOOP_offset_planar_r_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Result-free functions
+    // =========================================================================
+
+    /// Free results from `PK_TOPOL_find_box_2`.
+    pub fn PK_TOPOL_find_box_2_r_f(results: *mut PK_TOPOL_find_box_2_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_TOPOL_find_connected`.
+    pub fn PK_TOPOL_find_connected_r_f(results: *mut PK_TOPOL_find_connected_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_TOPOL_is_connected`.
+    pub fn PK_TOPOL_is_connected_r_f(results: *mut PK_TOPOL_is_connected_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_TOPOL_make_new`.
+    pub fn PK_TOPOL_make_new_r_f(results: *mut c_int) -> PK_ERROR_code_t;
+
+    /// Free topology tracking results.
+    pub fn PK_TOPOL_track_r_f(results: *mut PK_TOPOL_track_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_ENTITY_range`.
+    pub fn PK_ENTITY_range_r_f(results: *mut PK_ENTITY_range_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_ENTITY_range_vector`.
+    pub fn PK_ENTITY_range_vector_r_f(results: *mut PK_ENTITY_range_vector_r_t) -> PK_ERROR_code_t;
+
+    /// Free entity description string.
+    pub fn PK_ENTITY_ask_description_r_f(description: *mut *mut std::os::raw::c_char) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_LOOP_offset_planar`.
+    pub fn PK_LOOP_offset_planar_r_f(results: *mut PK_LOOP_offset_planar_r_t) -> PK_ERROR_code_t;
 
 }

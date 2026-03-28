@@ -1214,6 +1214,90 @@ pub const PK_ERROR_failed_to_change: PK_ERROR_code_t = 603;
 // =============================================================================
 
 // =============================================================================
+// Opaque options/result types for editing operations
+// =============================================================================
+
+/// Options for `PK_BODY_create_implicit`.
+#[repr(C)]
+pub struct PK_BODY_create_implicit_o_t { _private: [u8; 0] }
+
+/// Results from `PK_BODY_create_implicit`.
+#[repr(C)]
+pub struct PK_BODY_create_implicit_r_t { _private: [u8; 0] }
+
+/// Options for `PK_BODY_is_cellular`.
+#[repr(C)]
+pub struct PK_BODY_is_cellular_o_t { _private: [u8; 0] }
+
+/// Results from `PK_BODY_is_cellular`.
+#[repr(C)]
+pub struct PK_BODY_is_cellular_r_t { _private: [u8; 0] }
+
+/// Options for `PK_BODY_is_disjoint`.
+#[repr(C)]
+pub struct PK_BODY_is_disjoint_o_t { _private: [u8; 0] }
+
+/// Results from `PK_BODY_is_disjoint`.
+#[repr(C)]
+pub struct PK_BODY_is_disjoint_r_t { _private: [u8; 0] }
+
+/// Options for `PK_BODY_enlarge`.
+#[repr(C)]
+pub struct PK_BODY_enlarge_o_t { _private: [u8; 0] }
+
+/// Results from `PK_BODY_enlarge`.
+#[repr(C)]
+pub struct PK_BODY_enlarge_r_t { _private: [u8; 0] }
+
+/// Options for `PK_BODY_slice`.
+#[repr(C)]
+pub struct PK_BODY_slice_o_t { _private: [u8; 0] }
+
+/// Results from `PK_BODY_slice`.
+#[repr(C)]
+pub struct PK_BODY_slice_r_t { _private: [u8; 0] }
+
+/// Options for `PK_BODY_make_patterned`.
+#[repr(C)]
+pub struct PK_BODY_make_patterned_o_t { _private: [u8; 0] }
+
+/// Results from `PK_BODY_make_patterned`.
+#[repr(C)]
+pub struct PK_BODY_make_patterned_r_t { _private: [u8; 0] }
+
+/// Options for `PK_FACE_make_valid_faces`.
+#[repr(C)]
+pub struct PK_FACE_make_valid_faces_o_t { _private: [u8; 0] }
+
+/// Results from `PK_FACE_make_valid_faces`.
+#[repr(C)]
+pub struct PK_FACE_make_valid_faces_r_t { _private: [u8; 0] }
+
+/// Options for `PK_FACE_repair`.
+#[repr(C)]
+pub struct PK_FACE_repair_o_t { _private: [u8; 0] }
+
+/// Options for `PK_FACE_fix_mesh_defects`.
+#[repr(C)]
+pub struct PK_FACE_fix_mesh_defects_o_t { _private: [u8; 0] }
+
+/// Results from `PK_FACE_fix_mesh_defects`.
+#[repr(C)]
+pub struct PK_FACE_fix_mesh_defects_r_t { _private: [u8; 0] }
+
+/// Tracking results for entity operations.
+#[repr(C)]
+pub struct PK_ENTITY_track_r_t { _private: [u8; 0] }
+
+/// Options for `PK_REGION_embed_body`.
+#[repr(C)]
+pub struct PK_REGION_embed_body_o_t { _private: [u8; 0] }
+
+/// Results from `PK_REGION_embed_body`.
+#[repr(C)]
+pub struct PK_REGION_embed_body_r_t { _private: [u8; 0] }
+
+// =============================================================================
 // Extern function declarations
 // =============================================================================
 
@@ -1617,5 +1701,191 @@ unsafe extern "C" {
         n_new_edges: *mut c_int,
         new_edges: *mut *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Body query and creation (implicit/cellular/disjoint/enlarge/slice/pattern)
+    // =========================================================================
+
+    /// Create implicit/procedural body.
+    pub fn PK_BODY_create_implicit(
+        options: *const PK_BODY_create_implicit_o_t,
+        results: *mut PK_BODY_create_implicit_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Query whether body has cellular structure.
+    pub fn PK_BODY_is_cellular(
+        body: PK_BODY_t,
+        options: *const PK_BODY_is_cellular_o_t,
+        results: *mut PK_BODY_is_cellular_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Query whether body contains disjoint shells.
+    pub fn PK_BODY_is_disjoint(
+        body: PK_BODY_t,
+        options: *const PK_BODY_is_disjoint_o_t,
+        results: *mut PK_BODY_is_disjoint_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Scale body by factor with transform.
+    pub fn PK_BODY_enlarge(
+        body: PK_BODY_t,
+        factor: PK_scale_factor_t,
+        transf: PK_TRANSF_t,
+        tolerance: c_double,
+        options: *const PK_BODY_enlarge_o_t,
+        returns: *mut PK_BODY_enlarge_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Slice body with sheet tool.
+    pub fn PK_BODY_slice(
+        body: PK_BODY_t,
+        tool: PK_BODY_t,
+        options: *const PK_BODY_slice_o_t,
+        results: *mut PK_BODY_slice_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create patterned lattice-like mesh body from facet body.
+    pub fn PK_BODY_make_patterned(
+        body: PK_BODY_t,
+        tolerance: c_double,
+        options: *const PK_BODY_make_patterned_o_t,
+        results: *mut PK_BODY_make_patterned_r_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Face operations
+    // =========================================================================
+
+    /// Delete faces and repair holes.
+    pub fn PK_FACE_delete(
+        n_faces: c_int,
+        faces: *const PK_FACE_t,
+        heal_action: PK_FACE_heal_t,
+        loops_independent: PK_LOGICAL_t,
+        local_check: PK_LOGICAL_t,
+        n_bodies: *mut c_int,
+        bodies: *mut *mut PK_BODY_t,
+        check_results: *mut *mut PK_local_check_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create neutral sheet from two faces.
+    pub fn PK_FACE_make_neutral_sheet(
+        faces: *const PK_FACE_t,
+        placement: c_double,
+        neutral_sheet: *mut PK_BODY_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Repair invalid face.
+    pub fn PK_FACE_repair(
+        face: PK_FACE_t,
+        options: *const PK_FACE_repair_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create valid face topology from faces.
+    pub fn PK_FACE_make_valid_faces(
+        n_faces: c_int,
+        faces: *const PK_FACE_t,
+        options: *const PK_FACE_make_valid_faces_o_t,
+        results: *mut PK_FACE_make_valid_faces_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create sheet body from faces.
+    pub fn PK_FACE_make_sheet_body(
+        n_faces: c_int,
+        faces: *const PK_FACE_t,
+        body: *mut PK_BODY_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Fix mesh defects on facet faces.
+    pub fn PK_FACE_fix_mesh_defects(
+        n_faces: c_int,
+        faces: *const PK_FACE_t,
+        options: *const PK_FACE_fix_mesh_defects_o_t,
+        tracking: *mut PK_ENTITY_track_r_t,
+        results: *mut PK_FACE_fix_mesh_defects_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Replace face surfaces with isocline surfaces.
+    pub fn PK_FACE_install_surfs_isocline(
+        n_faces: c_int,
+        faces: *const PK_FACE_t,
+        references: *const PK_ENTITY_t,
+        direction: PK_VECTOR1_t,
+        angle: c_double,
+        tolerance: c_double,
+        face_face_check: PK_LOGICAL_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Trim neutral sheets by face-set pairs.
+    pub fn PK_BODY_trim_neutral_sheets(
+        body: PK_BODY_t,
+        n_pairs: c_int,
+        pairs: *const PK_FACE_set_pair_t,
+        tol: c_double,
+        neutral_sheets: *mut PK_BODY_t,
+        errors: *mut PK_neutral_error_t,
+        causes: *mut PK_FACE_neutral_causes_array_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Region operations
+    // =========================================================================
+
+    /// Imprint curve onto region.
+    pub fn PK_REGION_imprint_curve(
+        region: PK_REGION_t,
+        curve: PK_CURVE_t,
+        bounds: PK_INTERVAL_t,
+        n_new_edges: *mut c_int,
+        new_edges: *mut *mut PK_EDGE_t,
+        n_new_faces: *mut c_int,
+        new_faces: *mut *mut PK_FACE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Embed body into region (cellular topology).
+    pub fn PK_REGION_embed_body(
+        region: PK_REGION_t,
+        body: PK_BODY_t,
+        options: *const PK_REGION_embed_body_o_t,
+        results: *mut PK_REGION_embed_body_r_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Result-free functions
+    // =========================================================================
+
+    /// Free results from `PK_BODY_create_implicit`.
+    pub fn PK_BODY_create_implicit_r_f(results: *mut PK_BODY_create_implicit_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_BODY_is_cellular`.
+    pub fn PK_BODY_is_cellular_r_f(results: *mut PK_BODY_is_cellular_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_BODY_is_disjoint`.
+    pub fn PK_BODY_is_disjoint_r_f(results: *mut PK_BODY_is_disjoint_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_BODY_enlarge`.
+    pub fn PK_BODY_enlarge_r_f(results: *mut PK_BODY_enlarge_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_BODY_slice`.
+    pub fn PK_BODY_slice_r_f(results: *mut PK_BODY_slice_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_BODY_make_patterned`.
+    pub fn PK_BODY_make_patterned_r_f(results: *mut PK_BODY_make_patterned_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_FACE_make_valid_faces`.
+    pub fn PK_FACE_make_valid_faces_r_f(results: *mut PK_FACE_make_valid_faces_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_FACE_fix_mesh_defects`.
+    pub fn PK_FACE_fix_mesh_defects_r_f(results: *mut PK_FACE_fix_mesh_defects_r_t) -> PK_ERROR_code_t;
+
+    /// Free entity tracking results.
+    pub fn PK_ENTITY_copy_r_f(results: *mut PK_ENTITY_track_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_REGION_embed_body`.
+    pub fn PK_REGION_embed_body_r_f(results: *mut PK_REGION_embed_body_r_t) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_BODY_thicken_2`.
+    pub fn PK_BODY_thicken_r_f(results: *mut PK_BODY_thicken_r_t) -> PK_ERROR_code_t;
 
 }
