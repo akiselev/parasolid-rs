@@ -1,0 +1,1993 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Geometry</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Geometry</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.017.html">Session And Local Precision</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.019.html">B-Curves And B-Surfaces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-395619">17.1	Introduction </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-309652">17.2	Standard forms </A>
+<UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-341031">17.2.1	B-curve </A>
+<UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-611384">17.2.1.1	PK_BCURVE_sf_t </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-611440">17.2.1.2	PK_BCURVE_piecewise_sf_t </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-611512">17.2.1.3	PK_BCURVE_splinewise_sf_t </A>
+</UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-325869">17.2.2	Blendsf </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-309934">17.2.3	B-surface </A>
+<UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-611570">17.2.3.1	PK_BSURF_sf_t </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-611636">17.2.3.2	PK_BSURF_piecewise_sf_t </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-611687">17.2.3.3	PK_BSURF_splinewise_sf_t </A>
+</UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-309940">17.2.4	Circle </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-325454">17.2.5	Cone </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-309956">17.2.6	Cylinder </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-309962">17.2.7	Ellipse </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-309968">17.2.8	Line </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-326312">17.2.9	Plane </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-326255">17.2.10	Point </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-501396">17.2.11	SP-curve </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-326198">17.2.12	Sphere </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-326158">17.2.13	Spun surface </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-326117">17.2.14	Swept surface </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-326084">17.2.15	Torus </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-310008">17.2.16	Trimmed curve </A>
+</UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-310139">17.3	Parameterisation information </A>
+<UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-297763">17.3.1	Curve parameterisations </A>
+<UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-310280">17.3.1.1	Straight Line </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-310395">17.3.1.2	Circle </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-310559">17.3.1.3	Ellipse </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-298099">17.3.1.4	B-curve </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-298111">17.3.1.5	Intersection curve </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-500734">17.3.1.6	SP-curves </A>
+</UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-298124">17.3.2	Surface parameterisation </A>
+<UL>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-310773">17.3.2.1	Plane </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-310961">17.3.2.2	Cylinder </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-311131">17.3.2.3	Cone </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-298574">17.3.2.4	Torus </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-311204">17.3.2.5	Sphere </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-311395">17.3.2.6	Rolling-ball blend </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-311435">17.3.2.7	Swept surface </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-311541">17.3.2.8	Spun surface </A>
+<LI> <A HREF="fd_chap.018.html#50422087_pgfId-299498">17.3.2.9	B-surface </A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422087_pgfId-395619"></A>17.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422087_pgfId-338197"></A>The main purpose of geometric entities is when attached to a topological entity. </P>
+<P>
+<A NAME="50422087_pgfId-340954"></A>Geometry can be:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-338199"></A>Attached to sub-topology within a body which specifies the shape and boundaries of a body</LI>
+<LI>
+<A NAME="50422087_pgfId-338200"></A>Associated with a body or assembly directly as construction geometry</LI>
+<LI>
+<A NAME="50422087_pgfId-338201"></A>Orphan, that is not attached to any topological entity.</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-338205"></A>See <A HREF="fd_chap.015.html#50422084_32491">Section 14.3, “Geometric entities”</A> for more information on the types of geometry.</P>
+<P>
+<A NAME="50422087_pgfId-338206"></A>There are four classes of geometric entity:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-329720"></A>Lattice (PK_CLASS_lattice). See <A HREF="fd_chap.015.html#50422084_11812">Section 14.3.1, “Lattice”</A> for more information.</LI>
+<LI>
+<A NAME="50422087_pgfId-578957"></A>Surface (PK_CLASS_surf). This entity has more specialized classes defined. See section <A HREF="fd_chap.015.html#50422084_55912">Section 14.3.2, “Surface”</A> for more information.</LI>
+<LI>
+<A NAME="50422087_pgfId-318542"></A>Curve (PK_CLASS_curve). This entity has more specialized classes defined. See <A HREF="fd_chap.015.html#50422084_75947">Section 14.3.3, “Curve”</A>for more information.</LI>
+<LI>
+<A NAME="50422087_pgfId-308211"></A>Point (PK_CLASS_point). See <A HREF="fd_chap.015.html#50422084_79655">Section 14.3.4, “Point”</A> for more information. </LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-309502"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-109.gif">
+
+<P>
+<A NAME="50422087_pgfId-338311"></A>Figure 17-1 The GEOM class and its subclasses</P>
+<P>
+<A NAME="50422087_pgfId-338312"></A>Geometric entities can be shared within a single body and in some cases between bodies. See <A HREF="fd_chap.015.html#50422084_96222">Section 14.3.5, “Geometry sharing”</A> and <A HREF="fd_chap.016.html#50422085_29983">Section 15.12, “Compound bodies”</A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309587"></A>Parasolid supports nominal geometry, which is a mechanism by which edges with local precision may reference a notional accurate curve. See <A HREF="fd_chap.020.html#50422089_36760">Chapter 19, “Nominal Geometry”</A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309591"></A>B-curves and B-surfaces are fully integrated into Parasolid so you can attach them to edges and faces and apply any relevant Parasolid operation to them just as you would any other type of curve or surface. See <A HREF="fd_chap.019.html#50422088_13353">Chapter 18, “B-Curves And B-Surfaces”</A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-383981"></A>For a mathematical description of B-curves and B-surfaces See <A HREF="fd_chap.124.html#50422207_12301">Chapter B, “The Mathematical Form Of B-Geometry”</A>. </P>
+<P>
+<A NAME="50422087_pgfId-383983"></A>The following functions are used to attach geometry to edges, fins, faces and vertices:</P>
+<P>
+<A NAME="50422087_pgfId-384017"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-383986"></A>Attach functions </P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-383988"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-383990"></A><A HREF=../headers/pk_edge_attach_curve_nmnl.html>PK_EDGE_attach_curve_nmnl</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-383992"></A>Attaches curves to edges as nominal curves</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-383994"></A><A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-383996"></A>Attaches curves to edges</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-383998"></A><A HREF=../headers/pk_face_attach_surf_fitting.html>PK_FACE_attach_surf_fitting</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384000"></A>Creates a surface to fit and attach to a face</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384002"></A><A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384004"></A>Attaches surfaces to faces</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384006"></A><A HREF=../headers/pk_fin_attach_curves.html>PK_FIN_attach_curves</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384008"></A>Attaches curves to fins</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384185"></A><A HREF=../headers/pk_part_add_geoms.html>PK_PART_add_geoms</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384187"></A>Adds geometry to the construction geometry of a part</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384010"></A><A HREF=../headers/pk_vertex_attach_points.html>PK_VERTEX_attach_points</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384012"></A>Attaches points to vertices</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422087_pgfId-383056"></A>The following functions are used to detach geometry:</P>
+<P>
+<A NAME="50422087_pgfId-382306"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-382336"></A>Detach functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-382338"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-382340"></A><A HREF=../headers/pk_edge_detach_curve_nmnl.html>PK_EDGE_detach_curve_nmnl</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-382342"></A>Detaches a nominal curve from a tolerant edge if one is present</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384201"></A><A HREF=../headers/pk_part_remove_geoms.html>PK_PART_remove_geoms</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-384203"></A>Removes any geometry that is also in the <CODE>
+geoms</CODE>
+ array from the construction geometry of a part</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-382344"></A><A HREF=../headers/pk_topol_detach_geom.html>PK_TOPOL_detach_geom</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-382346"></A>Detaches geometry from topology</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422087_pgfId-384033"></A>You can also replace the existing geometry of a face using either <A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> or the <CODE>
+replace</CODE>
+ operation in <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>.</P>
+<P>
+<A NAME="50422087_pgfId-381930"></A>This chapter discusses the following:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-381720"></A>Standard formats used in Parasolid, see <A HREF="fd_chap.018.html#50422087_45701">Section 17.2, “Standard forms”</A>.</LI>
+<LI>
+<A NAME="50422087_pgfId-309607"></A>Curve parameterisations, see <A HREF="fd_chap.018.html#50422087_62660">Section 17.3.1, “Curve parameterisations”</A></LI>
+<LI>
+<A NAME="50422087_pgfId-309611"></A>Surface parameterisations, see <A HREF="fd_chap.018.html#50422087_47811">Section 17.3.2, “Surface parameterisation”</A></LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-395312"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-395042"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-395027"></A><A HREF="fd_chap.015.html#50422084_32491">Section 14.3, “Geometric entities”</A></LI>
+<LI>
+<A NAME="50422087_pgfId-395059"></A><A HREF="fd_chap.019.html#50422088_13353">Chapter 18, “B-Curves And B-Surfaces”</A></LI>
+<LI>
+<A NAME="50422087_pgfId-395076"></A><A HREF="fd_chap.020.html#50422089_36760">Chapter 19, “Nominal Geometry”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422087_pgfId-309652"></A>17.2	<A NAME="50422087_45701"></A>Standard forms 
+
+
+</H1>
+<P>
+<A NAME="50422087_pgfId-309656"></A>This section describes the standard forms of classic geometry that are used in Parasolid. Standard forms are ways of describing geometric information in a standard way for communication with applications. </P>
+<P>
+<A NAME="50422087_pgfId-320497"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422087_pgfId-320537"></A>Note: The application is responsible for allocating the space for the standard form, but it does not need to initialise any of the fields.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422087_pgfId-309657"></A>The following table lists the standard forms of geometry and what functions they are used in.</P>
+<P>
+<A NAME="50422087_pgfId-406287"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309685"></A>Standard form:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309687"></A>Describes:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309689"></A>Used in:</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309691"></A><A HREF=../headers/pk_bcurve_sf_t.html>PK_BCURVE_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309693"></A>B-curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309695"></A><A HREF=../headers/pk_bcurve_ask.html>PK_BCURVE_ask</A> and <A HREF=../headers/pk_bcurve_create.html>PK_BCURVE_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-609923"></A><A HREF=../headers/pk_bcurve_piecewise_sf_t.html>PK_BCURVE_piecewise_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-609925"></A>Piecewise b-curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-609927"></A><A HREF=../headers/pk_bcurve_ask_piecewise.html>PK_BCURVE_ask_piecewise</A> and <A HREF=../headers/pk_bcurve_create_piecewise.html>PK_BCURVE_create_piecewise</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-608973"></A><A HREF=../headers/pk_bcurve_splinewise_sf_t.html>PK_BCURVE_splinewise_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-608975"></A>Splinewise b-curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-608977"></A><A HREF=../headers/pk_bcurve_ask_splinewise.html>PK_BCURVE_ask_splinewise</A> and <A HREF=../headers/pk_bcurve_create_splinewise.html>PK_BCURVE_create_splinewise</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309697"></A><A HREF=../headers/pk_blendsf_sf_t.html>PK_BLENDSF_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309699"></A>Rolling ball blend surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309701"></A><A HREF=../headers/pk_blendsf_ask.html>PK_BLENDSF_ask</A> </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309703"></A><A HREF=../headers/pk_bsurf_sf_t.html>PK_BSURF_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309705"></A>B-surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309707"></A><A HREF=../headers/pk_bsurf_ask.html>PK_BSURF_ask</A> and <A HREF=../headers/pk_bsurf_create.html>PK_BSURF_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-610051"></A><A HREF=../headers/pk_bsurf_piecewise_sf_t.html>PK_BSURF_piecewise_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-610053"></A>Piecewise b-surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-610055"></A><A HREF=../headers/pk_bsurf_ask_piecewise.html>PK_BSURF_ask_piecewise</A> and <A HREF=../headers/pk_bsurf_create_piecewise.html>PK_BSURF_create_piecewise</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-609476"></A><A HREF=../headers/pk_bsurf_splinewise_sf_t.html>PK_BSURF_splinewise_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-609478"></A>Splinewise b-surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-609480"></A><A HREF=../headers/pk_bsurf_ask_splinewise.html>PK_BSURF_ask_splinewise</A> and <A HREF=../headers/pk_bsurf_create_splinewise.html>PK_BSURF_create_splinewise</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309709"></A><A HREF=../headers/pk_circle_sf_t.html>PK_CIRCLE_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309711"></A>Circle</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309713"></A><A HREF=../headers/pk_circle_ask.html>PK_CIRCLE_ask</A> and <A HREF=../headers/pk_circle_create.html>PK_CIRCLE_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309715"></A><A HREF=../headers/pk_cone_sf_t.html>PK_CONE_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309717"></A>Cone</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309719"></A><A HREF=../headers/pk_cone_ask.html>PK_CONE_ask</A> and <A HREF=../headers/pk_cone_create.html>PK_CONE_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309721"></A><A HREF=../headers/pk_cyl_sf_t.html>PK_CYL_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309723"></A>Cylinder</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309725"></A><A HREF=../headers/pk_cyl_ask.html>PK_CYL_ask</A> and <A HREF=../headers/pk_cyl_create.html>PK_CYL_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309727"></A><A HREF=../headers/pk_ellipse_sf_t.html>PK_ELLIPSE_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309729"></A>Ellipse</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309731"></A><A HREF=../headers/pk_ellipse_ask.html>PK_ELLIPSE_ask</A> and <A HREF=../headers/pk_ellipse_create.html>PK_ELLIPSE_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309733"></A><A HREF=../headers/pk_line_sf_t.html>PK_LINE_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309735"></A>Line</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309737"></A><A HREF=../headers/pk_line_ask.html>PK_LINE_ask</A> and <A HREF=../headers/pk_line_create.html>PK_LINE_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309739"></A><A HREF=../headers/pk_plane_sf_t.html>PK_PLANE_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309741"></A>Plane</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309743"></A><A HREF=../headers/pk_plane_ask.html>PK_PLANE_ask</A> and <A HREF=../headers/pk_plane_create.html>PK_PLANE_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309745"></A><A HREF=../headers/pk_point_sf_t.html>PK_POINT_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309747"></A>Point</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309749"></A><A HREF=../headers/pk_point_ask.html>PK_POINT_ask</A> and <A HREF=../headers/pk_point_create.html>PK_POINT_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-501940"></A><A HREF=../headers/pk_spcurve_sf_t.html>PK_SPCURVE_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-501942"></A>SP-curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-501944"></A><A HREF=../headers/pk_spcurve_ask.html>PK_SPCURVE_ask</A> and <A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309751"></A><A HREF=../headers/pk_sphere_sf_t.html>PK_SPHERE_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309753"></A>Sphere</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309755"></A><A HREF=../headers/pk_sphere_ask.html>PK_SPHERE_ask</A> and <A HREF=../headers/pk_sphere_create.html>PK_SPHERE_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309757"></A><A HREF=../headers/pk_spun_sf_t.html>PK_SPUN_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309759"></A>Spun surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309761"></A><A HREF=../headers/pk_spun_ask.html>PK_SPUN_ask</A> and <A HREF=../headers/pk_spun_create.html>PK_SPUN_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309763"></A><A HREF=../headers/pk_swept_sf_t.html>PK_SWEPT_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309765"></A>Swept surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309767"></A><A HREF=../headers/pk_swept_ask.html>PK_SWEPT_ask</A> and <A HREF=../headers/pk_swept_create.html>PK_SWEPT_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309769"></A><A HREF=../headers/pk_torus_sf_t.html>PK_TORUS_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309771"></A>Torus</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309773"></A><A HREF=../headers/pk_torus_ask.html>PK_TORUS_ask</A> and <A HREF=../headers/pk_torus_create.html>PK_TORUS_create</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309781"></A><A HREF=../headers/pk_trcurve_sf_t.html>PK_TRCURVE_sf_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309783"></A>Trimmed curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-309785"></A><A HREF=../headers/pk_trcurve_ask.html>PK_TRCURVE_ask</A> </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422087_pgfId-309786"></A>Standard forms are also used in Convergent Modeling. See <A HREF="fd_chap.085.html#50422162_95174">Section 84.4.1, “Creating bodies from a mesh”</A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-341030"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422087_pgfId-341029"></A>Note: An intersection curve is a type of curve of the class PK_CLASS_icurve. These curves do not have a standard form. These curves are created when surfaces are intersected and the intersection cannot be represented by one of the analytic curves. See <A HREF="fd_chap.018.html#50422087_15438">Section 17.3.1.5, “Intersection curve”</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422087_pgfId-341031"></A>	17.2.1 	<A NAME="50422087_47573"></A>B-curve </H3>
+
+<H4>
+<A NAME="50422087_pgfId-611384"></A>17.2.1.1 <A HREF=../headers/pk_bcurve_sf_t.html>PK_BCURVE_sf_t</A> </H4>
+<P>
+<A NAME="50422087_pgfId-341032"></A><A HREF=../headers/pk_bcurve_sf_t.html>PK_BCURVE_sf_t</A> is the standard form of a b-curve. It contains fields to specify:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-608546"></A>the vertices,</LI>
+<LI>
+<A NAME="50422087_pgfId-608564"></A>the knot sets, </LI>
+<LI>
+<A NAME="50422087_pgfId-608582"></A>the shape of the b-curve and </LI>
+<LI>
+<A NAME="50422087_pgfId-608595"></A>whether the surface is periodic, closed or self intersecting. </LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-608608"></A><A HREF=../headers/pk_bcurve_ask.html>PK_BCURVE_ask</A> returns the standard form for a b-curve. <A HREF=../headers/pk_bcurve_create.html>PK_BCURVE_create</A> uses the standard form to create a b-curve. See <A HREF=../headers/pk_bcurve_sf_t.html>PK_BCURVE_sf_t</A> for more information. </P>
+
+
+<H4>
+<A NAME="50422087_pgfId-611440"></A>17.2.1.2 <A HREF=../headers/pk_bcurve_piecewise_sf_t.html>PK_BCURVE_piecewise_sf_t</A> </H4>
+<P>
+<A NAME="50422087_pgfId-610404"></A><A HREF=../headers/pk_bcurve_piecewise_sf_t.html>PK_BCURVE_piecewise_sf_t</A> is the piecewise standard form of a b-curve. It contains fields to specify:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-610405"></A>the degree of the curve</LI>
+<LI>
+<A NAME="50422087_pgfId-610406"></A>the number of segments in the curve</LI>
+<LI>
+<A NAME="50422087_pgfId-610407"></A>the coefficient vectors</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-610408"></A><A HREF=../headers/pk_bcurve_ask_piecewise.html>PK_BCURVE_ask_piecewise</A> returns the piecewise standard form for a b-curve. <A HREF=../headers/pk_bcurve_create_piecewise.html>PK_BCURVE_create_piecewise</A> uses the standard form to create a piecewise b-curve. See <A HREF=../headers/pk_bcurve_piecewise_sf_t.html>PK_BCURVE_piecewise_sf_t</A> for more information.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-611512"></A>17.2.1.3 <A HREF=../headers/pk_bcurve_splinewise_sf_t.html>PK_BCURVE_splinewise_sf_t</A> </H4>
+<P>
+<A NAME="50422087_pgfId-607252"></A><A HREF=../headers/pk_bcurve_splinewise_sf_t.html>PK_BCURVE_splinewise_sf_t</A> is the splinewise standard form of a b-curve. It contains fields to specify:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-608885"></A>the degree of the curve</LI>
+<LI>
+<A NAME="50422087_pgfId-609881"></A>the derivatives</LI>
+<LI>
+<A NAME="50422087_pgfId-608628"></A>the knot vector</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-608642"></A><A HREF=../headers/pk_bcurve_ask_splinewise.html>PK_BCURVE_ask_splinewise</A> returns the splinewise standard form for a b-curve. <A HREF=../headers/pk_bcurve_create_splinewise.html>PK_BCURVE_create_splinewise</A> uses the standard form to create a splinewise b-curve. See <A HREF=../headers/pk_bcurve_splinewise_sf_t.html>PK_BCURVE_splinewise_sf_t</A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309921"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_12576">Section 17.3.1.4, “B-curve”</A>.</P>
+
+
+
+<H3>
+<A NAME="50422087_pgfId-325869"></A>	17.2.2 	Blendsf </H3>
+<P>
+<A NAME="50422087_pgfId-325871"></A><A HREF=../headers/pk_blendsf_sf_t.html>PK_BLENDSF_sf_t</A> is the standard form of a rolling ball blend surface (i.e.blendsf). The surface of a blendsf is defined by:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-309924"></A>two supporting geometries, to which the blendsf is tangential</LI>
+<LI>
+<A NAME="50422087_pgfId-309925"></A>two radii, whose common magnitude is the radius of the rolling ball</LI>
+<LI>
+<A NAME="50422087_pgfId-309926"></A>a spine curve, which is the locus of the centre of the rolling ball</LI>
+<LI>
+<A NAME="50422087_pgfId-309927"></A>a spine extent, which is the parameter range of the spine over which the blendsf is defined.</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-309928"></A>See <A HREF=../headers/pk_blendsf_sf_t.html>PK_BLENDSF_sf_t</A>, for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309929"></A><A HREF=../headers/pk_blendsf_ask.html>PK_BLENDSF_ask</A> returns the standard form of a blendsf.</P>
+<P>
+<A NAME="50422087_pgfId-309933"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_18873">Section 17.3.2.6, “Rolling-ball blend”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-309934"></A>	17.2.3 	<A NAME="50422087_45508"></A>B-surface </H3>
+
+<H4>
+<A NAME="50422087_pgfId-611570"></A>17.2.3.1 <A HREF=../headers/pk_bsurf_sf_t.html>PK_BSURF_sf_t</A> </H4>
+<P>
+<A NAME="50422087_pgfId-309935"></A><A HREF=../headers/pk_bsurf_sf_t.html>PK_BSURF_sf_t</A> is the standard form for a b-surface. It contains fields to specify:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-608175"></A>the vertices, </LI>
+<LI>
+<A NAME="50422087_pgfId-608195"></A>the knot sets, </LI>
+<LI>
+<A NAME="50422087_pgfId-608204"></A>the shape of the b-curve, </LI>
+<LI>
+<A NAME="50422087_pgfId-608230"></A>whether the surface is periodic, closed or self intersecting. </LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-608259"></A><A HREF=../headers/pk_bsurf_ask.html>PK_BSURF_ask</A> returns the standard form of a b-surface. <A HREF=../headers/pk_bsurf_create.html>PK_BSURF_create</A> uses the standard form to create a b-surface. See <A HREF=../headers/pk_bsurf_sf_t.html>PK_BSURF_sf_t</A> for more information.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-611636"></A>17.2.3.2 <A HREF=../headers/pk_bsurf_piecewise_sf_t.html>PK_BSURF_piecewise_sf_t</A> </H4>
+<P>
+<A NAME="50422087_pgfId-610816"></A><A HREF=../headers/pk_bsurf_piecewise_sf_t.html>PK_BSURF_piecewise_sf_t</A> is the piecewise standard form of a b-surface. It contains fields to specify:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-610817"></A>the surface degree </LI>
+<LI>
+<A NAME="50422087_pgfId-610818"></A>the number of segments in the surface</LI>
+<LI>
+<A NAME="50422087_pgfId-610819"></A>the coefficient vectors</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-607466"></A><A HREF=../headers/pk_bsurf_ask_piecewise.html>PK_BSURF_ask_piecewise</A> returns a piecewise standard form of a b-surface. <A HREF=../headers/pk_bsurf_create_piecewise.html>PK_BSURF_create_piecewise</A> uses the standard form to create a piecewise b-surface. See <A HREF=../headers/pk_bsurf_piecewise_sf_t.html>PK_BSURF_piecewise_sf_t</A> for more information.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-611687"></A>17.2.3.3 <A HREF=../headers/pk_bsurf_splinewise_sf_t.html>PK_BSURF_splinewise_sf_t</A> </H4>
+<P>
+<A NAME="50422087_pgfId-611355"></A><A HREF=../headers/pk_bsurf_splinewise_sf_t.html>PK_BSURF_splinewise_sf_t</A> is the splinewise standard form of a b-surface. It contains fields to specify:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-608361"></A>the surface degree</LI>
+<LI>
+<A NAME="50422087_pgfId-608962"></A>the twist vectors </LI>
+<LI>
+<A NAME="50422087_pgfId-608396"></A>the knot vectors </LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-608336"></A><A HREF=../headers/pk_bsurf_ask_splinewise.html>PK_BSURF_ask_splinewise</A> returns a splinewise standard form of a b-surface. <A HREF=../headers/pk_bsurf_create_splinewise.html>PK_BSURF_create_splinewise</A> uses the standard form to create a splinewise b-surface. See <A HREF=../headers/pk_bsurf_splinewise_sf_t.html>PK_BSURF_splinewise_sf_t</A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309939"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_88799">Section 17.3.2.9, “B-surface”</A>.</P>
+
+
+
+<H3>
+<A NAME="50422087_pgfId-309940"></A>	17.2.4 	Circle </H3>
+<P>
+<A NAME="50422087_pgfId-309941"></A><A HREF=../headers/pk_circle_sf_t.html><A HREF=../headers/pk_circle_sf_t.html>PK_CIRCLE_sf_t</A></A> is the standard form of a given circle. It contains fields that specify the radius of the circle. It also has a data structure that specifies the location and orientation of two mutually perpendicular axes. <A HREF=../headers/pk_circle_ask.html>PK_CIRCLE_ask</A> returns the standard form of a circle. <A HREF=../headers/pk_circle_create.html>PK_CIRCLE_create</A> uses the standard form to create a circle. See <A HREF=../headers/pk_circle_sf_t.html><A HREF=../headers/pk_circle_sf_t.html>PK_CIRCLE_sf_t</A></A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-325452"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_65809">Section 17.3.1.2, “Circle”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-325454"></A>	17.2.5 	Cone </H3>
+<P>
+<A NAME="50422087_pgfId-332983"></A><A HREF=../headers/pk_cone_sf_t.html><A HREF=../headers/pk_cone_sf_t.html>PK_CONE_sf_t</A></A> is the standard form of a given cone. It contains fields that specify the radius and semi-angle of the cone. It also contains a data structure that specifies the location and orientation of two mutually perpendicular axes. <A HREF=../headers/pk_cone_ask.html>PK_CONE_ask</A> returns the standard form of a given cone. <A HREF=../headers/pk_cone_create.html>PK_CONE_create</A> uses the standard form to create a cone.See <A HREF=../headers/pk_cone_sf_t.html><A HREF=../headers/pk_cone_sf_t.html>PK_CONE_sf_t</A></A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309955"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_81397">Section 17.3.2.3, “Cone”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-309956"></A>	17.2.6 	Cylinder </H3>
+<P>
+<A NAME="50422087_pgfId-309957"></A><A HREF=../headers/pk_cyl_sf_t.html><A HREF=../headers/pk_cyl_sf_t.html>PK_CYL_sf_t</A></A> is the standard form of a given cylinder. It contains a field for the radius of the cylinder and a data structure specifying  the location and orientation of two mutually perpendicular axes. <A HREF=../headers/pk_cyl_ask.html>PK_CYL_ask</A> returns the standard form of a cylinder. <A HREF=../headers/pk_cyl_create.html>PK_CYL_create</A> uses the standard form to create a cylinder. See <A HREF=../headers/pk_cyl_sf_t.html><A HREF=../headers/pk_cyl_sf_t.html>PK_CYL_sf_t</A></A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309961"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_66440">Section 17.3.2.2, “Cylinder”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-309962"></A>	17.2.7 	Ellipse </H3>
+<P>
+<A NAME="50422087_pgfId-309963"></A><A HREF=../headers/pk_ellipse_sf_t.html><A HREF=../headers/pk_ellipse_sf_t.html>PK_ELLIPSE_sf_t</A></A> is the standard form of a given ellipse. It contains fields that specify both the larger and smaller radius of the ellipse. It also has a data structure that specifies the location and orientation of two mutually perpendicular axes. <A HREF=../headers/pk_ellipse_ask.html>PK_ELLIPSE_ask</A> returns the standard form of an ellipse. <A HREF=../headers/pk_ellipse_create.html>PK_ELLIPSE_create</A> uses the standard form to create a ellipse. See <A HREF=../headers/pk_ellipse_sf_t.html><A HREF=../headers/pk_ellipse_sf_t.html>PK_ELLIPSE_sf_t</A></A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309967"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_60727">Section 17.3.1.3, “Ellipse”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-309968"></A>	17.2.8 	Line </H3>
+<P>
+<A NAME="50422087_pgfId-309969"></A><A HREF=../headers/pk_line_sf_t.html><A HREF=../headers/pk_line_sf_t.html>PK_LINE_sf_t</A></A> is the standard form of a line. It contains a data structure that specifies a direction and cartesian point. <A HREF=../headers/pk_line_ask.html>PK_LINE_ask</A> returns the standard form of a line. <A HREF=../headers/pk_line_create.html>PK_LINE_create</A> uses the standard form to create a line. See <A HREF=../headers/pk_line_sf_t.html><A HREF=../headers/pk_line_sf_t.html>PK_LINE_sf_t</A></A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309973"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_93068">Section 17.3.1.1, “Straight Line”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-326312"></A>	17.2.9 	Plane </H3>
+<P>
+<A NAME="50422087_pgfId-309975"></A><A HREF=../headers/pk_plane_sf_t.html><A HREF=../headers/pk_plane_sf_t.html>PK_PLANE_sf_t</A></A> is the standard form of a plane. It contains a data structure that specifies the location and orientation of two mutually perpendicular axes. If the direction of the axes are not orthogonal, PK_ERROR_vectors_not_orthogonal is returned. <A HREF=../headers/pk_plane_ask.html>PK_PLANE_ask</A> returns the standard form of a plane. <A HREF=../headers/pk_plane_create.html>PK_PLANE_create</A> uses the standard form to create a plane. See <A HREF=../headers/pk_plane_sf_t.html><A HREF=../headers/pk_plane_sf_t.html>PK_PLANE_sf_t</A></A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309979"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_32469">Section 17.3.2.1, “Plane”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-326255"></A>	17.2.10 	Point </H3>
+<P>
+<A NAME="50422087_pgfId-309981"></A><A HREF=../headers/pk_point_sf_t.html><A HREF=../headers/pk_point_sf_t.html><A HREF=../headers/pk_point_sf_t.html>PK_POINT_sf_t</A></A></A> is the standard form of a point which is located at a given position. <A HREF=../headers/pk_point_ask.html>PK_POINT_ask</A> returns the standard form of a point. <A HREF=../headers/pk_point_create.html>PK_POINT_create</A> uses the standard form to create a point. <A HREF=../headers/pk_point_sf_t.html><A HREF=../headers/pk_point_sf_t.html><A HREF=../headers/pk_point_sf_t.html>PK_POINT_sf_t</A></A></A> contains a field that specifies a cartesian position. PK_ERROR_bad_position is returned if the position is outside the size box. See <A HREF=../headers/pk_point_sf_t.html><A HREF=../headers/pk_point_sf_t.html><A HREF=../headers/pk_point_sf_t.html>PK_POINT_sf_t</A></A></A> for more information.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-501396"></A>	17.2.11 	<A NAME="50422087_80666"></A>SP-curve </H3>
+<P>
+<A NAME="50422087_pgfId-501447"></A><A HREF=../headers/pk_spcurve_sf_t.html>PK_SPCURVE_sf_t</A> is the standard form of a Surface Parameter curve (SP-curve). It contains fields that specify the surface and the 2D B-curve needed to create the 3D SP-curve. <A HREF=../headers/pk_spcurve_ask.html>PK_SPCURVE_ask</A> returns the standard form of the SP-curve. <A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A> uses the standard form to create an SP-curve. </P>
+<P>
+<A NAME="50422087_pgfId-501869"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_64236">Section 17.3.1.6, “SP-curves”</A>. </P>
+
+
+<H3>
+<A NAME="50422087_pgfId-326198"></A>	17.2.12 	Sphere </H3>
+<P>
+<A NAME="50422087_pgfId-309983"></A><A HREF=../headers/pk_sphere_sf_t.html><A HREF=../headers/pk_sphere_sf_t.html>PK_SPHERE_sf_t</A></A> is the standard form of a sphere. It contains fields that specify the radius as well as a data structure for the location and orientation of two mutually perpendicular axes. <A HREF=../headers/pk_sphere_ask.html>PK_SPHERE_ask</A> returns the standard form of a sphere. <A HREF=../headers/pk_sphere_create.html>PK_SPHERE_create</A> uses the standard form to create a sphere. See <A HREF=../headers/pk_sphere_sf_t.html><A HREF=../headers/pk_sphere_sf_t.html>PK_SPHERE_sf_t</A></A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309987"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_39434">Section 17.3.2.5, “Sphere”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-326158"></A>	17.2.13 	Spun surface </H3>
+<P>
+<A NAME="50422087_pgfId-309989"></A><A HREF=../headers/pk_spun_sf_t.html><A HREF=../headers/pk_spun_sf_t.html>PK_SPUN_sf_t</A></A> is the standard form of a spun surface. It contains fields that specify the curve needed to form the spun surface and the axis around which the curve is spun. <A HREF=../headers/pk_spun_ask.html>PK_SPUN_ask</A> returns the standard form of a spun surface. <A HREF=../headers/pk_spun_create.html>PK_SPUN_create</A> uses the standard form to create a spun surface. See <A HREF=../headers/pk_spun_sf_t.html><A HREF=../headers/pk_spun_sf_t.html>PK_SPUN_sf_t</A></A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-309993"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_13010">Section 17.3.2.8, “Spun surface”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-326117"></A>	17.2.14 	Swept surface </H3>
+<P>
+<A NAME="50422087_pgfId-309995"></A><A HREF=../headers/pk_swept_sf_t.html><A HREF=../headers/pk_swept_sf_t.html>PK_SWEPT_sf_t</A></A> is the standard form of a swept surface. It contains fields that specify the curve to be swept and the vector direction of the sweep. <A HREF=../headers/pk_swept_ask.html>PK_SWEPT_ask</A> returns the standard form of a swept surface. <A HREF=../headers/pk_swept_create.html>PK_SWEPT_create</A> uses the standard form to create a swept surface. See <A HREF=../headers/pk_swept_sf_t.html><A HREF=../headers/pk_swept_sf_t.html>PK_SWEPT_sf_t</A></A> for more information</P>
+<P>
+<A NAME="50422087_pgfId-309999"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_49633">Section 17.3.2.7, “Swept surface”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-326084"></A>	17.2.15 	<A NAME="50422087_22672"></A>Torus </H3>
+<P>
+<A NAME="50422087_pgfId-310001"></A><A HREF=../headers/pk_torus_sf_t.html>PK_TORUS_sf_t</A> is the standard form of a torus. It contains fields to specify the major and minor radius of the torus as well as a basis set that holds the location and orientation of two mutually perpendicular axes. Certain choices of <CODE>
+major_radius</CODE>
+ and <CODE>
+minor_radius</CODE>
+ will cause the torus to intersect. Tori whose <CODE>
+major_radius</CODE>
+ is 0 are not supported and are represented as spheres. <A HREF=../headers/pk_torus_ask.html>PK_TORUS_ask</A> returns the standard form of a torus. <A HREF=../headers/pk_torus_create.html>PK_TORUS_create</A> uses the standard form to create a torus. See <A HREF=../headers/pk_torus_sf_t.html>PK_TORUS_sf_t</A> for more information.</P>
+<P>
+<A NAME="50422087_pgfId-310005"></A>For parameterisation information see <A HREF="fd_chap.018.html#50422087_51930">Section 17.3.2.4, “Torus”</A>.</P>
+
+
+<H3>
+<A NAME="50422087_pgfId-310008"></A>	17.2.16 	Trimmed curve </H3>
+<P>
+<A NAME="50422087_pgfId-310009"></A><A HREF=../headers/pk_trcurve_sf_t.html><A HREF=../headers/pk_trcurve_sf_t.html>PK_TRCURVE_sf_t</A></A> is the standard form of a trimmed curve. It contains fields to specify a curve and an interval. <A HREF=../headers/pk_trcurve_ask.html>PK_TRCURVE_ask</A> returns the standard form of a trimmed curve.See <A HREF=../headers/pk_trcurve_sf_t.html><A HREF=../headers/pk_trcurve_sf_t.html>PK_TRCURVE_sf_t</A></A>, for more information</P>
+<P>
+<A NAME="50422087_pgfId-310119"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422087_pgfId-310118"></A>Note: Parasolid does not support the creation or manipulation of trimmed curves. <A HREF="fd_chap.015.html#50422084_75947">Section 14.3.3, “Curve”</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422087_pgfId-310139"></A>17.3	Parameterisation information 
+
+
+</H1>
+<P>
+<A NAME="50422087_pgfId-310143"></A>Parasolid offers facilities to perform parameter space enquiries on general curves and surfaces. This section describes the parameterisation for surfaces and curves and lists the functions that use the parametric information.<A NAME="50422087_marker-419780"></A><A NAME="50422087_29592"></A></P>
+<P>
+<A NAME="50422087_pgfId-310146"></A>Curves have a representation of the form <STRONG>
+R</STRONG>(t), where <STRONG>
+R </STRONG>is a vector valued function of a parameter t. Surfaces have a representation of the form <STRONG>
+R</STRONG>(u, v), where <STRONG>
+R</STRONG> is a vector valued function of parameters u and v. The parameters t, u, and v may take a range of values, which varies according to the type of curve or surface. All curves and surfaces which can exist in a model are representable in this form, with the exception of intersection curves and SP-curves. </P>
+<P>
+<A NAME="50422087_pgfId-310147"></A>The parameter ranges, and other properties of the parameterisation, can be found from two PK functions, <A NAME="50422087_marker-310148"></A><A HREF=../headers/pk_curve_ask_interval.html>PK_CURVE_ask_interval</A> and <A NAME="50422087_marker-310149"></A><A HREF=../headers/pk_surf_ask_uvbox.html>PK_SURF_ask_uvbox</A>. The vector valued functions <STRONG>
+R</STRONG>(t), <STRONG>
+R</STRONG>(u, v) can be considered as mappings from the parameter space, to three-space. <A NAME="50422087_marker-310150"></A><A NAME="50422087_marker-310151"></A><A HREF=../headers/pk_curve_eval.html>PK_CURVE_eval</A> (<A HREF=../headers/pk_curve_eval_with_tangent.html>PK_CURVE_eval_with_tangent</A>) and <A NAME="50422087_marker-310152"></A><A NAME="50422087_marker-310153"></A><A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A> (<A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A>) perform these mappings and the inverse mappings are performed by <A NAME="50422087_marker-310154"></A><A HREF=../headers/pk_curve_parameterise_vector.html>PK_CURVE_parameterise_vector</A> and <A NAME="50422087_marker-310155"></A><A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A>.</P>
+<P>
+<A NAME="50422087_pgfId-310156"></A>The parameterisation of a curve or surface is invariant under translation and rotation, but not under reflection or a scaling transformation. For instance a curve is represented by <STRONG>
+F</STRONG>(t) is transformed by <STRONG>
+T</STRONG>. The parameterisation of the resulting curve is <STRONG>
+G</STRONG>(t). If the transformation <STRONG>
+T</STRONG> is a translation or rotation then</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-310157"></A><STRONG>
+G</STRONG>(t)  = <STRONG>
+T</STRONG>( <STRONG>
+F</STRONG>(t) ). This cannot necessarily be said if <STRONG>
+T</STRONG> is a reflection or a scaling.</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-310158"></A>In this chapter, the following conventions apply:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-310159"></A>round brackets () denote open intervals</LI>
+<LI>
+<A NAME="50422087_pgfId-310160"></A>square brackets [] denote closed intervals</LI>
+<LI>
+<A NAME="50422087_pgfId-310161"></A>intervals can be open at one end, and closed at the other; for example, the interval [0,2pi) refers to the numbers between 0 and 2pi, including 0 but excluding 2pi</LI>
+<LI>
+<A NAME="50422087_pgfId-310162"></A>capital letters denote vectors</LI>
+<LI>
+<A NAME="50422087_pgfId-310163"></A>small letters denote scalars</LI>
+<LI>
+<A NAME="50422087_pgfId-310164"></A>all axes are assumed to be of unit length</LI>
+</UL>
+
+<H3>
+<A NAME="50422087_pgfId-297763"></A>	17.3.1 	<A NAME="50422087_62660"></A>Curve parameterisations </H3>
+<P>
+<A NAME="50422087_pgfId-297781"></A><A NAME="50422087_marker-297779"></A><A NAME="50422087_marker-297780"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-297766"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-297768"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-297771"></A><A NAME="50422087_marker-297770"></A><A HREF=../headers/pk_curve_ask_interval.html>PK_CURVE_ask_interval</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-297773"></A>Returns interval indicating the parametric bounds of the given curve</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-297776"></A><A NAME="50422087_marker-297775"></A><A HREF=../headers/pk_curve_ask_param.html>PK_CURVE_ask_param</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-297778"></A>Returns parameterisation of the curve</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422087_pgfId-310280"></A>17.3.1.1 <A NAME="50422087_marker-297782"></A><A NAME="50422087_marker-297783"></A><A NAME="50422087_93068"></A>Straight Line </H4>
+<P>
+<A NAME="50422087_pgfId-310283"></A><A NAME="50422087_marker-310281"></A><A NAME="50422087_marker-310282"></A>A straight line has a parametric representation of the form:</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-310284"></A><STRONG>
+R</STRONG>(t)   =   <STRONG>
+P</STRONG>  +  t <STRONG>
+D</STRONG></P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-310285"></A>where: </P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-310286"></A><STRONG>
+P</STRONG> is a point on the line, and is specified using the <CODE>
+basis_set.location </CODE>
+field.</LI>
+<LI>
+<A NAME="50422087_pgfId-310287"></A><STRONG>
+D</STRONG> is its direction (unit vector) and is specified using the <CODE>
+basis_set.direction </CODE>
+field.</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-310288"></A>The range for t is (-infinity, +infinity). </P>
+<P>
+<A NAME="50422087_pgfId-310339"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-110.gif">
+
+<P>
+<A NAME="50422087_pgfId-310340"></A>Figure 17-2 Curve parameterisation - straight line</P>
+<P>
+<A NAME="50422087_pgfId-297827"></A>The reference point <STRONG>
+P</STRONG> and direction <STRONG>
+D</STRONG> can be obtained from <A NAME="50422087_marker-297826"></A><A HREF=../headers/pk_line_ask.html>PK_LINE_ask</A>. The parameter t represents the signed distance of the point <STRONG>
+R</STRONG>(t) on the line from the reference point <STRONG>
+P</STRONG>.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-310395"></A>17.3.1.2 <A NAME="50422087_65809"></A>Circle </H4>
+<P>
+<A NAME="50422087_pgfId-310398"></A><A NAME="50422087_marker-310396"></A><A NAME="50422087_marker-310397"></A>A circle has a parametric representation of the form:</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-310399"></A><STRONG>
+R</STRONG>(t)   =   <STRONG>
+C</STRONG>  +  r <STRONG>
+X</STRONG> cos(t)  + r <STRONG>
+Y</STRONG> sin(t)</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-310400"></A>where: </P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-310401"></A><STRONG>
+C</STRONG> is the center of the circle, and is specified using the <CODE>
+basis_set.location</CODE>
+ field.</LI>
+<LI>
+<A NAME="50422087_pgfId-310402"></A>r is the circle <CODE>
+radius</CODE>
+ and must be larger than zero,</LI>
+<LI>
+<A NAME="50422087_pgfId-319996"></A><STRONG>
+X</STRONG> and <STRONG>
+Y</STRONG> are axes in the circle plane where <STRONG>
+X</STRONG> is specified using the <CODE>
+basis_set.ref_direction</CODE>
+ field and <STRONG>
+Y</STRONG> is the cross product of <CODE>
+basis_set.axis</CODE>
+ x <CODE>
+basis_set.ref_direction.</CODE>
+</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-310485"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-111.gif">
+
+<P>
+<A NAME="50422087_pgfId-310486"></A>Figure 17-3 Curve parameterisation - circle</P>
+<P>
+<A NAME="50422087_pgfId-297935"></A>The range for t is [0, 2pi). The parameterisation is periodic, so that <A NAME="50422087_marker-297934"></A><A HREF=../headers/pk_curve_eval.html>PK_CURVE_eval</A> can take any value of t and returns a point on the circle.</P>
+<P>
+<A NAME="50422087_pgfId-297936"></A>The circle center <STRONG>
+C, the axis A, the ref_direction X, </STRONG>and radius r can be obtained from <A NAME="50422087_marker-297937"></A><A HREF=../headers/pk_circle_ask.html>PK_CIRCLE_ask</A>. </P>
+<P>
+<A NAME="50422087_pgfId-297938"></A>The <STRONG>
+Y</STRONG> axis is given by the vector cross product of <STRONG>
+A</STRONG> and <STRONG>
+X</STRONG>.</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-297939"></A><STRONG>
+Y</STRONG> = <STRONG>
+A</STRONG> X <STRONG>
+X</STRONG></P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-297940"></A>Alternatively, the <STRONG>
+Y</STRONG> axis can be obtained by evaluating <STRONG>
+R</STRONG>(pi/2) using <A HREF=../headers/pk_curve_eval.html>PK_CURVE_eval</A>, and applying the formula</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-297941"></A><STRONG>
+Y</STRONG>  =  (<STRONG>
+R</STRONG>(pi/2) - <STRONG>
+C</STRONG>)/r</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-297942"></A>The parameter t represents the angle around the circle, measured in radians from the <STRONG>
+X</STRONG> axis. It runs clockwise when viewed along the axis <STRONG>
+A</STRONG>.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-310559"></A>17.3.1.3 <A NAME="50422087_marker-297943"></A><A NAME="50422087_marker-297944"></A><A NAME="50422087_60727"></A>Ellipse </H4>
+<P>
+<A NAME="50422087_pgfId-310562"></A><A NAME="50422087_marker-310560"></A><A NAME="50422087_marker-310561"></A>An ellipse has a parametric representation of the form:</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-310563"></A><STRONG>
+R</STRONG>(t)   =   <STRONG>
+C  </STRONG>+  a<STRONG>
+X</STRONG>cos(t)  + b<STRONG>
+Y</STRONG>sin(t)</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-310564"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-310565"></A><STRONG>
+C</STRONG> is the center of the ellipse, and is specified using the <CODE>
+basis_set.location</CODE>
+ field.</LI>
+<LI>
+<A NAME="50422087_pgfId-310566"></A>a is <CODE>
+R1,</CODE>
+the major radius, </LI>
+<LI>
+<A NAME="50422087_pgfId-310567"></A>b is <CODE>
+R2,</CODE>
+the minor radius, </LI>
+<LI>
+<A NAME="50422087_pgfId-310568"></A><STRONG>
+X</STRONG> is the major axis and <STRONG>
+Y</STRONG> is the minor axis, where <STRONG>
+X</STRONG> is specified using the <CODE>
+basis_set.ref_direction</CODE>
+ field and <STRONG>
+Y</STRONG> is the cross product of <CODE>
+basis_set.axis</CODE>
+ x <CODE>
+basis_set.ref_direction</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-310572"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422087_pgfId-310571"></A>Note: <CODE>
+R1</CODE>
+ must be larger than <CODE>
+R2</CODE>
+ and both must be larger than zero.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422087_pgfId-310660"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-112.gif">
+
+<P>
+<A NAME="50422087_pgfId-310661"></A>Figure 17-4 Curve parameterisation - ellipse</P>
+<P>
+<A NAME="50422087_pgfId-298061"></A>The range for t is [0, 2pi); the parameterisation is periodic, so <A HREF=../headers/pk_curve_eval.html>PK_CURVE_eval</A> works for any value of t, but <A HREF=../headers/pk_curve_parameterise_vector.html>PK_CURVE_parameterise_vector</A> always returns a value in the above range.</P>
+<P>
+<A NAME="50422087_pgfId-298062"></A>The ellipse center <STRONG>
+C</STRONG>, the axis <STRONG>
+A</STRONG>, the ref_direction <STRONG>
+X</STRONG> and the radii a and b can be obtained from <A NAME="50422087_marker-298063"></A><A HREF=../headers/pk_ellipse_ask.html>PK_ELLIPSE_ask</A>. The ellipse parameterisation is equivalent to the parameterisation of a circle with radius a, and the same center as the ellipse. The point <STRONG>
+R</STRONG>(t) on the ellipse can be projected onto the circle by projecting it parallel to the <STRONG>
+Y</STRONG> axis and away from the <STRONG>
+X</STRONG> axis. The parameter t represents the angle around the circle, measured from the <STRONG>
+X</STRONG> axis, made by the projection of <STRONG>
+R</STRONG>(t). The following diagram illustrates this. </P>
+<P>
+<A NAME="50422087_pgfId-368527"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-113.gif">
+
+<P>
+<A NAME="50422087_pgfId-298096"></A>Figure 17-5 Curve parameterisation - curve compared with an ellipse</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-298099"></A>17.3.1.4 <A NAME="50422087_marker-298097"></A><A NAME="50422087_marker-298098"></A><A NAME="50422087_12576"></A>B-curve </H4>
+<P>
+<A NAME="50422087_pgfId-318883"></A><A NAME="50422087_marker-318880"></A><A NAME="50422087_marker-318881"></A><A NAME="50422087_marker-318882"></A>B-curves (including B-splines which are represented internally as Bezier) have their own parameterisation.</P>
+<P>
+<A NAME="50422087_pgfId-318886"></A>For details, see <A HREF="fd_chap.124.html#50422207_12301">Chapter B, “The Mathematical Form Of B-Geometry”</A>.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-298111"></A>17.3.1.5 <A NAME="50422087_marker-298108"></A><A NAME="50422087_marker-298109"></A><A NAME="50422087_marker-298110"></A><A NAME="50422087_15438"></A>Intersection curve </H4>
+<P>
+<A NAME="50422087_pgfId-298115"></A><A NAME="50422087_marker-298112"></A><A NAME="50422087_marker-298113"></A><A NAME="50422087_marker-298114"></A>An intersection curve does not have an explicit parametric form. A parameterisation is supported for it, however, which is based on a polyline approximation of the curve.</P>
+<P>
+<A NAME="50422087_pgfId-298116"></A>The parameterisation has the following properties:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-298117"></A>The range for t varies from curve to curve.</LI>
+<LI>
+<A NAME="50422087_pgfId-298118"></A>The parameterisation is continuous and continuously differentiable, but the second derivative is not continuous in general.</LI>
+<LI>
+<A NAME="50422087_pgfId-298119"></A>Closed, smooth intersection curves have periodic parameterisations, but the parameterisation is not continuously differentiable between periods.</LI>
+<LI>
+<A NAME="50422087_pgfId-298120"></A>Some modeling operations involving intersection curves can extend them; this has the effect of extending the parameter range as well. However, the parameterisation is arranged so that a point on the curve retains its parameter value, even though the curve may have been extended.</LI>
+<LI>
+<A NAME="50422087_pgfId-298121"></A>The parameterisation is predictable in the sense that the magnitude of the first derivative does not vary greatly; in fact its value is always close to 1.0.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50422087_pgfId-500734"></A>17.3.1.6 <A NAME="50422087_64236"></A>SP-curves </H4>
+<P>
+<A NAME="50422087_pgfId-500769"></A>The parameterisation of an SP-curve is the parameterisation of the 2D B-spline curve used to create it. Evaluating this curve at a given parameter produces a corresponding u and v parameter on the surface. Evaluating the surface at the uv parameter gives the corresponding 3-space position on the SP-curve. See <A HREF="fd_chap.092.html#50422170_18216">Section 91.1.5, “Concept of SP-curves”</A>, for more information.</P>
+
+
+
+<H3>
+<A NAME="50422087_pgfId-298124"></A>	17.3.2 	<A NAME="50422087_marker-506077"></A><A NAME="50422087_marker-506078"></A><A NAME="50422087_47811"></A>Surface parameterisation </H3>
+<P>
+<A NAME="50422087_pgfId-560887"></A><A NAME="50422087_marker-506104"></A><A NAME="50422087_marker-506105"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298127"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298129"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298132"></A><A NAME="50422087_marker-506088"></A><A HREF=../headers/pk_surf_ask_uvbox.html>PK_SURF_ask_uvbox</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298134"></A>Returns a uvbox indicating the bounds of the given surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298137"></A><A NAME="50422087_marker-506093"></A><A HREF=../headers/pk_surf_ask_params.html>PK_SURF_ask_params</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298139"></A>Returns parameterisation in the U and V directions.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-419807"></A><A HREF=../headers/pk_entity_find_reparam.html>PK_ENTITY_find_reparam</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-419809"></A>Examines the parameterisation of given surfaces and identifies those that can be reparameterised in order to optimise the success of downstream Parasolid operations.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422087_pgfId-310773"></A>17.3.2.1 <A NAME="50422087_marker-298143"></A><A NAME="50422087_marker-298144"></A><A NAME="50422087_32469"></A>Plane </H4>
+<P>
+<A NAME="50422087_pgfId-310776"></A>A<A NAME="50422087_marker-310774"></A><A NAME="50422087_marker-310775"></A> plane has a parametric representation of the form:</P>
+<P>
+<A NAME="50422087_pgfId-310850"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-114.gif">
+
+<P>
+<A NAME="50422087_pgfId-310851"></A>Figure 17-6 Surface parameterisation - plane</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-310852"></A><STRONG>
+R</STRONG>(u, v) = <STRONG>
+P </STRONG>+ u<STRONG>
+X </STRONG>+ v<STRONG>
+Y</STRONG></P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-310853"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-310854"></A><STRONG>
+P</STRONG> is a point on the plane and is specified using the <CODE>
+basis_set.location</CODE>
+ field,</LI>
+<LI>
+<A NAME="50422087_pgfId-310855"></A><STRONG>
+X</STRONG> and <STRONG>
+Y</STRONG> are axes in the plane where <STRONG>
+X</STRONG> is specified using the <CODE>
+basis_set.ref_direction</CODE>
+ field and <STRONG>
+Y</STRONG> is the cross product of <CODE>
+basis_set.axis</CODE>
+ x <CODE>
+basis_set.ref_direction</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-298232"></A>The range for u is (-infinity, +infinity). The range for v is (-infinity, +infinity). </P>
+<P>
+<A NAME="50422087_pgfId-298233"></A>The reference point <STRONG>
+P, reference direction X </STRONG>and plane normal <STRONG>
+N </STRONG>can be obtained from <A HREF=../headers/pk_plane_ask.html>PK_PLANE_ask</A>.</P>
+<P>
+<A NAME="50422087_pgfId-298234"></A>The <STRONG>
+Y</STRONG> axis is the vector product of the plane normal <STRONG>
+N</STRONG> and the <STRONG>
+X </STRONG>axis: <STRONG>
+Y </STRONG>= <STRONG>
+N</STRONG> X <STRONG>
+X</STRONG></P>
+<P>
+<A NAME="50422087_pgfId-298235"></A>Alternatively, the <STRONG>
+Y</STRONG> axis can be obtained by evaluating <STRONG>
+R</STRONG>(0, 1) using <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A>, and applying the formula</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-298236"></A><STRONG>
+Y</STRONG> = <STRONG>
+R</STRONG>(0, 1) -<STRONG>
+ P</STRONG></P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-298237"></A>The parameters u and v both represent distances: the distance of the point <STRONG>
+R</STRONG>(u, v) from the reference point <STRONG>
+P</STRONG> projected onto the <STRONG>
+X</STRONG> and <STRONG>
+Y </STRONG>axes respectively.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-310961"></A>17.3.2.2 <A NAME="50422087_marker-298238"></A><A NAME="50422087_marker-298239"></A><A NAME="50422087_66440"></A>Cylinder </H4>
+<P>
+<A NAME="50422087_pgfId-310964"></A><A NAME="50422087_marker-310962"></A><A NAME="50422087_marker-310963"></A>A cylinder has a parametric representation of the form:</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-310965"></A><STRONG>
+R</STRONG>(u,v)   =  <STRONG>
+ P</STRONG>  +  r<STRONG>
+X</STRONG>cos(u)  +  r<STRONG>
+Y</STRONG>sin(u)  + v<STRONG>
+A</STRONG></P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311057"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-115.gif">
+
+<P>
+<A NAME="50422087_pgfId-311058"></A>Figure 17-7 Surface parameterisation - cylinder</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-311059"></A><STRONG>
+P</STRONG> is a point on the cylinder axis and is specified using the <CODE>
+basis_set.location</CODE>
+ field.</LI>
+<LI>
+<A NAME="50422087_pgfId-311060"></A>r is the cylinder <CODE>
+radius</CODE>
+</LI>
+<LI>
+<A NAME="50422087_pgfId-311061"></A><STRONG>
+A</STRONG> is the cylinder axis and is specified using the <CODE>
+basis_set.axis</CODE>
+ field,</LI>
+<LI>
+<A NAME="50422087_pgfId-311062"></A><STRONG>
+X</STRONG> and <STRONG>
+Y</STRONG> are unit vectors such that <STRONG>
+A</STRONG>, <STRONG>
+X </STRONG>and <STRONG>
+Y</STRONG> form an orthonormal set where <STRONG>
+X</STRONG> is specified using the <CODE>
+basis_set.ref_direction</CODE>
+ field and <STRONG>
+Y</STRONG> is the cross product of <CODE>
+basis_set.axis</CODE>
+ x <CODE>
+basis_set.ref_direction</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-298367"></A>The range for u is [0, 2pi); the parameterisation is periodic, so <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A> works for any value of u, but <A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A> always returns a value in the above range. The range for v is (-infinity, +infinity).</P>
+<P>
+<A NAME="50422087_pgfId-298368"></A>The reference point <STRONG>
+P</STRONG>, cylinder axis <STRONG>
+A</STRONG>, reference direction <STRONG>
+X </STRONG>and radius <STRONG>
+r</STRONG> can be obtained from <A HREF=../headers/pk_cyl_ask.html>PK_CYL_ask</A>.</P>
+<P>
+<A NAME="50422087_pgfId-298369"></A>The <STRONG>
+Y</STRONG> axis is the vector cross product of the cylinder axis <STRONG>
+A</STRONG> and the <STRONG>
+X</STRONG> axis: <STRONG>
+Y</STRONG> = <STRONG>
+A</STRONG> X <STRONG>
+X</STRONG>. </P>
+<P>
+<A NAME="50422087_pgfId-298370"></A>Alternatively, the <STRONG>
+Y </STRONG>axis can be obtained by evaluating <STRONG>
+R</STRONG>(pi/2, 0) using <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A>, and applying the formula </P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-298371"></A><STRONG>
+Y</STRONG>  =  (<STRONG>
+R</STRONG>(pi/2, 0) - <STRONG>
+P</STRONG>)/r</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-298372"></A>The parameter u represents the angle around the cylinder, measured in radians, from the <STRONG>
+X </STRONG>axis. It runs clockwise when viewed along the <STRONG>
+A</STRONG> axis. The parameter v represents the distance from <STRONG>
+R</STRONG>(u, v) to the reference point <STRONG>
+P</STRONG>, projected onto the axis.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-311131"></A>17.3.2.3 <A NAME="50422087_marker-298373"></A><A NAME="50422087_marker-298374"></A><A NAME="50422087_81397"></A>Cone </H4>
+<P>
+<A NAME="50422087_pgfId-311134"></A><A NAME="50422087_marker-311132"></A><A NAME="50422087_marker-311133"></A>A cone in Parasolid is only half of a mathematical cone. By convention, the cone axis points in the direction of increasing radius and the half angle defines the angle between the axis and any line on the surface of the cone. A cone has a parametric representation of the form:</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-311135"></A><STRONG>
+R</STRONG>(u, v)   =   <STRONG>
+P</STRONG> + v<STRONG>
+A</STRONG>  +  ( <STRONG>
+X</STRONG>cos(u) + <STRONG>
+Y</STRONG>sin(u))(r + vtan(a))</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311136"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-311137"></A><STRONG>
+P</STRONG> is a point on the cone axis, and is specified using the <CODE>
+basis_set.location </CODE>
+field,</LI>
+<LI>
+<A NAME="50422087_pgfId-311138"></A>r is the cone <CODE>
+radius</CODE>
+ at the point <STRONG>
+P</STRONG>. </LI>
+<LI>
+<A NAME="50422087_pgfId-311139"></A><STRONG>
+A </STRONG>is the cone axis (unit vector). </LI>
+<LI>
+<A NAME="50422087_pgfId-311140"></A><STRONG>
+X</STRONG> and <STRONG>
+Y</STRONG> are unit vectors where <STRONG>
+X</STRONG> is specified using the <CODE>
+basis_set.ref_direction</CODE>
+ field and <STRONG>
+Y</STRONG> is the cross product of the <CODE>
+basis_set.axis</CODE>
+ x <CODE>
+basis_set.ref_direction</CODE>
+. <STRONG>
+A</STRONG>, <STRONG>
+X</STRONG> and <STRONG>
+Y</STRONG> form an orthonormal set, i.e. <STRONG>
+Y</STRONG> = <STRONG>
+A</STRONG> x <STRONG>
+X.</STRONG></LI>
+<LI>
+<A NAME="50422087_pgfId-311141"></A>‘a’ is the cone half angle.</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-368983"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-116.gif">
+
+<P>
+<A NAME="50422087_pgfId-298562"></A>Figure 17-8 Surface parameterisation - cone</P>
+<P>
+<A NAME="50422087_pgfId-298563"></A>The range for u is [0,2pi); the parameterisation is periodic, so <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A> works for any value of u, but <A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A> always returns a value in the above range.</P>
+<P>
+<A NAME="50422087_pgfId-298564"></A>The range for v is [-r cot(a), +infinity).</P>
+<P>
+<A NAME="50422087_pgfId-298565"></A>The reference point <STRONG>
+P</STRONG>, cone axis <STRONG>
+A</STRONG>, reference direction <STRONG>
+X</STRONG> and radius <STRONG>
+r</STRONG> at <STRONG>
+P</STRONG> and half angle <STRONG>
+a</STRONG> can be obtained from <A NAME="50422087_marker-298566"></A><A HREF=../headers/pk_cone_ask.html>PK_CONE_ask</A>.</P>
+<P>
+<A NAME="50422087_pgfId-298567"></A>The <STRONG>
+Y</STRONG> axis is the vector product of the <STRONG>
+X</STRONG> axis and the cone axis <STRONG>
+A</STRONG>: <STRONG>
+Y</STRONG> = <STRONG>
+X</STRONG> X <STRONG>
+A</STRONG>.</P>
+<P>
+<A NAME="50422087_pgfId-298568"></A>Alternatively, the <STRONG>
+Y</STRONG> axis can be obtained by evaluating <STRONG>
+R</STRONG>(pi/2,1) using <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A>, and applying the formula</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-298569"></A><STRONG>
+Y</STRONG>  =  (<STRONG>
+R</STRONG>(pi/2,1) + <STRONG>
+A</STRONG> - <STRONG>
+P</STRONG>)/(r + tan(a))</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-298570"></A>The parameter u represents the angle around the cone, measured from the <STRONG>
+X</STRONG> axis. It runs clockwise when viewed along the <STRONG>
+A</STRONG> axis. The parameter v represents the distance from <STRONG>
+R</STRONG>(u, v) to the reference point <STRONG>
+P</STRONG>, projected onto the axis. It runs away from the cone apex.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-298574"></A>17.3.2.4 <A NAME="50422087_marker-298571"></A><A NAME="50422087_marker-298572"></A><A NAME="50422087_marker-298573"></A><A NAME="50422087_51930"></A>Torus </H4>
+<P>
+<A NAME="50422087_pgfId-298577"></A><A NAME="50422087_marker-298575"></A><A NAME="50422087_marker-298576"></A>A torus has a parametric representation of the form:</P>
+<P>
+<A NAME="50422087_pgfId-369456"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-117.gif">
+
+<P>
+<A NAME="50422087_pgfId-298685"></A>Figure 17-9 Surface parameterisation - torus</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-298686"></A><STRONG>
+R</STRONG>(u, v)   =   <STRONG>
+C</STRONG> + (<STRONG>
+X </STRONG>cos(u) + <STRONG>
+Y </STRONG>sin(u))(a + b cos(v) ) + b<STRONG>
+A</STRONG>sin(v)</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311184"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-311185"></A>C is center of the torus, and is specified using the <CODE>
+basis_set.location</CODE>
+ field,</LI>
+<LI>
+<A NAME="50422087_pgfId-311186"></A>A is the torus axis (unit vector), </LI>
+<LI>
+<A NAME="50422087_pgfId-311187"></A>a is the <CODE>
+major_radius</CODE>
+, </LI>
+<LI>
+<A NAME="50422087_pgfId-311188"></A>b is the <CODE>
+minor_radius</CODE>
+,</LI>
+<LI>
+<A NAME="50422087_pgfId-311189"></A>X and Y are unit vectors such that <STRONG>
+A</STRONG>, <STRONG>
+X</STRONG> and <STRONG>
+Y</STRONG> form an orthonormal set. <STRONG>
+X</STRONG> is specified using the <CODE>
+basis_set.ref_direction</CODE>
+ field and <STRONG>
+Y</STRONG> is the cross product of <CODE>
+basis_set.axis</CODE>
+ x <CODE>
+basis_set.ref_direction</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-298689"></A>In Parasolid, there are three types of torus:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-298690"></A><STRONG>
+Doughnut:</STRONG> The torus is not self-intersecting (a&gt;b)</LI>
+<LI>
+<A NAME="50422087_pgfId-298691"></A><STRONG>
+Apple:</STRONG> The outer part of a self-intersecting torus (a&lt;=b, a&gt;0)</LI>
+<LI>
+<A NAME="50422087_pgfId-298692"></A><STRONG>
+Lemon:</STRONG> The inner part of a self-intersecting torus (a&lt;0, |a|&lt;b)</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-298693"></A>The limiting case a=b is allowed; it is called an ‘osculating apple’, but there is no ‘lemon’ surface corresponding to this case.</P>
+<P>
+<A NAME="50422087_pgfId-298694"></A>The limiting case a=0 cannot be represented as a torus; this must be represented as a sphere.</P>
+<P>
+<A NAME="50422087_pgfId-298695"></A>The range for u is [0, 2pi); the parameterisation is periodic, so <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A> works for any value of u, but <A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A> always returns a value in the above range.</P>
+<P>
+<A NAME="50422087_pgfId-298696"></A>The range for <STRONG>
+v</STRONG> varies according to the type of torus:</P>
+<P>
+<A NAME="50422087_pgfId-298714"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298699"></A>Torus type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298701"></A>V range</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298703"></A>Doughnut</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298705"></A>The range is [-pi, pi); the parameterisation is periodic, so <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A> works for any value of v, but <A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A> always return a value in the above range.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298707"></A>Apple</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298709"></A>The range is [-q, +q], where q = pi - arccos(a / b).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298711"></A>Lemon</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422087_pgfId-298713"></A>The range is [-q, +q], where q = arccos(|a| / b)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422087_pgfId-298715"></A>The v parameterisation for the doughnut is periodic, for the lemon and apple it is not.</P>
+<P>
+<A NAME="50422087_pgfId-298716"></A>The torus center <STRONG>
+C</STRONG>, axis <STRONG>
+A</STRONG>, reference direction <STRONG>
+X</STRONG>, major radius <STRONG>
+a </STRONG>and minor radius <STRONG>
+b</STRONG> can be obtained from <A NAME="50422087_marker-298717"></A><A HREF=../headers/pk_torus_ask.html>PK_TORUS_ask</A>.</P>
+<P>
+<A NAME="50422087_pgfId-298718"></A>The Y axis is the vector product of the torus axis <STRONG>
+A</STRONG> and the <STRONG>
+X </STRONG>axis: <STRONG>
+Y </STRONG>= <STRONG>
+A</STRONG> X <STRONG>
+X</STRONG>. Alternatively, the <STRONG>
+Y </STRONG>axis can be obtained by evaluating <STRONG>
+R</STRONG>(p/2, 0) using <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A>, and applying the formula</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-298719"></A><STRONG>
+Y</STRONG>  =  (<STRONG>
+R</STRONG>(p/2, 0) - <STRONG>
+C</STRONG>) / (a+b)</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-298720"></A>The parameter u represents the angle around the A axis, measured from the <STRONG>
+X</STRONG> axis. It runs clockwise when viewed along the <STRONG>
+A</STRONG> axis. The parameter v represents the angle around the torus spine, measured from the circle with center <STRONG>
+C</STRONG>, axis <STRONG>
+A</STRONG> and radius a + b. It runs clockwise when viewed along the spine.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-311204"></A>17.3.2.5 <A NAME="50422087_marker-298721"></A><A NAME="50422087_marker-298722"></A><A NAME="50422087_39434"></A>Sphere </H4>
+<P>
+<A NAME="50422087_pgfId-311207"></A><A NAME="50422087_marker-311205"></A><A NAME="50422087_marker-311206"></A>A sphere has a parametric representation of the form:</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-311208"></A><STRONG>
+R</STRONG>(u,v) = <STRONG>
+C</STRONG> + (<STRONG>
+X</STRONG>cos(u) + <STRONG>
+Y</STRONG>sin(u)) rcos(v)  +  r<STRONG>
+A</STRONG>sin(v)</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311209"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-311210"></A><STRONG>
+C</STRONG> is center of the sphere,and is specified using the <CODE>
+basis_set.location</CODE>
+ field,</LI>
+<LI>
+<A NAME="50422087_pgfId-311211"></A>r is the sphere <CODE>
+radius</CODE>
+. This must be greater than zero. </LI>
+<LI>
+<A NAME="50422087_pgfId-311212"></A><STRONG>
+A</STRONG>, <STRONG>
+X </STRONG>and <STRONG>
+Y</STRONG> form an orthonormal axis set,where <STRONG>
+X</STRONG> is specified using the <CODE>
+basis_set.ref_direction</CODE>
+ field and <STRONG>
+Y</STRONG> is the cross product of <CODE>
+basis_set.axis</CODE>
+ x <CODE>
+basis_set.ref_direction</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311213"></A>The range for u is [0,2pi); the parameterisation is periodic, so <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A> works for any value of u, but <A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A> always returns a value in the above range. The range for v is [-pi/2,+pi/2]. </P>
+<P>
+<A NAME="50422087_pgfId-311214"></A>The sphere center <STRONG>
+C, </STRONG>axis<STRONG>
+ A, </STRONG>ref_direction<STRONG>
+ X </STRONG>and radius <STRONG>
+r </STRONG>can be obtained from <A NAME="50422087_marker-311215"></A><A HREF=../headers/pk_sphere_ask.html>PK_SPHERE_ask</A>. The <STRONG>
+Y</STRONG> axis is the vector product of the sphere axis A and the X axis: <STRONG>
+Y</STRONG> = <STRONG>
+A</STRONG> X <STRONG>
+X.</STRONG> Alternatively, the Y axis can be obtained by evaluating <STRONG>
+R</STRONG>(pi/2, 0) using <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A> and applying the formula.</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-311216"></A><STRONG>
+Y</STRONG>  =  (<STRONG>
+R</STRONG>(pi/2,0) - <STRONG>
+C</STRONG>) / r</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311302"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-118.gif">
+
+<P>
+<A NAME="50422087_pgfId-311303"></A>Figure 17-10 Surface parameterisation - sphere</P>
+<P>
+<A NAME="50422087_pgfId-311304"></A>The parameter u represents longitude; i.e. the angle around the axis, measured from the <STRONG>
+X</STRONG> axis. It runs clockwise when viewed along the axis. The parameter <STRONG>
+v</STRONG> represents the latitude; i.e. the angle subtended at the equatorial plane.</P>
+<P>
+<A NAME="50422087_pgfId-311362"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422087_pgfId-311361"></A>Note: The surface normals point away from the centre of the sphere.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422087_pgfId-311395"></A>17.3.2.6 <A NAME="50422087_marker-298841"></A><A NAME="50422087_marker-298842"></A><A NAME="50422087_marker-298843"></A><A NAME="50422087_18873"></A>Rolling-ball blend </H4>
+<P>
+<A NAME="50422087_pgfId-311399"></A><A NAME="50422087_marker-311396"></A><A NAME="50422087_marker-311397"></A><A NAME="50422087_marker-311398"></A>A rolling-ball blend has a parametric representation of the form:</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-311400"></A><STRONG>
+R</STRONG>(u,v) = <STRONG>
+C</STRONG>(u) + r<STRONG>
+X</STRONG>(u)cos(v a(u)) + r<STRONG>
+Y</STRONG>(u)sin(v a(u))</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311401"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-311402"></A><STRONG>
+C</STRONG>(u) is the <CODE>
+spine</CODE>
+ curve, which is the locus of the centre of the rolling ball,</LI>
+<LI>
+<A NAME="50422087_pgfId-311403"></A>r is the blend radius, </LI>
+<LI>
+<A NAME="50422087_pgfId-311404"></A><STRONG>
+X</STRONG>(u) and <STRONG>
+Y</STRONG>(u) are unit vectors such that <STRONG>
+dC</STRONG>(u)/du, <STRONG>
+X</STRONG>(u) and <STRONG>
+Y</STRONG>(u) form an orthogonal set and <STRONG>
+X</STRONG>(u) is in the direction <STRONG>
+R</STRONG>(u,0) - <STRONG>
+C</STRONG>(u),</LI>
+<LI>
+<A NAME="50422087_pgfId-311406"></A>a(u) is the angle subtended by points on the boundary curves at the spine, </LI>
+<LI>
+<A NAME="50422087_pgfId-311407"></A><STRONG>
+X</STRONG>, <STRONG>
+Y</STRONG> and a are expressed as functions of u, as their values change with u.</LI>
+<LI>
+<A NAME="50422087_pgfId-311408"></A><STRONG>
+R</STRONG>(u,0) and <STRONG>
+R</STRONG>(u,1) are the curves where the blendsf meets the supporting geometries. </LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-298851"></A>The spine of the rolling-ball blend is the center line of the blend; i.e. the path along which the center of the ball moves. The range for u is the range for the spine curve and can be output through the <A HREF=../headers/pk_blendsf_ask.html>PK_BLENDSF_ask</A> function. The range for <STRONG>
+v</STRONG> is [0,1]. The parameter u represents the progress along the length of the blend. The parameter <STRONG>
+v</STRONG> runs along a circular arc, with its center on the spine. It takes the value 0 on one boundary, 1 on the other. It is proportional to the angle around the circular arc. If the spine curve is extended by a modeling operation, the parameterisation may also be extended.</P>
+<P>
+<A NAME="50422087_pgfId-369953"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-119.gif">
+
+<P>
+<A NAME="50422087_pgfId-299299"></A>Figure 17-11 Surface parameterisation - rolling-ball blend</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-311435"></A>17.3.2.7 <A NAME="50422087_marker-299300"></A><A NAME="50422087_marker-299301"></A><A NAME="50422087_marker-299302"></A><A NAME="50422087_49633"></A>Swept surface </H4>
+<P>
+<A NAME="50422087_pgfId-311439"></A><A NAME="50422087_marker-311436"></A><A NAME="50422087_marker-311437"></A><A NAME="50422087_marker-311438"></A>A swept surface has a parametric representation of the form:</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-311440"></A><STRONG>
+R</STRONG>( u, v )   =   <STRONG>
+C</STRONG>( u )  +  v<STRONG>
+D</STRONG></P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311441"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-311442"></A><STRONG>
+C</STRONG>(u) is the section <CODE>
+curve</CODE>
+, </LI>
+<LI>
+<A NAME="50422087_pgfId-311443"></A><STRONG>
+D</STRONG> is the sweep <CODE>
+direction</CODE>
+ (unit vector).</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311444"></A>The range for u is the range for the section <CODE>
+curve</CODE>
+ and the range for v is (-infinity, +infinity).</P>
+<P>
+<A NAME="50422087_pgfId-311446"></A>The section curve and the sweep direction are obtained from <A NAME="50422087_marker-311445"></A><A HREF=../headers/pk_swept_ask.html>PK_SWEPT_ask</A>. The u parameter corresponds to the section curve parameter.</P>
+<P>
+<A NAME="50422087_pgfId-311447"></A>The v parameter represents distance: the distance of the current point from the corresponding point on the section curve.</P>
+<P>
+<A NAME="50422087_pgfId-311451"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422087_pgfId-311450"></A>Note: The curve C must be a line, circle, ellipse or a b-curve. If it is not one of these, PK_ERROR_unsuitable_entity is returned</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422087_pgfId-311515"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-120.gif">
+
+<P>
+<A NAME="50422087_pgfId-311516"></A>Figure 17-12 Surface parameterisation - swept surface</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-311541"></A>17.3.2.8 <A NAME="50422087_marker-299379"></A><A NAME="50422087_marker-299380"></A><A NAME="50422087_marker-299381"></A><A NAME="50422087_13010"></A>Spun surface </H4>
+<P>
+<A NAME="50422087_pgfId-311545"></A><A NAME="50422087_marker-311542"></A><A NAME="50422087_marker-311543"></A><A NAME="50422087_marker-311544"></A>A spun surface has a parametric representation of the form:</P>
+<UL>
+<P>
+<A NAME="50422087_pgfId-311546"></A><STRONG>
+R</STRONG> (u, v)   =   <STRONG>
+Z</STRONG> (u)  +  ( <STRONG>
+C</STRONG>(u) - <STRONG>
+Z </STRONG>(u)) cos (v)     +      <STRONG>
+A</STRONG> X (<STRONG>
+C</STRONG>(u) - <STRONG>
+Z </STRONG>(u)) sin (v)</P>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311547"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422087_pgfId-311548"></A>C(u) is the profile <CODE>
+curve</CODE>
+, </LI>
+<LI>
+<A NAME="50422087_pgfId-311549"></A><STRONG>
+Z</STRONG>(u) is the projection of C(u) onto the spin axis. </LI>
+<LI>
+<A NAME="50422087_pgfId-311550"></A><STRONG>
+A</STRONG> is the spin axis direction (unit vector), where A is <CODE>
+axis.axis.</CODE>
+</LI>
+</UL>
+<P>
+<A NAME="50422087_pgfId-311569"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422087_pgfId-311568"></A>Note: <STRONG>
+Z</STRONG>(u)  =  <STRONG>
+P</STRONG>   +  ( ( <STRONG>
+C</STRONG>( u ) - <STRONG>
+P</STRONG> ) . <STRONG>
+A</STRONG> )<STRONG>
+A</STRONG> where <STRONG>
+P</STRONG> is a reference point on the axis. <STRONG>
+P</STRONG> is specified using the <CODE>
+axis.location</CODE>
+ field.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422087_pgfId-299393"></A>The range for u is the range for the profile curve.</P>
+<P>
+<A NAME="50422087_pgfId-299394"></A>The range for v is [0, 2pi).</P>
+<P>
+<A NAME="50422087_pgfId-299395"></A>The profile curve <STRONG>
+C</STRONG>, axis direction <STRONG>
+A</STRONG> and a reference point <STRONG>
+P</STRONG> on the axis can be obtained from <A NAME="50422087_marker-299396"></A><A HREF=../headers/pk_spun_ask.html>PK_SPUN_ask</A></P>
+<P>
+<A NAME="50422087_pgfId-370593"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-121.gif">
+
+<P>
+<A NAME="50422087_pgfId-299492"></A>Figure 17-13 Surface parameterisation - spun surface</P>
+<P>
+<A NAME="50422087_pgfId-311584"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422087_pgfId-311583"></A>Note: The curve must be a line, circle, ellipse or a b-curve. PK_ERROR_unsuitable_entity is returned if the curve is not one of these. PK_ERROR_su_self_intersect is returned if the surface would be self-intersecting.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422087_pgfId-299493"></A>The u parameter corresponds to the profile curve parameter.</P>
+<P>
+<A NAME="50422087_pgfId-299494"></A>The v parameter represents the angle about the axis, measured from the initial position of the profile curve. </P>
+<P>
+<A NAME="50422087_pgfId-299495"></A>The parameter runs clockwise when viewed along the A axis.</P>
+
+
+<H4>
+<A NAME="50422087_pgfId-299498"></A>17.3.2.9 <A NAME="50422087_marker-299496"></A><A NAME="50422087_marker-299497"></A><A NAME="50422087_88799"></A>B-surface </H4>
+<P>
+<A NAME="50422087_pgfId-299502"></A><A NAME="50422087_marker-299499"></A><A NAME="50422087_marker-299500"></A><A NAME="50422087_marker-299501"></A>B-surfaces (including B-splines which are represented internally as Bezier) have their own parameterisation.</P>
+<P>
+<A NAME="50422087_pgfId-299506"></A>For details, see <A HREF="fd_chap.124.html#50422207_12301">Chapter B, “The Mathematical Form Of B-Geometry”</A>.</P>
+<P>
+<A NAME="50422087_pgfId-593239"></A>&nbsp;</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.017.html">Session And Local Precision</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.019.html">B-Curves And B-Surfaces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

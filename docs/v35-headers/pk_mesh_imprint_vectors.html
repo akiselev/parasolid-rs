@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_MESH_imprint_vectors</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MESH_imprint_vectors</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_MESH_imprint_vectors
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_mesh_t.html>PK_MESH_t</A>                           mesh,           --- mesh
+int                                 n_vectors,      --- number of vectors
+const <A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                  *vectors,        --- vectors
+const <A HREF=../headers/pk_mesh_imprint_vectors_o_t.html>PK_MESH_imprint_vectors_o_t</A>  *options,        --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_mesh_t.html>PK_MESH_t</A>                    *const resultant_mesh, --- mesh with imprinted
+                                                    --- vectors
+<A HREF=../headers/pk_mvertex_t.html>PK_MVERTEX_t</A>                 *const mvertices,      --- mvertices
+<A HREF=../headers/pk_mesh_imprint_vectors_r_t.html>PK_MESH_imprint_vectors_r_t</A>  *const results         --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function imprints an array of vectors onto a mesh.
+</I>
+<A NAME="documentation"></A>
+This function creates a copy of the given <B>'mesh'</B> with the given <B>'vectors'</B>
+imprinted. The <B>'destination'</B> of the new mesh may be specified by the <B>'options'</B>.
+
+The function may optionally return an mvertex array of the same length as the
+vector array, where the ith mvertex comes from the ith vector. Note that
+one mvertex may come from multiple input vectors if they are within session
+precision of each other, and an input vector may be snapped to an existing
+mvertex if they are within session precision.
+
+If any vector is not within session precision of the mesh or not within
+session precision of its corresponding parameter or mtopol (given in the
+options structure), then the function will not imprint any vectors and
+<B>'resultant_mesh'</B> will be PK_ENTITY_null. Additionally, all vectors which were
+not within session precision of the mesh or their given parameter/mtopol will
+have their indices in the input array included in the <B>'error_indices'</B> array
+in the <B>'results'</B>.
+
+A "cluster" is a set of input vectors which satisfy the following conditions:
+
+1. It has at least two members.
+2. Each member is within session precision of at least one other in the set.
+3. No input vectors outside the set are within session precision of any member.
+4. It does not have any smaller subsets satisfying the first three conditions.
+
+The algorithm will attempt to resolve each cluster into a single vector which
+lies within session precision of all the vectors in the cluster. If it is not
+possible to resolve all the clusters, the function will not imprint the
+vectors and <B>'resultant_mesh'</B> will be PK_ENTITY_null. All vectors in the
+clusters which cannot be resolved will have their index in the input array
+included in the <B>'results'</B>.
+
+The function does not attempt to repair any defects in the <B>'resultant_mesh'</B>,
+but will return any defects in the <B>'resultant_mesh'</B> caused by imprinting the
+vectors in the <B>'results'</B>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

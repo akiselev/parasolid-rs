@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_attach_curve_nmnl</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_attach_curve_nmnl</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_EDGE_attach_curve_nmnl
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                            edge,      --- edge to which 'curve'
+                                                --- will be attached
+<A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                           curve,     --- curve of edge
+const <A HREF=../headers/pk_edge_attach_curve_nmnl_o_t.html>PK_EDGE_attach_curve_nmnl_o_t</A> *options    --- option structure
+)
+</B>
+<A NAME="description"></A>
+<I>This function attaches the <B>'curve'</B> provided to the <B>'edge'</B> as a nominal curve.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_curve_nmnl_off         nominal curves are not enabled on the
+                                    body to which <B>'edge'</B> belongs (MILD)
+    PK_ERROR_invalid_geometry       <B>'curve'</B> does not check (MILD)
+    PK_ERROR_geom_not_needed        <B>'edge'</B> already has a nominal curve (MILD)
+    PK_ERROR_bad_interval           parameter interval is not consistent with
+                                    end-points of <B>'edge'</B> (MILD)
+    PK_ERROR_missing_geometry       vertices or fins have missing geometry
+                                    (MILD)
+    PK_ERROR_inconsistent_geom      <B>'curve'</B> is not consistent with the geometry
+                                    of <B>'edge'</B> (MILD)
+    PK_ERROR_bad_shared_dep         <B>'curve'</B>, or one of its dependents, would be
+                                    illegally shared (MILD)
+
+<A NAME="documentation"></A>
+<B>'curve'</B> is attached to <B>'edge'</B> as a nominal curve.
+
+<B>'edge'</B> must not already have nominal geometry attached and must be tolerant.
+
+If <B>'edge'</B>s fins have curves, then <B>'curve'</B> must lie within <B>'edge'</B>s
+precision of these along the whole length of <B>'edge'</B>, or the call will fail
+with PK_ERROR_inconsistent_geom.
+
+If the application needs to fix the exact parameter values of the end-points
+(as returned by <A HREF=../headers/pk_edge_ask_geometry_nmnl.html>PK_EDGE_ask_geometry_nmnl</A>) it should supply them as an interval
+in the options structure, otherwise they will be calculated from the end-points
+of the edge.
+
+Nominal geometry must be enabled for the body to which <B>'edge'</B> belongs, or
+the error PK_ERROR_curve_nmnl_off results.
+
+<B>'curve'</B> must be either
+
+    o orphan geometry in the same partition as <B>'edge'</B>, which does not share
+      dependents with any other orphan geometry, or
+
+    o construction or boundary geometry in the body of <B>'edge'</B>
+
+The curve must be capable of passing Parasolid's geometry checking.
+
+The self intersection check is only performed if the appropriate interface
+parameter is set. See <A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>.
+
+
+The continuity check is only performed if the appropriate interface
+parameter is set. See <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A>.
+
+
+Note that <B>'curve'</B> may already be attached to another edge as edge geometry,
+fin geometry or nominal geometry.  In this case, where possible, <B>'curve'</B> will
+be shared, otherwise a copy of <B>'curve'</B> will be attached to <B>'edge'</B>.
+
+
+
+See <A HREF="../chapters/fd_chap.020.html#50434377_pgfId-294726">here</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

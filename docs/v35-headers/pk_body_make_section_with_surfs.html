@@ -1,0 +1,176 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_section_with_surfs</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_section_with_surfs</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                 PK_BODY_make_section_with_surfs
+(
+<I>--- received arguments ---
+</I>int                             n_targets, --- number of target bodies
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                       targets[], --- target bodies
+int                             n_tools,   --- number of tool surfaces
+<A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                       tools[],   --- tool surfaces
+const <A HREF=../headers/pk_body_make_section_o_t.html>PK_BODY_make_section_o_t</A> *options,   --- Sectioning options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>       *const tracking,  --- tracking information
+<A HREF=../headers/pk_body_make_section_r_t.html>PK_BODY_make_section_r_t</A> *const results    --- resultant bodies
+)
+</B>
+<A NAME="description"></A>
+<I>This function generates sections of target bodies using set of tool surfaces.
+Target bodies remain unchanged.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_contradictory_request      Bad combination of options or bad value
+                                        for option <B>'result_body_type'</B> (MILD)
+    PK_ERROR_missing_geom               Target or tool has incomplete
+                                        geometry (SERIOUS)
+    PK_ERROR_wire_body                  Target is a wire body (MILD)
+    PK_ERROR_non_manifold               Non-manifold result (SERIOUS)
+    PK_ERROR_boolean_failure            Inconsistent arguments, or
+                                        internal error (SERIOUS)
+    PK_ERROR_general_body               Target is a general body (MILD)
+
+<A NAME="documentation"></A>
+
+Introduction
+The given set of tool surfaces is used to generate sections of target bodies.
+The target bodies remain unchanged.
+
+Targets may be solid or sheet bodies.
+
+When targets are imprinted on tool surfaces, new tool faces will be generated.
+After imprinting, any tool faces that are inside target bodies are
+retained, and any tool faces that are outside target bodies are deleted. If
+this results in the resultant body being split into several disjoint manifold
+components, <B>'allow_disjoint'</B> in the options structure controls whether the
+body is split or not.
+
+The operation of the sectioning may be controlled via a set of options passed
+to the function as an input argument.
+
+Output of the operation is returned in the <B>'results'</B> structure.
+
+When the optional argument <B>'offsets'</B> is used to section a solid body, the
+curve tangent direction in the resultant bodies will be set so that the
+solid region of the originating target is on the left. Here, "left" is defined
+relative to a forward and vertical direction. The forward direction is
+the resultant curve tangent and the vertical direction is the
+tool surface normal.
+
+See <A HREF="../chapters/fd_chap.056.html#50434417_pgfId-296117">Non-destructive sectioning</A> for more information.
+
+Section Options
+If the <B>'tracking'</B> option is set to PK_LOGICAL_true, then tracking information
+for all faces and edges from <B>'bodies'</B> in <B>'results'</B> is returned.
+
+If the <B>'allow_disjoint'</B> option is set to PK_LOGICAL_true, then <B>'bodies'</B> in
+<B>'results'</B> may contain disjoint manifold components.
+If this option is set to PK_LOGICAL_false, resultant bodies having disjoint
+manifold components will be split such that every resultant body has a single
+manifold component.
+
+<B>'result_body_type'</B> can either be PK_BODY_type_sheet_c or PK_BODY_type_wire_c.
+If <B>'result_body_type'</B> is PK_BODY_type_wire_c, attempts will be made to ensure
+that <B>'bodies'</B> contains valid wire bodies, i.e no vertex has more than two
+edges meeting.
+
+
+Returned Arguments
+Tracking
+
+The <B>'tracking'</B> structure contains topology tracking information on the
+operation. In the case of this function, tracking information for all the
+faces and the edges from <B>'bodies'</B> is returned.
+
+For the faces, the <A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A> structure in <B>'tracking'</B> will be of type
+PK_TOPOL_track_create_c. <B>'original_topols'</B> will contain the tag of the surface
+from the <B>'tools'</B> that was imprinted to create the face.
+For the faces <B>'n_original_topols'</B> will be 1.
+
+For the edges, the <A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A> structure in <B>'tracking'</B> will be of type
+PK_TOPOL_track_create_c. <B>'original_topols'</B> will contain the tag of the target
+face and tool surface. If the edge is coincident with the target edge,
+tag of the target edge will be returned. The first entity will be from the
+target body and second entity will be tool surface.
+For the edges <B>'n_original_topols'</B> will be 2.
+
+Status and Fault Reporting
+
+The <B>'results'</B> structure contains resultant bodies and additional information,
+if any about the operation.
+
+If the function returns <B>'PK_ERROR_no_errors'</B>, then resultant bodies will be
+contained within the <B>'bodies'</B> array.
+
+If the <B>'n_offsets'</B> option is set greater than zero and all the offsets
+are distinct then any <B>'bodies'</B> returned in the <B>'results'</B> returned argument
+will be returned in the order that their corresponding offset values were
+supplied in the <B>'offsets'</B> option array.
+
+
+The <B>'reports'</B> will provide information about non-manifold or other invalid
+sections.
+
+Each report structure contains a <B>'report'</B> field indicating the reason for the
+failure and, if possible, an array of entities. These entities may assist the
+application in identifying the region or entities that resulted in the failure.
+The <B>'entities'</B> array may contain topology from the target and tool bodies. The
+entities returned in the array will be members of the following classes :
+
+   o PK_CLASS_body
+   o PK_CLASS_shell
+   o PK_CLASS_face
+   o PK_CLASS_edge
+   o PK_CLASS_vertex
+
+If <B>'report'</B> is <A HREF=../headers/pk_boolean_report_t.html>PK_boolean_report_non_manifold_c</A>, the invalid section body will
+be returned in <B>'entities'</B> array.
+
+Function Restrictions
+The following restrictions apply to the sectioning operation :
+
+   o Targets can be solid bodies or sheet bodies.
+   o This function supports general bodies only if the optional argument
+     <B>'offsets'</B> is used.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

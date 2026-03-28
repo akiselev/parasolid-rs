@@ -1,0 +1,174 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_output_surf_trimmed</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_output_surf_trimmed</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                        PK_FACE_output_surf_trimmed
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                              face,         --- face
+const <A HREF=../headers/pk_face_output_surf_trimmed_o_t.html>PK_FACE_output_surf_trimmed_o_t</A> *options,      --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                       *const surf,         --- surface
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>                    *const sense,        --- which side of surface
+<A HREF=../headers/pk_surf_trim_data_t.html>PK_SURF_trim_data_t</A>             *const trim_data,    --- trim data
+<A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A>                      **const geoms,        --- points and curves
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                  **const intervals,    --- geom intervals
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                     **const topols        --- topologies
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns a trimmed surface representation of the given face.
+
+This function does not support facet geometry [NF]. Similar functionality for
+faces with facet geometry is available within <A HREF=../headers/pk_mesh_make_surf_trimmed.html>PK_MESH_make_surf_trimmed</A>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_missing_geom            given face has no surface
+    PK_ERROR_bad_option_data         option data incorrect
+    PK_ERROR_tolerances_too_tight    curve tolerance too tight
+    PK_ERROR_trim_loop_degenerate    trimming loop degenerate
+    PK_ERROR_cant_make_bspline       failed to make equivalent bspline surface
+    PK_ERROR_cant_make_trimmed_sf    failed to make trimmed surface
+
+<A NAME="documentation"></A>
+See the documentation for <A HREF=../headers/pk_face_output_surf_trimmed_o_t.html>PK_FACE_output_surf_trimmed_o_t</A> for a description
+of the options.
+
+
+The Trimmed Surface Representation returned:
+
+A trimmed surface represents a bounded region of a parameterised surface by
+expressing the boundary curves of the trimmed surface as curves in surface
+parameter space. These curves, referred to as SP-curves, represent a 3-space
+curve with B-spline surface parameter space curves (i.e. B-spline curves with
+(u,v) vertices). In cases where the bounded region is the whole of the surface
+the trimmed surface can optionally be represented as a surface with no
+trimming curves.
+
+Wire edges and biwire edges are not considered, to form part of the
+boundary of a face and so will not be represented amongst the SP-curves
+returned.
+
+The surface that is trimmed is returned in <B>'surf'</B>.
+
+The <B>'sense'</B> argument indicates whether <B>'surf'</B>s normal points in the same
+direction (PK_LOGICAL_true) or opposite to (PK_LOGICAL_false) the face
+normal.
+If this returned information is to be passed into <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>
+then the surface and trim data are passed directly to that and then, if the
+<B>'sense'</B> was PK_LOGICAL_false, <A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A> is applied to the
+result.
+
+A description of a single trimmed surface is comprised of the
+surface to be trimmed, the sense of the surface, trimming information held
+in a <A HREF=../headers/pk_surf_trim_data_t.html>PK_SURF_trim_data_t</A> structure and three additional arrays.
+
+<B>'trim_data'</B> returns the trimming information.  The <B>'spcurves'</B> field of
+<B>'trim_data'</B> is described here.  For further information on <B>'trim_data'</B> see
+documentation for <A HREF=../headers/pk_surf_trim_data_t.html>PK_SURF_trim_data_t</A>.
+
+<B>'spcurves'</B> consists of an array of SP-curves which describe the boundary
+           loops of the trimmed surface (these will not necessarily be in
+           1-1 correspondence with the loops on the face). Where it is
+           appropriate to do so the code will place the outer boundary
+           loop of the trimmed surface at the head of the list of loops.
+           An example of where this is not appropriate is a trimmed
+           surface on a sphere, in this case it is sometimes hard
+           to distinguish between outer boundaries and holes.
+
+           Each component trimmed SP-curve of a trimming loop will
+           be G1 in in 3-space. This means, however, that it will not
+           necessarily be possible to represent a single G1 edge curve
+           as a single G1 SP-curve when the surface does not have a
+           parameterisation with continuous first derivatives.
+
+           Where an SP-curve is to represent a 3-space curve
+           identified as a line of constant surface parameter the
+           SP-curve description of it will be in the form of a
+           linear B-spline.
+
+Note: if <B>'n_spcurves'</B>&gt;0 then `trim_set[n_spcurves-1]' says how many trim sets
+there are.
+
+The arrays <B>'geoms'</B>, <B>'intervals'</B> and <B>'topols'</B> provide additional information,
+if requested, in the options structure.  Information in these arrays at a
+particular array index goes with the SP-curve in the <B>'spcurves'</B> array in
+<B>'trim_data'</B> at the same index. When <B>'geoms'</B> contains a curve, the
+corresponding element in <B>'intervals'</B> will contain the parametric range
+of that curve.
+
+Setting the <B>'want_geoms'</B> flag in the options structure to PK_LOGICAL_true
+causes both the <B>'geoms'</B> and <B>'intervals'</B> arrays to be output.
+
+
+geoms
+   'geoms':      An optional array of corresponding 3-space geometry. Each
+                 3-space geometry will be either a curve or a point. Points
+                 will arise in cases where a SP-curve has been produced to
+                 cross a degeneracy in the surface parameterisation.
+
+intervals
+   'intervals':  An optional array of geometry intervals where the
+                 corresponding geometry is a curve.
+
+
+topols
+   'topols':     An optional array of corresponding model topology. Each
+                 topology may be one of fin, vertex or null. Vertices will be
+                 associated with parameterisation degeneracies. The topology
+                 will be null if the SP-curve represents part of a seam line
+                 on the surface underlying the face.
+
+
+If the trimmed surface has no trimming loops these arrays will be
+returned as NULLs.
+
+
+Deleting Returned Geometry
+
+In the returned data from PK_FACE_output_surf_trimmed all geometries are either
+copies of geometry on the face or have been built specifically as
+alternative representations of that geometry. To avoid the modeller
+filling up with unrequired nodes, the returned geometry arrays
+should be deleted as soon as their usefulness expires.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

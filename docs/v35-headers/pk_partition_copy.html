@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_PARTITION_copy</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_PARTITION_copy</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>              PK_PARTITION_copy
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>               partition,     --- partition
+const <A HREF=../headers/pk_partition_copy_o_t.html>PK_PARTITION_copy_o_t</A> *options,       --- copy options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>        *const partition_copy --- copy of partition
+)
+</B>
+<A NAME="description"></A>
+<I>This function produces a new <B>'partition_copy'</B> which is a copy of the given
+<B>'partition'</B>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_rollback_not_started   Partitioned rollback is not active (MILD)
+    PK_ERROR_bad_mark               Partition is at its initial pmark (MILD)
+    PK_ERROR_not_at_pmark           Partition is not at a pmark (MILD)
+    PK_ERROR_frustrum_failure       The frustrum returned an error (MILD)
+
+<A NAME="documentation"></A>
+All model data from the <B>'partition'</B> is copied into a new <B>'partition_copy'</B>.
+The <B>'partition'</B> must not be at its initial pmark. If the <B>'copy_deltas'</B> option
+is not PK_PARTITION_copy_deltas_none_c then the pmarks and deltas are copied.
+In this case the <B>'partition'</B> must be at a pmark.
+
+If the <B>'copy_deltas'</B> option is PK_PARTITION_copy_deltas_curr_c then the
+<B>'partition_copy'</B> will only have an initial and a current pmark.
+
+If the partition allows partial pmarks, the <B>'partition_copy'</B> will also allow
+partial pmarks.
+
+This function should only be called when partitioned rollback has been started
+by calling <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.
+
+For more information, see <A HREF="../chapters/fd_chap.097.html#50434464_pgfId-294860">Copying partitions</A>.
+
+Note: You are advised to consult with Parasolid Support before using partitions
+that allow partial pmarks.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

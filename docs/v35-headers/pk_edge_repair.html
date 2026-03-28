@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_repair</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_repair</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>           PK_EDGE_repair
+(
+<I>--- received arguments ---
+</I>int                       n_edges,  --- number of edges (may be zero)
+const <A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>           edges[],  --- edges
+const <A HREF=../headers/pk_edge_repair_o_t.html>PK_EDGE_repair_o_t</A> *options,  --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A> *const tracking  --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function attempts to repair an array of edges, i.e. make them valid.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_missing_geom          either the edge has no curve or the
+                                   adjacent faces have no surfaces (MILD)
+    PK_ERROR_bad_tolerance         either the edge is too short or
+                                   the required tolerance is greater than
+                                   the 'max_tolerance' option allows (MILD)
+    PK_ERROR_failed_to_create_sp   SP-curve generator failed (MILD)
+    PK_ERROR_tolerances_too_tight  SP-curve generator could not achieve
+                                   tolerance (SERIOUS)
+    PK_ERROR_cant_do_intersect     The adjacent face surfaces could not be
+                                   intersected - probably due to tangency or
+                                   near tangency (SERIOUS)
+    PK_ERROR_facet_geometry        A facet/mixed edge was either non-manifold
+                                   or caused an internal algorithm failure
+                                   (SERIOUS)
+
+<A NAME="documentation"></A>
+The method(s) employed to repair classic edges are controlled by setting
+the <B>'ensure_on_surfs'</B> and <B>'intersect'</B> flags in the options structure.
+These flags do not affect the repair of facet/mixed edges.
+
+This function is primarily intended for use when a model is being imported into
+Parasolid via a data exchange format.
+
+Edges are split to remove G1 discontinuities.
+
+Edges with facet/mixed geometry attached can only be repaired if they are
+manifold, otherwise PK_ERROR_facet_geometry is returned.
+
+If the option <B>'ensure_on_surfs'</B> is set to PK_LOGICAL_true, a suitable
+tolerance is applied to any classic edges if necessary, to ensure they each
+lie on their adjacent surfaces.
+
+If the option <B>'intersect'</B> is set to PK_LOGICAL_true, a suitable accurate
+curve is found for any classic edges where necessary and possible, by
+intersecting the adjacent faces of each.
+
+If both options are selected then the accurate method will be attempted first.
+Note however that there are various circumstances in which the accurate
+solution will not be attempted - for instance if the edge is laminar, has
+surfaces which meet tangentially or has surfaces which need geometric repair
+using <A HREF=../headers/pk_face_repair.html>PK_FACE_repair</A>.
+
+The returned <B>'tracking'</B> contains a track record for each edge that has been
+split.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

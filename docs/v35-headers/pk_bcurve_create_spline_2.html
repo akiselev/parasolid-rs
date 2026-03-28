@@ -1,0 +1,90 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BCURVE_create_spline_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BCURVE_create_spline_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_BCURVE_create_spline_2
+(
+<I>--- received arguments ---
+</I>int                                  n_positions,     --- number of positions
+const <A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                   *positions,       --- positions to spline
+                                                      --- through
+const <A HREF=../headers/pk_bcurve_create_spline_2_o_t.html>PK_BCURVE_create_spline_2_o_t</A> *options,         --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_bcurve_spline_r_t.html>PK_BCURVE_spline_r_t</A>          *const results          --- results
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates one or more B-curves by splining through a set of
+positions, with optional parameters and derivatives.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_insufficient_points    too few <B>'positions'</B> have been supplied
+                                    (MILD)
+    PK_ERROR_bad_position           a position is outside size box; or two or
+                                    more consecutive positions are coincident
+                                    and parameters have not been supplied for
+                                    them; or curve is periodic and start and
+                                    end are coincident without parameters
+                                    supplied (MILD)
+    PK_ERROR_bad_tolerance          the proposed <B>'fit_tol'</B> or <B>'chordal_tol'</B> is
+                                    too small (MILD)
+
+<A NAME="documentation"></A>
+At least two distinct positions must be supplied.
+
+Parameters and derivatives corresponding to the positions can be supplied
+in the option structure, as can the degree, knotset and periodicity.
+
+Consecutive coincident positions are only allowed if those positions have
+parameters supplied for them.  Similarly, if the curve is to be periodic, the
+first and last <B>'positions'</B> supplied can only be coincident if parameters are
+supplied for them.
+
+By default, a single B-curve will be returned, however multiple B-curves may
+be created by supplying break points.
+
+The resultant B-curve(s) will have (degree-1) continuity, except where a lower
+continuity is implied by the multiplicity of a knot in a supplied knotset.
+
+See <A HREF="../chapters/fd_chap.019.html#50434376_pgfId-298265">here</A> for more information about this function.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

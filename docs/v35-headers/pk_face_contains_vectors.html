@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_contains_vectors</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_contains_vectors</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>               PK_FACE_contains_vectors
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                     face, --- face
+<A HREF=../headers/pk_face_contains_vectors_o_t.html>PK_FACE_contains_vectors_o_t</A> *options,
+                                    --- options structure [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                    topologies[]
+                                    --- topologies coincident with given
+                                    --- vectors
+)
+</B>
+<A NAME="description"></A>
+<I>This function determines whether the points represented by the given vectors
+or parameters lie inside, outside or on the boundary of the given face.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+  PK_ERROR_no_geometry              missing geometry
+  PK_ERROR_bad_option_data          bad option data
+
+<A NAME="documentation"></A>
+This function returns the unique, lowest dimension, topological entity in
+the face which contains or coincides with each of the represented positions.
+
+The interior of a hole is taken to be outside the face and the boundary of
+a hole is taken to be part of the boundary of the face. Positions are
+classified by returning the lowest dimension topological entity with which
+they coincide.
+
+    Topology           Enclosure Classification
+    --------           ----------------------------
+    Null               vector lies outside the face
+    Edge or Vertex     vector lies on the the face on that edge or vertex
+    Face               vector lies inside the face
+
+The positions must be represented either as an array of coordinates or as an
+array of parameter pairs, or both. If both are supplied the parameter pairs
+and coordinates must correspond and <B>'n_uvs'</B> and <B>'n_vectors'</B> must be equal.
+
+If <B>'loops'</B> are supplied the function determines the containment with respect
+only to these loops. For example, if a face has a periphery loop and several
+hole loops and <B>'loops'</B> is only the periphery loop, points inside the holes
+will be regarded as inside the face.  The application must ensure that the
+given loops bound a finite area for meaningful results to be returned.
+
+For performance reasons, it is assumed by default that position vectors lie
+on the face's surface.  If it is required to correctly classify position
+vectors as outside the face if they do not lie on the face's surface then
+the option <B>'is_on_surf'</B> must be set to PK_LOGICAL_false.
+
+See <A HREF="../chapters/fd_chap.027.html#50434384_pgfId-309839">Spatial containment</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

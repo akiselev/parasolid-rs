@@ -1,0 +1,173 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_instance_bodies</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_instance_bodies</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                    PK_FACE_instance_bodies
+(
+<I>--- received arguments ---
+</I>int                                n_target_faces, --- number of target faces
+                                                   --- (&gt;0)
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                    target_faces[], --- target faces
+int                                n_tool_bodies,  --- number of tool bodies
+                                                   --- (&gt;0)
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                    tool_bodies[],  --- tool bodies to be
+                                                   --- instanced
+const <A HREF=../headers/pk_transf_array_t.html>PK_TRANSF_array_t</A>            transforms[],   --- instancing transforms
+const <A HREF=../headers/pk_face_instance_bodies_o_t.html>PK_FACE_instance_bodies_o_t</A> *options,
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>          *const instance_tracking,
+                                                   --- tracking records
+                                                   --- for instances
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>          *const tracking        --- tracking records
+                                                   --- for topology
+)
+</B>
+<A NAME="description"></A>
+<I>This function instances (creates and then booleans transformed copies of...)
+tool bodies with a single target body.
+
+</I>
+<A NAME="documentation"></A>
+
+Specific Errors
+PK_ERROR_unsuitable_entity          Arguments not of correct type
+                                    (MILD or SERIOUS)
+PK_ERROR_targ_faces_many_bodies     Target faces are from more than one body
+                                    (MILD)
+PK_ERROR_general_body               Target or tool is a general body
+                                    (MILD)
+PK_ERROR_same_tool_and_target       Target body cannot also be a tool body
+                                    (MILD)
+PK_ERROR_duplicate_array_item       Duplicate face in target or duplicate
+                                    body in tool array
+                                    (MILD)
+PK_ERROR_tool_generation            Problems instancing tool, tools may clash
+                                    (MILD or SERIOUS)
+PK_ERROR_instanced_tools            Tool is instanced within an assembly
+                                    (MILD)
+PK_ERROR_invalid_bodies             Boolean failure or invalid bodies
+                                    (SERIOUS)
+PK_ERROR_non_manifold               Result is non-manifold
+                                    (SERIOUS)
+PK_ERROR_missing_geom               A topological entity lacks geometry
+                                    (SERIOUS)
+PK_ERROR_cant_do_imprint            Imprint failure
+                                    (SERIOUS)
+PK_ERROR_partial_coi_found          Failure due to detection of partial
+                                    coincidence
+                                    (SERIOUS)
+PK_ERROR_partial_no_intersect       No imprinting in a local boolean
+                                    (MILD)
+PK_ERROR_boolean_failure            Inconsistent arguments or internal error
+                                    (MILD or SERIOUS)
+PK_ERROR_not_implemented            Requested operation is not
+                                    implemented
+                                    (MILD)
+PK_ERROR_cant_limit_faces           The option <B>'limit_target_faces'</B>
+                                    can only be used with a limited set of
+                                    operations and bodies. The supplied option
+                                    set is not supported for this operation
+                                    (MILD)
+PK_ERROR_cant_intsc_solid_sheet     Can't intersect solid target with
+                                    sheet tool bodies (MILD)
+PK_ERROR_cant_unite_solid_sheet     Attempt to unite solid and sheet
+                                    (MILD)
+PK_ERROR_unsupported_transf         Unsupported type of transform
+                                    (MILD)
+
+
+
+The tool bodies are not modified by the boolean: all instanced occurrences in
+the resultant body are copies created during the operation.
+
+Each tool body is instanced by applying the corresponding array of transforms
+supplied in the array of arrays of transforms, <B>'transforms'</B>.
+
+Body Instancing Restrictions
+If the instanced tool bodies do not intersect, then for optimal performance
+the field <B>'no_tool_intersect'</B> in the configuration structure should have
+the value PK_LOGICAL_true. However, incorrectly setting this to
+PK_LOGICAL_true when instanced tool bodies do intersect may result in
+invalidities or failures.
+
+The effect of the <B>'target_material_side'</B>, <B>'tool_material_side'</B>,
+<B>'limit_target_faces'</B>, <B>'imprint_complete_targ'</B>,
+<B>'imprint_complete_tool'</B> and <B>'extend_face_list'</B> options and their
+interactions are identical to the same options used by the
+<A HREF=../headers/pk_face_boolean_2.html><A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A></A> function. Refer to the <A HREF=../headers/pk_face_boolean_2.html><A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A></A> documentation
+for information about these subjects.
+
+
+Returned Tracking Information
+If the <B>'tracking_type'</B> option is set to PK_instance_track_type_none_c
+no tracking information will be returned.
+
+Tracking is returned in two separate tracking structures,
+<B>'instance_tracking'</B> and <B>'tracking'</B>.
+
+Tracking information associated with instances is returned. An instance is
+tracked by a pair of entities, one being the original tool body and one the
+transform applied to generate that instance.
+
+The <B>'tracking'</B> structure contains topology tracking information on the
+operation. Information is returned in the <B>'tracking'</B> structure, if
+<B>'tracking_type'</B> is set to PK_instance_track_type_topol_c or
+PK_instance_track_type_both_c. The first record contains product
+topology consisting of all the resultant bodies, this is of particular
+use in scenarios where the target body is split.
+
+The remaining records in <B>'tracking'</B> will contain information regarding
+newly created topology. New faces and edges will be tracked to the
+underlying topologies used to create them upon the original tool and
+target along with the tracking information associated with the relevent
+instance.
+
+The <B>'instance_tracking'</B> structure contains tracking regarding the
+resultant faces arising from each instance. For each instance a tracking
+record is created with the originators being the tool body tag and the
+the tag of the transform applied to it to yield the instance. The product
+topologies contained in this record will be a list of all the resultant
+faces arising from that instance. The instance tracking information will
+be returned if <B>'tracking_type'</B> is set to PK_instance_track_type_inst_c or
+PK_instance_track_type_both_c.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

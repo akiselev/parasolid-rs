@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_PARTITION_transmit</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_PARTITION_transmit</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_PARTITION_transmit
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>                   partition,   --- partition
+const char                      *key,         --- key string
+const <A HREF=../headers/pk_partition_transmit_o_t.html>PK_PARTITION_transmit_o_t</A> *options      --- transmit options
+)
+</B>
+<A NAME="description"></A>
+<I>This function transmits the given <B>'partition'</B> to the given 'file' <B>'key'</B>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_rollback_not_started  Partitioned rollback is not active (MILD)
+    PK_ERROR_bad_partition         Partition cannot be transmitted (MILD)
+    PK_ERROR_bad_mark              Partition is at its initial pmark or
+                                      bad pmarks to transmit (MILD)
+    PK_ERROR_not_at_pmark          Partition is not at a pmark (MILD)
+    PK_ERROR_bad_key               Frustrum (FFOPWR) returned FR_bad_name
+                                     (MILD)
+    PK_ERROR_key_in_use            Frustrum (FFOPWR) returned FR_already_exists
+                                     (MILD)
+    PK_ERROR_cant_open_file        Frustrum (FFOPWR) returned FR_open_fail
+                                     (MILD)
+    PK_ERROR_schema_access_error   Error opening, closing, or writing the
+                                      schema file (MILD)
+    PK_ERROR_wrong_version         Cannot transmit as given version (MILD)
+    PK_ERROR_file_access_error     Error writing or closing the transmit file
+                                     (MILD)
+    PK_ERROR_disc_full             Frustrum (FFWRIT) returned FR_disc_full
+                                     (MILD)
+    PK_ERROR_applio_not_registered Application i/o functions not registered
+                                     (only relevant if option <B>'transmit_format'</B>
+                                      is <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_applio_c</A>) (MILD)
+    PK_ERROR_indexio_not_registered
+                                   Application i/o functions not registered
+                                     (only relevant if option <B>'transmit_format'</B>
+                                      is <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_indexio_c</A>) (MILD)
+    PK_ERROR_bad_text_conversion   Some partition data could not be written
+                                     (only relevant if option <B>'transmit_format'</B>
+                                      is <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_text_c</A>) (MILD)
+    PK_ERROR_facet_geometry        Partition contains facet geometry but facet
+                                   geometry is not enabled in the session
+                                     (MILD)
+    PK_ERROR_mesh_not_found        Not all requested mesh data successfully
+                                      received (MILD)
+    PK_ERROR_partial_pmark         Partial pmarks cannot be transmitted (MILD)
+
+<A NAME="documentation"></A>
+The <B>'key'</B> is passed to the frustrum, identifying to which 'file' the
+<B>'partition'</B> will be transmitted.
+
+The frustrum routine FFOPWR is called with guise FFCXMP (transmit file
+containing a partition). The <B>'partition'</B> must not be at its initial pmark.
+
+If the <B>'transmit_deltas'</B> and <B>'pmarks'</B> options include pmark deltas to transmit
+then the pmarks and deltas are written to a separate file, with the same <B>'key'</B>,
+which is opened with guise FFCXMD (transmit file containing deltas). In this
+case or if the <B>'transmit_deltas'</B> option is PK_PARTITION_xmt_deltas_later_c,
+the <B>'partition'</B> must be at a non-initial pmark.
+
+The <B>'transmit_format'</B> option affects the format argument to FFOPWR as follows:
+
+    <B>'transmit_format'</B>              format
+
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_text_c</A>      FFTEXT
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_binary_c</A>    FFBNRY
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_neutral_c</A>   FFBNRY
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_applio_c</A>   (function <B>'open_wr'</B> is called -
+                                   see <A HREF=../headers/pk_session_register_applio.html>PK_SESSION_register_applio</A>)
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_indexio_c</A>  (function <B>'ffopwr'</B> is called -
+                                   see <A HREF=../headers/pk_session_register_indexio.html>PK_SESSION_register_indexio</A>)
+
+Light partitions cannot be transmitted.
+
+Partitions that allow partial pmarks have additional restrictions. When
+transmitting partitions without deltas, force-loading remaining delayed-load
+meshes is required; if the partition was at a partial pmark, the transmit
+operation will change the partition such that it is no longer at its partial
+pmark.  Partial pmarks (including the current pmark) are not allowed to be
+transmitted during a <B>'transmit_deltas'</B> operation.
+
+See <A HREF="../chapters/fd_chap.101.html#50434468_pgfId-295071">Transmitting a partition</A> for more information.
+
+Note: You are advised to consult with Parasolid Support before using
+partial pmarks.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

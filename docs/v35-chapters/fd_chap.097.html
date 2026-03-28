@@ -1,0 +1,644 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Partitions</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Partitions</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.096.html">Attributes</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.098.html">Rollback</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-294720">96.1	Introduction </A>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-294831">96.2	Inter-partition references </A>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-294838">96.3	Inter-partition references and PK functions </A>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-294854">96.4	Copying entities between partitions </A>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-372535">96.5	Moving entities between partitions </A>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-294860">96.6	Copying partitions </A>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-294879">96.7	Deleting partitions </A>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-294906">96.8	Merging partitions </A>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-294972">96.9	Changing the type of the partition </A>
+<LI> <A HREF="fd_chap.097.html#50422176_pgfId-294993">96.10	Partition functions </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-294720"></A>96.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-294721"></A><STRONG>
+Partitions</STRONG> are provided to help the application organise entities in the modeling session into sets of related parts, and to save these parts as a single item.</P>
+<P>
+<A NAME="50422176_pgfId-294722"></A><STRONG>
+Rollback</STRONG> enables the application to return the Parasolid session to an earlier state. It can be applied to individual partitions, or to the whole session. Rollback is described in more detail in <A HREF="fd_chap.098.html#50422177_36055">Chapter 97, “Rollback”</A>.</P>
+<P>
+<A NAME="50422176_pgfId-313070"></A>For an example of both of these functionalities, see the code examples in the <CODE>
+C++\Code Examples\Application Support\Partition and Delta Transmission</CODE>
+ folder and in the <CODE>
+Rollback</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422176_pgfId-294726"></A>The objects used by partitions and rollback are:</P>
+<P>
+<A NAME="50422176_pgfId-294758"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294729"></A>PK Object</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294731"></A>Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294733"></A>Rollback Use</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294735"></A>PARTITION</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294737"></A>partition</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294739"></A>a collection of entities which can be rolled back and forward independently</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294741"></A>PMARK</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294743"></A>partition mark</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294745"></A>record of the state of a particular partition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294747"></A>MARK</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294749"></A>session mark</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294751"></A>record of the state of the entire session</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294753"></A>DELTA</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294755"></A>changes between pmarks</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294757"></A>record of the entities which need to be created, modified or deleted in order to move from one pmark to an adjacent one</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422176_pgfId-294760"></A><A NAME="50422176_marker-294759"></A>A partition is a self-contained collection of bodies, orphan geometry and transforms. It can be rolled back and forward independently of other partitions.</P>
+<P>
+<A NAME="50422176_pgfId-294764"></A>As shown in <A HREF="fd_chap.097.html#50422176_98866"><EM>
+Figure 96-1</EM></A>, all entities in the session are in some partition, except for:</P>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-294765"></A>Attribute definitions</LI>
+<LI>
+<A NAME="50422176_pgfId-294766"></A>The bulletin board</LI>
+<LI>
+<A NAME="50422176_pgfId-294767"></A>Modeling and session parameters </LI>
+</UL>
+<P>
+<A NAME="50422176_pgfId-294768"></A>These objects exist at a session level; they take no account of the current partition when created and are exempt from the no inter-partition references rule (see <A HREF="fd_chap.097.html#50422176_13609">Section 96.2, “Inter-partition references”</A>). They are not affected by partitioned rollback.</P>
+<P>
+<A NAME="50422176_pgfId-294774"></A>At any particular time, one partition is designated the <STRONG>
+current</STRONG><A NAME="50422176_marker-294772"></A><A NAME="50422176_marker-294773"></A> partition:</P>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-294775"></A>New, non-referenced entities created are put into the current partition.</LI>
+<LI>
+<A NAME="50422176_pgfId-294776"></A>When a Parasolid session is started, one partition is created and made current.</LI>
+<LI>
+<A NAME="50422176_pgfId-294777"></A>The value of the current partition is affected (i.e. restored) by session rollback.</LI>
+</UL>
+<P>
+<A NAME="50422176_pgfId-294778"></A>You can designate a partition as being <STRONG>
+light</STRONG> instead of <STRONG>
+standard</STRONG> (the default). A light partition is exactly the same as a standard partition except that there is no backward delta at the first non-initial pmark . You would consider using a light partition in a situation where just two pmarks are used and the first non-initial pmark is frequently advanced; or when three or more pmarks are used and the first non-initial pmark is frequently deleted. In these circumstances, advancing or deleting the first non-initial pmark of a light partition is much faster than for a standard partition.</P>
+<P>
+<A NAME="50422176_pgfId-294779"></A>An example of where light partitions can prove effective is when pmarks are used as a way of saving the state of the partition every so often, for the purposes of error recovery after a failed operation. To do this you only need set two pmarks, where the first non-initial pmark would be advanced each time the state of the partition is saved.</P>
+<P>
+<A NAME="50422176_pgfId-294780"></A>In certain circumstances, you can change the type of a partition using <A HREF=../headers/pk_partition_set_type.html>PK_PARTITION_set_type</A>; for details, see <A HREF="fd_chap.097.html#50422176_85697" CLASS="XRef">Section 96.9, “Changing the type of the partition”</A>. For more information about pmarks and deltas, see <A HREF="fd_chap.098.html#50422177_12385">Section 97.2, “Partitioned rollback”</A> and <A HREF="fd_chap.098.html#50422177_86443">Section 97.3, “Deltas”</A></P>
+<P>
+<A NAME="50422176_pgfId-294824"></A>.</P>
+
+<IMG SRC="../graphics/fd_chap-1139.gif">
+
+<P>
+<A NAME="50422176_pgfId-294826"></A>Figure 96-1 <A NAME="50422176_98866"></A>Session structure</P>
+<P>
+<A NAME="50422176_pgfId-317854"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-317600"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-317565"></A><A HREF="fd_chap.098.html#50422177_36055">Chapter 97, “Rollback”</A></LI>
+<LI>
+<A NAME="50422176_pgfId-317615"></A><A HREF="fd_chap.098.html#50422177_70447">Section 97.2.6, “Advancing a partition mark”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-294831"></A>96.2	<A NAME="50422176_13609"></A><A NAME="50422176_marker-294828"></A><A NAME="50422176_marker-294829"></A><A NAME="50422176_marker-294830"></A>Inter-partition references 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-294834"></A><A NAME="50422176_marker-294832"></A><A NAME="50422176_marker-294833"></A>In general, <EM>
+inter-partition references are not allowed</EM>. This condition is imposed to avoid inconsistencies which could arise when using partitioned rollback. Therefore, many modeling operations that would create such references are not allowed; for example, uniting bodies in different partitions, attaching geometry to bodies in different partitions or intersecting surfaces in different partitions.</P>
+<P>
+<A NAME="50422176_pgfId-294835"></A>The behaviour of PK functions is determined by the fact that if an entity is created which is referenced by an existing entity, then it must be created in the same partition as that entity. If it is not so referenced - for example a new line created by <A HREF=../headers/pk_line_create.html>PK_LINE_create</A> - then its partition is not so determined, and it is put in the current partition. </P>
+<P>
+<A NAME="50422176_pgfId-294836"></A>Therefore, if a PK function creates (or may create) a reference between two existing entities, it may only be called if those two entities are in the same partition; for example, boolean operations may only be performed on faces and bodies in the same partition.</P>
+<P>
+<A NAME="50422176_pgfId-294837"></A>However, some functions are allowed to reference entities in other partitions during an operation, as long as there are no inter-partition references created when the operation has completed.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-294838"></A>96.3	Inter-partition references and PK functions 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-303483"></A>PK functions can be divided into the following groups when considering inter-partition references:</P>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-303484"></A>For read-only functions with one input entity, there is no problem.</LI>
+<LI>
+<A NAME="50422176_pgfId-294841"></A>For read-only functions with more than one input entity, these entities can be in any partition.</LI>
+<LI>
+<A NAME="50422176_pgfId-294842"></A>For modeling functions which do not create references between different input parts or orphan geometry, the input entities can be in any partition.</LI>
+<LI>
+<A NAME="50422176_pgfId-294843"></A>Modeling functions which create entities not referenced by any existing entity (i.e. parts or orphan geometry), create them in the current partition.</LI>
+<LI>
+<A NAME="50422176_pgfId-294844"></A>Receiving a part creates bodies in the current partition.</LI>
+<LI>
+<A NAME="50422176_pgfId-294845"></A>Other PK functions may create references between their input entities, and new entities created are referenced by existing ones - hence their arguments <EM>
+must</EM> be in the same partition and any entities created are also in that partition.</LI>
+</UL>
+<P>
+<A NAME="50422176_pgfId-294846"></A>There is one exception:</P>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-294847"></A>An attribute is not regarded as referencing its attribute definition, so the attribute definition is not stored in the same partition as the attribute, and new attribute definitions are not created in the current partition.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-294854"></A>96.4	<A NAME="50422176_marker-294848"></A><A NAME="50422176_marker-294849"></A><A NAME="50422176_marker-294850"></A><A NAME="50422176_marker-294851"></A><A NAME="50422176_marker-294852"></A><A NAME="50422176_marker-294853"></A><A NAME="50422176_40451"></A>Copying entities between partitions 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-370281"></A>You can <STRONG>
+copy</STRONG> an entity to a given partition and specify the destination of the copied entity using <A HREF=../headers/pk_entity_copy_2.html>PK_ENTITY_copy_2</A>. The behaviour varies depending on the entity you are copying. For more information see the table in <A HREF=../headers/pk_entity_copy_o_t.html>PK_ENTITY_copy_o_t</A>.</P>
+<P>
+<A NAME="50422176_pgfId-377106"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-377146"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-377127"></A><A HREF="fd_chap.003.html#50422070_39907">Section 2.4.6, “Copying entities”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-372535"></A>96.5	Moving entities between partitions 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-370340"></A><A NAME="50422176_marker-373202"></A><A HREF=../headers/pk_body_change_partition.html>PK_BODY_change_partition</A> can be used to <STRONG>
+move</STRONG> a body into a different partition, preserving all its tags, provided that it is a new body - i.e. the body, and all entities within it, have been created since the last roll operation (create or goto) in its partition. The tags of the body and entities within it are unchanged. This can be used, for example, when receiving a transmit file with a number of bodies in it, and then distributing them to other partitions.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-294860"></A>96.6	<A NAME="50422176_59217"></A>Copying partitions 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-294862"></A><A NAME="50422176_marker-294861"></A>You can copy an entire partition using <A HREF=../headers/pk_partition_copy.html>PK_PARTITION_copy</A>. This function accepts a <CODE>
+copy_deltas</CODE>
+ option that lets you control whether and how deltas in the partition are copied. You can choose between the following options:</P>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-294863"></A>Do not copy deltas at all.</LI>
+<LI>
+<A NAME="50422176_pgfId-294864"></A>Copy all deltas in the partition.</LI>
+<LI>
+<A NAME="50422176_pgfId-294865"></A>Copy all the deltas in the partition that are in the main line between the initial pmark and the current pmark. </LI>
+<LI>
+<A NAME="50422176_pgfId-294866"></A>Create a delta for the current pmark only. </LI>
+</UL>
+<P>
+<A NAME="50422176_pgfId-294867"></A>When you copy a partition, the following items are also copied:</P>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-294868"></A>All parts in the partition.</LI>
+<LI>
+<A NAME="50422176_pgfId-294869"></A>Any orphan geometry attached to the partition.</LI>
+</UL>
+<P>
+<A NAME="50422176_pgfId-294870"></A>However, any user fields in the original partition are not copied. </P>
+<P>
+<A NAME="50422176_pgfId-294871"></A>The contents of the copied partition are in the same order (as returned by various enquiry functions) as the original partition, so that your application can relate copied entities to the original ones.</P>
+<P>
+<A NAME="50422176_pgfId-294875"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422176_pgfId-294874"></A>Note: The partition to be copied must not be at its initial pmark when you call this function.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-294879"></A>96.7	<A NAME="50422176_80640"></A><A NAME="50422176_marker-294877"></A><A NAME="50422176_marker-294878"></A>Deleting partitions 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-294880"></A>You can delete partitions, and optionally all the data in them, using <A HREF=../headers/pk_partition_delete.html>PK_PARTITION_delete</A>. You cannot delete the current partition. </P>
+<P>
+<A NAME="50422176_pgfId-294884"></A>When deleting partitions, Parasolid needs to take account of any session marks at which the partition to be deleted is current. For example, suppose you delete a partition P, which is current at several session marks. If this is the case, the current partition, C, is made current at those session marks. <A HREF=../headers/pk_partition_delete.html>PK_PARTITION_delete</A> returns an error if this is not possible.</P>
+<P>
+<A NAME="50422176_pgfId-294888"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422176_pgfId-294887"></A>Note: Any partition that does not exist at a given session mark - because it had not been created when that session mark was created - is considered to be at its initial pmark.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422176_pgfId-294892"></A>See <A HREF="fd_chap.098.html#50422177_40541">Section 97.4, “Session rollback”</A> for more information about session marks.</P>
+<P>
+<A NAME="50422176_pgfId-294893"></A>By default, only empty partitions - those with no assemblies, bodies, geometric entities, KI lists or transforms - are deleted. Attempting to delete a non-empty partition returns an error.</P>
+<P>
+<A NAME="50422176_pgfId-294894"></A>If the <CODE>
+delete_non_empty</CODE>
+ option is PK_LOGICAL_true, non-empty partitions can be deleted as well, together with all model data currently in the partition, and at each mark. </P>
+<P>
+<A NAME="50422176_pgfId-294895"></A>If you do not wish to delete a partition explicitly, you can make it inactive by rolling it to its initial pmark using <A NAME="50422176_marker-294896"></A><A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A>. While a partition is <A NAME="50422176_marker-294897"></A><A NAME="50422176_marker-294898"></A>inactive, it cannot be made current, and entities cannot be created in it. To make an inactive partition current again, you need to roll forward to a non-initial pmark in the partition.</P>
+<P>
+<A NAME="50422176_pgfId-294902"></A>See also <A HREF="fd_chap.098.html#50422177_26402">Section 97.6, “Mark management - an example strategy”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-294906"></A>96.8	<A NAME="50422176_28671"></A><A NAME="50422176_marker-294904"></A><A NAME="50422176_marker-294905"></A>Merging partitions 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-294907"></A>You can use <A HREF=../headers/pk_partition_merge.html>PK_PARTITION_merge</A> to merge together two or more partitions, combining the model data from each partition and interleaving the pmark deltas in the process. Each partition to be merged must contain a linear pmark graph.</P>
+<P>
+<A NAME="50422176_pgfId-294911"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422176_pgfId-294910"></A>Note: Light partitions may not be merged.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422176_pgfId-294912"></A><A HREF=../headers/pk_partition_merge.html>PK_PARTITION_merge</A> takes an array of partitions and an array of pmarks. </P>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-294913"></A>The first partition in the partitions array survives the operation, and all the others are deleted. If the partitions supplied contain the current partition, then the surviving partition becomes the current partition.</LI>
+<LI>
+<A NAME="50422176_pgfId-294914"></A>The pmarks array contains all the pmarks for each of the specified partitions. Pmarks may be supplied in any order, so long as they are listed in order for each individual partition.</LI>
+<LI>
+<A NAME="50422176_pgfId-294915"></A>All pmarks for all supplied partitions (except for initial pmarks) must be given in the <CODE>
+pmarks</CODE>
+ array. The order of the pmarks in this array defines the order in which those pmarks will appear in the surviving partition. All pmarks from each original partition must appear in this array in the order in which they occur in the original partition (although not necessarily consecutively).</LI>
+</UL>
+<P>
+<A NAME="50422176_pgfId-294919"></A><A HREF="fd_chap.097.html#50422176_90199"><EM>
+Figure 96-2</EM></A> illustrates how three partitions can be combined using this function: </P>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-294920"></A>Partition A survives the operation. Its three pmarks survive unchanged apart from their connectivity.</LI>
+<LI>
+<A NAME="50422176_pgfId-294921"></A>Partitions B and C are destroyed by the operation. They contain pmarks which are given new identifiers (but have the same tags) in the surviving Partition A. </LI>
+<LI>
+<A NAME="50422176_pgfId-294922"></A>Partition B is the current partition before the operation, so Partition A is the current partition after the operation.</LI>
+<LI>
+<A NAME="50422176_pgfId-294923"></A>Pmarks are handed into <A HREF=../headers/pk_partition_merge.html>PK_PARTITION_merge</A> in the following order: </LI>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-294924"></A>A1 B1 A2 C1 A3 C2 (each pmark in tag order)</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422176_pgfId-294960"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1140.gif">
+
+<P>
+<A NAME="50422176_pgfId-294962"></A>Figure 96-2 <A NAME="50422176_90199"></A>Merging together the data from three partitions</P>
+<P>
+<A NAME="50422176_pgfId-294970"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422176_pgfId-294965"></A>Note: In the example above, pmarks could have been handed into <A HREF=../headers/pk_partition_merge.html>PK_PARTITION_merge</A> in a variety of orders. Some examples are shown below:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-330596"></A>A1 A2 A3 C1 C2 B1 (each partition independently)</LI>
+<LI>
+<A NAME="50422176_pgfId-330597"></A>C1 A1 B1 A2 C2 A3 (partitions mixed together, but still in order within each partition)</LI>
+<LI>
+<A NAME="50422176_pgfId-330501"></A>A1 B1 C1 A2 C2 A3 (all first pmarks, all second pmarks, all third pmarks)</LI>
+</UL>
+<P>
+<A NAME="50422176_pgfId-294969"></A>In each case, the resulting pmarks in the surviving partition would be ordered differently.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-294972"></A>96.9	<A NAME="50422176_85697"></A>Changing the type of the partition 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-294973"></A>You can set and ask the type of a partition (either light or standard) via the functions <A HREF=../headers/pk_partition_set_type.html>PK_PARTITION_set_type</A> and <A HREF=../headers/pk_partition_ask_type.html>PK_PARTITION_ask_type</A>.</P>
+<UL>
+<LI>
+<A NAME="50422176_pgfId-294974"></A>You can change the partition type from standard to light at any time; a backward delta between the initial pmark and a pmark immediately following it will be removed. Note that this change cannot be undone by rolling back the session; you would have to reset the partition type manually.</LI>
+<LI>
+<A NAME="50422176_pgfId-294975"></A>You can change the partition type from light to standard as long as the current pmark is either the initial pmark or a pmark immediately following it.</LI>
+</UL>
+<P>
+<A NAME="50422176_pgfId-294979"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422176_pgfId-294978"></A>Note: It is better to set a partition type to light <EM>
+before</EM> creating any pmarks if possible, as this avoids creating and removing a backward delta.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422176_pgfId-294982"></A>For more information about pmarks and deltas, see <A HREF="fd_chap.098.html#50422177_12385">Section 97.2, “Partitioned rollback”</A> and <A HREF="fd_chap.098.html#50422177_86443">Section 97.3, “Deltas”</A>.</P>
+<P>
+<A NAME="50422176_pgfId-294990"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422176_pgfId-294989"></A>Note: These functions should only be called when partitioned rollback has been started by calling <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422176_pgfId-294993"></A>96.10	<A NAME="50422176_marker-294991"></A><A NAME="50422176_marker-294992"></A>Partition functions 
+
+
+</H1>
+<P>
+<A NAME="50422176_pgfId-294994"></A>The majority of functions for enquiring, creating, and modifying partitions have names of the form PK_PARTITION_<EM>
+&lt;operation&gt;</EM>. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information about these functions.</P>
+<P>
+<A NAME="50422176_pgfId-294995"></A>The following functions are also relevant to partitions:</P>
+<P>
+<A NAME="50422176_pgfId-295028"></A><A NAME="50422176_marker-295026"></A><A NAME="50422176_marker-295027"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-294998"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295000"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295003"></A><A NAME="50422176_marker-295002"></A><A HREF=../headers/pk_body_change_partition.html>PK_BODY_change_partition</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295005"></A>moves a body into a different partition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295008"></A><A NAME="50422176_marker-295007"></A><A HREF=../headers/pk_entity_ask_partition.html>PK_ENTITY_ask_partition</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295010"></A>returns the partition of an entity</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295013"></A><A NAME="50422176_marker-295012"></A><A HREF=../headers/pk_pmark_ask_partition.html>PK_PMARK_ask_partition</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295015"></A>returns the partition of a partition mark</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295018"></A><A NAME="50422176_marker-295017"></A><A HREF=../headers/pk_session_ask_curr_partition.html>PK_SESSION_ask_curr_partition</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295020"></A>returns the current partition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295023"></A><A NAME="50422176_marker-295022"></A><A HREF=../headers/pk_session_ask_partitions.html>PK_SESSION_ask_partitions</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422176_pgfId-295025"></A>returns all the partitions in the session</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422176_pgfId-275053"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.096.html">Attributes</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.098.html">Rollback</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,284 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_pattern</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_pattern</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_FACE_pattern
+(
+<I>--- received arguments ---
+</I>int                        n_pattern_faces,  --- number of pattern faces (&gt;0)
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>            pattern_faces[],  --- pattern faces
+int                        n_transforms,     --- number of transforms (&gt;0)
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>          transforms[],     --- pattern transformations
+const <A HREF=../headers/pk_face_pattern_o_t.html>PK_FACE_pattern_o_t</A> *options,          --- pattern options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_face_pattern_r_t.html>PK_FACE_pattern_r_t</A> *const pattern_results   --- status and tracking info
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a pattern of a feature on the target body.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_wrong_transf        (MILD) a transform in <B>'transforms'</B> is general
+                                        affine, identity, or contains
+                                        perspective component
+
+<A NAME="documentation"></A>
+
+A pattern of features is created by specifying a collection of faces
+on the target which form the feature and a set of transformation
+entities which will determine the pattern. The collection of faces
+is copied in-situ and transformed to form the pattern. The pattern
+faces specified may belong to a manifold or general body.
+
+
+Pattern Faces
+
+The collection of pattern faces which are to be patterned must satisfy
+the following basic requirements :
+
+   o All the faces must belong to the same body.
+
+   o All the faces of the feature to be patterned, must be
+     specified.
+
+The set of pattern faces may have any number of boundaries (circuits of
+edges) at which it meets the non-pattern faces.  Each boundary must,
+after being transformed, remain coincident with the body, except when the
+<B>'coi_face'</B> option is set to <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A> - see below.
+The location of the transformed boundary is restricted to affect only those
+topological entities which are initially incident with the pattern
+faces.  There are two types of boundary circuit - those that form a
+loop inside a non-pattern face, and those that cross non-pattern edges.
+
+
+Boundary circuits inside non-pattern faces:
+
+If the <B>'same_face'</B> option is set to <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_yes_c</A> then the
+following restrictions apply :
+
+   o After transformation, the boundary loop must remain in the same
+     face.
+
+   o A boundary circuit must not be a winding loop.
+
+If the <B>'same_face'</B> option is set to <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_no_c</A> then these
+restrictions are lifted. This is obviously far more general but does -
+necessarily - involve more work so if the boundary loops are known to lie in
+the same face then it will be more efficient not to use this value.
+
+See <A HREF="../chapters/fd_chap.055.html#50434416_pgfId-300130">here</A> for more information.
+
+If the <B>'same_face'</B> option is set to <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_yes_c</A> then the
+boundary does not need to remain coincident with the body. If the <B>'coi_face'</B>
+option is <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A> transformed boundary edges which are
+not coincident with the surface of the face will be recalculated. If the
+boundary edges are smooth and bounded by blend faces then the <B>'reblend'</B>
+option allows the transformed boundary edges to be optionally recalculated
+by regenerating their bounding blend faces such that they remain smooth.
+
+If the <B>'same_face'</B> option is set to <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_no_c</A> and <B>'coi_face'</B>
+option is set to <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A>, <B>'face_maps'</B> can be specified
+by the application to help determine the transformed position of the pattern
+feature.
+
+See <A HREF="../chapters/fd_chap.055.html#50434416_pgfId-300280">here</A> for more information.
+
+Boundary circuits which cross non-pattern edges:
+
+If a boundary circuit is connected to non-pattern edges, then those
+edges must occur in groups, each of which contains all the edges
+coincident with a particular curve (e.g. if the feature consisted of a
+chimney in the middle of a roof, the ridge curve of the roof would be
+such a curve).
+
+   o There should be an even number of edges in each group, and at
+     the vertex where an edge meets the pattern faces, there must be
+     exactly one edge which is not adjacent to a pattern face (except
+     in the limiting case where two edges graze the pattern faces at a
+     single vertex).
+
+   o Each of the edges in a group must have the same number of
+     incident faces and the surfaces of these faces must be the same
+     or coincident.
+
+   o On transformation, it will be necessary to split existing edges
+     and perhaps also faces in order to accommodate an instance of the
+     face set.  Any edges or faces which are to be split must either be
+     adjacent to the face set initially, or be geometrically the same as
+     or a transformed copy of these adjacent topologies.
+
+   o Regions can not be split.
+
+   o If there are any boundary circuits of this type, then none of the
+     transforms may contain a reflection component.
+
+Tracking and Error Information
+
+The function returns overall and specific tracking information with
+respect to the patterning operation. The tracking information relates
+to the pattern faces themselves and not to other faces which may be
+created due to splitting non-pattern faces; applications must not
+assume anything about the order in which non-pattern faces or edges
+are split since this is not defined and may change in future if
+internal algorithms are changed. The amount of information returned
+will depend on the state of <B>'result'</B> field in the return structure and
+the data contained in the <B>'patterns'</B> array :
+
+
+Patterning result array is empty
+
+ The patterning operation has failed outright and no individual
+ pattern data is returned. The <B>'result'</B> field will contain a
+ value that reflects the reason for the failure. The <B>'error_topols'</B>
+ array may also contain topological data that will help identify
+ the reason for the failure.
+
+ This situation will typically arise if there is something wrong
+ with the input data.
+
+
+Result flag indicates partial success
+
+ If the <B>'result'</B> flag indicates partial success by containing the
+ value, <A HREF=../headers/pk_pattern_result_t.html>PK_pattern_result_partial_c</A>, the <B>'patterns'</B> array will contain
+ a pattern data structure for each patterned feature. This array will
+ map one-to-one with the <B>'transforms'</B> array input to the function.
+
+ Each pattern data structure only contains data pertaining to a single
+ instance of the pattern. The <B>'status'</B> field indicates whether the
+ instance of the pattern was successful.
+
+  o If the instance of the pattern was successful, then the
+    <B>'pattern_faces'</B> array will contain the newly created faces
+    of the pattern. This array will map one-to-one with the
+    <B>'pattern_faces'</B> input to the function.
+
+  o If the instance of the pattern was unsuccessful, and the instance
+    has not been removed from the body, then the <B>'pattern_faces'</B> array
+    will contain the newly created faces of the pattern. The
+    <B>'error_topols'</B> array may contain topological data that will help
+    identify the reason for the failure (e.g. faces which have been
+    found to clash).
+
+
+Result flag indicates complete success
+
+ If the <B>'result'</B> flag indicates complete success by containing the
+ value, <A HREF=../headers/pk_pattern_result_t.html>PK_pattern_result_ok_c</A>, the <B>'patterns'</B> array will contain a
+ pattern data structure for each patterned feature. This array
+ will map one-to-one with the <B>'transforms'</B> array input to the function.
+
+ Each pattern data structure only contains data pertaining to a single
+ instance of the pattern. Every <B>'status'</B> field of the pattern data
+ structures will indicate a successful operation.
+
+ In each pattern data structure, the <B>'pattern_faces'</B> array will contain
+ the newly created faces of the pattern. This array will map one-to-one
+ with the <B>'pattern_faces'</B> input to the function.
+
+
+State of the Body
+
+If the value of the <B>'result'</B> field contains anything other than the
+<B>'<A HREF=../headers/pk_pattern_result_t.html>PK_pattern_result_ok_c</A>'</B> code, then the input body should be considered
+to be in an invalid state. In other words, it will fail to check.
+
+If the value of the <B>'result'</B> field does contain the <B>'<A HREF=../headers/pk_pattern_result_t.html>PK_pattern_result_ok_c</A>'</B>
+code, then the application programmer still needs to consider the
+following :
+
+ o If no checking was specified in the options, the resultant body
+   may be invalid.
+
+ o If checking was specified in the options, the instances of the
+   pattern may clash.
+
+Pattern Checking
+
+By default and for reasons of performance, minimal checking of the
+patterned features takes place. The amount of checking the function
+undertakes is controlled via the check flags in the option structure.
+
+Where creation of instances requires edges or faces to be split, then
+certain basic checks are always performed.  The points in a group of
+edges at which splits are to be made are checked for consistency - if
+a clash between two instances is implied, then the later instance is
+removed and its returned status will be
+<B>'<A HREF=../headers/pk_pattern_status_t.html>PK_pattern_status_outside_fa_c</A>'</B>.
+
+ o Loop checking is controlled via the <B>'check_loops'</B> flag and, if
+   enabled, the function checks for clashes between new edges in an
+   instance and existing edges which share a face with each other and
+   also ensures that complete new loops lie inside a face.  No loop
+   checking is performed for pairs of new edges; thus, there may be
+   clashing edges in different instances in the result, even if loop
+   checking is on.
+
+   If the loop check for a particular pattern instance fails :
+     o The instance of the pattern is removed from the body.
+     o A suitable status is returned via the pattern data results
+       structure which may also include a clashing edge in the
+       error topology.
+
+   See <A HREF="../chapters/fd_chap.055.html#50434416_pgfId-299047">Ensuring loops remain in a single face</A> for more
+   information
+
+ o Face-face checking is controlled via the <B>'check_fa_fa'</B> flag and if
+   enabled, the function checks if any there are any clashes between
+   the faces of each instance of the pattern and the non-pattern faces
+   of the original body.
+   No face-face checking is performed between instances of the pattern.
+
+   If the face-face check for a particular pattern instance fails :
+     o The instance of the pattern is NOT removed from the body.
+     o A suitable status is returned via the pattern data results
+       structure which will include error topology. The error topology
+       array will contain pairs of clashing faces. Each pair will be
+       returned in the format, pattern face followed by clash face :
+
+         error_topols[ pattenface1 clashface1 patternface2 clashface2 ...]
+
+   See <A HREF="../chapters/fd_chap.055.html#50434416_pgfId-299883">here</A> for more information
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TOPOL_range_vector</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TOPOL_range_vector</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                    PK_TOPOL_range_vector
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                         topol,          --- topological entity
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                        vector,         --- position
+const <A HREF=../headers/pk_topol_range_vector_o_t.html>PK_TOPOL_range_vector_o_t</A>   *options,        --- options structure [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_range_result_t.html>PK_range_result_t</A>           *const range_result,   --- if range data returned
+<A HREF=../headers/pk_range_1_r_t.html>PK_range_1_r_t</A>              *const range           --- range data
+)
+</B>
+<A NAME="description"></A>
+<I>This function finds the global minimum separation between a topological
+entity and a position.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_option_data       bad option data given (MILD)
+    PK_ERROR_wrong_entity          given topology is of the wrong type (MILD)
+    PK_ERROR_missing_geom          given topology has missing geometry (MILD)
+    PK_ERROR_bad_parameter         bad parameter given (MILD)
+    PK_ERROR_no_closest_approach   failed to find closest approach (MILD)
+
+<A NAME="documentation"></A>
+
+
+PK_TOPOL_range_vector will find the global closest approach between <B>'topol'</B> and
+the position vector <B>'vector'</B>.
+
+The following topology types are supported:
+    - vertex, fin, edge, face, and body.
+
+
+
+The function returns <B>'range_result'</B> which can be one of three values:
+   <A HREF=../headers/pk_range_result_t.html>PK_range_result_found_c</A>      the separation has been successfully found.
+   <A HREF=../headers/pk_range_result_t.html>PK_range_result_lower_c</A>      minimum separation is less than the provided
+                                lower bound.
+   <A HREF=../headers/pk_range_result_t.html>PK_range_result_upper_c</A>      no separation is less than the provided
+                                upper bound.
+
+If <B>'range_result'</B> is equal to <A HREF=../headers/pk_range_result_t.html>PK_range_result_found_c</A>, then a range data will
+also be returned in <B>'range'</B>, this consists of a structure of type
+<A HREF=../headers/pk_range_1_r_t.html>PK_range_1_r_t</A>, and contains a double <B>'distance'</B>, which is the
+separation distance between the topological entity and the position vector
+provided, and a structure of type <A HREF=../headers/pk_range_end_t.html>PK_range_end_t</A>, which provides information
+on the end of the line of separation on the entity as follows:
+
+<B>'entity'</B>           : the topology supplied in <B>'topol'</B>.
+<B>'sub_entity'</B>       : the topology of the lowest dimensionality which contains
+                     the end position.  e.g if a body is passed in as <B>'topol'</B>
+                     and the end position is found on a vertex then <B>'entity'</B>
+                     will return the body and <B>'sub_entity'</B> will return the
+                     vertex. If <B>'sub_entity'</B> would be the same as <B>'entity'</B>
+                     then no <B>'sub_entity'</B> will be returned. If a fin is
+                     identified as the <B>'sub_entity'</B>, the function will return
+                     either the fin or the edge of the fin. This is dependent
+                     on the option <B>'param_entity'</B> in the option structure
+                     <A HREF=../headers/pk_topol_range_vector_o_t.html>PK_TOPOL_range_vector_o_t</A>.
+<B>'vector'</B>           : the end position on <B>'entity'</B>.
+<B>'parameters'</B>       : an array of two parameters of the end position holding
+                     curve or surface parameter(s). Which parameterisation is
+                     used is firstly dependent upon the geometry of the entity
+                     returned and secondly upon the geometry of the sub_entity
+                     (if identified). Furthermore when the entity passed in is
+                     a face, edge or fin, the parameterisation is also
+                     dependent on what token (if any) is passed in via the
+                     field <B>'param_entity'</B> in the option structure
+                     <A HREF=../headers/pk_topol_range_vector_o_t.html>PK_TOPOL_range_vector_o_t</A>.
+                     If curve parameterisation is used the 2nd parameter should
+                     be ignored.
+
+                     When <B>'param_entity'</B> is set to
+                     <A HREF=../headers/pk_range_param_entity_t.html>PK_range_param_entity_topol_c</A>, the following
+                     parameterisation is used:
+
+                      -------------------------------------------------------
+                     |  Entity   |  Identified  |     Geometry used for      |
+                     |           |  Sub-Entity  | solution parameterisation  |
+                     |-----------|--------------|----------------------------|
+                     |           |              |                            |
+                     |  vertex   |     none     |          none              |
+                     |           |              |                            |
+                     |   fin     |     none     |     curve of the fin       |
+                     |   fin     |    vertex    |     curve of the fin       |
+                     |           |              |                            |
+                     |   edge    |     none     |     curve of the edge      |
+                     |   edge    |    vertex    |     curve of the edge      |
+                     |           |              |                            |
+                     |   face    |     none     |    surface of the face     |
+                     |   face    |     edge     |    surface of the face     |
+                     |   face    |    vertex    |    surface of the face     |
+                     |           |              |                            |
+                     |   body    |     face     |    surface of the face     |
+                     |   body    |     edge     |     curve of the edge      |
+                     |   body    |    vertex    |          none              |
+                     |           |              |                            |
+                      -------------------------------------------------------
+
+                     The curve of the edge is the curve returned by
+                     <A HREF=../headers/pk_edge_ask_geometry.html>PK_EDGE_ask_geometry</A>.
+
+                     When <B>'param_entity'</B> is set to <A HREF=../headers/pk_range_param_entity_t.html>PK_range_param_entity_sub_c</A>:
+
+                      -------------------------------------------------------
+                     |  Entity   |  Identified  |     Geometry used for      |
+                     |           |  Sub-Entity  | solution parameterisation  |
+                     |-----------|--------------|----------------------------|
+                     |           |              |                            |
+                     |  vertex   |     none     |          none              |
+                     |           |              |                            |
+                     |   fin     |     none     |     curve of the fin       |
+                     |   fin     |    vertex    |          none              |
+                     |           |              |                            |
+                     |   edge    |     none     |     curve of the edge      |
+                     |   edge    |     fin      |     curve of the fin       |
+                     |   edge    |    vertex    |          none              |
+                     |           |              |                            |
+                     |   face    |     none     |    surface of the face     |
+                     |   face    |     edge     |     curve of the edge      |
+                     |   face    |     fin      |     curve of the fin       |
+                     |   face    |    vertex    |          none              |
+                     |           |              |                            |
+                     |   body    |     face     |    surface of the face     |
+                     |   body    |     edge     |     curve of the edge      |
+                     |   body    |     fin      |     curve of the fin       |
+                     |   body    |    vertex    |          none              |
+                     |           |              |                            |
+                      -------------------------------------------------------
+
+                     When the entity is a face, an edge can only be returned as
+                     the identified sub-entity if it is accurate, in this case
+                     the curve used for the parameterisation is the curve
+                     attached to the edge. When the entity is an edge or a
+                     body, the curve of the edge is the geometry or nominal
+                     geometry attached to the edge. In all cases the geometry
+                     will be returned by <A HREF=../headers/pk_edge_ask_geometry_nmnl.html>PK_EDGE_ask_geometry_nmnl</A>.
+
+                     If the entity is a face and the identified sub-entity is a
+                     tolerant edge then the fin which belongs to both the face
+                     and the edge that is nearest to the vector is returned.
+                     If the entity is an edge or a body and the identified
+                     sub-entity is a tolerant edge which has no nominal
+                     geometry attached, then the primary fin of the edge is
+                     returned. The primary fin is returned by
+                     <A HREF=../headers/pk_edge_ask_first_fin.html>PK_EDGE_ask_first_fin</A>.
+
+                     The curve and surface parameter values returned
+                     will be the same as would be returned by the
+                     parameterisation functions <A HREF=../headers/pk_curve_parameterise_vector.html>PK_CURVE_parameterise_vector</A>
+                     and <A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A>.
+
+                     The function returns the distance between the vector and
+                     a point on the geometric entity that the solution was
+                     parameterised on. Therefore the distance may change when
+                     a different solution parameterisation is employed.
+                     For example, consider a vector on a face within tolerance
+                     of an edge but not on one of the edge's fins. When the
+                     face is passed in and <B>'param_entity'</B> is set to
+                     <A HREF=../headers/pk_range_param_entity_t.html>PK_range_param_entity_topol_c</A>, the function will return a
+                     zero distance as the solution is parameterised on the
+                     face. However if <B>'param_entity'</B> is set to
+                     <A HREF=../headers/pk_range_param_entity_t.html>PK_range_param_entity_sub_c</A> and the same face is passed
+                     in, the function will return a non-zero distance as the
+                     solution is parameterised on the edge's fin in the face.
+
+<B>'region'</B>           : a logical value - whether the solution is regional. If
+                     PK_LOGICAL_true, the solution is a regional solution upon
+                     the entity (ie. it is possible to move from solution point
+                     pair without the distance changing )
+                     The identification of such a regional solution is not
+                     guaranteed.
+
+<B>'negative'</B>         : a logical value - whether the point lies inside or outside
+                     the body.
+                     If <B>'entity'</B> is a body and the point at the other end of
+                     the separation lies inside the body, <B>'negative'</B> will
+                     return PK_LOGICAL_true, otherwise PK_LOGICAL_false will
+                     be returned.
+
+See <A HREF="../chapters/fd_chap.029.html#50434386_pgfId-296591">Calculating minimum and maximum distance</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

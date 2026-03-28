@@ -1,0 +1,884 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Thickening</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Thickening</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.060.html">Hollowing</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.062.html">Introduction To Model Editing</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-300116">60.1	Introduction </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-297636">60.2	Basic usage of thickening functionality </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-297809">60.3	Thickening faces by different distances </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-297834">60.4	Specifying a punch direction for side faces </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-297888">60.5	Supplying side surfaces to use when thickening </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-297947">60.6	Dealing with self-intersecting surfaces </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-298226">60.7	Creating blends from offset edges </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-423875">60.8	Controlling triangular side faces </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-298735">60.9	Piercing faces </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-298850">60.10	Step faces along smooth edges </A>
+<LI> <A HREF="fd_chap.061.html#50422135_pgfId-299592">60.11	Controlling the growth of overflowing faces </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-300116"></A>60.1	<A NAME="50422135_29839"></A><A NAME="50422135_marker-300112"></A><A NAME="50422135_marker-300113"></A><A NAME="50422135_marker-300114"></A><A NAME="50422135_marker-300115"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-294726"></A>Thickening is the process of offsetting all the faces in a sheet body in order to create a solid body. Parasolid provides thickening functionality so that you can model thin-walled parts, for example sheet metal parts, in your application.</P>
+<P>
+<A NAME="50422135_pgfId-435529"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-663.gif">
+
+<P>
+<A NAME="50422135_pgfId-297537"></A>Figure 60-1 Thickening a sheet body into a solid body</P>
+<P>
+<A NAME="50422135_pgfId-297538"></A>Sheets may be thickened from either or both sides, along the surface normal. All faces in the sheet body can be thickened by the same amount, or different distances can be specified for different faces. Only manifold sheets can be thickened.</P>
+<P>
+<A NAME="50422135_pgfId-297539"></A>Side faces are created during thickening using one of the following methods:</P>
+<UL>
+<LI>
+<A NAME="50422135_pgfId-297540"></A>In the direction of the surface normals</LI>
+<LI>
+<A NAME="50422135_pgfId-297541"></A>In a specified punch direction</LI>
+<LI>
+<A NAME="50422135_pgfId-297542"></A>Utilizing side surfaces that you supply yourself</LI>
+</UL>
+<P>
+<A NAME="50422135_pgfId-297543"></A>In the first two of these methods, analytic geometry is used where possible, and ruled B-surfaces are used otherwise. Some edge geometry on the sheet boundary may have to be approximated by SP-curves in order to generate boundary curves on the offset faces. </P>
+<P>
+<A NAME="50422135_pgfId-297547"></A>Parasolid’s offsetting functionality is fundamental to the thickening operation. This means that certain topological changes are possible when thickening, such as deleting faces that become degenerate by offsetting. <A HREF="fd_chap.061.html#50422135_25610"><EM>
+Figure 60-2</EM></A> shows an example. </P>
+<P>
+<A NAME="50422135_pgfId-297584"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-664.gif">
+
+<P>
+<A NAME="50422135_pgfId-297586"></A>Figure 60-2 <A NAME="50422135_25610"></A>Thickening a sheet body, resulting in a topological change</P>
+<P>
+<A NAME="50422135_pgfId-297590"></A>By default, Parasolid creates triangular side 	faces when thickening sheets with sharp internal (i.e. non-boundary) edges, such that the two faces adjacent to the edge do not meet smoothly.</P>
+<P>
+<A NAME="50422135_pgfId-297591"></A>In general, the changes to topology and geometry that are permitted during thickening operations are similar to those permitted for offsetting operations. See <A HREF="fd_chap.059.html#50422133_18987">Section 58.11, “Changes to topology and geometry”</A>, for more details.</P>
+<P>
+<A NAME="50422135_pgfId-297595"></A>Thickening fails on valid sheet bodies that have a point contact vertex, such as the example shown in <A HREF="fd_chap.061.html#50422135_13560"><EM>
+Figure 60-3</EM></A>. Thickening this sheet body would create an invalid solid body that contains a non-manifold edge.</P>
+<P>
+<A NAME="50422135_pgfId-297632"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-665.gif">
+
+<P>
+<A NAME="50422135_pgfId-297634"></A>Figure 60-3 <A NAME="50422135_13560"></A>Thickening a sheet body with a point contact vertex</P>
+<P>
+<A NAME="50422135_pgfId-470769"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422135_pgfId-470802"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422135_pgfId-455370"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-455025"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422135_pgfId-454931"></A><A HREF="fd_chap.059.html#50422133_22949">Chapter 58, “Offsetting”</A></LI>
+<LI>
+<A NAME="50422135_pgfId-455110"></A><A HREF="fd_chap.060.html#50422134_22949">Chapter 59, “Hollowing”</A></LI>
+<LI>
+<A NAME="50422135_pgfId-455126"></A><A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-297636"></A>60.2	<A NAME="50422135_marker-297635"></A>Basic usage of thickening functionality 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-297638"></A>You can thicken a sheet body to form a solid body using <A NAME="50422135_marker-297637"></A><A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A>. This function receives a <CODE>
+body</CODE>
+, together with offset information which it uses to generate the appropriate thickened body.</P>
+<P>
+<A NAME="50422135_pgfId-297639"></A>Unlike offsetting and hollowing, where a single offset distance is specified, <A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A> receives two offsets: <CODE>
+front_default</CODE>
+ and <CODE>
+back_default</CODE>
+. The sheet body is then thickened by offsetting in both directions by the specified amount, as shown in <A HREF="fd_chap.061.html#50422135_32930"><EM>
+Figure 60-4</EM></A>.</P>
+<P>
+<A NAME="50422135_pgfId-438415"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-666.gif">
+
+<P>
+<A NAME="50422135_pgfId-297682"></A>Figure 60-4 <A NAME="50422135_32930"></A>Thickening a body using front and back offsets</P>
+<P>
+<A NAME="50422135_pgfId-297683"></A>Under some circumstances it may be necessary to replace exact edge geometry with tolerant geometry. Parasolid uses the supplied <CODE>
+tolerance</CODE>
+ when calculating approximate geometry.</P>
+<P>
+<A NAME="50422135_pgfId-297687"></A>The following table provides a summary of the options available in <A HREF=../headers/pk_body_thicken_3.html><A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A></A>. Default values are set such that all faces in the sheet body are thickened by the amount specified in the arguments to <A HREF=../headers/pk_body_thicken_3.html><A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A></A>.</P>
+<P>
+<A NAME="50422135_pgfId-297807"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297690"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297692"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297694"></A><CODE>faces</CODE>
+</PRE>
+<PRE><A NAME="50422135_pgfId-297695"></A><CODE>n_faces</CODE>
+</PRE>
+<PRE><A NAME="50422135_pgfId-297696"></A><CODE>front_offsets</CODE>
+</PRE>
+<PRE><A NAME="50422135_pgfId-297697"></A><CODE>back_offsets</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297699"></A>A group of options that are used to specify that certain faces in the body should be thickened by different amounts than those specified in the <CODE>
+front_default</CODE>
+ and <CODE>
+back_default</CODE>
+. See <A HREF="fd_chap.061.html#50422135_49428">Section 60.3, “Thickening faces by different distances”</A>, for more details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297704"></A><CODE>check_fa_fa</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297706"></A>Whether to check for face-face inconsistencies. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297708"></A><CODE>method</CODE>
+</PRE>
+<PRE><A NAME="50422135_pgfId-297709"></A><CODE>punch_dir</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297711"></A>Options that allow you to thicken a body in a direction other than the direction of the surface normals of the body’s faces. See <A HREF="fd_chap.061.html#50422135_94642">Section 60.4, “Specifying a punch direction for side faces”</A> for details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297716"></A>edges</PRE>
+<PRE><A NAME="50422135_pgfId-297717"></A>n_edges</PRE>
+<PRE><A NAME="50422135_pgfId-297718"></A>surfaces</PRE>
+<PRE><A NAME="50422135_pgfId-297719"></A>n_surfaces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297721"></A>Options to let you supply side surfaces to use for certain areas of the thickened body, rather than allowing Parasolid to generate those surfaces automatically. See <A HREF="fd_chap.061.html#50422135_32328">Section 60.5, “Supplying side surfaces to use when thickening”</A>, for more details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297729"></A><CODE>offset_method</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297731"></A>The method by which self-intersections are removed when thickening. This is the same option as available in Parasolid’s offsetting functionality. See <A HREF="fd_chap.061.html#50422135_89404">Section 60.6, “Dealing with self-intersecting surfaces”</A> for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297739"></A>report_sx</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297746"></A>Whether to report such self-intersections in the Parasolid report. See <A HREF="fd_chap.061.html#50422135_89404">Section 60.6, “Dealing with self-intersecting surfaces”</A>. Also available in all hollowing and offsetting operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297749"></A>fix_degens</PRE>
+<PRE><A NAME="50422135_pgfId-297750"></A>report_fix_degens</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297752"></A>Whether to fix degeneracies in the input body before the thicken operation. Whether to report such degeneracies in the Parasolid report. See <A HREF="fd_chap.059.html#50422133_56624">Section 58.4, “Dealing with degenerate faces”</A>, for more details. Also available in all hollowing and offsetting operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297760"></A>blend_edges</PRE>
+<PRE><A NAME="50422135_pgfId-297761"></A>blend_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297763"></A>Whether to produce blend faces when offsetting edges, together with the radius of the blend faces to produce. See <A HREF="fd_chap.061.html#50422135_17066">Section 60.7, “Creating blends from offset edges”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297768"></A>ortho_vx_split</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297770"></A>Whether to split laminar vertices orthogonally to surface geometry during the offset part of the thicken operation, so as to avoid triangular side faces. See <A HREF="fd_chap.061.html#50422135_99530">Section 60.8, “Controlling triangular side faces”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297775"></A>n_pierce_faces</PRE>
+<PRE><A NAME="50422135_pgfId-297776"></A>pierce_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297778"></A>An array of faces that are removed from the thickened body, rather than being offset. This may result in a disjoint solid body. See <A HREF="fd_chap.061.html#50422135_19049">Section 60.9, “Piercing faces”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297783"></A>offset_step</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297785"></A>Whether to create side faces along smooth edges that are affected by the thicken operation. See <A HREF="fd_chap.061.html#50422135_55562">Section 60.10, “Step faces along smooth edges”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297790"></A>grow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297792"></A>How to heal models when features of different convexity overflow each other. See <A HREF="fd_chap.061.html#50422135_69487">Section 60.11, “Controlling the growth of overflowing faces”</A>. Also available in all hollowing and offsetting operations. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297797"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-446833"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422135_pgfId-297806"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-297809"></A>60.3	<A NAME="50422135_49428"></A>Thickening faces by different distances 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-297810"></A>By default, <A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A> thickens a body by offsetting all the faces in the body by the specified <CODE>
+front_default</CODE>
+ and <CODE>
+back_default</CODE>
+. If you wish, you can specify that certain faces in the body are offset by different distances, by supplying alternative offsets for those faces. You do this using the following options:</P>
+<P>
+<A NAME="50422135_pgfId-297829"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297813"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297815"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297817"></A>n_faces</PRE>
+<PRE><A NAME="50422135_pgfId-297818"></A>faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297820"></A>An array of faces to be offset by a distance other than <CODE>
+front_default</CODE>
+ or <CODE>
+back_default</CODE>
+. Any faces not specified here are offset by the distances specified in <CODE>
+front_default</CODE>
+ and <CODE>
+back_default</CODE>
+. Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297822"></A><CODE>front_offsets</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297824"></A>An array of size <CODE>
+n_faces</CODE>
+ that provides front offsets to use for the specified <CODE>
+faces</CODE>
+. Each element in this array represents an offset to use on the corresponding element in <CODE>
+faces</CODE>
+. Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422135_pgfId-297826"></A><CODE>back_offsets</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-297828"></A>An array of size <CODE>
+n_faces </CODE>
+that provides back offsets to use for the specified <CODE>
+faces</CODE>
+. Each element in this array represents an offset to use on the corresponding element in <CODE>
+faces</CODE>
+. Default: NULL.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-297834"></A>60.4	<A NAME="50422135_94642"></A><A NAME="50422135_marker-297831"></A><A NAME="50422135_marker-297832"></A><A NAME="50422135_marker-297833"></A>Specifying a punch direction for side faces 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-297835"></A>By default, side faces are created in the direction of the surface normals. You can thicken faces in a different direction using the <CODE>
+method</CODE>
+ and <CODE>
+punch_dir</CODE>
+ options. To use these options:</P>
+<UL>
+<LI>
+<A NAME="50422135_pgfId-297836"></A>Set <CODE>
+method</CODE>
+ to <A HREF=../headers/pk_thicken_method_t.html>PK_thicken_method_punch_c</A>.</LI>
+<LI>
+<A NAME="50422135_pgfId-297837"></A>Specify a punch direction using <CODE>
+punch_dir</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422135_pgfId-297841"></A>Parasolid then creates side faces in the punch_dir direction instead of the direction of the surface normals, as shown in <A HREF="fd_chap.061.html#50422135_63306"><EM>
+Figure 60-5</EM></A>. Alternatively, side faces can be generated based on side surfaces you supply yourself, as described in <A HREF="fd_chap.061.html#50422135_32328">Section 60.5, “Supplying side surfaces to use when thickening”</A>.</P>
+<P>
+<A NAME="50422135_pgfId-297881"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-667.gif">
+
+<P>
+<A NAME="50422135_pgfId-297883"></A>Figure 60-5 <A NAME="50422135_63306"></A>Specifying a punch direction for side faces</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-297888"></A>60.5	<A NAME="50422135_32328"></A><A NAME="50422135_marker-297885"></A><A NAME="50422135_marker-297886"></A><A NAME="50422135_marker-297887"></A>Supplying side surfaces to use when thickening 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-297892"></A>Instead of letting Parasolid generate side surfaces, you can use the <CODE>
+edges</CODE>
+ and <CODE>
+surfaces</CODE>
+ options to supply your own, in order to influence the final appearance of the thickened body. To supply side surfaces, you either:</P>
+<UL>
+<LI>
+<A NAME="50422135_pgfId-297893"></A>Supply a single surface, and use this on all the laminar edges.</LI>
+<LI>
+<A NAME="50422135_pgfId-297894"></A>Supply several surfaces, one for each laminar edge.</LI>
+</UL>
+<P>
+<A NAME="50422135_pgfId-438508"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-668.gif">
+
+<P>
+<A NAME="50422135_pgfId-297933"></A>Figure 60-6 Specifying side surfaces to use during thicken operations</P>
+<P>
+<A NAME="50422135_pgfId-297934"></A>If you specify a single side surface, then <CODE>
+n_surfaces</CODE>
+ should be 1, and <CODE>
+edges</CODE>
+ and <CODE>
+n_edges</CODE>
+ should be left at their default values. If you supply several side surfaces, then <CODE>
+n_surfaces</CODE>
+ and <CODE>
+n_edges</CODE>
+ must have the same value. The first side surface supplied in <CODE>
+surfaces</CODE>
+ is then used on the first edge supplied in <CODE>
+edges</CODE>
+, the second side surface is used on the second edge, and so on.</P>
+<P>
+<A NAME="50422135_pgfId-297938"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422135_pgfId-297937"></A>Note: In all cases, each of the laminar edges must lie on the supplied side surface that is used for that edge when thickening.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422135_pgfId-297942"></A>If <CODE>
+n_surfaces</CODE>
+ is 0 (the default), then edges and surfaces are ignored. Parasolid generates new side surfaces for every laminar edge in the body according to the value of the <CODE>
+method</CODE>
+ option and, if relevant, the specified <CODE>
+punch_dir</CODE>
+.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-297947"></A>60.6	<A NAME="50422135_89404"></A><A NAME="50422135_marker-297944"></A><A NAME="50422135_marker-297945"></A><A NAME="50422135_marker-297946"></A>Dealing with self-intersecting surfaces 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-297950"></A><A NAME="50422135_marker-297948"></A><A NAME="50422135_marker-297949"></A>Sometimes, thickening a sheet may create self-intersecting surfaces on either the side face, or the offset face itself. These can be repaired, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422135_pgfId-297954"></A>Self-intersecting side faces are repaired automatically. Parasolid replaces the self-intersecting section with a new surface. See <A HREF="fd_chap.061.html#50422135_21995"><EM>
+Figure 60-7</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50422135_pgfId-297991"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-669.gif">
+
+<P>
+<A NAME="50422135_pgfId-298063"></A>Figure 60-7 <A NAME="50422135_21995"></A>Replacing self-intersecting side surfaces during thickening</P>
+<UL>
+<LI>
+<A NAME="50422135_pgfId-298064"></A>Self-intersecting offset surfaces are repaired by constructing B-surface patches, if the <CODE>
+offset_method</CODE>
+ is set to PK_offset_method_sx_repair_2_c. See <A HREF="fd_chap.061.html#50422135_41267"><EM>
+Figure 60-8</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50422135_pgfId-298102"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-670.gif">
+
+<P>
+<A NAME="50422135_pgfId-298215"></A>Figure 60-8 <A NAME="50422135_41267"></A>Replacing self-intersecting offset surfaces during thickening</P>
+<P>
+<A NAME="50422135_pgfId-298219"></A>See <A HREF="fd_chap.059.html#50422133_69049">Section 58.3, “Removing self-intersections”</A>, for information about removal of self-intersections in offsetting and hollowing.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-298226"></A>60.7	<A NAME="50422135_17066"></A><A NAME="50422135_39170"></A><A NAME="50422135_marker-298222"></A><A NAME="50422135_marker-298223"></A><A NAME="50422135_marker-298224"></A><A NAME="50422135_marker-298225"></A>Creating blends from offset edges 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-298227"></A>When you thicken a body, you can optionally choose to round off the edges of the body that are offset during the thicken operation. </P>
+<P>
+<A NAME="50422135_pgfId-298228"></A>To do this, you can use the <CODE>
+blend_edges</CODE>
+ and <CODE>
+blend_radius</CODE>
+ options available in <A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A>, which let you replace offset edges in a hollowed body with constant-radius rolling-ball blends. </P>
+<P>
+<A NAME="50422135_pgfId-298229"></A>You use these options in the same way as the identical options available in offsetting operations, and they are subject to the same constraints. See <A HREF="fd_chap.059.html#50422133_41359">Section 58.8, “Creating blends from offset edges”</A>, for more information. </P>
+<P>
+<A NAME="50422135_pgfId-298236"></A><A HREF="fd_chap.061.html#50422135_12744"><EM>
+Figure 60-9</EM></A> illustrates the configurations in which edges are offset to blend faces.</P>
+<P>
+<A NAME="50422135_pgfId-298270"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-671.gif">
+
+<P>
+<A NAME="50422135_pgfId-298272"></A>Figure 60-9 <A NAME="50422135_12744"></A>Constraints for replacing offset edges with blends</P>
+<P>
+<A NAME="50422135_pgfId-298298"></A>An example of this functionality is illustrated in <A HREF="fd_chap.061.html#50422135_65341"><EM>
+Figure 60-10</EM></A>.</P>
+<P>
+<A NAME="50422135_pgfId-298299"></A>In cases where three or more edge-derived blends meet at a common vertex, a blend is derived from that vertex, as shown in <A HREF="fd_chap.061.html#50422135_65341"><EM>
+Figure 60-10</EM></A>. Except for the face indicated in this example, each face in the sheet body is offset by a value equal to the specified blend radius.</P>
+<P>
+<A NAME="50422135_pgfId-298336"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-672.gif">
+
+<P>
+<A NAME="50422135_pgfId-298338"></A>Figure 60-10 <A NAME="50422135_65341"></A>Creating blends from offset edges and vertices</P>
+<P>
+<A NAME="50422135_pgfId-298339"></A>Blends can be created from offset edges in all hollowing and thickening operations. The <CODE>
+blend_edges</CODE>
+ and <CODE>
+blend_radius</CODE>
+ options are available in the following options structures:</P>
+<UL>
+<LI>
+<A NAME="50422135_pgfId-298340"></A><A HREF=../headers/pk_body_hollow_o_t.html>PK_BODY_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422135_pgfId-298341"></A><A HREF=../headers/pk_body_offset_o_t.html>PK_BODY_offset_o_t</A></LI>
+<LI>
+<A NAME="50422135_pgfId-298342"></A><A HREF=../headers/pk_body_thicken_o_t.html>PK_BODY_thicken_o_t</A></LI>
+<LI>
+<A NAME="50422135_pgfId-298343"></A><A HREF=../headers/pk_face_hollow_o_t.html>PK_FACE_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422135_pgfId-423625"></A><A HREF=../headers/pk_face_offset_o_t.html>PK_FACE_offset_o_t</A></LI>
+</UL>
+<P>
+<A NAME="50422135_pgfId-653554"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422135_pgfId-653553"></A>Note: The <CODE>
+blend_edges</CODE>
+ value PK_EDGE_offset_blend_convex_c is not supported for mixed edges.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-423875"></A>60.8	<A NAME="50422135_99530"></A>Controlling triangular side faces 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-423876"></A>Sometimes, a laminar vertex needs to be split during a thicken operation. By default, the new vertex is trimmed back to the laminar edge, leading to a triangular face in the resulting thickened body. However, it is sometimes preferable to produce a thickened body that contains no triangular faces, as shown in <A HREF="fd_chap.061.html#50422135_12891"><EM>
+Figure 60-11</EM></A>. You can achieve this effect in many cases by setting the <CODE>
+ortho_vx_split</CODE>
+ option to PK_LOGICAL_true. This option ensures that any appropriate vertices are split orthogonally to the face of the other laminar edge, often eliminating the need to create a triangular face. </P>
+<P>
+<A NAME="50422135_pgfId-354217"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-673.gif">
+
+<P>
+<A NAME="50422135_pgfId-298726"></A>Figure 60-11 <A NAME="50422135_12891"></A>Controlling triangular side faces during thickening</P>
+<P>
+<A NAME="50422135_pgfId-298732"></A>Similar control is available for Parasolid’s offsetting functionality: see <A HREF="fd_chap.059.html#50422133_47848">Section n, “<A HREF=../headers/pk_face_offset_o_t.html>PK_FACE_offset_o_t</A>”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-298735"></A>60.9	<A NAME="50422135_19049"></A>Piercing faces 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-298736"></A>Sometimes, you might want to designate that some faces in the thickened body should be treated as <STRONG>
+pierce faces</STRONG>, similar to the pierce faces used in hollow operations (described in <A HREF="fd_chap.060.html#50422134_21565">Section 59.3</A>). If you specify one or more pierce faces in a thicken operation, then those faces are removed from the resulting thickened body, rather than being thickened themselves. This is equivalent to specifying that some faces should be offset by zero. </P>
+<P>
+<A NAME="50422135_pgfId-298740"></A>You specify pierce faces for thickening using the <CODE>
+n_pierce_faces</CODE>
+ and <CODE>
+pierce_faces</CODE>
+ options.</P>
+<P>
+<A NAME="50422135_pgfId-298744"></A>In <A HREF="fd_chap.061.html#50422135_35617"><EM>
+Figure 60-12</EM></A>, two faces of the original sheet have been pierced during the thickening operation.</P>
+<P>
+<A NAME="50422135_pgfId-392904"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-674.gif">
+
+<P>
+<A NAME="50422135_pgfId-298844"></A>Figure 60-12 <A NAME="50422135_35617"></A>Two faces pierced</P>
+<P>
+<A NAME="50422135_pgfId-298848"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422135_pgfId-298847"></A>Note: Using this option may result in a disjoint body. Unlike offsetting, thickening does not contain a specific option to control whether disjoint bodies should be created or not. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-298850"></A>60.10	<A NAME="50422135_55562"></A>Step faces along smooth edges 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-298851"></A>When you thicken the faces in a body by different amounts, you can sometimes get undesirable results if the body contains faces that are joined smoothly. You can address this problem by requesting that Parasolid creates side faces between any smoothly joined faces that are thickened by different amounts. </P>
+<P>
+<A NAME="50422135_pgfId-298855"></A>The <CODE>
+offset_step</CODE>
+ option determines whether side faces (or step faces) are created when offsetting a face that is joined smoothly to its neighboring faces. This option takes the following values:</P>
+<P>
+<A NAME="50422135_pgfId-298876"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-298858"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-298860"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-298862"></A>PK_offset_step_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-298864"></A>Do not create any side faces. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-298866"></A>PK_offset_step_all_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-298868"></A>Create side faces where required between faces that are smoothly joined to their neighbors. As well as creating side faces for any pierce faces in the resulting body, this option creates side faces between faces that are thickened by different amounts. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-665278"></A>PK_offset_step_site_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-665280"></A>Only create side faces along smooth boundary edges if it cannot be done by growing the faces on either end of the boundary edges. Site faces that contain facet geometry will not be grown.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-298870"></A>PK_offset_step_pierce_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422135_pgfId-298872"></A>Create side faces along edges that are smoothly joined to a pierce face. This value is useful if you need to support legacy behaviour that was available in Parasolid v18.0 and earlier. If there are no pierce faces, this option produces the same result as PK_offset_step_no_c. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422135_pgfId-298877"></A>In general, you should use PK_offset_step_all_c if you want to create side faces.</P>
+<P>
+<A NAME="50422135_pgfId-441479"></A><A HREF="fd_chap.061.html#50422135_49205"><EM>
+Figure 60-13</EM></A> shows the behaviour when two smoothly-joined faces are thickened using different front offset distances for each face.</P>
+<P>
+<A NAME="50422135_pgfId-354867"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-675.gif">
+
+<P>
+<A NAME="50422135_pgfId-299207"></A>Figure 60-13 <A NAME="50422135_49205"></A>Step faces created between faces with different offset distances</P>
+<P>
+<A NAME="50422135_pgfId-299211"></A><A HREF="fd_chap.061.html#50422135_54604"><EM>
+Figure 60-14</EM></A> illustrates the use of <CODE>
+offset_step</CODE>
+ in conjunction with <CODE>
+n_pierce_faces</CODE>
+ and <CODE>
+pierce_faces</CODE>
+; the same operation is shown from two different angles. The pierced face is smoothly connected to its neighboring faces and <CODE>
+offset_step</CODE>
+ has been set to PK_offset_step_all_c. As a result, four step faces are created, corresponding to the front and back offsets of each common edge.</P>
+<P>
+<A NAME="50422135_pgfId-355399"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-676.gif">
+
+<P>
+<A NAME="50422135_pgfId-299583"></A>Figure 60-14 <A NAME="50422135_54604"></A>Side faces created at smooth joins both front and back</P>
+<P>
+<A NAME="50422135_pgfId-299587"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422135_pgfId-299586"></A>Note: Creating step faces at smooth edges splits the end vertices of those edges. You can supply a maximum of two different thicken distances (including zero) for the faces that share that vertex. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422135_pgfId-299592"></A>60.11	<A NAME="50422135_69487"></A><A NAME="50422135_marker-299589"></A><A NAME="50422135_marker-299590"></A><A NAME="50422135_25126"></A>Controlling the growth of overflowing faces 
+
+
+</H1>
+<P>
+<A NAME="50422135_pgfId-299593"></A>When features with different convexities overflow each other as a result of thickening, you can control which of the clashing features is grown to heal the model using the <CODE>
+grow</CODE>
+ option. </P>
+<P>
+<A NAME="50422135_pgfId-299597"></A><A HREF="fd_chap.061.html#50422135_28250"><EM>
+Figure 60-15</EM></A> shows a simple example of the effects that you can achieve using this functionality. </P>
+<P>
+<A NAME="50422135_pgfId-299631"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-677.gif">
+
+<P>
+<A NAME="50422135_pgfId-299633"></A>Figure 60-15 <A NAME="50422135_28250"></A>Controlling the growth of overflowing features with different convexity</P>
+<P>
+<A NAME="50422135_pgfId-299634"></A>This option is available in a range of different functional areas, including local operations, hollowing, and thickening. For a full description, see <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A>.</P>
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.060.html">Hollowing</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.062.html">Introduction To Model Editing</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

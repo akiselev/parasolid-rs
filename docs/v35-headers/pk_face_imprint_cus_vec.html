@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_imprint_cus_vec</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_imprint_cus_vec</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_FACE_imprint_cus_vec
+(
+<I>--- received arguments ---
+</I>int                                   n_targets,   --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                       targets[],   --- array of faces
+int                                   n_curves,    --- number of curves
+const <A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                      curves[],    --- curves
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                         intervals[], --- parametric intervals
+double                                tol,         --- tolerance
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                           direction,   --- direction to project
+                                                   --- curves in
+const <A HREF=../headers/pk_face_imprint_cus_vec_o_t.html>PK_FACE_imprint_cus_vec_o_t</A>    *options,     --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>             *const tracking     --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function imprints the given array of curves on the given array of faces
+by projecting them locally along the given vector direction. The faces must
+all belong to the same body.
+
+NOTE: This function is deprecated and has been superseded by <A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_invalid_geometry        Invalid curve (MILD)
+
+    PK_ERROR_unsuitable_entity       Unsuitable curve type for operation
+                                     (MILD)
+
+    PK_ERROR_cant_do_imprint         Failed to perform imprint
+                                     (MILD)
+
+    PK_ERROR_wrong_entity_in_array   <B>'targets'</B> not all from same body
+                                     (MILD)
+
+    PK_ERROR_cant_complete_imprint   Failed to complete imprint
+                                     (SERIOUS)
+
+    PK_ERROR_ambiguous_imprint       Failed to complete because
+                                     initial imprint is ambiguous
+                                     (SERIOUS)
+
+
+<A NAME="documentation"></A>
+Edges and vertices are added to the faces. These are the image of the curves on
+the faces under projection in the supplied direction. The edges created by this
+imprinting are returned. These may include existing edges where the curves
+project down onto existing edges.
+
+Edges are imprinted on the input faces which are visible in the view direction
+but whether side or hidden faces are also imprinted to produce a connected
+imprint is controlled by the option structure. The option structure also
+allows different options as to what visible means here - in particular which
+other faces are considered when deciding if a face or portion thereof is
+hidden.
+
+See <A HREF="../chapters/fd_chap.051.html#50434412_pgfId-549574">Connecting disjoint components of an imprint</A> for more
+information.
+
+The tolerance supplied is used to solve any resolution problems and may also be
+used to create SP-curves on the imprinted edges.
+
+The tracking information is returned by returning a track record for each
+imprinted edge. Each edge has two original_topols. The first of these is the
+input curve which gave rise to this edge. The second is the original
+topology on the body where this edge is created. This is usually a face,
+but where the edge is imprinted along a pre-existing edge that edge is
+returned instead. Imprinted edges arising from any requested imprint
+completion are tracked by the same method, but the original topology
+associated with the edge is always null.
+
+This operation does not work on faces which have no attached geometry.
+
+The input curves must be of type PK_CLASS_bcurve, PK_CLASS_ellipse, or
+PK_CLASS_circle or PK_CLASS_line; other types are not supported.
+If curves intersect in the view direction then the option
+<B>'process_intersections'</B> must be set appropriately for the function call
+to succeed.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,245 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_emboss</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_emboss</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>           PK_BODY_emboss
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                 target,           --- sheet or solid where emboss
+                                            --- feature is created
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                 profile,          --- sheet or closed wire defining
+                                            --- a cross-section of the
+                                            --- sidewall geometry
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                 endcap,           --- sheet or solid providing
+                                            --- capping for emboss sidewall
+const <A HREF=../headers/pk_body_emboss_o_t.html>PK_BODY_emboss_o_t</A> *options,          --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A> *const tracking,         --- tracking information
+<A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A> *const results           --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates emboss features on the target body.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_topology    One of the constraints on topologies
+                                    is not satisfied by an input body.
+                                    (MILD)
+
+    PK_ERROR_bad_value              Incorrect values are provided for emboss
+                                    convexity, sidewall method, taper method,
+                                    or profile residence.
+                                    (MILD)
+
+    PK_ERROR_bad_position           The position of endcap relative to the
+                                    target is incorrect for the specified
+                                    emboss convexity.
+                                    Any inconsistency in positioning caused
+                                    by not satisfying the constraints on
+                                    orientations.
+                                    The <B>'target'</B> body or the <B>'endcap'</B> body
+                                    is too small or misaligned to produce
+                                    complete interactions with the sidewall.
+                                    (MILD)
+
+    PK_ERROR_bad_angle              Specification of different taper angles is
+                                    not allowed on smoothly connected edges
+                                    of the profile body for sidewall creation.
+
+    PK_ERROR_not_implemented        Unavailable functionality is called.
+                                    (MILD)
+
+    PK_ERROR_non_manifold           Result of the emboss is non-manifold.
+                                    (SERIOUS)
+
+
+
+<A NAME="documentation"></A>
+
+
+Introduction
+
+PK_BODY_emboss enables pad and pocket like features to be added onto the
+<B>'target'</B> body with sidewalls constructed using ruled surfaces between
+base areas on the <B>'target'</B> body and cap areas on the <B>'endcap'</B> body. It
+receives a solid or sheet as the <B>'target'</B> body, another solid or sheet
+as the <B>'endcap'</B> body, a sheet or closed wire as the <B>'profile'</B> body and
+an <B>'options'</B> structure for other parameters required in emboss creation:
+
+    <B>'tolerance'</B>     This field controls the operation tolerance.
+    <B>'convexity'</B>     This field controls whether to create pads or pockets.
+    <B>'profile_on'</B>    This field indicates the source of profile body.
+    <B>'sidewall_data'</B> This field controls the creation of emboss sidewall.
+    <B>'overflow_data'</B> This field controls the processing of overflow.
+
+All input bodies survive the operation and remain unchanged except the
+<B>'target'</B> body.
+
+See <A HREF="../chapters/fd_chap.043.html#50434402_pgfId-294743">here</A> for more information.
+
+
+Constraints on Topologies
+
+The <B>'target'</B> body can be a solid or a sheet. It must contain a sufficiently
+large area to at least partially support the base of the emboss feature. No
+facet geometry on the body may be altered by the operation.
+
+The <B>'endcap'</B> body can be a solid or a sheet. It must contain a sufficiently
+large area to cap the sidewall of the emboss. It must be a classic body.
+
+The <B>'profile'</B> body can be a closed oriented wire or an open sheet. It must be a
+classic body. Its peripheral or laminar edges define a cross-section of the
+sidewall geometry.  The supplied <B>'profile'</B> must be a sheet if either:
+    o The <B>'sidewall'</B> field in the <B>'sidewall_data'</B> option is
+      <A HREF=../headers/pk_emboss_sidewall_t.html>PK_emboss_sidewall_ruled_c</A>.
+    o The <B>'taper_method'</B> field in the <B>'sidewall_data'</B> option is
+      <A HREF=../headers/pk_taper_method_t.html>PK_taper_method_normal_c</A>.
+In the second case, the normals of the sheet along its laminar edges are
+used as local draw directions during the tapering. Setting <B>'profile'</B> to
+PK_ENTITY_null is only acceptable for supplied sidewall. If a sidewall body
+is supplied, it is also assumed that the <B>'profile'</B>, if not PK_ENTITY_null,
+lies on the supplied sidewall body.
+
+For <A HREF=../headers/pk_emboss_sidewall_t.html>PK_emboss_sidewall_supplied_c</A>, a sheet body must be provided through
+the field <B>'sidewall_body'</B> in <B>'sidewall_data'</B> as the supplied sidewall. This
+sheet is usually duct-like in shape with two laminar peripheries.
+
+All input bodies must not be disjoint.
+
+See <A HREF="../chapters/fd_chap.043.html#50434402_pgfId-297604">here</A> for more information.
+
+Constraints on Orientations
+
+PK_BODY_emboss requires a unit vector to be supplied in the <B>'draw_direction'</B>
+field in <B>'sidewall_data'</B>. It is used as the draw direction for tapered
+sidewall and as the sweep direction for swept sidewall. It is also regarded
+as the emboss direction that controls the direction of pitting for pocket
+emboss and protruding for pad emboss.
+
+Orientations of the input bodies are constrained by the emboss direction.
+Both the base area on the <B>'target'</B> body and the cap area on the <B>'endcap'</B>
+body must have their overall face normals pointing to the positive side of
+the emboss direction. For a sheet profile, overall face normals are expected to
+point to the positive side of the emboss direction. A wire profile is expected
+to encircle the emboss direction in a right-handed manner. If a sidewall body
+is supplied, the face normals of the duct-like sheet forming the sidewall body
+are expected to point outwards for pad emboss and inwards for pocket emboss
+around the emboss direction.
+
+The constraints on orientations also provide a simple way of describing the
+correct positional relationship between the <B>'target'</B> body and the <B>'endcap'</B>
+body. When measured relative to the emboss direction, the cap area on the
+'endcap' body is above, for pad emboss, and below, for pocket emboss, the
+base area on the <B>'target'</B> body.
+
+See <A HREF="../chapters/fd_chap.043.html#50434402_pgfId-297629">here</A> for more information.
+
+Emboss Sidewall
+
+An emboss sidewall can be supplied as a sheet body or constructed internally
+by PK_BODY_emboss to rule through its peripheral or laminar edges of the
+<B>'profile'</B> body. PK_BODY_emboss supports the following methods of internal
+construction:
+
+    o Tapered according to a specified draw direction and other parameters.
+    o Ruled along normals of <B>'profile'</B> faces.
+    o Swept along a specified sweep direction.
+
+See <A HREF="../chapters/fd_chap.043.html#50434402_pgfId-295330">here</A> for more information.
+
+Overflow Processing
+
+When the interaction between the sidewall body and the target body extends
+beyond the boundary of the <B>'target'</B>, the emboss feature needs to
+overflow across that boundary. The behaviour of overflow processing during
+emboss creation is controlled by the <B>'overflow_data'</B> option field.
+
+As all faces in the <B>'target'</B> body are included by the emboss opertion,
+only laminar overflow options are relevant.
+
+The following methods are for processing a laminar overflow boundary:
+    o Limiting sidewall with ruled sheet from laminar overflow boundary.
+      This behaviour can be selected by setting <B>'laminar_overflow'</B> to
+      <A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_ruled_c</A>.
+    o Limiting sidewall with swept sheet from laminar overflow boundary.
+      This behaviour can be selected by setting <B>'laminar_overflow'</B> to
+      <A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_swept_c</A>.
+
+See <A HREF="../chapters/fd_chap.043.html#50434402_pgfId-295846">here</A> for more information.
+
+Non Die-Lock Tapering
+
+Tapered sidewalls by methods other than <A HREF=../headers/pk_taper_method_t.html>PK_taper_method_offset_c</A> will be
+constructed such that for a positive angle they draft outwards from endcap
+bodies to target bodies, thereby ensuring the parts created will be
+non die-lock.
+
+
+Returned Tracking and Results
+
+The function will return:
+
+<B>'tracking'</B>          It contains information identifying new emboss faces
+                    created during emboss processing. New emboss faces may be
+                    derived from their corresponding <B>'endcap'</B> faces as
+                    well as created using their originating profile edges
+                    or corresponding faces of the supplied sidewall body.
+                    Also, new emboss faces produced by overflow processing
+                    may be created from relevant edges and faces of the
+                    original target body.
+
+<B>'results'</B>           It is a structure containing the results of the operation.
+                    If the function returns PK_ERROR_no_errors, the result of
+                    the operation will be indicated by the value of the
+                    <B>'status'</B> field of this structure. When this value is not
+                    <A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A>, it indicates an operation failure
+                    and an array of entities involved in this failure is
+                    returned through the field <B>'error_entities'</B>, when possible.
+
+                    For more information regarding the failure status code and
+                    the error_entities, refer to the PK documentation of the
+                    <A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A> structure.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

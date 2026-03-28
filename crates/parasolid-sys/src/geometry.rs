@@ -584,6 +584,7 @@ unsafe extern "C" {
         uv: *const c_double,
         n_u_deriv: c_int,
         n_v_deriv: c_int,
+        triangular: PK_LOGICAL_t,
         position: *mut c_double,
     ) -> PK_ERROR_code_t;
 

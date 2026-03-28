@@ -1,0 +1,105 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_imprint_cus_shadow</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_imprint_cus_shadow</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                        PK_BODY_imprint_cus_shadow
+(
+<I>--- received arguments ---
+</I>const int                              n_bodies,        --- number of bodies
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                        bodies[],        --- bodies
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>                      transfs[],       --- body transformation
+const <A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>                     view_direction,  --- viewing direction
+const <A HREF=../headers/pk_body_imprint_cus_shadow_o_t.html>PK_BODY_imprint_cus_shadow_o_t</A>  *options,         --- option structure
+
+<I>--- returned arguments ---
+</I>int                             *const n_edges,         --- number of edges
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                      **const edges,           --- new edges
+int                             *const n_visible_faces, --- number of visible
+                                                        --- faces
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                      **const visible_faces    --- visible faces
+)
+</B>
+<A NAME="description"></A>
+<I>This function takes the given bodies and splits their faces into portions
+which are completely visible in the given view direction by imprinting the
+<B>'shadow'</B> curves cast by overlapping faces in front.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+  PK_ERROR_bad_component          (MILD)   <B>'transfs'</B> is inappropriate
+  PK_ERROR_unsuitable_entity      (MILD)    body is not a sheet or a solid body
+  PK_ERROR_duplicate_array_item   (MILD)    body is supplied multiple times
+  PK_ERROR_face_check_fails       (SERIOUS) face checker found a fault on a
+                                            modified face
+  PK_ERROR_imprint_shadows_failed (SERIOUS) Function failure
+
+<A NAME="documentation"></A>
+The function is only implemented for entities of type PK_BODY_type_solid_c or
+PK_BODY_type_sheet_c.
+
+If the <B>'transfs'</B> argument is not NULL, it refers to an array of <B>'n_bodies'</B>
+<A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A> entities. Each body is transformed by its corresponding entry in
+<B>'transfs'</B>. Transforms may contain translation and rotation but not perspective
+terms. If an instance does not need to be transformed, its <B>'transfs'</B> entry can
+be set to PK_ENTITY_null. The imprinted shadow edges will lie on the body
+in the position where shadows would have been cast had the transformation
+actually been explicitly applied to the body
+
+If the <B>'transfs'</B> argument is NULL, no transformations are applied to the
+bodies.
+
+Bodies may not appear in the <B>'bodies'</B> array more than once regardless of
+whether there is a transformation supplied for each entry.
+
+<B>'edges'</B> returns the new edges created by splitting the original face into
+visible and invisible portions. These edges could either correspond to
+silhouette curves, where the original face itself is divided into front- and
+back-facing regions, or shadow curves where another face overlaps the original
+face when viewed from the supplied view direction.
+
+The result body will consist of faces which are either entirely invisible,
+edge-on or visible when viewed in the direction specified. If the option
+<B>'want_visible_faces'</B> is selected in the options structure, the <B>'visible_faces'</B>
+array will indicate which faces are entirely visible.
+
+See <A HREF="../chapters/fd_chap.042.html#50434401_pgfId-324520">Imprinting shadow curves</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

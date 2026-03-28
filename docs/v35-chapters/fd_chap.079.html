@@ -1,0 +1,1049 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Three-Face Blending</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Three-Face Blending</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.078.html">Face-Face Blending</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.080.html">Interpreting Edge Blending Error Codes</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-294730">78.1	Introduction </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295054">78.2	Three-face blending concepts </A>
+<UL>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295059">78.2.1	Components of a three-face blend </A>
+<UL>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295176">78.2.1.1	Master faces </A>
+</UL>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295185">78.2.2	Creating a three-face blend </A>
+</UL>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295238">78.3	Defining the cross-sectional plane </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295696">78.4	Blend orientation </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295850">78.5	Tolerance </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295861">78.6	Propagating blends </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295930">78.7	Trimming three-face blends </A>
+<UL>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-295998">78.7.1	Trimming blend faces </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296043">78.7.2	Ignoring the centre wall when trimming blend faces </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296148">78.7.3	Trimming blend walls </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296204">78.7.4	Trimming the blend to a limiting entity</A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296227">78.7.5	Trimming the blend using capping faces or planes </A>
+</UL>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296257">78.8	Dealing with multiple solutions </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296324">78.9	Checking three-face blends </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296333">78.10	Repairing self-intersecting blends </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296520">78.11	Tracking laminar edges </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296526">78.12	Update control </A>
+<LI> <A HREF="fd_chap.079.html#50422155_pgfId-296538">78.13	Three-face blending summary </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-294730"></A>78.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-294737"></A>Parasolid’s support for face-face blending is described in <A HREF="fd_chap.078.html#50422154_61851">Chapter 77, “Face-Face Blending”</A>. In addition to standard face-face blending, Parasolid lets you create three-face blends (also known as <EM>
+full round fillets</EM>), which are blends between three sets of faces. </P>
+<P>
+<A NAME="50422155_pgfId-294745"></A><A HREF="fd_chap.079.html#50422155_65158"><EM>
+Figure 78-1</EM></A> shows a part containing a number of ribs, each of which has a three-face blend along the top.</P>
+<P>
+<A NAME="50422155_pgfId-327295"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1034.gif">
+
+<P>
+<A NAME="50422155_pgfId-294999"></A>Figure 78-1 <A NAME="50422155_65158"></A>Blending three sets of faces</P>
+<P>
+<A NAME="50422155_pgfId-295000"></A>Three-face blending differs from face-face blending in the following ways:</P>
+<UL>
+<LI>
+<A NAME="50422155_pgfId-295001"></A>Three sets of walls are provided, rather than two.</LI>
+<LI>
+<A NAME="50422155_pgfId-295002"></A>Walls that are separated by up to 260&#176; can be blended (face-face blending only blends successfully for separations up to 180&#176;).</LI>
+<LI>
+<A NAME="50422155_pgfId-295003"></A>Three-face blends are either rolling-ball blends or circular disc blends.</LI>
+<LI>
+<A NAME="50422155_pgfId-295004"></A>Checking is performed automatically.</LI>
+</UL>
+<P>
+<A NAME="50422155_pgfId-351109"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Blending\3</CODE>
+ <CODE>
+Face</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422155_pgfId-295005"></A>This chapter consists of the following sections: </P>
+<UL>
+<LI>
+<A NAME="50422155_pgfId-295009"></A><A HREF="fd_chap.079.html#50422155_10841">Section 78.2, “Three-face blending concepts”</A> gives an overview of the components of a three-face blend, together with information about how to create one.</LI>
+<LI>
+<A NAME="50422155_pgfId-295013"></A><A HREF="fd_chap.079.html#50422155_66217">Section 78.3, “Defining the cross-sectional plane”</A>, describes how you can set the cross-section of a three-face blend, and how you can further control the result using a guide wire.</LI>
+<LI>
+<A NAME="50422155_pgfId-295017"></A><A HREF="fd_chap.079.html#50422155_34014">Section 78.4, “Blend orientation”</A>, describes how to set the orientation of a three-face blend with respect to its walls.</LI>
+<LI>
+<A NAME="50422155_pgfId-295021"></A><A HREF="fd_chap.079.html#50422155_82018">Section 78.5, “Tolerance”</A>, explains how you can set tolerance values for three-face blend operations. </LI>
+<LI>
+<A NAME="50422155_pgfId-295025"></A><A HREF="fd_chap.079.html#50422155_98699">Section 78.6, “Propagating blends”</A>, explains how three-face blends can be propagated across smoothly adjoining edges. </LI>
+<LI>
+<A NAME="50422155_pgfId-295029"></A><A HREF="fd_chap.079.html#50422155_66028">Section 78.7, “Trimming three-face blends”</A>, explains how to trim three-face blends.</LI>
+<LI>
+<A NAME="50422155_pgfId-295033"></A><A HREF="fd_chap.079.html#50422155_37575">Section 78.9, “Checking three-face blends”</A>, explains how to control face-face inconsistency checking. </LI>
+<LI>
+<A NAME="50422155_pgfId-295037"></A><A HREF="fd_chap.079.html#50422155_51403">Section 78.10, “Repairing self-intersecting blends”</A>, explains the controls available for repairing self-intersecting three-face blends. </LI>
+<LI>
+<A NAME="50422155_pgfId-295041"></A><A HREF="fd_chap.079.html#50422155_27683">Section 78.11, “Tracking laminar edges”</A>, explains how you can track the laminar edges of a blend back to the entities they were created from.</LI>
+<LI>
+<A NAME="50422155_pgfId-295045"></A><A HREF="fd_chap.079.html#50422155_82229">Section 78.12, “Update control”</A>, explains the update switch available when creating three-face blends.</LI>
+<LI>
+<A NAME="50422155_pgfId-295049"></A><A HREF="fd_chap.079.html#50422155_78423">Section 78.13, “Three-face blending summary”</A>, provides a summary of the whole chapter, for ease of reference.</LI>
+</UL>
+<P>
+<A NAME="50422155_pgfId-419827"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422155_pgfId-419837"></A>Note: This functionality does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422155_pgfId-360796"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-358331"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422155_pgfId-358318"></A><A HREF="fd_chap.075.html#50422151_17798">Chapter 74, “Edge Blending Overview”</A></LI>
+<LI>
+<A NAME="50422155_pgfId-358346"></A><A HREF="fd_chap.078.html#50422154_61851">Chapter 77, “Face-Face Blending”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-295054"></A>78.2	<A NAME="50422155_10841"></A><A NAME="50422155_marker-295051"></A><A NAME="50422155_marker-295052"></A><A NAME="50422155_marker-295053"></A>Three-face blending concepts 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-295055"></A>This section gives you an overview of the important concepts in three-face blending. It describes the main aspects of a three-face blend, and explains how to create one using the PK interface. Three-face blending shares many concepts with face-face blending. Whenever necessary, this chapter refers you to a relevant section in <A HREF="fd_chap.078.html#50422154_61851">Chapter 77, “Face-Face Blending”</A>.</P>
+
+<H3>
+<A NAME="50422155_pgfId-295059"></A>	78.2.1 	Components of a three-face blend </H3>
+<P>
+<A NAME="50422155_pgfId-295063"></A><A HREF="fd_chap.079.html#50422155_22690"><EM>
+Figure 78-2</EM></A> illustrates the components of a general three-face blend.</P>
+<P>
+<A NAME="50422155_pgfId-327362"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1035.gif">
+
+<P>
+<A NAME="50422155_pgfId-295161"></A>Figure 78-2 <A NAME="50422155_22690"></A>General definition of a three-face blend</P>
+<P>
+<A NAME="50422155_pgfId-295162"></A>The three walls of faces supplied in a three-face blend are referred to as the <STRONG>
+left</STRONG>, <STRONG>
+centre</STRONG>, and <STRONG>
+right</STRONG> walls. For a rolling-ball blend, no guide wire is necessary and the blended surface is the result of rolling a ball along the left, right and centre walls. For a circular disc blend, a guide wire must be given; a blended surface is created that touches each of the three walls tangentially.</P>
+<P>
+<A NAME="50422155_pgfId-295163"></A>The walls can be composed of faces from a combination of solid and sheet bodies, with some limitations, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422155_pgfId-295164"></A>If the faces of the left wall come from a solid body, the faces of the right wall must come from the same solid body; the centre wall can come from either a sheet or a solid body. </LI>
+<LI>
+<A NAME="50422155_pgfId-295165"></A>If the faces of the right wall come from a solid body, the faces of the left wall must come from the same solid body; the centre wall can come from either a sheet or a solid body. </LI>
+</UL>
+<P>
+<A NAME="50422155_pgfId-295166"></A>In all cases, the centre wall can come from either a sheet or a solid body.</P>
+<P>
+<A NAME="50422155_pgfId-295167"></A>If the left and right walls come from different sheet bodies, their bodies are combined by the blending operation and the body containing the left wall is considered the <EM>
+target body</EM> for the operation.</P>
+<P>
+<A NAME="50422155_pgfId-295168"></A>As for face-face blends, three-face blends are defined using a set of cross-sectional planes that are used to determine the exact position where the blended surface touches the blend walls. For disc blends, these cross-sectional planes are defined using a guide wire: see <A HREF="fd_chap.079.html#50422155_66217">Section 78.3, “Defining the cross-sectional plane”</A>, for information.</P>
+
+<H4>
+<A NAME="50422155_pgfId-295176"></A>78.2.1.1 <A NAME="50422155_marker-295172"></A><A NAME="50422155_marker-295173"></A><A NAME="50422155_marker-295174"></A><A NAME="50422155_marker-295175"></A>Master faces </H4>
+<P>
+<A NAME="50422155_pgfId-464608"></A>Master faces in three-face blending are used in the same way as for face-face blending: that is, the first face in the list that defines a given wall is the master face, and a three-face blend must pass through at least one of the three master faces for the blend to succeed. See <A HREF="fd_chap.078.html#50422154_80688">Section 77.2.1, “General properties of a face-face blend”</A>, for more information on master faces in face-face blending.</P>
+
+
+
+<H3>
+<A NAME="50422155_pgfId-295185"></A>	78.2.2 	<A NAME="50422155_marker-295182"></A><A NAME="50422155_marker-295183"></A><A NAME="50422155_marker-295184"></A>Creating a three-face blend </H3>
+<P>
+<A NAME="50422155_pgfId-295186"></A>Three-face blends are created using <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A>, which receives and returns the following arguments:</P>
+<P>
+<A NAME="50422155_pgfId-295233"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295189"></A>Received</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295191"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295193"></A>n_left_wall_faces</PRE>
+<PRE><A NAME="50422155_pgfId-295194"></A>left_wall_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295196"></A>The number of faces in the left wall, and an array of those faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295198"></A>n_right_wall_faces</PRE>
+<PRE><A NAME="50422155_pgfId-295199"></A>right_wall_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295201"></A>The number of faces in the right wall, and an array of those faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295203"></A>n_centre_wall_faces</PRE>
+<PRE><A NAME="50422155_pgfId-295204"></A>centre_wall_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295206"></A>The number of faces in the centre wall, and an array of those faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295208"></A>guide</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295210"></A>For three-face disc blends, a wire body that defines the cross-sectional planes of the blend. For rolling-ball blends, this argument is not needed and should be set to PK_ENTITY_null. See <A HREF="fd_chap.079.html#50422155_66217">Section 78.3, “Defining the cross-sectional plane”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295215"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295217"></A>A set of options. These are described throughout the rest of this chapter.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295219"></A>Returned</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295221"></A>Description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295223"></A>results</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295225"></A>A structure containing the results of the blend operation, including the orientation used for each blend wall, a status code for the operation, and any blended sheets returned together with entities associated with the status in the event that the operation was not successful.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295227"></A>tracking</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295229"></A>Tracking information for the operation.</P>
+</TD>
+</TR>
+</TABLE>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422155_pgfId-295232"></A>Note: When blending faces from different bodies, the faces in the right wall must not come from an instanced body. If they are from an instanced body, PK_ERROR_instance_body is returned.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-295238"></A>78.3	<A NAME="50422155_66217"></A><A NAME="50422155_marker-295235"></A><A NAME="50422155_marker-295236"></A><A NAME="50422155_marker-295237"></A>Defining the cross-sectional plane 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-295239"></A>As with face-face blends, the cross-sectional planes of a three-face blend are the notional set of planes that pass through the blend surface, and contain the contact points for the blend.</P>
+<P>
+<A NAME="50422155_pgfId-295240"></A>You specify the cross-sectional plane of a three-face blend via the <CODE>
+xsection</CODE>
+ field of the options structure. To create a rolling-ball blend, <CODE>
+xsection</CODE>
+ should be set to PK_blend_xs_rolling_ball_c. In this case, no guide wire is necessary and <CODE>
+guide</CODE>
+ should be set to PK_ENTITY_null. For a circular disc blend, <CODE>
+xsection</CODE>
+ should be PK_blend_xs_disc_c (the default value); this choice requires the <CODE>
+guide</CODE>
+ argument to be set. The <CODE>
+guide</CODE>
+ argument should consist of a manifold, connected wire body that is G1-continuous and contains no tolerant vertices.</P>
+<P>
+<A NAME="50422155_pgfId-295244"></A><A HREF="fd_chap.079.html#50422155_58632"><EM>
+Figure 78-3</EM></A> shows the creation of a rolling-ball blend without the use of a guide wire. <A HREF="fd_chap.079.html#50422155_61382"><EM>
+Figure 78-4</EM></A> illustrates how different sets of cross-section profiles can be created using different guide wires. For more details of how to define the cross-sectional plane in a face-face blend, see <A HREF="fd_chap.078.html#50422154_43352">Section 77.3, “Defining the cross-sectional plane”</A>.</P>
+<P>
+<A NAME="50422155_pgfId-327412"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1036.gif">
+
+<P>
+<A NAME="50422155_pgfId-295398"></A>Figure 78-3 <A NAME="50422155_58632"></A>Creating a rolling-ball blend without a guide wire</P>
+<P>
+<A NAME="50422155_pgfId-327487"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1037.gif">
+
+<P>
+<A NAME="50422155_pgfId-295691"></A>Figure 78-4 <A NAME="50422155_61382"></A>Creating different sets of cross-sectional planes using different guides</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-295696"></A>78.4	<A NAME="50422155_34014"></A><A NAME="50422155_marker-295693"></A><A NAME="50422155_marker-295694"></A><A NAME="50422155_marker-295695"></A>Blend orientation 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-295697"></A><A HREF=../headers/pk_face_make_3_face_blend_o_t.html>PK_FACE_make_3_face_blend_o_t</A> contains three options that let you specify the orientation of the blend with respect to each wall. You need to set these options explicitly if the walls you supply come from several different bodies, since Parasolid is unable to determine which side of each wall the blend should lie in this situation.</P>
+<P>
+<A NAME="50422155_pgfId-295704"></A><A HREF="fd_chap.079.html#50422155_53234"><EM>
+Figure 78-5</EM></A> illustrates the effect of setting a different orientation on the centre wall of a three-face blend.</P>
+<P>
+<A NAME="50422155_pgfId-327533"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1038.gif">
+
+<P>
+<A NAME="50422155_pgfId-295835"></A>Figure 78-5 <A NAME="50422155_53234"></A>Blends created by setting different orientations</P>
+<P>
+<A NAME="50422155_pgfId-295836"></A>If the walls you supply all come from the same body, and the orientation of each wall is <A HREF=../headers/pk_blend_orientation_t.html>PK_blend_orientation_unknown_c</A> (the default), <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A> attempts to determine which side of the walls the blend lies based on the configuration of the supplied walls. </P>
+<P>
+<A NAME="50422155_pgfId-295837"></A>If the walls you supply all come from the same body, you should ensure that the orientation of each wall is the same.</P>
+<P>
+<A NAME="50422155_pgfId-295841"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422155_pgfId-295840"></A>Note: If you attempt to create a three-face blend from walls that come from different bodies and do not set the orientation options appropriately, the three-face blend will fail.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422155_pgfId-295842"></A><A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A> returns the orientation used by a blend in the <CODE>
+results</CODE>
+ structure. You can examine these return values to determine what orientation Parasolid has used for a given blend.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-295850"></A>78.5	<A NAME="50422155_82018"></A><A NAME="50422155_marker-295847"></A><A NAME="50422155_marker-295848"></A><A NAME="50422155_marker-295849"></A>Tolerance 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-295851"></A><A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A> contains two optional controls for specifying how tolerances are used in three-face blends:</P>
+<UL>
+<LI>
+<A NAME="50422155_pgfId-295852"></A>You can specify a tolerance to use when constructing blend surfaces using the <CODE>
+blend_tolerance</CODE>
+ option in <A HREF=../headers/pk_face_make_3_face_blend_o_t.html>PK_FACE_make_3_face_blend_o_t</A>. All blend surfaces are then constructed to that tolerance. The default is 1.0e-5.</LI>
+<LI>
+<A NAME="50422155_pgfId-295853"></A>You can specify a tolerance that <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A> uses when propagating general three-face blends. See <A HREF="fd_chap.079.html#50422155_98699">Section 78.6, “Propagating blends”</A>, for details.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-295861"></A>78.6	<A NAME="50422155_98699"></A><A NAME="50422155_marker-295858"></A><A NAME="50422155_marker-295859"></A><A NAME="50422155_marker-295860"></A>Propagating blends 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-295862"></A>As with face-face blends, three-face blends can propagate to adjoining faces in a body. This allows you to specify just the master face for each wall, leaving Parasolid to propagate the blend as far as possible. The extent to which a blend can propagate depends on both the configuration of the faces you are blending, and the options you have specified, as described in this section. </P>
+<P>
+<A NAME="50422155_pgfId-295866"></A>Three-face blends can automatically propagate across sharp edges between the supplied centre wall faces. <A HREF="fd_chap.079.html#50422155_19244"><EM>
+Figure 78-6</EM></A> shows some simple examples showing three-face blends that have propagated across the centre wall (shown in red), despite the centre wall having a sharp edge. </P>
+<P>
+<A NAME="50422155_pgfId-295903"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1039.gif">
+
+<P>
+<A NAME="50422155_pgfId-295905"></A>Figure 78-6 <A NAME="50422155_19244"></A>Propagating across sharp edges in the centre wall</P>
+<P>
+<A NAME="50422155_pgfId-295906"></A>In addition, three-face blends can propagate across smooth edges between the supplied side wall faces, or onto any face not explicitly supplied as a wall. You can switch this behaviour on or off, and control what Parasolid considers to be a smooth edge, using  the following options:</P>
+<P>
+<A NAME="50422155_pgfId-295928"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295912"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295914"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295916"></A>propagate</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295918"></A>Whether or not <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A> should propagate the blend across suitably smooth adjoining edges. The default is to propagate whenever possible.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295920"></A>propagation_tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295922"></A>An angular tolerance (in radians) that <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A> uses to determine whether adjoining edges are smooth enough to be able to propagate across. Default: 0.05</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-295924"></A>have_propagation_tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-295926"></A>Whether or not a <CODE>
+propagation_tolerance</CODE>
+ has been supplied. If this is PK_LOGICAL_false, then any supplied <CODE>
+propagation_tolerance</CODE>
+ is ignored, and the three-face blend will not propagate across sharp edges unless they are between supplied wall faces. </P>
+<P>
+<A NAME="50422155_pgfId-295927"></A>Default: PK_LOGICAL_true. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-295930"></A>78.7	<A NAME="50422155_66028"></A>Trimming three-face blends 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-295931"></A>Once a three-face blend has been created, it needs to be trimmed appropriately to any surrounding geometry. Parasolid supports:</P>
+<UL>
+<LI>
+<A NAME="50422155_pgfId-295938"></A>Trimming the blend faces to the wall boundaries. See <A HREF="fd_chap.079.html#50422155_28100">Section 78.7.1</A>.</LI>
+<LI>
+<A NAME="50422155_pgfId-295941"></A>Ignoring the centre wall when trimming blend faces to wall boundaries. See <A HREF="fd_chap.079.html#50422155_39422">Section 78.7.2</A>.</LI>
+<LI>
+<A NAME="50422155_pgfId-295943"></A>Trimming the blend walls to the blend face and determining how the faces should be returned. See <A HREF="fd_chap.079.html#50422155_45933">Section 78.7.3</A>.</LI>
+<LI>
+<A NAME="50422155_pgfId-295949"></A>Trimming the blend faces to one or more supplied limiting entities. See <A HREF="fd_chap.079.html#50422155_72844">Section 78.7.4</A>.</LI>
+<LI>
+<A NAME="50422155_pgfId-295953"></A>Trimming the blend faces to one or more capping faces or planes. See <A HREF="fd_chap.079.html#50422155_20753">Section 78.7.5</A>.</LI>
+</UL>
+<P>
+<A NAME="50422155_pgfId-295958"></A>The functionality Parasolid offers for trimming three-face blends is very similar to the functionality it offers for trimming face-face blends; you should refer to <A HREF="fd_chap.078.html#50422154_20242">Section 77.6, “Trimming face-face blends”</A>, for additional information. </P>
+<P>
+<A NAME="50422155_pgfId-295995"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1040.gif">
+
+<P>
+<A NAME="50422155_pgfId-295996"></A>Figure 78-7 Trimming blend faces and blend walls</P>
+
+<H3>
+<A NAME="50422155_pgfId-295998"></A>	78.7.1 	<A NAME="50422155_28100"></A>Trimming blend faces </H3>
+<P>
+<A NAME="50422155_pgfId-323289"></A>You need to specify how blend faces should be trimmed to the boundaries of the blend walls. This is done using the <CODE>
+trim</CODE>
+ option (<A HREF=../headers/pk_blend_trim_t.html>PK_blend_trim_t</A>) in <A HREF=../headers/pk_face_make_3_face_blend_o_t.html>PK_FACE_make_3_face_blend_o_t</A>. This option takes the same values as the <CODE>
+trim</CODE>
+ option in <A HREF=../headers/pk_face_make_blend_o_t.html>PK_FACE_make_blend_o_t</A>, as described in <A HREF="fd_chap.078.html#50422154_55028" CLASS="XRef">Section 77.6.1</A>. <A HREF="fd_chap.079.html#50422155_27808"><EM>
+Figure 78-8</EM></A> shows the effect that the <CODE>
+trim</CODE>
+ option has when creating a three-face blend between three sheet bodies. </P>
+<P>
+<A NAME="50422155_pgfId-296039"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1041.gif">
+
+<P>
+<A NAME="50422155_pgfId-296041"></A>Figure 78-8 <A NAME="50422155_27808"></A>Trimming blend faces to the body</P>
+
+
+<H3>
+<A NAME="50422155_pgfId-296043"></A>	78.7.2 	<A NAME="50422155_39422"></A>Ignoring the centre wall when trimming blend faces </H3>
+<P>
+<A NAME="50422155_pgfId-296044"></A>When trimming blend faces to the body, you might sometimes find it useful to ignore the centre wall used to create the blend. For example, if your application creates three-face blends by introducing an artificial sheet as a centre wall, rather than by choosing three faces from the same body (as shown in <A HREF="fd_chap.079.html#50422155_94939"><EM>
+Figure 78-9</EM></A>), then you never need to consider the centre wall when trimming the resultant blend.</P>
+<P>
+<A NAME="50422155_pgfId-296081"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1042.gif">
+
+<P>
+<A NAME="50422155_pgfId-296083"></A>Figure 78-9 <A NAME="50422155_94939"></A>Introducing an artificial sheet as the centre wall in a three-face blend</P>
+<P>
+<A NAME="50422155_pgfId-296084"></A>If this is the case, you can use the <CODE>
+trim_extent</CODE>
+ option to specify that the blend should only be trimmed with respect to the extent of the left and right walls. This option takes the following values:</P>
+<P>
+<A NAME="50422155_pgfId-296099"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296087"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296089"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296091"></A><A HREF=../headers/pk_blend_trim_extent_t.html>PK_blend_trim_extent_all_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296093"></A>Include the centre wall when trimming the blend. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296095"></A><A HREF=../headers/pk_blend_trim_extent_t.html>PK_blend_trim_extent_sides_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296097"></A>Ignore the centre wall when trimming the belnd. The blend will only be trimmed to the side walls, with further control provided by the value of <CODE>
+trim</CODE>
+. </P>
+<P>
+<A NAME="50422155_pgfId-296098"></A>You should not use this value if <CODE>
+trim</CODE>
+ is <A HREF=../headers/pk_blend_trim_t.html>PK_blend_trim_to_walls_c</A> and the centre wall comes from the same body as the side walls. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422155_pgfId-296103"></A><A HREF="fd_chap.079.html#50422155_92765"><EM>
+Figure 78-10</EM></A> shows the effect of changing the value of <CODE>
+trim_extent</CODE>
+ when <CODE>
+trim</CODE>
+ is <A HREF=../headers/pk_blend_trim_t.html>PK_blend_trim_long_c</A> and the centre wall is the largest of the three walls specified.</P>
+<P>
+<A NAME="50422155_pgfId-296137"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1043.gif">
+
+<P>
+<A NAME="50422155_pgfId-296139"></A>Figure 78-10 <A NAME="50422155_92765"></A>Ignoring the centre wall when trimming three-face blends</P>
+<P>
+<A NAME="50422155_pgfId-296143"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422155_pgfId-296142"></A>Note: If the centre wall comes from a different body, and <CODE>
+trim</CODE>
+ is <A HREF=../headers/pk_blend_trim_t.html>PK_blend_trim_to_walls_c</A>, then the value of <CODE>
+trim_extent</CODE>
+ is ignored. The result is as if <CODE>
+trim_extent</CODE>
+ was <A HREF=../headers/pk_blend_trim_extent_t.html>PK_blend_trim_extent_sides_c</A></ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422155_pgfId-296148"></A>	78.7.3 	<A NAME="50422155_45933"></A><A NAME="50422155_marker-296145"></A><A NAME="50422155_marker-296146"></A><A NAME="50422155_marker-296147"></A>Trimming blend walls </H3>
+<P>
+<A NAME="50422155_pgfId-296149"></A>Like face-face blending, you can specify whether the left and right walls of a three-face blend should be trimmed back to where they meet the blend face, and whether the blend should itself be attached to the walls. You can do this using the <CODE>
+walls</CODE>
+ option.</P>
+<P>
+<A NAME="50422155_pgfId-296152"></A>You can set <CODE>
+walls</CODE>
+ to any of the values described in <A HREF="fd_chap.078.html#50422154_48099">Section 77.6.2, “Trimming blend walls and returning the body”</A>. The left and right walls are trimmed to the blend face for all values of <CODE>
+walls</CODE>
+ except <A HREF=../headers/pk_blend_walls_t.html>PK_blend_walls_trim_no_c</A>, as shown in <A HREF="fd_chap.079.html#50422155_78449"><EM>
+Figure 78-11</EM></A>.</P>
+<P>
+<A NAME="50422155_pgfId-296190"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1044.gif">
+
+<P>
+<A NAME="50422155_pgfId-296192"></A>Figure 78-11 <A NAME="50422155_78449"></A>Trimming walls to blend faces</P>
+<P>
+<A NAME="50422155_pgfId-296193"></A>If <CODE>
+walls</CODE>
+ is either <A HREF=../headers/pk_blend_walls_t.html>PK_blend_walls_attach_c</A> or <A HREF=../headers/pk_blend_walls_t.html>PK_blend_walls_trim_solid_c</A>, the blend is also attached to the walls. It is not attached for the other values. The additional behaviour for each of value of <CODE>
+walls</CODE>
+ is as documented in <A HREF="fd_chap.078.html#50422154_48099">Section 77.6.2</A>.</P>
+<P>
+<A NAME="50422155_pgfId-296197"></A>Because of the nature of three-face blending, the centre wall cannot be trimmed. It is therefore destroyed if <CODE>
+walls</CODE>
+ is either <A HREF=../headers/pk_blend_walls_t.html>PK_blend_walls_trim_both_c</A> or <A HREF=../headers/pk_blend_walls_t.html>PK_blend_walls_attach_c</A>, and the centre is already attached to either of the other walls. It remains untouched otherwise.</P>
+<P>
+<A NAME="50422155_pgfId-296198"></A>As for <A HREF=../headers/pk_face_make_blend.html>PK_FACE_make_blend</A>, if the blend is returned as a separate sheet body then <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A> can create this body in a separate partition that you specify in the <CODE>
+partition</CODE>
+ field of the options structure.</P>
+<P>
+<A NAME="50422155_pgfId-296202"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422155_pgfId-296201"></A>Note: If <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A> returns <A HREF=../headers/pk_3_face_blend_t.html>PK_3_face_blend_sheet_c</A>, the blending operation was only partially successful and the new faces will be returned as a sheet body <EM>
+regardless</EM> of the value of <CODE>
+walls</CODE>
+. If <CODE>
+partition</CODE>
+ is set to a non-default value, the specified partition will be used to hold the new sheet body.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422155_pgfId-296204"></A>	78.7.4 	<A NAME="50422155_72844"></A>Trimming the blend to a limiting entity</H3>
+<P>
+<A NAME="50422155_pgfId-296208"></A>Parasolid can trim a three-face blend to a specified limiting entity: either a plane, face, or fin. If the blend intersects the limiting entity, it is trimmed so that it ends in a constant parameter line determined by the entity.</P>
+<P>
+<A NAME="50422155_pgfId-296209"></A>You use the <CODE>
+n_limits</CODE>
+ and <CODE>
+limits</CODE>
+ options to specify limiting entities. </P>
+<UL>
+<LI>
+<A NAME="50422155_pgfId-296210"></A>If you specify a plane, then the point of intersection is determined by the parameter curve of the blend. For a rolling-ball blend, the blend spine is automatically used. For a disc blend, the supplied <CODE>
+guide</CODE>
+ is used. If the blend intersects a limit plane at more than one point, it is trimmed at the intersection closest to the plane’s location vector (i.e the <CODE>
+location</CODE>
+ field from the <CODE>
+basis_set</CODE>
+ in the definition of the plane returned by <A HREF=../headers/pk_plane_ask.html>PK_PLANE_ask</A>).  </LI>
+<LI>
+<A NAME="50422155_pgfId-296211"></A>If you specify a face or a fin, then the point of intersection is determined by the point that the entity hits the blend. </LI>
+</UL>
+<P>
+<A NAME="50422155_pgfId-296215"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1045.gif">
+
+<P>
+<A NAME="50422155_pgfId-296217"></A>Figure 78-12 <A NAME="50422155_43760"></A>Trimming a blend to a limit plane</P>
+<P>
+<A NAME="50422155_pgfId-296218"></A>For more information about this functionality, see the description of the equivalent functionality for face blending, in <A HREF="fd_chap.078.html#50422154_79234">Section 77.6.3, “Trimming the blend to a plane”</A>.</P>
+<P>
+<A NAME="50422155_pgfId-296225"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422155_pgfId-296224"></A>Note: In the <CODE>
+tracking</CODE>
+ structure returned by <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A>, any cap faces created are tracked to fins if you have explicitly specified fins in the <CODE>
+limits</CODE>
+ array, and the cap face has arisen from using them to trim the blend. Otherwise, edges are used instead. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422155_pgfId-296227"></A>	78.7.5 	<A NAME="50422155_20753"></A>Trimming the blend using capping faces or planes </H3>
+<P>
+<A NAME="50422155_pgfId-296228"></A>As with face-blending, you can use the <CODE>
+caps</CODE>
+, <CODE>
+n_caps</CODE>
+, and <CODE>
+reverse_cap</CODE>
+ options to specify a list of faces or planes with which to trim a three-face blend. If capping faces are supplied, they must come from the same body as the three-face blend. <A HREF="fd_chap.079.html#50422155_27630"><EM>
+Figure 78-13</EM></A> shows a simple example in which a three-face blend can be successfully created by trimming it using one of the faces of the body itself. </P>
+<P>
+<A NAME="50422155_pgfId-296235"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1046.gif">
+
+<P>
+<A NAME="50422155_pgfId-296237"></A>Figure 78-13 <A NAME="50422155_27630"></A>Trimming a three-face blend using a capping face</P>
+<P>
+<A NAME="50422155_pgfId-296238"></A>Unlike limiting entities, which trim to a constant parameter line in the blend face, capping faces and planes trim the blend along the line of intersection between the blend and the supplied cap. <A HREF="fd_chap.079.html#50422155_10111"><EM>
+Figure 78-14</EM></A> illustrates how, by using the same original body and plane as the example in <A HREF="fd_chap.079.html#50422155_43760"><EM>
+Figure 78-12</EM></A>, a different result can be obtained by using the plane as a capping plane rather than a limiting plane. </P>
+<P>
+<A NAME="50422155_pgfId-296248"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1047.gif">
+
+<P>
+<A NAME="50422155_pgfId-296250"></A>Figure 78-14 <A NAME="50422155_10111"></A>Trimming a blend to a capping plane</P>
+<P>
+<A NAME="50422155_pgfId-296251"></A>If a blend intersects a capping plane at more than one point, it is trimmed at the intersection closest to the origin of the plane. </P>
+<P>
+<A NAME="50422155_pgfId-296252"></A>For more information about this functionality, see the description of the equivalent functionality for face blending, in <A HREF="fd_chap.078.html#50422154_72756">Section 77.6.5, “Trimming the blend using capping faces or planes”</A>.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-296257"></A>78.8	<A NAME="50422155_76234"></A>Dealing with multiple solutions 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-296258"></A>If the data you pass to <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A> is ambiguous, it can sometimes be possible to create more than one set of blend faces. Sometimes, you may want to create all possible blends defined by an ambiguous set of walls, but at other times you may only want to create one blend. The following options let you control which blend is created in cases where the walls specified are ambiguous:</P>
+<P>
+<A NAME="50422155_pgfId-296278"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296261"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296263"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-296265"></A>have_help_point</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296267"></A>Whether a <CODE>
+help_point</CODE>
+ has been specified. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-296269"></A>help_point</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-296271"></A>A 3 space vector that is used to distinguish between multiple possible solutions. Parasolid creates whichever blend lies closest to the supplied <CODE>
+help_point</CODE>
+. You should try to make the <CODE>
+help_point</CODE>
+ lie as close to the desired blend face as possible; the further away a <CODE>
+help_point</CODE>
+ is, the harder it is for Parasolid to identify the correct blend face. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422155_pgfId-296279"></A>The different results that can be created depending on whether you supply a help point are shown in <A HREF="fd_chap.079.html#50422155_22116"><EM>
+Figure 78-15</EM></A>. Here, two blends are created by default, but supplying the help point shown can limit the result to just a single blend. </P>
+<P>
+<A NAME="50422155_pgfId-296316"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1048.gif">
+
+<P>
+<A NAME="50422155_pgfId-296318"></A>Figure 78-15 <A NAME="50422155_22116"></A>Creating multiple and single solutions when supplying ambiguous data</P>
+<P>
+<A NAME="50422155_pgfId-296322"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422155_pgfId-296321"></A>Note: When dealing with multiple solutions, <A HREF=../headers/pk_face_make_3_face_blend.html><A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A></A> has a different default behaviour to <A HREF=../headers/pk_face_make_blend.html><A HREF=../headers/pk_face_make_blend.html>PK_FACE_make_blend</A></A>. If no help point information is specified, <A HREF=../headers/pk_face_make_3_face_blend.html><A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A></A> looks for multiple solutions, but <A HREF=../headers/pk_face_make_blend.html><A HREF=../headers/pk_face_make_blend.html>PK_FACE_make_blend</A></A> creates only a single solution (and does not guarantee which of the available solutions will be produced).</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-296324"></A>78.9	<A NAME="50422155_37575"></A>Checking three-face blends 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-296328"></A>To help ensure validity of the resulting body, Parasolid checks for face-face inconsistencies when creating three-face blends. You can turn this behaviour off using the <CODE>
+check_fa_fa</CODE>
+ option. See <A HREF="fd_chap.031.html#50422100_45550">Section 30.4.1, “Face-face checks”</A>, for more information about face-face checking. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-296333"></A>78.10	<A NAME="50422155_51403"></A>Repairing self-intersecting blends 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-296337"></A>Parasolid can attempt to repair any self-intersecting blend faces created after a call to <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A>; this is similar to the repairing done after local operations such as offsetting and tapering. The <CODE>
+repair_fa_X</CODE>
+ field of the options structure is used to specify whether Parasolid should attempt to repair self-intersecting blend faces.</P>
+<P>
+<A NAME="50422155_pgfId-296348"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-305283"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422155_pgfId-305285"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422155_pgfId-305287"></A><CODE>repair_fa_X</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422155_pgfId-305289"></A><A HREF=../headers/pk_blend_repair_fa_x_t.html>PK_blend_repair_fa_X_no_c</A>: do not attempt to repair self-intersecting blend faces. This is the default.</LI>
+<LI>
+<A NAME="50422155_pgfId-305290"></A><A HREF=../headers/pk_blend_repair_fa_x_t.html>PK_blend_repair_fa_X_yes_c</A>: attempt to repair self-intersecting blend faces.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422155_pgfId-296352"></A><A HREF="fd_chap.079.html#50422155_93507"><EM>
+Figure 78-16</EM></A> shows an example of a blend operation that can be completed successfully by setting <CODE>
+repair_fa_X</CODE>
+ to <A HREF=../headers/pk_blend_repair_fa_x_t.html>PK_blend_repair_fa_X_yes_c</A>. If <CODE>
+repair_fa_X</CODE>
+ is set to <A HREF=../headers/pk_blend_repair_fa_x_t.html>PK_blend_repair_fa_X_no_c</A>, the operation fails.</P>
+<P>
+<A NAME="50422155_pgfId-296356"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422155_pgfId-296355"></A>Note: This self-intersection repair applies to faces only; Parasolid does not attempt to repair any self-intersecting surfaces created after a call to <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422155_pgfId-327805"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1049.gif">
+
+<P>
+<A NAME="50422155_pgfId-296518"></A>Figure 78-16 <A NAME="50422155_93507"></A>Successful blend with <CODE>
+repair_fa_X</CODE>
+ set to <A HREF=../headers/pk_blend_repair_fa_x_t.html>PK_blend_repair_fa_X_yes_c</A></P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-296520"></A>78.11	<A NAME="50422155_27683"></A>Tracking laminar edges 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-296521"></A>When creating blends as, or on, sheet bodies, you can use the <CODE>
+track_edges</CODE>
+ option to track the laminar edges of a blend back to the entities that they were created from. This option is identical to the <CODE>
+track_edges</CODE>
+ option in face-face blending: see <A HREF="fd_chap.078.html#50422154_77367">Section 77.17, “Tracking laminar edgesDOC1165”</A>, for more information. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-296526"></A>78.12	<A NAME="50422155_82229"></A>Update control 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-296530"></A>If your application uses models created using earlier versions of Parasolid, you can use the <CODE>
+update</CODE>
+ option to help eliminate differences in rebuild results. This option is identical to the <CODE>
+update</CODE>
+ option in face-face blending: see <A HREF="fd_chap.078.html#50422154_49093">Section 77.19, “Update control”</A>, for more information. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422155_pgfId-296538"></A>78.13	<A NAME="50422155_78423"></A><A NAME="50422155_marker-296535"></A><A NAME="50422155_marker-296536"></A><A NAME="50422155_marker-296537"></A>Three-face blending summary 
+
+
+</H1>
+<P>
+<A NAME="50422155_pgfId-296542"></A>In summary, Parasolid provides functionality to create a rolling-ball or circular disc blend across three walls of faces; the faces must come either from a single solid body or from up to three separate sheet bodies.</P>
+<P>
+<A NAME="50422155_pgfId-296543"></A>Three-face blending functionality is provided via <A HREF=../headers/pk_face_make_3_face_blend.html>PK_FACE_make_3_face_blend</A>. This contains optional controls to:</P>
+<UL>
+<LI>
+<A NAME="50422155_pgfId-296544"></A>Specify whether to create a rolling-ball blend or a general circular disc blend.</LI>
+<LI>
+<A NAME="50422155_pgfId-296545"></A>Specify which side of each wall the blend lies in cases where the walls come from different bodies.</LI>
+<LI>
+<A NAME="50422155_pgfId-296546"></A>Specify how tolerance is used in a three-face blend.</LI>
+<LI>
+<A NAME="50422155_pgfId-296547"></A>Specify the propagation behaviour of a three-face blend specified with a guide wire.</LI>
+</UL>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.078.html">Face-Face Blending</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.080.html">Interpreting Edge Blending Error Codes</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_cover</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_cover</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_FACE_cover
+(
+<I>--- received arguments ---
+</I>int                        n_faces,        --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>            faces[],        --- target faces to cover
+const <A HREF=../headers/pk_face_cover_o_t.html>PK_FACE_cover_o_t</A>   *options,        --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_entity_track_r_t.html>PK_ENTITY_track_r_t</A> *const tracking        --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a single face covering a set of input faces, which can
+then be used to replace the original faces.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity     (MILD)    The faces' body is not a sheet or
+                                             solid body.
+    PK_ERROR_wrong_entity_in_array (MILD)    The input faces are not from same
+                                             body.
+    PK_ERROR_not_connected         (MILD)    The input faces do not form a
+                                             single connected set.
+    PK_ERROR_closed_faces          (MILD)    The input faces form a closed
+                                             connected set, i.e., with no
+                                             boundary edges.
+    PK_ERROR_bad_faces             (MILD)    The function did not attempt to
+                                             fit the input faces, due to
+                                             problems with the input faces. One
+                                             or more Reports will be generated,
+                                             describing the problems. Reports
+                                             may be of the following types:
+                                                 <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_sharp_eds_c</A>
+                                                 <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_tight_curvature_c</A>
+    PK_ERROR_cant_get_surf         (MILD)    Failed to fit a surface to the
+                                             faces.
+    PK_ERROR_failed_to_replace     (SERIOUS) A surface was created, but failed
+                                             to replace the faces with the new
+                                             geometry, or failed to return a
+                                             trimmed sheet.
+    PK_ERROR_cant_cover            (SERIOUS) Internal failure.
+
+<A NAME="documentation"></A>
+PK_FACE_cover will create a new single B-surface fitting a set of input faces.
+If the option <B>'output'</B> is set to PK_FACE_cover_output_replace_c, then the input
+faces will be replaced with a single face using this B-surface. If <B>'output'</B> is
+set to PK_FACE_cover_output_sheet_c, then a new sheet body with a single face
+using this B-surface will be returned.
+
+The faces must belong to the same sheet or solid body. General bodies are not
+supported.
+
+The faces must form a connected set, though it is allowed for the set to
+contain holes. The faces must not form a completely closed set of faces. The
+internal edges of the face set (i.e., edges between two faces that are both
+supplied) must be visibly G1 smooth. Note that the function does not support
+creating periodic B-surface solutions.
+
+
+Tracking
+The returned <B>'tracking'</B> structure contains entity tracking information on the
+operation.
+  o If <B>'output'</B> is set to PK_FACE_cover_output_replace_c, the tracking
+    information will indicate any merging of faces that was required (for cases
+    with multiple input faces).
+  o If <B>'output'</B> is set to PK_FACE_cover_output_sheet_c, then the tracking
+    information  will contain information for the resultant face and its edges.
+    For the face, the tracking will indicate the faces on the original body it
+    was created from. For the edges, the tracking will indicate the boundary
+    edges on the original body they were each created from.
+
+If the function succeeds, then a Report of type <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_distance_err_c</A> will
+be generated, containing the maximum distance error for the fitted surface
+from the input faces, and the parameters on the fitted surface where the
+maximum distance error occurs.
+
+If the function succeeds, but the function considers the resultant surface to
+have high curvature compared with the input faces, then a Report of type
+<A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_worse_curvature_c</A> will be generated, containing information on the
+positions were this occurs, along with the resultant curvature, and the
+corresponding curvature on the original input face.
+
+If the function fails, but a surface fitting the original faces was created,
+then this surface will be returned in a Report of type
+<A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_cover_surf_c</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

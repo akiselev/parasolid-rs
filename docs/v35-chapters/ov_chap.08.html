@@ -1,0 +1,269 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>B-Spline Curves and Surfaces</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>B-Spline Curves and Surfaces</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.07.html">Working with Sheets and Wires</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.09.html">Convergent Modeling</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.08.html#50446364_pgfId-274002">7.1	Introduction</A>
+<LI> <A HREF="ov_chap.08.html#50446364_pgfId-286927">7.2	Creating B-geometry</A>
+<LI> <A HREF="ov_chap.08.html#50446364_pgfId-287774">7.3	Modelling with B-geometry</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446364_pgfId-274002"></A>7.1	<A NAME="50446364_marker-340892"></A><A NAME="50446364_marker-340952"></A><A NAME="50446364_marker-340932"></A><A NAME="50446364_marker-340930"></A><A NAME="50446364_marker-340950"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446364_pgfId-277372"></A>Wherever possible, Parasolid uses analytic geometry in its models. For example, curves such as circles, ellipses and lines, and surfaces such as spheres, tori and cones are represented using geometry that can be described by an equation. Using analytic geometry as much as possible gives Parasolid unparalleled speed and economy of storage.</P>
+<P>
+<A NAME="50446364_pgfId-277589"></A>There are times, however, when geometry cannot be represented by analytic entities. If possible, other types of geometry are used (such as swept or spun surfaces), but when even this is not possible, NURBs-based (<STRONG>
+N</STRONG>on-<STRONG>
+U</STRONG>niform <STRONG>
+R</STRONG>ational <STRONG>
+B</STRONG>-<STRONG>
+s</STRONG>plines) <STRONG>
+B-geometry</STRONG><A NAME="50446364_marker-340970"></A><A NAME="50446364_marker-340968"></A><A NAME="50446364_marker-340966"></A> is used instead. Parasolid offers two forms of B-geometry: <STRONG>
+B-curves</STRONG><A NAME="50446364_marker-340910"></A> and <STRONG>
+B-surfaces</STRONG>. Unlike analytic geometry, B-geometry is defined over a finite region of space. </P>
+<P>
+<A NAME="50446364_pgfId-288957"></A>B-curves and B-surfaces are fully integrated into Parasolid, so you can attach them to edges and faces, and apply any relevant Parasolid operation to them, just as you would any other type of curve or surface. This integration is so tight that in most circumstances there is no reason why users even need be aware they are using B-geometry. However, in addition, Parasolid provides functionality to let you work explicitly with B-geometry. This chapter describes the functionality that is available. </P>
+<P>
+<A NAME="50446364_pgfId-504001"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-89.gif">
+
+<P>
+<A NAME="50446364_pgfId-286926"></A>Figure 7-1 Examples of B-surfaces</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446364_pgfId-286927"></A>7.2	<A NAME="50446364_marker-340894"></A><A NAME="50446364_marker-340948"></A>Creating B-geometry
+
+
+</H1>
+<P>
+<A NAME="50446364_pgfId-287600"></A>Parasolid&#8217;s use of B-geometry is kept to a minimum; wherever possible, other types of geometry are used during operations that create geometry. However, if you explicitly need to create B-geometry, Parasolid provides the following methods: </P>
+<P>
+<A NAME="50446364_pgfId-377131"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377091"></A>Method</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377093"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377095"></A>Supplying B-spline data</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377100"></A>You can supply B-splines (in the form of control points and knot vectors), and Parasolid can create B-curves and B-surfaces directly from this data. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377102"></A>Supplying piecewise data</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377105"></A>You can supply independent segments of surface or curve data, in either <A NAME="50446364_marker-377104"></A><A NAME="50446364_marker-377106"></A><A NAME="50446364_marker-377107"></A><A NAME="50446364_marker-377108"></A>Bezier, Hermite, polynomial or Taylor series format. Parasolid can piece these individual segments together to create the appropriate B-geometry. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377479"></A>Splining</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377482"></A>You can create B-geometry with data that is not as rich as B-spline or <A NAME="50446364_marker-377481"></A>piecewise data by using Parasolid&#8217;s general splining functionality. You supply a series (for a B-curve) or a <A NAME="50446364_marker-377486"></A>mesh (for a B-surface) of points, and Parasolid creates a curve or surface either by interpolating through the supplied points or by fitting to them within a specified tolerance. You can control the final appearance of the geometry using controls such as clamping conditions.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377113"></A>Curve and surface fitting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377116"></A>You can build B-curves and B-surfaces from a set of points sampled from existing curves or surfaces. This functionality is principally used to improve the quality of existing geometry; for example, after importing curve or surface data into Parasolid, you may decide to rebuild data that is not C2-continuous using these functions. You can also create B-geometry using only the definition of a curve or surface, rather than actual geometric data.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-407161"></A>Constrained surfaces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-407163"></A>You can create B-surfaces from a cloud of points and, optionally, normals, which constrain the shape of the resulting B-surface. To further constrain the surface, you can also supply parameterisation information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377125"></A>Converting from other geometry</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-377127"></A>You can convert any piece of geometry into B-geometry. This can be useful if you want to output your data for use in non-Parasolid based applications that use less efficient methods of storing data. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446364_pgfId-287774"></A>7.3	<A NAME="50446364_marker-340896"></A><A NAME="50446364_marker-340956"></A>Modelling with B-geometry
+
+
+</H1>
+<P>
+<A NAME="50446364_pgfId-329608"></A>While performing modelling operations, Parasolid treats B-geometry just like any other type of geometry, allowing you to apply relevant operations to models that have attached B-curves and B-surfaces. In addition, Parasolid offers a range of modelling functionality that is intended specifically for use with B-geometry. </P>
+<P>
+<A NAME="50446364_pgfId-506010"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-90.gif">
+
+<P>
+<A NAME="50446364_pgfId-293668"></A>Figure 7-2 <A NAME="50446364_47156"></A>modelling with B-geometry</P>
+<P>
+<A NAME="50446364_pgfId-298502"></A>Some of the modelling operations that can be performed with B-geometry are as follows:</P>
+<P>
+<A NAME="50446364_pgfId-298337"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-298351"></A>Operation</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-298353"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-298355"></A>Sweeping and spinning</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-298386"></A><A NAME="50446364_marker-341102"></A><A NAME="50446364_marker-341141"></A>Parasolid can create B-surfaces by sweeping or spinning <A NAME="50446364_marker-298384"></A><A NAME="50446364_marker-298385"></A>a previously created B-curve.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-298359"></A>Lofting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-298400"></A><A NAME="50446364_marker-298396"></A>Parasolid can create B-surfaces by <A NAME="50446364_marker-340914"></A><A NAME="50446364_marker-340976"></A><A NAME="50446364_marker-340974"></A>lofting between a set of pre-defined B-curves. Parasolid&#8217;s generic lofting functionality is described in more detail in <A HREF="ov_chap.10.html#50446338_31925">Chapter 9, &#8220;Building Bodies from Profiles&#8221;</A>. </P>
+<P>
+<A NAME="50446364_pgfId-298431"></A>Parasolid contains a variety of options to control the shape of the lofted surface. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-298363"></A>Extracting isoparam curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-298459"></A><A NAME="50446364_marker-341114"></A><A NAME="50446364_marker-341139"></A>Parasolid can create B-curves along constant parameter lines from a B-surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-329638"></A>Curve joining</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446364_pgfId-329640"></A>Parasolid can join a number of B-curves to form a single B-curve.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446364_pgfId-500769"></A>Parasolid allows you to simplify the geometry in a body by converting rational B-curves and B-surfaces to non-rational B-curves and B-surfaces. You can also convert non-rational B-curves to lines or circles, and non-rational B-surfaces to planes, cylinders, cones, spheres or tori.</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.07.html">Working with Sheets and Wires</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.09.html">Convergent Modeling</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

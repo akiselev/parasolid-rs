@@ -1,0 +1,1111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Creating Extruded Bodies</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Creating Extruded Bodies</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.037.html">Creating Profiles</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.039.html">Sweeping</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-294742">37.1	Introduction </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-294967">37.2	Supplied arguments </A>
+<UL>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295009">37.2.1	Profile types </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295037">37.2.2	Specifying the start and end of the extrusion </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295099">37.2.3	Supplying an extruded body </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295228">37.2.4	Returning disjoint bodies </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-363107">37.2.5	Consistent parameterisation </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-482335">37.2.6	Extruding facet bodies </A>
+<UL>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-483709">37.2.6.1	Preventing mixed bodies</A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295234">37.3	Bound types </A>
+<UL>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295237">37.3.1	PK_bound_distance_c </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295299">37.3.2	PK_bound_surf_c </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295376">37.3.3	PK_bound_face_c </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295446">37.3.4	PK_bound_body_c </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295502">37.3.5	PK_bound_sheet_c </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295505">37.3.6	PK_bound_none_c </A>
+</UL>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295514">37.4	Tracking information </A>
+<UL>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295519">37.4.1	Extruded entities </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295535">37.4.2	Bounding entities </A>
+</UL>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295581">37.5	Dealing with multiple intersections of the extruded body </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-295707">37.6	Dealing with profiles that intersect the first division </A>
+<LI> <A HREF="fd_chap.038.html#50422109_pgfId-296167">37.7	Examples of extrusion </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422109_pgfId-294742"></A>37.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422109_pgfId-294751"></A><A NAME="50422109_marker-294743"></A><A NAME="50422109_marker-294744"></A><A NAME="50422109_marker-294745"></A><A NAME="50422109_marker-294746"></A><A NAME="50422109_marker-294747"></A><A NAME="50422109_marker-294748"></A><A NAME="50422109_marker-294749"></A>Creation of extruded bodies is supported via <A NAME="50422109_marker-294750"></A><A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A>. This function creates a body by linear extrusion of a profile body. The profile body may be a minimum body, a wire body or a sheet body. These profiles create extruded wire bodies, sheet bodies or solid bodies respectively. The start and end of the extrusion can be specified in a number of ways; in particular by intersection with other bodies.</P>
+<P>
+<A NAME="50422109_pgfId-294752"></A>The direction of extrusion is defined by a unit vector. The start and end of the extrusion (the <EM>
+bounds</EM>) must be ordered along this vector so that the start comes first.</P>
+<P>
+<A NAME="50422109_pgfId-341564"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-277.gif">
+
+<P>
+<A NAME="50422109_pgfId-294924"></A>Figure 37-1 Extruding a profile to create an extruded body between two bounding faces</P>
+<P>
+<A NAME="50422109_pgfId-294925"></A>There are several ways of defining the start or end of an extrusion:</P>
+<P>
+<A NAME="50422109_pgfId-294955"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294928"></A>Bound type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294930"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294932"></A>Distance</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294934"></A>The extrusion is bound by a copy of the profile at a given distance from the profile.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294936"></A>Surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294938"></A>The extrusion is bound where it meets the given surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294940"></A>Face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294942"></A>The extrusion is bound where it meets the given face.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294944"></A>Body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294946"></A>The extrusion is bound where it meets the given body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294948"></A>Sheet</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294950"></A>The extrusion is bound where it meets the given sheet body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294952"></A>None</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294954"></A>The extrusion is not bound.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422109_pgfId-294959"></A>For more information on these options, see <A HREF="fd_chap.038.html#50422109_24379">Section 37.3, “Bound types”</A>.</P>
+<P>
+<A NAME="50422109_pgfId-294960"></A><A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A> returns tracking information that shows which entities have given rise to entities in the resulting extruded body. For more information, see <A HREF="fd_chap.038.html#50422109_93259">Section 37.4, “Tracking information”</A>.</P>
+<P>
+<A NAME="50422109_pgfId-362973"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Profiling\Extrude</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422109_pgfId-387878"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-387467"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422109_pgfId-387483"></A><A HREF="fd_chap.039.html#50422110_">Chapter 38, “Sweeping”</A></LI>
+<LI>
+<A NAME="50422109_pgfId-387348"></A><A HREF="fd_chap.041.html#50422112_13353">Chapter 40, “Lofting”</A></LI>
+<LI>
+<A NAME="50422109_pgfId-387330"></A><A HREF="fd_chap.045.html#50422117_30749">Chapter 44, “Wire Modeling”</A></LI>
+<LI>
+<A NAME="50422109_pgfId-387377"></A><A HREF="fd_chap.046.html#50422118_34338">Chapter 45, “Sheet Modeling”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422109_pgfId-294967"></A>37.2	<A NAME="50422109_marker-294964"></A><A NAME="50422109_marker-294965"></A><A NAME="50422109_marker-294966"></A>Supplied arguments 
+
+
+</H1>
+<P>
+<A NAME="50422109_pgfId-294968"></A>The following arguments are supplied to <A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A>:</P>
+<P>
+<A NAME="50422109_pgfId-295005"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294971"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294973"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-294975"></A>profile</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294980"></A>The profile to be extruded. See <A HREF="fd_chap.038.html#50422109_26195">Section 37.2.1, “Profile types”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-294982"></A>path</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294984"></A>The unit vector that defines the direction of extrusion. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-294986"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-294988"></A>An options structure that specifies:</P>
+<UL>
+<LI>
+<A NAME="50422109_pgfId-294992"></A>The end of the extrusion. See <A HREF="fd_chap.038.html#50422109_83610">Section 37.2.2, “Specifying the start and end of the extrusion”</A>.</LI>
+<LI>
+<A NAME="50422109_pgfId-294996"></A>The start of the extrusion (optional). See <A HREF="fd_chap.038.html#50422109_83610">Section 37.2.2, “Specifying the start and end of the extrusion”</A>.</LI>
+<LI>
+<A NAME="50422109_pgfId-295000"></A>A body to use instead of extruding the profile. See <A HREF="fd_chap.038.html#50422109_71178">Section 37.2.3, “Supplying an extruded body”</A>.</LI>
+<LI>
+<A NAME="50422109_pgfId-295004"></A>Whether or not disjoint bodies are allowed in the result. See <A HREF="fd_chap.038.html#50422109_78326">Section 37.2.4, “Returning disjoint bodies”</A>.</LI>
+<LI>
+<A NAME="50422109_pgfId-363160"></A>Whether to make parameterisation of an extruded plane consistent with the sweep direction. See <A HREF="fd_chap.038.html#50422109_24337">Section 37.2.5, “Consistent parameterisation”</A>.</LI>
+<LI>
+<A NAME="50422109_pgfId-482137"></A>Whether to supply an angular value to control how an extrusion is split if the <CODE>
+profile</CODE>
+ contains facet geometry. See <A HREF="fd_chap.038.html#50422109_44639">Section 37.2.6, “Extruding facet bodies”</A></LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422109_pgfId-295009"></A>	37.2.1 	<A NAME="50422109_26195"></A><A NAME="50422109_marker-295007"></A><A NAME="50422109_marker-295008"></A>Profile types </H3>
+<P>
+<A NAME="50422109_pgfId-295010"></A>Several different types of profile body can be passed to <A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A>, each of which creates a different type of extruded body. The supplied profile cannot be a general body.</P>
+<P>
+<A NAME="50422109_pgfId-295028"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295013"></A> Profile</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295015"></A>Resulting body</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295017"></A>sheet body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295019"></A>solid body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295021"></A>wire body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295023"></A>sheet body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295025"></A>minimum body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295027"></A>wire body</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422109_pgfId-295029"></A>A sheet profile must be a connected manifold sheet body. It may have multiple laminar boundaries. </P>
+
+
+<H3>
+<A NAME="50422109_pgfId-295037"></A>	37.2.2 	<A NAME="50422109_83610"></A><A NAME="50422109_marker-295031"></A><A NAME="50422109_marker-295032"></A><A NAME="50422109_marker-295033"></A><A NAME="50422109_marker-295034"></A><A NAME="50422109_marker-295035"></A><A NAME="50422109_marker-295036"></A>Specifying the start and end of the extrusion </H3>
+<P>
+<A NAME="50422109_pgfId-295038"></A>The start and end of the extrusion are specified in the <A HREF=../headers/pk_body_extrude_o_t.html>PK_BODY_extrude_o_t</A> structure. Two bounds must be supplied, and they are both specified in the same way, as described in the table below. </P>
+<P>
+<A NAME="50422109_pgfId-295039"></A>For each bound (whether start or end) the following information is required:</P>
+<P>
+<A NAME="50422109_pgfId-295094"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295042"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295044"></A>Value</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-295046"></A>bound</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295048"></A>One of: <A HREF=../headers/pk_bound_t.html><A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A></A>, <A HREF=../headers/pk_bound_t.html>PK_bound_surf_c</A>, <A HREF=../headers/pk_bound_t.html>PK_bound_face_c</A>, <A HREF=../headers/pk_bound_t.html>PK_bound_body_c</A>, <A HREF=../headers/pk_bound_t.html>PK_bound_sheet_c</A>, or <A HREF=../headers/pk_bound_t.html>PK_bound_none_c</A>. The default is <A HREF=../headers/pk_bound_t.html><A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A></A>. See <A HREF="fd_chap.038.html#50422109_24379">Section 37.3, “Bound types”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-295053"></A>forward</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295055"></A>Specifies which side of the profile the bound lies. Use this to choose whether the profile should be extruded forwards or backwards.</P>
+<P>
+<A NAME="50422109_pgfId-295056"></A><STRONG>
+PK_LOGICAL_false</STRONG> The bound lies on the opposite side of the profile to the path (the extrusion is backwards). </P>
+<P>
+<A NAME="50422109_pgfId-295057"></A><STRONG>
+PK_LOGICAL_true</STRONG> The bound lies on the same side of the profile as the path (the default). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-295059"></A>distance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295061"></A>For use with <A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A> only, the (non-negative) distance. For start bounds, the default is 0.0. For end bounds, the default is 1.0.</P>
+<P>
+<A NAME="50422109_pgfId-295062"></A>These default values produce a distance bound that starts from the profile itself and extrudes to a distance of 1 unit. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-295064"></A>entity</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295066"></A>The bounding entity. </P>
+<P>
+<A NAME="50422109_pgfId-295067"></A>For <STRONG>
+<A HREF=../headers/pk_bound_t.html>PK_bound_surf_c</A></STRONG>, a face or surface</P>
+<P>
+<A NAME="50422109_pgfId-295068"></A>For <STRONG>
+<A HREF=../headers/pk_bound_t.html>PK_bound_face_c</A></STRONG>, a face</P>
+<P>
+<A NAME="50422109_pgfId-295069"></A>For <STRONG>
+<A HREF=../headers/pk_bound_t.html>PK_bound_body_c</A></STRONG>, a sheet body or solid body</P>
+<P>
+<A NAME="50422109_pgfId-295070"></A>For <STRONG>
+<A HREF=../headers/pk_bound_t.html>PK_bound_sheet_c</A></STRONG>, a sheet body</P>
+<P>
+<A NAME="50422109_pgfId-295071"></A>The default is PK_ENTITY_null, which should also be used if <CODE>
+bound</CODE>
+ is <A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A>.</P>
+<P>
+<A NAME="50422109_pgfId-295072"></A>When supplied, the bounding entity must divide the extruded body completely from one side to the other. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-295074"></A>nearest</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295076"></A>If <CODE>
+entity</CODE>
+ intersects the extrusion several times:</P>
+<P>
+<A NAME="50422109_pgfId-295077"></A><STRONG>
+PK_LOGICAL_true:</STRONG> Use the nearest intersection for this bound (the default). </P>
+<P>
+<A NAME="50422109_pgfId-295078"></A><STRONG>
+PK_LOGICAL_false:</STRONG> Use the furthest intersection for this bound.</P>
+<P>
+<A NAME="50422109_pgfId-295079"></A>This option has no effect when <CODE>
+bound</CODE>
+ is <A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A>. This option is used in conjunction with <CODE>
+nth_division</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-295081"></A>nth_division</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295083"></A>If <CODE>
+entity</CODE>
+ intersects the extrusion several times, this is used to choose which intersection should form the bound, in conjunction with <CODE>
+nearest</CODE>
+. The default is 1. See <A HREF="fd_chap.038.html#50422109_30077">“Dealing with multiple intersections of the extruded body”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422109_pgfId-295088"></A>side</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295090"></A>Which side of the bound forms the first division if the bound intersects the profile. See <A HREF="fd_chap.038.html#50422109_97055">Section 37.6, “Dealing with profiles that intersect the first division”</A>.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422109_pgfId-295099"></A>	37.2.3 	<A NAME="50422109_71178"></A><A NAME="50422109_marker-295096"></A><A NAME="50422109_marker-295097"></A><A NAME="50422109_marker-295098"></A>Supplying an extruded body </H3>
+<P>
+<A NAME="50422109_pgfId-295103"></A>Rather than let Parasolid extrude a profile, there may be times when you have already created a body using a sweep or extrusion operation (for instance, a tapered extrusion created using <A HREF=../headers/pk_body_sweep.html>PK_BODY_sweep</A> and <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A>), and you want to trim it using the powerful bounding functionality provided by <A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A>. You can do this by supplying the body using the <CODE>
+extruded_body</CODE>
+ option in <A HREF=../headers/pk_body_extrude_o_t.html>PK_BODY_extrude_o_t</A>. An example of the intended use of this option is shown in <A HREF="fd_chap.038.html#50422109_75761"><EM>
+Figure 37-2</EM></A>.</P>
+<P>
+<A NAME="50422109_pgfId-337850"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-278.gif">
+
+<P>
+<A NAME="50422109_pgfId-295221"></A>Figure 37-2 <A NAME="50422109_75761"></A>Supplying an extruded body for trimming</P>
+<P>
+<A NAME="50422109_pgfId-295222"></A>If you supply an <CODE>
+extruded_body</CODE>
+, then you should supply the profile used to create that body as the <CODE>
+profile</CODE>
+ for <A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A>. If the <CODE>
+profile</CODE>
+ lies within the <CODE>
+extruded_body</CODE>
+ (i.e. if the start bound is backward and the end bound is forward) then it should be an exact section that fully intersects the <CODE>
+extruded_body</CODE>
+. This lets you specify a region to include, and is necessary to resolve any ambiguities where multiple solutions are possible. </P>
+
+
+<H3>
+<A NAME="50422109_pgfId-295228"></A>	37.2.4 	<A NAME="50422109_78326"></A><A NAME="50422109_marker-295225"></A><A NAME="50422109_marker-295226"></A><A NAME="50422109_marker-295227"></A>Returning disjoint bodies </H3>
+<P>
+<A NAME="50422109_pgfId-295229"></A>You can use <CODE>
+allow_disjoint</CODE>
+ in <A HREF=../headers/pk_body_extrude_o_t.html>PK_BODY_extrude_o_t</A> to specify whether disjoint components can be returned by <A HREF=../headers/pk_body_extrude.html><A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A></A>. By default, disjoint components are not allowed: if the resulting extruded body contains several components, <A HREF=../headers/pk_body_extrude.html><A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A></A> returns PK_ERROR_disjoint. To return a single body containing several disjoint components in such cases, set <CODE>
+allow_disjoint</CODE>
+ to PK_LOGICAL_true.</P>
+
+
+<H3>
+<A NAME="50422109_pgfId-363107"></A>	37.2.5 	<A NAME="50422109_24337"></A>Consistent parameterisation </H3>
+<P>
+<A NAME="50422109_pgfId-363310"></A>You can use <CODE>
+consistent_params</CODE>
+ to specify whether or not the v-parameter of an extruded plane is aligned with the sweep direction of the extrude operation. By default, it is set to <A HREF=../headers/pk_param_consistent_t.html>PK_PARAM_consistent_unset_c</A>. <A HREF="fd_chap.038.html#50422109_61503"><EM>
+Figure 37-3</EM></A> illustrates the result of an extruded plane when <CODE>
+consistent_params</CODE>
+ is set to either value.</P>
+<P>
+<A NAME="50422109_pgfId-364820"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-279.gif">
+
+<P>
+<A NAME="50422109_pgfId-364640"></A>Figure 37-3 <A NAME="50422109_61503"></A>Extruded plane with its v-parameter aligned with the sweep direction</P>
+<P>
+<A NAME="50422109_pgfId-554356"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422109_pgfId-554458"></A>Note: If the result of the extrude operation is a cylinder and <CODE>
+consistent_params</CODE>
+ is set to <A HREF=../headers/pk_param_consistent_t.html>PK_PARAM_consistent_set_c</A>, the seam of the cylinder will be aligned with the seam of its profile. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422109_pgfId-482335"></A>	37.2.6 	<A NAME="50422109_44639"></A>Extruding facet bodies </H3>
+<P>
+<A NAME="50422109_pgfId-506665"></A>If the supplied <CODE>
+profile</CODE>
+ contains facet geometry you can control how the resulting extruded body is split and model edges are created using the <CODE>
+have_pline_angle</CODE>
+ and the <CODE>
+pline_angle</CODE>
+ options. </P>
+<P>
+<A NAME="50422109_pgfId-514278"></A>The <CODE>
+pline_angle</CODE>
+ is the maximum angle between the polyline segments of the <CODE>
+profile</CODE>
+ that will result in a model edge being created in the extruded body.</P>
+<P>
+<A NAME="50422109_pgfId-508160"></A>If the <CODE>
+have_pline_angle</CODE>
+ option is set to PK_LOGICAL_true, and the angle between adjacent polyline segments, when viewed down the extrude direction, is greater than or equal to <CODE>
+pline_angle</CODE>
+ then an additional model edge is introduced to the extruded body which splits the body at that position. </P>
+<P>
+<A NAME="50422109_pgfId-506937"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422109_pgfId-506973"></A>Note: If an edge in the profile self-intersects when viewed down the direction of extrusion, the edges are split to avoid such an intersection, regardless of the setting of <CODE>
+have_pline_angle</CODE>
+ or <CODE>
+pline_angle</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422109_pgfId-584140"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422109_pgfId-483595"></A>Note: If an <CODE>
+extruded_body</CODE>
+ is supplied, the <CODE>
+pline_angle</CODE>
+ option has no effect</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422109_pgfId-483709"></A>37.2.6.1 <A NAME="50422109_23943"></A>Preventing mixed bodies</H4>
+<P>
+<A NAME="50422109_pgfId-594494"></A>You can control the geometry types of the resulting body if the input body contains facet geometry only.</P>
+<P>
+<A NAME="50422109_pgfId-593960"></A>The <CODE>
+keep_as_facet</CODE>
+ option controls the geometry type of the extrusion, and determines whether the result body contains only facet geometry, or a mixture of classic and facet geometry.</P>
+<P>
+<A NAME="50422109_pgfId-588206"></A>See <A HREF="fd_chap.085.html#50422162_65426">Section 84.6, “Creating a mixture of facet and classic geometry”</A>, for more information.</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422109_pgfId-295234"></A>37.3	<A NAME="50422109_24379"></A><A NAME="50422109_marker-295231"></A><A NAME="50422109_marker-295232"></A><A NAME="50422109_marker-295233"></A>Bound types 
+
+
+</H1>
+<P>
+<A NAME="50422109_pgfId-295235"></A>This section describes the different types of bound that can be defined.</P>
+
+<H3>
+<A NAME="50422109_pgfId-295237"></A>	37.3.1 	<A NAME="50422109_marker-295236"></A><A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A> </H3>
+<P>
+<A NAME="50422109_pgfId-295238"></A>The bound is produced by creating a copy of the given profile shifted along the path vector by the given distance. The distance must be non-negative. To extrude in the opposite direction to the path vector the forward field of the bound is set to PK_LOGICAL_false. </P>
+<P>
+<A NAME="50422109_pgfId-338220"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-280.gif">
+
+<P>
+<A NAME="50422109_pgfId-295293"></A>Figure 37-4 Extruding a profile a specified distance</P>
+<P>
+<A NAME="50422109_pgfId-295297"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422109_pgfId-295296"></A>Note: If you specify an extruded_body in <A HREF=../headers/pk_body_extrude_o_t.html>PK_BODY_extrude_o_t</A>, you should not use this type of bound.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422109_pgfId-295299"></A>	37.3.2 	<A NAME="50422109_marker-295298"></A><A HREF=../headers/pk_bound_t.html>PK_bound_surf_c</A> </H3>
+<P>
+<A NAME="50422109_pgfId-295300"></A>The bound is produced by trimming the extruded body to a surface. Either a surface or a face can be supplied. If a face is supplied then its surface is used, but divisions are not restricted to the region of the underlying surface that the face occupies. The surface is unaffected by the operation.</P>
+<P>
+<A NAME="50422109_pgfId-338461"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-281.gif">
+
+<P>
+<A NAME="50422109_pgfId-295374"></A>Figure 37-5 Extruding a profile to a surface</P>
+
+
+<H3>
+<A NAME="50422109_pgfId-295376"></A>	37.3.3 	<A NAME="50422109_marker-295375"></A><A HREF=../headers/pk_bound_t.html>PK_bound_face_c</A> </H3>
+<P>
+<A NAME="50422109_pgfId-295377"></A>The bound is produced by trimming the extruded body to a face. If the face does not completely trim the extruded body, then adjacent faces are used to trim the body. The faces are unaffected by the operation.</P>
+<P>
+<A NAME="50422109_pgfId-338950"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-282.gif">
+
+<P>
+<A NAME="50422109_pgfId-295444"></A>Figure 37-6 Extruding a profile to a face</P>
+
+
+<H3>
+<A NAME="50422109_pgfId-295446"></A>	37.3.4 	<A NAME="50422109_marker-295445"></A><A HREF=../headers/pk_bound_t.html>PK_bound_body_c</A> </H3>
+<P>
+<A NAME="50422109_pgfId-295447"></A>The bound is produced by trimming the extruded body to a sheet body or solid body. Parasolid selects suitable faces for bounding the extrusion. The body is unaffected by the operation.</P>
+<P>
+<A NAME="50422109_pgfId-295448"></A>Parasolid finds all collections of faces that may intersect the extrusion. </P>
+<P>
+<A NAME="50422109_pgfId-339099"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-283.gif">
+
+<P>
+<A NAME="50422109_pgfId-295500"></A>Figure 37-7 Extruding a profile to a bound created by intersection with a body</P>
+
+
+<H3>
+<A NAME="50422109_pgfId-295502"></A>	37.3.5 	<A NAME="50422109_marker-295501"></A><A HREF=../headers/pk_bound_t.html>PK_bound_sheet_c</A> </H3>
+<P>
+<A NAME="50422109_pgfId-295503"></A>Like <A HREF=../headers/pk_bound_t.html>PK_bound_body_c</A> (when given a sheet body), the bound is produced by trimming the extruded body to a sheet body. However, the sheet body itself is destroyed by the operation. All faces of the given sheet body are used in finding the bound. </P>
+
+
+<H3>
+<A NAME="50422109_pgfId-295505"></A>	37.3.6 	<A NAME="50422109_marker-295504"></A><A HREF=../headers/pk_bound_t.html>PK_bound_none_c</A> </H3>
+<P>
+<A NAME="50422109_pgfId-295506"></A>This bound is exclusively for use when you specify an existing body using the <CODE>
+extruded_body </CODE>
+option, rather than let Parasolid create one from a profile. Using this bound indicates that the corresponding end of the <CODE>
+extruded_body</CODE>
+ should not be altered by the extrude operation. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422109_pgfId-295514"></A>37.4	<A NAME="50422109_93259"></A><A NAME="50422109_marker-295511"></A><A NAME="50422109_marker-295512"></A><A NAME="50422109_marker-295513"></A>Tracking information 
+
+
+</H1>
+<P>
+<A NAME="50422109_pgfId-295515"></A><A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A> provides tracking information that shows which entities have given rise to entities in the resulting extruded body. Tracking is provided for both:</P>
+<UL>
+<LI>
+<A NAME="50422109_pgfId-295516"></A><STRONG>
+Extruded entities</STRONG>, i.e. entities that have been created as a result of extruding from the profile.</LI>
+<LI>
+<A NAME="50422109_pgfId-295517"></A><STRONG>
+Bounding entities</STRONG>, i.e. entities that have been created as a result of the extruded result intersecting with a bounding entity.</LI>
+</UL>
+<P>
+<A NAME="50422109_pgfId-295518"></A>In any result body, a given entity may be considered to be both an extruded entity and a bounding entity, and so may be tracked from more than one source.</P>
+
+<H3>
+<A NAME="50422109_pgfId-295519"></A>	37.4.1 	Extruded entities </H3>
+<P>
+<A NAME="50422109_pgfId-295520"></A>For extruded entities, the tracking information returned is as follows:</P>
+<P>
+<A NAME="50422109_pgfId-295534"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295523"></A>Profile type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295525"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295527"></A>Sheet or wire body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295529"></A>Each extruded face of the result body is tracked from the edge of the profile from which it is extruded.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295531"></A>Minimum body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295533"></A>The extruded edge is tracked from the vertex of the profile.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422109_pgfId-295535"></A>	37.4.2 	Bounding entities </H3>
+<P>
+<A NAME="50422109_pgfId-295536"></A>For all bound types except <A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A>, bounding entities are created where the extruded body intersects a bounding body.  The bounding entities are tracked from what they intersected. The nature of bounding entities created depend on the type of profile supplied:</P>
+<P>
+<A NAME="50422109_pgfId-295554"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295539"></A>Profile type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295541"></A>Bounding entities</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295543"></A>Sheet body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295545"></A>Faces which are not swept from profile edges (i.e. not laterals)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295547"></A>Wire body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295549"></A>Edges which are not swept from profile vertices (i.e. not laterals)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295551"></A>Minimum body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295553"></A>Two vertices</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422109_pgfId-295555"></A>The tracking information returned for bounding entities depends on the nature of the bound:</P>
+<P>
+<A NAME="50422109_pgfId-295574"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295558"></A>Bound type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295560"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295562"></A><A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295564"></A>Each bounding entity is tracked from the corresponding entity in the profile.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295566"></A><A HREF=../headers/pk_bound_t.html>PK_bound_surf_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295568"></A>Each bounding entity is tracked from the supplied surface. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295570"></A><A HREF=../headers/pk_bound_t.html>PK_bound_face_c</A><BR>
+<A HREF=../headers/pk_bound_t.html>PK_bound_body_c</A><BR>
+<A HREF=../headers/pk_bound_t.html>PK_bound_sheet_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295572"></A>Each bounding entity is tracked from a face of the bounding body.</P>
+<P>
+<A NAME="50422109_pgfId-295573"></A>If you extrude a wire profile and it exactly hits an edge of a bounding body, this is treated as a special case, and the edge of the bounding body is returned, instead of the face. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422109_pgfId-295575"></A>If you extrude a wire profile and also specify an <CODE>
+extruded_body</CODE>
+, then each edge of the result body that is not a bounding edge is tracked from the edge of the given extruded_body in the same position.  This is because the tag of the edge of the result body may not be the same as the tag of the edge of the <CODE>
+extruded_body</CODE>
+. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422109_pgfId-295581"></A>37.5	<A NAME="50422109_30077"></A><A NAME="50422109_marker-295577"></A><A NAME="50422109_marker-295578"></A><A NAME="50422109_marker-295579"></A><A NAME="50422109_marker-295580"></A>Dealing with multiple intersections of the extruded body 
+
+
+</H1>
+<P>
+<A NAME="50422109_pgfId-295582"></A>A given bounding entity (such as a sphere) may intersect the extruded body at several places. When this occurs, use <CODE>
+nth_division</CODE>
+ and <CODE>
+nearest</CODE>
+ to determine which intersection should be used as the bound. The way that intersections in the bounding body are numbered also depends on the value of <CODE>
+forward</CODE>
+. </P>
+<P>
+<A NAME="50422109_pgfId-295583"></A>When <CODE>
+nearest</CODE>
+ is PK_LOGICAL_true, divisions are numbered from the profile outwards, so that the first intersection is the nearest. The reverse is true if <CODE>
+nearest</CODE>
+ is PK_LOGICAL_false, as shown in <A HREF="fd_chap.038.html#50422109_26894"><EM>
+Figure 37-8</EM></A>.</P>
+<P>
+<A NAME="50422109_pgfId-339291"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-284.gif">
+
+<P>
+<A NAME="50422109_pgfId-295643"></A>Figure 37-8 <A NAME="50422109_26894"></A>Using <CODE>
+nearest</CODE>
+ to reverse the direction of division numbering</P>
+<P>
+<A NAME="50422109_pgfId-295644"></A>When <CODE>
+forward</CODE>
+ is PK_LOGICAL_false, the extrusion occurs in the opposite direction, and divisions are numbered as shown in <A HREF="fd_chap.038.html#50422109_25740"><EM>
+Figure 37-9</EM></A>.</P>
+<P>
+<A NAME="50422109_pgfId-339494"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-285.gif">
+
+<P>
+<A NAME="50422109_pgfId-295704"></A>Figure 37-9 <A NAME="50422109_25740"></A>Division numbering when extrusion occurs in the opposite direction</P>
+<P>
+<A NAME="50422109_pgfId-295705"></A>Bounds can only occur at a division that goes right across the extruded profile. Intersections with the extruded profile that do not completely cross the extrusion are ignored.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422109_pgfId-295707"></A>37.6	<A NAME="50422109_97055"></A>Dealing with profiles that intersect the first division 
+
+
+</H1>
+<P>
+<A NAME="50422109_pgfId-295708"></A>In cases where the profile (or a distance bound from the profile) intersects the first division on a bounding body or face, extruding the profile may yield several different solutions. <A HREF="fd_chap.038.html#50422109_14607"><EM>
+Figure 37-10</EM></A> shows an example (in cross-section) where several extrusions are possible as a result of extruding a profile from the first division of a bounding body.</P>
+<P>
+<A NAME="50422109_pgfId-339659"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-286.gif">
+
+<P>
+<A NAME="50422109_pgfId-295812"></A>Figure 37-10 <A NAME="50422109_14607"></A>Multiple solutions possible due to profile intersecting division</P>
+<P>
+<A NAME="50422109_pgfId-295813"></A>You can use the <CODE>
+side</CODE>
+ field in either the start or end bound to specify which side of a bounding entity should be in the first division when extruding. This field can take the following values:</P>
+<P>
+<A NAME="50422109_pgfId-295831"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295816"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295818"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295820"></A><A HREF=../headers/pk_bound_side_t.html>PK_bound_side_in_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295822"></A>The inside of the bounding entity should be in the first division.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295824"></A><A HREF=../headers/pk_bound_side_t.html>PK_bound_side_out_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295826"></A>The outside of the bounding entity should be in the first division</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295828"></A><A HREF=../headers/pk_bound_side_t.html>PK_bound_side_both_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422109_pgfId-295830"></A>Both the inside and the outside of the bounding entity should be in the first division.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422109_pgfId-295837"></A><A HREF="fd_chap.038.html#50422109_98387"><EM>
+Figure 37-11</EM></A> illustrates the bodies that would be extruded from the example in <A HREF="fd_chap.038.html#50422109_14607"><EM>
+Figure 37-10</EM></A> for each of these values.</P>
+<P>
+<A NAME="50422109_pgfId-339833"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-287.gif">
+
+<P>
+<A NAME="50422109_pgfId-295970"></A>Figure 37-11 <A NAME="50422109_98387"></A>Specifying which solution should be used</P>
+<P>
+<A NAME="50422109_pgfId-295974"></A><A HREF="fd_chap.038.html#50422109_37772"><EM>
+Figure 37-12</EM></A> shows a number of additional examples. In each one, the start bound is left at its default setting: a distance bound of 0. The end of the extrusion is bound by the bounding body shown. The examples demonstrate the different extruded bodies that can be created using different values in the <CODE>
+side</CODE>
+ field of the end bound.</P>
+<P>
+<A NAME="50422109_pgfId-331758"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-288.gif">
+
+<P>
+<A NAME="50422109_pgfId-296164"></A>Figure 37-12 <A NAME="50422109_marker-733271"></A><A NAME="50422109_marker-733272"></A><A NAME="50422109_marker-733273"></A><A NAME="50422109_37772"></A>Extruding using profiles that intersect the bounding body</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422109_pgfId-296167"></A>37.7	<A NAME="50422109_marker-296165"></A><A NAME="50422109_marker-296166"></A><A NAME="50422109_42386"></A>Examples of extrusion 
+
+
+</H1>
+<P>
+<A NAME="50422109_pgfId-296168"></A>In the following examples, only an end bound of type <A HREF=../headers/pk_bound_t.html>PK_bound_body_c</A> is supplied. The profile and the bounding body are as shown in <A HREF="fd_chap.038.html#50422109_37839"><EM>
+Figure 37-13</EM></A>. The path is from the profile directly towards the bounding body. Resulting extruded bodies are shaded.</P>
+<P>
+<A NAME="50422109_pgfId-340387"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-289.gif">
+
+<P>
+<A NAME="50422109_pgfId-296228"></A>Figure 37-13 <A NAME="50422109_37839"></A>Profile and bounding body used in subsequent examples</P>
+<P>
+<A NAME="50422109_pgfId-340629"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-290.gif">
+
+<P>
+<A NAME="50422109_pgfId-296269"></A>Figure 37-14 Extruding to the nearest and furthest bounding faces</P>
+<P>
+<A NAME="50422109_pgfId-340792"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-291.gif">
+
+<P>
+<A NAME="50422109_pgfId-296310"></A>Figure 37-15 Extruding in to the second nearest and second furthest bounding faces</P>
+<P>
+<A NAME="50422109_pgfId-296311"></A>In the following examples, both a start bound and an end bounds are specified. Both bounds are of type <A HREF=../headers/pk_bound_t.html>PK_bound_body_c</A>. The profile and bounding body shown in <A HREF="fd_chap.038.html#50422109_37839"><EM>
+Figure 37-13</EM></A> are used. </P>
+<P>
+<A NAME="50422109_pgfId-296318"></A>In <A HREF="fd_chap.038.html#50422109_30863"><EM>
+Figure 37-16</EM></A>, the profile is extruded from the nearest division to the furthest division. Note that the profile is not contained in the resulting extrusion.</P>
+<P>
+<A NAME="50422109_pgfId-340940"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-292.gif">
+
+<P>
+<A NAME="50422109_pgfId-296349"></A>Figure 37-16 <A NAME="50422109_30863"></A>Extruding from the nearest bounding face to the furthest bounding face</P>
+<P>
+<A NAME="50422109_pgfId-296350"></A>You can achieve the same effect by placing the profile between the bounds and extruding as far as possible in each direction</P>
+<P>
+<A NAME="50422109_pgfId-327093"></A>Because the start bound must come before the end bound, if you request start and end bounds at the same division, the end bound that Parasolid chooses is at the first division <EM>
+after</EM> the start bound, as shown in <A HREF="fd_chap.038.html#50422109_31106"><EM>
+Figure 37-17</EM></A>.</P>
+<P>
+<A NAME="50422109_pgfId-341092"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-293.gif">
+
+<P>
+<A NAME="50422109_pgfId-296385"></A>Figure 37-17 <A NAME="50422109_31106"></A>Extruding to identical start and end bounds</P>
+<P>
+<A NAME="50422109_pgfId-296389"></A><A HREF="fd_chap.038.html#50422109_29261"><EM>
+Figure 37-18</EM></A> demonstrates extruding across an intersection that does not go right across the profile. In such cases, the intersection is not considered to be a true division. Note that the extruded body could be further modified by setting the <CODE>
+side</CODE>
+ field in the start bound, as described in <A HREF="fd_chap.038.html#50422109_97055">Section 37.6, “Dealing with profiles that intersect the first division”</A>.</P>
+<P>
+<A NAME="50422109_pgfId-344052"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-294.gif">
+
+<P>
+<A NAME="50422109_pgfId-296417"></A>Figure 37-18 <A NAME="50422109_29261"></A>Extruding across an incomplete intersection to the nearest bounding face</P>
+<P>
+<A NAME="50422109_pgfId-296419"></A><A NAME="50422109_marker-296418"></A>If you extrude a wire profile to create a sheet body, each extruded face may intersect with a bounding body a different number of times. This can lead to different result bodies, depending on the division that you choose to extrude to. </P>
+<P>
+<A NAME="50422109_pgfId-296423"></A><A HREF="fd_chap.038.html#50422109_43023"><EM>
+Figure 37-19</EM></A> shows an example in which a square wire profile is extruded until it intersects a cylinder with a diameter that is equal to the length of an edge in the profile. In this example, some faces intersect with the bounding body once, while other faces intersect twice. You can produce different results, depending on whether you select the first or second division. </P>
+<P>
+<A NAME="50422109_pgfId-296457"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-295.gif">
+
+<P>
+<A NAME="50422109_pgfId-296459"></A>Figure 37-19 <A NAME="50422109_43023"></A>Specifying different divisions when extruding wire profiles</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.037.html">Creating Profiles</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.039.html">Sweeping</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

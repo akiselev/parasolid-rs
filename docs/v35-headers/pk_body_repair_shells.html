@@ -1,0 +1,102 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_repair_shells</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_repair_shells</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_BODY_repair_shells
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                        body,     --- body to repair
+const <A HREF=../headers/pk_body_repair_shells_o_t.html>PK_BODY_repair_shells_o_t</A> *options,  --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_shell_repair_stat_t.html>PK_SHELL_repair_stat_t</A>    *const status,   --- status returned
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>        *const tracking  --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function attempts to repair the shell and region structure of the given
+<B>'body'</B>.
+</I>
+<A NAME="documentation"></A>
+
+Introduction
+The following repairs are implemented:
+
+  - Regions with no shells are deleted.
+  - Shells with no faces, edges or vertices are deleted.
+  - Any shells whose topological contents are interlinked with those of
+    another shell are merged.
+  - Any shell whose topological contents are not fully connected to each other
+    will be split into multiple shells each of which will be fully connected.
+  - Any regions having the following property are merged:
+      o spatial extents of the regions are intersecting and the volume of the
+        common segment is non-zero,
+      o the common segment contains all shells of the related regions.
+  - Any region whose spatial extent is disconnected will be split into
+    multiple regions each of which will have connected spatial extent.
+  - Faces will be reoriented within shells to make the shells consistently
+    oriented where necessary.
+  - Faces will be reversed in order to have them point away from solid regions
+    where this is required.
+  - The region and shell structure will be re-organised to ensure correct
+    containment.
+  - The external void region will be identified. Its type will be set to void
+    and it will be placed at the head of the list of regions in the body.
+
+
+Restrictions and Limitations
+This function will not repair physical (geometric) clashes, for example
+face-face intersections, but will repair topological clashes between shells,
+for example where two faces, each in a different shell, share a common edge.
+
+
+User option
+The <A HREF=../headers/pk_body_repair_shells_o_t.html>PK_BODY_repair_shells_o_t</A> structure contains user control options. See
+its documentation for details.
+
+Tracking
+The <A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A> structure contains topology tracking information for the
+operation. See its documentation for details.
+
+Error handling
+If this function returns PK_ERROR_no_errors, the result of the operation will
+be indicated by the value of the <B>'status'</B>. For more information regarding
+the status code refer to the PK documentation of <A HREF=../headers/pk_shell_repair_stat_t.html>PK_SHELL_repair_stat_t</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

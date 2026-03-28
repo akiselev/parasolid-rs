@@ -1,0 +1,599 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>File Header Structure</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>File Header Structure</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.03.html">File Handling</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.05.html">Graphical Output</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273840">3.1	Introduction</A>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273851">3.2	Structure of file header</A>
+<UL>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273870">3.2.1	Format of the preamble</A>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273877">3.2.2	Format of part data</A>
+<UL>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273883">3.2.2.1	Part
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273885">3.2.2.2	Part
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273889">3.2.2.3	Part
+</UL>
+</UL>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273893">3.3	Example of simple file header</A>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273897">3.4	Syntax of keyword definitions</A>
+<UL>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273905">3.4.1	Escape sequences</A>
+<UL>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273912">3.4.1.1	New line</A>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273919">3.4.1.2	Space</A>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273925">3.4.1.3	Semicolon</A>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273931">3.4.1.4	Up arrow</A>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273936">3.4.1.5	General points</A>
+</UL>
+</UL>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273946">3.5	Pre-defined keywords</A>
+<UL>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-273953">3.5.1	Part one data</A>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-274180">3.5.2	Part two data</A>
+<LI> <A HREF="di_chap.04.html#50548800_pgfId-274215">3.5.3	Part three data</A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548800_pgfId-273840"></A>3.1	Introduction
+
+
+</H1>
+<P>
+<A NAME="50548800_pgfId-273841"></A>There is a standard format for a Frustrum file header, designed to give the following benefits:</P>
+<UL>
+<LI>
+<A NAME="50548800_pgfId-273842"></A>To allow a customer to add his own information to the file without rendering it incompatible with other Parasolid-based systems.</LI>
+<LI>
+<A NAME="50548800_pgfId-273843"></A>To provide a standard method for recording in the file such information as when, where, by whom the file was created.</LI>
+</UL>
+<P>
+<A NAME="50548800_pgfId-273844"></A>All files must begin with a file header. The header is written and read by the customer’s implementation of the Frustrum, <EM>
+not</EM> by Parasolid. The reason for standardizing the format of the header is to ensure compatibility between different Frustrum implementations; Parasolid itself never sees the header and therefore has no knowledge of its format.</P>
+<P>
+<A NAME="50548800_pgfId-273845"></A>It is vital that every Frustrum implementation produces file headers which conform to the standard. Therefore, the Frustrum validation tests include specific checks that this is the case.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548800_pgfId-273851"></A>3.2	<A NAME="50548800_marker-273846"></A><A NAME="50548800_marker-273847"></A><A NAME="50548800_marker-273848"></A><A NAME="50548800_marker-273849"></A><A NAME="50548800_11836"></A>Structure of file header
+
+
+</H1>
+<P>
+<A NAME="50548800_pgfId-273852"></A>The file header consists of a preamble, three parts of keyword data and a trailer.</P>
+<UL>
+<LI>
+<A NAME="50548800_pgfId-273856"></A><A NAME="50548800_marker-273853"></A><A NAME="50548800_marker-273854"></A><A NAME="50548800_marker-273855"></A>The purpose of the preamble is to identify whether or not a Frustrum file has a header, and also serves to define the character set which is used for writing keyword data.</LI>
+<LI>
+<A NAME="50548800_pgfId-273860"></A><A NAME="50548800_marker-273857"></A><A NAME="50548800_marker-273858"></A><A NAME="50548800_marker-273859"></A>The <STRONG>
+part 1</STRONG> keyword definitions describe the file characteristics and the environment in which it was created (e.g. the guise and date of creation).</LI>
+<LI>
+<A NAME="50548800_pgfId-273861"></A>The <STRONG>
+part 2</STRONG> keyword definitions provide information about the version of Parasolid which was being used when the file was created.</LI>
+<LI>
+<A NAME="50548800_pgfId-273862"></A>The <STRONG>
+part 3</STRONG> keyword definitions provide a method by which the Frustrum developer can attach user specific data to the file.</LI>
+<LI>
+<A NAME="50548800_pgfId-273866"></A><A NAME="50548800_marker-273863"></A><A NAME="50548800_marker-273864"></A><A NAME="50548800_marker-273865"></A>The file header is terminated by a trailer record. This provides a check as to whether the three parts of user data have been formatted correctly.</LI>
+</UL>
+
+<H3>
+<A NAME="50548800_pgfId-273870"></A>	3.2.1 	<A NAME="50548800_marker-273867"></A><A NAME="50548800_marker-273868"></A><A NAME="50548800_marker-273869"></A>Format of the preamble</H3>
+<P>
+<A NAME="50548800_pgfId-273871"></A>The preamble is written as two lines of 80 characters, each terminated by an end of line character. It includes all characters in the ASCII printing set.</P>
+<P>
+<A NAME="50548800_pgfId-281069"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50548800_pgfId-281133"></A>**ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz**************************</PRE>
+<PRE><A NAME="50548800_pgfId-283252"></A>**PARASOLID !&quot;#$%&amp;&acute;()*+,-./:;&lt;=&gt;?@[\]^_`{|}~0123456789**************************</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548800_pgfId-273873"></A>The punctuation characters in the preamble are written in the same order as they appear in the ASCII sequence (excluding alphanumeric characters).</P>
+
+
+<H3>
+<A NAME="50548800_pgfId-273877"></A>	3.2.2 	<A NAME="50548800_marker-273874"></A><A NAME="50548800_marker-273875"></A><A NAME="50548800_marker-273876"></A>Format of part data</H3>
+<P>
+<A NAME="50548800_pgfId-273878"></A>Each of the three parts of keyword data starts with the declaration “**PART1;”, “**PART2;” or “**PART3;”. (The quotation marks used here are for documentation purposes and do not appear in the file.)</P>
+<P>
+<A NAME="50548800_pgfId-273879"></A>Each part declaration is followed by a sequence of keyword definitions, each consisting of a keyword name and a keyword value.</P>
+<P>
+<A NAME="50548800_pgfId-273880"></A>The keyword definition sequence for each part is terminated by the start of the declaration for the next part or by the start of the trailer record.</P>
+<P>
+<A NAME="50548800_pgfId-273881"></A>Keyword definitions are written to file so that no output line is more than 80 characters long. The new line characters which are required to achieve this layout have no effect on the meaning of the keyword names or values and can appear anywhere within a keyword definition as it is written to file.</P>
+<P>
+<A NAME="50548800_pgfId-273882"></A>A new line character is written at the end of each keyword definition sequence so that the next part declaration or trailer record starts on a new line.</P>
+
+<H4>
+<A NAME="50548800_pgfId-273883"></A>3.2.2.1 Part 1 data</H4>
+<P>
+<A NAME="50548800_pgfId-273884"></A>The part 1 data is standard information which should be accessible to the Frustrum (e.g. by operating system calls). It is the responsibility of the Frustrum to gather the relevant information and to format it as described in this specification. A list of keywords and their meanings is given in a later section.</P>
+
+
+<H4>
+<A NAME="50548800_pgfId-273885"></A>3.2.2.2 Part 2 data</H4>
+<P>
+<A NAME="50548800_pgfId-273886"></A>The part 2 data is again standard information, but this time is information not readily available to the Frustrum (e.g. the Parasolid schema version), and which therefore must be provided from Parasolid. When creating a new file, Parasolid passes a string containing the relevant keywords/values to FFOPWR or UCOPWR, as appropriate. The frustrum must then insert this string into the header in the appropriate place.</P>
+<P>
+<A NAME="50548800_pgfId-273887"></A>The string passed to FFOPWR or UCOPWR does NOT include newline characters or the “**PART2;” prefix; these must be added by the Frustrum. However, the Frustrum should not add escape characters to the string; these have been added by Parasolid, if required.</P>
+<P>
+<A NAME="50548800_pgfId-273888"></A>As an example, the string passed to FFOPWR for the following sample file header would be “SCH=SCH_700084_7007;USFLD_SIZE=0;”.</P>
+
+
+<H4>
+<A NAME="50548800_pgfId-273889"></A>3.2.2.3 Part 3 data</H4>
+<P>
+<A NAME="50548800_pgfId-273890"></A>The part 3 data is non-standard information, which is only comprehensible to the Frustrum which wrote it. However, other Frustrum implementations must be able to parse it (in order to reach the end of the header), and it should therefore conform to the same keyword/value syntax as for part 1 and part 2 data. However, the choice and interpretation of keywords for the part 3 data is entirely at the discretion of the Frustrum which is writing the header.</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548800_pgfId-273893"></A>3.3	<A NAME="50548800_marker-273891"></A><A NAME="50548800_marker-273892"></A>Example of simple file header
+
+
+</H1>
+<P>
+<A NAME="50548800_pgfId-281179"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50548800_pgfId-281212"></A>**ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz**************************</PRE>
+<PRE><A NAME="50548800_pgfId-283264"></A>**PARASOLID !&quot;#$%&amp;&acute;()*+,-./:;&lt;=&gt;?@[\]^_`{|}~0123456789**************************</PRE>
+<PRE><A NAME="50548800_pgfId-283272"></A>**PART1;MC=hppa;MC_MODEL=9000/710;MC_ID=sdlhpp36.2006892913;OS=HP-</PRE>
+<PRE><A NAME="50548800_pgfId-283280"></A>UX;OS_RELEASE=A.09.05;FRU=sdl_parasolid_test_hppa;APPL=unknown;SITE=sdl-</PRE>
+<PRE><A NAME="50548800_pgfId-283288"></A>cambridge-u.k.;USER=ianb;FORMAT=text;GUISE=transmit;KEY=cube;FILE=cube.xmt_txt;DATE</PRE>
+<PRE><A NAME="50548800_pgfId-283296"></A>=2-apr-1996; **PART2;SCH=SCH_70084_7007;USFLD_SIZE=0;</PRE>
+<PRE><A NAME="50548800_pgfId-283304"></A>&nbsp;</PRE>
+<PRE><A NAME="50548800_pgfId-283312"></A>**PART3;</PRE>
+<PRE><A NAME="50548800_pgfId-283320"></A>&nbsp;</PRE>
+<PRE><A NAME="50548800_pgfId-283328"></A>**END_OF_HEADER*****************************************************************</PRE>
+<PRE><A NAME="50548800_pgfId-283336"></A>&nbsp;</PRE>
+<PRE><A NAME="50548800_pgfId-283344"></A>T50 : TRANSMIT FILE created by modeller version 70008415 SCH_700084_70070 </PRE>
+<PRE><A NAME="50548800_pgfId-283352"></A>12 1 6 2 0 0 0 0 0 2 1e3 1e-8 0 3 0 2 1 4 5 6 7 8 9 10 102 4 2 cube13 4 3 </PRE>
+<PRE><A NAME="50548800_pgfId-283360"></A>0 ... etc ...</PRE>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548800_pgfId-273897"></A>3.4	<A NAME="50548800_marker-273895"></A><A NAME="50548800_marker-273896"></A>Syntax of keyword definitions
+
+
+</H1>
+<P>
+<A NAME="50548800_pgfId-273898"></A>All keyword definitions which appear in the three parts of data are written in the form <CODE>
+&lt;name&gt;=&lt;value&gt;</CODE>
+ e.g. <CODE>
+MC=hppa;MC_MODEL=9000/710</CODE>
+;</P>
+<P>
+<A NAME="50548800_pgfId-273900"></A>where</P>
+<UL>
+<LI>
+<A NAME="50548800_pgfId-273901"></A><EM>
+&lt;name&gt;</EM> consists of 1 to 80 uppercase, digit, or underscore characters </LI>
+<LI>
+<A NAME="50548800_pgfId-273902"></A><EM>
+&lt;value&gt;</EM> consists of 1 or more ASCII printing characters (except space)</LI>
+</UL>
+
+<H3>
+<A NAME="50548800_pgfId-273905"></A>	3.4.1 	<A NAME="50548800_marker-273903"></A><A NAME="50548800_marker-273904"></A>Escape sequences</H3>
+<P>
+<A NAME="50548800_pgfId-273906"></A>Escape sequences provide a way of being able to use the full (7 bit) set of ASCII printing characters and the new line character within keyword values.</P>
+<UL>
+<LI>
+<A NAME="50548800_pgfId-273907"></A>The header specification does not allow certain characters to be written to file directly; instead, they must be converted to escaped form as they are written to file.</LI>
+</UL>
+<P>
+<A NAME="50548800_pgfId-273908"></A>The implementation must also be able to recognise and to convert escaped characters as they are read back from file.</P>
+
+<H4>
+<A NAME="50548800_pgfId-273912"></A>3.4.1.1 <A NAME="50548800_marker-273909"></A><A NAME="50548800_marker-273910"></A><A NAME="50548800_marker-273911"></A>New line</H4>
+<P>
+<A NAME="50548800_pgfId-273913"></A>The requirement to format the output data into lines of 80 characters or less means that new line characters are ignored as keyword definitions are read back from file (although they are still significant when they are read as part of the preamble or the trailer record).</P>
+<P>
+<A NAME="50548800_pgfId-273914"></A>If new line characters need to be included within a keyword value, they must be written to file in escaped form as “^n” (up_arrow followed by lower case n).</P>
+<P>
+<A NAME="50548800_pgfId-273915"></A>Care is required when reading keyword values from file so that new lines which are part of the keyword value are not confused with file layout new lines.</P>
+
+
+<H4>
+<A NAME="50548800_pgfId-273919"></A>3.4.1.2 <A NAME="50548800_marker-273916"></A><A NAME="50548800_marker-273917"></A><A NAME="50548800_marker-273918"></A>Space</H4>
+<P>
+<A NAME="50548800_pgfId-273920"></A>The specification does not allow spaces to be written to file as part of the keyword data. This is because of the danger of losing trailing spaces when porting text files between different systems.</P>
+<P>
+<A NAME="50548800_pgfId-273921"></A>If space characters need to be included within a keyword value, they must be written to file in escaped form as “^_” (up_arrow followed by underscore).</P>
+
+
+<H4>
+<A NAME="50548800_pgfId-273925"></A>3.4.1.3 <A NAME="50548800_marker-273922"></A><A NAME="50548800_marker-273923"></A><A NAME="50548800_marker-273924"></A>Semicolon</H4>
+<P>
+<A NAME="50548800_pgfId-273926"></A>The specification uses the semicolon character to mark the end of a keyword value. If semicolon characters need to be included within a keyword value, they must be written to file in escaped form as “^;” (up_arrow followed by semicolon).</P>
+<P>
+<A NAME="50548800_pgfId-273927"></A>Care is required when reading these characters back from file so that the semicolons within a keyword value are not confused with the semicolons which terminate a keyword value.</P>
+
+
+<H4>
+<A NAME="50548800_pgfId-273931"></A>3.4.1.4 <A NAME="50548800_marker-273928"></A><A NAME="50548800_marker-273929"></A><A NAME="50548800_marker-273930"></A>Up arrow</H4>
+<P>
+<A NAME="50548800_pgfId-273932"></A>The specification uses the up arrow character as its escape character when writing keyword values to file. When used in a keyword value, the up arrow character is doubled up when it is written to file so as to avoid ambiguity when reading back the data.</P>
+
+
+<H4>
+<A NAME="50548800_pgfId-273936"></A>3.4.1.5 <A NAME="50548800_marker-273933"></A><A NAME="50548800_marker-273934"></A><A NAME="50548800_marker-273935"></A>General points</H4>
+<P>
+<A NAME="50548800_pgfId-273937"></A>The two character escape sequences may be split by a new line character as they are written to file. They must not cause any output lines to be longer than 80 characters.</P>
+<P>
+<A NAME="50548800_pgfId-273938"></A>Only those characters which belong to the ASCII (7 bit) printing sequence, plus the new line character, can be included as part of a keyword value.</P>
+<P>
+<A NAME="50548800_pgfId-273939"></A>It is possible that the space, semicolon and up arrow characters are used within keyword values which follow the KEY and FILE keywords in part 1 data; the implementation must be able to decode these, even if it does not need to encode escaped characters when writing its own file headers.</P>
+<P>
+<A NAME="50548800_pgfId-273940"></A>The new line character does not appear as part of a file or key name (in normal operation) as this is rejected by the PK argument checking phase.</P>
+<P>
+<A NAME="50548800_pgfId-273941"></A>It is possible for any of the escaped sequences to be used within the keyword values which are associated with part 3 data.</P>
+<P>
+<A NAME="50548800_pgfId-273942"></A>Note that the preamble and the trailer record are written to file in literal mode, without using escape character sequences.</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548800_pgfId-273946"></A>3.5	<A NAME="50548800_marker-273943"></A><A NAME="50548800_marker-273944"></A><A NAME="50548800_marker-273945"></A>Pre-defined keywords
+
+
+</H1>
+<P>
+<A NAME="50548800_pgfId-273947"></A>The following keyword names must be present in each file header, in the correct section of part data. The keyword name must be set to one of the associated values which is shown on the right hand side below (such as hppa) or must use the formatting conventions which are given (such as the date consisting of a one or two digit day number, a three letter abbreviation for the month in lower case and a four digit year number).</P>
+<P>
+<A NAME="50548800_pgfId-273948"></A>The pre-defined sets of keyword values are written in lower case rather than in upper case; this is significant.</P>
+<P>
+<A NAME="50548800_pgfId-273949"></A>The spacing and commas which are shown with the lists of pre-defined keywords are for documentation purposes only and must not be used in keyword values.</P>
+<P>
+<A NAME="50548800_pgfId-273950"></A>The sequence “...” is used to represent an arbitrary sequence of one or more characters (for example, the value for the keyword FILE can be cube.xmt_txt). However, all characters which are used in a keyword value must be converted to the escaped form where necessary.</P>
+<P>
+<A NAME="50548800_pgfId-273951"></A>If the Frustrum developer cannot determine which keyword value applies to a particular keyword, in certain cases this can be set as “unknown”. In all other cases, the value should be set to one of the pre-defined values or to use the specified format.</P>
+<P>
+<A NAME="50548800_pgfId-273952"></A>If the range of keyword values which is shown in the Frustrum documentation is not sufficient (e.g. Parasolid is ported to a new machine), a request should be made to Parasolid Support to have the list extended.</P>
+
+<H3>
+<A NAME="50548800_pgfId-273953"></A>	3.5.1 	Part one data</H3>
+<P>
+<A NAME="50548800_pgfId-281269"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281275"></A>Keyword</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281277"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281279"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281281"></A>MC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281283"></A>make of computer e.g. hppa</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281330"></A>can be set as “unknown”</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281287"></A>MC_MODEL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281289"></A>model of computer e.g. 9000/710</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281357"></A>can be set as “unknown”</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281293"></A>MC_ID</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281295"></A>unique machine identifier ...</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281378"></A>can be set as “unknown”</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281299"></A>OS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281301"></A>name of operating system e.g. HP-UX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281303"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281402"></A>OS_RELEASE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281404"></A>version of operating system e.g.A.09.05</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281447"></A>can be set as “unknown”</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281408"></A>FRU</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281410"></A>Frustrum supplier and implementation name e.g. sdl_parasolid_customer_support</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281474"></A>can be set as “unknown”</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281414"></A>APPL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281416"></A>application which is using Parasolid e.g. parasolid_acceptance_tests</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281501"></A>can be set as “unknown”</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281420"></A>SITE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281422"></A>site at which application is running ...</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281522"></A>can be set as “unknown”</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281528"></A>USER</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281530"></A>login name of user ...</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281567"></A>can be set as “unknown”</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281534"></A>FORMAT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281536"></A>format of file binary, text</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281594"></A>MUST BE SET</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281540"></A>GUISE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281542"></A>guise of file snapshot, transmit, schema, journal, licence</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281621"></A>MUST BE SET</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281661"></A>DATE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281663"></A>dd-mmm-yyyy e.g. 2-apr-1996</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281716"></A>can be set as “unknown”</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50548800_pgfId-274180"></A>	3.5.2 	Part two data</H3>
+<P>
+<A NAME="50548800_pgfId-281753"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281803"></A>Keyword</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281805"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281807"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281771"></A>SCH</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281773"></A>SCH_m_n name of schema key e.g. SCH_700084_7007</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281835"></A>MUST BE SET</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281777"></A>USFLD_SIZE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281779"></A>length of user fields (0 - 16 integer words) m</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548800_pgfId-281886"></A>MUST BE SET</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50548800_pgfId-274215"></A>	3.5.3 	Part three data</H3>
+<P>
+<A NAME="50548800_pgfId-274216"></A>There are no restrictions on the choice of keyword names and values which can be used in the part three data, other than the general rules which have been stated earlier.</P>
+<P>
+<A NAME="50548800_pgfId-110680"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.03.html">File Handling</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.05.html">Graphical Output</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

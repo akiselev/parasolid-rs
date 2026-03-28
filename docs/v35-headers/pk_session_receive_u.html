@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SESSION_receive_u</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SESSION_receive_u</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>               PK_SESSION_receive_u
+(
+<I>--- received arguments ---
+</I>const <A HREF=../headers/pk_uchar_t.html>PK_UCHAR_t</A>             *key,      --- key string
+const <A HREF=../headers/pk_session_receive_o_t.html>PK_SESSION_receive_o_t</A> *options   --- receive options
+)
+</B>
+<A NAME="description"></A>
+<I>This function receives a session from the given Unicode 'file' <B>'key'</B>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_key               Frustrum (UCOPRD) returned FR_bad_name
+                                     (MILD)
+    PK_ERROR_key_not_found         Frustrum (UCOPRD) returned FR_not_found
+                                     (MILD)
+    PK_ERROR_cant_open_file        Frustrum (UCOPRD) returned FR_open_fail
+                                     (MILD)
+    PK_ERROR_file_access_error     Error reading or closing the transmit file
+                                     (MILD)
+    PK_ERROR_schema_access_error   Error opening, closing, or reading the
+                                      schema file (MILD)
+    PK_ERROR_schema_corrupt        Contents of schema file not as expected
+                                     (MILD)
+    PK_ERROR_schema_incompatible   Schema contents in newer format (MILD)
+    PK_ERROR_wrong_format          File does not have expected transmit format
+                                     (MILD)
+    PK_ERROR_wrong_version         File transmitted by incompatible version
+                                      of modeller (MILD)
+    PK_ERROR_corrupt_file          Invalid transmit file contents (MILD)
+    PK_ERROR_file_read_corruption  Corrupt data read, perhaps an NFS problem
+                                     (MILD)
+    PK_ERROR_applio_not_registered Application i/o functions not registered
+                                     (only relevant if options-&gt;transmit_format
+                                      is <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_applio_c</A>) (MILD)
+    PK_ERROR_usfd_mismatch         File has incompatible user-field size (MILD)
+    PK_ERROR_FG_receive_failure    Part contains irretrievable foreign
+                                      geometry (MILD)
+    PK_ERROR_rollback_not_started  Partitioned rollback is not active but file
+                                      was transmitted with pmarks or has
+                                      multiple partitions (MILD)
+    PK_ERROR_locked                Session contains locked partitions (MILD)
+
+<A NAME="documentation"></A>
+Before this function can be used, it must be enabled by
+<A HREF=../headers/pk_session_set_unicode.html>PK_SESSION_set_unicode</A> and then calls to <A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A> and/or
+<A HREF=../headers/pk_session_register_applio.html>PK_SESSION_register_applio</A>.
+
+The Unicode <B>'key'</B> is passed to the frustrum, identifying from which 'file' the
+session will be received.
+
+The registered frustrum routine UCOPRD is called with guise FFCSNP
+('snapshot' file containing a session).
+
+The transmit format option affects the format argument to FFOPRD as follows:
+
+    transmit format                format
+
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_text_c</A>      FFTEXT
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_binary_c</A>    FFBNRY
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_neutral_c</A>   FFBNRY
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_applio_c</A>   (function <B>'open_uc_rd'</B> is called -
+                                   see <A HREF=../headers/pk_session_register_applio.html>PK_SESSION_register_applio</A>)
+
+After the receive, either all the partitions in the session will have only
+their initial pmark, or they will have all their pmarks if the session was
+transmitted with deltas. The state of the bulletin board, attribute
+definitions and interface and modelling parameters will be as saved in the
+file. There will be no session marks, so it is impossible to roll back to
+before a successful call to PK_SESSION_receive_u.
+
+If the function fails, it will be possible to roll back, except in the case of
+PK_ERROR_FG_receive_failure.
+
+Received entities will have the same tags as when the session was transmitted.
+
+Snapshot files can only be received by the same version of the modeller that
+transmitted them.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_make_surf_isocline</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_make_surf_isocline</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>  PK_CURVE_make_surf_isocline
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>       curve,        --- curve through which isocline surf passes
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>    t_interval,   --- curve parameter range for which surf reqd
+<A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>     direction,    --- isocline direction
+double           angle,        --- isocline angle
+<A HREF=../headers/pk_hand_t.html>PK_HAND_t</A>        which,        --- left or right hand isocline surf
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>    range,        --- required extent of surface
+double           tolerance,    --- tolerance for fitting surf through curve
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A> *const surf          --- the isocline surface
+)
+</B>
+<A NAME="description"></A>
+<I>This function makes an isocline surface <B>'surf'</B> which passes through the
+given <B>'t_interval'</B> of the given <B>'curve'</B>.
+</I>
+<A NAME="documentation"></A>
+The isocline is specified by <B>'direction'</B> and <B>'angle'</B>.
+
+In general, two surfaces pass through the curve and satisfy the isocline
+condition.  The convention used for selection is defined by analogy with
+a mountain ridge from which descend two slopes:
+
+    If you walk along the curve in the direction from the start parameter
+    to the end parameter with your head pointing in the draw <B>'direction'</B>,
+    then there are two isocline surfaces below you: one to your left and
+    one to your right.
+
+The selection is by the argument <B>'which'</B> which may take either of the values:
+<A HREF=../headers/pk_hand_t.html>PK_HAND_left_c</A> or <A HREF=../headers/pk_hand_t.html>PK_HAND_right_c</A>. The sign of <B>'angle'</B> has no effect on the
+resulting surface.
+
+Along the curve, the surface will at least extend over the given
+<B>'t_interval'</B>, but it will not necessarily be bounded by this.
+The required extent of the surface away from the curve is specified by the
+INTERVAL <B>'range'</B> in distance units.
+This measure is zero at the curve itself, positive along
+the surface in the given <B>'direction'</B>, and negative in the opposite direction.
+If the angle is pi/2 then positive values are in the direction of the cross
+product of the curve tangent and the given <B>'direction'</B>.
+If the <B>'range'</B> interval contains zero then the given <B>'curve'</B> will be contained
+in the resulting <B>'surf'</B>.  If the projection of the surface in the given
+<B>'direction'</B> would be self intersecting, then the <B>'range'</B> is trimmed to avoid
+this condition.
+
+The function may, at times, have to use approximate geometry.
+For such cases, <B>'tolerance'</B> specifies an upper bound on the distance by which
+a point on the actual geometry may deviate from its ideal position.
+While the function will usually satisfy this constraint, it is not guaranteed.
+
+If no surface exists which can satisfy the conditions (e.g. the given curve is
+steep) then <B>'surf'</B> is given the value PK_ENTITY_null.
+
+If the given <B>'curve'</B> belongs to the geometry of a PART, then the new <B>'surf'</B>
+will become construction geometry of that PART. Otherwise it will become
+orphan geometry of the current PARTITION.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

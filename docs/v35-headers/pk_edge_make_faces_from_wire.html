@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_make_faces_from_wire</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_make_faces_from_wire</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>  PK_EDGE_make_faces_from_wire
+(
+<I>--- received arguments ---
+</I>int                 n_edges,           --- number of edges
+const <A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>     edges[],           --- initial wireframe edges
+const <A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>  senses[],          --- senses of initial fins
+const int           shared_loop[],     --- mapping from loops to faces
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>           new_faces[]        --- new faces created
+)
+</B>
+<A NAME="description"></A>
+<I>This function attaches faces to closed loops of wireframe edges in a body.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity    Edge not in closed wireframe loop
+    PK_ERROR_not_in_same_body     All the edges are not in the same body
+    PK_ERROR_wrong_number_edges   Attempted to create the same loop twice
+    PK_ERROR_bad_index            Can't find other loop in same face
+
+<A NAME="documentation"></A>
+Each edge should be one of a closed loop of wireframe edges.  Each
+corresponding entry in <B>'edges'</B> and <B>'senses'</B> represents a loop in a face to be
+created.  The sense indicates the required sense of the fin to be created
+corresponding to the edge, and this fin will be the first fin of the new loop.
+
+The array <B>'shared_loop'</B> indicates which loops should occur in the same face.
+Each entry of the array should either be negative or the index of a loop with
+which it is to share a face.  If it is negative then the corresponding loop
+will belong to a new face.  If it is non-negative, then it must be the
+index of an earlier loop - in other words, the value of entry i must be less
+than i.  The order of the loops in a face is not defined.
+
+The new faces are returned in <B>'new_faces'</B>, each entry of which will contain the
+face corresponding to each edge in <B>'edges'</B> (and therefore may contain repeats).
+The new faces will not have surfaces attached to them.
+
+All of the edges must belong to a single body whose type may either be wire or
+general.  The same closed loop must not be represented more than once and must
+not contain any non-manifold vertices.
+
+If the body is wire, the construction of the faces is successful, and there are
+no wireframe edges remaining, then the body will become a sheet body.  If the
+body is wire and there are wireframe edges remaining, then the body will become
+general.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

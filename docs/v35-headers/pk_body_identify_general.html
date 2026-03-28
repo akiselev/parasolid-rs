@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_identify_general</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_identify_general</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_BODY_identify_general
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                           body,     --- body to search
+const <A HREF=../headers/pk_body_identify_general_o_t.html>PK_BODY_identify_general_o_t</A> *options,  --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_identify_general_r_t.html>PK_identify_general_r_t</A>      *const results    --- identify results
+)
+</B>
+<A NAME="description"></A>
+<I>This function identifies characteristics of a general body which require it to
+be of type PK_BODY_type_general_c.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_not_general              (MILD) body is not a general body
+
+<A NAME="documentation"></A>
+
+In each case a token and associated topological entity are returned. The
+possible returns are as follows :
+
+<B>'type'</B>                       |    <B>'topol'</B>        |  meaning
+---------------------------------------------------------------------
+<A HREF=../headers/pk_general_t.html>PK_general_nm_edge_c</A>         |  edge             | edge is non-manifold
+<A HREF=../headers/pk_general_t.html>PK_general_nm_vertex_c</A>       |  vertex           | vertex is non-manifold
+<A HREF=../headers/pk_general_t.html>PK_general_opposed_faces_c</A>   |  edge             | edge has two faces with
+                             |                   | opposite normals
+<A HREF=../headers/pk_general_t.html>PK_general_solid_internal_c</A>  |  face             | face has solid regions on
+                             |                   | both sides
+<A HREF=../headers/pk_general_t.html>PK_general_mixed_dimension_c</A> |  region           | Body has components of
+                             |                   | different dimension
+<A HREF=../headers/pk_general_t.html>PK_general_wire_in_solid_c</A>   |  edge             | Wire-frame edge is inside
+                                                 | a solid region
+
+The dimension of a component is the highest dimension present, so a component
+with only wires is dimension one, one with sheets and wires is dimension two
+and so on. In the case that <A HREF=../headers/pk_general_t.html>PK_general_mixed_dimension_c</A> is returned then the
+corresponding region is a void region of the body separating different
+dimension components.
+
+The function works from higher dimension down and may not return lower
+dimension characteristics associated with a higher dimension general condition
+- so for example an internal face dividing a solid cube into two would be
+returned, but its edges would not be returned as non-manifold edges.
+
+If the function returns no general characteristics, i.e. n_general is zero,
+then the body does not have to be general and a call to
+<A HREF=../headers/pk_body_make_manifold_bodies.html>PK_BODY_make_manifold_bodies</A> will set it to be of the correct manifold type.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

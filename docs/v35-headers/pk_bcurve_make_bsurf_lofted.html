@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BCURVE_make_bsurf_lofted</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BCURVE_make_bsurf_lofted</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                        PK_BCURVE_make_bsurf_lofted
+(
+<I>--- received arguments ---
+</I>int                                    n_bcurves,  --- number of bcurves
+const <A HREF=../headers/pk_bcurve_t.html>PK_BCURVE_t</A>                      bcurves[],  --- bcurves
+const <A HREF=../headers/pk_bcurve_make_bsurf_lofted_o_t.html>PK_BCURVE_make_bsurf_lofted_o_t</A> *options,    --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_bsurf_t.html>PK_BSURF_t</A>                      *const bsurf       --- lofted surface
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a bsurf by lofting through a set of bcurves.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_incompatible_curves    curves cannot be matched
+    PK_ERROR_insufficient_curves    too few curves provided
+    PK_ERROR_bad_curves             coincidence between curves
+
+<A NAME="documentation"></A>
+Each of the given <B>'bcurves'</B> lies on a v isoparameter line of the lofted
+surface.
+
+The surface is always continuous up to the second order in the loft ( v )
+direction.  If the lofted curves were splined or created as B-splines and
+they all share the same knot vector, then a surface is produced which is
+continuous in the curve ( u ) direction to the same order as the lofted
+curves.  Otherwise the surface is, in general, only position continuous
+in the curve direction.
+
+The <B>'bsurf'</B> will be rational if any of the <B>'bcurves'</B> are rational.
+
+If the surface is to be periodic in the loft direction then <B>'n_bcurves'</B> must
+be at least 3.  If it is to be non-periodic then <B>'n_bcurves'</B> must be at
+least 2.
+
+The <B>'bcurves'</B> must be supplied in the order in which they become v
+isoparameter lines of the lofted surface.
+
+The <B>'bcurves'</B> are unchanged by this function.
+
+The <B>'bcurves'</B> must have the same number of segments unless either the
+<B>'amalgamate'</B> option is requested, or the number of segments is equated by
+adding degenerate segments.
+
+Either end of the lofted surface may have one of the following end conditions:
+
+  <A HREF=../headers/pk_param_end_t.html>PK_PARAM_end_periodic_c</A>       the surface is periodic in the loft direction.
+                                The other end must also have this end
+                                condition.
+                                <B>'n_bcurves'</B> must be at least 3.
+                                The surface will have continuity of tangent
+                                and curvature across the seam.
+
+  <A HREF=../headers/pk_param_end_t.html>PK_PARAM_end_natural_c</A>        the surface has no curvature in the loft
+                                direction across the end
+
+  <A HREF=../headers/pk_param_end_t.html>PK_PARAM_end_clamped_vector_c</A> derivative vectors are supplied across the
+                                end curve.  Derivatives should be supplied
+                                with respect to a parameter which varies
+                                from 0 to 1 between the first or last two
+                                curves (as appropriate).  The magnitude is
+                                significant.
+
+  <A HREF=../headers/pk_param_end_t.html>PK_PARAM_end_clamped_bcurve_c</A> when a derivative b-spline is used to clamp
+                                an end of the surface it is only necessary
+                                to supply the control vertices.  This is
+                                because the knot vector of the derivative
+                                curve will be the same as the knot vector of
+                                the corresponding start or end curve.  The
+                                dimension of the vertices and the number of
+                                vertices are the same as those for the
+                                corresponding start or end curve.
+
+If clamped boundary conditions are used with the insert degenerate segment
+option (<B>'n_v_degen_segs'</B> or <B>'n_V_degen_segs'</B> != 0 ) then it should be noted
+that for every extra segment added the end curve will have one extra spline
+point and one extra control vertex. This means that if the end is clamped with
+derivative vectors one extra vector must be supplied for every segment added.
+Similarly if the surface is clamped with a derivative curve one extra
+control vertex is required for every segment added.
+
+Twist vectors <B>'u_v_twist'</B>, u_V_twist', 'U_v_twist', <B>'U_V_twist'</B>:
+
+A twist vector is a derivative with respect to both u and v; i.e. it is
+the rate of change of the cross boundary derivatives in the direction of
+the curves. The twist vectors may be supplied at any of the four corners,
+but only when clamped boundary conditions have been supplied across the
+corresponding boundary.
+If the twist vectors are supplied when they are not required then they are
+ignored. If the twist vectors are not supplied then a suitable default value
+is used.
+
+The lofted surface may degenerate to a point at either the start or the
+end of the loft. This degeneracy may be supplied either as a single point
+using <A HREF=../headers/pk_param_degen_t.html>PK_PARAM_degen_vector_c</A> or as a degenerate b-spline curve using
+<A HREF=../headers/pk_param_degen_t.html>PK_PARAM_degen_bcurve_c</A>.
+A degenerate b-spline curve will provide greater control when lofting curves
+that are rational.
+
+When a degenerate b-spline curve is used to define the degeneracy it is
+only necessary to supply the control vertices. This is because the knot
+vector of the degenerate curve will be the same as the knot vector of
+the corresponding start or end curve.  The dimension of the vertices and
+the number of vertices are the same as those for the corresponding start
+or end curve.
+
+Periodic end conditions cannot be used if either end of the lofted
+surface is degenerate, but it is possible to use clamped or natural end
+conditions. The insert degenerate segment options cannot be used if the
+corresponding end of the surface is degenerate.
+
+If a knot vector is supplied (<B>'how_knot'</B> = <A HREF=../headers/pk_param_knot_t.html>PK_PARAM_knot_defined_c</A>) it
+must satisfy the following conditions:
+  . The knot values must form an increasing sequence; repeated knots are
+    not permitted.
+  . For non-periodic lofting there must be <B>'n_bcurves'</B> knot values.
+  . For periodic lofting there must be (<B>'n_bcurves'</B>+1) knot values.
+
+If the knot vector is not supplied (<B>'how_knot'</B> = <A HREF=../headers/pk_param_knot_t.html>PK_PARAM_knot_auto_c</A> )
+then an averaged accumulated chord length parametrisation is used.
+
+If <B>'amalgamate'</B> is set to PK_LOGICAL_true then an attempt is made to
+amalgamate the various knot vectors for the curves, and produce a surface
+which is continuous to the same order as the definition curves. However,
+this may produce a surface with a large number of patches, and should
+only be used on a small number of curves. The amalgamate option cannot
+be used in conjunction with inserted degenerate segments.
+
+If the first curve has fewer segments than the other curves <B>'v_degen_segs'</B>
+may be used add the required number of segments to the first curve. Similarly
+<B>'V_degen_segs'</B> may be used to add segments to the last curve. The segments
+added using these properties are degenerate, that is they contain the order
+of the curve coincident control points. Each degenerate segment added will
+cause the lofting process to make a patch with a corresponding degenerate
+boundary.
+
+See documentation for <A HREF=../headers/pk_bcurve_make_bsurf_lofted_o_t.html>PK_BCURVE_make_bsurf_lofted_o_t</A> for further information
+about the options.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

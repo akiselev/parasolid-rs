@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_find_vectors</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_find_vectors</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_CURVE_find_vectors
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                            curve,        --- curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                         t_int,        --- interval
+double                                tolerance,    --- tolerance
+const <A HREF=../headers/pk_curve_find_vectors_o_t.html>PK_CURVE_find_vectors_o_t</A>      *options,      --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_curve_find_vectors_r_t.html>PK_CURVE_find_vectors_r_t</A>      *const found_vectors --- result
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns position vectors on the supplied curve given measurements
+in 3-space.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+PK_ERROR_cant_get_vectors       (MILD)  The operation failed. Returned only
+                                        on request.
+
+PK_ERROR_bad_chord              (MILD)  Chord measurements have been supplied
+                                        in <B>'options'</B> but the start and end
+                                        point of the curve are not distinct
+                                        (up to <B>'tolerance'</B>).
+
+PK_ERROR_not_implemented        (MILD)  Returned if <B>'curve'</B> is a 2D BCURVE.
+
+PK_ERROR_bad_tolerance          (MILD)  The given <B>'tolerance'</B> has to be larger
+                                        than 1.0e-8.
+
+PK_ERROR_interval_exceed_period (MILD)  The given <B>'curve'</B> is periodic and the
+                                        supplied interval <B>'t_int'</B> is longer
+                                        than the period of <B>'curve'</B>.
+
+PK_ERROR_bad_interval           (MILD)  The <B>'curve'</B> could not be evaluated
+                                        at either (or both) ends of the
+                                        interval.
+
+PK_ERROR_no_measurements        (MILD)  No <B>'measurements'</B> have been supplied
+                                        via <B>'options'</B>.
+
+
+
+<A NAME="documentation"></A>
+The required part of the curve is bounded by the given interval <B>'t_int'</B>. The
+function will return position vectors on the required part of the curve. The
+returned position vectors satisfy (up to <B>'tolerance'</B>) the conditions imposed
+by the <B>'measurements'</B> supplied in <B>'options'</B>. The <B>'measurements'</B> are either
+distances in 3-space or ratios of distances in 3-space. See the documentation
+of the option structure <A HREF=../headers/pk_curve_find_vectors_o_t.html>PK_CURVE_find_vectors_o_t</A> for the details on how
+the <B>'measurements'</B> are defined.
+
+The position vectors are returned in the return structure <B>'found_vectors'</B> of
+type <A HREF=../headers/pk_curve_find_vectors_r_t.html>PK_CURVE_find_vectors_r_t</A>. Note that for some <B>'measurement_methods'</B>
+the position vectors on the curve may not be unique. In these cases all
+position vectors on the required part of the curve will be returned. Each
+position vector will be matched to its corresponding entry in <B>'measurements'</B>
+through an index. If a certain value in <B>'measurements'</B> corresponds to several
+position vectors the index of this value will appear multiple times. The return
+structure also holds status information about the position vectors. See the
+documentation of the return structure for more details.
+
+The error PK_ERROR_cant_get_vectors is only returned if requested via the
+option structure. See its documentation for details.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_embed_in_surf</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_embed_in_surf</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_BODY_embed_in_surf
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>         body,      --- sheet body to receive message
+<A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>         surf,      --- new surface for sheet body
+double            tolerance, --- tolerance for SPCURVE generation
+
+<I>--- returned arguments ---
+</I>int        *const n_edges,   --- number of edges converted to SPCURVEs
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A> **const edges      --- edges converted to SPCURVEs (optional)
+)
+</B>
+<A NAME="description"></A>
+<I>This function constructs the representation of a sheet body in the parameter
+space of its existing surface and embeds that in the parameter space of a
+new surface.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_not_in_same_partition  <B>'body'</B> and <B>'surf'</B> in different partitions
+    PK_ERROR_failed_to_replace      unable to replace surface of sheet
+    PK_ERROR_not_sheet              <B>'body'</B> is not a sheet body
+    PK_ERROR_missing_geom           sheet has no surface attached
+    PK_ERROR_unsuitable_entity      sheet has more than one non-rubber face
+    PK_ERROR_wrong_surface          <B>'surf'</B> is not compatible with sheet's surf
+    PK_ERROR_bad_sharing            illegal sharing of <B>'surf'</B>
+    PK_ERROR_bad_tolerance          edge too short for tolerance
+    PK_ERROR_invalid_geometry       <B>'surf'</B> fails continuity checks
+
+<A NAME="documentation"></A>
+The surface of the sheet is tweaked to the new surface while the
+parameter space representation of the edges is maintained.
+
+The supplied <B>'body'</B> must be a sheet body, which must have only
+one face and there must be a surface attached to the face.
+
+The new surface, <B>'surf'</B> must be of the same type as the surface currently
+attached to the face of the sheet or an offset of that type. The new
+surface must also have the same bound classification, as given by
+<A HREF=../headers/pk_surf_ask_params.html>PK_SURF_ask_params</A>, as the surface of the face and must be capable of
+passing the checks imposed by <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>.
+Continuity checks are also performed on <B>'surf'</B> if requested by
+<A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A>.
+
+If the curve of an edge is an SPCURVE or a constant parameter
+curve of the surface of the face then it will be transfered to the new
+surface.
+
+All other edges will be converted to SPCURVEs using the supplied
+<B>'tolerance'</B> and then transfered to the new surface. It is an
+error if any of these edges are shorter than twice the
+tolerance. During the conversion the edges may need to be split at
+surface discontinuities.
+
+The number of edges whose curves have been converted to SPCURVEs will be
+returned in <B>'n_edges'</B>.
+
+The argument <B>'edges'</B> is optional.  If it is set to NULL then only <B>'n_edges'</B> is
+returned.  Otherwise <B>'edges'</B> returns the array of edges whose curves have
+been converted to SPCURVEs.
+
+NOTE that PK_BODY_embed_in_surf will not replace the surface of a
+blend face (PK_CLASS_blendsf).
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

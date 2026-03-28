@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_replace_surfs</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_replace_surfs</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>         PK_FACE_replace_surfs
+(
+<I>--- received arguments ---
+</I>int                     n_faces,       --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>         faces[],       --- faces
+const <A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>         surfs[],       --- replacement surfaces
+double                  tolerance,     --- tolerance for replacement geometry
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>            local_check,   --- whether to perform local check
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_local_check_t.html>PK_local_check_t</A> *const check_result   --- result of local check
+)
+</B>
+<A NAME="description"></A>
+<I>This function replaces the geometry of the given faces with the
+supplied surfaces.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A>
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_tool_faces_many_bodies   faces do not belong to a single body
+    PK_ERROR_not_in_same_partition    faces and replacement orphan geometry
+                                      not in same partition
+
+<A NAME="documentation"></A>
+
+All geometry of the given faces is replaced by the given geometry
+in <B>'surfs'</B>. The geometry of the edges and vertices connected to
+the modified faces will be deleted and recalculated.
+
+Where edges are adjacent to faces whose geometry is being replaced,
+the edge curves are re-computed as the intersection of the face
+surfaces.
+
+Where edges or faces (sharing a vertex or edge at the boundary of the
+faces to be modified) have geometry which is inextendable, it may not
+be possible to recalculate vertices or edges. This is because the curve
+or surface do not intersect the new surface. If such edges have a user
+defined tolerance, this is likely to occur since SP-curves are
+inextendable.
+
+If the given faces are on a sheet body, they must not share an edge with
+any rubber faces.
+
+
+Surface Orientation
+
+The orientation of each input surface is assumed to be compatible with
+the face whose surface is being replaced. This implies that the normal
+of the input surface must be in a direction that ensures the loops of
+the face are still valid.
+
+Once the new surface is attached to the face, the loop directions of the
+face must still be valid with respect to the new face normal. The geometry
+of the loop will have to be recalculated, but the loop direction must
+remain the same for the operation to succeed.
+
+
+Returned Check Status
+
+If local checking is on, consistency checks will be made on newly
+created topological and geometrical entities, and the result of
+the local check on the body returned via <B>'check_result'</B> :
+
+ o <A HREF=../headers/pk_local_check_t.html>PK_local_check_ok_c</A>       indicates the body is valid.
+
+ o <A HREF=../headers/pk_local_check_t.html>PK_local_check_no_c</A>       indicates that local checking is
+                             switched off.
+
+ o <A HREF=../headers/pk_local_check_t.html>PK_local_check_failed_c</A>   indicates the body is invalid and
+                             further modelling operations on it
+                             may fail. It is the responsibility
+                             of the calling routine to make any
+                             necessary reparation.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

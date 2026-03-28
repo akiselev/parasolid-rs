@@ -1,0 +1,1637 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Rollback</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Rollback</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.097.html">Partitions</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.099.html">Groups</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294718">97.1	Introduction </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294736">97.2	Partitioned rollback </A>
+<UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294744">97.2.1	PK functions </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294785">97.2.2	Partition marks </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294796">97.2.3	The pmark graph </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294854">97.2.4	Rolling to a partition mark </A>
+<UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294925">97.2.4.1	Correct use of the mod_entities array </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294937">97.2.4.2	Requesting combinations of deleted, new, and modified entities </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294956">97.2.4.3	Requesting specific classes of entities </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294963">97.2.4.4	Controlling how attribute modifications are reported </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-294983">97.2.4.5	Specifying attribute callbacks when deleting entities </A>
+</UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295015">97.2.5	Deleting a partition mark </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295030">97.2.6	Advancing a partition mark </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295051">97.2.7	Pmark functions </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-414991">97.2.8	Retaining attribute values after a rollback </A>
+<UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-457582">97.2.8.1	Enquiring if the attribute is a no-roll attribute </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295151">97.3	Deltas </A>
+<UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295158">97.3.1	Delta functions </A>
+</UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295178">97.4	Session rollback </A>
+<UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295184">97.4.1	Session marks </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-355737">97.4.2	Creating a session mark </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295205">97.4.3	Rolling to a session mark </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295222">97.4.4	Deleting a session mark </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295236">97.4.5	Session rollback and partitions </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295245">97.4.6	Mark functions </A>
+</UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295311">97.5	The frustrum </A>
+<UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-355794">97.5.1	Frustrum rollback functions </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295367">97.5.2	Memory and disk space </A>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295385">97.5.3	Frustrum error conditions and error recovery </A>
+</UL>
+<LI> <A HREF="fd_chap.098.html#50422177_pgfId-295398">97.6	Mark management - an example strategy </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422177_pgfId-294718"></A>97.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422177_pgfId-294720"></A><A NAME="50422177_marker-294719"></A>Rollback can be used to:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-294721"></A>Undo an operation or series of operations that have not produced the expected result</LI>
+<LI>
+<A NAME="50422177_pgfId-294722"></A>Recover from an inconsistent state caused by a failed modeling operation</LI>
+<LI>
+<A NAME="50422177_pgfId-294723"></A>Investigate alternative methods of producing a part - ‘try and see’ modeling</LI>
+<LI>
+<A NAME="50422177_pgfId-294724"></A>Improve performance of feature model update</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-294728"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-294727"></A>Note: The way rollback is used is fundamental to the interface between the application and its user. It influences how the application cleans up after errors and whether users are allowed to step back and forth through a session.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294729"></A>Rollback is used to undo changes made after a certain point, indicated by a <STRONG>
+roll mark</STRONG> set at that point, either by the application or the user.</P>
+<P>
+<A NAME="50422177_pgfId-294730"></A>There are two types of rollback:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-294731"></A><STRONG>
+Partitioned rollback</STRONG></LI>
+<LI>
+<A NAME="50422177_pgfId-294732"></A><STRONG>
+Session rollback</STRONG></LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-368262"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-368107"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-368089"></A><A HREF="fd_chap.008.html#50422076_63745">Section 7.3, “Roll-back”</A></LI>
+<LI>
+<A NAME="50422177_pgfId-368122"></A><A HREF="fd_chap.097.html#50422176_36055">Chapter 96, “Partitions”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422177_pgfId-294736"></A>97.2	<A NAME="50422177_12385"></A><A NAME="50422177_marker-294734"></A><A NAME="50422177_marker-294735"></A>Partitioned rollback 
+
+
+</H1>
+<P>
+<A NAME="50422177_pgfId-294738"></A><A NAME="50422177_marker-294737"></A>Partitioned rollback enables feature modeling applications to perform model update more efficiently after model parameters are changed. It is possible to roll back a model to the point where a feature was added, reapply the modified feature, and then reapply subsequent features to generate the updated model. Individual bodies or collections of bodies can be rolled back independently, so updating one model in a session does not affect other models. Branching rollback of bodies - several alternative updates to a given body - can also be implemented.</P>
+<P>
+<A NAME="50422177_pgfId-294739"></A>Applications still have the ability to roll the entire session back and forward - a session undo which can be invoked by the user.</P>
+<P>
+<A NAME="50422177_pgfId-294740"></A>The application is expected to manage the storage and purging of session and partition marks, according to its own priorities and disk management strategy. However, Parasolid does provide some assistance with mark management, such as the clean-up of pmarks done when the roll forward option is off.</P>
+<P>
+<A NAME="50422177_pgfId-475989"></A>Before using partitioned rollback you need to register a delta frustrum using <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>. To stop partitioned rollback you must stop the Parasolid session. For more information about partitioned rollback, see <A HREF="fd_chap.098.html#50422177_94685">Section 97.3.1, “Delta functions”</A>.</P>
+<P>
+<A NAME="50422177_pgfId-359248"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application Support\Rollback</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H3>
+<A NAME="50422177_pgfId-294744"></A>	97.2.1 	<A NAME="50422177_marker-294742"></A><A NAME="50422177_marker-294743"></A>PK functions </H3>
+<P>
+<A NAME="50422177_pgfId-294745"></A>The following SESSION functions are provided to help manage rollback:</P>
+<P>
+<A NAME="50422177_pgfId-294782"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294748"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294750"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294753"></A><A NAME="50422177_marker-294752"></A><A HREF=../headers/pk_session_is_rollback_on.html>PK_SESSION_is_rollback_on</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294755"></A>returns true if partitioned rollback was initialised by calling <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A> before calling <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294758"></A><A NAME="50422177_marker-294757"></A><A HREF=../headers/pk_session_set_roll_forward.html>PK_SESSION_set_roll_forward</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294760"></A>sets the value of the <CODE>
+roll_forward</CODE>
+ session parameter</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294763"></A><A NAME="50422177_marker-294762"></A><A HREF=../headers/pk_session_is_roll_forward_on.html>PK_SESSION_is_roll_forward_on</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294765"></A>returns the roll_forward session parameter</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294768"></A><A NAME="50422177_marker-294767"></A><A HREF=../headers/pk_session_ask_curr_partition.html>PK_SESSION_ask_curr_partition</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294770"></A>returns the current partition</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294773"></A><A NAME="50422177_marker-294772"></A><A HREF=../headers/pk_session_ask_mark.html>PK_SESSION_ask_mark</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294775"></A>returns the most recent session mark, and whether the session is still at that mark</P>
+<P>
+<A NAME="50422177_pgfId-294776"></A>(supersedes <A HREF=../headers/pk_mark_ask_state.html>PK_MARK_ask_state</A>)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294779"></A><A NAME="50422177_marker-294778"></A><A HREF=../headers/pk_session_ask_partitions.html>PK_SESSION_ask_partitions</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294781"></A>returns all the partitions in the session</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422177_pgfId-294785"></A>	97.2.2 	<A NAME="50422177_marker-294783"></A><A NAME="50422177_marker-294784"></A><A NAME="50422177_37645"></A>Partition marks </H3>
+<P>
+<A NAME="50422177_pgfId-294788"></A><A NAME="50422177_marker-294786"></A><A NAME="50422177_marker-294787"></A>In order to roll partitions back and forth, marks are created in partitions. These are called <STRONG>
+partition marks</STRONG>, and the corresponding PK object is the <STRONG>
+PMARK</STRONG>. A partition mark can be thought of as recording a particular state of a partition.</P>
+<P>
+<A NAME="50422177_pgfId-294791"></A>At any time a partition has a <STRONG>
+current pmark</STRONG><A NAME="50422177_marker-294789"></A><A NAME="50422177_marker-294790"></A>. This is the pmark most recently created or rolled to. If the partition has not been modified (by creating, modifying, or deleting entities, or by a roll operation) since that pmark was made current, the partition is <STRONG>
+at</STRONG> that pmark.</P>
+<P>
+<A NAME="50422177_pgfId-294794"></A>Each partition has an <STRONG>
+initial pmark</STRONG><A NAME="50422177_marker-294792"></A><A NAME="50422177_marker-294793"></A>, and it cannot be deleted; it is the unique pmark in the partition with no preceding pmark. A newly created partition has only an initial pmark, which is current. However, the partition is not <STRONG>
+at</STRONG> its initial pmark, as that would represent an inactive state of the partition - a partition which is rolled back to its initial pmark is inactive, and can no longer be used.</P>
+
+
+<H3>
+<A NAME="50422177_pgfId-294796"></A>	97.2.3 	<A NAME="50422177_marker-294795"></A>The pmark graph </H3>
+<P>
+<A NAME="50422177_pgfId-294799"></A><A NAME="50422177_marker-294797"></A><A NAME="50422177_marker-294798"></A>The pmarks of a partition together form its <STRONG>
+pmark graph</STRONG>. Parasolid maintains the pmark graph of each partition, and the application can enquire on the sequence of pmarks contained in it:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-294800"></A>A pmark has one <STRONG>
+preceding</STRONG> pmark (except an initial pmark, which has none), and zero, one or more <STRONG>
+following</STRONG> pmarks, representing states after that pmark (i.e. in its future).</LI>
+<LI>
+<A NAME="50422177_pgfId-294801"></A>The main line is the path of pmarks from the initial pmark to the current pmark.</LI>
+<LI>
+<A NAME="50422177_pgfId-294832"></A>A newly created partition has a pmark graph containing only the initial pmark.</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-294836"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1142.gif">
+
+<P>
+<A NAME="50422177_pgfId-294838"></A>Figure 97-1 <A NAME="50422177_10609"></A>The pmark graphs of two partitions</P>
+<P>
+<A NAME="50422177_pgfId-294843"></A><A HREF="fd_chap.098.html#50422177_10609"><EM>
+Figure 97-1</EM></A> <A NAME="50422177_i3ddp299rich"></A>shows the pmark graphs of two partitions. The current pmark is shown in each case. In the case of Partition1:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-294844"></A>Pmarks 0-3 were created first, then the partition was rolled back to pmark 2.</LI>
+<LI>
+<A NAME="50422177_pgfId-294845"></A>Some modeling was done, then pmark 4 was created.</LI>
+<LI>
+<A NAME="50422177_pgfId-294846"></A>Pmarks 5 and 6 were also created before rolling back to pmark 1.</LI>
+<LI>
+<A NAME="50422177_pgfId-294847"></A>A new line of changes was started from pmark 7.</LI>
+<LI>
+<A NAME="50422177_pgfId-294848"></A>The partition was finally rolled back (and forward) to pmark 4, the current pmark.</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-294849"></A>At any time, both partitions can be rolled back or forward to any pmark, further modeling can be performed, or a new pmark can be created.</P>
+
+
+<H3>
+<A NAME="50422177_pgfId-294854"></A>	97.2.4 	<A NAME="50422177_marker-294850"></A><A NAME="50422177_marker-294851"></A><A NAME="50422177_marker-294852"></A><A NAME="50422177_38141"></A>Rolling to a partition mark </H3>
+<P>
+<A NAME="50422177_pgfId-294858"></A>Use <A NAME="50422177_marker-294855"></A><A NAME="50422177_marker-294856"></A><A NAME="50422177_marker-294857"></A><A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A> to roll a partition back or forward to a specified pmark. As a result of the rolling operation, entities are created, modified and deleted. This section describes how you can control reporting of these entities and use them for tracking purposes.</P>
+<P>
+<A NAME="50422177_pgfId-294859"></A><A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A> returns the number of affected entities as well as, by default, the entities themselves, using the following arrays:</P>
+<P>
+<A NAME="50422177_pgfId-294877"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294862"></A>Array name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294864"></A>Contents</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294866"></A><CODE>
+del_entities</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294868"></A>Deleted entities: these are entities that were alive before the rolling operation but are dead after it.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294870"></A><CODE>
+new_entities</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294872"></A>New entities: these are entities that were dead before the rolling operation but are alive after it.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294874"></A><CODE>
+mod_entities</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294876"></A>Modified entities: these are entities that existed before the rolling operation and still exist after it, and that may have been modified by the operation.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294878"></A>You can control which of these arrays are returned, and what they contain, with the following options:</P>
+<P>
+<A NAME="50422177_pgfId-294907"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294881"></A>Options</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294883"></A>Summary</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422177_pgfId-294885"></A>want_new_entities</PRE>
+<PRE><A NAME="50422177_pgfId-294886"></A>want_mod_entities</PRE>
+<PRE><A NAME="50422177_pgfId-294887"></A>want_del_entities</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294889"></A>Control which arrays to return.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422177_pgfId-294891"></A>want_logged_mod</PRE>
+<PRE><A NAME="50422177_pgfId-294892"></A>want_attrib_mod</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294894"></A>Control the contents of the <CODE>
+mod_entities</CODE>
+ array.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422177_pgfId-294896"></A>del_attrib_cb</PRE>
+<PRE><A NAME="50422177_pgfId-294897"></A>del_context</PRE>
+<PRE><A NAME="50422177_pgfId-294898"></A>del_attdefs</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294900"></A>Specify and control attribute callbacks that are called on attributes of any deleted entities.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422177_pgfId-294902"></A>new_entities_classes</PRE>
+<PRE><A NAME="50422177_pgfId-294903"></A>mod_entities_classes</PRE>
+<PRE><A NAME="50422177_pgfId-294904"></A>del_entities_classes</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294906"></A>Control which classes of entity are recorded in each of the return arrays.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294908"></A>These options are described in more detail throughout the rest of this section.</P>
+<P>
+<A NAME="50422177_pgfId-294909"></A>You can also use <A HREF=../headers/pk_pmark_ask_entities.html>PK_PMARK_ask_entities</A> to perform “what-if” computations on partition information without actually changing the Parasolid session. This function tells you which entities would be created, modified, or deleted if you rolled to a specified pmark, from either the current state of the partition, or from a specified pmark.</P>
+<P>
+<A NAME="50422177_pgfId-294916"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-294915"></A>Note: <A HREF=../headers/pk_pmark_ask_entities.html>PK_PMARK_ask_entities</A> is particularly useful in that it can tell you which entities would be deleted as a result of moving between any two partition states, without having to actually delete those entities. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294917"></A><A HREF=../headers/pk_pmark_ask_entities.html>PK_PMARK_ask_entities</A> receives and returns the same information as <A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A>, and takes a very similar set of options.</P>
+<P>
+<A NAME="50422177_pgfId-294922"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-294920"></A>Note: With the exception of <CODE>
+del_attrib_cb</CODE>
+, <CODE>
+del_context</CODE>
+, and <CODE>
+del_attdefs</CODE>
+, these options are also available for <A HREF=../headers/pk_partition_make_pmark_2.html>PK_PARTITION_make_pmark_2</A>. </ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422177_pgfId-294921"></A>In addition, with the exception of <CODE>
+del_attrib_cb</CODE>
+, <CODE>
+del_context</CODE>
+, <CODE>
+del_attdefs</CODE>
+, and <CODE>
+want_attrib_mod</CODE>
+, these options are also available for <A HREF=../headers/pk_pmark_ask_entities.html>PK_PMARK_ask_entities</A>. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294923"></A>The <STRONG>
+bulletin board</STRONG> must be emptied before <A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A> is called, if it is switched on. The bulletin board logs operations that occur on entities in different partitions, and a partition roll could invalidate its contents (for example, if a body is used in a logged operation, its partition is rolled back to before the body's creation).</P>
+<P>
+<A NAME="50422177_pgfId-294924"></A>To make a partition inactive, it must be rolled to its initial pmark. This cannot be done to the current partition.</P>
+
+<H4>
+<A NAME="50422177_pgfId-294925"></A>97.2.4.1 Correct use of the mod_entities array </H4>
+<P>
+<A NAME="50422177_pgfId-294929"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-294928"></A>Warning: The entity arrays returned (optionally) by <A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A> relate to the internal Parasolid model, not that seen by your application. Although the contents of the <CODE>
+del_entities</CODE>
+ and <CODE>
+new_entities</CODE>
+ arrays are guaranteed, the contents of the <CODE>
+mod_entities</CODE>
+ array cannot be, and it is not recommended that you rely on this list as a means of tracking from your application. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294930"></A>The <CODE>
+mod_entities</CODE>
+ array may sometimes contain entities that do not seem to have been changed, and may not contain entities that do seem to have changed, as far as your application is concerned. In addition, the contents of <CODE>
+mod_entities</CODE>
+ may vary between different versions of Parasolid.</P>
+<P>
+<A NAME="50422177_pgfId-294934"></A>Some examples of how <CODE>
+mod_entities</CODE>
+ might contain entries that are not relevant to your application are:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-294935"></A>A boolean operation may cause faces which have not been geometrically or topologically modified to appear in the changed list, because of internal pointer references.</LI>
+<LI>
+<A NAME="50422177_pgfId-294936"></A>A modification to the surfaces of a body might not provoke a change to their owning faces.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50422177_pgfId-294937"></A>97.2.4.2 Requesting combinations of deleted, new, and modified entities </H4>
+<P>
+<A NAME="50422177_pgfId-294938"></A>You can request that any of the arrays of entities be suppressed in the output by setting the appropriate <CODE>
+want_</CODE>
+<EM>
+xxx</EM><CODE>
+_entities</CODE>
+ option to PK_LOGICAL_false. For example, to omit the return of modified entities (but allow the return of created and deleted entities), set <CODE>
+want_mod_entities</CODE>
+ to PK_LOGICAL_false. By default, each of the <CODE>
+want_</CODE>
+<EM>
+xxx</EM><CODE>
+_entities</CODE>
+ fields is PK_LOGICAL_true.</P>
+<P>
+<A NAME="50422177_pgfId-294942"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422177_pgfId-294941"></A>Performance issue: The <EM>
+xxx</EM><CODE>
+_entities</CODE>
+ arrays can potentially be very large and require the allocation of large amounts of contiguous memory. Omitting them from the return arguments can save time and reduce peak memory usage significantly during rollback.</ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294943"></A>For modified entities, you can improve performance by requesting that only entities having undergone modeling changes should be returned in the <CODE>
+mod_entities</CODE>
+ array. A <EM>
+modeling change</EM> is a bulletin-board event where some specified modification has been made to an entity; this does not include creation, deletion and copying. For a list of all possible modeling changes, see <A HREF="fd_chap.100.html#50422179_62429">Section 99.2.1, “Bulletin board events”</A>.</P>
+<P>
+<A NAME="50422177_pgfId-294950"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-294949"></A>Note: Modeling changes include changes to an attribute of an entity; e.g., adding, deleting or modifying attributes. In these cases, it is the <EM>
+owning entity</EM> that would be reported in the <CODE>
+mod_entities</CODE>
+ array, not the attributes themselves.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294951"></A>You limit the <CODE>
+mod_entities</CODE>
+ array (and improve performance) in this way by setting the <CODE>
+want_logged_mod</CODE>
+ field of the options structure to PK_LOGICAL_true. The default is PK_LOGICAL_false, which specifies that any modified entity should be reported in the <CODE>
+mod_entities</CODE>
+ array (assuming that <CODE>
+want_mod_entities</CODE>
+ is set to PK_LOGICAL_true).</P>
+<P>
+<A NAME="50422177_pgfId-294955"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-294954"></A>Note: If <CODE>
+want_logged_mod</CODE>
+ is PK_LOGICAL_true and an entity was modified in more than one pmark during a roll operation, it will be reported if any individual modification was a modeling change. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422177_pgfId-294956"></A>97.2.4.3 Requesting specific classes of entities </H4>
+<P>
+<A NAME="50422177_pgfId-294957"></A>You can use the <CODE>
+new_entities_classes</CODE>
+, <CODE>
+del_entities_classes</CODE>
+, and <CODE>
+mod_entities_classes</CODE>
+ options to control which classes of entity are returned in the three respective return arrays. </P>
+<P>
+<A NAME="50422177_pgfId-294958"></A>These arrays can contain PK_CLASS_entity and any of its subclasses, except PK_CLASS_attdef. If you specify a superclass and any of its subclasses (e.g. PK_CLASS_curve and PK_CLASS_ellipse) then an error is raised. </P>
+<P>
+<A NAME="50422177_pgfId-294962"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422177_pgfId-294961"></A>Performance issue: Omitting entity classes that you are not interested in from the return arrays can improve performance as well as reduce the memory overhead for your application. </ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422177_pgfId-294963"></A>97.2.4.4 Controlling how attribute modifications are reported </H4>
+<P>
+<A NAME="50422177_pgfId-294964"></A>Although the <CODE>
+mod_entities</CODE>
+ return array can include entities that do not appear to have changed, this is not the case for attributes. Changes to attributes, are <EM>
+always</EM> included in <CODE>
+mod_entities</CODE>
+, and you can control the types of attribute modifications that are reported using the following option:</P>
+<P>
+<A NAME="50422177_pgfId-294978"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294967"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294969"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422177_pgfId-294971"></A>want_attrib_mod</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294973"></A>If PK_LOGICAL_true (the default), the following modifications may sometimes be reported:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-294974"></A>Entities that have only had attributes added or removed.</LI>
+<LI>
+<A NAME="50422177_pgfId-294975"></A>Attributes that have not had their values changed.</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-294976"></A>If PK_LOGICAL_false, these modifications are not reported.</P>
+<ADDRESS>
+<A NAME="50422177_pgfId-294977"></A>Note: Some modifications cannot easily be suppressed. For example, if, as the result of a roll to a pmark, attributes are attached to a body that previously had no attributes, this will be reported as a modification to the body.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294982"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-294981"></A>Note: If you want to use <CODE>
+mod_entities</CODE>
+ to track changes in a model, we recommend that you leave <CODE>
+want_attrib_mod</CODE>
+ at its default of PK_LOGICAL_true. Setting it to PK_LOGICAL_false can suppress entities that have also been modified by modelling changes. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422177_pgfId-294983"></A>97.2.4.5 Specifying attribute callbacks when deleting entities </H4>
+<P>
+<A NAME="50422177_pgfId-294984"></A>When entities are deleted as a result of rolling to a specified pmark, any attributes attached to those entities are deleted as well. You can use the <CODE>
+del_attrib_cb</CODE>
+ option to specify a callback that is called just before an attribute is deleted. You could use this, for example, to free memory in your application that is pointed to by the contents of an attribute. The callback below shows a very simple example of how this could be done:</P>
+<P>
+<A NAME="50422177_pgfId-294988"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422177_pgfId-294987"></A><STRONG>void</STRONG> my_callback </PRE>
+<PRE><A NAME="50422177_pgfId-364760"></A>( <A HREF=../headers/pk_attrib_t.html>PK_ATTRIB_t</A> attrib,<A HREF=../headers/pk_attdef_t.html>PK_ATTDEF_t</A> attdef, <A HREF=../headers/pk_pointer_t.html>PK_POINTER_t</A> context </PRE>
+<PRE><A NAME="50422177_pgfId-364783"></A>)     {    <A HREF=../headers/pk_pointer_t.html>PK_POINTER_t</A> my_memory = NULL;</PRE>
+<PRE><A NAME="50422177_pgfId-364786"></A>    <STRONG>if</STRONG> ( <A HREF=../headers/pk_attrib_ask_nth_pointer.html>PK_ATTRIB_ask_nth_pointer</A>( attrib, 0, 0, my_memory )== PK_ERROR_no_errors )        {</PRE>
+<PRE><A NAME="50422177_pgfId-364793"></A>        <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>( my_memory );</PRE>
+<PRE><A NAME="50422177_pgfId-364796"></A>        }</PRE>
+<PRE><A NAME="50422177_pgfId-364799"></A>    }</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-294989"></A>The following options can be used with <CODE>
+del_attrib_cb</CODE>
+ to provide additional flexibility:</P>
+<P>
+<A NAME="50422177_pgfId-295003"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294992"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294994"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422177_pgfId-294996"></A>del_attdefs</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-294998"></A>Use this to limit the callback so that it is only called when attributes with particular definitions are called.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422177_pgfId-295000"></A>del_context</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295002"></A>Use this to pass information between your application and the <CODE>
+del_attrib_cb</CODE>
+ callback, if required.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-295004"></A>In the example above, <CODE>
+del_attdefs</CODE>
+ should contain the appropriate attribute definition that you want to trigger the callback. This avoids having to check the attribute definition in the callback code itself, thereby saving calls to the callback.</P>
+<P>
+<A NAME="50422177_pgfId-412876"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-295007"></A>Warning: Avoid using <A HREF=../headers/pk_attrib_ask_owner.html>PK_ATTRIB_ask_owner</A> in any <CODE>
+del_attrib_cb</CODE>
+ definition. Because Parasolid does not guarantee whether an attribute or its owner is deleted first when rolling to a pmark, it is possible that an attribute’s owner has already been deleted when the <CODE>
+del_attrib_cb</CODE>
+ callback is called.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422177_pgfId-295015"></A>	97.2.5 	<A NAME="50422177_92159"></A><A NAME="50422177_marker-403975"></A><A NAME="50422177_marker-403976"></A><A NAME="50422177_marker-403977"></A>Deleting a partition mark </H3>
+<P>
+<A NAME="50422177_pgfId-295020"></A><A NAME="50422177_marker-396706"></A><A NAME="50422177_marker-396707"></A><A NAME="50422177_marker-396708"></A><A NAME="50422177_marker-396709"></A><A HREF=../headers/pk_pmark_delete.html>PK_PMARK_delete</A> is used to delete partition marks. More than one pmark can be deleted with a single call. However, the following pmarks cannot be deleted:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295021"></A>An initial pmark (one with no preceding pmark).</LI>
+<LI>
+<A NAME="50422177_pgfId-295022"></A>Pmarks used by a session mark.</LI>
+<LI>
+<A NAME="50422177_pgfId-295023"></A>Pmarks with more than one immediately following pmark, unless all or all but one of the immediately following pmarks are also in the array of pmarks to be deleted (and can themselves be deleted).</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-295024"></A>The current pmark can be deleted, provided that any pmarks that follow it are also deleted successfully.</P>
+<P>
+<A NAME="50422177_pgfId-295025"></A><A HREF=../headers/pk_pmark_delete.html>PK_PMARK_delete</A> returns the pmarks that could not be deleted for these reasons.</P>
+<P>
+<A NAME="50422177_pgfId-295026"></A>Deleting a pmark may result in extra disk space being (temporarily) required, if the Frustrum data for a partition mark is written out again to merge the changes (deltas) on either side of the pmark. For example, in <A HREF="fd_chap.098.html#50422177_10609"><EM>
+Figure 97-1</EM></A>, if pmark 5 in partition 1 were deleted, n5 and n6 would be merged, keeping the pmark graph connected.</P>
+
+
+<H3>
+<A NAME="50422177_pgfId-295030"></A>	97.2.6 	<A NAME="50422177_70447"></A>Advancing a partition mark </H3>
+<P>
+<A NAME="50422177_pgfId-295035"></A><A NAME="50422177_marker-295031"></A><A NAME="50422177_marker-295032"></A><A NAME="50422177_marker-295033"></A><A NAME="50422177_marker-295034"></A><A HREF=../headers/pk_partition_advance_pmark.html>PK_PARTITION_advance_pmark</A> resets the current pmark so that it represents the current state of the given partition; this overwrites the previous state of the partition stored by the pmark. This function is more efficient than setting a new pmark and immediately deleting the previously current one in two steps, as it reduces delta frustrum access (that results in memory transfers or disk usage).</P>
+<P>
+<A NAME="50422177_pgfId-295039"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-295038"></A>Note: For the special case of advancing the second pmark of a light partition, Parasolid does not need to call any functions of the delta frustrum (since a light partition has no delta at the second pmark); this operation is therefore very fast.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-295040"></A>The following pmarks cannot be advanced:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295041"></A>Initial pmarks.</LI>
+<LI>
+<A NAME="50422177_pgfId-295042"></A>Pmarks used by a session mark.</LI>
+<LI>
+<A NAME="50422177_pgfId-295043"></A>Pmarks that precede another pmark (after rolling back).</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-414987"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-295046"></A>Note: These functions should only be called when partitioned rollback has been started by calling <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422177_pgfId-295051"></A>	97.2.7 	<A NAME="50422177_marker-415185"></A><A NAME="50422177_marker-415186"></A><A NAME="50422177_marker-415187"></A>Pmark functions </H3>
+<P>
+<A NAME="50422177_pgfId-295052"></A>The following is a summary of all functions that relate to pmarks.</P>
+<P>
+<A NAME="50422177_pgfId-295102"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295055"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295057"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295060"></A><A NAME="50422177_marker-295059"></A><A HREF=../headers/pk_pmark_is.html>PK_PMARK_is</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295062"></A>Returns true if the given partition mark exists.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295065"></A><A NAME="50422177_marker-295064"></A><A HREF=../headers/pk_pmark_delete.html>PK_PMARK_delete</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295067"></A>Deletes the given partition marks.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295070"></A><A NAME="50422177_marker-295069"></A><A HREF=../headers/pk_pmark_ask_partition.html>PK_PMARK_ask_partition</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295072"></A>Returns the partition of a partition mark.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295075"></A><A NAME="50422177_marker-346449"></A><A HREF=../headers/pk_pmark_ask_marks.html>PK_PMARK_ask_marks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295077"></A>Returns the session marks which use the given pmark, if any.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295080"></A><A NAME="50422177_marker-295079"></A><A HREF=../headers/pk_pmark_is_used_by_mark.html>PK_PMARK_is_used_by_mark</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295082"></A>Returns true if the given pmark is used by a session mark.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295085"></A><A NAME="50422177_marker-295084"></A><A HREF=../headers/pk_pmark_ask_following.html>PK_PMARK_ask_following</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295087"></A>Returns the pmarks immediately following the given one, if any.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295090"></A><A NAME="50422177_marker-295089"></A><A HREF=../headers/pk_pmark_ask_preceding.html>PK_PMARK_ask_preceding</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295092"></A>Returns the partition mark preceding the given one.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295094"></A><A HREF=../headers/pk_pmark_ask_entities.html>PK_PMARK_ask_entities</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295096"></A>Returns the entities that would be created, deleted, or modified if a partition were rolled to the given pmark. Does not actually change the session. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295099"></A><A NAME="50422177_marker-295098"></A><A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295101"></A>Rolls a partition back or forward (or both), to reach the given pmark.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-295103"></A>The following functions are also relevant to partition marks:</P>
+<P>
+<A NAME="50422177_pgfId-427621"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295106"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295108"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295111"></A><A NAME="50422177_marker-295110"></A><A HREF=../headers/pk_mark_ask_pmarks.html>PK_MARK_ask_pmarks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295113"></A>Returns the pmarks which would be current if the given mark were rolled to - one for each partition in the session.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295116"></A><A NAME="50422177_marker-295115"></A><A HREF=../headers/pk_partition_ask_pmark.html>PK_PARTITION_ask_pmark</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295118"></A>Returns the current partition mark of a partition, and whether the partition is at that pmark, or has changed since that pmark was set.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295121"></A><A NAME="50422177_marker-295120"></A><A HREF=../headers/pk_partition_ask_initial_pmark.html>PK_PARTITION_ask_initial_pmark</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295123"></A>Returns the initial pmark of a partition.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295126"></A><A NAME="50422177_marker-295125"></A><A HREF=../headers/pk_partition_ask_pmarks_2.html>PK_PARTITION_ask_pmarks_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295128"></A>Returns all the pmarks in the given partition.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295131"></A><A NAME="50422177_marker-295130"></A><A HREF=../headers/pk_partition_ask_pmark_size.html>PK_PARTITION_ask_pmark_size</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295133"></A>Returns the number of bytes which would be written to the Frustrum if a partition mark were to be set in the given partition.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295136"></A><A NAME="50422177_marker-295135"></A><A HREF=../headers/pk_partition_make_pmark_2.html>PK_PARTITION_make_pmark_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295138"></A>Creates a partition mark in the given partition, optionally providing information about the entities created, modified, or deleted prior to the partition mark. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295140"></A><A HREF=../headers/pk_partition_find_pmark_by_id.html>PK_PARTITION_find_pmark_by_id</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295142"></A>Returns the pmark of the given partition with the specified identifier. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295144"></A><A HREF=../headers/pk_partition_advance_pmark.html>PK_PARTITION_advance_pmark</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295146"></A>Advances the most recent pmark to record the current state of the given partition.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422177_pgfId-414991"></A>	97.2.8 	<A NAME="50422177_51470"></A>Retaining attribute values after a rollback </H3>
+<P>
+<A NAME="50422177_pgfId-418108"></A>A no-roll attribute is one where its field values are always the latest values specified in the current session even after rolling back or forward to a pmark at which the attribute existed with a different field value. </P>
+<P>
+<A NAME="50422177_pgfId-416065"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-416064"></A>Note: Attributes can only be made no-roll attributes if partitioned rollback is active (see <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>). </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-421092"></A>Attributes can be set as no-roll attributes using <A HREF=../headers/pk_attrib_set_no_roll.html>PK_ATTRIB_set_no_roll</A>. Before you set an attribute to be a no-roll attribute, you must do the following:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-414998"></A>Create an attribute with one of the following classes; PK_ATTDEF_class_01_c or PK_ATTDEF_class_06_c. </LI>
+<LI>
+<A NAME="50422177_pgfId-414999"></A>Populate all fields of the attribute that may ever take values with values. This fixes the length of these fields. Once an attribute is set to be a no-roll attribute, it is not possible to change the length of its fields.</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-448391"></A><A HREF="fd_chap.098.html#50422177_19657"><EM>
+Figure 97-2</EM></A> illustrates the effect of setting an attribute to be a no-roll attribute. In both of the examples shown in the image, a user-defined colour attribute is created for one face of a body and its value is initially set to blue. </P>
+<P>
+<A NAME="50422177_pgfId-424247"></A>In (A), a taper operation is performed on the body and the value of the attribute is changed to red. The attribute is not set to be a no-roll attribute; therefore when we rollback the value of the attribute reverts to the value it was at pmark0 (i.e. the colour of the face returns to blue).</P>
+<P>
+<A NAME="50422177_pgfId-423529"></A>In (B), the same taper operation is performed on the body and the value of the attribute is changed to red. In this case, the attribute is set to be a no-roll attribute; therefore when we rollback the value of the attribute does not change and instead retains the latest value specified in the session (i.e the colour of the face remains red).</P>
+<P>
+<A NAME="50422177_pgfId-415016"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1143.gif">
+
+<P>
+<A NAME="50422177_pgfId-415018"></A>Figure 97-2 <A NAME="50422177_19657"></A>The effects of setting an attribute to be a no-roll attribute</P>
+<P>
+<A NAME="50422177_pgfId-415012"></A>You can set an attribute to be a no-roll attribute at any point in the current session. Once an attribute is set as a no-roll attribute, it retains its no-roll property until the end of the current session. Its field values will always be the latest values specified in the session, even if you rollback to a pmark that was created before the attribute was set as a no-roll attribute, or roll forwards as illustrated in <A HREF="fd_chap.098.html#50422177_33502"><EM>
+Figure 97-3</EM></A>.</P>
+<P>
+<A NAME="50422177_pgfId-438793"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-438819"></A>Note: The no-roll property of these attributes is not transmitted between sessions.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-431738"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1144.gif">
+
+<P>
+<A NAME="50422177_pgfId-431629"></A>Figure 97-3 <A NAME="50422177_33502"></A>Rolling a no-roll attribute backward and forward</P>
+<P>
+<A NAME="50422177_pgfId-437150"></A>If you rollback to a pmark that was created when the attribute was not a no-roll attribute and the length of the field of the attribute is different at this pmark, then that field of the attribute will revert to the field values at that pmark. This can occur if the length of the field was changed prior to the attribute being set as a no-roll attribute. You can request a report of the changes due to the rollback using the <CODE>
+no_roll_diff</CODE>
+ option in either <A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A> or <A HREF=../headers/pk_mark_goto_2.html>PK_MARK_goto_2</A>. By setting this option to PK_ATTRIB_no_roll_diff_report_c, a <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_no_roll_diff_c</A> report indicating the field values that have changed as a result of the rollback is returned. Subsequently rolling forward again will restore the no-roll value. </P>
+
+<H4>
+<A NAME="50422177_pgfId-457582"></A>97.2.8.1 Enquiring if the attribute is a no-roll attribute </H4>
+<P>
+<A NAME="50422177_pgfId-450184"></A>You can use <A HREF=../headers/pk_attrib_ask_no_roll.html>PK_ATTRIB_ask_no_roll</A> to find out if an attribute is a no-roll attribute. This function takes an array of attributes and checks each one for the no-roll property. </P>
+<P>
+<A NAME="50422177_pgfId-458229"></A>There are circumstances, particularly involving legacy deltas, where the no-roll property of an attribute and its fields may differ. In these cases, you can use the <CODE>
+check_consistency</CODE>
+ option to request that such differences are reported. By default, this option is set to PK_LOGICAL_false. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information.</P>
+<P>
+<A NAME="50422177_pgfId-447419"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-415027"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-415035"></A><A HREF="fd_chap.095.html#50422174_42241">Chapter 94, “Attribute Definitions”</A></LI>
+<LI>
+<A NAME="50422177_pgfId-426158"></A><A HREF="fd_chap.097.html#50422176_36055">Chapter 96, “Partitions”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422177_pgfId-295151"></A>97.3	<A NAME="50422177_marker-295148"></A><A NAME="50422177_marker-295149"></A><A NAME="50422177_86443"></A>Deltas 
+
+
+</H1>
+<P>
+<A NAME="50422177_pgfId-295154"></A><A NAME="50422177_marker-295152"></A><A NAME="50422177_marker-295153"></A>The partition rolling mechanism works by storing <STRONG>
+DELTAs</STRONG> (changes) between pmarks. These are byte-streams (e.g. files) which record the entities which need to be created, modified or deleted in order to move from<A NAME="50422177_95.3 Deltas"></A> one pmark to an adjacent one. These deltas are written out through the Frustrum interface, stored by the application Frustrum, and read back in during a roll operation. </P>
+<P>
+<A NAME="50422177_pgfId-295155"></A>If a new pmark is created, and the partition is currently at a pmark, a zero-length delta is written to the Frustrum.</P>
+<P>
+<A NAME="50422177_pgfId-359139"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+Support\Partition</CODE>
+ <CODE>
+and</CODE>
+ <CODE>
+Delta</CODE>
+ <CODE>
+Transmission</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H3>
+<A NAME="50422177_pgfId-295158"></A>	97.3.1 	<A NAME="50422177_marker-295156"></A><A NAME="50422177_marker-295157"></A><A NAME="50422177_94685"></A><A NAME="50422177_"></A>Delta functions </H3>
+<P>
+<A NAME="50422177_pgfId-295169"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295161"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295163"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295166"></A><A NAME="50422177_marker-295165"></A><A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295168"></A>registers the rollback Frustrum functions</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-295170"></A>This function must be called before the Parasolid session is started, if partitioned rollback is to be used during a session. It registers the rollback Frustrum functions which the partitioned rollback system uses to read and write delta files.</P>
+<P>
+<A NAME="50422177_pgfId-295174"></A>See <A HREF="di_chap.09.html#29993">Appendix C, “PK_DELTA Functions”</A> in the Parasolid <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422177_pgfId-295178"></A>97.4	<A NAME="50422177_40541"></A><A NAME="50422177_marker-295176"></A><A NAME="50422177_marker-295177"></A>Session rollback 
+
+
+</H1>
+<P>
+<A NAME="50422177_pgfId-295181"></A><A NAME="50422177_marker-295179"></A><A NAME="50422177_marker-295180"></A>Session rollback provides the ability to change the state of the whole session at once. It coordinates the partitions in a session by setting simultaneous pmarks in each one.</P>
+
+<H3>
+<A NAME="50422177_pgfId-295184"></A>	97.4.1 	<A NAME="50422177_marker-295182"></A><A NAME="50422177_marker-295183"></A><A NAME="50422177_99663"></A>Session marks </H3>
+<P>
+<A NAME="50422177_pgfId-295187"></A><A NAME="50422177_marker-295185"></A><A NAME="50422177_marker-295186"></A><STRONG>
+Session marks</STRONG> record stages in the state of the entire session, and the session can be returned to any of these marks. The PK object representing a session mark is the <STRONG>
+MARK</STRONG>. After the session is rolled back or forward to a session mark, the entities in the session are exactly as they were when the session mark was created (except for attribute definitions and certain session parameters which are not affected by rolling back):</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295190"></A>The <STRONG>
+current session mark</STRONG><A NAME="50422177_marker-295188"></A><A NAME="50422177_marker-295189"></A> is the one most recently created or rolled to (if one exists).</LI>
+<LI>
+<A NAME="50422177_pgfId-295191"></A>The session is <STRONG>
+at</STRONG> the current session mark immediately after creating it or rolling to it.</LI>
+<LI>
+<A NAME="50422177_pgfId-355733"></A>When any model entities are modified, created or deleted, or pmarks are created or rolled to, the current session mark (and the mark sequence) is unchanged; but the session is no longer at the current session mark.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422177_pgfId-355737"></A>	97.4.2 	<A NAME="50422177_marker-355734"></A><A NAME="50422177_marker-355735"></A><A NAME="50422177_marker-355736"></A>Creating a session mark </H3>
+<P>
+<A NAME="50422177_pgfId-355741"></A><A NAME="50422177_marker-355738"></A><A NAME="50422177_marker-355739"></A><A NAME="50422177_marker-355740"></A><A HREF=../headers/pk_mark_create.html>PK_MARK_create</A> generates a session mark. The session mark notes the state of all partitions in the session, by creating new partition marks in all partitions which are not already at a pmark. It also notes the state of the bulletin board and session and modeling parameters, which are not in any partition.</P>
+<P>
+<A NAME="50422177_pgfId-295201"></A>Session marks form a linear sequence, not a branching tree. When a session mark is created, any session marks <EM>
+following</EM> the previously current one are first deleted.</P>
+
+
+<H3>
+<A NAME="50422177_pgfId-295205"></A>	97.4.3 	<A NAME="50422177_marker-295202"></A><A NAME="50422177_marker-295203"></A><A NAME="50422177_marker-295204"></A><A NAME="50422177_61261"></A>Rolling to a session mark </H3>
+<P>
+<A NAME="50422177_pgfId-295209"></A><A NAME="50422177_marker-295206"></A><A NAME="50422177_marker-295207"></A><A NAME="50422177_marker-295208"></A><A HREF=../headers/pk_mark_goto_2.html>PK_MARK_goto_2</A> returns the session (i.e. all the partitions, the bulletin board, modeling parameters and some session parameters - but not attribute definitions) to its state when the given session mark was created. The current partition is set to the partition which was current when the mark was created.</P>
+<P>
+<A NAME="50422177_pgfId-295210"></A>If the session roll forward option is off, then when a session mark is rolled to, all session marks following it are deleted, along with all pmarks which were created after it was created.</P>
+<P>
+<A NAME="50422177_pgfId-295211"></A>The bulletin board and modeling parameters are rolled back by session rollback, but are unaffected by partitioned rollback. The bulletin board does not need to be empty before a session rollback operation (as it does for a partition roll operation), as it is updated by session rollback.</P>
+<P>
+<A NAME="50422177_pgfId-295212"></A>The following session parameters are not affected by session rollback:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295213"></A>Interface checking on/off</LI>
+<LI>
+<A NAME="50422177_pgfId-295214"></A>Journalling on/off</LI>
+<LI>
+<A NAME="50422177_pgfId-295215"></A>Roll forward on/off</LI>
+<LI>
+<A NAME="50422177_pgfId-295216"></A>Tag limit</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-295217"></A>All other session parameters are rolled back by a session roll operation. None are changed by partitioned rollback.</P>
+<P>
+<A NAME="50422177_pgfId-295218"></A>Attribute definitions are not affected - once created, they always exist during a modeling session.</P>
+
+
+<H3>
+<A NAME="50422177_pgfId-295222"></A>	97.4.4 	<A NAME="50422177_marker-295219"></A><A NAME="50422177_marker-295220"></A><A NAME="50422177_marker-295221"></A>Deleting a session mark </H3>
+<P>
+<A NAME="50422177_pgfId-295226"></A><A NAME="50422177_marker-295223"></A><A NAME="50422177_marker-295224"></A><A NAME="50422177_marker-295225"></A><A HREF=../headers/pk_mark_delete.html>PK_MARK_delete</A> deletes a session mark. Earlier and later session marks (if any) are still accessible.</P>
+<P>
+<A NAME="50422177_pgfId-295227"></A>Pmarks which were created as a result of this mark being set are not deleted. These might eventually be deleted by the application as part of its mark management strategy (see <A HREF="fd_chap.098.html#50422177_26402">“Mark management - an example strategy”</A><A NAME="50422177_"></A><A NAME="50422177_DYg9o15cjosi"></A>, at the end of this chapter, for a suggested method).</P>
+
+
+<H3>
+<A NAME="50422177_pgfId-295236"></A>	97.4.5 	<A NAME="50422177_marker-295233"></A><A NAME="50422177_marker-295234"></A><A NAME="50422177_marker-295235"></A>Session rollback and partitions </H3>
+<P>
+<A NAME="50422177_pgfId-295237"></A>If the session is rolled back to a mark which was created before a particular partition was created, the fate of the partition depends on the setting of the <A NAME="50422177_marker-295238"></A>roll forward session parameter:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295239"></A>If <CODE>
+roll_forward</CODE>
+ is true, then the partition still exists, and is at its initial pmark (i.e. it is inactive - it cannot be made current, has no entities in it, and none can be created). Partition roll operations on it are still allowed.</LI>
+<LI>
+<A NAME="50422177_pgfId-295240"></A>If <CODE>
+roll_forward</CODE>
+ is false, then the partition (with all its pmarks) is deleted.</LI>
+<P>
+<A NAME="50422177_pgfId-295241"></A>Note that the current partition may not be the same after session rollback, as the value of the current partition rolls with the session.</P>
+</UL>
+
+
+<H3>
+<A NAME="50422177_pgfId-295245"></A>	97.4.6 	<A NAME="50422177_marker-295242"></A><A NAME="50422177_marker-295243"></A><A NAME="50422177_marker-295244"></A>Mark functions </H3>
+<P>
+<A NAME="50422177_pgfId-295286"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295248"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295250"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295253"></A><A NAME="50422177_marker-295252"></A><A HREF=../headers/pk_mark_is.html>PK_MARK_is</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295255"></A>returns true if the given session mark exists</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295258"></A><A NAME="50422177_marker-295257"></A><A HREF=../headers/pk_mark_create.html>PK_MARK_create</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295260"></A>creates a session mark</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295263"></A><A NAME="50422177_marker-295262"></A><A HREF=../headers/pk_mark_delete.html>PK_MARK_delete</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295265"></A>deletes a session mark</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295268"></A><A NAME="50422177_marker-295267"></A><A HREF=../headers/pk_mark_goto_2.html>PK_MARK_goto_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295270"></A>returns the session to its state when the given session mark was set</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295273"></A><A NAME="50422177_marker-295272"></A><A HREF=../headers/pk_mark_ask_following.html>PK_MARK_ask_following</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295275"></A>returns the mark after the given one, if any</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295278"></A><A NAME="50422177_marker-295277"></A><A HREF=../headers/pk_mark_ask_preceding.html>PK_MARK_ask_preceding</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295280"></A>returns the mark before the given one, if any</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295283"></A><A NAME="50422177_marker-295282"></A><A HREF=../headers/pk_mark_ask_pmarks.html>PK_MARK_ask_pmarks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295285"></A>returns the pmarks which would be current if the given mark were rolled to - one for each partition in the session</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-295287"></A>The following functions are also relevant to session marks:</P>
+<P>
+<A NAME="50422177_pgfId-400413"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295290"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295292"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295295"></A><A NAME="50422177_marker-410912"></A><A HREF=../headers/pk_pmark_ask_marks.html>PK_PMARK_ask_marks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295297"></A>returns the session marks which use the given pmark, if any</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295300"></A><A NAME="50422177_marker-410917"></A><A HREF=../headers/pk_pmark_is_used_by_mark.html>PK_PMARK_is_used_by_mark</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295302"></A>returns true if the given pmark is used by a session mark</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295305"></A><A NAME="50422177_marker-410922"></A><A HREF=../headers/pk_session_ask_mark.html>PK_SESSION_ask_mark</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295307"></A>returns the most recent session mark, and whether the session is still at that mark</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422177_pgfId-295311"></A>97.5	<A NAME="50422177_marker-411617"></A><A NAME="50422177_marker-411618"></A>The frustrum 
+
+
+</H1>
+<P>
+<A NAME="50422177_pgfId-295314"></A><A NAME="50422177_marker-295312"></A><A NAME="50422177_marker-295313"></A>If the application is going to use partitioned rollback, the registered Frustrum must conform to a new interface, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295315"></A>Rollback files are referred to as <STRONG>
+deltas</STRONG>. A positive integer value for each one must be allocated by the application Frustrum. When Parasolid asks the Frustrum to create a delta, it gives it the succeeding pmark to which the delta relates.</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-295316"></A>A delta holds the changes required to get from one pmark to an adjacent one. Deltas are unidirectional, i.e. they hold only enough information to get from pmark A to pmark B, not back again. When Parasolid executes a roll operation from one pmark to an adjacent one, it creates a new reversed delta to generate the reverse route. If there is insufficient disk space to do this, the roll operation does not take place.</P>
+<P>
+<A NAME="50422177_pgfId-295317"></A>Similarly, if a pmark is deleted, two deltas need to be merged into one. In this case the merged delta is written out first, before deleting the original deltas.</P>
+<P>
+<A NAME="50422177_pgfId-355790"></A>The pmark passed to the <CODE>
+open_for_write</CODE>
+ function may sometimes be PK_PMARK_null (i.e. 0), in which case the delta does not correspond to a pmark visible to the application. The application should store this delta as usual, but need not (and cannot) delete it. These pmarks are generated by internal kernel processing, and is deleted by Parasolid when no longer required.</P>
+
+<H3>
+<A NAME="50422177_pgfId-355794"></A>	97.5.1 	<A NAME="50422177_marker-355791"></A><A NAME="50422177_marker-355792"></A><A NAME="50422177_marker-355793"></A>Frustrum rollback functions </H3>
+<P>
+<A NAME="50422177_pgfId-355795"></A>These rollback functions must be provided as part of the application Frustrum.</P>
+<P>
+<A NAME="50422177_pgfId-295328"></A><EM>
+</EM>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422177_pgfId-295326"></A>Note: The function names used below are purely nominal, as the actual names are passed to <A NAME="50422177_marker-295327"></A><A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-295358"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295331"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295333"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295335"></A>open_for_write_fn</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295337"></A>opens (creates) a delta file for output, associated with the given pmark</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295339"></A>open_for_read_fn</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295341"></A>opens the given delta for input</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295343"></A>close_fn</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295345"></A>closes the delta</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295347"></A>write_fn</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295349"></A>writes (appends) n_bytes bytes from the given array to the given delta</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295351"></A>read_fn</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295353"></A>reads n_bytes bytes from the given delta into the array</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295355"></A>delete_fn</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422177_pgfId-295357"></A>deletes the given delta</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422177_pgfId-295362"></A>See also <A HREF="di_chap.09.html#29993">Appendix C, “PK_DELTA Functions”</A> in the Parasolid <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual.</P>
+
+
+<H3>
+<A NAME="50422177_pgfId-295367"></A>	97.5.2 	<A NAME="50422177_marker-295363"></A><A NAME="50422177_marker-295364"></A><A NAME="50422177_marker-295365"></A><A NAME="50422177_marker-295366"></A>Memory and disk space </H3>
+<P>
+<A NAME="50422177_pgfId-295369"></A><A NAME="50422177_marker-295368"></A>In the following sections, ‘disk space’ refers to wherever the application’s Frustrum stores the deltas.</P>
+<P>
+<A NAME="50422177_pgfId-295370"></A>A session roll operation may involve writing to disk, and may require more memory, and so it is possible for the operation to fail. However, the following can be guaranteed:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295371"></A>If a session roll operation fails due to a “disk full” condition, then provided the application can make more disk space available, the operation can successfully be re-executed. This ensures that applications are always able to recover from run-time errors or other severe errors by using session rollback, provided disk space is or can be made available.</LI>
+<LI>
+<A NAME="50422177_pgfId-295372"></A>Rolling back to the <STRONG>
+current</STRONG> session mark (the one most recently set or rolled to) does not run out of memory.</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-295373"></A>The application is expected to delete partition marks and session marks as required to conserve disk space when the marks are no longer required:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295374"></A>If the disk becomes full during creating or rolling to a pmark or a mark, the application should free some disk, either by deleting session or partition marks, or in some other way, and retry the call.</LI>
+<LI>
+<A NAME="50422177_pgfId-295376"></A>Alternatively, <A NAME="50422177_marker-295375"></A><A HREF=../headers/pk_partition_ask_pmark_size.html>PK_PARTITION_ask_pmark_size</A> returns the number of bytes which would be written to the Frustrum if a pmark were set in a given partition. The application can then ensure that enough disk space is available before calling <A NAME="50422177_marker-295377"></A><A HREF=../headers/pk_partition_make_pmark_2.html>PK_PARTITION_make_pmark_2</A>.</LI>
+<LI>
+<A NAME="50422177_pgfId-295378"></A>In order to assist the application with deleting marks, the PMARK enquiry functions are provided to navigate the pmark graphs, and to say which partition marks are used by which session marks.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422177_pgfId-295385"></A>	97.5.3 	<A NAME="50422177_marker-295379"></A><A NAME="50422177_marker-295380"></A><A NAME="50422177_marker-295381"></A><A NAME="50422177_marker-295382"></A><A NAME="50422177_marker-295383"></A><A NAME="50422177_marker-295384"></A>Frustrum error conditions and error recovery </H3>
+<P>
+<A NAME="50422177_pgfId-295387"></A><A NAME="50422177_marker-295386"></A>If memory is exhausted or the Frustrum returns a write error during a call to <A HREF=../headers/pk_partition_make_pmark_2.html>PK_PARTITION_make_pmark_2</A> or <A NAME="50422177_marker-295388"></A><A HREF=../headers/pk_mark_create.html>PK_MARK_create</A>, the session is unchanged (apart possibly from some new pmarks having been created), so the application can free some disk and retry the call.</P>
+<P>
+<A NAME="50422177_pgfId-295389"></A>If memory is exhausted or the Frustrum returns a write error during a call to <A NAME="50422177_marker-295390"></A><A HREF=../headers/pk_pmark_goto_2.html><A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A></A> or <A HREF=../headers/pk_mark_goto_2.html>PK_MARK_goto_2</A>, then the session may have changed in that some partitions may have been rolled some or all the way to their destination pmarks. However, the application can free some disk space and try the operation again, because the session is in a known state (all partitions are at some pmark), even though it is not necessarily either the starting or the desired destination state. Note that, in the case of <A HREF=../headers/pk_pmark_goto_2.html><A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A></A>, the application should first return to the original pmark before retrying the roll operation, otherwise the returned arrays of new, modified and deleted entities are not as expected.</P>
+<P>
+<A NAME="50422177_pgfId-295391"></A>If the Frustrum returns a read error after successfully opening a delta file, this may in some circumstances result in a fatal error so that the Parasolid session cannot be continued.</P>
+<P>
+<A NAME="50422177_pgfId-295392"></A>If a run-time error occurs during a roll operation, this results in the usual failure code being returned to the PK. As with any other run-time error, the application is expected to roll back to the current session mark to recover the session to a valid state. However, a run-time error during a call to <A HREF=../headers/pk_mark_goto_2.html>PK_MARK_goto_2</A> or <A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A> may result in a fatal error return.</P>
+<P>
+<A NAME="50422177_pgfId-295393"></A>If a roll operation (including <A HREF=../headers/pk_mark_goto_2.html>PK_MARK_goto_2</A>) is interrupted as a result of a call to KABORT with code user-interrupt, the usual failure code is returned to the PK, and the application should roll back to the current session mark to recover, as usual.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422177_pgfId-295398"></A>97.6	<A NAME="50422177_26402"></A><A NAME="50422177_marker-295395"></A><A NAME="50422177_marker-295396"></A>Mark management - an example strategy<A NAME="50422177_31549"></A> 
+
+
+</H1>
+<P>
+<A NAME="50422177_pgfId-295401"></A><A NAME="50422177_marker-295399"></A><A NAME="50422177_marker-295400"></A>The following is an example of how mark management might be performed by a feature modeling application, using pmarks to record feature attachment and session marks for user-level undo.</P>
+<P>
+<A NAME="50422177_pgfId-295402"></A>The application makes the following assumptions for its algorithm:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295403"></A>Pmarks off the main line (i.e. the path from the initial pmark to the current pmark) are only required to enable session rollback. In other words, only the main line represents the current feature-attachment sequence of the partition.</LI>
+<LI>
+<A NAME="50422177_pgfId-295404"></A>The density of pmarks on the main line affects the performance of feature update. The density of pmarks off the main line (supporting session marks) affects the performance of feature update after a session rollback.</LI>
+<LI>
+<A NAME="50422177_pgfId-295405"></A>Session roll forward is not required.</LI>
+<LI>
+<A NAME="50422177_pgfId-295406"></A>Session marks are only set when the current pmark has no following pmarks.</LI>
+<LI>
+<A NAME="50422177_pgfId-295407"></A>A partition may be deleted explicitly, although they will not reappear when the session is rolled back.</LI>
+<LI>
+<A NAME="50422177_pgfId-295408"></A>Session marks are to be deleted oldest first (an alternative strategy would be to thin out marks).</LI>
+</UL>
+<P>
+<A NAME="50422177_pgfId-295409"></A>Hence when a session mark is deleted, any pmarks which are not on the main line and which do not have future pmarks which are used by some session mark, can be deleted. This applies whether the session mark is explicitly deleted, or deleted as a result of a session rollback with roll-forward option off.</P>
+<P>
+<A NAME="50422177_pgfId-295410"></A>The remaining question is which pmarks or session marks to delete when disk becomes full or nearly full:</P>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295411"></A>It seems more logical to thin out pmarks off the main line rather than delete session marks - because the former renders old session marks accessible but slow to update, whereas the latter makes them unreachable.</LI>
+<LI>
+<A NAME="50422177_pgfId-295412"></A>On the other hand the application would not want to thin out pmarks supporting recent session marks simply in order to maintain very old session marks.</LI>
+<LI>
+<A NAME="50422177_pgfId-295413"></A>In fact the trade-off is between three competing uses of disk:</LI>
+<UL>
+<LI>
+<A NAME="50422177_pgfId-295414"></A>session marks</LI>
+<LI>
+<A NAME="50422177_pgfId-295415"></A>pmarks to support session marks</LI>
+<LI>
+<A NAME="50422177_pgfId-295416"></A>pmarks in the main line (i.e. supporting feature update)</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422177_pgfId-275053"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.097.html">Partitions</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.099.html">Groups</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TRANSF_check</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TRANSF_check</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_TRANSF_check
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>                transf,      --- transformation to be checked
+const <A HREF=../headers/pk_transf_check_o_t.html>PK_TRANSF_check_o_t</A> *options,     --- options structure
+
+<I>--- returned arguments ---
+</I>int                 *const n_faults,    --- number of faults
+<A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A>   **const faults       --- faults
+)
+</B>
+<A NAME="description"></A>
+<I>This function checks the given transformation.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_check_error        a fault has been found when max_faults = 0
+                                (MILD)
+    PK_ERROR_check_failure      checker failure (MILD)
+    PK_ERROR_bad_option_data    max_faults &lt; 0 (MILD)
+
+<A NAME="documentation"></A>
+
+This function performs a validity check on a transformation,
+and returns information about the fault found, if any.
+
+
+option structure
+------ ---------
+The option structure allows the caller to control which checks are performed;
+if no options are supplied, all checks appropriate to the transformation will
+be made.
+
+The option structure allows the following to be set:
+
+    <B>'max_faults'</B>
+        maximum number of faults to be returned and whether to force checking
+        to raise a PK error instead of returning check faults.
+
+
+The check fault associated with this check is as follows
+
+'state'                        |<B>'entity_1'</B>|<B>'entity_2'</B>|     'position'
+-------------------------------------------------------------------------------
+PK_ENTITY_state_invalid_c      |  transf  |          |      null
+                               |          |          |
+
+
+Faults are returned in an array of <A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A> structures.
+If there are no faults found, then <B>'n_faults'</B> is returned as zero.
+
+If there is more than one fault then the function does not
+guarantee to return all the faults.
+
+For more details on fault types and how they may arise, see the chapter on
+'Checking' in the Functional Description.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

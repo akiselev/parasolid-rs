@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SESSION_abort</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SESSION_abort</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_SESSION_abort
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_abort_reason_t.html>PK_abort_reason_t</A> reason
+)
+</B>
+<A NAME="description"></A>
+<I>This function makes a request to Parasolid to abort the interrupted current
+operation.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_cant_be_aborted    operation cannot be aborted
+    PK_ERROR_not_interrupted    kernel has not been interrupted
+
+<A NAME="documentation"></A>
+
+
+General
+
+PK_SESSION_abort should only be called from the application's interrupt-
+handler when it has trapped an interrupt. PK_SESSION_abort is used to abort
+the interrupted Kernel operation so-as to avoid irrecoverably corrupting the
+Kernel datastructures, and must be called whenever an interrupt is trapped
+(except where the interrupted operation is allowed to resume to completion,
+which of course is not legitimate for interrupts caused by run-time errors).
+
+After aborting a Kernel operation by use of PK_SESSION_abort, the application
+should call <A HREF=../headers/pk_mark_goto.html>PK_MARK_goto</A> or <A HREF=../headers/pk_pmark_goto.html>PK_PMARK_goto</A> to rollback the Kernel to the most
+recent roll-mark; otherwise the Kernel will be left in an uncertain (and
+possibly inconsistent) state.
+
+If PK_SESSION_abort is called when the Kernel has not been interrupted (for
+example, if the interrupt happened within the application's code), it will
+simply return (having done nothing) with error PK_ERROR_not_interrupted.
+
+Determination of whether the Kernel has been interrupted is done by making a
+call to <A HREF=../headers/pk_session_is_in_kernel.html>PK_SESSION_is_in_kernel</A>. This is the only other PK interface function
+that should be called from the application's interrupt handler.
+
+
+User interrupts vs run-time errors
+
+Assuming that the Kernel has indeed been interrupted, what happens next
+depends on the nature of the interrupt, as specified by the value of
+<B>'reason'</B> and whether the Kernel was executing an unprotected PK function
+call or a protected PK or KI function call :-
+
+
+PK_abort_user_interrupt_c
+
+    Implies a user-interrupt. In this circumstance PK_SESSION_abort sets an
+    abort flag in the Kernel, then returns to the interrupt handler, which
+    must then allow the  original Kernel operation to resume execution.
+    When the Kernel reaches a consistent state, it will abort the operation
+    and call the application's FABORT routine (see the Frustrum Reference
+    Manual) if a KI function was executing, or registered error handler if a
+    PK function was executing. FABORT or the error handler can do a longjump
+    to a "safe-point" within the application, alternatively, it may simply
+    return to the Kernel, which will return through the original Kernel call
+    with the error-code KI_aborted (for a KI function) or PK_ERROR_aborted
+   (for a PK function).
+
+
+PK_abort_runtime_error_c
+
+    This indicates that some run-time error has occurred within the Kernel.
+    In this case, PK_SESSION_abort will not return to the interrupt-
+    handler; for a KI or protected PK function call it will do a longjump
+    back to the original Kernel routine, which will return to the calling
+    routine, normally giving error code KI_run_time_error or
+    PK_ERROR_run_time_error respectively. Very occasionally, error code
+    KI_fatal_error/PK_ERROR_fatal_error may be returned; this indicates that
+    the Kernel has been left in a bad state, and the application should abort
+    the program run without making further calls to the Kernel. FABORT is not
+    called for a run-time error inside a KI function. The user supplied
+    PK error handler will be called for a run-time error in a protected PK
+    function.
+
+    For an unprotected PK function, a run-time error will lead to the user-
+    supplied error handler being called with the error code
+    PK_ERROR_unhandleable_condition and the error handler MUST longjump over
+    the kernel to a safe-point in the applications code. If there is no
+    error handler registered, or if it returns, Parasolid will exit the
+    program.
+
+
+PK_abort_frustrum_error_c
+
+    This behaves like PK_abort_runtime_error_c, but the error has occurred
+    in the Frustrum, an error code of KI_fru_error/PK_ERROR_fru_error is
+    returned.
+
+
+
+Operations which cannot be aborted
+
+It is not possible to abort operations invoked by calls to <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A>,
+<A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>, or any PK_MARK_*, PK_PMARK_* or PK_DELTA_* rollback function.
+If PK_SESSION_abort is called for a user interrupt within
+the scope of one of these operations, it will return (having done nothing)
+with error PK_ERROR_cant_be_aborted; the interrupt handler must then allow the
+Kernel to continue the operation to completion. If PK_SESSION_abort is called
+for a run-time error during one of these operations, it will cause the original
+PK routine to return with error code PK_ERROR_fatal_error.
+
+
+
+Coping with infinite loops in Parasolid
+
+Whilst a call to PK_SESSION_abort for a run-time error will force an immediate
+exit from the PK, a call for a user-interrupt involves a short delay before the
+operation is aborted. In the unlikely event that a program fault causes
+Parasolid to go into an infinite loop, it is possible that a call to
+PK_SESSION_abort requesting a user-interrupt will be ignored. It is therefore
+suggested that the application's interrupt-handler should incorporate a timer
+such that any subsequent interrupt more than (say) five cpu-seconds after the
+original interrupt is treated as if it were a run-time error (by calling
+PK_SESSION_abort with reason PK_abort_runtime_error_c) in order to force exit
+from the PK. The timer should be reset by FABORT or the user-supplied PK error
+handler (which is called after a successfully aborted PK call) and by the
+interrupt-handler when it decides to treat an interrupt as a run-time error.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

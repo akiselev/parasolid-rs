@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_install_surfs_isocline</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_install_surfs_isocline</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_FACE_install_surfs_isocline
+(
+<I>--- received arguments ---
+</I>int               n_faces,          --- number of target faces (&gt;0)
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>   faces[],          --- faces to be drafted
+const <A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A> references[],     --- reference entities
+<A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>      direction,        --- isocline direction
+double            angle,            --- isocline angle
+double            tolerance,        --- max tol for applying surfs
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>      face_face_check   --- do face face checks
+)
+</B>
+<A NAME="description"></A>
+<I>This function replaces the surfaces of given faces with isocline surfaces.
+
+NOTE: This function is deprecated and has been superseded by <A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_cant_get_point         (SERIOUS)can not produce vertex geometry
+    PK_ERROR_cant_get_curve         (SERIOUS)can not produce curve geometry
+    PK_ERROR_cant_get_surf          (SERIOUS)can not produce isocline surface
+    PK_ERROR_edge_didnt_vanish      (SERIOUS)an edge should have disappeared
+    PK_ERROR_general_body           (MILD)general bodies not supported
+
+<A NAME="documentation"></A>
+The isocline is specified by a <B>'direction'</B> and an <B>'angle'</B>.
+For each face in <B>'faces'</B> an isocline surface is defined by a <B>'reference'</B>
+entity.
+
+The reference entity may be of classes:
+
+   o PK_CLASS_edge: An isocline surface is defined through the curve of the
+     edge between the vertices of the edge (if it has any).
+
+   o PK_CLASS_face: The isocline surface(s) to be used for the face in
+     <B>'faces'</B> is to be that (those) defined for this <B>'reference'</B> face.
+
+   o PK_CLASS_surf: An isocline surface is defined through the curve of
+     intersection between the face's surface and the reference surface.
+     A reference surface can also be used in association with reference
+     edges to produce step drafting.
+
+A face may appear more than once in <B>'faces'</B>.  The effect of this is that
+the face will be split so as to satisfy the separate constraints.
+
+In the case of step drafting, no face-splitting occurs; the reference edges
+which lie on the reference surface will produce the face's draft surface, the
+other face-related reference edges will, each of them, produce a step
+tapered face. These new step faces are connected to the main draft face and
+their draft angle is greater or equal to the specified isocline angle.
+
+If a face appears in <B>'references'</B> then it must also appear in <B>'faces'</B>.
+
+The function may, at times, have to use approximate geometry.
+For such cases, <B>'tolerance'</B> specifies an upper bound on the distance by which
+a point on the actual geometry may deviate from its ideal position.
+While the function will usually satisfy this constraint, it is not guaranteed.
+
+When an error occurs, the function will, where possible, make extra
+information regarding the error available to the application
+by means of a GROUP.
+This GROUP is accessible from the standard form of the error.  Note that,
+while the members of the GROUP will be objects which existed before the
+call (and so will survive rollback), the GROUP itself will be destroyed by
+rollback.  The members of the GROUP will be as follows:
+
+    PK_ERROR_cant_get_point         1 VERTEX   Failed to find new geometry for
+                                               existing vertex
+                                    n FACEs    Failed to find geometry for
+                                               new vertex.
+
+    PK_ERROR_cant_get_curve         1 EDGE     Failed to find new geometry for
+                                               existing edge
+                                    n FACEs    Failed to find geometry for
+                                               new edge
+
+    PK_ERROR_cant_get_surf          n FACEs    Unable to produce isocline
+                                               surfaces for these faces.
+                                               No surface replacement is
+                                               performed.
+
+    PK_ERROR_edge_didnt_vanish      1 EDGE     An existing edge should have
+                                               disappeared
+                                    n FACEs    A transient edge should have
+                                               disappeared
+
+    PK_ERROR_face_check_fails       1 FACE     Face which failed check
+
+    PK_ERROR_face_face_check_fails  2 FACEs    Pair of faces where
+                                               inconsistency found.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_attach_curves_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_attach_curves_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_EDGE_attach_curves_2
+(
+<I>--- received arguments ---
+</I>int                              n_edges,  --- number of edges
+const <A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                  edges[],  --- edges to have curves attached
+const <A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                 curves[], --- curves to attach to edges
+const <A HREF=../headers/pk_edge_attach_curves_o_t.html>PK_EDGE_attach_curves_o_t</A> *options,  --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_entity_track_r_t.html>PK_ENTITY_track_r_t</A>       *const tracking  --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function attaches curves to edges.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_vertex          (MILD)     A curve has failed the vertex
+                                            checking (if enabled).
+    PK_ERROR_not_in_same_body    (MILD)     Not all members of <B>'edges'</B> are
+                                            from the same body.
+    PK_ERROR_geom_topol_mismatch (MILD)     At least one of the edges is not
+                                            accurate.
+    PK_ERROR_geom_not_needed     (MILD)     A member of <B>'edges'</B> already has
+                                            an attached curve.
+    PK_ERROR_bad_combination     (MILD)     An invalid combination of options
+                                            has been supplied.
+    PK_ERROR_cant_get_point      (MILD)     Unable to find the point
+                                            associated with a vertex.
+    PK_ERROR_cant_use_curve      (MILD)     A curve to be attached to a ring
+                                            edge is not closed or periodic.
+    PK_ERROR_bad_shared_entity   (MILD)     An illegal attempt to share a
+                                            member of <B>'curves'</B>.
+    PK_ERROR_bad_interval        (MILD)     The specified interval extends
+                                            beyond the curve's parameter range.
+    PK_ERROR_invalid_geometry    (MILD)     A member of <B>'curves'</B> fails the
+                                            geometry checks (if enabled).
+    PK_ERROR_has_parent          (MILD)     A member of <B>'curves'</B> is already
+                                            attached to an edge and the
+                                            copy_never option is specified.
+
+<A NAME="documentation"></A>
+The arrays <B>'edges'</B> and <B>'curves'</B> are both of the length <B>'n_edges'</B> and all the
+<B>'edges'</B> must belong to the same body.
+
+If a curve occurs more than once in <B>'curves'</B> then the curve will be shared,
+providing the sharing is legal. Curves may not be attached to tolerant
+edges.
+
+Unless specified in the options structure, PK_EDGE_attach_curves_2 will copy
+curves (and their dependents) if they have geometric owners or are unable
+to be shared. Any copied geometry is returned in the tracking array.
+Attributes are not copied.
+
+The curve must be able to pass Parasolid's geometry checking, unless this is
+disabled in the options structure, or self-intersection or G1-continuity
+checking is disabled by an interface parameter (<A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>
+or <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A>).
+
+No checking is performed to ensure that the curve lies on the corresponding
+surface(s). This may lead to face invalidities.
+
+Only closed periodic curves may be attached to ring edges. For split ring
+edges, vertex checking (if enabled) applies to the sole vertex.
+
+Finer control over curve attachment (including suppressing geometry checking,
+controlling copying behaviour, specifying curve interval and orientation) is
+provided through the options structure. See <A HREF=../headers/pk_edge_attach_curves_o_t.html>PK_EDGE_attach_curves_o_t</A> for
+details.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_imprint_curves_isocline</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_imprint_curves_isocline</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>      PK_FACE_imprint_curves_isocline
+(
+<I>--- received arguments ---
+</I>int                  n_rec_faces,   --- number of received faces (&gt;0)
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>      rec_faces[],   --- received faces
+<A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>         direction,     --- isocline direction
+double               angle,         --- isocline angle
+double               tolerance,     --- max tol for applying surfs
+
+<I>--- returned arguments ---
+</I>int           *const n_ret_faces,   --- number of returned faces (&gt;=0)
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>    **const ret_faces,     --- returned faces           (optional)
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> **const is_steep,      --- whether faces are steep  (optional)
+int           *const n_edges,       --- number of new edges      (&gt;=0)
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>    **const edges          --- new edges                (optional)
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates and imprints isocline curves on a given set of faces.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_face_imprint_cus_isoclin.html>PK_FACE_imprint_cus_isoclin</A>.
+
+</I>
+<A NAME="documentation"></A>
+The isocline is specified by a <B>'direction'</B> and an <B>'angle'</B>.
+
+The function may, at times, have to use approximate geometry.
+For such cases, <B>'tolerance'</B> specifies an upper bound on the distance by which
+a point on the actual geometry may deviate from its ideal position.
+While the function will usually satisfy this constraint, it is not guaranteed.
+
+The set <B>'ret_faces'</B> is the union of <B>'rec_faces'</B> and any newly created faces.
+In <B>'ret_faces'</B>, each given face from <B>'rec_faces'</B> is immediately followed by
+any additional faces that have been created from it.  By definition, each face
+in <B>'ret_faces'</B> is not steep or all steep.  `is_steep[i]' reports whether
+`ret_faces[i]' is steep.
+
+The new edges created are returned in <B>'edges'</B>.
+
+The output array <B>'ret_faces'</B> is optional.  If it is set to NULL, the function
+will only output the number of resulting faces.  The output array <B>'is_steep'</B> is
+optional.  It may not be non-NULL if <B>'ret_faces'</B> is NULL.
+
+The output array <B>'edges'</B> is optional.  If it is set to NULL the function will
+only output the number of new edges.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

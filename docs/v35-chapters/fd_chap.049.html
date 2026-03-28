@@ -1,0 +1,1571 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Extending Sheets And Surfaces</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Extending Sheets And Surfaces</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.048.html">Mid-Surface Generation</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.050.html">Introduction To Imprinting and Booleans</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-294749">48.1	Extending sheets </A>
+<UL>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-294750">48.1.1	Introduction </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-294859">48.1.2	Different extension methods </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-295499">48.1.3	Controlling extension to a target </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-295621">48.1.4	Specifying the shape of the extension </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-296081">48.1.5	Preserving smoothness of extended edges </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-296329">48.1.6	Changes to topology </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-296421">48.1.7	Creating precise boundaries </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-296467">48.1.8	Controlling the shape of sheet extensions </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-296506">48.1.9	Tracking new edges </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-442036">48.1.10	Return information </A>
+</UL>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-296794">48.2	Extending surfaces </A>
+<UL>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-296797">48.2.1	Introduction </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-297124">48.2.2	Specifying the shape of the extension </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-297415">48.2.3	Returned status </A>
+<LI> <A HREF="fd_chap.049.html#50422121_pgfId-297449">48.2.4	Update control </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422121_pgfId-294749"></A>48.1	<A NAME="50422121_64810"></A>Extending sheets 
+
+
+</H1>
+
+<H3>
+<A NAME="50422121_pgfId-294750"></A>	48.1.1 	<A NAME="50422121_51078"></A>Introduction </H3>
+<P>
+<A NAME="50422121_pgfId-294751"></A>You can use <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> to extend across a set of laminar edges on a body. The body may contain non-manifold components, so long as the supplied laminar edges are locally manifold.</P>
+<P>
+<A NAME="50422121_pgfId-456907"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-456906"></A>Note: This functionality offers partial support for facet geometry. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-294752"></A><A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> receives the following arguments:</P>
+<P>
+<A NAME="50422121_pgfId-720265"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-719861"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-719863"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-719865"></A><CODE>body</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-719867"></A>A body, which may contain non-manifold components.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-719869"></A><CODE>n_boundary_edges</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-719871"></A>The number of edges to extend across.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-719926"></A>boundary_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-719928"></A>An array of laminar edges belonging to the body: the body is extended across these edges. The edges do not need to form a single chain. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-719843"></A>The function has the following options:</P>
+<P>
+<A NAME="50422121_pgfId-441692"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294758"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294760"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294762"></A>modify</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294764"></A>Whether or not to modify the original faces of the body when extending. The default is to create new faces for the extension. See <A HREF="fd_chap.049.html#50422121_45636">Section 48.1.6, “Changes to topology”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294769"></A>extension_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294771"></A>Whether to extend across the specified laminar edges of the body by a specified distance, or by extending across those edges until they meet a specified target body. See <A HREF="fd_chap.049.html#50422121_57503">Section 48.1.2, “Different extension methods”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294776"></A>extension_shape</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294778"></A>The shape that the extension should have. You can choose between linear, soft and reflective extension. See <A HREF="fd_chap.049.html#50422121_99946">Section 48.1.4, “Specifying the shape of the extension”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294783"></A>extension_distance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294785"></A>The distance by which the body should be extended across the boundary edges, relative to the underlying surfaces of the body, when extending by a specified distance. See <A HREF="fd_chap.049.html#50422121_57503">Section 48.1.2, “Different extension methods”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294790"></A>target</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294792"></A>A target body that intersects the extended body and is used to define the new boundary for the body. See <A HREF="fd_chap.049.html#50422121_57503">Section 48.1.2, “Different extension methods”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294797"></A>target_limit</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294799"></A>Controls that let you specify where an extension to a target should stop. See <A HREF="fd_chap.049.html#50422121_76363">Section 48.1.3, “Controlling extension to a target”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294804"></A>preserve_internal_smoothness</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294806"></A>Whether to preserve the smoothness across internal edges of the body after extension. See <A HREF="fd_chap.049.html#50422121_74161">Section 48.1.5, “Preserving smoothness of extended edges”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294811"></A>track_laminar</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294813"></A>Provides control over the tracking information for new split laminar edges. See <A HREF="fd_chap.049.html#50422121_85632">Section 48.1.9, “Tracking new edges”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294818"></A>track_internal</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294820"></A>Whether to track non-laminar side edges in the same way as laminar side edges. See <A HREF="fd_chap.049.html#50422121_85632">Section 48.1.9, “Tracking new edges”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294825"></A>extend_create</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294827"></A>Whether to create new topology, or extend by splitting existing topology. See <A HREF="fd_chap.049.html#50422121_45636">Section 48.1.6, “Changes to topology”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294832"></A>extension_boundary</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294836"></A>Whether or not to create precise extension boundaries. See <A HREF="fd_chap.049.html#50422121_21554">Section 48.1.7, “Creating precise boundaries”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294839"></A>extend_side</PRE>
+<PRE><A NAME="50422121_pgfId-294840"></A>extend_side_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294842"></A>Whether extensions should follow adjacent edges and/or their extension on the body, or whether they should be created orthogonally to the base edge being extended. See <A HREF="fd_chap.049.html#50422121_17956">Section 48.1.8, “Controlling the shape of sheet extensions”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-294847"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294849"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422121_pgfId-294856"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-441174"></A>results_output</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-441176"></A>Whether the local status and associated entities are returned as a return argument or in a Parasolid Report. See <A HREF="fd_chap.049.html#50422121_58316">Section 48.1.10, “Return information”</A>, for more information.</P>
+<P>
+<A NAME="50422121_pgfId-441769"></A>Default: <A HREF=../headers/pk_results_output_t.html>PK_results_output_return_c</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-424657"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-424316"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-424299"></A><A HREF="fd_chap.046.html#50422118_34338">Chapter 45, “Sheet Modeling”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422121_pgfId-294859"></A>	48.1.2 	<A NAME="50422121_57503"></A>Different extension methods </H3>
+<P>
+<A NAME="50422121_pgfId-294860"></A><A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> provides the following methods for extending a body:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-294861"></A>Extend across the specified laminar edges of the body by a specified distance.</LI>
+<LI>
+<A NAME="50422121_pgfId-294862"></A>Extend across the specified laminar edges of the body until they meet a specified target body.</LI>
+</UL>
+<P>
+<A NAME="50422121_pgfId-294863"></A>You control which extension method is used with the <CODE>
+extension_type</CODE>
+ option in <A HREF=../headers/pk_body_extend_o_t.html>PK_BODY_extend_o_t</A>. </P>
+<P>
+<A NAME="50422121_pgfId-461585"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294866"></A>Method</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294868"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294870"></A>Distance</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294872"></A>This is the default extension method for <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A>. The body is extended across each of the <CODE>
+boundary_edges</CODE>
+ received by <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> by a distance specified in the <CODE>
+extension_distance</CODE>
+ option. When using this method, make sure that a non-zero distance is supplied in <CODE>
+extension_distance</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294874"></A>Extend to target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-294876"></A>The body is extended across each of the <CODE>
+boundary_edges</CODE>
+ received by <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> until it intersects a target body specified in the <CODE>
+target</CODE>
+ option. When using this method, make sure that a suitable surface, sheet, solid or general body is supplied in <CODE>
+target</CODE>
+. The target itself remains unmodified. </P>
+<ADDRESS>
+<A NAME="50422121_pgfId-460769"></A>Note: You can extend a body to a general target body so long as the extension does not intersect non-manifold topology.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-462572"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-474.gif">
+
+<P>
+<A NAME="50422121_pgfId-294877"></A>Figure 48-1 <A NAME="50422121_41003"></A>Extending a body across locally manifold edges</P>
+<P>
+<A NAME="50422121_pgfId-294881"></A><A HREF="fd_chap.049.html#50422121_78983"><EM>
+Figure 48-2</EM></A> shows a simple example in which a body is extended across two boundary edges of a sheet by a specific distance. New faces are created for the extension, although this behaviour can be controlled (see <A HREF="fd_chap.049.html#50422121_45636">Section 48.1.6, “Changes to topology”</A> for details). </P>
+<P>
+<A NAME="50422121_pgfId-349369"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-475.gif">
+
+<P>
+<A NAME="50422121_pgfId-295027"></A>Figure 48-2 <A NAME="50422121_78983"></A>Extending sheets by a specified distance</P>
+<P>
+<A NAME="50422121_pgfId-295031"></A><A HREF="fd_chap.049.html#50422121_89520"><EM>
+Figure 48-3</EM></A> shows several cases where a sheet is extended to a specified target. In the first example, a sheet is extended until it intersects the swept surface of a nearby sheet target. In the other examples, a sheet is extended until it intersects a solid target that wholly encloses the sheet. </P>
+<P>
+<A NAME="50422121_pgfId-352143"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-476.gif">
+
+<P>
+<A NAME="50422121_pgfId-295497"></A>Figure 48-3 <A NAME="50422121_89520"></A>Extending sheets to a target body</P>
+
+
+<H3>
+<A NAME="50422121_pgfId-295499"></A>	48.1.3 	<A NAME="50422121_76363"></A>Controlling extension to a target </H3>
+<P>
+<A NAME="50422121_pgfId-295500"></A>If you extend a sheet body to a target, the sheet may often be able to intersect the target several times, for example if the target is a solid body. This can lead to different possible results for the extension operation. You can use the <CODE>
+target_limit</CODE>
+ option to control which of those results is used. </P>
+<P>
+<A NAME="50422121_pgfId-295501"></A>The <CODE>
+target_limit</CODE>
+ option can control the extension shape as follows:</P>
+<P>
+<A NAME="50422121_pgfId-295519"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295504"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295506"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295508"></A><A HREF=../headers/pk_extension_limit_t.html>PK_extension_limit_minimal_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295510"></A>Extend the sheet by the minimum distance required for each boundary edge to intersect the target. This is the default, and in many cases produces the same result as one of the other values. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295512"></A><A HREF=../headers/pk_extension_limit_t.html>PK_extension_limit_inside_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295514"></A>Extend the sheet across each boundary edge until it reaches the inside of the target.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295516"></A><A HREF=../headers/pk_extension_limit_t.html>PK_extension_limit_outside_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295518"></A>Extend the sheet across each boundary edge until it reaches the outside of the target. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-295523"></A><A HREF="fd_chap.049.html#50422121_16519"><EM>
+Figure 48-4</EM></A> shows a simple example in which the side faces from an open sheet cube are extended until they intersect a solid target body. Two results are possible:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-295524"></A>If <CODE>
+target_limit</CODE>
+ is <A HREF=../headers/pk_extension_limit_t.html>PK_extension_limit_inside_c</A>, then the faces are extended until they intersect the target faces closest to the sheet cube. Notice that no extension is necessary at any point where the boundary edge is already inside the target.</LI>
+<LI>
+<A NAME="50422121_pgfId-295525"></A>If <CODE>
+target_limit</CODE>
+ is <A HREF=../headers/pk_extension_limit_t.html>PK_extension_limit_outside_c</A>, then the faces are extended through the target until they intersect the target faces furthest to the sheet cube.</LI>
+</UL>
+<P>
+<A NAME="50422121_pgfId-295526"></A>In this example, the default extension to the target would produce the same result as <A HREF=../headers/pk_extension_limit_t.html>PK_extension_limit_inside_c</A>.</P>
+<P>
+<A NAME="50422121_pgfId-399887"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-477.gif">
+
+<P>
+<A NAME="50422121_pgfId-295566"></A>Figure 48-4 <A NAME="50422121_16519"></A>Extending a sheet until it reaches the inside or outside of a target body</P>
+<P>
+<A NAME="50422121_pgfId-295567"></A>In some cases, for example if you are extending to a hollow body target that intersects the sheet body, the default extension may produce the same result as <A HREF=../headers/pk_extension_limit_t.html>PK_extension_limit_outside_c</A>. For example, consider the sheet body shown in <A HREF="fd_chap.049.html#50422121_81980"><EM>
+Figure 48-5</EM></A>. Here, a U-shaped sheet is extended to a hollow target that the sheet already intersects. As well as being hollow, the target body contains a through hole that effects the shape of the resulting extended sheet.</P>
+<P>
+<A NAME="50422121_pgfId-399930"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-478.gif">
+
+<P>
+<A NAME="50422121_pgfId-295610"></A>Figure 48-5 <A NAME="50422121_81980"></A>Extending a sheet to a hollow target body</P>
+<P>
+<A NAME="50422121_pgfId-295617"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-295613"></A>Note: The result bodies for both the <A HREF=../headers/pk_extension_limit_t.html>PK_extension_limit_outside_c</A> case and default case in <A HREF="fd_chap.049.html#50422121_81980"><EM>
+Figure 48-5</EM></A> contain a notch. This is because the through hole in the target body causes no extension to be created in the sheet across the extent of the hole: the body is <EM>
+already</EM> outside the target in this area, and so does not need to be extended. The result body for <A HREF=../headers/pk_extension_limit_t.html>PK_extension_limit_inside_c</A>, however, does <EM>
+not</EM> contain this notch, because in this case the sheet needs to be extended until it reaches the inside of the target body. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422121_pgfId-295621"></A>	48.1.4 	<A NAME="50422121_99946"></A><A NAME="50422121_marker-295619"></A><A NAME="50422121_marker-295620"></A>Specifying the shape of the extension </H3>
+<P>
+<A NAME="50422121_pgfId-295622"></A>When extending faces in a sheet, <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> follows the shape of any underlying surface as far as possible. In particular, analytic surfaces are preserved. For example, <A HREF="fd_chap.049.html#50422121_77851"><EM>
+Figure 48-6</EM></A> shows the effect of extending a sheet body whose underlying surface is a sphere.</P>
+<P>
+<A NAME="50422121_pgfId-358189"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-479.gif">
+
+<P>
+<A NAME="50422121_pgfId-295750"></A>Figure 48-6 <A NAME="50422121_77851"></A>Using the underlying surface to extend a sheet</P>
+<P>
+<A NAME="50422121_pgfId-295754"></A>When the requested extension lies beyond the scope of the underlying surface, Parasolid has to create its own surface. You can use the <CODE>
+extension_shape</CODE>
+ field to determine the shape that <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> follows when this is the case. This field takes the following values:</P>
+<P>
+<A NAME="50422121_pgfId-295782"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295757"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295759"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295762"></A><A NAME="50422121_87971"></A><A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_linear_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295767"></A>Parasolid extends the sheet in a linear direction. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295769"></A><A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_soft_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295774"></A>Parasolid extends the sheet using a “softer” algorithm that ensures the extension is C2-continuous at the boundary of the underlying surface, and tends toward linear after a small change of direction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295776"></A><A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_reflective_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-295781"></A>Parasolid extends the sheet using an algorithm that ensures the extension is C2-continuous at the boundary of the underlying surface, and which also mirrors the existing geometry of the sheet. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-295786"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-295785"></A>Note: The values <A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_arc_c</A> and <A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_natural_c</A>, as used in <A HREF=../headers/pk_bcurve_extend.html>PK_BCURVE_extend</A> and <A HREF=../headers/pk_surf_extend.html>PK_SURF_extend</A>, are not valid for use with <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-295790"></A><A HREF="fd_chap.049.html#50422121_55067"><EM>
+Figure 48-7</EM></A> illustrates the difference between these types of extension shape. In this figure, the underlying surface of the sheet body is a B-surface that resembles an incomplete sphere. Beyond the B-surface, the sheet has been extended linearly in the first example, softly in the second and reflectively in the third. </P>
+<P>
+<A NAME="50422121_pgfId-358859"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-480.gif">
+
+<P>
+<A NAME="50422121_pgfId-295980"></A>Figure 48-7 <A NAME="50422121_55067"></A>The difference between various shapes of extension</P>
+<P>
+<A NAME="50422121_pgfId-295984"></A>For the sake of clarity, the soft extension diagram in <A HREF="fd_chap.049.html#50422121_55067"><EM>
+Figure 48-7</EM></A> is exaggerated. In practice, the angular deviation between a linearly extended surface and a softly extended surface is about 3&#176;. <A HREF="fd_chap.049.html#50422121_60290"><EM>
+Figure 48-8</EM></A> illustrates the effect of linear extension and soft extension on a constant parameter that is extended.</P>
+<P>
+<A NAME="50422121_pgfId-295991"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-295990"></A>Note: When extending linearly, a G2 discontinuity may be created at the boundary of the underlying surface.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-359393"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-481.gif">
+
+<P>
+<A NAME="50422121_pgfId-296072"></A>Figure 48-8 <A NAME="50422121_60290"></A>The difference between linear and soft extension for curves</P>
+<P>
+<A NAME="50422121_pgfId-296077"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-296075"></A>Note: In general, the shape of the underlying surface outside the range of an unextended face can have a noticeable effect on the shape of the extended face. In particular, if two faces that appear to be identical have different underlying surfaces (for example, an analytic and a b-surface), performing the same extension on each face can lead to very different results.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422121_pgfId-296076"></A>The geometry immediately surrounding the edge to extend across can also have an effect on the shape of the final extended body. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422121_pgfId-296081"></A>	48.1.5 	<A NAME="50422121_74161"></A><A NAME="50422121_marker-296079"></A><A NAME="50422121_marker-296080"></A>Preserving smoothness of extended edges </H3>
+<P>
+<A NAME="50422121_pgfId-296082"></A>By default, if you extend an edge that is smooth (that is, the faces on either side of the edge are tangent to each other at the point where the edge intersects the edge to extend across), that smoothness is not preserved in the extended body. You can set the <CODE>
+preserve_internal_smoothness</CODE>
+ field to <A HREF=../headers/pk_extension_smoothness_t.html>PK_extension_smoothness_g1_c</A> in order to preserve G1 smoothness whenever possible, as shown in <A HREF="fd_chap.049.html#50422121_27494"><EM>
+Figure 48-9</EM></A>.</P>
+<P>
+<A NAME="50422121_pgfId-359852"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-482.gif">
+
+<P>
+<A NAME="50422121_pgfId-296324"></A>Figure 48-9 <A NAME="50422121_27494"></A>Preserving the smoothness of extended internal edges</P>
+
+
+<H3>
+<A NAME="50422121_pgfId-296329"></A>	48.1.6 	<A NAME="50422121_45636"></A><A NAME="50422121_marker-296326"></A><A NAME="50422121_marker-296327"></A><A NAME="50422121_marker-296328"></A>Changes to topology </H3>
+<P>
+<A NAME="50422121_pgfId-296333"></A>Parasolid can modify the topology of the resulting sheet, depending on the setting of the <CODE>
+modify</CODE>
+ field, which takes the following values:</P>
+<P>
+<A NAME="50422121_pgfId-296347"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296336"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296338"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296340"></A>PK_LOGICAL_false</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296342"></A>Where possible, no faces in the original sheet body are modified. Instead, the edges to extend across are preserved and new faces are created for the extension. This is the default</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296344"></A>PK_LOGICAL_true</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296346"></A>Where possible the edges to extend across are removed and the original faces modified.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-296351"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-296350"></A>Note: When modify is PK_LOGICAL_true, the configuration of boundary edges and vertices depends on the geometry of the body to be extended. Where possible, boundary edges are merged in the extended body, but if B-curves or SP-curves need to be constructed in order to extend the body, there will generally be vertices present in the resulting edges. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-296352"></A>In addition, you can use the <CODE>
+extend_create</CODE>
+ option to control how topology is created with respect to the way attributes attached to the topology are processed. This takes the following values:</P>
+<P>
+<A NAME="50422121_pgfId-296369"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296355"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296357"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296359"></A><A HREF=../headers/pk_extend_create_t.html>PK_extend_create_new_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296361"></A>Topology is newly created for the extension, without any attributes from the original topology. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296363"></A><A HREF=../headers/pk_extend_create_t.html>PK_extend_create_split_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296365"></A>New topology is split from the original topology. Any attributes attached to the original topology are processed according to the attributes’ rules for split events: they will either be deleted from both entities or propagated to both entities. See <A HREF="fd_chap.096.html#50422175_64286">Section 95.4.4, “Split”</A>, for information about split events.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-296370"></A>In both cases if the new topology is subsequently merged with original topology during the extend, then any attributes are processed according to their rules for merge events.</P>
+<P>
+<A NAME="50422121_pgfId-296371"></A>The <CODE>
+modify</CODE>
+ and <CODE>
+extend_create</CODE>
+ options combine to create different effects. These are shown in <A HREF="fd_chap.049.html#50422121_32932"><EM>
+Figure 48-10</EM></A>, which shows how a single face with an attached colour attribute (blue) can be extended using all possible combinations of <CODE>
+modify</CODE>
+ and <CODE>
+extend_create</CODE>
+. The resulting faces are either shown in blue, to indicate the propagation of the colour attribute, or yellow, to indicate that no attribute is attached to that face. The settings for each resulting body are described in the following table:</P>
+<P>
+<A NAME="50422121_pgfId-474841"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296377"></A>Body</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296379"></A>Option values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296381"></A>Behaviour</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296383"></A>A</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296385"></A><CODE>
+modify</CODE>
+: PK_LOGICAL_true<BR>
+<CODE>
+extend_create</CODE>
+: <A HREF=../headers/pk_extend_create_t.html>PK_extend_create_split_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296387"></A>A new face is split from the original and then merged back in. Attributes are processed for split and merge events. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296389"></A>B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296391"></A><CODE>
+modify</CODE>
+: PK_LOGICAL_false<BR>
+<CODE>
+extend_create</CODE>
+: <A HREF=../headers/pk_extend_create_t.html>PK_extend_create_split_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296393"></A>A new face is split from the original. Attributes are processed for split events.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296395"></A>C</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296397"></A><CODE>
+modify</CODE>
+: PK_LOGICAL_true<BR>
+<CODE>
+extend_create</CODE>
+: <A HREF=../headers/pk_extend_create_t.html>PK_extend_create_new_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296399"></A>A new face is created from the original and then merged back in. Attributes are processed for merge events. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296401"></A>D</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296403"></A><CODE>
+modify</CODE>
+: PK_LOGICAL_false<BR>
+<CODE>
+extend_create</CODE>
+: <A HREF=../headers/pk_extend_create_t.html>PK_extend_create_new_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296405"></A>A new face is created from the original. Attributes are not processed. This is the default behaviour.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-296410"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-483.gif">
+
+<P>
+<A NAME="50422121_pgfId-296412"></A>Figure 48-10 <A NAME="50422121_32932"></A>The effect of the <CODE>
+modify</CODE>
+ and <CODE>
+extend_create</CODE>
+ options when extending sheets</P>
+<P>
+<A NAME="50422121_pgfId-296419"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-296418"></A>Note: In the example shown in <A HREF="fd_chap.049.html#50422121_32932"><EM>
+Figure 48-10</EM></A>, processed attributes are shown as being copied onto new faces. For attributes of type 1, 4, 6, or 7, (e.g., colour, density), this is the expected behaviour. However, for attributes of type 2, 3, or 5, (e.g. incremental faceting) whose behaviour is that they are deleted when a split event occurs, then the results will be different to those shown. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422121_pgfId-296421"></A>	48.1.7 	<A NAME="50422121_21554"></A>Creating precise boundaries </H3>
+<P>
+<A NAME="50422121_pgfId-296422"></A>Sometimes when you are extending sheets by distance, the exact shape of the boundary of the extended sheet may be irrelevant for your needs. This is particularly true if you intend to trim away some of the extension using subsequent modelling operations. In these circumstances, you only need to ensure that you create an extension that is large enough for your requirements, and creating a precise extension can be costly in terms of performance.</P>
+<P>
+<A NAME="50422121_pgfId-296423"></A><A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> provides the <CODE>
+extension_boundary</CODE>
+ option for use in this type of case. The behaviour of this option is shown in <A HREF="fd_chap.049.html#50422121_39383"><EM>
+Figure 48-11</EM></A>. </P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-296427"></A>By default, <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> creates a precise boundary when extending a sheet. </LI>
+<LI>
+<A NAME="50422121_pgfId-296428"></A>If you set <CODE>
+extension_boundary</CODE>
+ to <A HREF=../headers/pk_extension_boundary_t.html>PK_extension_boundary_loose_c</A>, <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> creates a loose boundary that is a rough measure of the extension distance. Creating a loose boundary can reduce complexity of the boundary and improve operation performance; however, detailed tracking information is not returned and by definition the boundary is not in general precise. </LI>
+</UL>
+<P>
+<A NAME="50422121_pgfId-296463"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-484.gif">
+
+<P>
+<A NAME="50422121_pgfId-296465"></A>Figure 48-11 <A NAME="50422121_39383"></A>Creating precise and loose boundaries when extending sheets</P>
+
+
+<H3>
+<A NAME="50422121_pgfId-296467"></A>	48.1.8 	<A NAME="50422121_17956"></A>Controlling the shape of sheet extensions </H3>
+<P>
+<A NAME="50422121_pgfId-296468"></A>You can use the <CODE>
+extend_side</CODE>
+ and <CODE>
+extend_side_data</CODE>
+ options to control the shape of the extension when extending sheets across laminar edges. These options let you choose how to construct the side edges required, so that extensions either follow adjacent edges and/or their extension in the body, or are orthogonal to the base edge being extended.</P>
+<P>
+<A NAME="50422121_pgfId-296469"></A>Two options are provided so that you can control the extension shape in two ways, as follows:</P>
+<P>
+<A NAME="50422121_pgfId-296492"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296472"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296474"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-296476"></A>extend_side</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296478"></A>Controls the shape of extensions across laminar edges for the whole body by constructing side edges in different ways. This can take any of the following values:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-296479"></A><A HREF=../headers/pk_extend_side_t.html>PK_extend_side_follow_adj_c</A>: construct side edges so that they always follow adjacent edges and/or their extension in the body. </LI>
+<LI>
+<A NAME="50422121_pgfId-296480"></A><A HREF=../headers/pk_extend_side_t.html>PK_extend_side_ortho_base_c</A>: construct side edges so that they are always orthogonal to the base edge being extended. </LI>
+<LI>
+<A NAME="50422121_pgfId-296484"></A><A HREF=../headers/pk_extend_side_t.html>PK_extend_side_default_c</A>: let Parasolid decide whether to extend side edges along the line of adjacent edges or orthogonally to the base edge. This is the default. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-296486"></A>extend_side_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296488"></A>This structure allows you to specify different extension shapes at selected terminal vertices of edge chains in the body. It allows you to override the behaviour specified by <CODE>
+extend_side</CODE>
+ at those vertices. The structure contains the following fields:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-296489"></A><CODE>
+n_vertices</CODE>
+, <CODE>
+vertices</CODE>
+: an array of vertices representing the terminal vertices of edge chains whose behaviour you want to specify. Defaults: 0, NULL.</LI>
+<LI>
+<A NAME="50422121_pgfId-296490"></A><CODE>
+extend_sides</CODE>
+: an array of tokens of type <A HREF=../headers/pk_extend_side_t.html>PK_extend_side_t</A> specifying how to control the extension shape at each terminal vertex specified in vertices. Each token can be one of the values taken by <CODE>
+extend_side</CODE>
+. Default: NULL.</LI>
+</UL>
+<P>
+<A NAME="50422121_pgfId-296491"></A>Extensions at any terminal vertices of edge chains that are not specified here are controlled according to the value of <CODE>
+extend_side</CODE>
+. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-296496"></A><A HREF="fd_chap.049.html#50422121_21278"><EM>
+Figure 48-12</EM></A> shows the different results that can be achieved by setting <CODE>
+extend_side</CODE>
+ and <CODE>
+extend_side_data</CODE>
+ while extending two laminar edges on a face:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-296497"></A>By setting <CODE>
+extend_side</CODE>
+ appropriately, you can construct side faces that either both follow adjacent edges and/or their extension, or are both orthogonal to the base edge. </LI>
+<LI>
+<A NAME="50422121_pgfId-296498"></A>Alternatively, by using <CODE>
+extend_side_data</CODE>
+, you can control the behaviour at each end of the edge chain individually.</LI>
+</UL>
+<P>
+<A NAME="50422121_pgfId-296502"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-485.gif">
+
+<P>
+<A NAME="50422121_pgfId-296504"></A>Figure 48-12 <A NAME="50422121_21278"></A>Controlling the shape of extensions across laminar edges</P>
+
+
+<H3>
+<A NAME="50422121_pgfId-296506"></A>	48.1.9 	<A NAME="50422121_85632"></A>Tracking new edges </H3>
+<P>
+<A NAME="50422121_pgfId-296507"></A><A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> returns tracking information for end edges and side edges that are created during the extend operation, allowing you to associate these new edges with the topology that they originated from. </P>
+<P>
+<A NAME="50422121_pgfId-296508"></A><A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> associates any end edges created by the extend operation with the original edges that they were created from, as shown in <A HREF="fd_chap.049.html#50422121_87699"><EM>
+Figure 48-13</EM></A>.</P>
+<P>
+<A NAME="50422121_pgfId-360417"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-486.gif">
+
+<P>
+<A NAME="50422121_pgfId-296565"></A>Figure 48-13 <A NAME="50422121_87699"></A>Tracking end edges</P>
+<P>
+<A NAME="50422121_pgfId-296566"></A>By default, <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> associates any laminar side edges created by the extend operation with the vertex that the side edge was created from, together with the unique originating side edge, if there is one. This is illustrated in <A HREF="fd_chap.049.html#50422121_26618"><EM>
+Figure 48-14</EM></A>.</P>
+<P>
+<A NAME="50422121_pgfId-370735"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-487.gif">
+
+<P>
+<A NAME="50422121_pgfId-296651"></A>Figure 48-14 <A NAME="50422121_26618"></A>Tracking laminar side edges</P>
+<P>
+<A NAME="50422121_pgfId-296652"></A>Sometimes, a laminar side edge cannot be tracked to a single unique edge. In such cases, <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> associates the new side edge with the vertex that it was created from by default. However, you can return additional tracking information using the <CODE>
+track_laminar</CODE>
+ option. <A HREF=../headers/pk_body_extend_o_t.html>PK_BODY_extend_o_t</A> also provides the <CODE>
+track_internal</CODE>
+ option for tracking non-laminar side edges. You use these options as follows:</P>
+<P>
+<A NAME="50422121_pgfId-296678"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296655"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296657"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-296659"></A>track_laminar</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296661"></A>Controls the amount of tracking information returned for new side edges. It takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-296662"></A>PK_extend_track_laminar_basic_c (the default): return only basic tracking information. This associates the new side edge with the originating vertex from which it was created. </LI>
+<LI>
+<A NAME="50422121_pgfId-296663"></A>PK_extend_track_laminar_edges_c: return extended tracking information. This associates the new side edge with both the originating vertex, and the set of edges that were incident to that vertex before the extend operation. </LI>
+</UL>
+<P>
+<A NAME="50422121_pgfId-296667"></A><A HREF="fd_chap.049.html#50422121_37734"><EM>
+Figure 48-15</EM></A> illustrates the difference between the two values. </P>
+<ADDRESS>
+<A NAME="50422121_pgfId-296668"></A>Note: The setting of this option has no effect on the tracking information returned for side edges that are created from a unique edge, such as the example shown in <A HREF="fd_chap.049.html#50422121_26618"><EM>
+Figure 48-14</EM></A>. </ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-296673"></A>track_internal</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296675"></A>Whether or not to return tracking information for non-laminar side edges that are created. This takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-296676"></A><A HREF=../headers/pk_extend_track_internal_t.html>PK_extend_track_internal_no_c</A> (the default): only track laminar side edges.</LI>
+<LI>
+<A NAME="50422121_pgfId-296677"></A><A HREF=../headers/pk_extend_track_internal_t.html>PK_extend_track_internal_yes_c</A>: track non-laminar side edges as well. If you use this value, then the same tracking information is returned for internal side edges as for laminar side edges. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-348173"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-488.gif">
+
+<P>
+<A NAME="50422121_pgfId-296790"></A>Figure 48-15 <A NAME="50422121_37734"></A>Tracking side edges that cannot be associated with a single unique edge</P>
+
+
+<H3>
+<A NAME="50422121_pgfId-442036"></A>	48.1.10 	<A NAME="50422121_58316"></A>Return information </H3>
+<P>
+<A NAME="50422121_pgfId-443652"></A>You can return information using the <CODE>
+results_output</CODE>
+ option. This allows you to choose to either return the local status and associated entities as a return argument or in a Parasolid Report using the following values:</P>
+<P>
+<A NAME="50422121_pgfId-453250"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-449041"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-449043"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-449045"></A><A HREF=../headers/pk_results_output_t.html>PK_results_output_return_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-449047"></A>Return the information as a return argument (Default).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-449049"></A><A HREF=../headers/pk_results_output_t.html>PK_results_output_report_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-449051"></A>Return a complete list of multiple fault entities and fault types in a Parasolid Report. </P>
+<P>
+<A NAME="50422121_pgfId-453992"></A>In addition, when the operation succeeds report records with the following statuses are generated:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-454085"></A><A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_on_target_c</A> </LI>
+<LI>
+<A NAME="50422121_pgfId-454634"></A><A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_not_extended_c</A></LI>
+</UL>
+<P>
+<A NAME="50422121_pgfId-454068"></A>These provide information on the edges that were not extended across because those extensions were not needed.</P>
+<P>
+<A NAME="50422121_pgfId-454002"></A>See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A> for more information on the local statuses returned.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-442559"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid Report mechanism.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422121_pgfId-296794"></A>48.2	<A NAME="50422121_79692"></A><A NAME="50422121_marker-296792"></A><A NAME="50422121_marker-296793"></A>Extending surfaces 
+
+
+</H1>
+
+<H3>
+<A NAME="50422121_pgfId-296797"></A>	48.2.1 	Introduction<A NAME="50422121_marker-296795"></A><A NAME="50422121_marker-296796"></A> </H3>
+<P>
+<A NAME="50422121_pgfId-296798"></A>You can extend surfaces of any class (except foreign geometry surfaces) using <A NAME="50422121_marker-296799"></A><A HREF=../headers/pk_surf_extend.html>PK_SURF_extend</A>. This function take as arguments a surface to modify and an options structure that specifies the type of extension required. It returns a status flag that indicates the outcome of the operation.</P>
+<P>
+<A NAME="50422121_pgfId-468644"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-468656"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-296800"></A>You can extend a surface in any of four ways:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-296801"></A>Extend to a specified point</LI>
+<LI>
+<A NAME="50422121_pgfId-296802"></A>Extend to a specified box</LI>
+<LI>
+<A NAME="50422121_pgfId-296803"></A>Extend to a specified parameter box</LI>
+<LI>
+<A NAME="50422121_pgfId-296804"></A>Extend by increasing the individual parameter boundaries of the surfaces</LI>
+</UL>
+<P>
+<A NAME="50422121_pgfId-348315"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-489.gif">
+
+<P>
+<A NAME="50422121_pgfId-296921"></A>Figure 48-16 Extending a surface <STRONG>
+(a)</STRONG> to a specified point <STRONG>
+(b)</STRONG> to a specified box</P>
+<P>
+<A NAME="50422121_pgfId-296922"></A>Each type is specified using fields in the options structure, as described in the table below. The default values for these fields are set such that no extension is performed to a surface supplied to <A HREF=../headers/pk_surf_extend.html>PK_SURF_extend</A>.</P>
+<P>
+<A NAME="50422121_pgfId-296991"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296925"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296927"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296929"></A><CODE>
+extension_type</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296931"></A>The type of extension to perform. This is one of:</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-296932"></A><STRONG>
+PK_SURF_extension_none_c</STRONG>: No extension requested (default)</LI>
+<LI>
+<A NAME="50422121_pgfId-296933"></A><STRONG>
+PK_SURF_extension_point_c</STRONG>: Extend to a point.</LI>
+<LI>
+<A NAME="50422121_pgfId-296934"></A><STRONG>
+PK_SURF_extension_box_c</STRONG>: Extend to a box. </LI>
+<LI>
+<A NAME="50422121_pgfId-296935"></A><STRONG>
+PK_SURF_extension_uvbox_c</STRONG>: Extend to a parameter box. </LI>
+<LI>
+<A NAME="50422121_pgfId-296936"></A><STRONG>
+PK_SURF_extension_ratio_c</STRONG>: Extend by increasing the individual parameter boundaries.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296938"></A><CODE>
+extension_point</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296941"></A>The <A NAME="50422121_marker-296940"></A>point to extend to, if extending to a point. Ignored otherwise.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296943"></A><CODE>
+extension_box</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296946"></A>The <A NAME="50422121_marker-296945"></A>box to extend to, if extending to a box. Ignored otherwise.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296948"></A><CODE>
+extension_uvbox</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296952"></A>The <A NAME="50422121_marker-296950"></A><A NAME="50422121_marker-296951"></A>parameter box to extend to, if extending to a parameter box. Ignored otherwise.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296954"></A><CODE>
+u_ratio</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296956"></A>Ratio of the u parameter range by which to extend the low u boundary, if extending by ratio. Ignored otherwise. Default: 0.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296958"></A><CODE>
+U_ratio</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296960"></A>Ratio of the u parameter range by which to extend the high u boundary, if extending by ratio. Ignored otherwise. Default: 0.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296962"></A><CODE>
+v_ratio</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296964"></A>Ratio of the v parameter range by which to extend the low v boundary, if extending by ratio. Ignored otherwise. Default: 0.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296966"></A><CODE>
+V_ratio</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296968"></A>Ratio of the v parameter range by which to extend the high v boundary, if extending by ratio. Ignored otherwise. Default: 0.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296970"></A><CODE>
+allow_partial_extension</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296972"></A>If the extension requested would result in an invalid surface, then setting this option to PK_LOGICAL_true attempts to extend the surface as far as possible, while keeping the surface valid. If PK_LOGICAL_false, then no extension is performed at all in cases where an invalid surface would result. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-296974"></A>extension_shape</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296976"></A>The shape that the extension should have. The choices available depend on the type of surface, and any attached topology or owning geometry. See <A HREF="fd_chap.049.html#50422121_14920">Section 48.2.2, “Specifying the shape of the extension”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422121_pgfId-296981"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-296983"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.049.html#50422121_54663">Section 48.2.4, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422121_pgfId-296990"></A>Default: PK_surf_extend_update_default_c. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-296992"></A>For each of the <EM>
+x</EM><CODE>
+_ratio</CODE>
+ options, a ratio of 1.0 extends the relevant boundary by 100%. The effect of extending different boundaries by different amounts is shown in <A HREF="fd_chap.049.html#50422121_37233"><EM>
+Figure 48-17</EM></A>.</P>
+<P>
+<A NAME="50422121_pgfId-361691"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-490.gif">
+
+<P>
+<A NAME="50422121_pgfId-297041"></A>Figure 48-17 <A NAME="50422121_37233"></A>Extending a surface by ratio</P>
+<P>
+<A NAME="50422121_pgfId-297045"></A>The effect of setting <CODE>
+allow_partial_extension</CODE>
+ is shown in <A HREF="fd_chap.049.html#50422121_30944"><EM>
+Figure 48-18</EM></A>. In the example shown, extending the specified surface to the point shown would result in a self-intersection, thereby creating an invalid surface. </P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-297046"></A>If <CODE>
+allow_partial_extension</CODE>
+ is PK_LOGICAL_false, then no extension is performed. </LI>
+<LI>
+<A NAME="50422121_pgfId-297047"></A>If <CODE>
+allow_partial_extension</CODE>
+ is PK_LOGICAL_true, then the surface is extended as far as the point of self-intersection, as indicated in the illustration.</LI>
+</UL>
+<P>
+<A NAME="50422121_pgfId-361904"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-491.gif">
+
+<P>
+<A NAME="50422121_pgfId-297120"></A>Figure 48-18 <A NAME="50422121_30944"></A>Partially extending a surface that would otherwise be invalid</P>
+
+
+<H3>
+<A NAME="50422121_pgfId-297124"></A>	48.2.2 	<A NAME="50422121_marker-297121"></A><A NAME="50422121_marker-297122"></A><A NAME="50422121_14920"></A>Specifying the shape of the extension </H3>
+<P>
+<A NAME="50422121_pgfId-297125"></A>For B-surfaces that are not attached to topology or owned by other geometry, the <CODE>
+extension_shape</CODE>
+ field determines the shape of the surface created by Parasolid. This field takes the following values:</P>
+<P>
+<A NAME="50422121_pgfId-297166"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297128"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297130"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297132"></A><A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_linear_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-432949"></A>Parasolid extends the surface in a direction (which is usually linear), which is the default direction for the surface type. See <A HREF="fd_chap.049.html#50422121_99946">Section 48.1.4, “Specifying the shape of the extension”</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297139"></A><A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_soft_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297141"></A>Parasolid extends the surface in a direction that tends toward linear after a small change. See <A HREF="fd_chap.049.html#50422121_99946">Section 48.1.4, “Specifying the shape of the extension”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297146"></A><A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_reflective_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297148"></A>Parasolid extends the surface using an algorithm that mirrors the existing geometry of the surface. See <A HREF="fd_chap.049.html#50422121_99946">Section 48.1.4, “Specifying the shape of the extension”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297153"></A><A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_arc_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297158"></A>Parasolid adds a new section that has constant radii of curvature in the direction of the extension, and matches the surface with G2 continuity. A cross-section taken through the new section would be a circular arc.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297160"></A><A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_natural_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297165"></A>Parasolid extends the surface “naturally”, continuing the shape described by the original surface just before the start of the extension. The new surface is infinitely continuous (C-infinity) at the boundary.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-297170"></A><A HREF="fd_chap.049.html#50422121_70819"><EM>
+Figure 48-19</EM></A> illustrates the different shapes available for extending B-surfaces. See also <A HREF="fd_chap.019.html#50422088_84834"><EM>
+Figure 18-28</EM></A> of <A HREF="fd_chap.019.html#50422088_32578">Section 18.5.5, “Extending B-curves”</A>.</P>
+<P>
+<A NAME="50422121_pgfId-414453"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-414452"></A>Note: Rational B-surfaces cannot always be explicitly extended when using the linear extension shape. If this is the case, the rational B-surface will be extended implicitly so that it is handled correctly in downstream operations.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-372008"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-492.gif">
+
+<P>
+<A NAME="50422121_pgfId-297413"></A>Figure 48-19 <A NAME="50422121_70819"></A>The difference between various shapes of extension</P>
+
+
+<H3>
+<A NAME="50422121_pgfId-297415"></A>	48.2.3 	<A NAME="50422121_marker-297414"></A>Returned status </H3>
+<P>
+<A NAME="50422121_pgfId-297416"></A><A HREF=../headers/pk_surf_extend.html>PK_SURF_extend</A> returns a status flag to indicate the result of the operation. This can take the following values:</P>
+<P>
+<A NAME="50422121_pgfId-297444"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297419"></A>Status</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297421"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297423"></A>PK_SURF_extend_ok_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297425"></A>The extension succeeded as requested.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297427"></A>PK_SURF_extend_unextended_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297429"></A>No extension was necessary. This status is returned, for example, when</P>
+<UL>
+<LI>
+<A NAME="50422121_pgfId-297430"></A>attempting to extend a plane</LI>
+<LI>
+<A NAME="50422121_pgfId-297431"></A>extending a surface to a point already on the surface</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297433"></A>PK_SURF_extend_partial_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297435"></A>Only part of the extension was performed. This cannot be returned if <CODE>
+allow_partial_extension</CODE>
+ is PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297437"></A>PK_SURF_extend_invalid_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297439"></A>The extension failed, because the resulting surface would have been invalid.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297441"></A>PK_SURF_extend_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422121_pgfId-297443"></A>Internal algorithm failure.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422121_pgfId-297449"></A>	48.2.4 	<A NAME="50422121_54663"></A><A NAME="50422121_marker-297446"></A><A NAME="50422121_marker-297447"></A><A NAME="50422121_marker-297448"></A>Update control </H3>
+<P>
+<A NAME="50422121_pgfId-410831"></A>If your application relies on reproducing behaviour when updating models created using earlier versions of Parasolid, you should use the <CODE>
+update</CODE>
+ option to preserve old behaviour and help eliminate differences in rebuild results. This option lets you disable some surface extension enhancements that have been added at different Parasolid versions. Doing this ensures that <A HREF=../headers/pk_surf_extend.html>PK_SURF_extend</A> gives the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_surf_extend_update_t.html>PK_surf_extend_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<P>
+<A NAME="50422121_pgfId-410844"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422121_pgfId-410843"></A>Note:  The default value is PK_surf_extend_update_default_c which uses all appropriate surface extension enhancements. Setting to a non-default value disables all appropriate surface extension enhancements.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422121_pgfId-411042"></A>&nbsp;</P>
+
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.048.html">Mid-Surface Generation</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.050.html">Introduction To Imprinting and Booleans</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

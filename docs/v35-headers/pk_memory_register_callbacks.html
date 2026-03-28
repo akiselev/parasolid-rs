@@ -1,0 +1,79 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_MEMORY_register_callbacks</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MEMORY_register_callbacks</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>      PK_MEMORY_register_callbacks
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_memory_frustrum_t.html>PK_MEMORY_frustrum_t</A> frustrum      --- application's memory handlers
+)
+</B>
+<A NAME="description"></A>
+<I>This function registers memory allocation and free functions for Parasolid
+to use when returning variable length information.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+     PK_ERROR_memory_not_empty     Data is in process of being returned
+
+<A NAME="documentation"></A>
+This function may be called whenever Parasolid's internal PK memory is empty.
+
+The alloc and free functions are allowed to longjump out of Parasolid in case
+of an error, with the same restrictions and requirements as the user registered
+error handling function. Otherwise the allocator must return NULL in the event
+of an error.
+
+If this function has not been called, or either of the function pointers
+given is NULL, Parasolid will default to using the appropriate function
+from the standard C run-time-library. The application should ensure that
+the two functions thus registered are compatible.
+
+The alloc and free functions registered with this function are used session-
+wide, and may be called by any application thread that has not registered
+thread-specific alloc and free functions with <A HREF=../headers/pk_thread_register_memory_cbs.html>PK_THREAD_register_memory_cbs</A>.
+Thread-specific functions are used in preference to session-wide functions,
+but only by the threads that have registered them.
+
+If multiple application threads are used to call Parasolid, any registered
+session-wide alloc and free functions must be thread-safe, since it will be
+possible for either of them to be called simultaneously from two different
+threads.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

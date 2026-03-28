@@ -1,0 +1,163 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_make_spcurves</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_make_spcurves</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>      PK_CURVE_make_spcurves
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>           curve,       --- curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>        range,       --- parameter bounds of reqd part of curve
+<A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>            surf,        --- surface on which curve lies
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>         degenerate,  --- create degenerate spcurves
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>         sense,       --- spcurves in same dirn. as <B>'curve'</B>
+double               tolerance,   --- required accuracy if soln. is approx
+
+<I>--- returned arguments ---
+</I>int           *const n_spcurves,  --- no. spcurves produced
+<A HREF=../headers/pk_spcurve_t.html>PK_SPCURVE_t</A> **const spcurves     --- spcurves
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates an SPCURVE representation of a curve which lies,
+possibly approximately, in a surface.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_curve_make_spcurves_2.html>PK_CURVE_make_spcurves_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_precision           tolerance less than modelling resolution
+    PK_ERROR_tolerances_too_tight    tolerance too tight
+    PK_ERROR_failed_to_create_sp     no spcurves made
+
+<A NAME="documentation"></A>
+This function approximates <B>'curve'</B> which lies approximately on <B>'surf'</B> by an
+SP_Curve or series of SP_Curves, lying on <B>'surf'</B>.
+
+The arguments are:
+
+
+<B>'curve'</B>
+
+   Curve to be approximated by SP-curve(s)
+
+   Lies approximately on <B>'surf'</B>.
+
+
+<B>'range'</B>
+
+   Parametric extent of the part of the given <B>'curve'</B> to be represented by one
+   or more SP-Curves.
+
+   If the <B>'range'</B> is sufficiently long to overhang the parameter range of a
+   limited surface, then the surface may be extended in order to accommodate
+   the SP-curve(s).
+
+   If the given <B>'curve'</B> is a trimmed curve, then the <B>'range'</B> must be contained
+   within the bounds of the trimmed curve.
+
+<B>'surf'</B>
+
+   Surface upon which to create SP_Curve(s), <B>'surf'</B> forms the basis surface
+   of the new SP-curve(s).
+
+   If <B>'surf'</B> is construction geometry or is attached to a face, within a
+   body, the SP-curve will be created as construction geometry
+   in that body, and may only be attached to topology within that body.
+
+
+<B>'degenerate'</B>
+
+   Sp_curves may start or end on surface degeneracies, may lie entirely
+   within them, but may not pass through them. A trimmed curve which passes
+   through a surface degeneracy will be approximated by at least two
+   SP_Curves. If <B>'degenerate'</B> is PK_LOGICAL_true a zero length SP_Curve will be
+   returned which joins the otherwise disjoint SP_Curves in parameter space.
+   Zero length SP_Curves may not be attached to a model.
+
+
+<B>'sense'</B>
+
+   If <B>'sense'</B> is PK_LOGICAL_true, then the created SP-curve(s) will start at
+   the beginning of <B>'range'</B> and end at the end of <B>'range'</B>.  If <B>'sense'</B> is
+   PK_LOGICAL_false, then the SP-curve(s) will be in the opposite direction.
+
+
+<B>'tolerance'</B>
+
+   The SP-Curve will be created to the distance tolerance <B>'tolerance'</B>, i.e. it
+   lies within <B>'tolerance'</B> of the image of <B>'curve'</B> in the surface. The image of
+   <B>'curve'</B> in this context means the curve formed by the locus of points
+   on <B>'surf'</B> closest to corresponding points on <B>'curve'</B>.
+
+   If the required tolerance cannot be met then the function will fail with
+   error PK_ERROR_tolerances_too_tight indicating that
+   a larger tolerance may allow a successful approximation.
+
+
+The returns are
+
+
+<B>'n_spcurves'</B>
+
+   Number of SP-curves produced
+
+
+<B>'spcurves'</B>
+
+   Array of SP-Curves of length n_spcurves.
+
+
+
+Ownership
+
+The ownership of the newly created SP_Curve(s) is determined by the ownership
+of <B>'surf'</B> as follows
+
+    |____________________|___________________|
+    | <B>'surf'</B> owner       | SP_Curve owner    |
+    |____________________|___________________|
+    | Partition          | Partition         |
+    | Assembly           | Assembly          |
+    | Body               | Body              |
+    | Face               | Body owning face  |
+    _____________________|___________________|
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,209 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_create_topology_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_create_topology_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_BODY_create_topology_2
+(
+<I>--- received arguments ---
+</I>int                                  n_topols,    --- number of topols
+const <A HREF=../headers/pk_class_t.html>PK_CLASS_t</A>                     classes[],   --- class of each topol
+int                                  n_relations, --- number of relations
+const int                            parents[],   --- parents
+const int                            children[],  --- children
+const <A HREF=../headers/pk_topol_sense_t.html>PK_TOPOL_sense_t</A>               senses[],    --- sense in which child
+                                                  --- is used by parent
+const <A HREF=../headers/pk_body_create_topology_2_o_t.html>PK_BODY_create_topology_2_o_t</A> *options,     --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_create_topology_2_r_t.html>PK_BODY_create_topology_2_r_t</A> *const creation     --- result
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates the topology of a general body.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_class             (MILD) bad class in <B>'classes'</B> array
+    PK_ERROR_bad_value             (MILD) a value in <B>'parents'</B> or <B>'children'</B>
+                                   array is not a valid index to <B>'classes'</B>
+                                   array
+    PK_ERROR_empty_body            (MILD) no PK_CLASS_body entry in classes
+                                   array
+    PK_ERROR_fragment              (MILD) there is a value in the <B>'classes'</B>
+                                   array, other than the body, that has no
+                                   parent
+
+
+<A NAME="documentation"></A>
+The array <B>'classes'</B> specifies the class of each topological entity.
+The allowed values are:
+
+    PK_CLASS_body
+    PK_CLASS_region
+    PK_CLASS_shell
+    PK_CLASS_face
+    PK_CLASS_loop
+    PK_CLASS_fin
+    PK_CLASS_edge
+    PK_CLASS_vertex
+
+Each topological entity is referred to by its index in this array.
+
+All of the body's regions, shells, faces, loops, edges and vertices must be
+present in the input.  It is optional whether fins are present.  The
+existence of a fin may be inferred from an edge being a child of a loop.
+
+The arrays <B>'parents'</B>, <B>'children'</B> and <B>'senses'</B> are all the same length which
+is <B>'n_relations'</B>.
+`parents[i]', `children[i]' and `senses[i]' define one relation between
+two topological entities.  The values put into <B>'parents'</B> and <B>'children'</B>
+are indices of the <B>'classes'</B> array.
+
+The following rules apply to the order of the relations:
+
+ - the child relations to a common parent need not be contiguous.
+
+ - edge or fin children of a loop must appear in order around the loop.
+
+ - vertex children of an edge must appear in the order of the direction of
+   the edge.
+
+ - loop or fin children of a non-manifold edge must appear in order around the
+   edge
+
+ - the first relation given between the body and a region must refer to
+   the body's outer region
+
+<B>'senses'</B> indicate the manner in which a child is used by its parent.  In
+relations in which sense matters it should be set to one of:
+    PK_TOPOL_sense_positive_c or
+    PK_TOPOL_sense_negative_c.
+In relations where sense does not matter it should be set to:
+    PK_TOPOL_sense_none_c.
+
+The relations in which sense matters are:
+  - region as child of body:
+    PK_TOPOL_sense_positive_c means region is solid and
+    PK_TOPOL_sense_negative_c means region is void
+  - face as child of shell:
+    PK_TOPOL_sense_positive_c means the face normal points to the interior of
+                              the shell and
+    PK_TOPOL_sense_negative_c means the face normal points away from the
+                              interior of the shell
+    As a special case, if a face is child of a shell twice, with each sense
+    then this may be expressed in a single relation with the sense set to
+    PK_TOPOL_sense_none_c
+  - an edge as a child of a fin or loop:
+    PK_TOPOL_sense_positive_c means the edge is in the same direction as the
+                              fin or loop
+    PK_TOPOL_sense_negative_c means the edge is in the opposite direction to
+                              the fin or loop
+  - a fin or loop as a child of an edge:
+    PK_TOPOL_sense_positive_c means the edge is in the same direction as the
+                              fin or loop
+    PK_TOPOL_sense_negative_c means the edge is in the opposite direction to
+                              the fin or loop
+
+
+The permitted classes and numbers of children and parents are as follows:
+
+--------------------------------------------------------------------
+Entity    Children      No. of children   Parents     No. of parents
+--------------------------------------------------------------------
+Body      Regions             &gt;=1           -             -
+Region    Shells              &gt;=1         Body            1
+Shell     Faces               &gt;=1         Region          1
+          Edges               &gt;=1
+          Vertex              1
+Face      Loops               &gt;=1         Shell           2
+Loop      Edges               &gt;=1         Face,Edge       &gt;=1
+          Fins                &gt;=1
+          Vertex              1
+Fin       Edge                1           Loop,Edge       &lt;=2
+Edge      Vertices            &lt;=2         Loop,Fin,Shell  1
+          Loop                &gt;=1
+          Fin                 &gt;=1
+Vertex    -                   0           Edge,Loop,Shell &gt;=1
+--------------------------------------------------------------------
+
+NB: - Each face must be used twice as a child, once with each sense (this
+      may be in the same shell).
+    - A loop must have either a number of edges (with senses) as children, or
+      a number of fins as children, or a single vertex; it cannot have any
+      mixture of edges, fins and vertices, or more than one vertex.
+    - a shell may contain a mixture of faces and edges (an edge which is the
+      child of a shell is a wireframe edge), but if the shell contains a vertex
+      then it must be a single vertex and the shell may not have any faces or
+      edges
+    - A vertex must have a number of edges as parents, or a number of loops
+      or a single shell.
+
+The application may indicate the expected body type in the options structure.
+If the given topology is the topology of a body of that type, then the returned
+body will be of that type, otherwise the returned body will be of type
+PK_BODY_type_general_c. If the expected body type is set to
+PK_BODY_type_unspecified_c then, if possible, PK_BODY_create_topology_2 will
+return a manifold body of the lowest dimension. If this is not possible the
+returned body will be of type PK_BODY_type_general_c.
+
+Success of the function is indicated by there being no PK error returned
+and by the return structure <B>'creation'</B> holding:
+
+ -  the created body in <B>'body'</B>
+ -  the entities corresponding to the entries in the <B>'classes'</B> array are
+    returned in the <B>'topols'</B> array.
+ -  the structure <B>'create_fault'</B> will hold the token PK_BODY_state_ok_c.
+ -  if an expected body type had been specified but a body of this type could
+    not be created the structure <B>'create_fault'</B> will hold the token
+    PK_BODY_state_ok_but_alt_type_c to indicate this.
+
+If the creation is unsuccessful but no PK error is returned then the following
+is true regarding the return structure <B>'creation'</B>:
+
+ -  no body is returned in <B>'body'</B>.
+ -  <B>'topols'</B> is empty.
+ -  the fault structure <B>'create_fault'</B> is filled in. For each detected fault
+    the return structure holds one <A HREF=../headers/pk_check_state_t.html>PK_check_state_t</A> fault token and, if
+    possible, the indices (of the <B>'classes'</B> array) of the offending
+    topologies. If the body that PK_BODY_create_topology_2 attempted to
+    construct had more than than one fault then the function does not
+    guarantee to return all the faults.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

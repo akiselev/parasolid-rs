@@ -1,0 +1,97 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TOPOL_ask_entities_by_attdef</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TOPOL_ask_entities_by_attdef</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_TOPOL_ask_entities_by_attdef
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>          topol,          --- topological entity
+<A HREF=../headers/pk_class_t.html>PK_CLASS_t</A>          class,          --- class of requested entities
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>        have_attrib,    --- whether entities have an attribute
+<A HREF=../headers/pk_attdef_t.html>PK_ATTDEF_t</A>         attdef,         --- attribute definition
+                                    --- ( may be PK_ENTITY_null )
+
+<I>--- returned arguments ---
+</I>int          *const n_entities,     --- number of entities ( &gt;= 0 )
+<A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A> **const entities        --- entities ( optional )
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns the set of <B>'entities'</B> of the given <B>'class'</B> which belong
+to <B>'topol'</B> and either do or do not have an attribute of the given <B>'attdef'</B>,
+depending upon <B>'have_attrib'</B>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_wrong_entity       Topological entity not supported (MILD)
+    PK_ERROR_bad_class          Given class is invalid           (MILD)
+
+<A NAME="documentation"></A>
+At present <B>'topol'</B> is restricted to be of class PK_CLASS_body.
+
+The output array <B>'entities'</B> is optional.  If it is set to NULL, the function
+will only compute the number of entities.
+
+The function selects from all the entities belonging to the given <B>'topol'</B> by
+applying two filters:
+
+ - class:  all returned <B>'entities'</B> will belong to the given <B>'class'</B>.
+           <B>'class'</B> may be:
+
+           PK_CLASS_face
+           PK_CLASS_edge
+           PK_CLASS_vertex
+           PK_CLASS_region
+           PK_CLASS_lattice
+           PK_CLASS_surf    and all subclasses
+           PK_CLASS_curve   and all subclasses
+           PK_CLASS_point
+           PK_CLASS_group
+
+ - attdef: entities are also selected by whether or not they have particular
+           attributes.  <B>'attdef'</B> may be set to an existing attribute
+           definition, in which case selection is by whether or not an entity
+           has an attribute of that attribute definition, or it may be set to
+           PK_ENTITY_null, meaning an attribute of any attribute definition.
+           If <B>'have_attrib'</B> is set to PK_LOGICAL_true then selected entities
+           will have an attribute as specified by <B>'attdef'</B>.  If <B>'have_attrib'</B>
+           is set to PK_LOGICAL_false then selected entities will not have
+           an attribute as specified by <B>'attdef'</B>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

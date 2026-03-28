@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SESSION_is_in_kernel_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SESSION_is_in_kernel_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_SESSION_is_in_kernel_2
+(
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> *const is_in_kernel,   --- whether called from within the kernel
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> *const is_protected,   --- whether called from protected region
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> *const is_subthread    --- whether called from internal thread
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns whether it has been called from within the kernel or
+from outside the kernel.
+</I>
+<A NAME="documentation"></A>
+This function may be called at any time.  Being only inside this function does
+not constitute being inside the kernel.  The argument <B>'is_protected'</B> returns
+whether kernel code being executed, if any, may change the model.  The
+argument <B>'is_subthread'</B> returns whether the kernel is executing in an
+internal Parasolid thread rather than that of the application (see
+<A HREF=../headers/pk_session_set_smp.html>PK_SESSION_set_smp</A>).
+
+The action required for error recovery is indicated in the following table:
+
+  <B>'is_in_kernel'</B>    <B>'is_protected'</B>
+  --------------    --------------
+
+ PK_LOGICAL_false  PK_LOGICAL_false    execution is not within Parasolid.
+                                       No action required.
+
+ PK_LOGICAL_true   PK_LOGICAL_false    execution is within a lightweight PK
+                                       function, or an unprotected part of
+                                       a heavyweight PK function.
+                                       <A HREF=../headers/pk_session_tidy.html>PK_SESSION_tidy</A> should be called.
+
+ PK_LOGICAL_true   PK_LOGICAL_true     execution is within the protected part
+                                       of a heavyweight PK function or within
+                                       a KI function.
+                                       If <B>'is_subthread'</B> is PK_LOGICAL_true,
+                                       the application must not longjump and
+                                       must call <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A>. The main
+                                       application may call <A HREF=../headers/pk_session_tidy.html>PK_SESSION_tidy</A>
+                                       when it regains control.
+                                       If <B>'is_subthread'</B> is PK_LOGICAL_false,
+                                       both <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A> and
+                                       <A HREF=../headers/pk_session_tidy.html>PK_SESSION_tidy</A> should be called.
+                                       In either case, rollback must be used
+                                       to regain a valid model state.
+
+ PK_LOGICAL_false  PK_LOGICAL_true     Protection mechanism is corrupt or the
+                                       kernel interface has been by-passed.
+                                       <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A> may recover from this
+                                       condition.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

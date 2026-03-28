@@ -1,0 +1,578 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Application Support</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Application Support</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.15.html">Displaying Data</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.17.html">Writing Parasolid Applications</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-353333">15.1	Introduction</A>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-274986">15.2	Attaching attribute information</A>
+<UL>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-275006">15.2.1	Attribute definitions</A>
+<UL>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-275028">15.2.1.1	System-defined attributes</A>
+</UL>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-281860">15.2.2	Using attributes</A>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-281458">15.2.3	Attribute behaviour</A>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-282329">15.2.4	Specifying your own attribute behaviours</A>
+</UL>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-275072">15.3	Partitions and roll-back</A>
+<UL>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-275073">15.3.1	Concepts</A>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-275074">15.3.2	Partition-level roll-back</A>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-275075">15.3.3	Session-level roll-back</A>
+</UL>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-284396">15.4	Groups</A>
+<UL>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-284404">15.4.1	Characteristics of groups</A>
+</UL>
+<LI> <A HREF="ov_chap.16.html#50446385_pgfId-276350">15.5	Tracking entities</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446385_pgfId-353333"></A>15.1	<A NAME="50446385_marker-353332"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446385_pgfId-353337"></A>Any Parasolid-powered application needs to provide functionality to the user that extends beyond core modelling operations. Although you could develop much of this functionality from scratch yourself, having built-in support from Parasolid makes the task easier, and provides better and more reliable performance to the user. In recognition of this, Parasolid provides tools to help you implement functionality in a range of key non-modelling areas. This chapter describes the most important of these.</P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-283619"></A><A HREF="ov_chap.16.html#50446385_22337">Section 15.2, &#8220;Attaching attribute information&#8221;</A>, explains Parasolid&#8217;s support for attaching arbitrary information to modelling entities that is either provided by the user or by your application.</LI>
+<LI>
+<A NAME="50446385_pgfId-283629"></A><A HREF="ov_chap.16.html#50446385_81921">Section 15.3, &#8220;Partitions and roll-back&#8221;</A>, describes features that can be used to let your users undo and redo operations, and recover elegantly from errors.</LI>
+<LI>
+<A NAME="50446385_pgfId-284423"></A><A HREF="ov_chap.16.html#50446385_75817">Section 15.4, &#8220;Groups&#8221;</A>, explains how you can create collections of associated entities for further processing by your application.</LI>
+<LI>
+<A NAME="50446385_pgfId-283634"></A><A HREF="ov_chap.16.html#50446385_71012">Section 15.5, &#8220;Tracking entities&#8221;</A>, describes the information recorded by Parasolid during a session that you can use to provide feedback in your application.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446385_pgfId-274986"></A>15.2	<A NAME="50446385_22337"></A><A NAME="50446385_marker-298619"></A><A NAME="50446385_marker-298525"></A>Attaching attribute information
+
+
+</H1>
+<P>
+<A NAME="50446385_pgfId-280750"></A><EM>
+Attributes</EM><A NAME="50446385_marker-280749"></A><A NAME="50446385_marker-298466"></A> are data structures that can be attached to Parasolid entities to supplement the standard data structure defined by Parasolid. Your application can use attributes to store arbitrary information that is associated with the entity to which it is attached. This is a convenient way of representing information such as constraints, manufacturing data, analysis data, references to entities in application data structures, and so on. Any of the following types of information can be stored in an attribute:<A NAME="50446385_marker-298970"></A></P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-284224"></A>real</LI>
+<LI>
+<A NAME="50446385_pgfId-284228"></A>integer</LI>
+<LI>
+<A NAME="50446385_pgfId-284229"></A>string</LI>
+<LI>
+<A NAME="50446385_pgfId-284230"></A>Unicode string</LI>
+<LI>
+<A NAME="50446385_pgfId-284231"></A>vector</LI>
+<LI>
+<A NAME="50446385_pgfId-284266"></A>coordinate</LI>
+<LI>
+<A NAME="50446385_pgfId-284267"></A>direction</LI>
+<LI>
+<A NAME="50446385_pgfId-284268"></A>axis</LI>
+<LI>
+<A NAME="50446385_pgfId-284269"></A>pointer</LI>
+</UL>
+<P>
+<A NAME="50446385_pgfId-280631"></A>Attributes can be attached to any of Parasolid&#8217;s geometry and topology types. Once attached to a Parasolid entity, an attribute remains attached until either the entity is deleted or the attribute is deleted. When a Parasolid model is archived, any attributes attached to it are also archived.</P>
+<P>
+<A NAME="50446385_pgfId-280632"></A>Attributes are useful in almost any Parasolid-powered application. At the simplest level, they can be used to store information such as colour, or notes written by a user. They are a particularly powerful feature when used in concurrent engineering systems where the Parasolid model is the basic building block of a complex product definition model.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446385_pgfId-275006"></A>	15.2.1 	<A NAME="50446385_marker-298442"></A><A NAME="50446385_marker-298657"></A><A NAME="50446385_marker-298623"></A>Attribute definitions</H2>
+<P>
+<A NAME="50446385_pgfId-281139"></A>An application can have many different types of attributes at its disposal. The structure of each type (in terms of the type of data it can hold, where it can be used and so on) must be clearly defined using an <EM>
+attribute definition</EM>. Each attribute definition records information such as: </P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-280922"></A>The attribute <EM>
+class</EM><A NAME="50446385_marker-298470"></A><A NAME="50446385_marker-298535"></A>, which defines the attribute&#8217;s behaviour when the entity to which it is attached is involved in modelling operations</LI>
+<LI>
+<A NAME="50446385_pgfId-280923"></A>The types of entity to which the attribute may be attached</LI>
+<LI>
+<A NAME="50446385_pgfId-280924"></A>The order and types of attribute <EM>
+fields</EM><A NAME="50446385_marker-298472"></A><A NAME="50446385_marker-298659"></A><A NAME="50446385_marker-298631"></A> in which data is held</LI>
+</UL>
+<P>
+<A NAME="50446385_pgfId-275187"></A>Your application can create as many different attribute definitions as required. Once an attribute definition has been created, attributes of that type can be attached to entities.</P>
+
+<H4>
+<A NAME="50446385_pgfId-275028"></A>15.2.1.1 <A NAME="50446385_marker-298444"></A><A NAME="50446385_marker-298605"></A>System-defined attributes</H4>
+<P>
+<A NAME="50446385_pgfId-281451"></A>As well as specifying your own attribute definitions for use in your application. Parasolid comes pre-defined with a number of attribute types, known as <EM>
+system-defined attributes</EM><A NAME="50446385_marker-298474"></A><A NAME="50446385_marker-298607"></A>. These attribute types are used by Parasolid itself (for example, mass properties<A NAME="50446385_marker-299004"></A> calculations use attributes that hold density information), and so should not be redefined in any way, but you are free to use them in your application, if you wish. </P>
+<P>
+<A NAME="50446385_pgfId-281469"></A>The system defined attributes provided by Parasolid include:</P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-281508"></A>Colour<A NAME="50446385_marker-299011"></A><A NAME="50446385_marker-299316"></A></LI>
+<LI>
+<A NAME="50446385_pgfId-281528"></A>Density of various topological entities<A NAME="50446385_marker-299018"></A><A NAME="50446385_marker-299320"></A></LI>
+<LI>
+<A NAME="50446385_pgfId-281537"></A><A NAME="50446385_marker-299022"></A><A NAME="50446385_marker-299328"></A>Transparency, <A NAME="50446385_marker-299028"></A><A NAME="50446385_marker-299326"></A>translucency and <A NAME="50446385_marker-299034"></A><A NAME="50446385_marker-299324"></A>reflectivity</LI>
+<LI>
+<A NAME="50446385_pgfId-281546"></A><A NAME="50446385_marker-299038"></A><A NAME="50446385_marker-299322"></A>Planar, radial and parametric hatching</LI>
+</UL>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446385_pgfId-281860"></A>	15.2.2 	<A NAME="50446385_marker-298446"></A><A NAME="50446385_marker-298609"></A>Using attributes</H2>
+<P>
+<A NAME="50446385_pgfId-281881"></A>Parasolid provides a comprehensive range of operations for creating and managing attributes and attribute definitions. You can create attributes, attach them to entities, add information to them, retrieve information from them and delete them. </P>
+<P>
+<A NAME="50446385_pgfId-281905"></A>Parasolid also offers higher level attribute management functions, allowing you, for example, to filter attribute information so as to retrieve all attributes on a part based on some property of the attribute, such as its class or a specific value in one of its fields.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446385_pgfId-281458"></A>	15.2.3 	<A NAME="50446385_63104"></A><A NAME="50446385_marker-298448"></A>Attribute behaviour</H2>
+<P>
+<A NAME="50446385_pgfId-275318"></A>The class of an attribute definition indicates what happens to an attribute of that type when its owning entity is involved in a modelling operation. For example, if a face has an attached attribute, and that face is split into two as a result of imprinting an edge, what happens to the attribute? Under different circumstances, the attribute may be deleted, remain on the original face, or (as shown in <A HREF="ov_chap.16.html#50446385_28263"><EM>
+Figure 15-1</EM></A>) be copied so that it exists on both faces, depending on the class of its attribute definition and the nature of the event.</P>
+<P>
+<A NAME="50446385_pgfId-406955"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-175.gif">
+
+<P>
+<A NAME="50446385_pgfId-283337"></A>Figure 15-1 <A NAME="50446385_28263"></A>Attribute behaviour when entities are modeled</P>
+<P>
+<A NAME="50446385_pgfId-282298"></A>Parasolid uses an attribute definition&#8217;s class to specify how to process attributes when their owning entities are involved in a modelling operation that cause any of the events shown below:</P>
+<P>
+<A NAME="50446385_pgfId-282328"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282301"></A>Event</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282303"></A>Behaviour</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282305"></A><A NAME="50446385_marker-282574"></A><A NAME="50446385_marker-282575"></A>Transform</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282523"></A>An entity may be transformed via any of reflection, rotation, translation or scaling. Each type of transformation may independently be applied to, have no effect on, or delete an attribute attached to a transformed entity, depending on the class. <A NAME="50446385_marker-299051"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282309"></A><A NAME="50446385_marker-282566"></A><A NAME="50446385_marker-282567"></A>Split</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282558"></A>A topological entity may be split into two or more entities of the same type. For example, a face may be split by a boolean, scribing, or a local operation. When an entity is split, each attribute can be either deleted or propagated to all resulting entities, depending on the class.<A NAME="50446385_marker-299058"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282313"></A><A NAME="50446385_marker-282609"></A><A NAME="50446385_marker-282610"></A>Merge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282625"></A>Two topological entities of the same type may be merged to form one. Attributes on those entities may be kept if they are equal and deleted if they are not equal. Alternatively, they may simply be deleted regardless of the data they contain.<A NAME="50446385_marker-299065"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282317"></A><A NAME="50446385_marker-282617"></A><A NAME="50446385_marker-282618"></A>Transfer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282648"></A>An entity may be transferred between, into or out of parts. For example, shells, faces and loops may be transferred between bodies during a boolean. Attributes attached to such entities may be deleted or left as they are, depending on the class.<A NAME="50446385_marker-299072"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282321"></A><A NAME="50446385_marker-282681"></A><A NAME="50446385_marker-282682"></A><A NAME="50446385_marker-282683"></A><A NAME="50446385_marker-282684"></A>Create/Delete</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282717"></A>When creating an entity, either with a direct call to a Parasolid creation function, or as an effect of a modelling operation such as a boolean, the entity has no attributes. When an entity is deleted, so are its attributes.<A NAME="50446385_marker-299079"></A><A NAME="50446385_marker-299318"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282325"></A><A NAME="50446385_marker-282691"></A><A NAME="50446385_marker-282692"></A>Change</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446385_pgfId-282759"></A>An entity may be changed in some other way that is not expressible in terms of the above events, though may be induced by one of them. For example, reflecting a body induces a change of handedness (what was on the left is now on the right) on all topological relationships between entities in the body. To allow for this, Parasolid supports a general change event, which may delete associated attributes or alternatively have no effect on them, depending on the class.<A NAME="50446385_marker-299086"></A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446385_pgfId-283255"></A>The Parasolid documentation suite contains a full list of all the attribute definition classes available, and the effect on attributes of those classes whose owning entities undergo any of these events.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446385_pgfId-282329"></A>	15.2.4 	<A NAME="50446385_62031"></A><A NAME="50446385_marker-298450"></A><A NAME="50446385_marker-298579"></A><A NAME="50446385_marker-298577"></A>Specifying your own attribute behaviours</H2>
+<P>
+<A NAME="50446385_pgfId-281552"></A>Instead of relying on Parasolid&#8217;s normal attribute processing behaviour, you can specify your own by defining <EM>
+attribute callback functions</EM><A NAME="50446385_marker-298476"></A><A NAME="50446385_marker-298603"></A>. These let you provide your application with attribute processing behaviour that is more specifically tailored to your requirements than that available using Parasolid&#8217;s normal attribute handling. </P>
+<P>
+<A NAME="50446385_pgfId-281688"></A>You associate a callback function with a specific attribute definition, for a particular event. When the owning entity of an attribute of that type undergoes the event, the callback function is called. The events for which you can define callback functions are:</P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-281553"></A>split</LI>
+<LI>
+<A NAME="50446385_pgfId-281554"></A>merge</LI>
+<LI>
+<A NAME="50446385_pgfId-281555"></A>delete</LI>
+<LI>
+<A NAME="50446385_pgfId-281556"></A>copy</LI>
+<LI>
+<A NAME="50446385_pgfId-281557"></A>transmit</LI>
+<LI>
+<A NAME="50446385_pgfId-281558"></A>receive</LI>
+</UL>
+<P>
+<A NAME="50446385_pgfId-281560"></A>There are two types of callback function:</P>
+
+<H4>
+<A NAME="50446385_pgfId-281564"></A><A NAME="50446385_marker-299108"></A><A NAME="50446385_marker-281561"></A><A NAME="50446385_marker-281562"></A>Normal <A NAME="50446385_marker-281563"></A>callbacks</H4>
+<P>
+<A NAME="50446385_pgfId-281565"></A>These functions can modify and enquire about the attributes or other parts of a model as necessary. When a normal callback is invoked, the action it carries out replaces Parasolid&#8217;s normal attribute processing (as described in <A HREF="ov_chap.16.html#50446385_63104">Section 15.2.3</A>).</P>
+
+
+<H4>
+<A NAME="50446385_pgfId-281570"></A><A NAME="50446385_marker-299112"></A>Read-only <A NAME="50446385_marker-281569"></A>callbacks</H4>
+<P>
+<A NAME="50446385_pgfId-281571"></A>These functions cannot modify the attributes or other parts of a model in any way. After a call to a read-only callback returns, Parasolid processes the attributes according to their class, in the usual way (as described in <A HREF="ov_chap.16.html#50446385_63104">Section 15.2.3</A>).</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446385_pgfId-275072"></A>15.3	<A NAME="50446385_81921"></A><A NAME="50446385_marker-298452"></A><A NAME="50446385_marker-298661"></A><A NAME="50446385_marker-298641"></A><A NAME="50446385_marker-298521"></A><A NAME="50446385_marker-298663"></A><A NAME="50446385_marker-298643"></A>Partitions and roll-back
+
+
+</H1>
+<P>
+<A NAME="50446385_pgfId-276673"></A>All but the most trivial applications should be able to undo user operations and return the application to the state it was in at some previous point in time. This is especially true of design environments, where users are likely to want to try out different ideas and experiment with tools and techniques. In addition, users expect sophisticated error recovery, and this requires an application to be able to return an entire session to a previously known stable state.</P>
+<P>
+<A NAME="50446385_pgfId-277666"></A>Parasolid addresses both these needs using a facility that is known generically as <EM>
+roll-back</EM><A NAME="50446385_marker-298478"></A><A NAME="50446385_marker-298665"></A><A NAME="50446385_marker-298645"></A>. There are different forms of roll-back, which between them provide comprehensive support for each of the situations mentioned above.</P>
+<P>
+<A NAME="50446385_pgfId-276735"></A>If you take advantage of Parasolid&#8217;s roll-back functionality, there are many ways that you might choose to make this available to the user. For example:</P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-276738"></A><A NAME="50446385_marker-276736"></A><A NAME="50446385_marker-276737"></A>To automatically revert to a stable state after any failed operation.</LI>
+<LI>
+<A NAME="50446385_pgfId-283982"></A>To recover and save data in the event of an emergency (such as a system crash).</LI>
+<LI>
+<A NAME="50446385_pgfId-283963"></A>As a simple, one-step undo facility to be called by the user.</LI>
+<LI>
+<A NAME="50446385_pgfId-276740"></A><A NAME="50446385_marker-276739"></A>To mark the major milestones in the design history of a part within a feature modelling environment (to enable sophisticated user-controlled undo and redo facilities, and the implementation of history trees).</LI>
+</UL>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446385_pgfId-275073"></A>	15.3.1 	<A NAME="50446385_64742"></A><A NAME="50446385_marker-298454"></A><A NAME="50446385_marker-298559"></A>Concepts</H2>
+<P>
+<A NAME="50446385_pgfId-284295"></A>A <EM>
+partition</EM><A NAME="50446385_marker-298480"></A> is a self-contained collection of bodies that can be manipulated independently of other bodies. At any one time, many different partitions may exist. Parasolid provides two different types of partition:</P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-335383"></A>Standard partitions contain the information required for sophisticated undo and redo facilities, together with history management.</LI>
+<LI>
+<A NAME="50446385_pgfId-335387"></A>Light partitions contain just the information required to implement undo functionality, thereby requiring significantly less memory overheads.</LI>
+</UL>
+<P>
+<A NAME="50446385_pgfId-284303"></A>A <EM>
+session</EM><A NAME="50446385_marker-298482"></A> is the collection of all partitions. There can only ever be a single Parasolid session open at any one time; each time a new session is started, a single partition is created automatically.</P>
+<P>
+<A NAME="50446385_pgfId-276842"></A><A NAME="50446385_marker-276837"></A><A NAME="50446385_marker-276838"></A>Parasolid supports two types of roll-back, both of which are available through the same general mechanism. </P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-276846"></A><EM>
+Partition-level roll-back</EM><A NAME="50446385_marker-276844"></A><A NAME="50446385_marker-276845"></A><A NAME="50446385_marker-298484"></A><A NAME="50446385_marker-298555"></A><A NAME="50446385_marker-298667"></A><A NAME="50446385_marker-298647"></A> allows your application to roll an individual <A NAME="50446385_marker-276847"></A><A NAME="50446385_marker-276848"></A>partition back or forward independently of other partitions. </LI>
+<LI>
+<A NAME="50446385_pgfId-277471"></A><EM>
+Session-level roll-back</EM><A NAME="50446385_marker-298486"></A><A NAME="50446385_marker-298567"></A> allows your application to roll the contents of the entire session back or forward, including all partitions in the session.</LI>
+</UL>
+<P>
+<A NAME="50446385_pgfId-277975"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50446385_pgfId-278084"></A>Note: For its roll-back mechanisms, Parasolid uses terminology familiar to database users: <EM>
+rolling back </EM><A NAME="50446385_marker-298488"></A>refers to returning to an earlier state in the session or partition (i.e. undo), and <EM>
+rolling forward</EM><A NAME="50446385_marker-298563"></A> refers to moving to a later state in the session or partition (i.e. redo). </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446385_pgfId-278073"></A>Partition-level and session-level roll-back both work by employing a system of marks. Rather like tying knots in a piece of string, your application can save marks at significant points in either the modelling session or the current partition. At any point, you can move to one of these marks, thereby restoring the session or partition status, as appropriate.</P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-278049"></A>Marks in a session are referred to as <EM>
+session marks</EM><A NAME="50446385_marker-298492"></A><A NAME="50446385_marker-298575"></A> (or sometimes just marks).</LI>
+<LI>
+<A NAME="50446385_pgfId-278056"></A>Marks in a partition are referred to as <EM>
+partition marks</EM><A NAME="50446385_marker-298494"></A><A NAME="50446385_marker-298557"></A> (or p-marks).</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446385_pgfId-275074"></A>	15.3.2 	<A NAME="50446385_marker-298456"></A><A NAME="50446385_marker-298551"></A>Partition-level roll-back</H2>
+<P>
+<A NAME="50446385_pgfId-278155"></A>Partition-level roll-back can be used primarily as a means of providing your application with undo and redo functionality, allowing your users to move back and forth in a history tree of modelling operations. Depending on the amount of p-mark data your application maintains, this functionality can be as sophisticated at the user level as you require it to be: anything from a simple one-step undo facility to a complete implementation of a comprehensive history tree.</P>
+<P>
+<A NAME="50446385_pgfId-280557"></A>Partition-level roll-back is also crucial for enabling feature modelling applications to perform model updates after model parameters are changed: a feature modeler needs to roll back a model to the point where a feature was added, reapply the modified feature, and then reapply subsequent features to generate the updated model. </P>
+<P>
+<A NAME="50446385_pgfId-280606"></A>Individual bodies or collections of bodies can be rolled back independently, so updating one model in a session does not affect other models. Branching roll-back of bodies - several alternative updates to a given body - can also be implemented.</P>
+<P>
+<A NAME="50446385_pgfId-277943"></A>In the context of partition-level roll-back, a <EM>
+partition</EM><A NAME="50446385_marker-298496"></A> is a simply a self-contained collection of bodies which can be rolled back and forward independently of other partitions. When a Parasolid session is started, a single partition is created automatically. Your application can create additional partitions when required, so that a given Parasolid session may eventually contain many partitions. </P>
+<P>
+<A NAME="50446385_pgfId-284054"></A>You can use partitions to collect together bodies in any way you wish. For example, you may decide that each <A NAME="50446385_marker-284055"></A><A NAME="50446385_marker-284056"></A>partition in a session should contain only one part. Adding partition-level roll-back to your application would then mean that your users could make changes to individual parts and roll those changes back or forward independently of other parts in the session. </P>
+<P>
+<A NAME="50446385_pgfId-278167"></A><A NAME="50446385_marker-299190"></A>Only one partition can be <EM>
+current</EM> (that is, in use) at any time. As the Parasolid session progresses, your application should create p-marks in the current partition, thereby creating a series of checkpoints in the history tree that can potentially be rolled back to later in the session.</P>
+<P>
+<A NAME="50446385_pgfId-278171"></A>If new entities are created that do not reference existing entities, they are automatically placed in the current partition. </P>
+<P>
+<A NAME="50446385_pgfId-353449"></A>Parasolid provides a full range of functionality to let you manage the partitions in a session, including the ability to:</P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-353450"></A>Create, delete, copy, and merge together partitions. </LI>
+<LI>
+<A NAME="50446385_pgfId-353472"></A>Roll between any two partition marks.</LI>
+<LI>
+<A NAME="50446385_pgfId-353451"></A>Receive and transmit partitions. </LI>
+<LI>
+<A NAME="50446385_pgfId-353413"></A>Return information about the different entities in a partition.</LI>
+<LI>
+<A NAME="50446385_pgfId-353426"></A>Perform &#8220;what-if&#8221; calculations, to find which entities would be created, deleted, or modified when rolling between different points in a session. </LI>
+</UL>
+<P>
+<A NAME="50446385_pgfId-279658"></A><A HREF="ov_chap.16.html#50446385_65008"><EM>
+Figure 15-2</EM></A> shows an example of how you might implement partition-level roll-back and present it to the user. The figure illustrates a number of stages in the creation of a part, showing the different design decisions that the user has gone through, and how your application can use partition-level roll-back to support those design decisions:</P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-279793"></A>First, the user creates a block. After the operation has completed, your application creates a p-mark: pm0</LI>
+<LI>
+<A NAME="50446385_pgfId-279849"></A>Next, the user adds a boss to this block. Your application then creates pm1.</LI>
+<LI>
+<A NAME="50446385_pgfId-279876"></A>Then the user adds a cliff-edge blend around the boss. Your application creates pm2.</LI>
+<LI>
+<A NAME="50446385_pgfId-279929"></A>At this point, the user decides that one edge of the block should have been blended before the boss was applied, and uses the history facility that is available in your application to go back to the initial stage. To achieve, this, your application rolls the partition back to pm0.</LI>
+<LI>
+<A NAME="50446385_pgfId-280114"></A>The user adds an edge blend to the block. Your application creates pm3.</LI>
+<LI>
+<A NAME="50446385_pgfId-280141"></A>The user adds the same boss to the block that was added earlier. Your application creates pm4.</LI>
+<LI>
+<A NAME="50446385_pgfId-280194"></A>The user then adds a blend around the boss, this time opting to let the blend overflow into the blend created earlier. Your application creates pm5.</LI>
+<LI>
+<A NAME="50446385_pgfId-280247"></A>The user decides that this blend is not what was desired and goes back a stage. Your application rolls back to pm4. </LI>
+<LI>
+<A NAME="50446385_pgfId-280300"></A>Finally, the user adds a cliff-edge blend around the boss. Your application creates pm6.</LI>
+</UL>
+<P>
+<A NAME="50446385_pgfId-280353"></A>At this stage, Parasolid can potentially roll between any of the partition marks already created (unless your application has explicitly tidied up some of the p-mark data along the way). Depending on the history facility you have implemented in your application, this can give the user the potential to jump to any stage in the design process at will.</P>
+<P>
+<A NAME="50446385_pgfId-407007"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-176.gif">
+
+<P>
+<A NAME="50446385_pgfId-279601"></A>Figure 15-2 <A NAME="50446385_65008"></A>An example of partition-level roll-back in use</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446385_pgfId-275075"></A>	15.3.3 	<A NAME="50446385_marker-298458"></A><A NAME="50446385_marker-298571"></A>Session-level roll-back</H2>
+<P>
+<A NAME="50446385_pgfId-277441"></A>In addition to partition-level roll-back, session-level roll-back lets you roll back the contents of an entire session, including partitions, session parameters and modelling parameters. Session-level roll-back can be used as part of an error handling strategy for your application, giving you the ability to return the session to a stable state whenever an operation fails.</P>
+<P>
+<A NAME="50446385_pgfId-277125"></A><A NAME="50446385_marker-277123"></A><A NAME="50446385_marker-277124"></A>The session-level equivalent of a p-mark is a <EM>
+session mark</EM><A NAME="50446385_marker-298500"></A><A NAME="50446385_marker-298573"></A>. These record the state of the entire session and, as with p-marks, you can return the session to any recorded session mark. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446385_pgfId-284396"></A>15.4	<A NAME="50446385_75817"></A><A NAME="50446385_marker-298460"></A>Groups
+
+
+</H1>
+<P>
+<A NAME="50446385_pgfId-284397"></A>Groups are used to collect entities together so that they can be modelled as if they were a single entity. For example, you can put all the faces of a particular feature, such as a boss, into a group. You can use groups to supplement the Parasolid data structure to suit your application. Parasolid groups enable form feature applications and constraints managed applications to be easily developed. The way you use this functionality depends upon your specific requirements.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446385_pgfId-284404"></A>	15.4.1 	<A NAME="50446385_marker-298462"></A><A NAME="50446385_marker-298543"></A>Characteristics of groups</H2>
+<P>
+<A NAME="50446385_pgfId-284405"></A>Each group is owned by a specific part and can only contain entities that belong to that part. In addition, each group has a specified class that determines the classes of entities that can be added to the group. You can use the group class to prevent inappropriate entities being added to a group.</P>
+<P>
+<A NAME="50446385_pgfId-284406"></A>A given body or assembly can have any number of groups, which can be of the same or different classes. Similarly, a given entity can be added to any number of valid groups, as determined by the group class. </P>
+<P>
+<A NAME="50446385_pgfId-284410"></A>Parasolid tracks and updates entities in groups during modelling operations. A documented set of rules determines how group membership is affected if any entity within a group is merged with other entities, split or deleted.In addition, Parasolid lets you define rules based on certain criteria to enable you to intelligently manage the number of groups defined on a part, for example by automatically deleting groups when they are empty.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446385_pgfId-276350"></A>15.5	<A NAME="50446385_71012"></A><A NAME="50446385_marker-298464"></A><A NAME="50446385_marker-298585"></A>Tracking entities
+
+
+</H1>
+<P>
+<A NAME="50446385_pgfId-276513"></A>Keeping track of changes to entities during a modelling session is an important factor for most 3D modelling applications. When new entities are created as a result of a modelling operation, your application may need to keep a record of how that entity came into being. Tracking entities is particularly important in any feature-based system. Likewise, an application may need to track entities in order to update graphical display information. </P>
+<P>
+<A NAME="50446385_pgfId-276378"></A>Parasolid offers a number of different ways that you can track activity during a modelling session. Which of these you use (or which combination of them you use) depends almost entirely on what information you need to track.</P>
+<UL>
+<LI>
+<A NAME="50446385_pgfId-276351"></A>Parasolid functions return generic <EM>
+tracking structures</EM><A NAME="50446385_marker-298502"></A><A NAME="50446385_marker-298587"></A><A NAME="50446385_marker-298669"></A><A NAME="50446385_marker-298651"></A> that match topological entities in the original body with the corresponding topological entities in the result body, together with the type of operation that was performed on the original entities.</LI>
+<LI>
+<A NAME="50446385_pgfId-276352"></A>If you have very specific requirements, you can also record tracking information yourself by attaching attributes to entities as you progress through a session. See <A HREF="ov_chap.16.html#50446385_22337">Section 15.2, &#8220;Attaching attribute information&#8221;</A>, for more information.</LI>
+<LI>
+<A NAME="50446385_pgfId-276353"></A>If preferred, you can automate information tracking via attributes by defining attribute callbacks that are called automatically when particular modelling operations occur. See <A HREF="ov_chap.16.html#50446385_62031">Section 15.2.4, &#8220;Specifying your own attribute behaviours&#8221;</A>, for more information.</LI>
+<LI>
+<A NAME="50446385_pgfId-284426"></A>If necessary, you can use groups in conjunction with entity tracking. See <A HREF="ov_chap.16.html#50446385_75817">Section 15.4, &#8220;Groups&#8221;</A>. </LI>
+<LI>
+<A NAME="50446385_pgfId-347343"></A>When working with partitions, you can track entities created, deleted, or modified prior to creating a p-mark. </LI>
+<LI>
+<A NAME="50446385_pgfId-276354"></A>Finally, the Parasolid <EM>
+bulletin board</EM><A NAME="50446385_marker-298504"></A> is also available as an alternative method for tracking the changes that occur to entities during a modelling session.</LI>
+</UL>
+<P>
+<A NAME="50446385_pgfId-274871"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.15.html">Displaying Data</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.17.html">Writing Parasolid Applications</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

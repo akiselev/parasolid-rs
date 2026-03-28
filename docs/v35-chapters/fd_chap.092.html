@@ -1,0 +1,577 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Exporting Data</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Exporting Data</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.091.html">Importing Data</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.093.html">Introduction To Application Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-308617">91.1	Standard representations </A>
+<UL>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-390190">91.1.1	Surface related options </A>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-308671">91.1.2	SP-curve options </A>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-308698">91.1.3	Output related options </A>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-308718">91.1.4	Trimmed surfaces </A>
+<UL>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-394042">91.1.4.1	Gaps in SP-curve loops </A>
+</UL>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-310210">91.1.5	Concept of SP-curves </A>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-310229">91.1.6	Form of the SP-curve </A>
+</UL>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-302672">91.2			Controlling redundant topology </A>
+<LI> <A HREF="fd_chap.092.html#50422170_pgfId-302741">91.3	Splitting topology </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422170_pgfId-308617"></A>91.1	<A NAME="50422170_29871"></A>Standard representations 
+
+
+</H1>
+<P>
+<A NAME="50422170_pgfId-308618"></A>Standard Representations are ways of outputting geometric information in a standard way, for use in other applications. The information returned is intended only for output.</P>
+<P>
+<A NAME="50422170_pgfId-308632"></A><A NAME="50422170_marker-308629"></A><A NAME="50422170_marker-308630"></A><A NAME="50422170_marker-308631"></A><A HREF=../headers/pk_face_output_surf_trimmed.html>PK_FACE_output_surf_trimmed</A> provides a means of outputting a trimmed surface representation of a face. This is the part of the surface which represents the bounded surface region of the face. </P>
+<P>
+<A NAME="50422170_pgfId-360192"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422170_pgfId-459036"></A>Note: <A NAME="50422170_marker-459362"></A><A NAME="50422170_marker-459363"></A><A NAME="50422170_marker-459364"></A><A HREF=../headers/pk_face_output_surf_trimmed.html>PK_FACE_output_surf_trimmed</A> does not support facet geometry, however <A HREF=../headers/pk_mesh_make_surf_trimmed.html>PK_MESH_make_surf_trimmed</A> provides similar functionality for meshes. See <A HREF="fd_chap.085.html#50422162_44333">Section 84.5, “Creating classic geometry from a mesh”</A> for more information. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422170_pgfId-308633"></A>A trimmed surface represents a bounded region on a parameterised surface. It does this by representing the region's boundary curves in the parameter space of the surface. Hence such a representation of a face consists of representing its edge loops (excluding any wire or bi-wire edges) in the parameter space of the surface.</P>
+<P>
+<A NAME="50422170_pgfId-308635"></A><A NAME="50422170_marker-308634"></A>The curves used to trim the surface in parameter space are represented by a curve entity called an SP-curve (surface parameter (space) curve). SP-curves are defined with respect to the surface’s parameterisation. For the trimmed surface representation, the SP-curves are used to approximate the edges that bound the face.</P>
+<P>
+<A NAME="50422170_pgfId-308636"></A>There are various surface and SP-curve options in use with the outputting of a trimmed surface representation of a face, these options control the following:</P>
+
+<H3>
+<A NAME="50422170_pgfId-390190"></A>	91.1.1 	Surface related options </H3>
+<P>
+<A NAME="50422170_pgfId-308638"></A>The surface whose parameter space is to be used can either be the surface attached to the face, or a B-spline representation of that face.</P>
+<P>
+<A NAME="50422170_pgfId-308652"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308641"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308643"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308645"></A>trim_surf</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308647"></A>what surface to use, either the surface attached to the face (default), or a B-spline approximation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308649"></A>extend_surf</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308651"></A>whether or not to allow extension of the surface to fit SP-curves that stray outside (Default: PK_LOGICAL_true).</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422170_pgfId-308653"></A>When the surface to use is a B-spline approximation further options that can be set are:</P>
+<P>
+<A NAME="50422170_pgfId-390247"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308656"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308658"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308660"></A>surf_tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308662"></A>specifying a tolerance where the tolerance is the maximum distance between the B-spline and the surface it represents (Default: 0.00001).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308664"></A>cubic</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308666"></A>force output of B-spline of degree 3.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308668"></A>non_rational</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308670"></A>force output of non-rational B-spline</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422170_pgfId-308671"></A>	91.1.2 	SP-curve options </H3>
+<P>
+<A NAME="50422170_pgfId-308673"></A>These options are available for SP-curves which are to be constructed and they cover:</P>
+<P>
+<A NAME="50422170_pgfId-390301"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308676"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308678"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308680"></A>curve_tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308682"></A>specifying a tolerance which the SP-curve representations of the edges should satisfy (Default: 0.00001).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308684"></A>confine</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308686"></A>determines how the trimming loops are confined:</P>
+<UL>
+<LI>
+<A NAME="50422170_pgfId-308687"></A>PK_FACE_trim_confine_no_c: not confined to a single period, where the trimmed surface returned may have more than one outer boundary and the trimmed SP-curves in a loop may have gaps between them in parameter space where there are degeneracies; </LI>
+<LI>
+<A NAME="50422170_pgfId-308688"></A>PK_FACE_trim_confine_yes_c: confined to a single period, where the trimmed surface returned may have more than one outer boundary and the trimmed SP-curves in a loop may have gaps between them in parameter space where there are degeneracies;</LI>
+<LI>
+<A NAME="50422170_pgfId-308689"></A>PK_FACE_trim_confine_closed_c: confined to a single period, where the trimming loops are closed and without gaps in parameter space;</LI>
+<LI>
+<A NAME="50422170_pgfId-308690"></A>PK_FACE_trim_confine_periph_c: confined to a single period, where the trimming loops are closed and without gaps in parameter space and each trimmed surface has exactly one outer peripheral loop.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308695"></A>degen</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308697"></A>whether or not to in/exclude degeneracies, the default action is to not represent degeneracies except where the selected configuration option implies this.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422170_pgfId-308698"></A>	91.1.3 	Output related options </H3>
+<P>
+<A NAME="50422170_pgfId-308700"></A>These options relate to the quantity of data to be returned, they are:</P>
+<P>
+<A NAME="50422170_pgfId-349274"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308703"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308705"></A>Definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308707"></A>want_geoms</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308709"></A>whether geometry and bounding intervals associated with the SP-curves in the trimming loops is returned</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422170_pgfId-308711"></A>want_topols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-308713"></A>whether topology associated with the SP-curves in the trimming loops is returned</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422170_pgfId-308718"></A>	91.1.4 	<A NAME="50422170_marker-308716"></A><A NAME="50422170_marker-308717"></A>Trimmed surfaces </H3>
+<P>
+<A NAME="50422170_pgfId-308721"></A><A NAME="50422170_marker-308719"></A><A NAME="50422170_marker-308720"></A>A trimmed surface is essentially a subset of a complete surface. It is described by giving the whole surface along with a set of curves that describe the boundary of that part of the whole surface that it occupies, it is helpful to view these curves as curves along which the surface was trimmed in order to leave the area of interest.</P>
+<P>
+<A NAME="50422170_pgfId-308722"></A>The convention that Parasolid applies when deciding which side of the cut is the area that is to be retained is:</P>
+<UL>
+<LI>
+<A NAME="50422170_pgfId-308723"></A>When holding the surface with its normal upward and cutting from the start of the curve to its end, the area on the left of the cut is the area retained.</LI>
+</UL>
+<P>
+<A NAME="50422170_pgfId-308727"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422170_pgfId-308726"></A>Note: This definition refers to the surface, the face is on the left (with respect to the face normal) if, and only if, the surface and face senses are the same.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422170_pgfId-308728"></A>Because Parasolid is cutting in the surface the description of the trimming curves is best expressed in terms of where to go in the surface. For this reason the trimming curves are curves in the parameter space of the surface.</P>
+<P>
+<A NAME="50422170_pgfId-329661"></A>For example, consider the top of the following cube where the surface is an infinite plane, the outer boundary is a rectangle in parameter space and the hole is a circle in parameter space:</P>
+<P>
+<A NAME="50422170_pgfId-394128"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1121.gif">
+
+<P>
+<A NAME="50422170_pgfId-329662"></A>Figure 91-1 Trimming curves keeping the face on the left</P>
+<P>
+<A NAME="50422170_pgfId-308782"></A>As the trimming curves are in parameter space their shape need not correspond (directly) to that of the edges they represent. For example, consider the top of the following spun solid and its representation:</P>
+<P>
+<A NAME="50422170_pgfId-394201"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1122.gif">
+
+<P>
+<A NAME="50422170_pgfId-330085"></A>Figure 91-2 Representation of a spun solid</P>
+<P>
+<A NAME="50422170_pgfId-308829"></A>The shape of the SP-curves representing the boundaries of a face corresponds to how those boundaries would look if you painted constant parameter lines on the face, then took the face off, and stretched and ironed it flat so that all the constant parameter lines came out flat and evenly spaced as illustrated in <A HREF="fd_chap.092.html#50422170_65747"><EM>
+Figure 91-3</EM></A>.</P>
+<P>
+<A NAME="50422170_pgfId-394122"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1123.gif">
+
+<P>
+<A NAME="50422170_pgfId-330435"></A>Figure 91-3 <A NAME="50422170_65747"></A>Flattening a face without a parametric singularity</P>
+<P>
+<A NAME="50422170_pgfId-308888"></A>There are occasions when ironing out and pasting flat with an even spacing result isn't possible without doing an infinite amount of stretching. This happens when the parameterisation is bunched up to a point in one direction, at a parametric singularity. An example of this is at the N-pole of a sphere as illustrated in <A HREF="fd_chap.092.html#50422170_73084"><EM>
+Figure 91-4</EM></A></P>
+<P>
+<A NAME="50422170_pgfId-394323"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1124.gif">
+
+<P>
+<A NAME="50422170_pgfId-330813"></A>Figure 91-4 <A NAME="50422170_73084"></A>Flattening a face with a parametric singularity that requires an infinite stretch</P>
+<P>
+<A NAME="50422170_pgfId-308967"></A>In such cases, the trimming curves describing the boundaries may leave gaps as illustrated in <A HREF="fd_chap.092.html#50422170_37978"><EM>
+Figure 91-5</EM></A>.</P>
+<P>
+<A NAME="50422170_pgfId-394442"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1125.gif">
+
+<P>
+<A NAME="50422170_pgfId-331169"></A>Figure 91-5 <A NAME="50422170_37978"></A>Representation of a face with a parametric singularity that leaves a gap in the representation</P>
+<P>
+<A NAME="50422170_pgfId-309050"></A>Such descriptions with gaps in the boundaries are not always desirable. Options, PK_FACE_trim_confine_closed_c and PK_FACE_trim_confine_periph_c, when using <A HREF=../headers/pk_face_output_surf_trimmed.html>PK_FACE_output_surf_trimmed</A> are designed to make the trimming curves join up in the parameter space by adding extra trimming curves to fill in the ‘infinite stretch’ tear as illustrated in <A HREF="fd_chap.092.html#50422170_86423"><EM>
+Figure 91-6</EM></A>.</P>
+<P>
+<A NAME="50422170_pgfId-394559"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1126.gif">
+
+<P>
+<A NAME="50422170_pgfId-331518"></A>Figure 91-6 <A NAME="50422170_86423"></A>Closing the gap in the representation of a face with parametric singularity</P>
+<P>
+<A NAME="50422170_pgfId-394652"></A><A NAME="50422170_74195"></A>The same effect, as described in <A HREF="fd_chap.092.html#50422170_86423"><EM>
+Figure 91-6</EM></A> results when using the degeneracies option PK_FACE_trim_degen_yes_c. This option also represents the isolated parametric degeneracies.</P>
+<P>
+<A NAME="50422170_pgfId-309150"></A>Gaps can also appear in the boundary description in parameter space through the way periodicities are treated. Surfaces with periodicities can be viewed as flat surfaces glued along a seam line. The viewpoint requires the trimmed surface output to first cut the (sur)face along the seam and then proceed to iron it out flat. This process, however, cuts and opens out boundaries as well as the surface as illustrated in <A HREF="fd_chap.092.html#50422170_35352"><EM>
+Figure 91-7</EM></A>.</P>
+<P>
+<A NAME="50422170_pgfId-394666"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1127.gif">
+
+<P>
+<A NAME="50422170_pgfId-331874"></A>Figure 91-7 <A NAME="50422170_35352"></A>Cutting and opening boundaries as well as the surface (option PK_FACE_trim_confine_yes_c)</P>
+<P>
+<A NAME="50422170_pgfId-338016"></A>This view of periodic surfaces is optional when using the options PK_FACE_trim_confine_yes_c in <A HREF=../headers/pk_face_output_surf_trimmed.html>PK_FACE_output_surf_trimmed</A>. The alternative is to follow the boundaries as they cross the seam, in which case they are not confined to a single period of the parameter space, by using the option PK_FACE_trim_confine_no_c as illustrated in <A HREF="fd_chap.092.html#50422170_41110"><EM>
+Figure 91-8</EM></A>.</P>
+<P>
+<A NAME="50422170_pgfId-332419"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1128.gif">
+
+<P>
+<A NAME="50422170_pgfId-394783"></A>Figure 91-8 <A NAME="50422170_41110"></A>Following the boundaries as they cross the seamline (option PK_FACE_trim_confine_no_c)</P>
+<P>
+<A NAME="50422170_pgfId-309739"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422170_pgfId-309738"></A>Note: Even with this viewpoint, boundaries that wind around the surface in such a way that you can’t shrink them to a point must also be cut and opened out. In the previous example, the top and bottom edges of the cylinder cannot be made to shrink because they are wrapped around the cylinder. The hole is not fundamentally part of the cylindrical surface and by gradually making it smaller the boundary becomes a pinprick point.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422170_pgfId-309740"></A>When it is necessary to close the loops, use either of the options PK_FACE_trim_confine_closed_c or PK_FACE_trim_confine_periph_c in <A HREF=../headers/pk_face_output_surf_trimmed.html>PK_FACE_output_surf_trimmed</A> as illustrated in <A HREF="fd_chap.092.html#50422170_47947"><EM>
+Figure 91-9</EM></A>. Here the outputting a trimmed surface function essentially views the seam-line cuts as a face boundary that it had earlier been convenient to ignore. In the previous example the following view is taken.</P>
+<P>
+<A NAME="50422170_pgfId-394922"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1129.gif">
+
+<P>
+<A NAME="50422170_pgfId-332952"></A>Figure 91-9 <A NAME="50422170_47947"></A>Using the option PK_FACE_trim_confine_closed_c or PK_FACE_trim_confine_periph_c to close the loops</P>
+<P>
+<A NAME="50422170_pgfId-310002"></A>Further to this theme of cutting surfaces along invisible seams, <A HREF="fd_chap.092.html#50422170_49062"><EM>
+Figure 91-10</EM></A> shows that the result of cutting the face on the illustrated seam would result in two individual pieces:</P>
+<P>
+<A NAME="50422170_pgfId-395048"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1130.gif">
+
+<P>
+<A NAME="50422170_pgfId-333421"></A>Figure 91-10 <A NAME="50422170_49062"></A>Cutting a surface along an invisible seam, producing two trimmed surfaces</P>
+<P>
+<A NAME="50422170_pgfId-310103"></A>Here <A HREF=../headers/pk_face_output_surf_trimmed.html>PK_FACE_output_surf_trimmed</A> is forced to produce two trimmed surfaces when it is asked to cut the face and produce closed, joined up loops. In effect, our viewpoint implied that the original face was actually two faces glued together along the ignored seam.</P>
+<P>
+<A NAME="50422170_pgfId-310104"></A>The word ‘trimmed’ in trimmed surface implies that something has been removed from the whole surface. In considering faces there is one kind of boundary that effectively trims nothing. This is the natural boundary of the surface, i.e. that part of the surface that marks out the limits of its definition.</P>
+<P>
+<A NAME="50422170_pgfId-310105"></A>An example of such a boundary is the rectangle of bounding constant parameter lines, B-curves of a B-surface. Spheres, on the other hand, have no such boundary.</P>
+<P>
+<A NAME="50422170_pgfId-310106"></A>If this natural boundary coincides with one of the face boundaries then, as it effectively trims nothing, it can readily be accepted that it be omitted from the trimmed surface PK_FACE_trim_confine_closed_c is selected. Its omission is independent of whether the face has holes or not as illustrated in <A HREF="fd_chap.092.html#50422170_87183"><EM>
+Figure 91-11</EM></A>.</P>
+<P>
+<A NAME="50422170_pgfId-395146"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1131.gif">
+
+<P>
+<A NAME="50422170_pgfId-333842"></A>Figure 91-11 <A NAME="50422170_87183"></A>Omitting the natural boundary when using the option PK_FACE_trim_confine_closed_c</P>
+
+<H4>
+<A NAME="50422170_pgfId-394042"></A>91.1.4.1 Gaps in SP-curve loops </H4>
+<P>
+<A NAME="50422170_pgfId-310172"></A>To summarize, the following factors can lead to occurrences when the SP-curve loops are not closed:</P>
+<UL>
+<LI>
+<A NAME="50422170_pgfId-310173"></A>SP-curves are present only on the fins of tolerant edges.</LI>
+<LI>
+<A NAME="50422170_pgfId-310174"></A>Tolerant edges have tolerant vertices.</LI>
+<LI>
+<A NAME="50422170_pgfId-310175"></A>Faces with only accurate edges may have tolerant vertices.</LI>
+<LI>
+<A NAME="50422170_pgfId-310176"></A>Tolerant vertices are there to hide gaps in edge/fin geometry.</LI>
+</UL>
+<P>
+<A NAME="50422170_pgfId-310177"></A>Tolerances could be said to be present in Parasolid to reflect the extent to which geometries don’t meet. For example, edge tolerances reflect the extent to which surfaces don’t meet at a common boundary, and vertex tolerances reflect the size of gaps between edge geometries meeting.</P>
+<P>
+<A NAME="50422170_pgfId-310178"></A>When the gaps represent gaps between edge/fin geometries at a tolerant vertex, the size of the gaps should be less than twice the tolerance of the vertex.</P>
+<P>
+<A NAME="50422170_pgfId-334273"></A>Otherwise accurate faces may have tolerant vertices where the tolerant edge of a neighboring face intersects its boundary. While it may be expected that the accurate edges of the face meet there, this is not always possible. A simple example of this would be a cube with the top face replaced by two planar sheets, one of which is a micron above the other, and which share a common tolerant edge. All edges on the cube are accurate except for the mid-line across the top of the cube. <A HREF="fd_chap.092.html#50422170_57927"><EM>
+Figure 91-12</EM></A> shows the side view of the cube.</P>
+<P>
+<A NAME="50422170_pgfId-395283"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1132.gif">
+
+<P>
+<A NAME="50422170_pgfId-334277"></A>Figure 91-12 <A NAME="50422170_57927"></A>Two planar sheets sharing a common tolerant edge</P>
+<P>
+<A NAME="50422170_pgfId-310206"></A><A NAME="50422170_65408"></A>The top two accurate edges do not intersect, and typically have a gap at the vertex of about one micron - these are the gaps that Parasolid is trying to hide from you, and deal with, through the use of tolerances.</P>
+
+
+
+<H3>
+<A NAME="50422170_pgfId-310210"></A>	91.1.5 	<A NAME="50422170_marker-310208"></A><A NAME="50422170_marker-310209"></A><A NAME="50422170_18216"></A>Concept of SP-curves </H3>
+<P>
+<A NAME="50422170_pgfId-310213"></A><A NAME="50422170_marker-310211"></A><A NAME="50422170_marker-310212"></A>A parameterisable surface is defined in terms of an evaluator function which given two parametric values, u and v, maps to a single point in space. Typically this function is only defined on a certain range of values in u and v. </P>
+<P>
+<A NAME="50422170_pgfId-310214"></A>f(u, v) -&gt; (x, y, z) u e [a, b], v e [c, d]</P>
+<P>
+<A NAME="50422170_pgfId-310215"></A>We can consider this vector valued function as three scalar valued functions, with the same arguments.</P>
+<P>
+<A NAME="50422170_pgfId-310216"></A>f(u, v) -&gt; (f1(u, v), f2(u, v), f3(u, v))</P>
+<P>
+<A NAME="50422170_pgfId-310217"></A>Consider a function which maps from a single parametric value t, to a pair of values, u and v. </P>
+<P>
+<A NAME="50422170_pgfId-310218"></A>g(t) -&gt; (u, v) t e [l, m]</P>
+<P>
+<A NAME="50422170_pgfId-310219"></A>Similarly to the surface function, the function g, which maps to u,v space can be considered as two scalar functions.</P>
+<P>
+<A NAME="50422170_pgfId-310220"></A>g(t) -&gt; (g1(t), g2(t))</P>
+<P>
+<A NAME="50422170_pgfId-310221"></A>By combining the two functions we can have a mapping from a single parameter value to a single point in space. Consider now, all the values of t in a particular range, or interval. Each value maps onto a point in space, and so we have created a parametric curve. </P>
+<P>
+<A NAME="50422170_pgfId-310222"></A>f(g(t)) -&gt; (x, y, z) t e [l, m]</P>
+<P>
+<A NAME="50422170_pgfId-310223"></A>In the scalar format, for completeness.</P>
+<P>
+<A NAME="50422170_pgfId-310224"></A>f(g(t)) -&gt; (f1(g1(t), g2(t)), f2(g1(t), g2(t)), f3(g1(t), g2(t)))</P>
+<P>
+<A NAME="50422170_pgfId-310225"></A>Because of the way that this curve has been constructed, we know that all the points of the curve lie on the surface. The 2-dimensional function <STRONG>
+g</STRONG>, which maps t<STRONG>
+ </STRONG>into u,v space is called a Surface Parameter (space) curve, or SP-curve.</P>
+<P>
+<A NAME="50422170_pgfId-310226"></A>An SP-curve therefore represents a 3-space curve as a curve in the parameter space of the surface.</P>
+
+
+<H3>
+<A NAME="50422170_pgfId-310229"></A>	91.1.6 	<A NAME="50422170_marker-310227"></A><A NAME="50422170_marker-310228"></A><A NAME="50422170_94741"></A>Form of the SP-curve </H3>
+<P>
+<A NAME="50422170_pgfId-310232"></A><A NAME="50422170_marker-310230"></A><A NAME="50422170_marker-310231"></A>In Parasolid, SP-curves are 2d B-spline curves, which are allowed to be rational. See <A HREF="fd_chap.124.html#50422207_12301">Appendix B, “The Mathematical Form Of B-Geometry”</A> for information on B-spline curves in 3d. 2d B-spline curves are very similar. It should be understood that whilst the B-spline vertices in other cases are points in 3d space, the 2d B-spline vertices of SP-curves represent points in the parameter space of the basis surface.</P>
+<P>
+<A NAME="50422170_pgfId-310233"></A>An SP-curve must be G1-continuous, and if periodic, it must meet itself with G1 continuity, surface degeneracies may only appear at the start or end of an SP-curve. An SP-curve may pass through a periodic parameter space boundary, but must lie within the parameter range defined by <A HREF=../headers/pk_surf_ask_params.html>PK_SURF_ask_params</A> on limited surfaces. On limited surfaces, it is permissible for the B-spline vertices to lie out of parameter range if the B-spline curve so defined lies within the range.</P>
+<P>
+<A NAME="50422170_pgfId-310234"></A>The SP-curve is parameterised according to the underlying knot vector.</P>
+<P>
+<A NAME="50422170_pgfId-310235"></A>The SP-curve entity exists for:</P>
+<UL>
+<LI>
+<A NAME="50422170_pgfId-310236"></A>the purpose of outputting trimmed surface representations, using <A HREF=../headers/pk_face_output_surf_trimmed.html>PK_FACE_output_surf_trimmed</A>;</LI>
+<LI>
+<A NAME="50422170_pgfId-310237"></A>import of application trimmed surface data into Parasolid.</LI>
+</UL>
+<P>
+<A NAME="50422170_pgfId-310248"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-310240"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-310242"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-310245"></A><A NAME="50422170_marker-310244"></A><A HREF=../headers/pk_curve_output_vectors.html>PK_CURVE_output_vectors</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422170_pgfId-310247"></A>outputs position vectors along a curve</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422170_pgfId-302672"></A>91.2			Controlling redundant topology 
+
+
+</H1>
+<P>
+<A NAME="50422170_pgfId-325884"></A>See <A HREF="fd_chap.034.html#50422104_">Chapter 33, “Controlling Redundant Topology”</A>, for information on how Parasolid identifies and deletes redundant topology.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422170_pgfId-302741"></A>91.3	Splitting topology 
+
+
+</H1>
+<P>
+<A NAME="50422170_pgfId-294768"></A>See <A HREF="fd_chap.035.html#50422105_">Chapter 34, “Splitting Topology”</A>, for information on how Parasolid can split topology.</P>
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.091.html">Importing Data</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.093.html">Introduction To Application Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

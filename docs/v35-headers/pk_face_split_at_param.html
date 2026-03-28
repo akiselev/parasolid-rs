@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_split_at_param</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_split_at_param</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_FACE_split_at_param
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                           face,        --- Target face
+double                              param,       --- parameter to split
+<A HREF=../headers/pk_param_direction_t.html>PK_PARAM_direction_t</A>                param_dir,   --- direction u or v
+const <A HREF=../headers/pk_face_split_at_param_o_t.html>PK_FACE_split_at_param_o_t</A>   *options,     --- options
+
+<I>--- returned arguments ---
+</I>int                          *const n_new_edges, --- number of new edges
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                   **const new_edges,   --- new edges
+int                          *const n_new_faces, --- number of new faces
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                   **const new_faces    --- new faces
+)
+</B>
+<A NAME="description"></A>
+<I>This function splits a face along constant parameter line.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_bad_parameter              Supplied parameter is outside
+                                        face range (MILD)
+    PK_ERROR_missing_geom               <B>'face'</B> does not have geometry
+                                        (MILD)
+    PK_ERROR_cant_get_curve             Failed to create isoparameter
+                                        curve (SERIOUS)
+
+
+<A NAME="documentation"></A>
+
+
+Introduction
+
+The given face is split along specified constant u or v parameter line.
+The parameter line is defined by U or V direction <B>'param_dir'</B> argument
+and <B>'param'</B> value.
+
+As a result new edges and faces may be created. The new edges are returned
+in <B>'new_edges'</B>, and the number of them in <B>'n_new_edges'</B>.  The new edges may
+split the face into several faces. The new faces are returned in <B>'new_faces'</B>
+and the number of them in <B>'n_new_faces'</B>. If new faces are created, the old
+face will lie on the right of one of the new edges, which will all go in the
+direction of the parameter line.
+
+Note that <B>'new_edges'</B> only includes the edges imprinted on the face in the
+split operation. Derived edges that are created as a result of splitting
+existing edges are not returned.
+
+If <B>'new_edges'</B> or <B>'new_faces'</B>  arguments are set to NULL then only the number
+of new edges and/or faces will be returned.
+
+If given parameter line lies outside or coincident with face boundary, no
+new edges or faces will be created and error 'PK_ERROR_not_on_face' will
+be raised.
+
+
+Split Options
+
+Option structure argument '<A HREF=../headers/pk_face_split_at_param_o_t.html>PK_FACE_split_at_param_o_t</A>* options' is reserved for
+future enhancements.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

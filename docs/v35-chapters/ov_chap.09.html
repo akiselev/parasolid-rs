@@ -1,0 +1,236 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Convergent Modeling</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Convergent Modeling</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.08.html">B-Spline Curves and Surfaces</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.10.html">Building Bodies from Profiles</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.09.html#50446376_pgfId-292445">8.1	Introduction</A>
+<LI> <A HREF="ov_chap.09.html#50446376_pgfId-292520">8.2	Managing facet geometry</A>
+<LI> <A HREF="ov_chap.09.html#50446376_pgfId-292554">8.3	Mesh-specific operations</A>
+<LI> <A HREF="ov_chap.09.html#50446376_pgfId-292589">8.4	Facet geometry support throughout Parasolid</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446376_pgfId-292445"></A>8.1	<A NAME="50446376_marker-292670"></A><A NAME="50446376_Session support"></A><A NAME="50446376_Symmetric multi-processing"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446376_pgfId-381310"></A>CAD,CAM and CAE applications are increasingly relying on facet bodies to support workflows in growth areas like additive manufacturing, reverse engineering and virtual simulation. A facet body is a body with Parasolid topology that references geometric data composed of mesh and polyline data rather that classic Parasolid surface and curve geometry. </P>
+<P>
+<A NAME="50446376_pgfId-294142"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-92.gif">
+
+<P>
+<A NAME="50446376_pgfId-293352"></A>Figure 8-1 <A NAME="50446376_99378"></A>Examples of facet bodies</P>
+<P>
+<A NAME="50446376_pgfId-383125"></A>In order to perform classic modelling operations on a body, traditional CAD software needs to convert facet bodies to and from accurate CAD geometry. This conversion can result in additional complexity and errors in the result body. Therefore being able to perform classic modelling operations directly on facet bodies can dramatically improve your workflow.Parasolid gives you this ability thereby letting your application perform topological operations, such as booleans, sectioning, and offsetting on facet bodies.</P>
+<P>
+<A NAME="50446376_pgfId-379061"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-93.gif">
+
+<P>
+<A NAME="50446376_pgfId-379062"></A>Figure 8-2 Offsetting a surface of a mesh with a step</P>
+<P>
+<A NAME="50446376_pgfId-387861"></A>Parasolid Convergent Modeling greatly extends scope beyond pure facet bodies by providing full support for models containing an arbitrary mix of facet and classic geometries. Convergent Modeling support for mixed bodies enables more efficient workflows in a wide range of applications. For example, in reverse engineering processes it can be used to add precise analytic surfaces (e.g. machined holes) to scanned data of parts for re-manufacture. It can also be used in restoring design intent by adding precise, classic mating surfaces to an imported model or one that has undergone facet-based topology optimisations.</P>
+<P>
+<A NAME="50446376_pgfId-360754"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-94.gif">
+
+<P>
+<A NAME="50446376_pgfId-360702"></A>Figure 8-3 <A NAME="50446376_47499"></A>Example of a mixed bodies</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446376_pgfId-292520"></A>8.2	Managing facet geometry
+
+
+</H1>
+<P>
+<A NAME="50446376_pgfId-294246"></A>Parasolid provides a range of APIs for creating facet geometry and for converting between facet and classic geometry.</P>
+<UL>
+<LI>
+<A NAME="50446376_pgfId-295164"></A>You can convert a body containing classic geometry to a facet body as illustrated in <A HREF="ov_chap.09.html#50446376_43903"><EM>
+Figure 8-4</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446376_pgfId-296012"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-95.gif">
+
+<P>
+<A NAME="50446376_pgfId-295050"></A>Figure 8-4 <A NAME="50446376_43903"></A>Converting a classic body to a facet body</P>
+<UL>
+<LI>
+<A NAME="50446376_pgfId-294294"></A>Parasolid can create a mixed body by converting selected classic topology to facet geometry as illustrated in <A HREF="ov_chap.09.html#50446376_18377"><EM>
+Figure 8-5</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446376_pgfId-359509"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-96.gif">
+
+<P>
+<A NAME="50446376_pgfId-359466"></A>Figure 8-5 <A NAME="50446376_18377"></A>Converting a classic body to a mixed body </P>
+<UL>
+<LI>
+<A NAME="50446376_pgfId-371841"></A>You can create a mesh from an existing mesh, a subset of meshes, or a selection of mfacets taken from multiple meshes.</LI>
+<LI>
+<A NAME="50446376_pgfId-294380"></A>Parasolid can convert mesh data into classic geometry in the form of a single trimmed surface as shown in <A HREF="ov_chap.09.html#50446376_68580"><EM>
+Figure 8-6</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446376_pgfId-296027"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-97.gif">
+
+<P>
+<A NAME="50446376_pgfId-295033"></A>Figure 8-6 <A NAME="50446376_68580"></A>Creating a trimmed surface from a single mesh</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446376_pgfId-292554"></A>8.3	<A NAME="50446376_32861"></A>Mesh-specific operations
+
+
+</H1>
+<P>
+<A NAME="50446376_pgfId-296301"></A>There are fundamental differences between classic bodies and meshes which mean that some areas of functionality need to be treated differently in order to produce consistent and accurate results. Parasolid provides a range of mesh-specific operations which enable you to perform the following operations on meshes: </P>
+<UL>
+<LI>
+<A NAME="50446376_pgfId-294728"></A>Evaluating the parameters and normals of a mesh</LI>
+<LI>
+<A NAME="50446376_pgfId-294659"></A>Identifying the perimeters of a selected group of mesh facets as shown in <A HREF="ov_chap.09.html#50446376_56061"><EM>
+Figure 8-7</EM></A> </LI>
+</UL>
+<P>
+<A NAME="50446376_pgfId-296765"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-98.gif">
+
+<P>
+<A NAME="50446376_pgfId-296748"></A>Figure 8-7 <A NAME="50446376_56061"></A>Identifying perimeters of selected groups of facets on a mesh</P>
+<P>
+<A NAME="50446376_pgfId-296664"></A>Parasolid also provides functionality for:</P>
+<UL>
+<LI>
+<A NAME="50446376_pgfId-295286"></A>Enquiring the facet topology of a mesh</LI>
+<LI>
+<A NAME="50446376_pgfId-316994"></A>Checking the mesh for defects such as invalidities or other sub-optimal mesh properties whose removal may be desirable <A NAME="50446376_31273"></A></LI>
+<LI>
+<A NAME="50446376_pgfId-295361"></A>Repairing holes in the mesh as shown in <A HREF="ov_chap.09.html#50446376_38299"><EM>
+Figure 8-8</EM></A></LI>
+</UL>
+<P>
+<A NAME="50446376_pgfId-296815"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-99.gif">
+
+<P>
+<A NAME="50446376_pgfId-296802"></A>Figure 8-8 <A NAME="50446376_38299"></A>Repairing holes in the mesh</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446376_pgfId-292589"></A>8.4	Facet geometry support throughout Parasolid
+
+
+</H1>
+<P>
+<A NAME="50446376_pgfId-294664"></A>Support for facet geometry is deeply integrated into the Parasolid toolkit, and as a result, most areas of Parasolid functionality fully support bodies that have facet geometry attached. </P>
+<P>
+<A NAME="50446376_pgfId-365667"></A>For a full list of functions along with their level of support for facet geometry, see the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>. </P>
+<P>
+<A NAME="50446376_pgfId-365787"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50446376_pgfId-365811"></A>Note: There are additional royalty fees for distributing your Parasolid-based products with Convergent Modeling functionality enabled. If you do not license Convergent Modeling, your maintenance fee will cover the use of Convergent Modeling functionality in your development environment for evaluation and prototyping purposes. Your Parasolid Sales Representative can provide full information if you have any questions. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446376_pgfId-388683"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.08.html">B-Spline Curves and Surfaces</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.10.html">Building Bodies from Profiles</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

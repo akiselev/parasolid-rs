@@ -1,0 +1,220 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_make_blend</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_make_blend</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_FACE_make_blend
+(
+<I>--- received arguments ---
+</I>int                            n_left_wall_faces,   --- number of faces in
+                                                    --- left wall
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                left_wall_faces[],   --- faces in left wall
+int                            n_right_wall_faces,  --- number of faces in
+                                                    --- right wall
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                right_wall_faces[],  --- faces in right wall
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>                   left_sense,          --- blend direction
+                                                    --- from left wall
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>                   right_sense,         --- blend direction
+                                                    --- from right wall
+const <A HREF=../headers/pk_face_make_blend_o_t.html>PK_FACE_make_blend_o_t</A>  *options,             --- options structure
+
+<I>--- returned arguments ---
+</I>int                     *const n_sheet_bodies,      --- number of sheet bodies
+                                                    --- created
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>              **const sheet_bodies,        --- sheet bodies
+int                     *const n_blend_topols,      --- number of blend
+                                                    --- topologies created
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>             **const blend_topols,        --- blend topologies
+<A HREF=../headers/pk_topol_array_t.html>PK_TOPOL_array_t</A>       **const unders,              --- originating topology
+                                                    --- of each blend face
+<A HREF=../headers/pk_blend_rib_r_t.html>PK_blend_rib_r_t</A>        *const ribs,                --- ribs returned (if any)
+<A HREF=../headers/pk_fxf_error_t.html>PK_fxf_error_t</A>          *const fault                --- fault found (if any)
+)
+</B>
+<A NAME="description"></A>
+<I>This function makes a blend of the given faces.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_not_in_same_partition  faces are not all in the same partition
+    PK_ERROR_fxf_blend_failed       could not create blends
+    PK_ERROR_bad_partition          user supplied partition is invalid (MILD)
+    PK_ERROR_instanced_body         the faces in the left and right walls are
+                                    from different bodies, and the right wall
+                                    faces belong to a body that is instanced
+                                    (MILD)
+    PK_ERROR_facet_geometry         The faces in one of the walls are from a
+                                    body with facet geometry (MILD)
+
+
+<A NAME="documentation"></A>
+This function creates one or more blends between the two sets of faces
+provided. The user specifies whether the blend will be attached to the
+bodies involved or returned as a separate sheet body.  The user may also
+specify whether cross sections of the surfaces, "ribs", are returned
+instead of or as well as blends.  For further details see
+<A HREF="../chapters/fd_chap.078.html#50434442_pgfId-294729">Face-face Blending</A> in the Functional Description.
+
+The function receives:
+
+
+
+<B>'left_wall_faces'</B>   an array of the faces which make up the left wall.
+                    These faces must all lie in the same shell of the same
+                    body.
+
+<B>'right_wall_faces'</B>  an array of the faces which make up the right wall.
+                    These faces must all lie in the same shell of the same
+                    body.
+
+The two walls do not need to lie in the same body. If the blend does not
+contact either the first face in <B>'left_wall_faces'</B> or the first face in
+<B>'right_wall_faces'</B> (or both), then PK_FACE_make_blend will fail.
+
+It is possible to make a cliffedge blend between a wall of faces and
+the edges of a wire body. This is termed a "wire-face" blend. To make
+a wire-face blend, provide no faces for one of the walls, and instead
+provide edges from a smooth connected manifold oriented wire body as
+<B>'cliff_edges'</B> in the <B>'constraints'</B> sub-structure of the option
+structure.
+
+See <A HREF="../chapters/fd_chap.078.html#50434442_pgfId-715609">Master faces</A> for more information.
+
+
+
+<B>'left_sense'</B>        a logical determining which side of <B>'left_wall_faces'</B>
+                    the blend lies. The blend lies in the direction of the
+                    face normals if <B>'left_sense'</B> is false.
+
+<B>'right_sense'</B>       a logical determining which side of <B>'right_wall_faces'</B>
+                    the blend lies. The blend lies in the direction of the
+                    face normals if <B>'right_sense'</B> is false.
+
+For wire-face blends the sense logical for the wire side is with respect to
+the cross-product of the other body's face normals and the wire edge tangents.
+
+See <A HREF="../chapters/fd_chap.078.html#50434442_pgfId-296927">Blend sense</A> for more information.
+
+
+
+Further options can be supplied to the function in the <A HREF=../headers/pk_face_make_blend_o_t.html>PK_FACE_make_blend_o_t</A>
+option structure.
+
+If PK_FACE_make_blend has successfully created a blend, then:
+
+
+<B>'sheet_bodies'</B> will consist of an array of length <B>'n_sheet_bodies'</B>
+               containing any new blend sheet bodies created,
+               or NULL if the blend has been attached.
+
+<B>'blend_topols'</B> will consist of an array of <B>'n_blend_topols'</B> blend
+               topologies. In general this topology will consist of the
+               faces of the blend. If the result is a sheet body and the
+               field <B>'track_edges'</B> is set to <A HREF=../headers/pk_blend_track_edges_t.html>PK_blend_track_edges_laminar_c</A>
+               in the options structure, the laminar edges of the sheet
+               body will also be returned.
+
+               If the <B>'run_out'</B> option is set to <A HREF=../headers/pk_blend_run_out_t.html>PK_blend_run_out_angle_c</A>
+               then any edges where the blend has stopped due to the run_out
+               condition having been met will also be returned. These will
+               be either:
+
+               * The edges between the blend face and capping face.
+               * The edges at the end of the blend face (if the capping
+                 face has been consumed by tolerances on the part).
+               * The vertex at the end of the blend face (if the edges
+                 have also consumed by tolerances on the part).
+
+<B>'unders'</B>       will consist of a parallel array of <B>'n_blend_topols'</B>
+               arrays of integers.  Each array will contain the
+               ( possibly dead ) tags of the originating topology or
+               geometry used to determine the equivalent blend face in
+               <B>'blend_topols'</B>. In general this will be the tags of the left
+               and right wall faces and any other data that determined the
+               geometry of the blend face, such as a cliff edge or
+               tangent holdline.
+
+               For capping faces the array will contain the tag/tags
+               of the appropriate original entities from which they
+               were derived. For capping faces derived from
+               user-supplied limiting topology/geometry the array will
+               contain the tag of the relevant user-supplied entity.
+               For other capping faces the tag/tags of the topology
+               used to determine the cap face will be returned.
+
+               If the <B>'run_out'</B> option is set to <A HREF=../headers/pk_blend_run_out_t.html>PK_blend_run_out_angle_c</A>
+               then the array associated with any capping faces, edges
+               or vertices derived from a run_out will contain -1, if
+               the topology is at the start of a sheet, or -2, if it is
+               at the end of a sheet.
+
+               When updating v21.0 parts and older: For capping
+               faces derived from a limit plane the array will contain
+               the tag of the relevant limit plane. For capping faces
+               other than limit planes, the array will instead contain
+               -1, if the face is at the start of a sheet, or -2, if
+               it is the end cap of a sheet.
+
+               If the result is a sheet body and the field <B>'track_edges'</B>
+               is set to <A HREF=../headers/pk_blend_track_edges_t.html>PK_blend_track_edges_laminar_c</A> in the options
+               structure, additional tracking information will be
+               returned associated with the laminar edges of the sheet
+               body. For laminar edges the array may contain faces,
+               edges or planes.
+
+
+
+<B>'ribs'</B> consists of <A HREF=../headers/pk_blend_rib_r_t.html>PK_blend_rib_r_t</A> structure containing the fields:
+
+ <B>'n_ribs'</B>       the number of curves and points in the <B>'ribs'</B> array (may be 0)
+ <B>'rib_indices'</B>  an array of integers uniquely identifying each rib
+ <B>'rib_parms'</B>    an array of parameters of each rib, with values
+                in the range of the <B>'parameter'</B> curve
+ <B>'ribs'</B>         an array of curves and points which are cross sections of the
+                blend surfaces
+
+See <A HREF="../chapters/fd_chap.078.html#50434442_pgfId-714442">Generating blend ribs</A> and
+<A HREF="../chapters/fd_chap.078.html#50434442_pgfId-311522">How ribs are returned</A> for more information.
+
+
+<B>'fault'</B> consists of a <A HREF=../headers/pk_fxf_error_t.html>PK_fxf_error_t</A> structure containing the status of the
+blending operation and any associated data.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,1020 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Edge Blend Overflows</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Edge Blend Overflows</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.076.html">Edge Blending Options</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.078.html">Face-Face Blending</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-294731">76.1	Introduction </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-294743">76.2	Definitions </A>
+<UL>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-294750">76.2.1	Internal and external overflow </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-294979">76.2.2	Bounds </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-295073">76.2.3	Edges </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-295163">76.2.4	Convexity </A>
+</UL>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-295262">76.3	Overflow types </A>
+<UL>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-295272">76.3.1	Smooth overflow </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-295347">76.3.2	Cliff overflow </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-295418">76.3.3	Cliff end overflow </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-295428">76.3.4	Notch overflow </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-295528">76.3.5	Combining different overflows </A>
+</UL>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-296040">76.4	The default overflow behaviour and influencing tokens </A>
+<UL>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-296061">76.4.1	Tokens for use with PK_EDGE_set_blend_constant </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-296127">76.4.2	Tokens for use with PK_EDGE_set_blend_chamfer </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-296165">76.4.3	Tokens for use with PK_EDGE_set_blend_chain </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-296233">76.4.4	Internal overflows </A>
+<UL>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-296498">76.4.4.1	Internal overflow over a sharp edge </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-297480">76.4.4.2	Internal overflow over a smooth edge with opposite convexity </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-298539">76.4.4.3	Internal overflow over a sharp edge with the same convexity </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-299587">76.4.4.4	Internal overflow over a smooth edge with the same convexity </A>
+</UL>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-300982">76.4.5	External overflows </A>
+<UL>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-301145">76.4.5.1	External overflow over a sharp edge </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-389526">76.4.5.2	External overflow over a smooth edge with opposite convexity </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-302166">76.4.5.3	External overflow over a sharp edge with the same convexity </A>
+<LI> <A HREF="fd_chap.077.html#50422153_pgfId-302569">76.4.5.4	External overflow over a smooth edge with the same convexity </A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422153_pgfId-294731"></A>76.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422153_pgfId-294733"></A><A NAME="50422153_marker-294732"></A>A blend <STRONG>
+overflow</STRONG> occurs when a blend as defined by its basic parameters, would leave one or both of the faces adjacent to the edge being blended.</P>
+<P>
+<A NAME="50422153_pgfId-294734"></A>This configuration can be dealt with by specifying how the blend surface should be modified:</P>
+<UL>
+<LI>
+<A NAME="50422153_pgfId-294735"></A>Smooth overflow</LI>
+<LI>
+<A NAME="50422153_pgfId-294736"></A>Cliff overflow</LI>
+<LI>
+<A NAME="50422153_pgfId-294737"></A>Cliff end overflow</LI>
+<LI>
+<A NAME="50422153_pgfId-294738"></A>Notch overflow</LI>
+</UL>
+<P>
+<A NAME="50422153_pgfId-499143"></A>For an example of edge blend overflows, see the code example in the <CODE>
+C++\Code</CODE>
+ <CODE>
+Examples\Modelling\Blending\Edge\Recommended</CODE>
+ <CODE>
+Options</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422153_pgfId-493973"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-489544"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422153_pgfId-489531"></A><A HREF="fd_chap.075.html#50422151_17798">Chapter 74, “Edge Blending Overview”</A></LI>
+<LI>
+<A NAME="50422153_pgfId-489559"></A><A HREF="fd_chap.076.html#50422152_39578">Chapter 75, “Edge Blending Options”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422153_pgfId-294743"></A>76.2	<A NAME="50422153_marker-294739"></A><A NAME="50422153_marker-294740"></A><A NAME="50422153_marker-294741"></A><A NAME="50422153_marker-294742"></A>Definitions 
+
+
+</H1>
+
+<H3>
+<A NAME="50422153_pgfId-294750"></A>	76.2.1 	<A NAME="50422153_marker-294744"></A><A NAME="50422153_marker-294745"></A><A NAME="50422153_marker-294746"></A><A NAME="50422153_marker-294747"></A><A NAME="50422153_marker-294748"></A><A NAME="50422153_marker-294749"></A>Internal and external overflow </H3>
+<P>
+<A NAME="50422153_pgfId-294751"></A>The blends can leave either <STRONG>
+internally</STRONG>, when the blend lies in a face adjacent to the edge being blended to both sides of the overflow,</P>
+<P>
+<A NAME="50422153_pgfId-368242"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-930.gif">
+
+<P>
+<A NAME="50422153_pgfId-294821"></A>Figure 76-1 Blend overflowing internally</P>
+<P>
+<A NAME="50422153_pgfId-294822"></A>or <STRONG>
+externally</STRONG>, when the overflow occurs at one end of the blend:</P>
+<P>
+<A NAME="50422153_pgfId-378337"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-931.gif">
+
+<P>
+<A NAME="50422153_pgfId-294976"></A>Figure 76-2 Blend overflowing externally</P>
+
+
+<H3>
+<A NAME="50422153_pgfId-294979"></A>	76.2.2 	<A NAME="50422153_marker-294977"></A><A NAME="50422153_marker-294978"></A>Bounds </H3>
+<P>
+<A NAME="50422153_pgfId-294980"></A>The overflow <STRONG>
+bounds</STRONG> are the edges bounding the region of overflow.</P>
+<P>
+<A NAME="50422153_pgfId-378432"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-932.gif">
+
+<P>
+<A NAME="50422153_pgfId-295069"></A>Figure 76-3 Overflow bounds</P>
+
+
+<H3>
+<A NAME="50422153_pgfId-295073"></A>	76.2.3 	<A NAME="50422153_marker-295070"></A><A NAME="50422153_marker-295071"></A><A NAME="50422153_marker-295072"></A>Edges </H3>
+<P>
+<A NAME="50422153_pgfId-295074"></A>Overflow <STRONG>
+edges</STRONG> are any other edges at vertices between overflow <STRONG>
+bounds</STRONG>.</P>
+<P>
+<A NAME="50422153_pgfId-378794"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-933.gif">
+
+<P>
+<A NAME="50422153_pgfId-295159"></A>Figure 76-4 Overflow edges</P>
+
+
+<H3>
+<A NAME="50422153_pgfId-295163"></A>	76.2.4 	<A NAME="50422153_marker-295160"></A><A NAME="50422153_marker-295161"></A><A NAME="50422153_marker-295162"></A>Convexity </H3>
+<P>
+<A NAME="50422153_pgfId-295164"></A>The <STRONG>
+convexity</STRONG> of an overflow refers to the relative convexities of the overflow bounds and the edge being blended.</P>
+<P>
+<A NAME="50422153_pgfId-384145"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-934.gif">
+
+<P>
+<A NAME="50422153_pgfId-295260"></A>Figure 76-5 Overflow convexity</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422153_pgfId-295262"></A>76.3	<A NAME="50422153_marker-295261"></A>Overflow types 
+
+
+</H1>
+<P>
+<A NAME="50422153_pgfId-295263"></A>Overflows can be dealt with by being treated as:</P>
+<UL>
+<LI>
+<A NAME="50422153_pgfId-295264"></A>Smooth overflow</LI>
+<LI>
+<A NAME="50422153_pgfId-295265"></A>Cliff overflow</LI>
+<LI>
+<A NAME="50422153_pgfId-295266"></A>Cliff end overflow</LI>
+<LI>
+<A NAME="50422153_pgfId-295267"></A>Notch overflow</LI>
+</UL>
+
+<H3>
+<A NAME="50422153_pgfId-295272"></A>	76.3.1 	<A NAME="50422153_marker-295268"></A><A NAME="50422153_marker-295269"></A><A NAME="50422153_marker-295270"></A><A NAME="50422153_marker-295271"></A>Smooth overflow </H3>
+<P>
+<A NAME="50422153_pgfId-295275"></A><A NAME="50422153_marker-295273"></A><A NAME="50422153_marker-295274"></A>Smooth overflow <CODE>
+ov_smooth</CODE>
+ - in the region of the overflow, the blend surface is replaced by an equivalent blend on the face(s) associated with the overflow. This occurs when all the overflow bounds and all the overflow edges are smooth.</P>
+<P>
+<A NAME="50422153_pgfId-379627"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-935.gif">
+
+<P>
+<A NAME="50422153_pgfId-295344"></A>Figure 76-6 Smooth overflow</P>
+
+
+<H3>
+<A NAME="50422153_pgfId-295347"></A>	76.3.2 	<A NAME="50422153_marker-295345"></A><A NAME="50422153_marker-295346"></A><A NAME="50422153_17899"></A>Cliff overflow </H3>
+<P>
+<A NAME="50422153_pgfId-295350"></A><A NAME="50422153_marker-295348"></A><A NAME="50422153_marker-295349"></A>Cliff overflow <CODE>
+ov_cliff</CODE>
+ - in the region of the overflow, the blend surface is replaced by a (series of) cliff-edge blends running round the region of overflow. For this to be successful all the overflow edges must be smooth, though the overflow bounds need not be smooth.</P>
+<P>
+<A NAME="50422153_pgfId-379946"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-936.gif">
+
+<P>
+<A NAME="50422153_pgfId-295414"></A>Figure 76-7 Cliff overflow</P>
+
+
+<H3>
+<A NAME="50422153_pgfId-295418"></A>	76.3.3 	<A NAME="50422153_marker-295415"></A><A NAME="50422153_marker-295416"></A><A NAME="50422153_marker-295417"></A>Cliff end overflow </H3>
+<P>
+<A NAME="50422153_pgfId-295421"></A><A NAME="50422153_marker-295419"></A><A NAME="50422153_marker-295420"></A>Cliff end overflow <CODE>
+ov_cliff_end</CODE>
+ - if the configuration is unsuitable for cliff overflow, Parasolid tries to ‘cliff end overflow’ - i.e. replace the appropriate section of the blend by a cliff-edge blend at the ends of the appropriate edges.</P>
+
+
+<H3>
+<A NAME="50422153_pgfId-295428"></A>	76.3.4 	<A NAME="50422153_marker-295422"></A><A NAME="50422153_marker-295423"></A><A NAME="50422153_marker-295424"></A><A NAME="50422153_marker-295425"></A><A NAME="50422153_marker-295426"></A><A NAME="50422153_marker-295427"></A>Notch overflow </H3>
+<P>
+<A NAME="50422153_pgfId-295431"></A><A NAME="50422153_marker-295429"></A><A NAME="50422153_marker-295430"></A>Notch overflow <CODE>
+ov_notch</CODE>
+ - the blend surface remains the same, and the blend is trimmed by extending or trimming the neighboring faces in the notch.</P>
+<P>
+<A NAME="50422153_pgfId-380137"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-937.gif">
+
+<P>
+<A NAME="50422153_pgfId-295526"></A>Figure 76-8 Notch overflow</P>
+
+
+<H3>
+<A NAME="50422153_pgfId-295528"></A>	76.3.5 	<A NAME="50422153_50164"></A>Combining different overflows </H3>
+<P>
+<A NAME="50422153_pgfId-295529"></A>If you want to give your users more control over the final shape of the blend, you can combine cliff edge or cliff end overflow with other types of overflow. You do this by using the <CODE>
+explicit_cliff_edges</CODE>
+ and <CODE>
+explicit_cliff_edges_type</CODE>
+ options in <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A> to control which edges do and do not form cliff-edge blends. In this way you can force a cliff edge overflow in cases where Parasolid would use a smooth or notch solution by default.</P>
+<P>
+<A NAME="50422153_pgfId-295536"></A><A HREF="fd_chap.077.html#50422153_45628"><EM>
+Figure 76-9</EM></A> shows an example where a notch overflow is required to successfully place a blend on an edge, because of a boss on the side of the body. The default solution for this is to create a notch overflow for the entire blend. However, by specifying that the edge shown must be a cliff edge, you can control the blend operation and produce an alternative result.</P>
+<P>
+<A NAME="50422153_pgfId-380482"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-938.gif">
+
+<P>
+<A NAME="50422153_pgfId-295867"></A>Figure 76-9 <A NAME="50422153_45628"></A>Combining notch and cliff-end overflow</P>
+<P>
+<A NAME="50422153_pgfId-295871"></A><A HREF="fd_chap.077.html#50422153_27720"><EM>
+Figure 76-10</EM></A> shows another use of this functionality in which one side of a blend is given a notch overflow, while the other side has a cliff edge overflow: if no explicit cliff edge was specified on the original body, the default solution would have a notch overflow on both sides of the resulting blend. </P>
+<P>
+<A NAME="50422153_pgfId-380948"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-939.gif">
+
+<P>
+<A NAME="50422153_pgfId-296030"></A>Figure 76-10 <A NAME="50422153_27720"></A>Specifying cliff edge overflow and notch overflow on each side of a blend</P>
+<P>
+<A NAME="50422153_pgfId-296033"></A>For more information about controlling the use of cliff-edge blends, see <A HREF="fd_chap.076.html#50422152_93163">Section 75.3.1, “Creating cliff-edge blends”</A>.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422153_pgfId-296040"></A>76.4	<A NAME="50422153_marker-296035"></A><A NAME="50422153_marker-296036"></A><A NAME="50422153_marker-296037"></A><A NAME="50422153_marker-296038"></A><A NAME="50422153_marker-296039"></A>The default overflow behaviour and influencing tokens 
+
+
+</H1>
+<P>
+<A NAME="50422153_pgfId-296041"></A>In general, Parasolid attempts overflow in the following order:</P>
+<UL>
+<LI>
+<A NAME="50422153_pgfId-296042"></A>Smooth overflow</LI>
+<LI>
+<A NAME="50422153_pgfId-296043"></A>Cliff-edge overflow</LI>
+<LI>
+<A NAME="50422153_pgfId-296044"></A>Notch overflow</LI>
+</UL>
+<P>
+<A NAME="50422153_pgfId-296050"></A>The following two sections, <A HREF="fd_chap.077.html#50422153_42449">“Internal overflows”</A> and <A HREF="fd_chap.077.html#50422153_19502">“External overflows”</A>, illustrate the different overflow types being used in specific circumstances, and the default conditions which apply in these circumstances.</P>
+<P>
+<A NAME="50422153_pgfId-296052"></A>When an overflow type, other than the default, is required the relevant token must be supplied in the argument <CODE>
+properties</CODE>
+. These tokens are declared in the typedefs:</P>
+<UL>
+<LI>
+<A NAME="50422153_pgfId-296053"></A><A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_t</A></LI>
+<LI>
+<A NAME="50422153_pgfId-296054"></A><A HREF=../headers/pk_blend_ov_cliff_t.html>PK_blend_ov_cliff_t</A></LI>
+<LI>
+<A NAME="50422153_pgfId-296055"></A><A HREF=../headers/pk_blend_ov_cliff_end_t.html>PK_blend_ov_cliff_end_t</A></LI>
+<LI>
+<A NAME="50422153_pgfId-296056"></A><A HREF=../headers/pk_blend_ov_notch_t.html>PK_blend_ov_notch_t</A></LI>
+</UL>
+<P>
+<A NAME="50422153_pgfId-296057"></A>The tokens listed in the following tables each have the prefix PK_blend_ov_ (e.g. <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_no_c</A>).</P>
+
+<H3>
+<A NAME="50422153_pgfId-296061"></A>	76.4.1 	<A NAME="50422153_marker-296058"></A><A NAME="50422153_marker-296059"></A><A NAME="50422153_marker-296060"></A>Tokens for use with <A HREF=../headers/pk_edge_set_blend_constant.html>PK_EDGE_set_blend_constant</A> </H3>
+<P>
+<A NAME="50422153_pgfId-296123"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296064"></A>Overflow Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="4">
+<P>
+<A NAME="50422153_pgfId-296066"></A>PK_BLEND_ov_... Token to</P>
+</TH>
+</TR>
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296076"></A>prevent</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296078"></A>allow when same convexity</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296080"></A>allow at end</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296082"></A>default</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296084"></A>Smooth</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296086"></A>smooth_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296088"></A>smooth_any_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296090"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296092"></A>smooth_diff_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296094"></A>Cliff-edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296096"></A>cliff_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296098"></A>cliff_any_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296100"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296102"></A>cliff_diff_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296104"></A>Cliff-edge end</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296106"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296108"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296110"></A>cliff_end_yes_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296112"></A>cliff_end_no_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296114"></A>Notch</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296116"></A>notch_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296118"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296120"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296122"></A>notch_yes_c</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422153_pgfId-296127"></A>	76.4.2 	<A NAME="50422153_marker-296124"></A><A NAME="50422153_marker-296125"></A><A NAME="50422153_marker-296126"></A>Tokens for use with <A HREF=../headers/pk_edge_set_blend_chamfer.html>PK_EDGE_set_blend_chamfer</A> </H3>
+<P>
+<A NAME="50422153_pgfId-296161"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296130"></A>Overflow Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="3">
+<P>
+<A NAME="50422153_pgfId-296132"></A>PK_BLEND_ov_... Token to</P>
+</TH>
+</TR>
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296140"></A>prevent</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296142"></A>allow when same convexity</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296144"></A>default</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296146"></A>Smooth</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296148"></A>smooth_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296150"></A>smooth_any_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296152"></A>smooth_diff_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296154"></A>Notch</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296156"></A>notch_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296158"></A>notch_yes_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296160"></A>&nbsp;</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422153_pgfId-296165"></A>	76.4.3 	<A NAME="50422153_marker-296162"></A><A NAME="50422153_marker-296163"></A><A NAME="50422153_marker-296164"></A>Tokens for use with <A HREF=../headers/pk_edge_set_blend_chain.html>PK_EDGE_set_blend_chain</A> </H3>
+<P>
+<A NAME="50422153_pgfId-296227"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296168"></A>Overflow Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="4">
+<P>
+<A NAME="50422153_pgfId-296170"></A>PK_BLEND_ov_... Token to</P>
+</TH>
+</TR>
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296180"></A>prevent</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296182"></A>allow when same convexity</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296184"></A>allow at end</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296186"></A>default</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296188"></A>Smooth</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296190"></A>smooth_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296192"></A>smooth_any_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296194"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296196"></A>smooth_diff_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296198"></A>Cliff-edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296200"></A>cliff_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296202"></A>cliff_any_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296204"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296206"></A>cliff_diff_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296208"></A>Cliff-edge end</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296210"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296212"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296214"></A>cliff_end_yes_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296216"></A>cliff_end_no_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296218"></A>Notch</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296220"></A>notch_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296222"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296224"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422153_pgfId-296226"></A>notch_yes_c</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422153_pgfId-296228"></A>When no allowed overflow type can be created, the blend operation fails.</P>
+
+
+<H3>
+<A NAME="50422153_pgfId-296233"></A>	76.4.4 	<A NAME="50422153_42449"></A><A NAME="50422153_marker-296230"></A><A NAME="50422153_marker-296231"></A><A NAME="50422153_marker-296232"></A>Internal overflows </H3>
+<P>
+<A NAME="50422153_pgfId-296234"></A>For any type of internal overflow to be allowed, there must be one (and only one) overflow edge per vertex, i.e. all vertices between overflow bounds must have 3 edges meeting at them. Internal smooth overflows may flow more than one face away from the blend.</P>
+<P>
+<A NAME="50422153_pgfId-385629"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-940.gif">
+
+<P>
+<A NAME="50422153_pgfId-296491"></A>Figure 76-11 Internal overflows</P>
+<P>
+<A NAME="50422153_pgfId-296492"></A>The following examples of internal overflows are used to illustrate the expected default behaviour of the particular example, and the behaviour of the example when specific overflow conditions (via tokens) are applied.</P>
+
+<H4>
+<A NAME="50422153_pgfId-296498"></A>76.4.4.1 <A NAME="50422153_marker-296493"></A><A NAME="50422153_marker-296494"></A><A NAME="50422153_marker-296495"></A><A NAME="50422153_marker-296496"></A><A NAME="50422153_marker-296497"></A>Internal overflow over a sharp edge </H4>
+<P>
+<A NAME="50422153_pgfId-385853"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-941.gif">
+
+<P>
+<A NAME="50422153_pgfId-296681"></A>Figure 76-12 Blend to overflow a sharp edge of opposite convexity</P>
+<P>
+<A NAME="50422153_pgfId-296682"></A>For this set of conditions the default blend overflow is a cliff-edge overflow.</P>
+<P>
+<A NAME="50422153_pgfId-296686"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422153_pgfId-296685"></A>Note: At some point, as the blend radius increases, the cliff edge becomes unstable and at that point the overflow becomes a notch overflow by default. If you want to prevent the cliff-edge overflow changing to a notch overflow then apply the token <A HREF=../headers/pk_blend_ov_notch_t.html>PK_blend_ov_notch_no_c</A>. This prevents the formation of the notch overflow, with the result that if a cliff edge is not possible the blend operation fails.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422153_pgfId-373034"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-942.gif">
+
+<P>
+<A NAME="50422153_pgfId-297079"></A>Figure 76-13 Default conditions creating a cliff-edge overflow</P>
+<P>
+<A NAME="50422153_pgfId-297080"></A>To create a notch overflow the default cliff-edge overflow must overridden. This is managed by supplying the <A HREF=../headers/pk_blend_ov_cliff_t.html>PK_blend_ov_cliff_no_c</A> token to the <CODE>
+properties</CODE>
+ argument (bearing in mind that with these conditions a smooth overflow is not possible).</P>
+<P>
+<A NAME="50422153_pgfId-394165"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-943.gif">
+
+<P>
+<A NAME="50422153_pgfId-297475"></A>Figure 76-14 Overriding the default to produce a notch overflow</P>
+
+
+<H4>
+<A NAME="50422153_pgfId-297480"></A>76.4.4.2 <A NAME="50422153_marker-297476"></A><A NAME="50422153_marker-297477"></A><A NAME="50422153_marker-297478"></A><A NAME="50422153_marker-297479"></A>Internal overflow over a smooth edge with opposite convexity </H4>
+<P>
+<A NAME="50422153_pgfId-373350"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-944.gif">
+
+<P>
+<A NAME="50422153_pgfId-297703"></A>Figure 76-15 Blend to overflow a smooth edge of opposite convexity</P>
+<P>
+<A NAME="50422153_pgfId-297704"></A>For this set of conditions the default blend overflow is a smooth overflow. It is not possible to produce a notch overflow in these circumstances.</P>
+<P>
+<A NAME="50422153_pgfId-387339"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-945.gif">
+
+<P>
+<A NAME="50422153_pgfId-298133"></A>Figure 76-16 Default conditions producing a smooth overflow</P>
+<P>
+<A NAME="50422153_pgfId-298134"></A>To create a cliff-edge overflow, the default smooth overflow must be overridden. This is managed by supplying the token <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_no_c</A> to the <CODE>
+properties</CODE>
+ argument.</P>
+<P>
+<A NAME="50422153_pgfId-387814"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-946.gif">
+
+<P>
+<A NAME="50422153_pgfId-298533"></A>Figure 76-17 Overriding the default to produce a cliff-edge overflow</P>
+
+
+<H4>
+<A NAME="50422153_pgfId-298539"></A>76.4.4.3 <A NAME="50422153_marker-298534"></A><A NAME="50422153_marker-298535"></A><A NAME="50422153_marker-298536"></A><A NAME="50422153_marker-298537"></A><A NAME="50422153_marker-298538"></A>Internal overflow over a sharp edge with the same convexity </H4>
+<P>
+<A NAME="50422153_pgfId-388397"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-947.gif">
+
+<P>
+<A NAME="50422153_pgfId-298704"></A>Figure 76-18 Blend to overflow a sharp edge of same convexity</P>
+<P>
+<A NAME="50422153_pgfId-298705"></A>For this set of conditions the default blend overflow is a notch overflow. In these circumstances a smooth overflow is not possible, therefore the <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_any_c</A> token would be ignored (if supplied).</P>
+<P>
+<A NAME="50422153_pgfId-402570"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-948.gif">
+
+<P>
+<A NAME="50422153_pgfId-299118"></A>Figure 76-19 Default conditions creating a notch overflow</P>
+<P>
+<A NAME="50422153_pgfId-299119"></A>To create a cliff-edge overflow, the token <A HREF=../headers/pk_blend_ov_cliff_t.html>PK_blend_ov_cliff_any_c</A> must be supplied to the <CODE>
+properties</CODE>
+ argument. If a cliff-edge overflow is not possible a notch overflow is attempted. Supplying the <A HREF=../headers/pk_blend_ov_notch_t.html>PK_blend_ov_notch_no_c</A> token would prevent this notch overflow from being attempted.</P>
+<P>
+<A NAME="50422153_pgfId-401689"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-949.gif">
+
+<P>
+<A NAME="50422153_pgfId-299582"></A>Figure 76-20 Overriding the default to produce a cliff-edge overflow</P>
+
+
+<H4>
+<A NAME="50422153_pgfId-299587"></A>76.4.4.4 <A NAME="50422153_marker-299583"></A><A NAME="50422153_marker-299584"></A><A NAME="50422153_marker-299585"></A><A NAME="50422153_marker-299586"></A>Internal overflow over a smooth edge with the same convexity </H4>
+<P>
+<A NAME="50422153_pgfId-389090"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-950.gif">
+
+<P>
+<A NAME="50422153_pgfId-299762"></A>Figure 76-21 Blend to overflow a smooth edge of the same convexity</P>
+<P>
+<A NAME="50422153_pgfId-299763"></A>For this set of conditions the default blend overflow is a notch overflow.</P>
+<P>
+<A NAME="50422153_pgfId-389141"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-951.gif">
+
+<P>
+<A NAME="50422153_pgfId-300160"></A>Figure 76-22 Default conditions creating a notch overflow</P>
+<P>
+<A NAME="50422153_pgfId-300161"></A>To create a cliff-edge overflow, the token <A HREF=../headers/pk_blend_ov_cliff_t.html>PK_blend_ov_cliff_any_c</A> must be supplied to the <CODE>
+properties</CODE>
+ argument. </P>
+<P>
+<A NAME="50422153_pgfId-389210"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-952.gif">
+
+<P>
+<A NAME="50422153_pgfId-300588"></A>Figure 76-23 Overriding the default to produce a cliff-edge overflow</P>
+<P>
+<A NAME="50422153_pgfId-300589"></A>To create a smooth overflow, the token <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_any_c</A> must be supplied to the <CODE>
+properties</CODE>
+ argument. </P>
+<P>
+<A NAME="50422153_pgfId-389257"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-953.gif">
+
+<P>
+<A NAME="50422153_pgfId-300978"></A>Figure 76-24 Overriding the default to produce a smooth overflow</P>
+
+
+
+<H3>
+<A NAME="50422153_pgfId-300982"></A>	76.4.5 	<A NAME="50422153_19502"></A><A NAME="50422153_marker-300980"></A><A NAME="50422153_marker-300981"></A>External overflows </H3>
+<P>
+<A NAME="50422153_pgfId-300983"></A>External overflows are those cases where the overflowing blend is the only edge being blended at the appropriate vertex.</P>
+<P>
+<A NAME="50422153_pgfId-389304"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-954.gif">
+
+<P>
+<A NAME="50422153_pgfId-301134"></A>Figure 76-25 External overflow</P>
+<P>
+<A NAME="50422153_pgfId-301139"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422153_pgfId-301137"></A>Note: When creating external overflows of the cliff-edge type it is always necessary to specify that the cliff edge is required at the end of the blend by supplying the <A HREF=../headers/pk_blend_ov_cliff_end_t.html>PK_blend_ov_cliff_end_yes_c</A> token to the <CODE>
+properties</CODE>
+ argument.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422153_pgfId-301138"></A>The <A HREF=../headers/pk_blend_ov_notch_t.html>PK_blend_ov_notch_no_c</A> token only applies to internal overflows, and has no effect on external overflow behaviour.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422153_pgfId-301140"></A>The following examples of external overflows are used to illustrate the expected default behaviour of the particular example and the behaviour of the example when specific overflow conditions (via tokens) are applied. </P>
+
+<H4>
+<A NAME="50422153_pgfId-301145"></A>76.4.5.1 <A NAME="50422153_marker-301141"></A><A NAME="50422153_marker-301142"></A><A NAME="50422153_marker-301143"></A><A NAME="50422153_marker-301144"></A>External overflow over a sharp edge </H4>
+<P>
+<A NAME="50422153_pgfId-389351"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-955.gif">
+
+<P>
+<A NAME="50422153_pgfId-301210"></A>Figure 76-26 Blend to overflow a sharp edge of opposite convexity</P>
+<P>
+<A NAME="50422153_pgfId-301211"></A>For this set of conditions the default blend overflow is a notch overflow. In these circumstances smooth overflow is not possible, the token <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_any_c</A> would be ignored if supplied to the <CODE>
+properties</CODE>
+ argument.</P>
+<P>
+<A NAME="50422153_pgfId-389419"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-956.gif">
+
+<P>
+<A NAME="50422153_pgfId-301310"></A>Figure 76-27 Default conditions creating a notch overflow</P>
+<P>
+<A NAME="50422153_pgfId-301311"></A>To create a cliff-edge overflow the <A HREF=../headers/pk_blend_ov_cliff_t.html>PK_blend_ov_cliff_any_c</A> token must be supplied to the <CODE>
+properties</CODE>
+ argument. As previously explained, when creating external overflows of the cliff-edge type it is necessary, as in this case, to also supply the <A HREF=../headers/pk_blend_ov_cliff_end_t.html>PK_blend_ov_cliff_end_yes_c</A> token as the cliff-edge overflow is at the end of the blend.</P>
+<P>
+<A NAME="50422153_pgfId-389466"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-957.gif">
+
+<P>
+<A NAME="50422153_pgfId-301444"></A>Figure 76-28 Overriding the default to produce a cliff-edge overflow</P>
+
+
+<H4>
+<A NAME="50422153_pgfId-389526"></A>76.4.5.2 <A NAME="50422153_marker-389522"></A><A NAME="50422153_marker-389523"></A><A NAME="50422153_marker-389524"></A><A NAME="50422153_marker-389525"></A>External overflow over a smooth edge with opposite convexity </H4>
+<P>
+<A NAME="50422153_pgfId-389595"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-958.gif">
+
+<P>
+<A NAME="50422153_pgfId-301578"></A>Figure 76-29 Blend to overflow a smooth edge of opposite convexity</P>
+<P>
+<A NAME="50422153_pgfId-301579"></A>For this set of conditions the default blend overflow is a smooth overflow. The notch overflow is not possible in these circumstances.</P>
+<P>
+<A NAME="50422153_pgfId-389644"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-959.gif">
+
+<P>
+<A NAME="50422153_pgfId-301874"></A>Figure 76-30 Default condition creating a smooth overflow</P>
+<P>
+<A NAME="50422153_pgfId-301875"></A>To create a cliff-edge overflow, the <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_no_c</A> token must be supplied to the <CODE>
+properties</CODE>
+ argument. As previously explained, when creating external overflows of the cliff-edge type it is necessary, as is in this case, to also supply the <A HREF=../headers/pk_blend_ov_cliff_end_t.html>PK_blend_ov_cliff_end_yes_c</A> token to allow an end cliff.</P>
+<P>
+<A NAME="50422153_pgfId-397355"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-960.gif">
+
+<P>
+<A NAME="50422153_pgfId-302160"></A>Figure 76-31 Overriding the default to produce a cliff-edge overflow</P>
+
+
+<H4>
+<A NAME="50422153_pgfId-302166"></A>76.4.5.3 <A NAME="50422153_marker-302161"></A><A NAME="50422153_marker-302162"></A><A NAME="50422153_marker-302163"></A><A NAME="50422153_marker-302164"></A><A NAME="50422153_marker-302165"></A>External overflow over a sharp edge with the same convexity </H4>
+<P>
+<A NAME="50422153_pgfId-389759"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-961.gif">
+
+<P>
+<A NAME="50422153_pgfId-302228"></A>Figure 76-32 Blend to overflow a sharp edge of the same convexity</P>
+<P>
+<A NAME="50422153_pgfId-302229"></A>For this set of conditions the default blend overflow is a notch overflow. The smooth overflow is not possible in these circumstances, therefore the <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_any_c</A> token would be ignored if it were supplied to the <CODE>
+properties</CODE>
+ argument.</P>
+<P>
+<A NAME="50422153_pgfId-389810"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-962.gif">
+
+<P>
+<A NAME="50422153_pgfId-302384"></A>Figure 76-33 Default condition creating a notch overflow</P>
+<P>
+<A NAME="50422153_pgfId-302385"></A>To create a cliff-edge overflow the <A HREF=../headers/pk_blend_ov_cliff_t.html>PK_blend_ov_cliff_any_c</A> token must be provided because the convexity is the same, and the <A HREF=../headers/pk_blend_ov_cliff_end_t.html>PK_blend_ov_cliff_end_yes_c</A> token because the cliff edge is at the end of the blend.</P>
+<P>
+<A NAME="50422153_pgfId-398073"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-963.gif">
+
+<P>
+<A NAME="50422153_pgfId-302564"></A>Figure 76-34 Overriding the default to produce a cliff-edge overflow</P>
+
+
+<H4>
+<A NAME="50422153_pgfId-302569"></A>76.4.5.4 <A NAME="50422153_marker-302565"></A><A NAME="50422153_marker-302566"></A><A NAME="50422153_marker-302567"></A><A NAME="50422153_marker-302568"></A>External overflow over a smooth edge with the same convexity </H4>
+<P>
+<A NAME="50422153_pgfId-389910"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-964.gif">
+
+<P>
+<A NAME="50422153_pgfId-302666"></A>Figure 76-35 Blend to overflow a smooth edge of the same convexity</P>
+<P>
+<A NAME="50422153_pgfId-302667"></A>For this set of conditions the default blend overflow is a notch overflow.</P>
+<P>
+<A NAME="50422153_pgfId-398545"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-965.gif">
+
+<P>
+<A NAME="50422153_pgfId-302832"></A>Figure 76-36 Default conditions creating a notch overflow</P>
+<P>
+<A NAME="50422153_pgfId-302833"></A>To create a smooth overflow the <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_any_c</A> token must be supplied to the <CODE>
+properties</CODE>
+ argument.</P>
+<P>
+<A NAME="50422153_pgfId-398900"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-966.gif">
+
+<P>
+<A NAME="50422153_pgfId-303108"></A>Figure 76-37 Creating a smooth overflow by supplying token <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_any_c</A></P>
+<P>
+<A NAME="50422153_pgfId-303109"></A>To create a cliff-edge overflow the <A HREF=../headers/pk_blend_ov_cliff_t.html>PK_blend_ov_cliff_any_c</A> token must be provided because the convexity is the same, and the <A HREF=../headers/pk_blend_ov_cliff_end_t.html>PK_blend_ov_cliff_end_yes_c</A> token because the cliff edge is at the end of the blend.</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.076.html">Edge Blending Options</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.078.html">Face-Face Blending</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

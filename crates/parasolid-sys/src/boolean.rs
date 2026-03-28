@@ -1252,6 +1252,10 @@ pub struct PK_FACE_pattern_2_r_t { _private: [u8; 0] }
 #[repr(C)]
 pub struct PK_FACE_imprint_cus_vector_o_t { _private: [u8; 0] }
 
+/// Options for `PK_BODY_imprint_cus_vector`.
+#[repr(C)]
+pub struct PK_BODY_imprint_cus_vector_o_t { _private: [u8; 0] }
+
 // =============================================================================
 // Extern "C" function declarations
 // =============================================================================
@@ -1280,6 +1284,7 @@ unsafe extern "C" {
         n_tools: c_int,
         tools: *const PK_BODY_t,
         options: *const PK_BODY_boolean_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
         results: *mut PK_boolean_r_t,
     ) -> PK_ERROR_code_t;
 
@@ -1295,6 +1300,7 @@ unsafe extern "C" {
         n_tool_faces: c_int,
         tool_faces: *const PK_FACE_t,
         options: *const PK_FACE_boolean_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
         results: *mut PK_boolean_r_t,
     ) -> PK_ERROR_code_t;
 
@@ -1712,6 +1718,43 @@ unsafe extern "C" {
         direction: PK_VECTOR_t,
         tol: c_double,
         options: *const PK_FACE_imprint_cus_vector_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+    ) -> PK_ERROR_code_t;
+
+    // =========================================================================
+    // Body imprinting (deprecated, superseded by PK_CURVE_project)
+    // =========================================================================
+
+    /// Imprint curves on body by projecting down face normals (deprecated).
+    pub fn PK_BODY_imprint_curves_normal(
+        body: PK_BODY_t,
+        n_curves: c_int,
+        curves: *const PK_CURVE_t,
+        tol: c_double,
+        n_edges: *mut c_int,
+        edges: *mut *mut PK_EDGE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Imprint curves on body by projecting in a direction (deprecated).
+    pub fn PK_BODY_imprint_curves_vector(
+        body: PK_BODY_t,
+        n_curves: c_int,
+        curves: *const PK_CURVE_t,
+        tol: c_double,
+        direction: PK_VECTOR_t,
+        n_edges: *mut c_int,
+        edges: *mut *mut PK_EDGE_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Imprint curves on body by vector projection with options (deprecated).
+    pub fn PK_BODY_imprint_cus_vector(
+        body: PK_BODY_t,
+        n_curves: c_int,
+        curves: *const PK_CURVE_t,
+        intervals: *const PK_INTERVAL_t,
+        tol: c_double,
+        direction: PK_VECTOR_t,
+        options: *const PK_BODY_imprint_cus_vector_o_t,
         tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 

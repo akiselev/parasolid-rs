@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_make_bcurve_array</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_make_bcurve_array</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_CURVE_make_bcurve_array
+(
+<I>--- received arguments ---
+</I>int                                   n_curves,      --- number of curves
+<A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                            curves[],      --- curves
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                         ranges[],      --- curve intervals
+const <A HREF=../headers/pk_curve_make_bcurve_array_o_t.html>PK_CURVE_make_bcurve_array_o_t</A> *options,       --- option structure [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_curve_make_bcurve_res_t.html>PK_CURVE_make_bcurve_res_t</A>            results[],     --- results
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>                  *const  all_succeeded  --- whether succeeded for
+                                                     --- all curves
+)
+</B>
+<A NAME="description"></A>
+<I>Given an array of curves and intervals this function creates
+B-curves that satisfy the <B>'options'</B> specified.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="documentation"></A>
+Each created B-curve will be exactly coincident with the given curve if
+possible. Where this is not possible, the maximum distance between the curve
+and the returned B-curve will be limited by <B>'tolerance'</B>. The function will
+usually achieve this condition but this is not guaranteed.
+
+If an exact result does not match the specified continuity, an approximation
+will be used.
+
+Finer control over the form of the resulting bcurve can be provided through
+the option structure.
+
+The resulting B-curves will be attached to the specified <B>'destination'</B>.
+
+  Notes for specific classes of input curve
+  =========================================
+
+             Line:  Unless the <B>'have_degree'</B> option is set, the B-curve will be
+                    linear (degree 1). The result will always be exact.
+
+   Circle/Ellipse:  The result will be cubic by default, and exact unless the
+                    <B>'force_non_rational'</B> option is set. The parameterisation
+                    of the input curve may not be preserved.
+
+          B-curve:  Unless you specify the degree of the output B-curve, using
+                    the <B>'have_degree'</B> and <B>'degree'</B> option fields, the output
+                    B-curve will have the same degree as the input curve if
+                    the result is exact.
+
+                    The result will be an approximation if and only if any of
+                    the following are true:
+                      o The degree is lowered (note that increasing the degree
+                        can be done with an exact result).
+                      o The input curve is rational and the
+                        <B>'force_non_rational'</B> option is true, except in the
+                        special case when all the weights of the rational curve
+                        are equal.
+                      o Any discontinuities are eliminated (via the
+                        <B>'force_continuity'</B> option).
+
+  Intersection/SP:  The output will usually be approximate (and cubic by
+                    default) unless the curve coincides with a constant
+                    parameter line of an underlying B-surface. In this case
+                    the options will apply to the extracted B-curve and an
+                    exact result will be possible in some cases.
+
+         Polyline:  The output B-curve will be piecewise linear (degree 1) and
+                    the result will be exact. If either the <B>'have_degree'</B>
+                    option or <B>'force_continuity'</B> option is set to an
+                    unsupported value, then PK_ERROR_facet_geometry error will
+                    be returned.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

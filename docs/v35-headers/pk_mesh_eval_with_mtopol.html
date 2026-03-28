@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_MESH_eval_with_mtopol</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MESH_eval_with_mtopol</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_MESH_eval_with_mtopol
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_mesh_t.html>PK_MESH_t</A>                           mesh,       --- the mesh
+<A HREF=../headers/pk_uv_t.html>PK_UV_t</A>                             uv,         --- mesh parameters
+const <A HREF=../headers/pk_mesh_eval_with_mtopol_o_t.html>PK_MESH_eval_with_mtopol_o_t</A> *options,    --- option structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                  *const position,   --- position returned
+<A HREF=../headers/pk_mfacet_t.html>PK_MFACET_t</A>                  *const mfacet,     --- mfacet returned
+<A HREF=../headers/pk_mtopol_t.html>PK_MTOPOL_t</A>                  *const mtopol      --- mtopol returned
+)
+</B>
+<A NAME="description"></A>
+<I>This function evaluates the <B>'mesh'</B> at the given <B>'uv'</B> position and returns the
+<B>'position'</B>, <B>'mfacet'</B> and <B>'mtopol'</B> at that position.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_parameter      the uv coordinates supplied do not lie on the
+                                given mesh. (MILD)
+    PK_ERROR_invalid_geometry   the mesh has invalid geometry. (MILD)
+
+    PK_ERROR_eval_failure       internal evaluator failure (MILD)
+
+<A NAME="documentation"></A>
+If the <B>'position'</B> is inside an mfacet both the <B>'mfacet'</B> and the <B>'mtopol'</B>
+returned will be this mfacet.
+
+If the <B>'position'</B> is on an mfin or an mvertex, it is considered to lie on more
+than one mfacet.
+    * If the <B>'position'</B> is on an mfin the <B>'mfacet'</B> returned will be an mfacet
+      which has an mfin on which this <B>'position'</B> lies.  The <B>'mtopol'</B> returned
+      will be the mfin corresponding to the <B>'mfacet'</B>.
+    * If the <B>'position'</B> is on an mvertex the <B>'mfacet'</B> returned will be an
+      mfacet at the mvertex and the <B>'mtopol'</B> returned will be the mvertex.
+
+In cases where the <B>'position'</B> lies on more than one mfacet, if the
+<B>'want_lowest_mfacet'</B> option is set to PK_LOGICAL_true (the default) the
+<B>'mfacet'</B> returned will be the mfacet with the lowest identifier.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

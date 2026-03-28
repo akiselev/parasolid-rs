@@ -1,0 +1,1544 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Sectioning</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Sectioning</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.055.html">Instancing And Patterning </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.057.html">Intersections</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-294719">55.1	Introduction </A>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-294725">55.2	Global sectioning </A>
+<UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-294729">55.2.1	Sectioning with surfaces </A>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-294737">55.2.2	Sectioning with sheets </A>
+</UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-294745">55.3	Local sectioning </A>
+<UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-294750">55.3.1	Sectioning with faces </A>
+</UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-294760">55.4	Options for global and local sectioning </A>
+<UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-294826">55.4.1	Effect of the fence options in sectioning operations </A>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-295475">55.4.2	Merging options in sectioning operations</A>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-296112">55.4.3	Geometry sharing </A>
+</UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-296117">55.5	Non-destructive sectioning </A>
+<UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-453923">55.5.1	Creating planar sections at multiple offsets </A>
+</UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-463367">55.6	Clipping Lattices </A>
+<UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-480930">55.6.1	Received and returned arguments </A>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-481821">55.6.2	Effect of the fence option in lattice clipping </A>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-544980">55.6.3	Effect of clipping </A>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-481830">55.6.4	Controlling the behaviour of clipped ltopology </A>
+<UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-597258">55.6.4.1	Controlling the behaviour of ltopologies that are coincident with a clip entity </A>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-625853">55.6.4.2	Merging duplicate ltopologies when clipping lattices </A>
+</UL>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-481803">55.6.5	Controlling returned information </A>
+<LI> <A HREF="fd_chap.056.html#50421908_pgfId-482082">55.6.6	Returned information on clipped lattices </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50421908_pgfId-294719"></A>55.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50421908_pgfId-294720"></A>This chapter explains how you section bodies using the sectioning operations available within Parasolid, and also how to clip lattices using a set of clipping entities. The sectioning functions support sectioning with surfaces (planar or cylindrical) or sheet bodies.</P>
+<P>
+<A NAME="50421908_pgfId-294721"></A>The sectioning operation is similar to the boolean subtract operation, except the functions receive slightly different options and return more section-related information. Apart from these differences, the rules regarding tag persistence are identical to that of the boolean operation.</P>
+<P>
+<A NAME="50421908_pgfId-351475"></A>Parasolid supports both global and local sectioning operations. These are described in the rest of this chapter. </P>
+<P>
+<A NAME="50421908_pgfId-372786"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50421908_pgfId-372900"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-351359"></A>Like global and local booleans, global and local sectioning can automatically look for regions between the target and tool that are nearly coincident to aid the sectioning operation. See <A HREF="fd_chap.052.html#50422125_34853">Section 51.4.5, “Matched topology in local and global boolean operations”</A>, for complete details.</P>
+<P>
+<A NAME="50421908_pgfId-478761"></A>The lattice clipping operation is similar to a sectioning operation and will return one or more new lattices that represent the portions of the supplied lattice that lie on the relevant side of the supplied clipping entities.</P>
+<P>
+<A NAME="50421908_pgfId-365554"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-360957"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50421908_pgfId-479081"></A><A HREF="fd_chap.021.html#50422090_36208">Chapter 20, “Lattice Geometry”</A></LI>
+<LI>
+<A NAME="50421908_pgfId-360961"></A><A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50421908_pgfId-294725"></A>55.2	<A NAME="50421908_85972"></A><A NAME="50421908_marker-294723"></A><A NAME="50421908_marker-294724"></A>Global sectioning 
+
+
+</H1>
+<P>
+<A NAME="50421908_pgfId-294726"></A>A global section is characterized by the comparison of all face pairs from the target and section entities. These section operations are supported by the <A HREF=../headers/pk_body_section_with_sheet_2.html>PK_BODY_section_with_sheet_2</A> and <A HREF=../headers/pk_body_section_with_surf.html>PK_BODY_section_with_surf</A> functions which require one target body, one tool entity and an options structure.</P>
+
+<H3>
+<A NAME="50421908_pgfId-294729"></A>	55.2.1 	<A NAME="50421908_marker-294727"></A><A NAME="50421908_marker-294728"></A>Sectioning with surfaces </H3>
+<P>
+<A NAME="50421908_pgfId-294733"></A><A NAME="50421908_marker-294730"></A><A NAME="50421908_marker-294731"></A><A NAME="50421908_marker-294732"></A><A HREF=../headers/pk_body_section_with_surf.html>PK_BODY_section_with_surf</A> supports sectioning a body with a planar or cylindrical surface. The target body to be sectioned can be either a solid or sheet body. The effect is the same as subtracting a sheet tool with the same infinite surface.</P>
+<P>
+<A NAME="50421908_pgfId-294734"></A>This function receives an options structure that contains an option to specify whether resulting bodies in front of the sectioning tool, behind the sectioning surface or both should be returned by the function.</P>
+<P>
+<A NAME="50421908_pgfId-350610"></A>If generalised topology is enabled, then the target may be a general body. In cases where a general body cannot be successfully sectioned, error information is saved in a Parasolid Report. See the documentation for <A HREF=../headers/pk_body_section_with_surf.html>PK_BODY_section_with_surf</A> for more details. </P>
+
+
+<H3>
+<A NAME="50421908_pgfId-294737"></A>	55.2.2 	<A NAME="50421908_marker-294735"></A><A NAME="50421908_marker-294736"></A><A NAME="50421908_87815"></A>Sectioning with sheets </H3>
+<P>
+<A NAME="50421908_pgfId-294739"></A><A NAME="50421908_marker-425033"></A><A HREF=../headers/pk_body_section_with_sheet_2.html>PK_BODY_section_with_sheet_2</A> supports sectioning a body with a sheet tool. The target body to be sectioned can be either a solid or sheet body. The tool may be disjoint. </P>
+<P>
+<A NAME="50421908_pgfId-425172"></A>After modifying the target body the sectioning sheet tool is deleted. </P>
+<P>
+<A NAME="50421908_pgfId-294741"></A><A NAME="50421908_marker-425035"></A><A HREF=../headers/pk_body_section_with_sheet_2.html>PK_BODY_section_with_sheet_2</A> receives an options structure which contains an option to specify whether result bodies in front of the sectioning tool, behind the sectioning tool or both should be returned by the function. </P>
+<P>
+<A NAME="50421908_pgfId-350769"></A>If generalised topology is enabled, then the target and the result body (or bodies) can be general but the tool body must be manifold.If it is not possible to classify the result body as being in front of or behind the sectioning tool, then a Parasolid Report of type <A HREF=../headers/pk_report_record_1_t.html>PK_REPORT_record_1_t</A> is generated. </P>
+<P>
+<A NAME="50421908_pgfId-369494"></A>See the documentation for <A HREF=../headers/pk_body_section_with_sheet_2.html>PK_BODY_section_with_sheet_2</A> for more details.</P>
+<P>
+<A NAME="50421908_pgfId-369943"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid Report mechanism.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50421908_pgfId-294745"></A>55.3	<A NAME="50421908_15626"></A><A NAME="50421908_marker-294743"></A><A NAME="50421908_marker-294744"></A>Local sectioning 
+
+
+</H1>
+<P>
+<A NAME="50421908_pgfId-294746"></A>A local sectioning operation is characterized by the comparison of selected face pairs in the target and section bodies. This form of section is quicker than a global section but does not guarantee topological consistency on the resulting bodies.</P>
+<P>
+<A NAME="50421908_pgfId-294747"></A>This sectioning operation is supported by the <A HREF=../headers/pk_face_section_with_sheet_2.html>PK_FACE_section_with_sheet_2</A> function, which requires one or more faces from the target and section bodies and an options structure.</P>
+
+<H3>
+<A NAME="50421908_pgfId-294750"></A>	55.3.1 	<A NAME="50421908_marker-294748"></A><A NAME="50421908_marker-294749"></A>Sectioning with faces </H3>
+<P>
+<A NAME="50421908_pgfId-294752"></A><A NAME="50421908_marker-379625"></A><A HREF=../headers/pk_face_section_with_sheet_2.html>PK_FACE_section_with_sheet_2</A> supports sectioning particular faces of a target body with faces of a sheet body. The target body to be sectioned can be either a solid or sheet body. This function does not support generalised topology. It is similar to <A NAME="50421908_marker-379627"></A><A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> in that it supports partial sectioning of bodies.</P>
+<P>
+<A NAME="50421908_pgfId-294755"></A><A NAME="50421908_marker-294754"></A><A HREF=../headers/pk_face_section_with_sheet_2.html>PK_FACE_section_with_sheet_2</A> receives an options structure similar to that of <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> and includes the option to specify whether resulting bodies in front of the sectioning tool, behind the sectioning tool or both should be returned by the function. The options structure also has the facility for the user to specify matched topology in the same way as for boolean operations.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50421908_pgfId-294760"></A>55.4	<A NAME="50421908_64079"></A><A NAME="50421908_marker-294757"></A><A NAME="50421908_marker-294758"></A><A NAME="50421908_marker-294759"></A>Options for global and local sectioning 
+
+
+</H1>
+<P>
+<A NAME="50421908_pgfId-294761"></A>The behaviour of the sectioning functions, <A HREF=../headers/pk_body_section_with_sheet_2.html>PK_BODY_section_with_sheet_2</A> (global), <A HREF=../headers/pk_body_section_with_surf.html>PK_BODY_section_with_surf</A> (global) and <A HREF=../headers/pk_face_section_with_sheet_2.html>PK_FACE_section_with_sheet_2</A> (local) is altered using options passed to these functions. The options structures for these functions are different, but overlap with respect to a number of options. The options are as follows:</P>
+<P>
+<A NAME="50421908_pgfId-294823"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294764"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294766"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294768"></A><CODE>
+fence<BR>
+</CODE>
+(global &amp; local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294770"></A>Determines which bodies, front and/or back, are returned when performing a section operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294772"></A><CODE>
+merge_imprinted<BR>
+</CODE>
+(global &amp; local</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294774"></A>Merge all mergeable imprinted edges created and/or located by the section operation. Note, mergeable edges which are adjacent to the new section faces are not merged.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294776"></A><CODE>
+merge_new_faces<BR>
+</CODE>
+(global &amp; local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294778"></A>Merge all mergeable imprinted edges created by the section operation, including edges adjacent to the new section faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294780"></A><CODE>
+selective_merge<BR>
+</CODE>
+(global &amp; local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294782"></A>Avoid merging imprinted edges that existed and were mergeable before the start of the section operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294784"></A><CODE>
+check_fa<BR>
+</CODE>
+(global &amp; local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294786"></A>Checks faces involved in the section operation. Only faces which are adjacent to imprinted edges are checked</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294788"></A><CODE>
+default_tol<BR>
+</CODE>
+(global &amp; local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294790"></A>The default tolerance to which the section operation, if it has to, may approximate entities or assume that entities are coincident.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294792"></A><CODE>
+max_tol<BR>
+</CODE>
+(global &amp; local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294794"></A>The maximum tolerance which may be applied to any entity involved in the section operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-617359"></A><CODE>
+tracking</CODE>
+ <BR>
+(global)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-618146"></A>Whether or not tracking information for imprinted edges and for vertices imprinted on wireframe edges on the target body is returned in the <CODE>
+tracking</CODE>
+ structure.</P>
+<P>
+<A NAME="50421908_pgfId-618137"></A>Default: PK_LOGICAL_false.</P>
+<ADDRESS>
+<A NAME="50421908_pgfId-617713"></A>Note: This option is used by <A HREF=../headers/pk_body_section_with_sheet_2.html>PK_BODY_section_with_sheet_2</A> only</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294796"></A><CODE>
+extend_face_list<BR>
+</CODE>
+(local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294798"></A>A local boolean receives a subset of the faces of a target and/or a tool body. If the imprinting phase of the boolean results in incomplete loops of imprinted edges, then additional target and/or tool faces are used.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294800"></A><CODE>
+select_region<BR>
+</CODE>
+(local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294802"></A>This option sub-structure is used to identify regions of the tool to be included or excluded in the boolean result. See <A HREF="fd_chap.052.html#50422125_56451">Section 51.4.2, “Selecting regions in local booleans”</A> for a description of the options.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294807"></A><CODE>
+matched_region<BR>
+</CODE>
+(global &amp; local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294809"></A>This option sub-structure describes matched regions between the target and tool bodies. See <A HREF="fd_chap.052.html#50422125_34853">Section 51.4.5, “Matched topology in local and global boolean operations”</A>, for a description of the options.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294814"></A><CODE>
+keep_target_edges<BR>
+</CODE>
+(global &amp; local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-294816"></A>Control which edge survives when a target edge and tool edge coincide during a section operation. This can be one of:</P>
+<UL>
+<LI>
+<A NAME="50421908_pgfId-294817"></A>PK_LOGICAL_false: The older edge (with the smallest tag) survives. This is the default.</LI>
+<LI>
+<A NAME="50421908_pgfId-294818"></A>PK_LOGICAL_true: The target edge survives, unless both</LI>
+<UL>
+<LI>
+<A NAME="50421908_pgfId-294819"></A>the target edge is a new edge imprinted during the boolean, and </LI>
+<LI>
+<A NAME="50421908_pgfId-294820"></A>the tool edge was already present</LI>
+</UL>
+<P>
+<A NAME="50421908_pgfId-294821"></A>in which case, the tool edge survives.</P>
+</UL>
+<P>
+<A NAME="50421908_pgfId-294822"></A>If both faces adjacent to the tool edge survive, then the tool edge survives, regardless of the value of this option. If generalised topology is on, the target edge always survives.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-427344"></A><CODE>
+keep_as_facet<BR>
+</CODE>
+(global &amp; local)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-427777"></A>Controls whether to return a resulting body containing facet geometry only, or a mixture of classic and facet geometry. See <A HREF="fd_chap.085.html#50422162_65426">Section 84.6, “Creating a mixture of facet and classic geometry”</A>, for more information. </P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50421908_pgfId-294826"></A>	55.4.1 	<A NAME="50421908_marker-519750"></A><A NAME="50421908_marker-519751"></A><A NAME="50421908_77844"></A>Effect of the fence options in sectioning operations </H3>
+<P>
+<A NAME="50421908_pgfId-294827"></A>The <CODE>
+fence</CODE>
+ option controls which regions of the target entities are returned.</P>
+
+<H4>
+<A NAME="50421908_pgfId-294828"></A>Example 1:</H4>
+<P>
+<A NAME="50421908_pgfId-294829"></A><STRONG>
+Sectioning solid with sheet using the </STRONG><CODE>
+both</CODE>
+<STRONG>
+ fence option</STRONG></P>
+<P>
+<A NAME="50421908_pgfId-334064"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-619.gif">
+
+<P>
+<A NAME="50421908_pgfId-295060"></A>Figure 55-1 Sectioning solid using the <CODE>
+both</CODE>
+ fence option</P>
+<P>
+<A NAME="50421908_pgfId-295061"></A>Using the <CODE>
+both</CODE>
+ fence option, all regions (in front and behind the sheet body are returned); i.e., three front bodies, one back body, three front faces and three back faces.</P>
+
+
+<H4>
+<A NAME="50421908_pgfId-295062"></A>Example 2:</H4>
+<P>
+<A NAME="50421908_pgfId-295063"></A><STRONG>
+Sectioning solid with sheet using the </STRONG><CODE>
+front</CODE>
+<STRONG>
+ fence option</STRONG></P>
+<P>
+<A NAME="50421908_pgfId-336908"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-620.gif">
+
+<P>
+<A NAME="50421908_pgfId-295264"></A>Figure 55-2 Sectioning solid using the <CODE>
+front</CODE>
+ fence option</P>
+<P>
+<A NAME="50421908_pgfId-295265"></A>Using the <CODE>
+front</CODE>
+ fence option, only regions in front of the sheet body are returned; i.e., three front bodies and three front faces.</P>
+
+
+<H4>
+<A NAME="50421908_pgfId-295266"></A>Example 3:</H4>
+<P>
+<A NAME="50421908_pgfId-295267"></A><STRONG>
+Sectioning solid with sheet using the </STRONG><CODE>
+back</CODE>
+<STRONG>
+ fence option</STRONG></P>
+<P>
+<A NAME="50421908_pgfId-332800"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-621.gif">
+
+<P>
+<A NAME="50421908_pgfId-295470"></A>Figure 55-3 Sectioning solid using the <CODE>
+back</CODE>
+ fence option</P>
+<P>
+<A NAME="50421908_pgfId-295471"></A>Using the <CODE>
+back</CODE>
+ fence option, only regions behind the sheet body are returned; i.e., one back body and three back faces.</P>
+
+
+
+<H3>
+<A NAME="50421908_pgfId-295475"></A>	55.4.2 	<A NAME="50421908_marker-295472"></A><A NAME="50421908_marker-295473"></A><A NAME="50421908_marker-295474"></A>Merging options in sectioning operations</H3>
+
+<H4>
+<A NAME="50421908_pgfId-295476"></A>Example:</H4>
+<P>
+<A NAME="50421908_pgfId-348050"></A><STRONG>
+Local section with two excluded regions and fence = </STRONG><CODE>
+back</CODE>
+ </P>
+<P>
+<A NAME="50421908_pgfId-348085"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-622.gif">
+
+<P>
+<A NAME="50421908_pgfId-296108"></A>Figure 55-4 Merge options in sectioning operations</P>
+
+
+
+<H3>
+<A NAME="50421908_pgfId-296112"></A>	55.4.3 	<A NAME="50421908_marker-296109"></A><A NAME="50421908_marker-296110"></A><A NAME="50421908_marker-296111"></A>Geometry sharing </H3>
+<P>
+<A NAME="50421908_pgfId-296113"></A>Using the sectioning functions may break the geometry sharing by splitting a body into two with the result that there are faces on each body that used to share a common surface. Similarly, the functions may also create geometry sharing of the section surface in one of the bodies, and the sharing of a copy of it in the other body.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50421908_pgfId-296117"></A>55.5	<A NAME="50421908_71633"></A><A NAME="50421908_marker-296115"></A><A NAME="50421908_marker-296116"></A>Non-destructive sectioning 
+
+
+</H1>
+<P>
+<A NAME="50421908_pgfId-296124"></A>The global and local sectioning operations described in <A HREF="fd_chap.056.html#50421908_85972" CLASS="XRef">Section 55.2</A>, <A HREF="fd_chap.056.html#50421908_15626">Section 55.3</A>, and <A HREF="fd_chap.056.html#50421908_64079">Section 55.4</A> all operate directly on the target body, either destroying it completely or splitting it up into several components and returning only the components requested.</P>
+<P>
+<A NAME="50421908_pgfId-296131"></A>Parasolid also offers support for non-destructive sectioning, where the target entities supplied to Parasolid are left unchanged. You can perform non-destructive sectioning using any of the following functions:</P>
+<P>
+<A NAME="50421908_pgfId-296152"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296137"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296139"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296141"></A><A HREF=../headers/pk_body_make_section.html>PK_BODY_make_section</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296143"></A>Section a set of target bodies using a set of sheet bodies. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296145"></A><A HREF=../headers/pk_body_make_section_with_surfs.html>PK_BODY_make_section_with_surfs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296147"></A>Section a set of target bodies using a set of surfaces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296149"></A><A HREF=../headers/pk_face_make_sect_with_sfs.html>PK_FACE_make_sect_with_sfs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296151"></A>Section a set of target faces using a set of surfaces.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-296153"></A>All of these functions take the following options:</P>
+<P>
+<A NAME="50421908_pgfId-296171"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296156"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296158"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-296160"></A>tracking</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296162"></A>Whether or not to return tracking information that relates new edges created in the tool body to their originating faces in the target body. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-296164"></A>allow_disjoint</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296166"></A>Whether or not to allow disjoint bodies to be returned. </P>
+<UL>
+<LI>
+<A NAME="50421908_pgfId-296167"></A>If PK_LOGICAL_false, a tool body that is disjoint after the operation is returned as several bodies, each with a single connected component. </LI>
+<LI>
+<A NAME="50421908_pgfId-296168"></A>If PK_LOGICAL_true, a tool body that is disjoint after the operation is returned as a single disjoint body with several disconnected components. </LI>
+</UL>
+<P>
+<A NAME="50421908_pgfId-296169"></A>This behaviour occurs regardless of whether a tool body is disjoint when passed into the function. For example, if a disjoint tool body is passed in, and <CODE>
+allow_disjoint</CODE>
+ is PK_LOGICAL_false, several non-disjoint bodies may be returned.</P>
+<P>
+<A NAME="50421908_pgfId-296170"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-460759"></A>keep_as_facet</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-460761"></A>Controls whether to return a resulting body containing facet geometry only, or a mixture of classic and facet geometry. See <A HREF="fd_chap.085.html#50422162_65426">Section 84.6, “Creating a mixture of facet and classic geometry”</A>, for more information. Default: PK_BODY_keep_as_facet_yes_c.</P>
+<ADDRESS>
+<A NAME="50421908_pgfId-460995"></A>Note: This field is ignored if the target entities contain classic geometry. This field is ignored in calls to <A HREF=../headers/pk_body_make_section.html>PK_BODY_make_section</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-296172"></A><A HREF=../headers/pk_body_make_section.html>PK_BODY_make_section</A> and <A HREF=../headers/pk_body_make_section_with_surfs.html>PK_BODY_make_section_with_surfs</A> also take the following options:</P>
+<P>
+<A NAME="50421908_pgfId-296182"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296175"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296177"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-365984"></A>default_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-365999"></A>The default tolerance to which the boolean operation may approximate entities or assume that entities are coincident to. Default: 1.0e-5.</P>
+<P>
+<A NAME="50421908_pgfId-366930"></A>See the PK Reference documentation for PK_BODY_make_section_t for more information.</P>
+<ADDRESS>
+<A NAME="50421908_pgfId-366633"></A>Note: This field is used by <A HREF=../headers/pk_body_make_section_with_surfs.html>PK_BODY_make_section_with_surfs</A> only.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-366014"></A>max_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-366016"></A>The maximum tolerance which may be applied to any entity involved in the boolean operation. By default, it is set to 0.0. If it is not set to the default, then it must be set to a value that is greater than that of <CODE>
+default_tol</CODE>
+.</P>
+<P>
+<A NAME="50421908_pgfId-367060"></A>See the PK Reference documentation for PK_BODY_make_section_t for more information.</P>
+<ADDRESS>
+<A NAME="50421908_pgfId-366717"></A>Note: This field is used by <A HREF=../headers/pk_body_make_section_with_surfs.html>PK_BODY_make_section_with_surfs</A> only.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-296179"></A>result_body_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296181"></A>Whether tool bodies should be returned as sheet bodies or wire bodies (by deleting the faces from the returned sheet bodies). Default: PK_BODY_type_sheet_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-354440"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-354442"></A>Update switch to maintain consistency when rebuilding models built in earlier versions of Parasolid (Default: <A HREF=../headers/pk_boolean_update_t.html>PK_boolean_update_default_c</A>). See <A HREF="fd_chap.052.html#50422125_69648">Section 51.4.19, “Update control”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-453284"></A>n_offsets</PRE>
+<PRE><A NAME="50421908_pgfId-453311"></A>offsets</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-453286"></A>For slicing operations, the number of offsets to be applied to the supplied tool plane and the offset distances themselves. (Default: 0, NULL.) See <A HREF="fd_chap.056.html#50421908_74747">Section 55.5.1, “Creating planar sections at multiple offsets”</A> for more information.</P>
+<ADDRESS>
+<A NAME="50421908_pgfId-453570"></A>Note: This field is used by <A HREF=../headers/pk_body_make_section_with_surfs.html>PK_BODY_make_section_with_surfs</A> only.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-453280"></A>banned_classes</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-453728"></A>For slicing operations, an array of classes of curves that cannot appear in the resultant wire bodies. (Default: 0, NULL.) See <A HREF="fd_chap.056.html#50421908_74747">Section 55.5.1, “Creating planar sections at multiple offsets”</A> for more information.</P>
+<ADDRESS>
+<A NAME="50421908_pgfId-453729"></A>Note: This field is used by <A HREF=../headers/pk_body_make_section_with_surfs.html>PK_BODY_make_section_with_surfs</A> only.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-296183"></A><A HREF=../headers/pk_face_make_sect_with_sfs.html>PK_FACE_make_sect_with_sfs</A> differs from <A HREF=../headers/pk_body_make_section.html>PK_BODY_make_section</A> and <A HREF=../headers/pk_body_make_section_with_surfs.html>PK_BODY_make_section_with_surfs</A> in that it takes a set of target faces (rather than bodies) and tool surfaces as input and computes intersections between those faces and surfaces. The result is a set of imprinted edges that forms one or more wire bodies. These edges may or may not form a closed loop, depending on the input faces used. If you want to ensure that the returned edges always form a closed loop (regardless of the input faces used), you should set the <CODE>
+extend_face_list</CODE>
+ field (described below) in the options structure to PK_LOGICAL_true; this will enable Parasolid to use additional target faces in order to return closed loops of edges.</P>
+<P>
+<A NAME="50421908_pgfId-296187"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50421908_pgfId-296186"></A>Note: <A HREF=../headers/pk_face_make_sect_with_sfs.html>PK_FACE_make_sect_with_sfs</A> <EM>
+never</EM> returns sheet bodies, even when the imprinted edges form a closed loop; the resulting bodies are always wire bodies.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-296191"></A><A HREF="fd_chap.056.html#50421908_13570"><EM>
+Figure 55-5</EM></A> shows an example of local sectioning using <A HREF=../headers/pk_face_make_sect_with_sfs.html>PK_FACE_make_sect_with_sfs</A>, illustrating the effect of <CODE>
+extend_face_list</CODE>
+.</P>
+<P>
+<A NAME="50421908_pgfId-296202"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296194"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296196"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50421908_pgfId-296198"></A><CODE>extend_face_list</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-296200"></A>Whether to use additional target faces to obtain a closed loop of imprinted edges.</P>
+<P>
+<A NAME="50421908_pgfId-296201"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-333776"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-623.gif">
+
+<P>
+<A NAME="50421908_pgfId-296555"></A>Figure 55-5 <A NAME="50421908_13570"></A>Sectioning a body using target faces and surfaces</P>
+
+<H3>
+<A NAME="50421908_pgfId-453923"></A>	55.5.1 	<A NAME="50421908_74747"></A>Creating planar sections at multiple offsets </H3>
+<P>
+<A NAME="50421908_pgfId-459418"></A>The n_offsets, offsets and banned_classes options in <A HREF=../headers/pk_body_make_section_with_surfs.html>PK_BODY_make_section_with_surfs</A> allow you to create wire body sections from a single tool plane and an array of offset distances. Parasolid will generate a section for each offset value. Offset values can be positive or negative, and a value of zero will produce a section that is coincident with the tool plane. This functionality offers improved performance over sectioning with multiple tool planes, and can be useful for creating sections in Additive Manufacturing workflows in which models are sliced in preparation for printing,</P>
+<P>
+<A NAME="50421908_pgfId-458483"></A><A HREF="fd_chap.056.html#50421908_16951"><EM>
+Figure 55-6</EM></A> shows an example in which a target body has been sectioned using a tool plane and an offsets array containing four non-zero values.</P>
+<P>
+<A NAME="50421908_pgfId-455663"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-624.gif">
+
+<P>
+<A NAME="50421908_pgfId-455619"></A>Figure 55-6 <A NAME="50421908_16951"></A>Sectioning a body using a tool plane and four non-zero offset values</P>
+<P>
+<A NAME="50421908_pgfId-460301"></A>The banned_classes option allows you to specify classes of curve that should not appear in the resulting wire bodies. When used, any resulting curves that are of a banned class are converted to polylines. This option could be used if your application (or others in the full workflow) cannot support certain classes of curve.</P>
+<P>
+<A NAME="50421908_pgfId-475212"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50421908_pgfId-463366"></A>Note: When setting the n_offsets, offsets and banned_classes options to non-default values, the tool surfaces array must contain a single plane, keep_as_facet must be set to PK_BODY_keep_as_facet_no_c, and result_body_type must be PK_BODY_type_wire_c</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50421908_pgfId-463367"></A>55.6	<A NAME="50421908_88599"></A>Clipping Lattices 
+
+
+</H1>
+<P>
+<A NAME="50421908_pgfId-478596"></A>You can clip a lattice using either a single surface or one or more faces from bodies which are manifold and not disjoint  with <A HREF=../headers/pk_lattice_clip.html>PK_LATTICE_clip</A>. This function returns one or more lattices representing the portion of the input lattice that lies on the specified side of the clipping entities. The original lattice and the set of clipping entities are left unchanged.</P>
+<P>
+<A NAME="50421908_pgfId-479178"></A>This functionality allows you to trim Parasolid lattices so that they match the shape of a model,  as shown in <A HREF="fd_chap.056.html#50421908_19269"><EM>
+Figure 55-7</EM></A></P>
+<P>
+<A NAME="50421908_pgfId-520755"></A>A lattice is clipped at the intersections of the centre lines of its lrods with the supplied clipping entities. A new lball will be created at the end of each clipped lrod, to close the lattice.</P>
+<P>
+<A NAME="50421908_pgfId-480164"></A>The result of a call to <A HREF=../headers/pk_lattice_clip.html>PK_LATTICE_clip</A> is a set of lattices with information on their validity and, optionally, on the set of lballs that were created at the ends of any clipped lrods, and on any lballs that were incident with one or more clipping entities.</P>
+<P>
+<A NAME="50421908_pgfId-503423"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-625.gif">
+
+<P>
+<A NAME="50421908_pgfId-503282"></A>Figure 55-7 <A NAME="50421908_19269"></A>Clipping a lattice using a plane as the clipping entity</P>
+<P>
+<A NAME="50421908_pgfId-521145"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-521136"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50421908_pgfId-521140"></A><A HREF="fd_chap.021.html#50422090_36208">Chapter 20, “Lattice Geometry”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50421908_pgfId-480930"></A>	55.6.1 	Received and returned arguments </H3>
+<P>
+<A NAME="50421908_pgfId-480938"></A><A HREF=../headers/pk_lattice_clip.html>PK_LATTICE_clip</A> receives a lattice and an options structure, which contains the following options:</P>
+<P>
+<A NAME="50421908_pgfId-484256"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484190"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484192"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484194"></A><CODE>
+n_clip_entities</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484196"></A>The number of entities used to clip the lattice.</P>
+<P>
+<A NAME="50421908_pgfId-524108"></A>Default: 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484198"></A><CODE>
+clip_entities</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484200"></A>An array of clipping entities which must be either a single surface or one or more faces from bodies which are manifold and not disjoint.</P>
+<P>
+<A NAME="50421908_pgfId-524135"></A>Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484202"></A><CODE>
+fence</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484204"></A>A parallel array of flags that indicate which side of the corresponding entry in <CODE>
+clip_entities</CODE>
+ should clip the lattice. All <CODE>
+clip_entities</CODE>
+ from the same body should have the same fence value. See <A HREF="fd_chap.056.html#50421908_18354">Section 55.6.2, “Effect of the fence option in lattice clipping”</A>, for more information.</P>
+<P>
+<A NAME="50421908_pgfId-524158"></A>Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484206"></A><CODE>
+lrod_clip</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484208"></A>Controls the behaviour of lrods that are clipped during the operation. See <A HREF="fd_chap.056.html#50421908_79012">Section 55.6.4, “Controlling the behaviour of clipped ltopology”</A>, for more information.</P>
+<P>
+<A NAME="50421908_pgfId-524181"></A>Default: <A HREF=../headers/pk_lrod_clip_t.html>PK_LROD_clip_keep_connected_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484210"></A><CODE>
+lrod_min_length</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484212"></A>Controls the minimum length for an lrod to survive. See <A HREF="fd_chap.056.html#50421908_79012">Section 55.6.4, “Controlling the behaviour of clipped ltopology”</A>, for more information.</P>
+<P>
+<A NAME="50421908_pgfId-524219"></A>Default: 0.0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-588561"></A><CODE>
+lrod_coi</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-597302"></A>Controls whether lrods that are coincident with the clipping entities survive after a clipping operation. See <A HREF="fd_chap.056.html#50421908_55386">Section 55.6.4.1, “Controlling the behaviour of ltopologies that are coincident with a clip entity”</A>, for more information.</P>
+<P>
+<A NAME="50421908_pgfId-588693"></A>Default: <A HREF=../headers/pk_lrod_coi_t.html>PK_LROD_coi_keep_connected_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484214"></A><CODE>
+lball_radius</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484216"></A>Controls the radius of any new lballs that are created during the operation. See <A HREF="fd_chap.056.html#50421908_79012">Section 55.6.4, “Controlling the behaviour of clipped ltopology”</A>, for more information.</P>
+<P>
+<A NAME="50421908_pgfId-524242"></A>Default: <A HREF=../headers/pk_lball_radius_t.html>PK_LBALL_radius_interpolate_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484218"></A><CODE>
+want_clipped_lballs</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-484220"></A>Controls whether to return information about lballs that were affected by the clipping operation. See <A HREF="fd_chap.056.html#50421908_66060">Section 55.6.5, “Controlling returned information”</A>, for more information.</P>
+<P>
+<A NAME="50421908_pgfId-524295"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-625266"></A><CODE>
+merge_duplicates</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-625268"></A>Controls whether duplicate ltopologies created by the clipping operation should be merged. See <A HREF="fd_chap.056.html#50421908_73244">Section 55.6.4.2, “Merging duplicate ltopologies when clipping lattices”</A>, for more information.</P>
+<P>
+<A NAME="50421908_pgfId-625422"></A>Default: <A HREF=../headers/pk_ltopol_dup_merge_t.html>PK_LTOPOL_dup_merge_no_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-625286"></A><CODE>
+duplicate_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-625288"></A>The tolerance used to merge duplicate ltopologies when <CODE>
+merge_duplicate</CODE>
+ is set to <A HREF=../headers/pk_ltopol_dup_merge_t.html>PK_LTOPOL_dup_merge_yes_c</A>. See <A HREF="fd_chap.056.html#50421908_73244">Section 55.6.4.2, “Merging duplicate ltopologies when clipping lattices”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-480946"></A>The function returns the following arguments:</P>
+<P>
+<A NAME="50421908_pgfId-485765"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-485719"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-485721"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-485723"></A><CODE>
+result</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-485725"></A>A token giving information on the success of the operation</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-485823"></A><CODE>
+n_lattices</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-485825"></A>The number of lattices created</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-485727"></A><CODE>
+lattices</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-485729"></A>An array of <CODE>
+n_lattices</CODE>
+ structures, each containing a result lattice and information about it. See <A HREF="fd_chap.056.html#50421908_52408">Section 55.6.6, “Returned information on clipped lattices”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50421908_pgfId-481821"></A>	55.6.2 	<A NAME="50421908_18354"></A>Effect of the fence option in lattice clipping </H3>
+<P>
+<A NAME="50421908_pgfId-513545"></A>The <CODE>
+fence</CODE>
+ option in <A HREF=../headers/pk_lattice_clip.html>PK_LATTICE_clip</A> allows you to specify whether lattice topology (ltopology) in front or behind each of the clipping entities should survive the operation. An ltopology is considered to be in front of a clipping entity if the entity’s normal points towards the ltopology, and behind the clipping entity if the ltopology lies in the direction opposite to the entity’s normal.</P>
+<P>
+<A NAME="50421908_pgfId-489971"></A>A <CODE>
+fence</CODE>
+ token should be supplied for each of the clipping entities. The token may take one of the following values:</P>
+<P>
+<A NAME="50421908_pgfId-619408"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-523683"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-523685"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-523687"></A><A HREF=../headers/pk_clip_fence_t.html>PK_clip_fence_front_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-523689"></A>Ltopology will survive if it lies in front of the clipping entity, and any ltopology behind the entity will be deleted.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-523807"></A><A HREF=../headers/pk_clip_fence_t.html>PK_clip_fence_back_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-523693"></A>Ltopology will survive if it lies behind the clipping entity, and any ltopology in front of the entity will be deleted.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-523701"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50421908_pgfId-619418"></A>Note: All clipping entities from the same body should have the same fence value.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-490325"></A><A HREF="fd_chap.056.html#50421908_34017"><EM>
+Figure 55-8</EM></A> demonstrates the effect of the <CODE>
+fence</CODE>
+ option when clipping a simple cube lattice using a planar face. In this figure, clipped lrods are retained in each of the results, and new lballs created by the operation are highlighted in blue.</P>
+<P>
+<A NAME="50421908_pgfId-504409"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-626.gif">
+
+<P>
+<A NAME="50421908_pgfId-504364"></A>Figure 55-8 <A NAME="50421908_34017"></A>Illustrates the effect of the <CODE>
+fence</CODE>
+ option when clipping a cube lattice with a planar face.</P>
+
+
+<H3>
+<A NAME="50421908_pgfId-544980"></A>	55.6.3 	Effect of clipping </H3>
+<P>
+<A NAME="50421908_pgfId-524364"></A>Clipping entities act on the centre lines of the lattice’s lrods rather than on the volume of the lattice. Therefore, the <CODE>
+fence</CODE>
+ option takes effect at the position where the clip entity intersects the axis of each lrod. This is illustrated in <A HREF="fd_chap.056.html#50421908_31701"><EM>
+Figure 55-9</EM></A>, which shows two examples of a dumbbell lattice that forms a shallow angle of intersection with the supplied clip entity. The <CODE>
+fence</CODE>
+ option is set so that ltopology will survive if it is below the clip entity in the figure.</P>
+<UL>
+<LI>
+<A NAME="50421908_pgfId-535958"></A>In <A HREF="fd_chap.056.html#50421908_31701"><EM>
+Figure 55-9</EM></A><EM>
+(A)</EM> there is no intersection between the clip entity and the axis of the lrod within the limits of the lrod, so the lrod is left unchanged by the call to <A HREF=../headers/pk_lattice_clip.html>PK_LATTICE_clip</A>.</LI>
+<LI>
+<A NAME="50421908_pgfId-535972"></A>In <A HREF="fd_chap.056.html#50421908_31701"><EM>
+Figure 55-9</EM></A><EM>
+(B)</EM> the clip entity intersects the lrod’s axis inside the lrod, so the lrod is clipped and a new lball (highlighted in blue) is created.</LI>
+</UL>
+<P>
+<A NAME="50421908_pgfId-525730"></A>&nbsp;</P>
+<P>
+<A NAME="50421908_pgfId-524786"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-627.gif">
+
+<P>
+<A NAME="50421908_pgfId-524754"></A>Figure 55-9 <A NAME="50421908_31701"></A>Demonstrates how clip entities clip the axes of the lattice’s lrods.</P>
+<P>
+<A NAME="50421908_pgfId-543808"></A>When ltopology lies coincident with a clip entity this is treated as a special case. See <A HREF="fd_chap.056.html#50421908_55386">Section 55.6.4.1, “Controlling the behaviour of ltopologies that are coincident with a clip entity”</A>, for more information.</P>
+
+
+<H3>
+<A NAME="50421908_pgfId-481830"></A>	55.6.4 	<A NAME="50421908_79012"></A>Controlling the behaviour of clipped ltopology </H3>
+<P>
+<A NAME="50421908_pgfId-482034"></A>The behaviour of ltopology that interacts with a clipping entity is controlled by the <CODE>
+lrod_clip</CODE>
+, <CODE>
+lrod_min_length</CODE>
+, <CODE>
+lball_radius</CODE>
+and <CODE>
+lrod_coi</CODE>
+ options.</P>
+<P>
+<A NAME="50421908_pgfId-515696"></A>The <CODE>
+lrod_clip</CODE>
+ and <CODE>
+lrod_min_length</CODE>
+ options work in collaboration and determine whether an lrod that interacts with the clipping entities should survive the operation. Primary control over the survival of lrods is given by the <CODE>
+lrod_clip</CODE>
+ option, which can take the following values:</P>
+<P>
+<A NAME="50421908_pgfId-534851"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-534840"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-534842"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-534844"></A><A HREF=../headers/pk_lrod_clip_t.html>PK_LROD_clip_delete_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-534846"></A>Any lrods that interact with the clipping entity are deleted</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-534848"></A><A HREF=../headers/pk_lrod_clip_t.html>PK_LROD_clip_keep_connected_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-534850"></A>The surviving portions of any lrods that interact with the clipping entity are retained provided that they have a surviving lball</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-534944"></A><A HREF=../headers/pk_lrod_clip_t.html>PK_LROD_clip_keep_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-534946"></A>The surviving portions of any lrods that interact with the clipping entity are retained</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-516620"></A><A HREF="fd_chap.056.html#50421908_40621"><EM>
+Figure 55-10</EM></A> shows the different results that can be obtained through varying the <CODE>
+lrod_clip</CODE>
+ control. In this figure, the <CODE>
+fence</CODE>
+ option has been set to <A HREF=../headers/pk_clip_fence_t.html>PK_clip_fence_front_c</A>, and new lballs created by the operation are highlighted in blue.</P>
+<P>
+<A NAME="50421908_pgfId-515732"></A>The <CODE>
+lrod_min_length</CODE>
+ option allows you to specify a minimum length value for the surviving portions of lrods when <CODE>
+lrod_clip</CODE>
+ is set to <A HREF=../headers/pk_lrod_clip_t.html>PK_LROD_clip_keep_connected_c</A> or <A HREF=../headers/pk_lrod_clip_t.html>PK_LROD_clip_keep_c</A>. If you supply a non-zero <CODE>
+lrod_min_length</CODE>
+ clipped lrods will be retained if their length is greater than or equal to this value.</P>
+<P>
+<A NAME="50421908_pgfId-511814"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-628.gif">
+
+<P>
+<A NAME="50421908_pgfId-511770"></A>Figure 55-10 <A NAME="50421908_40621"></A>The effect of the <CODE>
+lrod_clip</CODE>
+ option when clipping a lattice with two faces.</P>
+<P>
+<A NAME="50421908_pgfId-516709"></A><A NAME="50421908_96443"></A>When an lrod is clipped and retained in the result, Parasolid will create a new lball to cap the open end of the lrod. The size of this lball is controlled by the <CODE>
+lball_radius</CODE>
+ option. The radii of any new lballs can either be linearly interpolated from the radii of the original lballs, or set to the radius of the lrod at the clipping point.</P>
+<P>
+<A NAME="50421908_pgfId-602362"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50421908_pgfId-500012"></A>Note: As all clipped lrods must be capped with a new lball, unavoidable self-intersections can sometimes occur in the resulting lattice(s) where, for example, a new lball clashes with its lrod-adjacent lball. Any clashing ltopologies in the result are reported to the application. See <A HREF="fd_chap.056.html#50421908_52408">Section 55.6.6, “Returned information on clipped lattices”</A>, for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50421908_pgfId-597258"></A>55.6.4.1 <A NAME="50421908_55386"></A>Controlling the behaviour of ltopologies that are coincident with a clip entity </H4>
+<P>
+<A NAME="50421908_pgfId-597263"></A>When ltopology lies coincident with a clip entity this is treated as a special case. If the axis of an lrod lies coincident with a clip entity, the <CODE>
+lrod_coi</CODE>
+ option can be used to determine whether the lrod survives the operation. It has the following values:</P>
+<P>
+<A NAME="50421908_pgfId-605515"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-597266"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-597268"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-597270"></A><A HREF=../headers/pk_lrod_coi_t.html>PK_LROD_coi_delete_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-597272"></A>All lrods that are coincident with the clipping entity are deleted</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-597274"></A><A HREF=../headers/pk_lrod_coi_t.html>PK_LROD_coi_keep_connected_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-597276"></A>All lrods that are coincident with the clipping entity are retained provided they are connected to surviving non-coincident ltopology. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-597278"></A><A HREF=../headers/pk_lrod_coi_t.html>PK_LROD_coi_keep_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-597280"></A>All lrods that are coincident with the clipping entity are retained</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-602556"></A>If an lball’s centre lies on a clip entity, its survival depends on the values of the <CODE>
+lrod_coi</CODE>
+ option. If it survives, the lball will be marked as touched. See <A HREF="fd_chap.056.html#50421908_52408">Section 55.6.6, “Returned information on clipped lattices”</A>, for more information on touched lballs</P>
+<P>
+<A NAME="50421908_pgfId-604986"></A><A HREF="fd_chap.056.html#50421908_52806"><EM>
+Figure 55-11</EM></A> shows an example where a planar clip entity is coincident with the axis of an lrod in a lattice. In both results the <CODE>
+lrod_coi</CODE>
+ option is set to <A HREF=../headers/pk_lrod_coi_t.html>PK_LROD_coi_keep_all_c</A>, and the coincident lrod is retained. The result lballs that are touched by the clip entity are highlighted in orange.</P>
+<P>
+<A NAME="50421908_pgfId-597535"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-629.gif">
+
+<P>
+<A NAME="50421908_pgfId-597537"></A>Figure 55-11 <A NAME="50421908_52806"></A>Clipping a lattice with a clip entity that lies coincident with an lrod of the lattice.</P>
+<P>
+<A NAME="50421908_pgfId-597285"></A><A HREF="fd_chap.056.html#50421908_53257"><EM>
+Figure 55-12</EM></A> shows the different results that can be obtained through varying the <CODE>
+lrod_coi</CODE>
+ control. The result lballs that are touched by the clip entity are highlighted in orange.</P>
+<P>
+<A NAME="50421908_pgfId-597289"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-630.gif">
+
+<P>
+<A NAME="50421908_pgfId-597291"></A>Figure 55-12 <A NAME="50421908_53257"></A>The effect of the<CODE>
+ lrod_coi</CODE>
+ option when clipping a lattice</P>
+
+
+<H4>
+<A NAME="50421908_pgfId-625853"></A>55.6.4.2 <A NAME="50421908_73244"></A>Merging duplicate ltopologies when clipping lattices </H4>
+<P>
+<A NAME="50421908_pgfId-625913"></A>When clipping lattices you can choose to merge any duplicate ltopologies created as a result of the clipping operation using the <CODE>
+merge_duplicates</CODE>
+ and <CODE>
+duplicate_tolerance</CODE>
+ options.</P>
+<P>
+<A NAME="50421908_pgfId-633463"></A>When<CODE>
+ merge_duplicates</CODE>
+ is set to <A HREF=../headers/pk_ltopol_dup_merge_t.html>PK_LTOPOL_dup_merge_yes_c</A>, lballs created as a result of the clipping operation are merged with other lballs whose position, radius and <CODE>
+lball_lrod_radius</CODE>
+ are within the tolerance supplied in <CODE>
+duplicate_tolerance</CODE>
+.</P>
+<P>
+<A NAME="50421908_pgfId-641486"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50421908_pgfId-641510"></A>Note: Lballs will only be merged if at least one of them was created by the clip operation.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50421908_pgfId-640820"></A><A HREF="fd_chap.056.html#50421908_68617"><EM>
+Figure 55-13</EM></A> demonstrates a clip operation on a lattice where duplicate ltopologies are merged. In this example, the <CODE>
+fence</CODE>
+ option is set to <A HREF=../headers/pk_clip_fence_t.html>PK_clip_fence_back_c</A> and <CODE>
+merge_duplicate</CODE>
+ is set to <A HREF=../headers/pk_ltopol_dup_merge_t.html>PK_LTOPOL_dup_merge_yes_c</A>.</P>
+<P>
+<A NAME="50421908_pgfId-640855"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-631.gif">
+
+<P>
+<A NAME="50421908_pgfId-640857"></A>Figure 55-13 <A NAME="50421908_68617"></A>The effect of the <CODE>
+merge_duplicate</CODE>
+ option when clipping a lattice</P>
+
+
+
+<H3>
+<A NAME="50421908_pgfId-481803"></A>	55.6.5 	<A NAME="50421908_66060"></A>Controlling returned information </H3>
+<P>
+<A NAME="50421908_pgfId-482090"></A>If your application needs to return detailed information to the user on the ltopology that was affected by the clipping operation, you can use the <CODE>
+want_clipped_lballs</CODE>
+ option to request that an array of affected lballs is returned for each result lattice.</P>
+
+
+<H3>
+<A NAME="50421908_pgfId-482082"></A>	55.6.6 	<A NAME="50421908_52408"></A>Returned information on clipped lattices </H3>
+<P>
+<A NAME="50421908_pgfId-485692"></A><A HREF=../headers/pk_lattice_clip.html>PK_LATTICE_clip</A> returns an array of structures containing information on the lattices that were created during the operation. Each structure contains the following fields:</P>
+<P>
+<A NAME="50421908_pgfId-500594"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500548"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500550"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500552"></A><CODE>
+status</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500554"></A>The validity status of the resulting lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500556"></A><CODE>
+lattice</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500558"></A>The resulting lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500560"></A><CODE>
+n_error_ltopols</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500562"></A>The number of <CODE>
+error_ltopols</CODE>
+ if any unavoidable self-intersections are present in the result</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500567"></A><CODE>
+error_ltopols</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500569"></A>The ltopologies in the lattice that clash with other ltopologies</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500574"></A><CODE>
+n_clipped_lballs</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500576"></A>The length of the <CODE>
+clipped_lballs</CODE>
+ and <CODE>
+lball_clip_types</CODE>
+ arrays, if requested using the <CODE>
+want_clipped_lballs</CODE>
+ option. See <A HREF="fd_chap.056.html#50421908_66060">Section 55.6.5, “Controlling returned information”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500581"></A><CODE>
+clipped_lballs</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500583"></A>The lballs in the resulting lattice that were affected by the clipping operation</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500588"></A><CODE>
+lball_clip_types</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50421908_pgfId-500590"></A>A parallel array of tokens giving information on how the corresponding lball in the <CODE>
+clipped_lballs</CODE>
+ array was affected. The information that is returned is as follows:</P>
+<UL>
+<LI>
+<A NAME="50421908_pgfId-501771"></A><A HREF=../headers/pk_lball_clipped_t.html>PK_LBALL_clipped_created_c</A>: the corresponding lball was created when an lrod was clipped</LI>
+<LI>
+<A NAME="50421908_pgfId-501882"></A><A HREF=../headers/pk_lball_clipped_t.html>PK_LBALL_clipped_touched_c</A>: the corresponding lball was touched by a clipping entity but not removed</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.055.html">Instancing And Patterning </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.057.html">Intersections</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

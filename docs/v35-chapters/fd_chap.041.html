@@ -1,0 +1,1648 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Lofting</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Lofting</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.040.html">Sweeping Tool Bodies Along a Path</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.042.html">Shadow Curves</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-301378">40.1	Introduction </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-295083">40.2	Supplying profiles </A>
+<UL>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-599097">40.2.1	Piecewise lofting </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-526298">40.2.2	Profile restrictions </A>
+</UL>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-534212">40.3	Specifying derivative conditions </A>
+<UL>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-790115">40.3.1	Composite clamps for derivative conditions</A>
+</UL>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-295506">40.4	Specifying derivative conditions for the first or last profile </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-295589">40.5	Specifying derivative conditions for intermediate profiles </A>
+<UL>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-295649">40.5.1	Specifying a derivative condition </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-295658">40.5.2	Specifying intermediate profiles </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-295916">40.5.3	Calculating derivative magnitudes </A>
+</UL>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-295977">40.6	Lofting degenerate profiles </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-296139">40.7	Matching </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-296263">40.8	Lofting with guide wires </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-296664">40.9	Specifying derivative conditions for guide wires </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-296803">40.10	Specifying the topological form of lofted bodies </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-296909">40.11	Creating construction topology </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-296996">40.12	Controlling profile smoothness </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-297101">40.13	Simplifying the final body </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-297118">40.14	Nominal geometry </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-297126">40.15	Handling lofting tolerances </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-297140">40.16	Tracking information for lofted bodies </A>
+<LI> <A HREF="fd_chap.041.html#50422112_pgfId-298073">40.17	Update control </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-301378"></A>40.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-301381"></A><A NAME="50422112_marker-301379"></A><A NAME="50422112_marker-301380"></A>Lofting creates a sheet or solid body by fitting surfaces through a series of profiles, and is performed by <A NAME="50422112_marker-301382"></A><A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A>. Lofts may be periodic (the start and end profiles are the same, resulting in a periodic lofted surface), or non-periodic (the start and end profiles are different). Lofts can also be created in a piecewise manner (the profiles are repeated). See <A HREF="fd_chap.041.html#50422112_36528">Section 40.2, “Supplying profiles”</A> for more information.</P>
+<P>
+<A NAME="50422112_pgfId-581799"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-581798"></A>Note: This functionality does not support facet bodies.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-294823"></A>You can additionally constrain the geometry of a loft across profiles by specifying any of the following:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-301343"></A>End conditions that control the geometry at the start or end of the loft</LI>
+<LI>
+<A NAME="50422112_pgfId-301344"></A>Derivative conditions that control the geometry at intermediate points in any profile</LI>
+<LI>
+<A NAME="50422112_pgfId-301345"></A>Guide wires that control the geometry in the direction of the loft</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-301346"></A>A series of options control the derivative conditions, and how adjacent profiles containing different numbers of edges are matched.</P>
+<P>
+<A NAME="50422112_pgfId-545230"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Profiling\Loft</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422112_pgfId-553598"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-553147"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-553126"></A><A HREF="fd_chap.038.html#50422109_">Chapter 37, “Creating Extruded Bodies”</A></LI>
+<LI>
+<A NAME="50422112_pgfId-553215"></A><A HREF="fd_chap.039.html#50422110_45750">Chapter 38.1, “Introduction”</A></LI>
+<LI>
+<A NAME="50422112_pgfId-553230"></A><A HREF="fd_chap.045.html#50422117_30749">Chapter 44, “Wire Modeling”</A></LI>
+<LI>
+<A NAME="50422112_pgfId-553245"></A><A HREF="fd_chap.046.html#50422118_34338">Chapter 45, “Sheet Modeling”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-295083"></A>40.2	<A NAME="50422112_36528"></A><A NAME="50422112_marker-301348"></A><A NAME="50422112_marker-301349"></A><A NAME="50422112_marker-301350"></A>Supplying profiles 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-295084"></A>Profiles are supplied to <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A> as an array of wire, sheet or minimal bodies. Sheets and minimum bodies can only be used as start or end profiles. All intermediate profiles must be wire bodies.</P>
+<P>
+<A NAME="50422112_pgfId-295085"></A>The minimum number of profiles required for periodic and non-periodic lofts, with and without guide wires, is shown below:</P>
+<P>
+<A NAME="50422112_pgfId-295117"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295088"></A>Periodic?</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295090"></A>Guide wires?</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295092"></A>Minimum no. of profiles</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295094"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295096"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295098"></A>2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295100"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295102"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295104"></A>1 (wire profiles)</P>
+<P>
+<A NAME="50422112_pgfId-578577"></A>2 (sheet profiles)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295106"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295108"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295110"></A>3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295112"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295114"></A>Yes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295116"></A>1</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-575058"></A>See <A HREF="fd_chap.041.html#50422112_86768">Section 40.8, “Lofting with guide wires”</A>, for more information about guide wires. </P>
+<P>
+<A NAME="50422112_pgfId-295122"></A>If either of the start or end profiles are wires then the resulting body is a sheet, otherwise the result is a solid.</P>
+<P>
+<A NAME="50422112_pgfId-295123"></A>None of the profiles’ geometry or topology appears in the resulting solid, and it is up to you to delete profiles when they are no longer required.</P>
+<P>
+<A NAME="50422112_pgfId-294960"></A>Generally, profiles should be either all open or all closed. However, provided all intermediate profiles are closed, one or both of the end profiles may be open, as shown in <A HREF="fd_chap.041.html#50422112_75076"><EM>
+Figure 40-1</EM></A>. In such cases, any open end profile is treated as a degenerate closed profile that doubles back on itself. Minimum body profiles are considered either open or closed, depending on the closure of the other supplied profiles.</P>
+<P>
+<A NAME="50422112_pgfId-438190"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-378.gif">
+
+<P>
+<A NAME="50422112_pgfId-317305"></A>Figure 40-1 <A NAME="50422112_75076"></A>Combining open and closed profiles</P>
+<P>
+<A NAME="50422112_pgfId-294976"></A>You must supply a start vertex for each profile. These start vertices should be aligned to avoid twist in the result, as shown in <A HREF="fd_chap.041.html#50422112_Loft twist"><EM>
+Figure 40-2</EM></A>.</P>
+<P>
+<A NAME="50422112_pgfId-453888"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-379.gif">
+
+<P>
+<A NAME="50422112_pgfId-298327"></A>Figure 40-2 <A NAME="50422112_Loft twist"></A>Loft twist</P>
+<P>
+<A NAME="50422112_pgfId-297438"></A>For best results, any edge in a profile should be at least ten times the specified tolerance for the loft operation. The loft may fail if any edge is smaller than this, depending on the relative length of the edges it is adjacent to, and the edges it is matched with on other profiles. If a profile contains an edge that is smaller than this recommendation, you can replace it with a tolerant vertex and specify a degenerate match in the adjacent profiles (in the case of a start or end loft), as shown in <A HREF="fd_chap.041.html#50422112_77408"><EM>
+Figure 40-3</EM></A>.</P>
+<P>
+<A NAME="50422112_pgfId-446193"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-380.gif">
+
+<P>
+<A NAME="50422112_pgfId-298528"></A>Figure 40-3 <A NAME="50422112_Replacing"></A>Replacing short edges in profiles with tolerant vertices.<A NAME="50422112_77408"></A></P>
+<P>
+<A NAME="50422112_pgfId-526296"></A>See <A HREF="fd_chap.041.html#50422112_19228">Section 40.7, “Matching”</A>, for more information about matching.</P>
+
+<H3>
+<A NAME="50422112_pgfId-599097"></A>	40.2.1 	<A NAME="50422112_17938"></A>Piecewise lofting </H3>
+<P>
+<A NAME="50422112_pgfId-604276"></A>Repeated profiles can be supplied to <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A> to produce a piecewise lofted body. In piecewise lofting the operation is completed in separate sections, as shown in <A HREF="fd_chap.041.html#50422112_59131"><EM>
+Figure 40-4</EM></A>, to create a resultant lofted body that is non-G1 smooth across the repeated profiles. </P>
+<P>
+<A NAME="50422112_pgfId-611684"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-611718"></A>Note: Repeated profiles must be in sequential order in the profile array and clamps cannot be applied to the repeated profiles.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-599656"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-381.gif">
+
+<P>
+<A NAME="50422112_pgfId-599612"></A>Figure 40-4 <A NAME="50422112_59131"></A>Piecewise lofting with repeated profiles</P>
+
+
+<H3>
+<A NAME="50422112_pgfId-526298"></A>	40.2.2 	<A NAME="50422112_marker-526297"></A>Profile restrictions </H3>
+<P>
+<A NAME="50422112_pgfId-526299"></A>A number of restrictions apply to the supplied profiles, depending on whether wire or sheet profiles are specified. These are shown below:</P>
+<P>
+<A NAME="50422112_pgfId-302843"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295326"></A>Profile type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295328"></A>Restrictions</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295330"></A>Wire</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422112_pgfId-295333"></A>Each profile must be oriented. <A NAME="50422112_marker-295332"></A>Use <A HREF=../headers/pk_edge_propagate_orientation.html>PK_EDGE_propagate_orientation</A> to achieve this. </LI>
+<P>
+<A NAME="50422112_pgfId-295334"></A>The resulting sheet is constructed so that the outward normal is aligned with the cross product of a tangent in the direction of the profile orientation, and the loft direction (taken in that order). All the profiles should have the same orientation in order to avoid twist in the result.</P>
+<LI>
+<A NAME="50422112_pgfId-295335"></A>Each profile must have at least one vertex. Use <A HREF=../headers/pk_edge_imprint_point.html>PK_EDGE_imprint_point</A> to add a vertex if necessary.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295337"></A>Sheet</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422112_pgfId-295339"></A>The sheet body may only have a single laminar boundary.</LI>
+<LI>
+<A NAME="50422112_pgfId-295340"></A>The laminar boundary of the profile must have at least one vertex. Use <A HREF=../headers/pk_edge_imprint_point.html>PK_EDGE_imprint_point</A> to add a vertex if necessary.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-409201"></A>You also need to make sure that the resulting body will not be self-intersecting. For example, this can happen when two profiles are co-planar and one undergoes a large change of direction, as illustrated below:</P>
+<P>
+<A NAME="50422112_pgfId-456050"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-382.gif">
+
+<P>
+<A NAME="50422112_pgfId-409246"></A>Figure 40-5 Self-intersecting sheet body created from two co-planar profiles</P>
+<P>
+<A NAME="50422112_pgfId-295411"></A>In addition, there are several restrictions that apply if any of the supplied profiles touch:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-295415"></A>Profiles may only touch at a vertex that is within tolerance (<A HREF="fd_chap.041.html#50422112_36065"><EM>
+Figure 40-6</EM></A>(a)), or along two corresponding edges that are entirely within tolerance (<A HREF="fd_chap.041.html#50422112_36065"><EM>
+Figure 40-6</EM></A>(b)), where “within tolerance” means the greater of the tolerance of the associated vertex or edges, and the specified lofting tolerance.</LI>
+<LI>
+<A NAME="50422112_pgfId-295422"></A>A guide wire (see <A HREF="fd_chap.041.html#50422112_86768">Section 40.8, “Lofting with guide wires”</A>) may not pass through two vertices that are within tolerance, unless one of the vertices belongs to the start or end profile of a non-periodic loft. </LI>
+<LI>
+<A NAME="50422112_pgfId-537291"></A>When supplying a vector clamp (see <A HREF="fd_chap.041.html#50422112_62881">Section 40.3, “Specifying derivative conditions”</A>) for a profile whose vertices or edges touch those of an adjacent profile, a magnitude must be supplied for each clamped vertex and <CODE>
+deriv_mag</CODE>
+ must be set to PK_BODY_loft_deriv_mag_smooth_c. See <A HREF="fd_chap.041.html#50422112_46897">Section 40.5.3, “Calculating derivative magnitudes”</A> for more information on derivative magnitudes.</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-537296"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-383.gif">
+
+<P>
+<A NAME="50422112_pgfId-298845"></A>Figure 40-6 <A NAME="50422112_36065"></A>Lofting between touching profiles</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-534212"></A>40.3	<A NAME="50422112_62881"></A>Specifying derivative conditions 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-534213"></A>You specify derivative conditions for a loft operation using a <A HREF=../headers/pk_body_loft_deriv_conds_t.html>PK_BODY_loft_deriv_conds_t</A> structure. Derivative conditions can be applied to any of the following:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-534216"></A>The start or end profile in the loft. See <A HREF="fd_chap.041.html#50422112_71245">Section 40.4, “Specifying derivative conditions for the first or last profile”</A>.</LI>
+<LI>
+<A NAME="50422112_pgfId-534220"></A>Any other profile in the loft. See <A HREF="fd_chap.041.html#50422112_80808">Section 40.5, “Specifying derivative conditions for intermediate profiles”</A>. </LI>
+<LI>
+<A NAME="50422112_pgfId-534224"></A>Any guide wire in the loft. See <A HREF="fd_chap.041.html#50422112_41623">Section 40.9, “Specifying derivative conditions for guide wires”</A>.</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-534226"></A>These fields are also used to specify derivative conditions for any intermediate profile in a loft. </P>
+<P>
+<A NAME="50422112_pgfId-534276"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534229"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534231"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534233"></A><CODE>
+curvature_condition</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534235"></A>If PK_BODY_loft_unconstrained_c, no constraints are applied to the curvature across the profile or guide wire. This is the default, and you are strongly advised to use this setting.</P>
+<P>
+<A NAME="50422112_pgfId-534236"></A>If PK_BODY_loft_natural_c, natural (zero) curvature is applied across the profile. You can only use this option at the start or end of a non-periodic loft, providing there are no vector, face, or planar clamps at that end, and no guide wires have been specified. In addition, no other derivative conditions may be specified for that profile.</P>
+<P>
+<A NAME="50422112_pgfId-534237"></A>If PK_BODY_loft_clamped_c, constrain the curvature according to the specified clamp conditions, when, and only when, a face clamp is specified via the <CODE>
+type</CODE>
+ and <CODE>
+face_clamp</CODE>
+ fields.</P>
+<P>
+<A NAME="50422112_pgfId-534241"></A><A HREF="fd_chap.041.html#50422112_72511"><EM>
+Figure 40-7</EM></A> shows the effect of this value, using a profile that has been clamped at both ends to a spherical face. Using PK_BODY_loft_clamped_c produces a lofted surface that is G2-continuous at that profile, whereas the surface produced using PK_BODY_loft_unconstrained_c is G1-continuous.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534244"></A><CODE>
+type</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534246"></A>The type of clamp to be supplied.  Clamps of an individual type are vector, face, planar and none. A combination of these clamp types may also be applied. See <A HREF="fd_chap.041.html#50422112_14792">Section 40.3.1, “Composite clamps for derivative conditions”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534248"></A><CODE>
+vector_clamp</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534250"></A>With a vector clamp, a tangent vector is applied to vertices of the profile or guide wire to constrain the tangents across that profile or guide wire. </P>
+<P>
+<A NAME="50422112_pgfId-534251"></A>You can supply separate pairs of tangent vectors and vertices for each vertex you want to constrain, or you can supply a single tangent vector to be applied across the whole profile or guide wire. </P>
+<P>
+<A NAME="50422112_pgfId-534252"></A>The <CODE>
+vector_clamp</CODE>
+ structure controls the vector clamps in a given profile using the following fields:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-534253"></A><CODE>
+tangents</CODE>
+ controls the direction of each clamp.</LI>
+<LI>
+<A NAME="50422112_pgfId-534254"></A><CODE>
+vertices</CODE>
+ controls the position of each clamp. If set to NULL, all vertices on the clamp are used.</LI>
+<LI>
+<A NAME="50422112_pgfId-534255"></A><CODE>
+magnitudes</CODE>
+ determines the magnitude of each clamp:</LI>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-534256"></A>If an array of values is supplied, then the magnitude of each clamp varies according to each entry in the array, based on a default magnitude value that is calculated automatically.</LI>
+<LI>
+<A NAME="50422112_pgfId-534257"></A>If a single value is supplied, then this magnitude is used for every clamp.</LI>
+<LI>
+<A NAME="50422112_pgfId-534258"></A>If NULL is supplied, then the magnitudes of the clamps are taken from the magnitudes of the supplied <CODE>
+tangents</CODE>
+. This is older behaviour that is only supported for legacy purposes.</LI>
+</UL>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534260"></A><CODE>
+face_clamp</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534262"></A>With a face clamp, the tangents across the profile or guide wire are constrained to match faces that meet the profile or guide wire. </P>
+<P>
+<A NAME="50422112_pgfId-534263"></A>You should supply pairs of clamp faces and profile or guide edges for the edges you want to constrain. </P>
+<P>
+<A NAME="50422112_pgfId-534264"></A>You can specify the magnitude for the cross boundary derivative, paired with any vertex from an edge with a face clamp, as shown in <A HREF="fd_chap.041.html#50422112_82713"><EM>
+Figure 40-11</EM></A>.</P>
+<P>
+<A NAME="50422112_pgfId-534268"></A>This option is not applicable to degenerate profiles.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534270"></A><CODE>
+planar_clamp</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-534272"></A>With a planar clamp, the start or end of the loft is clamped parallel to a specified plane. The magnitude of the cross boundary derivative can also be specified. See <A HREF="fd_chap.041.html#50422112_29063"><EM>
+Figure 40-12</EM></A> for an example of planar clamping.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-534311"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-384.gif">
+
+<P>
+<A NAME="50422112_pgfId-534313"></A>Figure 40-7 <A NAME="50422112_72511"></A>Constraining the curvature of the loft when applying face clamps</P>
+<P>
+<A NAME="50422112_pgfId-790113"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-534316"></A>Note: If you are using guide wires, then the use of certain derivative conditions is restricted. See <A HREF="fd_chap.041.html#50422112_86768">Section 40.8, “Lofting with guide wires”</A> for full details.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422112_pgfId-790115"></A>	40.3.1 	<A NAME="50422112_14792"></A>Composite clamps for derivative conditions</H3>
+<P>
+<A NAME="50422112_pgfId-790116"></A>If the type of clamp supplied in <A HREF=../headers/pk_body_loft_deriv_conds_t.html><A HREF=../headers/pk_body_loft_deriv_conds_t.html>PK_BODY_loft_deriv_conds_t</A></A> is one of vector, face or planar then only the corresponding clamp option fields will be examined for the description of the clamp. However, if a combination of types of clamp is required then composite clamps can be requested. In these cases Parasolid will examine multiple clamp option fields supplied through the <A HREF=../headers/pk_body_loft_deriv_conds_t.html><A HREF=../headers/pk_body_loft_deriv_conds_t.html>PK_BODY_loft_deriv_conds_t</A></A> structure.</P>
+<P>
+<A NAME="50422112_pgfId-790117"></A>Parasolid supports the following two <CODE>
+type</CODE>
+ values for using composite clamps:</P>
+<P>
+<A NAME="50422112_pgfId-790131"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-790120"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-790122"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-790124"></A>PK_BODY_loft_clamp_vec_face_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-790126"></A>Both the <CODE>
+vector_clamp</CODE>
+ and <CODE>
+face_clamp</CODE>
+ option fields will be examined for clamp descriptions</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-790128"></A>PK_BODY_loft_clamp_vec_planar_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-790130"></A>Both the <CODE>
+vector_clamp </CODE>
+and <CODE>
+planar_clamp</CODE>
+ option fields will be examined for clamp descriptions.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-790132"></A>If composite clamps are used then the following restrictions apply to the <CODE>
+vector_clamp</CODE>
+ option field in the <A HREF=../headers/pk_body_loft_vector_clamp_t.html>PK_BODY_loft_vector_clamp_t</A> structure:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-790135"></A><CODE>
+magnitudes</CODE>
+ must be supplied and set to 1 for all <CODE>
+vertices</CODE>
+. See <A HREF="fd_chap.041.html#50422112_46897">Section 40.5.3, “Calculating derivative magnitudes”</A> for more information. </LI>
+<LI>
+<A NAME="50422112_pgfId-790137"></A><CODE>
+tangents</CODE>
+ must be perpendicular to the face or planar clamp normals at all the <CODE>
+vertices</CODE>
+. </LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-790138"></A>Composite clamps can be applied to any of the following:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-790141"></A>The start or end profile in the loft. See <A HREF="fd_chap.041.html#50422112_71245">Section 40.4, “Specifying derivative conditions for the first or last profile”</A>.</LI>
+<LI>
+<A NAME="50422112_pgfId-790146"></A>Any other profile in the loft. See <A HREF="fd_chap.041.html#50422112_80808">Section 40.5, “Specifying derivative conditions for intermediate profiles”</A>.</LI>
+<LI>
+<A NAME="50422112_pgfId-790150"></A>Any guide wires in the loft. See <A HREF="fd_chap.041.html#50422112_41623">Section 40.9, “Specifying derivative conditions for guide wires”</A>Section 38.9,</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-797746"></A>&nbsp;</P>
+<P>
+<A NAME="50422112_pgfId-790154"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-385.gif">
+
+<P>
+<A NAME="50422112_pgfId-787243"></A>Figure 40-8 Subtle changes to a lofted result that can be applied through specifying composite clamps.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-295506"></A>40.4	<A NAME="50422112_71245"></A>Specifying derivative conditions for the first or last profile 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-295507"></A>Parasolid provides several different methods of controlling the derivative conditions to be applied to the start and end profiles of a loft. These are specified using structures and fields in the <CODE>
+end_conditions</CODE>
+ structure of <A HREF=../headers/pk_body_make_lofted_body_o_t.html>PK_BODY_make_lofted_body_o_t</A>. The <CODE>
+end_conditions</CODE>
+ structure contains the following options:</P>
+<P>
+<A NAME="50422112_pgfId-295531"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295510"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295512"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295514"></A><CODE>
+periodic</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295516"></A>If <A HREF=../headers/pk_param_periodic_t.html>PK_PARAM_periodic_yes_c</A>, the loft returns periodically to the start profile. If the start profile is a sheet then the result is a solid body. Otherwise the result is a sheet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295518"></A><CODE>
+start</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295522"></A>A structure that specifies a derivative condition for the start profile in the loft. See <A HREF="fd_chap.041.html#50422112_46897">Section 40.5.3, “Calculating derivative magnitudes”</A> for a description of the fields available in this structure.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295525"></A><CODE>
+end</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295529"></A>A structure that specifies a derivative condition for the end profile in the loft. See <A HREF="fd_chap.041.html#50422112_46897">Section 40.5.3, “Calculating derivative magnitudes”</A> for a description of the fields available in this structure. If the loft is periodic, these constraints are ignored.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-434797"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-386.gif">
+
+<P>
+<A NAME="50422112_pgfId-304323"></A>Figure 40-9 Derivative conditions for the start and end profiles in a loft</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-295589"></A>40.5	<A NAME="50422112_80808"></A>Specifying derivative conditions for intermediate profiles 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-295593"></A>In addition to the start and end profiles in a loft (as described in <A HREF="fd_chap.041.html#50422112_71245">Section 40.4, “Specifying derivative conditions for the first or last profile”</A>), you can specify derivative conditions to control the shape of the loft at any other profile. This is done using the following options to specify derivative conditions for any combination of other profiles in a loft:</P>
+<P>
+<A NAME="50422112_pgfId-295617"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295596"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295598"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295600"></A><CODE>
+n_intermediate_derivs</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295602"></A>The number of profiles that you want to specify derivative conditions for. This is the number of elements in both the <CODE>
+intermediate_derivs</CODE>
+ and <CODE>
+intermediate_profiles</CODE>
+ arrays.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295604"></A><CODE>
+intermediate_derivs</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295606"></A>An array of derivative conditions for the profiles indexed in <CODE>
+intermediate_profiles</CODE>
+. See <A HREF="fd_chap.041.html#50422112_23637">Section 40.5.1, “Specifying a derivative condition”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295611"></A><CODE>
+intermediate_profiles</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295613"></A>An array of integers. Each integer refers to a profile in the loft. See <A HREF="fd_chap.041.html#50422112_98841">Section 40.5.2, “Specifying intermediate profiles”</A></P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422112_pgfId-295649"></A>	40.5.1 	<A NAME="50422112_23637"></A>Specifying a derivative condition </H3>
+<P>
+<A NAME="50422112_pgfId-295650"></A>The <CODE>
+intermediate_derivs</CODE>
+ option contains an array of derivative conditions for the profiles you want to constrain. Each element in the array describes a curvature and clamp type to apply to the loft at a given profile. This is specified using a structure in the same way as derivative conditions for the start and end profiles in a loft. See <A HREF="fd_chap.041.html#50422112_46897">Section 40.5.3, “Calculating derivative magnitudes”</A> for more information.</P>
+
+
+<H3>
+<A NAME="50422112_pgfId-295658"></A>	40.5.2 	<A NAME="50422112_98841"></A><A NAME="50422112_marker-295655"></A><A NAME="50422112_marker-295656"></A><A NAME="50422112_marker-295657"></A>Specifying intermediate profiles </H3>
+<P>
+<A NAME="50422112_pgfId-295659"></A>Derivative conditions specified in <CODE>
+intermediate_derivs</CODE>
+ are mapped onto profiles in the loft using the <CODE>
+intermediate_profiles</CODE>
+ array. This is an array of integers that specifies which profile each derivative condition should be applied to. </P>
+<P>
+<A NAME="50422112_pgfId-295660"></A>The start and end profiles must not be referred to in the <CODE>
+intermediate_profiles</CODE>
+ array. It must therefore contain integers between </P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-295661"></A>1 and <CODE>
+n_profiles</CODE>
+-2 for non-periodic lofts, or </LI>
+<LI>
+<A NAME="50422112_pgfId-295662"></A>1 and <CODE>
+n_profiles</CODE>
+-1 for periodic lofts</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-295663"></A>where <CODE>
+n_profiles</CODE>
+ is the number of profiles, as specified in the call to <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A>.</P>
+<P>
+<A NAME="50422112_pgfId-295585"></A><A HREF="fd_chap.041.html#50422112_58479"><EM>
+Figure 40-10</EM></A> illustrates how derivative conditions can be specified for some of the intermediate profiles in a loft containing 6 profiles.</P>
+<P>
+<A NAME="50422112_pgfId-304947"></A>Figure 40-10 <A NAME="50422112_58479"></A>Specifying derivative conditions for intermediate profiles in a loft</P>
+
+<IMG SRC="../graphics/fd_chap-387.gif">
+
+
+
+<H3>
+<A NAME="50422112_pgfId-295916"></A>	40.5.3 	<A NAME="50422112_46897"></A><A NAME="50422112_marker-295914"></A><A NAME="50422112_marker-295915"></A>Calculating derivative magnitudes </H3>
+<P>
+<A NAME="50422112_pgfId-295917"></A>When you specify face clamps or planar clamps, you also specify a magnitude that affects the extent of the clamp, as shown in <A HREF="fd_chap.041.html#50422112_82713"><EM>
+Figure 40-11</EM></A>. </P>
+<P>
+<A NAME="50422112_pgfId-457106"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-388.gif">
+
+<P>
+<A NAME="50422112_pgfId-305872"></A>Figure 40-11 <A NAME="50422112_82713"></A>Using different cross boundary derivative magnitudes on partial face clamps</P>
+<P>
+<A NAME="50422112_pgfId-295952"></A>You can use the <CODE>
+deriv_mag</CODE>
+ option in <A HREF=../headers/pk_body_make_lofted_body_o_t.html>PK_BODY_make_lofted_body_o_t</A> to control the algorithm that Parasolid uses to apply this magnitude to a clamp. This option takes the following values:</P>
+<P>
+<A NAME="50422112_pgfId-295969"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295958"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295960"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295962"></A>PK_BODY_loft_deriv_mag_single_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295964"></A>Use a single magnitude value across all smooth profile sections in the clamp. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295966"></A>PK_BODY_loft_deriv_mag_smooth_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-295968"></A>Vary the magnitude smoothly across all profile sections in the clamp.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-819305"></A>PK_BODY_loft_deriv_mag_round_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-819307"></A>Vary the magnitude smoothly across all profile sections in the clamp with the aim to produce a more rounded shape across the entire loft. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-295973"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-295972"></A>Note: It is recommended that you always set this option to PK_BODY_loft_deriv_mag_round_c. Other values in this option should only be used when updating old models.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-295977"></A>40.6	<A NAME="50422112_marker-295974"></A><A NAME="50422112_marker-295975"></A><A NAME="50422112_marker-295976"></A>Lofting degenerate profiles 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-295978"></A>Lofting to a degenerate profile is considered as having a loft profile which occupies a single point in space. A degenerate point profile is specified as a minimal body.</P>
+<P>
+<A NAME="50422112_pgfId-295979"></A>Three types of end conditions are applicable at a degenerate loft profile:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-295980"></A><STRONG>
+No clamp:</STRONG> the tangents of the loft are not constrained.</LI>
+<LI>
+<A NAME="50422112_pgfId-295981"></A><STRONG>
+Planar Clamp:</STRONG> produces a smooth loft termination by constraining the loft to have a unique tangent plane with a specified normal at the degenerate end.</LI>
+<LI>
+<A NAME="50422112_pgfId-295982"></A><STRONG>
+Vector Clamp:</STRONG> clamp produces a more general termination which may or may not be smooth, by constraining the loft to interpolate the specified derivatives at the degenerate end. The clamp may have one of the following:</LI>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-295983"></A>A single tangent vector</LI>
+<LI>
+<A NAME="50422112_pgfId-295984"></A>Pairs of tangent vectors and vertices on the profile adjacent to the degenerate profile</LI>
+<LI>
+<A NAME="50422112_pgfId-295985"></A>One tangent vector for each vertex on the adjacent profile</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-295986"></A>In the latter case, the order in which the vectors are supplied is significant: the first tangent vector in the clamp is associated with the start vertex of the adjacent profile, and the remaining tangent vectors are applied in order along the adjacent profile. Mismatching these can cause the loft to twist.</P>
+</UL>
+<P>
+<A NAME="50422112_pgfId-514990"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-389.gif">
+
+<P>
+<A NAME="50422112_pgfId-306612"></A>Figure 40-12 <A NAME="50422112_29063"></A>Lofting degenerate profiles</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-296139"></A>40.7	<A NAME="50422112_19228"></A>Matching 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-296140"></A>Where all the profiles in the loft have the same number of edges, and hence the same number of vertices, the vertices are mapped one-to-one across the profiles. All start vertices are matched with each other, then subsequent vertices on each profile are matched in order (i.e. nth vertices are matched).</P>
+<P>
+<A NAME="50422112_pgfId-296141"></A>Where the profiles have different numbers of edges, the application needs to provide information on how to match the profiles. This is done in one of two ways:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-296142"></A>Provide a mapping between vertices across the profiles using the <A HREF=../headers/pk_body_vertex_matches_t.html>PK_BODY_vertex_matches_t</A> structure.</LI>
+<LI>
+<A NAME="50422112_pgfId-296143"></A>Add extra vertices to some of the profiles using <A HREF=../headers/pk_edge_imprint_point.html>PK_EDGE_imprint_point</A>.</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-296144"></A>If a mapping between vertices is provided, constraints must be followed:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-296145"></A>Vertices can only be mapped to vertices on the profile immediately preceding or following.</LI>
+<LI>
+<A NAME="50422112_pgfId-296146"></A>Every vertex on the start or end profiles of non-periodic lofts must be mapped to at least one vertex on the preceding and following profiles (where they exist). <A HREF="fd_chap.041.html#50422112_28380"><EM>
+Figure 40-13</EM></A> shows an example of this with the profiles are showed in red.</LI>
+<LI>
+<A NAME="50422112_pgfId-296150"></A>For all other profiles, every vertex on the profile must have exactly one match to a vertex on both the preceding and following profiles. <A HREF="fd_chap.041.html#50422112_28193"><EM>
+Figure 40-14</EM></A> shows an example of illegal vertex mapping.</LI>
+<LI>
+<A NAME="50422112_pgfId-296154"></A>Paths must not cross over while passing from one profile to the next; if vertex A precedes vertex B on one profile, then the vertices it maps to on the preceding and following profiles must also precede the vertices that vertex B maps to--see <A HREF="fd_chap.041.html#50422112_12846"><EM>
+Figure 40-15</EM></A> (b).</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-296135"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-390.gif">
+
+<P>
+<A NAME="50422112_pgfId-297670"></A>Figure 40-13 <A NAME="50422112_28380"></A>Example of legal vertex mapping</P>
+<P>
+<A NAME="50422112_pgfId-296217"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-391.gif">
+
+<P>
+<A NAME="50422112_pgfId-409588"></A>Figure 40-14 <A NAME="50422112_28193"></A>Example of illegal vertex mapping</P>
+<P>
+<A NAME="50422112_pgfId-450388"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-392.gif">
+
+<P>
+<A NAME="50422112_pgfId-409672"></A>Figure 40-15 <A NAME="50422112_12846"></A>Example of illegal vertex mapping </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-296263"></A>40.8	<A NAME="50422112_86768"></A>Lofting with guide wires 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-457953"></A>By specifying guide wires for a loft operation, you can constrain the loft geometry across profiles, resulting in a lofted body that follows the shape described by the guide wires at relevant points. <A HREF="fd_chap.041.html#50422112_34195"><EM>
+Figure 40-16</EM></A> shows the effect of specifying a guide wire during a lofting operation. In the example, both end profiles are wires, thereby producing a sheet as the result. The guide wire specified is a half circle that intersects both profiles at a point one third from the left of each profile. The resulting body follows the guide wire along the line of the guide wire itself, and follows the shape of the loft operation at the ends of the profiles. In between, it transitions smoothly to result in the body shown in the right hand part of the figure.</P>
+<P>
+<A NAME="50422112_pgfId-458132"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-393.gif">
+
+<P>
+<A NAME="50422112_pgfId-458123"></A>Figure 40-16 <A NAME="50422112_34195"></A>Use of a simple guide wire during a lofting operation</P>
+<P>
+<A NAME="50422112_pgfId-458124"></A>Guide wires must be visibly smooth (adjacent edges in the guide wire must meet at an angle that is less than a relaxed angle precision determined internally by Parasolid, but may be greater than session angle precision) and are interpolated by the loft as iso-parameter curves along the loft direction. Each guide wire has a region of influence that covers the whole length of the loft and whose bound is the boundary of the corresponding smooth section of profiles or (in cases where more than one guide wire is specified) adjacent guide wires, whichever is reached first.</P>
+<P>
+<A NAME="50422112_pgfId-296343"></A>Each guide wire is assumed to intersect every profile once only at corresponding vertices, subject to the largest vertex tolerance there. Guide wires must be oriented.</P>
+<P>
+<A NAME="50422112_pgfId-296344"></A>Guide wires can extend beyond their intersections with either the start or end profiles (or both), so long as that profile:</P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-296345"></A>Is not itself touching an adjacent profile</LI>
+<LI>
+<A NAME="50422112_pgfId-296346"></A>Is not degenerate</LI>
+<LI>
+<A NAME="50422112_pgfId-296347"></A>Is a wire body</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-296323"></A>In such cases, the resultant lofted bodies extend beyond the start or end profile, as shown in <A HREF="fd_chap.041.html#50422112_25268"><EM>
+Figure 40-17</EM></A>. As a special case of this, you can also create a lofted body by supplying a single profile and at least one guide wire. </P>
+<P>
+<A NAME="50422112_pgfId-462311"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-394.gif">
+
+<P>
+<A NAME="50422112_pgfId-297746"></A>Figure 40-17 <A NAME="50422112_25268"></A>Extending guide wire beyond the start or end profiles</P>
+<P>
+<A NAME="50422112_pgfId-296435"></A>Similarly, you can also use guide wires to reduce the number of profiles required when creating periodic lofts: if you supply a closed guide wire, then only a single profile is required in order to produce a periodic loft. When Parasolid produces a loft from one or two profiles and a closed guide wire, it also creates additional construction profiles. You can control whether the topology from these construction profiles is propagated to the resultant lofted body: see <A HREF="fd_chap.041.html#50422112_44770">Section 40.11, “Creating construction topology”</A>, for more information. </P>
+<P>
+<A NAME="50422112_pgfId-296422"></A><A HREF="fd_chap.041.html#50422112_93755"><EM>
+Figure 40-18</EM></A> shows an example in which a single closed profile and three closed guide curves have been used to create a lofted body, creating a number of construction profiles in the process.</P>
+<P>
+<A NAME="50422112_pgfId-451623"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-395.gif">
+
+<P>
+<A NAME="50422112_pgfId-429272"></A>Figure 40-18 <A NAME="50422112_93755"></A>Creating a lofted body using a single profile and a closed guide wire</P>
+<P>
+<A NAME="50422112_pgfId-363001"></A>If any of the above conditions are not true, then the guide wire must be bound by its intersection with the start and end profiles, as shown in <A HREF="fd_chap.041.html#50422112_34195"><EM>
+Figure 40-16</EM></A>.</P>
+<P>
+<A NAME="50422112_pgfId-296505"></A>If any one of a set of matched profile vertices lies on a guide wire, then they must all lie on the same guide wire. This is illustrated in <A HREF="fd_chap.041.html#50422112_17303"><EM>
+Figure 40-19</EM></A>. On the left hand side of the figure three profiles are shown, A, B, and C, in which the highlighted vertices form a set of matching profile vertices. The guide curve shown correctly passes through each of these vertices. The right hand side of <A HREF="fd_chap.041.html#50422112_17303"><EM>
+Figure 40-19</EM></A> shows the same three profiles, but for two profiles (B and C) the guide curve passes through vertices that are not in the set of matching vertices. The loft operation described in the right hand side of the figure could not be performed.</P>
+<P>
+<A NAME="50422112_pgfId-451843"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-396.gif">
+
+<P>
+<A NAME="50422112_pgfId-297765"></A>Figure 40-19 <A NAME="50422112_17303"></A>Correct and incorrect use of guide wires with matching profile vertices</P>
+<P>
+<A NAME="50422112_pgfId-296595"></A>Guide wires restrict the use of certain clamped derivative conditions. Because guide wires are interpolated by the loft operation, the loft derivatives along the guide wires are completely determined. Any clamped end condition must therefore satisfy both the tangency and the derivative magnitude imposed by the guide wires. This means that the following clamp operations are not allowed at any profile vertex that has a match on a guide wire:</P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-296596"></A>Vector clamp operations</LI>
+<LI>
+<A NAME="50422112_pgfId-296597"></A>Magnitude control of face clamp operations</LI>
+<LI>
+<A NAME="50422112_pgfId-296598"></A>Magnitude control of planar clamp operations</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422112_pgfId-296605"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-296601"></A>Note: You can, however, specify derivative conditions on guide wires themselves. See <A HREF="fd_chap.041.html#50422112_41623">Section 40.9, “Specifying derivative conditions for guide wires”</A> for details. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-296606"></A>Edges of the lofted body that are coincident with the guide wire(s) have nominal curves on them that are derived from the guide wire geometries. These nominal curves are copies of the (nominal) curves of the edges of the corresponding guide wire. </P>
+<P>
+<A NAME="50422112_pgfId-296607"></A>You specify guide wires using the <CODE>
+n_guide_wires</CODE>
+ and <CODE>
+guide_wires</CODE>
+ options in <A HREF=../headers/pk_body_make_lofted_body_o_t.html>PK_BODY_make_lofted_body_o_t</A>:</P>
+<P>
+<A NAME="50422112_pgfId-296621"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296610"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296612"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296614"></A><CODE>
+n_guide_wires</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296616"></A>An integer specifying the number of guide curves being used.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296618"></A><CODE>
+guide_wires</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296620"></A>An array of oriented connected manifold wire bodies</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-296664"></A>40.9	<A NAME="50422112_41623"></A>Specifying derivative conditions for guide wires 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-296671"></A>In addition to loft profiles (as described in <A HREF="fd_chap.041.html#50422112_71245" CLASS="XRef">Section 40.4, “Specifying derivative conditions for the first or last profile”</A> and <A HREF="fd_chap.041.html#50422112_80808" CLASS="XRef">Section 40.5, “Specifying derivative conditions for intermediate profiles”</A>), you can specify derivative conditions to control the shape of the lofted body along any guide wire specified, as shown in <A HREF="fd_chap.041.html#50422112_37286"><EM>
+Figure 40-20</EM></A>.</P>
+<P>
+<A NAME="50422112_pgfId-463266"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-397.gif">
+
+<P>
+<A NAME="50422112_pgfId-297853"></A>Figure 40-20 <A NAME="50422112_37286"></A>Applying derivative conditions to guide wires</P>
+<P>
+<A NAME="50422112_pgfId-296733"></A>Derivative conditions are applied to guide wires using the following options to <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A>:</P>
+<P>
+<A NAME="50422112_pgfId-296754"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296736"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296738"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296740"></A><CODE>
+n_guide_derivs</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296742"></A>The number of guide wires that you want to specify derivative conditions for. This is the number of elements in both the <CODE>
+guide_derivs</CODE>
+ and <CODE>
+guide_indices</CODE>
+ arrays.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296744"></A><CODE>
+guide_derivs</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296746"></A>An array of derivative conditions for the guide wires indexed in <CODE>
+guide_indices</CODE>
+. See <A HREF="fd_chap.041.html#50422112_46897">Section 40.5.3, “Calculating derivative magnitudes”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296751"></A><CODE>
+guide_indices</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296753"></A>An array of integers. Each integer refers to a guide wire in the loft, where 0 refers to the first guide wire specified in the <CODE>
+guide_wires</CODE>
+ array.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-296755"></A>These options are analogous to the options used to specify derivative conditions for intermediate profiles, as described in <A HREF="fd_chap.041.html#50422112_80808">Section 40.5, “Specifying derivative conditions for intermediate profiles”</A>.</P>
+<P>
+<A NAME="50422112_pgfId-296765"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-296761"></A>Note: When supplying derivative conditions for guide wires, the following clamp operations are not allowed at any guide vertex that has a match on a profile:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-296762"></A>Vector clamp operations</LI>
+<LI>
+<A NAME="50422112_pgfId-296763"></A>Magnitude control of face clamp operations</LI>
+<LI>
+<A NAME="50422112_pgfId-296764"></A>Magnitude control of planar clamp operations</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-296803"></A>40.10	<A NAME="50422112_73758"></A>Specifying the topological form of lofted bodies 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-296804"></A>The <CODE>
+topology_form</CODE>
+ option controls how faces should divide up the resulting body. It takes the following values:</P>
+<P>
+<A NAME="50422112_pgfId-296826"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296811"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296813"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296815"></A>PK_BODY_topology_minimal_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296817"></A>The lofted body will contain the minimum number of faces. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296819"></A>PK_BODY_topology_columns_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296821"></A>The lofted body will contain columns of faces, which are produced from each set of corresponding edges in the profiles. Resultant edges between the columns will run in the directions followed by the profile vertices during the loft.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296823"></A>PK_BODY_topology_grid_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-296825"></A>The lofted body will contain a grid of faces. The grid is produced by dividing the body into columns, then dividing at each intermediate profile to create resultant edges representing the specified set of profile bodies.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-296837"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-296829"></A>Note: You can also control the topological form of lofted bodies by specifying how smooth edges in profiles should be determined. See <A HREF="fd_chap.041.html#50422112_85259">Section 40.12, “Controlling profile smoothness”</A>. </ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422112_pgfId-296836"></A>Using guide wires (see <A HREF="fd_chap.041.html#50422112_86768">Section 40.8, “Lofting with guide wires”</A>) does not change the number of faces in the resulting body, no matter which topology form option is used.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-437410"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-398.gif">
+
+<P>
+<A NAME="50422112_pgfId-297897"></A>Figure 40-21 Lofting topology form</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-296909"></A>40.11	<A NAME="50422112_44770"></A>Creating construction topology 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-296910"></A>When creating a periodic loft using a closed guide wire and fewer than three profiles (as described in <A HREF="fd_chap.041.html#50422112_86768">Section 40.8, “Lofting with guide wires”</A>), Parasolid creates additional <EM>
+construction profiles</EM> in order to complete the lofting operation. You can think of these construction profiles as profiles that you might ordinarily have specified yourself, but which Parasolid has been able to generate for you. </P>
+<P>
+<A NAME="50422112_pgfId-296920"></A>If you set the <CODE>
+create_construction_topol</CODE>
+ option to PK_LOGICAL_true, then the topology from any construction profiles is reflected in the topology of the resultant lofted body. It is strongly recommended that you use this option if you want to avoid any significant change in behaviour during downstream operations. For example, if the user of your application subsequently edited or reapplied the loft, your application should treat the construction profile that was created by Parasolid as a real profile, as if it had been specified in the original loft. Failure to do this could result in significant unexpected changes to the model. Setting <CODE>
+create_construction_topol</CODE>
+ to PK_LOGICAL_true allows you to do this. </P>
+<P>
+<A NAME="50422112_pgfId-296927"></A><A HREF="fd_chap.041.html#50422112_51418"><EM>
+Figure 40-22</EM></A> shows an example in which a lofted body has been created from two wire profiles and a closed guide curve. During the loft operation, Parasolid has created two construction profiles, and the edges from all four profiles have been included in the resulting lofted body. In your application, failing to include the construction profiles in any subsequent lofting operation could result in unexpected changes to the model. </P>
+<P>
+<A NAME="50422112_pgfId-452866"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-399.gif">
+
+<P>
+<A NAME="50422112_pgfId-363368"></A>Figure 40-22 <A NAME="50422112_51418"></A>Adding construction topology to the lofted body</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-296996"></A>40.12	<A NAME="50422112_85259"></A>Controlling profile smoothness 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-297000"></A>As described in <A HREF="fd_chap.041.html#50422112_73758">Section 40.10, “Specifying the topological form of lofted bodies”</A>, you can use <CODE>
+topology_form</CODE>
+ to control whether the loft operation creates edges in the direction of the loft at vertices where two profile edges join smoothly. <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A> also provides the <CODE>
+profile_smoothness</CODE>
+ option to control when lofting considers adjacent profile edges to join with G1 smoothness. It can take the following values:</P>
+<P>
+<A NAME="50422112_pgfId-297017"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-297003"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-297005"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-297007"></A>PK_BODY_smoothness_exact_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-297009"></A>Two adjacent profile edges are considered G1 smooth only if they meet at an angle less than session angle precision. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-297011"></A>PK_BODY_smoothness_relax_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422112_pgfId-297013"></A>Two adjacent profile edges are considered smooth if they meet at an angle that is less than relaxed angle precision. The relaxed angle precision is determined internally by Parasolid, and although greater than session angle precision, it is still very small. Setting <CODE>
+profile_smoothness</CODE>
+ to this value lets you treat profile edges that meet at a visibly smooth angle as G1-smooth.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-297018"></A>When profile edges are considered to join smoothly, a single surface is created for the area of the loft that is generated from them. If, in addition, <CODE>
+topology_form</CODE>
+ is left at its default value, a single face is created for that surface as well. </P>
+<P>
+<A NAME="50422112_pgfId-297022"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-297021"></A>Note: If <CODE>
+topology_form</CODE>
+ is set to a non-default value, then edges are still created in the direction of the loft, even if the profile edges are considered to join smoothly. Thus, separate loft faces are created, and in cases where the profile edges join smoothly, the single surface created is attached to both faces. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-297026"></A><A HREF="fd_chap.041.html#50422112_44301"><EM>
+Figure 40-23</EM></A> shows a loft created from two wire profiles, each of which contains two edges that join visibly smoothly, but not to within session angle precision. </P>
+<UL>
+<LI>
+<A NAME="50422112_pgfId-297027"></A>When <CODE>
+profile_smoothness</CODE>
+ is PK_BODY_smoothness_exact_c, an edge is created between the vertices in each profile. Separate surfaces and faces are created for the lofted body.</LI>
+<LI>
+<A NAME="50422112_pgfId-297028"></A>When <CODE>
+profile_smoothness</CODE>
+ is PK_BODY_smoothness_relax_c, the edges are considered to join smoothly, and a single surface is created for the loft. With <CODE>
+topology_form</CODE>
+ left at its default value, no additional edge is created, and a single face is created for this surface.</LI>
+</UL>
+<P>
+<A NAME="50422112_pgfId-453141"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-400.gif">
+
+<P>
+<A NAME="50422112_pgfId-297951"></A>Figure 40-23 <A NAME="50422112_44301"></A>Controlling when adjacent profile edges are considered smooth</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-297101"></A>40.13	<A NAME="50422112_marker-326930"></A>Simplifying the final body 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-297102"></A><A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A> supports the same <CODE>
+simplify</CODE>
+ option for simplifying the result body that <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> does. See <A HREF="fd_chap.039.html#50422110_44669">Section 38.2.13, “Simplifying the final body”</A>, for more information. </P>
+<P>
+<A NAME="50422112_pgfId-297106"></A>If you want to produce the simplest possible surfaces in the result (rather than the minimal number of surfaces), you may need to set the <CODE>
+topology_form</CODE>
+ option to a non-default value. See <A HREF="fd_chap.041.html#50422112_73758">Section 40.10, “Specifying the topological form of lofted bodies”</A>, for more details. </P>
+<P>
+<A NAME="50422112_pgfId-297113"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-297112"></A>Note: You must not set <CODE>
+simplify</CODE>
+ to PK_BODY_simplify_swept_spun_c. This value is not supported for <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A>. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-297118"></A>40.14	<A NAME="50422112_marker-297114"></A><A NAME="50422112_marker-297115"></A><A NAME="50422112_marker-297116"></A><A NAME="50422112_marker-297117"></A>Nominal geometry 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-297119"></A>The resultant bodies produced by <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A> have nominal curves enabled.</P>
+<P>
+<A NAME="50422112_pgfId-297120"></A>Edges running parallel to the profile(s) have nominal curves on them derived from the profile geometries. The nominal curves are copies of the (nominal) curves of the edges of the corresponding profile.</P>
+<P>
+<A NAME="50422112_pgfId-297121"></A>Lateral edges, i.e. edges running in the direction of the loft, have nominal geometry derived from the surfaces of their adjacent faces. In general they are B-curves, though analytic curves may be produced when the <CODE>
+simplify</CODE>
+ option is set to PK_BODY_simplify_yes_c.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-297126"></A>40.15	<A NAME="50422112_marker-297122"></A><A NAME="50422112_marker-297123"></A><A NAME="50422112_marker-297124"></A><A NAME="50422112_marker-297125"></A>Handling lofting tolerances 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-297127"></A><A HREF=../headers/pk_body_make_lofted_body_o_t.html>PK_BODY_make_lofted_body_o_t</A> contains the <CODE>
+tolerance</CODE>
+ and <CODE>
+minimise_tolerance</CODE>
+ options that are also available in <A HREF=../headers/pk_body_make_swept_body_2_o_t.html>PK_BODY_make_swept_body_2_o_t</A> for controlling how tolerances are applied when creating lofted bodies. See <A HREF="fd_chap.039.html#50422110_15033">Section 38.2.14, “Handling sweep tolerances”</A> for more information.</P>
+<P>
+<A NAME="50422112_pgfId-297134"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-297133"></A>Note: <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A> does not contain the <CODE>
+allow_rationals</CODE>
+ option that is available in <A HREF=../headers/pk_body_make_swept_body_2_o_t.html>PK_BODY_make_swept_body_2_o_t</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-297140"></A>40.16	<A NAME="50422112_38876"></A><A NAME="50422112_marker-297136"></A><A NAME="50422112_marker-297137"></A><A NAME="50422112_marker-297138"></A><A NAME="50422112_marker-297139"></A>Tracking information for lofted bodies 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-297144"></A>Parasolid returns tracking information about faces in the resultant lofted body. This information associates each face with the topology that it was created from. This information is returned in the <CODE>
+tracking_info</CODE>
+ sub-structure of the <CODE>
+lofted_body</CODE>
+ return structure. </P>
+<P>
+<A NAME="50422112_pgfId-297145"></A>You can use the <CODE>
+want_edge_tracking</CODE>
+ option in <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A> to return tracking information about edges in the lofted body, as well as faces. By default, edge tracking information is not returned. </P>
+<P>
+<A NAME="50422112_pgfId-297146"></A>If <CODE>
+label_profiles</CODE>
+ is PK_LOGICAL_true, <A HREF=../headers/pk_body_make_lofted_body.html>PK_BODY_make_lofted_body</A> returns extra tracking information for edges that allows you to associate each edge in the resultant body with the profile that it originated from. For each edge that is created from a profile edge, an additional integer is returned in the <CODE>
+original_topols</CODE>
+ array: edges with the same value originated from the same profile. </P>
+<P>
+<A NAME="50422112_pgfId-297150"></A><A HREF="fd_chap.041.html#50422112_92738"><EM>
+Figure 40-24</EM></A> shows a sheet body that has been lofted from three profiles, together with the extra information that is returned if <CODE>
+label_profiles</CODE>
+ is PK_LOGICAL_true. </P>
+<P>
+<A NAME="50422112_pgfId-453498"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-401.gif">
+
+<P>
+<A NAME="50422112_pgfId-298004"></A>Figure 40-24 <A NAME="50422112_92738"></A>Tracking the originating profile of edges created from profile edges</P>
+<P>
+<A NAME="50422112_pgfId-298005"></A>This option has no effect if <CODE>
+want_edge_tracking</CODE>
+ is PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422112_pgfId-298009"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-298008"></A>Note: Any construction profiles that have been created, such as those created when creating a periodic loft using a single profile and a closed guide wire, are used when determining information for <CODE>
+label_profiles</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422112_pgfId-298073"></A>40.17	<A NAME="50422112_69487"></A><A NAME="50422112_marker-298071"></A><A NAME="50422112_marker-298072"></A>Update control 
+
+
+</H1>
+<P>
+<A NAME="50422112_pgfId-298074"></A>If your application relies on reproducing behaviour when updating models built using earlier versions of Parasolid, you should use the <CODE>
+update</CODE>
+ option to preserve old behaviour and help eliminate differences in rebuild results. This option lets you disable lofting enhancements - such as lofting between profiles that touch - that have been added at different versions of Parasolid. Doing this ensures that lofting gives the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_body_loft_update_t.html>PK_BODY_loft_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<P>
+<A NAME="50422112_pgfId-531448"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422112_pgfId-531472"></A>Note:  The default value is PK_BODY_loft_update_default_c which uses all appropriate general lofting enhancements. Setting to a non-default value disables all appropriate general lofting enhancements.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422112_pgfId-542297"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.040.html">Sweeping Tool Bodies Along a Path</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.042.html">Shadow Curves</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

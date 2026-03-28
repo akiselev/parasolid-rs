@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_GEOM_range_vector</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_GEOM_range_vector</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                   PK_GEOM_range_vector
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A>                         geom,          --- geometrical entity
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                       vector,        --- position vector
+const <A HREF=../headers/pk_geom_range_vector_o_t.html>PK_GEOM_range_vector_o_t</A>   *options,       --- options structure [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_range_result_t.html>PK_range_result_t</A>          *const range_result,  --- if range data returned
+<A HREF=../headers/pk_range_1_r_t.html>PK_range_1_r_t</A>             *const range          --- range data
+)
+</B>
+<A NAME="description"></A>
+<I>This function finds the global minimum separation between a geometrical
+entity and a position.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_option_data       bad option data given (MILD)
+    PK_ERROR_wrong_entity          given entity is of the wrong type (MILD)
+    PK_ERROR_missing_geom          given entity has missing geometry (MILD)
+    PK_ERROR_bad_parameter         bad parameter given (MILD)
+    PK_ERROR_no_closest_approach   failed to find closest approach (MILD)
+
+<A NAME="documentation"></A>
+
+
+PK_GEOM_range_vector will find the global closest approach between the
+geometrical entity <B>'geom'</B> and a position vector <B>'vector'</B>.
+
+The following geometry types are supported:
+    - surface, curve and point.
+
+
+
+The function returns <B>'range_result'</B> which can be one of three values:
+   <A HREF=../headers/pk_range_result_t.html>PK_range_result_found_c</A>      the separation has been successfully found.
+   <A HREF=../headers/pk_range_result_t.html>PK_range_result_lower_c</A>      minimum separation is less than the provided
+                                lower bound.
+   <A HREF=../headers/pk_range_result_t.html>PK_range_result_upper_c</A>      no separation is less than the provided
+                                upper bound.
+
+If <B>'range_result'</B> is equal to <A HREF=../headers/pk_range_result_t.html>PK_range_result_found_c</A>, then a range data will
+also be returned in <B>'range'</B>, this consists of a structure of type
+<A HREF=../headers/pk_range_1_r_t.html>PK_range_1_r_t</A>, and contains a double <B>'distance'</B>, which is the
+separation distance between the geometrical entity and the vector provided, and
+a structure of type <A HREF=../headers/pk_range_end_t.html>PK_range_end_t</A>, which provides information on the
+end of the line of separation on the entity as follows:
+
+<B>'entity'</B>           : the geometry supplied in <B>'geom'</B>.
+<B>'sub_entity'</B>       : not applicable, PK_ENTITY_null will be returned.
+<B>'vector'</B>           : the end position on <B>'entity'</B>.
+<B>'parameters'</B>       : an array of two parameters of the end position holding
+                     curve or surface parameter(s). Which parameterisation is
+                     used is dependent upon the geometry of the entity
+                     returned.
+                     If curve parameterisation is used the 2nd parameter should
+                     be ignored.
+                     The table below indicates which parameterisation
+                     is used and when:
+
+                      -------------------------------------------------------
+                     |  Entity   |  Identified  |     Geometry used for      |
+                     |           |  Sub-Entity  |  solution parameterisation  |
+                     |-----------|--------------|----------------------------|
+                     |           |              |                            |
+                     |  point    |     none     |          none              |
+                     |  curve    |     none     |          curve             |
+                     | surface   |     none     |         surface            |
+                     |           |              |                            |
+                      -------------------------------------------------------
+
+                     The curve and surface parameter values returned
+                     will be the same as would be returned by the
+                     parameterisation functions <A HREF=../headers/pk_curve_parameterise_vector.html>PK_CURVE_parameterise_vector</A>
+                     and <A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A>.
+
+<B>'region'</B>           : a logical value - whether the solution is regional. If
+                     PK_LOGICAL_true, the solution is a regional solution upon
+                     the entity (ie. it is possible to move from solution point
+                     pair without the distance changing )
+                     The identification of such a regional solution is not
+                     guaranteed.
+
+<B>'negative'</B>         : not applicable, PK_LOGICAL_false will be returned.
+
+See <A HREF="../chapters/fd_chap.029.html#50434386_pgfId-296591">Calculating minimum and maximum distance</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

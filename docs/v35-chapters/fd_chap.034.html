@@ -1,0 +1,584 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Controlling Redundant Topology</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Controlling Redundant Topology</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.033.html">Euler Operations</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.035.html">Splitting Topology</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.034.html#50422104_pgfId-337686">33.1	Introduction </A>
+<LI> <A HREF="fd_chap.034.html#50422104_pgfId-324590">33.2	Deleting redundant topology </A>
+<UL>
+<LI> <A HREF="fd_chap.034.html#50422104_pgfId-358084">33.2.1	Controlling the topologies to be deleted </A>
+<LI> <A HREF="fd_chap.034.html#50422104_pgfId-358360">33.2.2	Controlling redundant topologies on facet geometry </A>
+</UL>
+<LI> <A HREF="fd_chap.034.html#50422104_pgfId-324681">33.3	Identifying redundant topology </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422104_pgfId-337686"></A>33.1	<A NAME="50422104_40083"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422104_pgfId-337798"></A>Bodies may sometimes contain edges or vertices that are not required for a complete, valid definition of the model. Such topology is referred to as <STRONG>
+redundant topology</STRONG>, and may include:</P>
+<UL>
+<LI>
+<A NAME="50422104_pgfId-337799"></A>Vertices attached to split ring edges.</LI>
+<LI>
+<A NAME="50422104_pgfId-337800"></A>Vertices splitting two edges that share the same curve.</LI>
+<LI>
+<A NAME="50422104_pgfId-337801"></A>Wire edges.</LI>
+<LI>
+<A NAME="50422104_pgfId-337802"></A>Edges splitting two faces that share the same surface. </LI>
+</UL>
+<P>
+<A NAME="50422104_pgfId-357699"></A>Parasolid provides you with functions to delete redundant topologies such as these from a body, or to identify them in order to take some other action (for example, to attach attributes to anything your application does not consider redundant). Dealing with redundant topology is often required before exporting data to another application. <A HREF="fd_chap.034.html#50422104_10106"><EM>
+Figure 33-1</EM></A> shows some simple examples of redundant topology on a body.</P>
+<P>
+<A NAME="50422104_pgfId-357700"></A>You can use the following functions to manage redundant topology in a body:</P>
+<P>
+<A NAME="50422104_pgfId-372775"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-357703"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-357705"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-357707"></A><A HREF=../headers/pk_topol_delete_redundant_2.html>PK_TOPOL_delete_redundant_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-357709"></A>Identify and then delete redundant topology from a model, merging together entities that become mergeable as a result of the deletion. See <A HREF="fd_chap.034.html#50422104_93817">Section 33.2, “Deleting redundant topology”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-357714"></A><A HREF=../headers/pk_topol_identify_redundant.html>PK_TOPOL_identify_redundant</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-357718"></A>Identify any topological entities in a body that are redundant. See <A HREF="fd_chap.034.html#50422104_76195">Section 33.3, “Identifying redundant topology”</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422104_pgfId-337841"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-248.gif">
+
+<P>
+<A NAME="50422104_pgfId-337843"></A>Figure 33-1 <A NAME="50422104_10106"></A>Redundant topology in a body</P>
+<P>
+<A NAME="50422104_pgfId-339760"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-337945"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422104_pgfId-337949"></A><A HREF="fd_chap.065.html#50422140_97650">Chapter 64, “Identifying And Simplifying Model Details”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422104_pgfId-324590"></A>33.2	<A NAME="50422104_93817"></A>Deleting redundant topology 
+
+
+</H1>
+<P>
+<A NAME="50422104_pgfId-324591"></A><A HREF=../headers/pk_topol_delete_redundant_2.html>PK_TOPOL_delete_redundant_2</A> receives an array of <CODE>
+topols</CODE>
+ together with a set of options. It deletes any topologies that are found to be redundant, and merges remaining topologies that become mergable as a result of this action. You can control the behaviour of the function using the following options:</P>
+<P>
+<A NAME="50422104_pgfId-374712"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324594"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324596"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-324598"></A>max_topol_dimension</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324600"></A>Lets you control which topologies are regarded as redundant, according to the dimension of the topology. For instance, to remove only redundant vertices from a body, set <CODE>
+max_topol_dimension</CODE>
+ to PK_TOPOL_dimension_0_c. Default: PK_TOPOL_dimension_any_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-324602"></A>scope</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324604"></A>Lets you specify the scope of the operation. This lets you control how sub-topologies on the boundaries of the specified <CODE>
+topols</CODE>
+ are treated. See <A HREF="fd_chap.034.html#50422104_27167">Section 33.2.1, “Controlling the topologies to be deleted”</A> for more information. </P>
+<P>
+<A NAME="50422104_pgfId-371385"></A>Default: <A HREF=../headers/pk_redundant_merge_t.html>PK_redundant_merge_on_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-358540"></A>facet_geom_continuity</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-358542"></A>Determines the level of geometric continuity between adjacent facet geometries that is necessary for topology to be considered redundant. See <A HREF="fd_chap.034.html#50422104_39681">Section 33.2.2, “Controlling redundant topologies on facet geometry”</A> for more information. </P>
+<P>
+<A NAME="50422104_pgfId-371394"></A>Default: <A HREF=../headers/pk_continuity_t.html>PK_continuity_g0_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-358558"></A>have_vertex_angle</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-358560"></A>Whether a <CODE>
+vertex_angle</CODE>
+ has been supplied. See <A HREF="fd_chap.034.html#50422104_39681">Section 33.2.2, “Controlling redundant topologies on facet geometry”</A> for more information. </P>
+<P>
+<A NAME="50422104_pgfId-371423"></A>Default: PK_LOGICAL_false. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-358828"></A>vertex_angle</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-358830"></A>An angle used to determine whether an mvertex between two polyline edges of a mesh will be considered for redundancy. See <A HREF="fd_chap.034.html#50422104_39681">Section 33.2.2, “Controlling redundant topologies on facet geometry”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-324606"></A>n_protected_topols</PRE>
+<PRE><A NAME="50422104_pgfId-324607"></A>protected_topols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324609"></A>Lets you specify any topologies that you want to ensure are not deleted during the operation. </P>
+<P>
+<A NAME="50422104_pgfId-371452"></A>Default: NULL.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422104_pgfId-374911"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422104_pgfId-374937"></A>Note:  The facet_geom_continuity, have_vertex_angle, and vertex_angle options can only be used with facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422104_pgfId-358084"></A>	33.2.1 	<A NAME="50422104_27167"></A>Controlling the topologies to be deleted </H3>
+<P>
+<A NAME="50422104_pgfId-324614"></A>The <CODE>
+scope</CODE>
+ option can be used to control the number of topologies that are deleted. This is illustrated in <A HREF="fd_chap.034.html#50422104_69566"><EM>
+Figure 33-2</EM></A>, which shows a sheet body comprising three faces, containing several redundant edges and vertices. In the call to PK_TOPOL_redundant_2, the two faces shown in red are supplied as <CODE>
+topols</CODE>
+. Different values of <CODE>
+scope</CODE>
+ produce different results for this example, as follows:</P>
+<P>
+<A NAME="50422104_pgfId-324643"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324617"></A>Value of <CODE>
+scope</CODE>
+</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324619"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324621"></A><A HREF=../headers/pk_redundant_merge_t.html>PK_redundant_merge_in_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324623"></A>Produces the least changes to the body. Topologies are only removed if they do not change neighboring topology not specified in <CODE>
+topols</CODE>
+.</P>
+<UL>
+<LI>
+<A NAME="50422104_pgfId-324624"></A>All redundant topologies internal to the specified <CODE>
+topols</CODE>
+ are removed. In this case, one edge and one vertex is removed. The faces supplied in <CODE>
+topols</CODE>
+ are merged as a result of this. </LI>
+<LI>
+<A NAME="50422104_pgfId-324625"></A>Redundant vertices on the laminar boundaries are removed. In this case, 5 vertices are removed, and their corresponding edges are merged to leave three laminar edges. </LI>
+</UL>
+<P>
+<A NAME="50422104_pgfId-324626"></A>The redundant vertices on the non-laminar boundaries are not removed in this case, because they have associated topology that has not been specified in the list of <CODE>
+topols</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324628"></A><A HREF=../headers/pk_redundant_merge_t.html>PK_redundant_merge_on_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324630"></A>Produces the default result. Topologies are only removed if this does not merge any of the <CODE>
+topols</CODE>
+ with neighboring topology. </P>
+<UL>
+<LI>
+<A NAME="50422104_pgfId-324631"></A>All redundant topologies internal to the specified <CODE>
+topols</CODE>
+ are removed. </LI>
+<LI>
+<A NAME="50422104_pgfId-324632"></A>All redundant vertices on the laminar boundaries are removed. </LI>
+<LI>
+<A NAME="50422104_pgfId-324633"></A>Redundant vertices on the non-laminar boundaries are also removed, and the corresponding edges merged to leave a single internal edge.</LI>
+</UL>
+<P>
+<A NAME="50422104_pgfId-324634"></A>The internal edge is not itself removed as this would result in merging with a neighboring topology. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324636"></A><A HREF=../headers/pk_redundant_merge_t.html>PK_redundant_merge_out_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324638"></A>Produces the most changes to the body. Topologies are removed even if this results in <CODE>
+topols</CODE>
+ being merged with neighboring topology.</P>
+<UL>
+<LI>
+<A NAME="50422104_pgfId-324639"></A>All redundant topologies internal to the specified <CODE>
+topols</CODE>
+ are removed. </LI>
+<LI>
+<A NAME="50422104_pgfId-324640"></A>All redundant vertices on the laminar boundaries are removed. </LI>
+<LI>
+<A NAME="50422104_pgfId-324641"></A>All redundant vertices on the non-laminar boundaries are removed.</LI>
+<LI>
+<A NAME="50422104_pgfId-324642"></A>Redundant non-laminar boundaries are removed and the faces merged.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422104_pgfId-324677"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-249.gif">
+
+<P>
+<A NAME="50422104_pgfId-324679"></A>Figure 33-2 <A NAME="50422104_69566"></A>Specifying the scope when deleting redundant topologies</P>
+
+
+<H3>
+<A NAME="50422104_pgfId-358360"></A>	33.2.2 	<A NAME="50422104_39681"></A>Controlling redundant topologies on facet geometry </H3>
+<P>
+<A NAME="50422104_pgfId-364149"></A>PK TOPOL_identify_redundant and PK TOPOL delete redundant 2 can be also be used to optimise redundant topology on facet bodies, but you are recommended to change the default settings of <CODE>
+facet_geom_continuity</CODE>
+, <CODE>
+have_vertex_angle</CODE>
+, and <CODE>
+vertex_angle</CODE>
+ options to achieve the best results. Failure to do this can mean the removal of almost all topology from a facet body, which is not desirable as it can have a detrimental impact on the performance of subsequent modelling operations. </P>
+<P>
+<A NAME="50422104_pgfId-361536"></A>The <CODE>
+facet_geom_continuity</CODE>
+ option controls the degree of continuity between adjacent facet geometries and determines whether topology is considered redundant. It takes the following values:</P>
+<P>
+<A NAME="50422104_pgfId-368414"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-361704"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-361706"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-361708"></A><A HREF=../headers/pk_continuity_t.html>PK_continuity_g0_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-361710"></A>All manifold non-laminar edges between faces with mesh surfaces or wire edges in faces with mesh surfaces are considered redundant. </P>
+<P>
+<A NAME="50422104_pgfId-372478"></A>All manifold mvertices between or on edges with polyline curves are considered redundant unless more than two non-redundant edges meet at the mvertices.</P>
+<P>
+<A NAME="50422104_pgfId-365721"></A>This is the default.</P>
+<ADDRESS>
+<A NAME="50422104_pgfId-365678"></A>Note: When using facet bodies, this value will remove all non-laminar manifold topology from the facet body. This typically results in a single-faced body with a single mesh surface.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-361712"></A><A HREF=../headers/pk_continuity_t.html>PK_continuity_g1_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-366589"></A>Edges on a facet body are considered redundant if the mvertices lying on the edge will not become sharp when the edge is removed. A sharp mvertex is one that does not have a unique normal, i.e the mfins at this mvertex do not share the same normal as returned from <A HREF=../headers/pk_mfin_ask_mvx_normal.html>PK_MFIN_ask_mvx_normal</A>. For more information on sharp mvertices, see <A HREF="fd_chap.089.html#50422166_11846">Section 88.3.2.3, “Finding sharp mvertices in meshes”</A>.</P>
+<P>
+<A NAME="50422104_pgfId-366740"></A>An mvertex between two polyline edges is considered for redundancy if either of the polyline edges belongs to the g1 edge chain of the other. You can check this by calling <A HREF=../headers/pk_edge_find_g1_edges.html>PK_EDGE_find_g1_edges</A> with its <CODE>
+angular_tolerance</CODE>
+ option set to the same value as the supplied <CODE>
+vertex_angle</CODE>
+. The larger the <CODE>
+vertex_angle</CODE>
+, the higher the number of vertices which are considered redundant.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422104_pgfId-361524"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422104_pgfId-361094"></A>Note: To achieve the best results using facet geometry, we strongly advise that you set <CODE>
+facet_geom_continuity</CODE>
+ to <A HREF=../headers/pk_continuity_t.html>PK_continuity_g1_c</A>, <CODE>
+have_vertex_angle</CODE>
+ to PK_LOGICAL_true and <CODE>
+vertex_angle</CODE>
+ to an angular tolerance of your choice.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422104_pgfId-324681"></A>33.3	<A NAME="50422104_76195"></A>Identifying redundant topology 
+
+
+</H1>
+<P>
+<A NAME="50422104_pgfId-324682"></A>If you want to take some action other than deleting redundant topologies, use <A HREF=../headers/pk_topol_identify_redundant.html>PK_TOPOL_identify_redundant</A>. This function receives an array of <CODE>
+topols</CODE>
+ together with a set of options. It returns those topologies that are found to be redundant.</P>
+<P>
+<A NAME="50422104_pgfId-324683"></A>You might, for instance, use this function to attach an attribute to all topologies found to be redundant in a body, for later processing. </P>
+<P>
+<A NAME="50422104_pgfId-324684"></A><A HREF=../headers/pk_topol_identify_redundant.html>PK_TOPOL_identify_redundant</A> lets you control its behaviour using the following options, some of which are identical to those found in <A HREF=../headers/pk_topol_delete_redundant_2.html>PK_TOPOL_delete_redundant_2</A>:</P>
+<P>
+<A NAME="50422104_pgfId-324718"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324687"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324689"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-324691"></A>max_topol_dimension</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324695"></A>The maximum dimension of topologies to be identified. See <A HREF="fd_chap.034.html#50422104_93817">Section 33.2, “Deleting redundant topology”</A> for details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-324698"></A>scope</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324702"></A>The scope of the operation. See <A HREF="fd_chap.034.html#50422104_27167">Section 33.2.1, “Controlling the topologies to be deleted”</A> for details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-324705"></A>want_redundant_topols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324707"></A>Whether or not to return the redundant topologies. If PK_LOGICAL_false, then only the number of redundant topologies is returned. </P>
+<P>
+<A NAME="50422104_pgfId-371504"></A>Default: PK_LOGICAL_true. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-324709"></A>propagate_redundancy</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-324711"></A>Whether or not to identify dependent redundant topologies, i.e. topologies that are not themselves redundant, but would become redundant if other redundant topologies were removed. </P>
+<P>
+<A NAME="50422104_pgfId-324715"></A>In <A HREF="fd_chap.034.html#50422104_31213"><EM>
+Figure 33-3</EM></A>, the vertex at the intersection of the redundant edges is not itself redundant, but would become so if the redundant edges were deleted. </P>
+<UL>
+<LI>
+<A NAME="50422104_pgfId-324716"></A>If <CODE>
+propagate_redundancy</CODE>
+ is <A HREF=../headers/pk_redundant_propagate_t.html>PK_redundant_propagate_yes_c</A>, then this vertex is returned in the list of redundant topologies. </LI>
+<LI>
+<A NAME="50422104_pgfId-324717"></A>If <CODE>
+propagate_redundancy</CODE>
+ is <A HREF=../headers/pk_redundant_propagate_t.html>PK_redundant_propagate_no_c</A> (the default), then the vertex is not returned. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-359837"></A>facet_geom_continuity</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-359839"></A>Degree of continuity for use with facet geometry. See <A HREF="fd_chap.034.html#50422104_39681">Section 33.2.2, “Controlling redundant topologies on facet geometry”</A> for more information. </P>
+<P>
+<A NAME="50422104_pgfId-371517"></A>Default: <A HREF=../headers/pk_continuity_t.html>PK_continuity_g0_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-359844"></A>have_vertex_angle</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-359846"></A>Whether a <CODE>
+vertex_angle</CODE>
+ has been supplied. See <A HREF="fd_chap.034.html#50422104_39681">Section 33.2.2, “Controlling redundant topologies on facet geometry”</A> for more information. </P>
+<P>
+<A NAME="50422104_pgfId-371530"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422104_pgfId-359851"></A>vertex_angle</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422104_pgfId-359853"></A>Angular tolerance for use with facet geometry. See <A HREF="fd_chap.034.html#50422104_39681">Section 33.2.2, “Controlling redundant topologies on facet geometry”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422104_pgfId-325534"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-250.gif">
+
+<P>
+<A NAME="50422104_pgfId-324724"></A>Figure 33-3 <A NAME="50422104_31213"></A>Identifying dependent redundant topologies</P>
+<P>
+<A NAME="50422104_pgfId-324514"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.033.html">Euler Operations</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.035.html">Splitting Topology</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

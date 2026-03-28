@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_THREAD_lock_partitions</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_THREAD_lock_partitions</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_THREAD_lock_partitions
+(
+<I>--- received arguments ---
+</I>int                                  n_partitions,          --- (&gt; 0)
+const <A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>                 partitions[],
+<A HREF=../headers/pk_thread_lock_t.html>PK_THREAD_lock_t</A>                     lock_type,
+<A HREF=../headers/pk_thread_wait_t.html>PK_THREAD_wait_t</A>                     wait_type,
+const <A HREF=../headers/pk_thread_lock_partitions_o_t.html>PK_THREAD_lock_partitions_o_t</A> *options,
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_thread_lock_partitions_r_t.html>PK_THREAD_lock_partitions_r_t</A> *const results
+)
+</B>
+<A NAME="description"></A>
+<I>This function attempts to lock partitions to the calling thread, i.e. make
+partitions (and items within them) only usable in this thread.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_rollback_not_started   Partitioned rollback is not active (MILD)
+    PK_ERROR_bad_partition          Partition is current (MILD)
+    PK_ERROR_not_at_pmark           Partition is not at a pmark (MILD)
+    PK_ERROR_bad_mark               Partition is at its initial pmark (MILD)
+    PK_ERROR_locked                 Thread already has partitions locked (MILD)
+    PK_ERROR_not_stopped            Thread is in a chain (MILD)
+    PK_ERROR_recursion_depth        Called within an outer PK or KI function
+                                    (MILD)
+    PK_ERROR_bb_not_empty           Bulletin board is not empty (MILD)
+
+<A NAME="documentation"></A>
+Partitions to lock to the calling thread are specified using the <B>'partitions'</B>
+array, together with the value of <B>'lock_type'</B>:
+  o If set to <A HREF=../headers/pk_thread_lock_t.html>PK_THREAD_lock_all_c</A>, this function will attempt to lock all
+    the specified <B>'partitions'</B>.
+  o If set to <A HREF=../headers/pk_thread_lock_t.html>PK_THREAD_lock_one_c</A>, this function will attempt to lock
+    only the first, currently available, partition in <B>'partitions'</B>, i.e. the
+    first partition that is not locked and no other threads are waiting to
+    lock.
+
+If some partitions are currently unavailable, i.e. already locked or other
+threads are waiting to lock them, then the behaviour of this function depends
+on the value of <B>'wait_type'</B>:
+  o If set to <A HREF=../headers/pk_thread_wait_t.html>PK_THREAD_wait_yes_c</A>, this function will queue fairly until
+    other threads have signalled that all the partitions to lock have become
+    available.
+  o If set to <A HREF=../headers/pk_thread_wait_t.html>PK_THREAD_wait_no_c</A>, this function will immediately return.
+
+The output of this function is returned in the <B>'results'</B> structure:
+  o If the <B>'status'</B> field is set to <A HREF=../headers/pk_lock_status_t.html>PK_lock_status_ok_c</A>, only the partitions
+    this function locked (and items within them) are usable in the calling
+    thread until <A HREF=../headers/pk_thread_unlock_partitions.html>PK_THREAD_unlock_partitions</A> is next called. The first locked
+    partition in <B>'partitions'</B> becomes the current partition for this thread.
+  o If the <B>'status'</B> field is set to <A HREF=../headers/pk_lock_status_t.html>PK_lock_status_fail_c</A>, no partitions
+    will be locked to the calling thread.
+  o All the partitions that this function locked can be optionally returned
+    in the <B>'locked_partitions'</B> field.
+  o All the partitions that are currently unavailable can be optionally
+    returned in the <B>'unavailable_partitions'</B> field.
+
+While a thread has locked partitions:
+  o PK functions with local exclusivity will run concurrently in the thread.
+  o The following session settings will maintain thread-specific values:
+    <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>
+    <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A>
+    <A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>
+    <A HREF=../headers/pk_session_set_close_knots.html>PK_SESSION_set_close_knots</A>
+    <A HREF=../headers/pk_session_set_general_topology.html>PK_SESSION_set_general_topology</A>
+    <A HREF=../headers/pk_session_set_mesh_angle.html>PK_SESSION_set_mesh_angle</A>
+    <A HREF=../headers/pk_session_set_rebuild_history.html>PK_SESSION_set_rebuild_history</A>
+    <A HREF=../headers/pk_session_set_roll_forward.html>PK_SESSION_set_roll_forward</A>
+    <A HREF=../headers/pk_session_set_software_option.html>PK_SESSION_set_software_option</A>
+    <A HREF=../headers/pk_session_set_swept_spun_surfs.html>PK_SESSION_set_swept_spun_surfs</A>
+  o Any further partitions that it creates or receives will automatically be
+    locked to it.
+  o Any pre-existing session marks are unusable in the thread and cannot be
+    rolled to in any thread.
+
+These PK functions (and their KI equivalents) cannot be used while partitions
+are locked to any thread:
+    <A HREF=../headers/pk_session_receive.html>PK_SESSION_receive</A>
+    <A HREF=../headers/pk_session_receive_u.html>PK_SESSION_receive_u</A>
+    <A HREF=../headers/pk_session_set_facet_geometry.html>PK_SESSION_set_facet_geometry</A>
+    <A HREF=../headers/pk_session_transmit.html>PK_SESSION_transmit</A>
+    <A HREF=../headers/pk_session_transmit_u.html>PK_SESSION_transmit_u</A>
+
+This function should only be called when partitioned rollback has been started
+with <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

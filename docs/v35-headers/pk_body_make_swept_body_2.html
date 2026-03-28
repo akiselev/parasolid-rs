@@ -1,0 +1,899 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_swept_body_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_swept_body_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_BODY_make_swept_body_2
+(
+<I>--- received arguments ---
+</I>int                                  n_profiles,        --- number of profiles
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                      profiles[],        --- profiles to sweep
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                      path,              --- path of sweep
+const <A HREF=../headers/pk_vertex_t.html>PK_VERTEX_t</A>                    path_vertices[],   --- path vertices where
+                                                        --- profiles located
+const <A HREF=../headers/pk_body_make_swept_body_2_o_t.html>PK_BODY_make_swept_body_2_o_t</A> *options,           --- options on sweeping
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_tracked_sweep_2_r_t.html>PK_BODY_tracked_sweep_2_r_t</A>   *const swept_body         --- result swept body
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a sheet or solid body by sweeping a set of
+wire or sheet profiles along a wire path.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_type               One of the profiles or the path is of the
+                                    incorrect type. (MILD)
+
+    PK_ERROR_sweep_failed           PK_BODY_make_swept_body_2 suffered an
+                                    internal algorithmic failure. (SERIOUS)
+
+
+<A NAME="documentation"></A>
+
+
+Introduction
+This function creates a sheet or solid body from a set of wire or sheet
+profiles by sweeping them along a specified wire path. The function may also be
+used to generate a body representing cross-sections of the sweep.
+
+The wire or sheet profiles are supplied in the <B>'profiles'</B> argument and they are
+swept along the wire path specified in <B>'path'</B>. If only one profile is
+specified, the cross-section of the resulting body will be constant along the
+sweep and will be the same as the input profile. If more than one profile is
+specified, then the cross-sections of the resulting body will transition
+smoothly between the shapes of the specified profiles.
+
+The shape and structure of the swept body can be modified via the following
+controls within the option structure :
+
+    o Guide wires
+    o Profile alignment
+    o Twist and scale transformations
+    o Lock faces
+    o Profile derivative conditions
+    o Geometry simplification
+    o Topological structure
+    o Vertex matching between profiles
+
+
+The user is informed of the result of the sweep operation via a returned
+results structure which contains the resultant swept body, tracking and error
+information.
+
+See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-294996">Sweeping</A> for more information.
+
+
+Profile Specification
+The type of body (sheet or solid) created by this function depends on the type
+of bodies (wire or sheet) used to define the profiles for the sweep.
+
+Profiles for the sweeping operation may be specified as a combination of
+wire and sheet bodies. See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-295002">Supplying profiles</A> for more
+information. The following points need to be considered
+when specifying the different types of profiles:
+
+  Number of Profiles
+    o At least one profile must be specified.
+
+  Path Vertices
+    o Each input profile must have an associated path vertex specified. This
+      is the vertex on the sweeping path where the profile is located. If a
+      path vertex is non-G1, then the orientation of the profile to the path is
+      taken from the edge following the path vertex on the oriented path wire,
+      where such an edge exists.
+
+  Wire Profiles
+    o Wire profiles may be open or closed profiles. The input set must not
+      contain a mixture of open and closed profiles.
+    o A wire profile may be disjoint (i.e., it can consist of more than one
+      component). If more than one profile is supplied, then each wire profile
+      must have the same number of components, and this number must be equal to
+      the number of laminar boundaries in any sheet profiles.
+    o Each component of a wire profile must be oriented
+      (<A HREF=../headers/pk_edge_propagate_orientation.html>PK_EDGE_propagate_orientation</A> may be used to achieve this).
+    o The faces of the sheet body will be constructed so that the outward
+      normal is aligned with the cross product of :
+         o The tangent in the direction of the profile orientation.
+         o The tangent along the path in the direction of its orientation.
+    o If only a single wire profile is input, the wire profile may have
+      no vertices.
+      If more than one profile is input, each wire profile must have at
+      least one vertex.
+  
+
+  Sheet Profiles
+  If a sheet body is specified as a sweep profile, the resulting body will be
+  a solid body. The following points need to be considered when specifying a
+  sheet profile :
+  
+    o The boundaries of the sheet profile are swept along the path to form
+      new faces, while the interior of the sheet profiles become end caps.
+      Therefore, a sheet profile must have a non-empty boundary; i.e. it may
+      not be a closed sheet such as a sheet cube or sheet sphere.
+    o A sheet profile may be disjoint (i.e., it can consist of more than one
+      component) and each component may have more than one laminar boundary. If
+      more than one profile is supplied, than each sheet profile must have the
+      same number of laminar boundaries, and this number must be equal to the
+      number of components in any wire profiles.
+    o The normals of the faces of the sheet profile must be oriented
+      in the same direction as the sweep direction. A sheet profile body
+      can be "reversed" via the function, <A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A>.
+    o If one of the input profiles is a sheet profiles, any wire profiles
+      in the input list must be closed.
+    o There is a limit to the number of sheet profiles that can be
+      specified for a sweeping operation :
+      o For non-periodic sweeps, only one or two sheet profiles may be
+        specified. If one sheet profile is specified, it must be the
+        only profile. If two sheet profiles are specified, they must
+        form the start and end profiles of the sweep.
+      o For periodic sweeps, only one sheet profile may be
+        specified. The single sheet profile must be the first
+        profile.
+    o When more than one profile is specified, the laminar boundary of any
+      sheet profile must have at least one vertex.
+  
+
+  Touching Profiles
+    o Profiles input to the sweep operator may not touch each other.
+
+
+Path Specification
+The sweep path body must be a wire body. The following points need to be
+considered when specifying a wire body for the sweep path :
+
+  o The sweep path is expected to be a manifold connected wire that
+    is oriented (by use of <A HREF=../headers/pk_edge_propagate_orientation.html>PK_EDGE_propagate_orientation</A> if necessary).
+
+  o The sweep path need not be G1 continuous.  At non-G1 vertices the
+    resultant swept body will have mitered corners by default.  Spun corners
+    can be generated by setting the <B>'corner_type'</B> option (see below).  However,
+    if more than one profile is specified, the sweep path must be G1
+    continuous.
+
+  o The sweep path must not contain any tolerant vertices.
+
+  o The sweep path may be closed in which case the resulting swept body
+    will close up on itself and is called a periodic sweep, except in the case
+    where guide wires are supplied in which case the guide bodies must also
+    be closed for the sweep to be periodic (see Guide Wires, below).
+
+  o It is an error to specify a wire path that is a single ring edge with
+    no vertices.
+
+In the special case of sweeping with three global guide wires, and where
+<B>'alignment'</B> is set to PK_BODY_sweep_align_parm_c or PK_BODY_sweep_align_arcl_c,
+a path is not required. In these cases, PK_ENTITY_null should be specified for
+the <B>'path'</B> and all the entries of <B>'path_vertices'</B> (see Guide Wires, below).
+
+See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-295529">Supplying a path</A> for more information.
+
+Profile Vertex Matching
+If more than one profile is specified for sweep, the profiles need to be
+matched to their neighbouring profiles in order to fully define the sweep.
+By default, the function will attempt to match the profiles.
+
+If the profiles are non-disjoint, and any sheet profiles have a single laminar
+boundary, then:
+
+  o If all the profiles are open and contain the same number of vertices,
+    the vertices will be mapped one-to-one across the profiles, starting
+    with the first vertex of each profile. No matching information
+    needs to be input.
+
+  o If all profiles are closed and contain the same number of vertices,
+    the vertices can be matched one-to-one across profiles, but the
+    user must specify a single strand of vertices, one from each profile,
+    to define the origin of the matching. This should be input in the
+    <B>'matches'</B> field of the options structure.
+
+    If the profiles contain different number of vertices, then either:
+
+       o extra vertices must be added to some of the profiles using
+         <A HREF=../headers/pk_edge_imprint_point.html>PK_EDGE_imprint_point</A> to ensure the profiles contain the same number
+         of vertices, or
+       o a mapping between vertices across the profiles must be provided
+         using the structures provided in the <B>'matches'</B> field of the options
+         structure.
+
+If the profiles are disjoint or have more than a single laminar boundary, then
+matching information needs to be supplied in the <B>'matches'</B> field of the options
+structure. The number of components on each wire profile must be equal, and the
+number of laminar boundaries on each sheet profile must be equal. For sweeps
+consisting of sheet and wire profiles, the number of laminar boundaries on each
+sheet profile must equal the number of components on each wire profile. The
+matching information defines how components and laminar boundaries on different
+profiles are mapped to each other. There must be a one-to-one mapping between
+them. For each matched set of components or laminar boundaries:
+
+  o If the components or laminar boundaries in this set each contain the same
+    number of vertices, then the user must specify a single strand of vertices,
+    one from each of the profile components or laminar boundaries in this set.
+
+  o If the set of components or laminar boundaries contain a different number
+    of vertices, then a mapping between the vertices across the profiles must
+    be provided.
+
+  o Vertices that are on the same component or laminar boundary of a profile
+    must all be matched to vertices on a single component or laminar boundary
+    on the adjacent profile.
+
+Matching information is specified as a collection of vertex mappings between
+pairs of neighbouring profiles. If matching information is specified, then the
+following should be noted:
+
+   o All matching information must be specified. I.e. all vertices on all
+     the sweep profiles must be matched, except where a single strand of
+     vertices is allowed between profile components or laminar boundaries, as
+     described above.
+   o The matching information can be specified in any order.
+   o For a periodic sweep, in addition to a match between the vertices of the
+     first and second profiles the user must specify a match between the
+     vertices of the last and first profiles.
+   o A vertex may appear more than once in a match list and thus be matched
+     with more than one vertex on the following or preceding profile. This
+     will be taken to indicate what amounts to the insertion of a degenerate
+     section at that vertex into the profile in which it lies.
+     A vertex which appears more than once on a match list may not lie on an
+     interior profile -- it must be on either the first or last profile.
+     Vertices may not appear more than once in a match list in a periodic
+     sweep.
+
+Details of the representation of the map can be found in the documentation on:
+<A HREF=../headers/pk_body_vertex_matches_t.html>PK_BODY_vertex_matches_t</A>, <A HREF=../headers/pk_body_vertex_match_t.html>PK_BODY_vertex_match_t</A>, and
+<A HREF=../headers/pk_body_one_vertex_match_t.html>PK_BODY_one_vertex_match_t</A>
+
+For more information on matching profiles, see <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-298055">Matching</A>.
+
+Guide Wires
+Guide wires may be supplied to allow additional control over the sweep. The
+behaviour depends on the number of guide wires and the value of the option
+<B>'guide_scope'</B>.
+
+If <B>'guide_scope'</B> has the default value of <A HREF=../headers/pk_sweep_guide_scope_t.html>PK_sweep_guide_scope_global_c</A>, then
+the guides act globally and may affect the entire sweep; if <B>'guide_scope'</B> is
+<A HREF=../headers/pk_sweep_guide_scope_t.html>PK_sweep_guide_scope_local_c</A>, each neigbouring pair of guides influences only
+that portion of the sweep bounded by them.
+
+If the scope is global, up to three guides may be supplied and the behaviour
+depends on this number:
+
+   o One guide wire is supplied: In this case the position of the sweep is
+     taken from the guide wire, and the profile orientation is controlled by
+     the path.
+   o Two guide wires are supplied: How the swept cross-section is transformed
+     due to the guide wires is controlled by the additional options
+     <B>'guide_method'</B> and <B>'guide_scale'</B>. In general the profile orientation is
+     affected by the path, though also according to how corresponding guide
+     wire points are matched (see Guide Matching, below).
+   o Three guide wires are supplied. The swept cross-section is transformed
+     according to the guide wires, such that a profile point located at a
+     guide's profile vertex (supplied in the <B>'profile_matches'</B> array in
+     <B>'guide_controls'</B>) will remain in contact with that guide wire. The profile
+     orientation is controlled either by the path, or how corresponding guide
+     wire points are matched (see Guide Matching, below).
+
+When the scope is local, at least three guide wires must be supplied. If the
+profile is disjoint or has multiple laminar boundaries, then at least two guide
+wires must be matched to each component or laminar boundary.
+
+See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-298953">Sweeping with guide wires</A> for more information.
+
+Guide wires may either be closed or open. The sweep is considered to be
+periodic if and only if the path and all guide wires are closed.
+
+If guide wires are supplied, the following restrictions apply:
+
+   o The guide wires are expected to be manifold connected wires that are
+     oriented (by use of <A HREF=../headers/pk_edge_propagate_orientation.html>PK_EDGE_propagate_orientation</A> if necessary).
+   o It is an error to specify a guide wire that is a single ring edge with no
+     vertices.
+   o No scale or twist laws may be supplied.
+   o The path must be G1 continuous.
+   o Lock faces may not be supplied.
+   o Guide wires may not cause the sweep cross-section to become degenerate.
+
+If any guide wire is not G1 continuous, the following restrictions also apply:
+
+  o Only a single profile may be supplied.
+  o No profile derivative conditions may be supplied.
+
+When sweeping with three guide wires and global scope, the following
+restrictions also apply:
+
+  o <B>'guide_method'</B> and <B>'guide_scale'</B> must be left at their defaults.
+  o A lock direction may not be supplied (see Profile Alignment and Guide
+    Matching, below).
+  o No guide clamps (specified in <B>'guide_controls'</B>) may be supplied.
+  o It is an error if the guide wires are such that any three corresponding
+    guide wire points are colinear.
+
+If the guide scope is local, the additional restrictions are:
+
+  o No guide clamps (specified in <B>'guide_controls'</B>) may be supplied.
+  o <B>'guide_matches'</B> must be supplied in <B>'guide_controls'</B>.
+  o <B>'profile_continuity'</B> must be <A HREF=../headers/pk_continuity_t.html>PK_continuity_g0_c</A>.
+  o <B>'alignment'</B> must be either PK_BODY_sweep_align_normal_c or
+     PK_BODY_sweep_align_parallel_c.
+  o <B>'guide_method'</B> must be PK_guide_method_point_c.
+  o <B>'n_profile_derivs'</B> must be 0.
+
+When locally scoped, each guide wire is required to cut across all profiles
+through a set of matched profile vertices at the wire's own vertices, subject
+to relevant vertex tolerances. When globally scoped, matching vertices on the
+guide wires are not required.
+
+For local guides, sheet profiles are only supported if one of the following
+applies:
+
+  o the path is closed;
+  o the profile is planar, all its edges are laminar, and all the guide
+    vertices in <B>'profile_matches'</B> within <B>'guide_controls'</B> lie in that plane;
+    for normal <B>'alignment'</B>, the profile and guide vertices must lie in the
+    plane passing through the profile's path vertex, and perpendicular to the
+    sweep direction;
+  o or multiple profiles are supplied, two of which have <B>'path_vertices'</B>
+    corresponding to the start or end of the path, respectively.
+
+Sweep Shape Controls
+The shape of the resultant swept body can be modified via the shape controls
+within the function's option structure.
+
+
+ Profile Alignment and Guide Matching
+ When sweeping profiles along the path, their orientations are controlled by
+ the <B>'alignment'</B> field of the options structure. The orientations maintain a
+ fixed relationship with the sweep direction, which is defined according to
+ this field. If any guide wires are supplied, this option also specifies how
+ points on the path should be matched to corresponding points on the guides.
+ This field should be set to one of the following values:
+ 
+    o PK_BODY_sweep_align_parallel_c, selects constant orientation. The sweep
+      direction is a fixed vector.
+    o PK_BODY_sweep_align_normal_c, the default, selects varying orientation,
+      determined by the path. The sweep direction is the path tangent, or if
+      <B>'have_lock_direction'</B> is set to PK_LOGICAL_true, and <B>'lock_type'</B> equals
+      <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_and_dir_c</A> or <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_c</A>, it is the path
+      tangent projected into the plane perpendicular to <B>'lock_direction'</B>.
+    o PK_BODY_sweep_align_parm_c and PK_BODY_sweep_align_arcl_c select varying
+      orientation, determined by the path and guides, and may only be used if
+      at least one guide wire is supplied.
+       o If three global guide wires are supplied, then the sweep direction is
+         perpendicular to the plane formed by the corresponding guide points.
+         In this case, a path is not required: PK_ENTITY_null should be
+         specified for the <B>'path'</B> and all the entries of <B>'path_vertices'</B>.
+       o If two guides and a path different to the guides are supplied, then
+         the sweep direction is perpendicular to the plane formed by the
+         corresponding path and guide points. A lock direction may not be
+         supplied.
+       o Otherwise, the sweep direction is perpendicular to the direction
+         between corresponding path and guide points. If a lock direction is
+         supplied and <B>'lock_type'</B> equals <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_and_dir_c</A> or
+         <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_c</A>, it is also perpendicular to the lock direction.
+ 
+ If <B>'have_lock_direction'</B> is set to PK_LOGICAL_true, and <B>'lock_type'</B> is set to
+ <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_and_dir_c</A> or <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_rotation_c</A>, the sweep behaviour
+ will be constrained further:
+   o With <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_and_dir_c</A>, the profiles of the sweep will maintain
+     a fixed relationship to both the sweep direction and the <B>'lock_direction'</B>,
+     rather than just the sweep direction.
+   o With <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_rotation_c</A>, the profiles of the sweep will maintain a
+     fixed relationship to both the sweep direction, and the projected
+     lock direction. The projected lock direction is the <B>'lock_direction'</B>
+     projected into the plane perpendicular to the sweep direction.
+ Note that if used with two guides and a <B>'guide_method'</B> of
+ PK_sweep_guide_point_c or PK_sweep_guide_chord_c, this behaviour will in
+ general cause the sweep cross-section to shear as it is swept along the path.
+ 
+ A lock direction may not be supplied if sweeping with three global guide
+ wires or if the lock to faces option is used.
+ 
+ The alignment control is applied to the profiles prior to any application
+ of a transformation implied by scale or twist laws ( see below ).
+ 
+ See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-296683">Controlling the profile alignment</A> for more information.
+ 
+ If any guide wires are supplied, the <B>'alignment'</B> option also specifies how
+ points on the path should be matched to corresponding points on the guides as
+ follows:
+ 
+    o PK_BODY_sweep_align_parallel_c: Each guide point is a fixed distance
+      from a plane with fixed orientation which passes through the path point.
+    o PK_BODY_sweep_align_normal_c: Each guide point is a fixed distance
+      from a plane which passes through the path position, and is perpendicular
+      to the sweep direction.
+    o PK_BODY_sweep_align_parm_c: Points are matched according to the
+      parameterisation of the underlying edge curve. This option requires that
+      the path and guides all have only one edge each.
+    o PK_BODY_sweep_align_arclength_c: Points are matched according to the
+      proportional arc length distance along the path and guides.
+
+
+ Twist and Scale Controls
+ Variation from a simple sweep is enabled by controlling :
+    o Angles of rotation about the path at the point on the path (twist) in
+      radians.
+    o Scale magnifications.
+ 
+ Twist and scale controls may only be supplied with G1 continuous paths, and
+ when no guide wires are supplied. Scale controls may also only be used when a
+ single profile is specified.
+ 
+
+  Twist Control
+  Twist is specified via the <B>'twist'</B> field of the function's option
+  structure. The twist is specified as a rotation transformation of the
+  swept cross-section. Profiles should be supplied in their untwisted
+  orientations.
+      o If <B>'alignment'</B> is set to PK_BODY_sweep_align_parallel_c then:
+          o If <B>'have_twist_direction'</B> is set to PK_LOGICAL_true, the rotation
+            is about the vector <B>'twist_direction'</B>.
+          o Otherwise, the rotation is about the fixed direction that is the
+            path tangent at the first path vertex in <B>'path_vertices'</B>.
+      o Otherwise, the rotation is about the sweep direction at that point on
+        the path.
+  
+  The twist may be applied by providing one of the following :
+  
+      o A set of radian angular values to be interpolated at each vertex on the
+        path. A constant or linear interpolated twist between the start and end
+        vertices can be achieved via this control. When sweeping with more than
+        one profile, an angular twist value must be specified for all of the
+        vertices that are supplied as <B>'path_vertices'</B>. See the
+        <A HREF=../headers/pk_body_sweep_law_discrete_t.html>PK_BODY_sweep_law_discrete_t</A> documentation for more details.
+  
+      o A 1-D twist law function parameterised [0,1] proportionally to the
+        arc length of the path (e.g. evaluating it at t = 0.5 should produce
+        the angle to be rotated through by the profile half way along the
+        path).
+  
+      o The inverse of a 1-D twist law function as described above.  This
+        inverse function should be parameterised over the range of twist
+        values required and should evaluate to values in the range [0,1]
+        proportionally to the arc length of the path (e.g. the parameter
+        giving rise to the value 0.5 should be the angle to be rotated
+        through by the profile half way along the path).  Each value of
+        the law must correspond to a unique parameter.  An inverse law
+        may not be provided on a closed path.
+  
+  In specifying twist controls it should be remembered that all sweeps are
+  carried out making appropriate transformations on the swept cross-section
+  about the appropriate location on the path. Twist transformations will cause
+  rotations of the whole cross-section around the path, producing corkscrew
+  like sweeps where the profiles aren't pierced by the path.
+  
+  See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-297046">Specifying twist</A> for more information.
+
+  Scale Control
+  Scale is specified via the <B>'scale'</B>, <B>'scale_type'</B> and <B>'scale_point'</B> fields of
+  the function's options structure.
+  
+  The <B>'scale'</B> option provides the actual scale law.  It should be one of the
+  following:
+  
+      o A set of scale values to be interpolated at each vertex on the path.
+        The scale values specified via this control must always be positive.
+        A constant or linear interpolated scaling between the start and end
+        vertices can be achieved via this control. See the
+        <A HREF=../headers/pk_body_sweep_law_discrete_t.html>PK_BODY_sweep_law_discrete_t</A> documentation for more details.
+  
+      o A 1-D scale law function parameterised [0,1] proportionally to the
+        arc length of the path ( e.g. evaluating it at t = 0.5 should produce
+        the scale to be applied to the profile half way along the path ).
+        The scale law must always evaluate to positive values.
+  
+      o The inverse of a 1-D scale law function as described above.  This
+        inverse function should be parameterised over the range of scaling
+        required and should evaluate to values in the range [0,1]
+        proportionally to the arc length of the path (e.g. the parameter
+        giving rise to the value 0.5 should be the scale to be applied
+        to the profile half way along the path).  Each value of the law must
+        correspond to a unique parameter.  An inverse law may not be
+        provided on a closed path.  The parameter interval of an inverse
+        scale law must always be positive.
+  
+  The effect of a scale law upon the profile is controlled using the
+  <B>'scale_type'</B> and <B>'scale_point'</B> options.  Depending on the <B>'scale_type'</B>,
+  a supplied scale can either:
+  
+      o Change the size of the profile, keeping the distance between the
+        supplied <B>'scale_point'</B> and the path constant.
+      o Keep the size of the profile constant, changing the distance between
+        the supplied <B>'scale_point'</B> and the path.
+      o Alter both the size of the profile and the distance of the profile
+        from the path - no <B>'scale_point'</B> is required. This is the default
+        behaviour.
+  
+  See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-297380">Specifying scale</A> for more information.
+
+
+ Corner Controls
+ If the path has non-G1 continuous vertices, the sweep shape at them is
+ specified by setting <B>'corner_type'</B>.
+ 
+    o The default value is <A HREF=../headers/pk_sweep_corner_type_t.html>PK_sweep_corner_type_mitre_c</A> and produces sharp
+      intersections between sections of the sweep.
+    o A value of <A HREF=../headers/pk_sweep_corner_type_t.html>PK_sweep_corner_type_spin_c</A> produces a sweep in which the
+      profile is spun on the convex side of non-G1 discontinuities.
+ 
+ This option has no effect if set when supplying a G1 continuous path.
+
+
+ Lock to Faces
+ The orientation of the swept cross-section may also be controlled by locking
+ to a set of faces, using the <B>'lock_faces'</B> option. At each point along the
+ path, the swept cross-section will maintain a fixed relationship to the sweep
+ direction, and the normal of whichever face that path point is coincident
+ with.
+ 
+ If lock faces are supplied, then the following restrictions apply:
+ 
+    o No lock direction may be supplied.
+    o No guide wires may be supplied.
+    o Profile alignment must be set to PK_BODY_sweep_align_normal_c.
+    o All the faces must belong to the same body.
+    o If the faces belong to a general body, then the supplied faceset must be
+      locally manifold.
+    o The path must be visibly G1 smooth.
+    o Where the path lies within the boundary of the supplied lock faces, it
+      must be within tolerance of those lock faces. If the path passes outside
+      the boundary of the supplied set of faces, then:
+        o The path must continue to lie on the surface of the face where it
+          exits the faceset.
+        o If the path runs along an edge between two of the supplied faces
+          where it exits the faceset, then either the faces must have identical
+          surfaces, or the path must remain within tolerance of at least one
+          of the surfaces of the faces.
+        o If the path exits and then re-enters the faceset (i.e., crosses a
+          hole in the faceset) at different faces, then the faces must have
+          identical surfaces.
+        o The path may not lie entirely outside of the supplied faces.
+    o If the path runs along a non-laminar edge between two of the supplied
+      faces, then the edge must be visibly G1 smooth.
+    o The normal of the faces must be continuous in the direction along the
+      path.
+
+
+ Profile Derivative Conditions
+ In the case where more than one profile is supplied, the swept surface
+ derivatives across a profile may be modified by specifying derivative
+ conditions.
+ 
+    o <B>'n_profile_derivs'</B> specifies the number of profiles that have derivative
+      conditions. It must be between 0 and <B>'n_profiles'</B> inclusive.
+ 
+    o <B>'profile_derivs'</B> and 'profile_indices' are arrays of length
+      <B>'n_profile_derivs'</B>. Each entry in <B>'profile_derivs'</B> specifies a constraint
+      on the derivative at the profile indexed by the corresponding entry in
+      <B>'profile_indices'</B> (so each entry must be an int between 0 and
+      <B>'n_profiles'</B>-1). Any profile that is not specified in this array will
+      have no derivative constraints applied there. <B>'profile_derivs'</B> and
+      <B>'profile_indices'</B> may be set to NULL, only if <B>'n_profile_derivs'</B> equals
+      0.
+ 
+ Details of the derivative constraints that may be applied are to be found in
+ the documentation of the <A HREF=../headers/pk_sweep_deriv_conds_t.html>PK_sweep_deriv_conds_t</A> structure.
+
+Swept Body Structure Controls
+The structure of the resultant swept body can be modified via controls within
+the function's option structure.
+
+
+ Topological Structure of Swept Body
+ The topological structure of the resultant swept body may be controlled via
+ the <B>'topology_form'</B> field within the option structure. Further control is
+ available via the <B>'ignorable_vertices'</B> field. <B>'topology_form'</B> may be set to
+ one of the following values :
+ 
+    o PK_BODY_topology_minimal_c: (default) The swept body will have the
+      minimum number of faces possible. Profile edges which meet smoothly
+      may be swept into a single face, or split into multiple faces where the
+      resultant sweep is not G1 smooth. For the sweep of a single profile on
+      a closed smooth path, a set of edges corresponding to the profile's
+      position will be created, unless the path start vertex is supplied
+      in the <B>'ignorable_vertices'</B> array. For the sweep of multiple profiles
+      on a closed smooth path, a set of edges corresponding to the position
+      of the first profile in the input array will be created, unless the path
+      start vertex is supplied in the <B>'ignorable_vertices'</B> array. If locally
+      scoped guides are used, separate faces will be produced between each pair
+      of guides even if the edges between them meet smoothly.
+ 
+    o PK_BODY_topology_columns_c:  For a sweep of a single profile, the swept
+      body will have one column of faces for each edge in the profile
+      regardless of whether the edges are smoothly connected. For a sweep of
+      multiple profiles, the swept body will have one column of faces for each
+      set of matching edges in the profiles regardless of whether a profile
+      edge is smoothly connected to an adjacent edge in the same profile. Each
+      column of faces will consist of either a single face, or multiple faces
+      where the resultant sweep is not G1 smooth.
+      For the sweep of a single profile on a closed smooth path, a set of edges
+      corresponding to the profile's position will be created, unless the path
+      start vertex is supplied in the <B>'ignorable_vertices'</B> array. For the sweep
+      of multiple profiles on a closed smooth path, a set of edges
+      corresponding to the position of the first profile in the input array
+      will be created, unless the path start vertex is supplied in the
+      <B>'ignorable_vertices'</B> array.
+ 
+    o PK_BODY_topology_grid_c:  Additional edges may be created, so that the
+      number of faces in the sweep direction is equal to or greater than the
+      number produced with PK_BODY_topology_columns_c. An edge will be made
+      corresponding to each vertex on the path, and any guides, unless that
+      vertex is supplied in the <B>'ignorable_vertices'</B> array. An edge is made
+      corresponding to a vertex regardless of whether a profile is located at
+      that vertex.
+ 
+ See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-297741">Specifying final topology</A> for more information.
+
+ Geometry Simplification
+ The simplification of the geometry of individual swept faces may be
+ attempted, depending on the value of the <B>'simplify'</B> field within the
+ option structure. The field may be set to one of the following values :
+ 
+    o PK_BODY_simplify_no_c: B-spline geometry will be used to represent
+      the sweep of all sections of the profiles.
+ 
+    o PK_BODY_simplify_analytic_c (default): The swept surfaces may be replaced
+      where the combination of sweep profile and path edge geometries
+      produces an analytic simplification of the sweep, to within session
+      precision. If the surface of a face is simplified, the edges of the face
+      may be simplified as well.
+ 
+    o PK_BODY_simplify_swept_spun_c: The swept surfaces may be replaced by an
+      analytic simplification of the sweep as described in the above option
+      PK_BODY_simplify_analytic_c. If no such analytic simplification can be
+      found, the function will attempt to generate a swept or spun surface that
+      is within session precision of the surface defined by the sweep.
+ 
+ Note, however, that no simplification will be done if multiple profiles are
+ specified, and the <B>'simplify'</B> field must be set to PK_BODY_simplify_no_c in
+ this case.
+ 
+ See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-298230">Simplifying the final body</A> for more information.
+
+Nominal Geometry on the Swept Body
+The resultant swept body will always have nominal geometry enabled. The state
+of the nominal geometry flag on the resultant swept body can be enquired and
+set via <A HREF=../headers/pk_body_ask_curve_nmnl_state.html>PK_BODY_ask_curve_nmnl_state</A> and <A HREF=../headers/pk_body_set_curve_nmnl_state.html>PK_BODY_set_curve_nmnl_state</A>
+respectively.
+
+Edges in the resultant swept body which are in situ copies of the profile edges
+will have nominal geometry  associated with them. Other edges across the body
+may have nominal geometry associated with them.
+The edges formed as a result of the sweeping operation (lateral edges)
+may have nominal geometry associated with them.
+
+The nominal geometry for an edge may be acquired via the functions,
+<A HREF=../headers/pk_edge_ask_curve_nmnl.html>PK_EDGE_ask_curve_nmnl</A> and <A HREF=../headers/pk_edge_ask_geometry_nmnl.html>PK_EDGE_ask_geometry_nmnl</A>.
+
+See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-298424">Nominal geometry</A> for more information.
+
+Returned Tracking and Error Information
+The resultant swept body is returned in <B>'swept_body'</B> as a structure that
+packages it with associated status and tracking information.
+
+The status information, in the <B>'status'</B> field of the returned structure,  is
+itself a structure that contains information on any failure to create the
+swept body. The type of fault that occurred is indicated by the <B>'fault'</B>
+field. The locations of the fault are given by a list of points and list of
+entities in the <B>'fault_locations'</B> and <B>'fault_entities'</B> fields respectively.
+
+
+The tracking information relates topology prior to the operation, to topology
+after it. Details of the structure of this information are given in the
+documentation on <A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>.
+
+The tracking information will relate faces in the resultant body to faces and
+edges in the received profile and path bodies, and optionally relate edges
+in the result to edges or vertices in the received profiles and path.
+The tracking records contain :
+
+    o for a lateral face generated by sweeping an edge or set of edges :
+
+        <B>'product_topols'</B>  is an array containing that lateral face
+        <B>'original_topols'</B> is the set of edges in the profiles and path and any
+         guides from which it was generated. Faces which are in the same column
+         along the path should be distinguished by looking at the path edges,
+         rather than by which profiles the profile edges come from. Where the
+         lateral face results from mitring or spinning about a corner the path
+         topology will be the corresponding non-G1 vertex.
+
+    o for a face in an end cap copied from a sheet profile :
+
+        <B>'product_topols'</B>  is an array containing that end face
+        <B>'original_topols'</B> is an array holding the single face in the original
+         profile for which it is a transformed copy, and the corresponding
+         start or end vertex on the path. In the special case where <B>'path'</B> is
+         supplied as PK_ENTITY_null, the corresponding start or end vertices of
+         all the guide wires will be returned instead.
+
+If <B>'want_edge_tracking'</B> is set to PK_LOGICAL_true, then the tracking records
+will additionally contain:
+
+    o for each edge that is in the direction of the path :
+
+        <B>'product_topols'</B>  is an array containing that edge.
+        <B>'original_topols'</B> is an array holding the set of corresponding path
+        and guide edges, along with a vertex from which it was generated taken
+        from every profile. For edges between two faces that are generated by
+        different pairs of local guides, <B>'original_topols'</B> will contain edges
+        from the three guides that influence those faces.
+
+    o for each edge that is in the direction of the profile :
+
+        <B>'product_topols'</B>  is an array containing that edge.
+        <B>'original_topols'</B> is an array containing the set of corresponding
+        edges from which it was generated taken from every profile, along with
+        either a corresponding path vertex or path edge, and a corresponding
+        vertex or edge from each guide wire from which it was generated.
+
+    o for each edge that is created by splitting faces during self intersection
+      repair :
+
+        <B>'product_topols'</B>  is an array containing that edge.
+        <B>'original_topols'</B> is an array containing the set that is the union of
+        the sets of <B>'original_topols'</B> of the two adjacent faces.
+
+Topologies involved in many topological operations may appear in several
+tracking records.  In particular, where several product topologies arise from
+the same original topologies these products will be grouped together in a
+single track record.
+
+Note that face-face checks are not performed on the resultant swept body for
+performance reasons, so it is possible that even if this function returns
+success, a swept body may have PK_FACE_state_bad_face_face_c check faults (if
+the path is such that the body intersects itself, and the function is unable
+to repair the result).
+
+
+Generating Profile Cross-Sections
+The function may be used to generate a body representing cross-sections of the
+sweep along the path. This functionality is controlled with the <B>'output_xsect'</B>
+field, which may be set to one of the following values:
+
+   o <A HREF=../headers/pk_sweep_output_xsect_t.html>PK_sweep_output_xsect_no_c</A> (default): Produce the complete sheet or solid
+     swept body.
+   o <A HREF=../headers/pk_sweep_output_xsect_t.html>PK_sweep_output_xsect_yes_c</A>: Produce cross-sections instead.
+   o <A HREF=../headers/pk_sweep_output_xsect_t.html>PK_sweep_output_xsect_on_fail_c</A>: Produce the swept body if possible. If
+     this is not possible due to failure, the function will attempt to generate
+     the cross-sections.
+
+The cross-sections will be returned as a single body (which in general will be
+a disjoint body). Each cross-section will have one edge for every profile edge,
+or for multiple profiles there will be one edge for each set of matching edges
+in the profiles. Each cross-section will be represented as follows:
+   o If the start or end of an open sweep is degenerate, then the corresponding
+     cross-section will also be degenerate, and represented as an acorn vertex.
+   o If sheet profiles are supplied and the sweep is periodic, then the first
+     cross-section will consist of one or more faces. If sheet profiles are
+     supplied and the sweep is non-periodic, then the first and last cross-
+     sections will consist of one or more faces (unless degenerate).
+   o All other cross-sections will be formed by a set of wire-frame edges.
+
+Therefore the resultant body may either be a wire, sheet or general body as
+follows:
+   o If the start or end of an open sweep is degenerate, then the resultant
+     body will be a general body.
+   o Otherwise, if sheet profiles are supplied, then the result will be a
+     general body, unless there are no wireframe cross-sections returned, in
+     which case the result will be a sheet body.
+   o Otherwise, the result will be a wire body.
+
+<A HREF=../headers/pk_body_disjoin.html>PK_BODY_disjoin</A> may be used to separate the resultant body into separate
+connected bodies.
+
+ Controlling the Number and Location of Cross-Sections
+ The number and location of the cross-sections returned is controlled by the
+ fields <B>'group_xsect'</B> and <B>'n_xsects'</B> fields.
+ 
+    o If <B>'group_xsect'</B> is set to <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_vx_c</A>, then cross-
+      sections are produced corresponding to each path vertex, except those
+      path vertices supplied in the <B>'ignorable_vertices'</B> array. There will be
+      one cross-section for a smooth path vertex. For a non-G1 path vertex
+      there will be two cross-sections, each with a different orientation from
+      the two edges adjacent to the vertex. The <B>'n_xsects'</B> field is ignored,
+      and must be left at 0. This option may only be set if a path is supplied.
+    o If <B>'group_xsect'</B> is set to <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_edge_c</A>, then
+      <B>'n_xsects'</B> cross-sections will be produced corresponding to every path
+      edge. This count includes the start and end vertices of the edge (though
+      cross-sections at smooth vertices are only returned once). The cross-
+      sections will be distributed roughly evenly along each edge. This option
+      may only be set if a path is supplied.
+    o If <B>'group_xsect'</B> is set to <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_no_c</A>, then a minimum of
+      <B>'n_xsects'</B> cross-sections will be produced along the entire path. Two
+      cross-sections will always be produced corresponding to each non-G1 path
+      vertex. The cross-sections will be distributed roughly evenly along the
+      path.
+ 
+ If guide wires are supplied then it is possible for the extent of the
+ resultant sweep to be shorter than the path. In such cases:
+   o For <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_vx_c</A>, cross-sections will not be produced for
+     path vertices outside the extent of the sweep.
+   o For <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_edge_c</A>, no cross-sections will be produced
+     for path edges entirely outside the extent of the sweep, and fewer than
+     <B>'n_xsects'</B> cross-sections for path edges partially outside the extent of
+     the sweep.
+   o For <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_no_c</A>, the cross-sections will be distributed
+     roughly evenly along the extent of the sweep.
+ If the guide wires shorten the extent of the resultant sweep such that no
+ cross-sections would be produced, the operation will return a status of
+ PK_BODY_sweep_bad_guide_c, with error topology indicating a guide that is
+ too short.
+
+ Effect of Path Torsion on Number of Cross-Sections
+ Two cross-sections will be returned not only at any non-G1 path vertices, but
+ also at the first path vertex in <B>'path_vertices'</B> if the path is closed and the
+ sweep is not periodic.  It is possible for a sweep along a closed path to not
+ be periodic if the path has torsion that causes the profile at the end of the
+ sweep to be rotated relative to the profile at the start of the sweep.
+ Therefore, if the sweep would fail with the status
+ PK_BODY_sweep_torsion_failure_c when <B>'output_xsect'</B> is set to
+ <A HREF=../headers/pk_sweep_output_xsect_t.html>PK_sweep_output_xsect_no_c</A>, then setting <B>'output_xsect'</B> to
+ <A HREF=../headers/pk_sweep_output_xsect_t.html>PK_sweep_output_xsect_yes_c</A> or <A HREF=../headers/pk_sweep_output_xsect_t.html>PK_sweep_output_xsect_on_fail_c</A> will cause two
+ cross-sections to be returned at the first path vertex in <B>'path_vertices'</B>,
+ regardless of whether it is a non-G1 vertex.
+
+ Tracking Information for Cross-Sections
+ Tracking information will be returned for the following topology in the
+ resultant body:
+    o Cross-sections formed by a set of wire-frame edges will have tracking
+      information returned for every edge.
+    o Cross-sections represented by faces will have tracking information
+      returned for the faces and edges.
+    o Cross-sections which are degenerate will have tracking information
+      returned for the acorn vertex.
+ 
+ The tracking records contain, for each of these:
+     <B>'product_topols'</B>  is an array containing the resultant vertex, edge or
+         face.
+     <B>'original_topols'</B> is an array containing:
+       o For an edge or vertex, the set of corresponding edges from which it
+         was generated taken from every profile; for a face, the corresponding
+         profile face from which it was generated.
+       o Either a corresponding path vertex or path edge, and a corresponding
+         vertex or edge from each guide wire from which it was generated.
+       o An entry of class PK_CLASS_int. The integer value will identify which
+         cross-section the topology belongs to. Cross-sections will be uniquely
+         labelled, starting at 0 and increasing numerically along the sweep.
+         All items of topology in the same cross-section will have the same
+         value.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

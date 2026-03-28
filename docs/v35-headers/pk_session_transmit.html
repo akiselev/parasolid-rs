@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SESSION_transmit</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SESSION_transmit</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_SESSION_transmit
+(
+<I>--- received arguments ---
+</I>const char                    *key,         --- key string
+const <A HREF=../headers/pk_session_transmit_o_t.html>PK_SESSION_transmit_o_t</A> *options      --- transmit options
+)
+</B>
+<A NAME="description"></A>
+<I>This function transmits the session to the given 'file' <B>'key'</B>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_key               Frustrum (FFOPWR) returned FR_bad_name
+                                     (MILD)
+    PK_ERROR_key_in_use            Frustrum (FFOPWR) returned FR_already_exists
+                                     (MILD)
+    PK_ERROR_cant_open_file        Frustrum (FFOPWR) returned FR_open_fail
+                                     (MILD)
+    PK_ERROR_schema_access_error   Error opening, closing, or writing the
+                                       schema file (MILD)
+    PK_ERROR_file_access_error     Error writing or closing the transmit file
+                                     (MILD)
+    PK_ERROR_disc_full             Frustrum (FFWRIT) returned FR_disc_full
+                                     (MILD)
+    PK_ERROR_applio_not_registered Application i/o functions not registered
+                                     (only relevant if options-&gt;transmit_format
+                                      is <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_applio_c</A>) (MILD)
+    PK_ERROR_bad_text_conversion   Some part data could not be written
+                                     (only relevant if options-&gt;transmit_format
+                                      is <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_text_c</A>) (MILD)
+    PK_ERROR_rollback_not_started  Partitioned rollback is not active
+                                     (only relevant if options-&gt;transmit_deltas
+                                      is PK_PARTITION_xmt_deltas_all_c) (MILD)
+    PK_ERROR_not_at_pmark          Partition is not at a pmark
+                                     (only relevant if options-&gt;transmit_deltas
+                                      is PK_PARTITION_xmt_deltas_all_c) (MILD)
+    PK_ERROR_not_at_rollmark       Modeller is not at a session mark
+                                     (only relevant if options-&gt;transmit_marks
+                                      is <A HREF=../headers/pk_session_xmt_marks_t.html>PK_SESSION_xmt_marks_all_c</A>) (MILD)
+    PK_ERROR_locked                Session contains locked partitions (MILD)
+
+<A NAME="documentation"></A>
+The <B>'key'</B> is passed to the frustrum, identifying to which 'file' the session
+will be transmitted.
+
+The frustrum routine FFOPWR is called with guise FFCSNP ('snapshot' file
+containing session).
+
+The partitions in the session, and their contents, are transmitted; but the
+pmarks and session marks are optional. No missing delayed-load model data
+is loaded during a session transmit. Partial pmarks are allowed to be
+transmitted during session transmit, however, data connections of
+delayed-load model data will be lost. The state of the bulletin board,
+attribute definitions and interface and modelling parameters are also saved
+in the file.
+
+The <B>'transmit_format'</B> option affects the format argument to FFOPWR as follows:
+
+    <B>'transmit_format'</B>              format
+
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_text_c</A>      FFTEXT
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_binary_c</A>    FFBNRY
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_neutral_c</A>   FFBNRY
+    <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_applio_c</A>    (registered function is called, not FFOPWR -
+                                    see <A HREF=../headers/pk_session_register_applio.html>PK_SESSION_register_applio</A>)
+
+Note: You are advised to consult with Parasolid Support before using
+partial pmarks.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

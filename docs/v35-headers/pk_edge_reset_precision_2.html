@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_reset_precision_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_reset_precision_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                    PK_EDGE_reset_precision_2
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                          edge,    --- edge
+const <A HREF=../headers/pk_edge_reset_precision_o_t.html>PK_EDGE_reset_precision_o_t</A> *options, --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_t</A>             *const result
+)
+</B>
+<A NAME="description"></A>
+<I>This function attempts to reset the precision of the given <B>'edge'</B> to the
+session precision: that is to make Parasolid regard the edge as exact.
+</I>
+<A NAME="documentation"></A>
+The function aims to remove all fin curves and delete them if possible and
+to represent the geometry of the edge by a single curve attached to the edge.
+This operation may not always be possible - the level of success is indicated
+by <B>'result'</B> which can take the following values:
+
+   <A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_ok_c</A>             geometry successfully replaced and precision
+                                  set to session precision
+
+   <A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_tangent_c</A>        geometry not replaced and precision
+                                  unaltered because surfaces are approximately
+                                  tangential at edge
+
+   <A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_missing_geom_c</A>   not enough geometry present on edge or
+                                  adjacent faces to recompute edge geometry
+
+   <A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_failure_c</A>        recomputation of edge geometry failed.
+
+The function attempts to replace geometry and precision as follows:
+
+. if all adjacent faces of the edge have surface geometry attached, a
+  3-space curve of intersection will be derived by re-intersection of
+  these surfaces. Extensive pre-checks will be made to ensure that
+  tangent or near-tangent configurations (such as boundaries of
+  Variable Radius Blends) are not attempted in this way. In these cases
+  the token <A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_tangent_c</A> will be returned, and the edge geometry and
+  precision will be unchanged. There will also be cases where the edge is not
+  a near tangency, but nevertheless a new curve of intersection could not be
+  computed (for example, the adjacent surfaces may simply not intersect to
+  Parasolid default precision); in such cases <A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_failure_c</A>
+  will be returned.  If the function is successful, the <B>'result'</B> will be set
+  to <A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_ok_c</A>.
+
+. if Parasolid can determine that one of the curves on a fin, or the nominal
+  curve of the edge if present, lies on all the surfaces, then it will use
+  that curve for the edge. This behaviour can be controlled by the <B>'method'</B>
+  option.
+
+. if not all face geometries are present, as at the boundary of a
+  sheet body, the SP-curve present on the relevant fin will be first
+  simplified to its 3-space equivalent (if it was a constant parameter
+  curve) and this new curve attached to the edge. If no simplification
+  was possible, the SP-curve itself will be transferred to the edge.
+  In either case <A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_ok_c</A> will be returned in <B>'result'</B> if the
+  geometry was successfully recomputed.
+
+If insufficient geometry was present to successfully replace the precision
+of the edge, <A HREF=../headers/pk_reset_prec_t.html>PK_reset_prec_missing_geom_c</A> will be returned.
+
+The function will also attempt to set the precision of each vertex of the edge
+to Parasolid default. It will only be able to do this if all the other
+edges meeting at the vertex in question have Parasolid default precision
+associated with them, and the new 3-space curve intersects at a unique
+point with all the other edge curves meeting there.
+
+The behaviour of the function can be controlled by the option structure.
+See <A HREF=../headers/pk_edge_reset_precision_o_t.html>PK_EDGE_reset_precision_o_t</A> for details.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

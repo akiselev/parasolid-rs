@@ -8,7 +8,7 @@
 
 #![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 
-use std::os::raw::{c_char, c_int};
+use std::os::raw::{c_char, c_double, c_int};
 
 // =============================================================================
 // Frustrum callback function pointer types
@@ -168,6 +168,217 @@ pub type PK_GOCLSG_f_t = Option<
     unsafe extern "C" fn(n_data: *const c_int, data: *const c_int),
 >;
 
+/// FFOPRB — open file for rollback reading (obsolete, use PK_DELTA instead).
+pub type PK_FFOPRB_f_t = Option<
+    unsafe extern "C" fn(
+        n_guises: *const c_int,
+        guises: *const c_int,
+        key_len: *const c_int,
+        key: *const c_char,
+        ifail: *mut c_int,
+    ),
+>;
+
+/// FFSEEK — seek to position in rollback file (obsolete).
+pub type PK_FFSEEK_f_t = Option<
+    unsafe extern "C" fn(
+        strid: *const c_int,
+        position: *const c_int,
+        ifail: *mut c_int,
+    ),
+>;
+
+/// FFTELL — return current position in rollback file (obsolete).
+pub type PK_FFTELL_f_t = Option<
+    unsafe extern "C" fn(
+        strid: *const c_int,
+        position: *mut c_int,
+        ifail: *mut c_int,
+    ),
+>;
+
+/// FFSKXT — open file for reading XT format specifically (legacy variant of FFOPRD).
+pub type PK_FFSKXT_f_t = Option<
+    unsafe extern "C" fn(
+        n_guises: *const c_int,
+        guises: *const c_int,
+        key_len: *const c_int,
+        key: *const c_char,
+        ifail: *mut c_int,
+    ),
+>;
+
+/// UCOPRD — open file for Unicode reading (replaces FFOPRD when Unicode enabled).
+pub type PK_UCOPRD_f_t = Option<
+    unsafe extern "C" fn(
+        n_guises: *const c_int,
+        guises: *const c_int,
+        key_len: *const c_int,
+        key: *const c_int,  // Unicode char array, not c_char
+        ifail: *mut c_int,
+    ),
+>;
+
+/// UCOPWR — open file for Unicode writing (replaces FFOPWR when Unicode enabled).
+pub type PK_UCOPWR_f_t = Option<
+    unsafe extern "C" fn(
+        n_guises: *const c_int,
+        guises: *const c_int,
+        key_len: *const c_int,
+        key: *const c_int,  // Unicode char array, not c_char
+        ifail: *mut c_int,
+    ),
+>;
+
+/// GOOPPX — open pixel buffer for shaded images (obsolete).
+pub type PK_GOOPPX_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
+
+/// GOPIXL — write pixel data for shaded images (obsolete).
+pub type PK_GOPIXL_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
+
+/// GOCLPX — close pixel buffer for shaded images (obsolete).
+pub type PK_GOCLPX_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
+
+// =============================================================================
+// FG Module Interface callback function pointer types
+//
+// These callbacks are registered via PK_SESSION_register_frustrum so the kernel
+// can call back into application code to initialize and evaluate foreign curves
+// and surfaces.  All scalar in/out parameters follow the Parasolid by-reference
+// convention (passed as pointers rather than by value).
+// =============================================================================
+
+/// FGCRCU — initialize a foreign curve evaluator.
+///
+/// Called by the kernel when a foreign curve entity is first touched.
+/// - `key`      — evaluator key string (input; not NUL-terminated).
+/// - `keylen`   — byte length of `key` (in/out; application may shorten).
+/// - `n_kii`    — number of integers in `ki_ints` (output).
+/// - `ki_ints`  — KI integer array to fill (output).
+/// - `n_kir`    — number of reals in `ki_reals` (output).
+/// - `ki_reals` — KI real array to fill (output).
+/// - `n_data`   — number of doubles in `fg_data` working space (output).
+/// - `fg_data`  — working-space array to fill (output).
+/// - `ifail`    — 0 on success, nonzero on failure (output).
+pub type PK_FGCRCU_f_t = Option<
+    unsafe extern "C" fn(
+        key: *const c_char,
+        keylen: *mut c_int,
+        n_kii: *mut c_int,
+        ki_ints: *mut c_int,
+        n_kir: *mut c_int,
+        ki_reals: *mut c_double,
+        n_data: *mut c_int,
+        fg_data: *mut c_double,
+        ifail: *mut c_int,
+    ),
+>;
+
+/// FGCRSU — initialize a foreign surface evaluator.
+///
+/// Identical calling convention to `FGCRCU`; used for surface entities.
+pub type PK_FGCRSU_f_t = Option<
+    unsafe extern "C" fn(
+        key: *const c_char,
+        keylen: *mut c_int,
+        n_kii: *mut c_int,
+        ki_ints: *mut c_int,
+        n_kir: *mut c_int,
+        ki_reals: *mut c_double,
+        n_data: *mut c_int,
+        fg_data: *mut c_double,
+        ifail: *mut c_int,
+    ),
+>;
+
+/// FGEVCU — evaluate a foreign curve.
+///
+/// Called by the kernel to compute curve position and derivatives.
+/// - `ki_ints`  — KI integer array (input).
+/// - `ki_reals` — KI real array (input).
+/// - `fg_data`  — evaluator working space (input).
+/// - `t`        — parameter value at which to evaluate (input).
+/// - `nderiv`   — number of derivatives requested (input).
+/// - `results`  — output array: position followed by derivative vectors (output).
+/// - `ifail`    — 0 on success (output).
+pub type PK_FGEVCU_f_t = Option<
+    unsafe extern "C" fn(
+        ki_ints: *const c_int,
+        ki_reals: *const c_double,
+        fg_data: *const c_double,
+        t: *const c_double,
+        nderiv: *const c_int,
+        results: *mut c_double,
+        ifail: *mut c_int,
+    ),
+>;
+
+/// FGEVSU — evaluate a foreign surface.
+///
+/// Called by the kernel to compute surface position and partial derivatives.
+/// - `ki_ints`  — KI integer array (input).
+/// - `ki_reals` — KI real array (input).
+/// - `fg_data`  — evaluator working space (input).
+/// - `u`        — first parameter value (input).
+/// - `v`        — second parameter value (input).
+/// - `nu`       — number of derivatives in U direction requested (input).
+/// - `nv`       — number of derivatives in V direction requested (input).
+/// - `triang`   — whether to compute triangular derivative table (input).
+/// - `results`  — output array of evaluated values (output).
+/// - `ifail`    — 0 on success (output).
+pub type PK_FGEVSU_f_t = Option<
+    unsafe extern "C" fn(
+        ki_ints: *const c_int,
+        ki_reals: *const c_double,
+        fg_data: *const c_double,
+        u: *const c_double,
+        v: *const c_double,
+        nu: *const c_int,
+        nv: *const c_int,
+        triang: *const c_int,
+        results: *mut c_double,
+        ifail: *mut c_int,
+    ),
+>;
+
+/// FGPRCU — return foreign curve parametrization properties.
+///
+/// - `ki_ints`  — KI integer array (input).
+/// - `ki_reals` — KI real array (input).
+/// - `fg_data`  — evaluator working space (input).
+/// - `range`    — two-element array [t_min, t_max] (output).
+/// - `period`   — nonzero if the curve is periodic (output).
+/// - `ifail`    — 0 on success (output).
+pub type PK_FGPRCU_f_t = Option<
+    unsafe extern "C" fn(
+        ki_ints: *const c_int,
+        ki_reals: *const c_double,
+        fg_data: *const c_double,
+        range: *mut c_double,
+        period: *mut c_int,
+        ifail: *mut c_int,
+    ),
+>;
+
+/// FGPRSU — return foreign surface parametrization properties.
+///
+/// - `ki_ints`  — KI integer array (input).
+/// - `ki_reals` — KI real array (input).
+/// - `fg_data`  — evaluator working space (input).
+/// - `range`    — four-element array [u_min, u_max, v_min, v_max] (output).
+/// - `period`   — two-element array: nonzero in each direction if periodic (output).
+/// - `ifail`    — 0 on success (output).
+pub type PK_FGPRSU_f_t = Option<
+    unsafe extern "C" fn(
+        ki_ints: *const c_int,
+        ki_reals: *const c_double,
+        fg_data: *const c_double,
+        range: *mut c_double,
+        period: *mut c_int,
+        ifail: *mut c_int,
+    ),
+>;
+
 // =============================================================================
 // PK_SESSION_frustrum_t — v1 frustrum struct
 //
@@ -225,6 +436,26 @@ pub struct PK_SESSION_register_fru_o_t {
     pub gosgmt: *const PK_GOSGMT_f_t,
     /// GOCLSG callback (tristate).
     pub goclsg: *const PK_GOCLSG_f_t,
+    // Foreign geometry — curves (tristate)
+    pub fgcrcu: *const PK_FGCRCU_f_t,
+    pub fgevcu: *const PK_FGEVCU_f_t,
+    pub fgprcu: *const PK_FGPRCU_f_t,
+    // Foreign geometry — surfaces (tristate)
+    pub fgcrsu: *const PK_FGCRSU_f_t,
+    pub fgevsu: *const PK_FGEVSU_f_t,
+    pub fgprsu: *const PK_FGPRSU_f_t,
+    // Rollback file I/O (obsolete, tristate)
+    pub ffoprb: *const PK_FFOPRB_f_t,
+    pub ffseek: *const PK_FFSEEK_f_t,
+    pub fftell: *const PK_FFTELL_f_t,
+    pub ffskxt: *const PK_FFSKXT_f_t,
+    // Unicode file I/O (tristate)
+    pub ucoprd: *const PK_UCOPRD_f_t,
+    pub ucopwr: *const PK_UCOPWR_f_t,
+    // Shaded images (obsolete, tristate)
+    pub gooppx: *const PK_GOOPPX_f_t,
+    pub gopixl: *const PK_GOPIXL_f_t,
+    pub goclpx: *const PK_GOCLPX_f_t,
 }
 
 /// Ask-frustrum options (v2 API), used with `PK_SESSION_ask_fru_2`.
@@ -243,6 +474,10 @@ pub type PK_SESSION_ask_fru_o_t = PK_SESSION_register_fru_o_t;
 ///
 /// Similar layout to `PK_SESSION_frustrum_t` but used per-mark.
 /// Registered via `PK_MARK_start` options.
+///
+/// FG module callbacks (FGCRCU, FGCRSU, FGEVCU, FGEVSU, FGPRCU, FGPRSU) are not
+/// present — per the Parasolid FG User Manual, FG callbacks are registered at
+/// session level only via `PK_SESSION_register_frustrum`.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_MARK_frustrum_t {
@@ -321,22 +556,3 @@ pub const PK_FFCXMT_delta: PK_FFCXMT_t = 6;
 /// Mesh file guise — .xmm_txt / .xmm_bin / .M_T / .M_B
 pub const PK_FFCXMT_mesh: PK_FFCXMT_t = 7;
 
-// =============================================================================
-// Extern functions — linked from pskernel.dll
-// =============================================================================
-
-#[link(name = "pskernel")]
-unsafe extern "C" {
-    // -------------------------------------------------------------------------
-    // Session-level frustrum registration (v1 API)
-    // -------------------------------------------------------------------------
-
-    // -------------------------------------------------------------------------
-    // Session-level frustrum registration (v2 API, tristate)
-    // -------------------------------------------------------------------------
-
-    // -------------------------------------------------------------------------
-    // Mark-level frustrum
-    // -------------------------------------------------------------------------
-
-}

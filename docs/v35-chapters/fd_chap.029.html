@@ -1,0 +1,1017 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Calculating Minimum And Maximum Distance </TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Calculating Minimum And Maximum Distance </B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.028.html">Mass Properties</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.030.html">Clash Detection Of Bodies</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.029.html#50422098_pgfId-296591">28.1	Introduction </A>
+<LI> <A HREF="fd_chap.029.html#50422098_pgfId-296863">28.2	Functions available </A>
+<UL>
+<LI> <A HREF="fd_chap.029.html#50422098_pgfId-296970">28.2.1	Calculating the distance between transformed entity arrays </A>
+</UL>
+<LI> <A HREF="fd_chap.029.html#50422098_pgfId-296972">28.3	Options available </A>
+<LI> <A HREF="fd_chap.029.html#50422098_pgfId-297060">28.4	Using estimates to improve performance </A>
+<LI> <A HREF="fd_chap.029.html#50422098_pgfId-297156">28.5	Results returned </A>
+<LI> <A HREF="fd_chap.029.html#50422098_pgfId-297187">28.6	Local minimum distance </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422098_pgfId-296591"></A>28.1	<A NAME="50422098_75578"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422098_pgfId-296596"></A>Parasolid provides a range of functionality that lets you calculate both the minimum distance (also known as <STRONG>
+closest approach</STRONG>) and the maximum distance between two different entities or groups of entities. Using this functionality, you can calculate the smallest or greatest distance between:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-296597"></A>Two geometric entities or groups of geometric entities.</LI>
+<LI>
+<A NAME="50422098_pgfId-296598"></A>Two topological entities or groups of topological entities.</LI>
+<LI>
+<A NAME="50422098_pgfId-296599"></A>A topological entity and a geometric entity.</LI>
+<LI>
+<A NAME="50422098_pgfId-296600"></A>A group of topological entities and a group of geometric entities.</LI>
+</UL>
+<P>
+<A NAME="50422098_pgfId-296601"></A>You can also find the minimum (but not maximum) distance between any entity or group of entities and a position or array of positions.</P>
+<P>
+<A NAME="50422098_pgfId-334819"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422098_pgfId-334833"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-331699"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-331532"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-331536"></A><A HREF="fd_chap.030.html#50422099_Clash Detection Of Bodies">Chapter 29, “Clash Detection Of Bodies”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-318775"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-217.gif">
+
+<P>
+<A NAME="50422098_pgfId-296862"></A>Figure 28-1 Finding the maximum and minimum distance between entities</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422098_pgfId-296863"></A>28.2	Functions available 
+
+
+</H1>
+<P>
+<A NAME="50422098_pgfId-296867"></A>This section gives a summary of the functions Parasolid provides for calculating the maximum and minimum distances between entities.</P>
+<P>
+<A NAME="50422098_pgfId-296868"></A>Use the following functions to find minimum and maximum distances between two entities. For convenience, these are referred to as the <STRONG>
+standard functions</STRONG> in subsequent sections.</P>
+<P>
+<A NAME="50422098_pgfId-296897"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296871"></A>Range function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296873"></A>Finds</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296875"></A>Supported entities</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296878"></A><A NAME="50422098_marker-296877"></A><A HREF=../headers/pk_geom_range.html>PK_GEOM_range</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296880"></A>The global minimum or maximum distances between two geometrical entities.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296882"></A>Point, curve, surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296885"></A><A NAME="50422098_marker-296884"></A><A HREF=../headers/pk_topol_range.html>PK_TOPOL_range</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296887"></A>The global minimum or maximum distances between two topological entities.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296889"></A>Vertex, edge, face, body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296891"></A><A HREF=../headers/pk_topol_range_geom.html>PK_TOPOL_range_geom</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296893"></A>The global minimum or maximum distances between a topological entity and a geometric entity.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296895"></A>Vertex, edge, face, body</P>
+<P>
+<A NAME="50422098_pgfId-296896"></A>Point, curve, surface</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-296898"></A>Use the following functions to find the minimum and maximum distances between two arrays of entities. For convenience, these are referred to as the <STRONG>
+array functions</STRONG> in subsequent sections.</P>
+<P>
+<A NAME="50422098_pgfId-296927"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296901"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296903"></A>Finds</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296905"></A>Supported entities</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296908"></A><A NAME="50422098_marker-373092"></A><A HREF=../headers/pk_geom_range_array.html>PK_GEOM_range_array</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296910"></A>The global minimum or maximum distances between two arrays of geometrical entities.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296912"></A>Point, curve, surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296915"></A><A NAME="50422098_marker-373099"></A><A HREF=../headers/pk_topol_range_array.html>PK_TOPOL_range_array</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296917"></A>The global minimum or maximum distances between two arrays of topological entities.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296919"></A>Vertex, edge, face, body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296921"></A><A HREF=../headers/pk_topol_range_geom_array.html>PK_TOPOL_range_geom_array</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296923"></A>The global minimum or maximum distances between an array of topological entities and an array of geometric entities. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296925"></A>Vertex, edge, face, body</P>
+<P>
+<A NAME="50422098_pgfId-296926"></A>Point, curve, surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-373217"></A><A HREF=../headers/pk_entity_range.html>PK_ENTITY_range</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-373219"></A>The global minimum or maximum distances between two transformed arrays of entities. See <A HREF="fd_chap.029.html#50422098_20583">Section 28.2.1, “Calculating the distance between transformed entity arrays”</A> for more information.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-373221"></A>Vertex, edge, face, body, surface, curve, point</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-296928"></A>Use the following functions to find the minimum distance between a position or array of positions and an entity or array of entities. For convenience, these are referred to as the <STRONG>
+vector functions</STRONG> in subsequent sections (the last two also fall into the category of array functions already mentioned).</P>
+<P>
+<A NAME="50422098_pgfId-373471"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296931"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296933"></A>Finds</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296935"></A>Supported entities</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296938"></A><A NAME="50422098_marker-296937"></A><A HREF=../headers/pk_geom_range_vector.html>PK_GEOM_range_vector</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296940"></A>The global minimum distance between a geometrical entity and a position.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296942"></A>Point, curve, surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296944"></A><A HREF=../headers/pk_geom_range_vector_many.html>PK_GEOM_range_vector_many</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296946"></A>The global minimum distances between a geometrical entity and an array of positions, one distance for each geometry/position pairing.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296948"></A>Point, curve, surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296951"></A><A NAME="50422098_marker-296950"></A><A HREF=../headers/pk_topol_range_vector.html>PK_TOPOL_range_vector</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296953"></A>The global minimum distance between a topological entity and a position.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296955"></A>Vertex, fin, edge, face, body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296958"></A><A NAME="50422098_marker-296957"></A><A HREF=../headers/pk_geom_range_array_vector.html>PK_GEOM_range_array_vector</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296960"></A>The global minimum distance between an array of geometrical entities and a position.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296962"></A>Point, curve, surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296965"></A><A NAME="50422098_marker-296964"></A><A HREF=../headers/pk_topol_range_array_vector.html>PK_TOPOL_range_array_vector</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296967"></A>The global minimum distance between an array of topological entities and a position.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296969"></A>Vertex, fin, edge, face, body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-373442"></A><A HREF=../headers/pk_entity_range_vector.html>PK_ENTITY_range_vector</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-373444"></A>The global minimum distance between a transformed array of entities and an array of positions. See <A HREF="fd_chap.029.html#50422098_20583">Section 28.2.1, “Calculating the distance between transformed entity arrays”</A> for more information.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-373446"></A>Vertex, fin, edge, face, body, surface, curve, point</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422098_pgfId-296970"></A>	28.2.1 	<A NAME="50422098_20583"></A>Calculating the distance between transformed entity arrays </H3>
+<P>
+<A NAME="50422098_pgfId-378935"></A>You can calculate the distance between transformed arrays of entities without having to apply a transformation to each entity before the function call using <A HREF=../headers/pk_entity_range.html>PK_ENTITY_range</A> and <A HREF=../headers/pk_entity_range_vector.html>PK_ENTITY_range_vector</A> functions,</P>
+<P>
+<A NAME="50422098_pgfId-378427"></A>The transforms for the input entities arrays are supplied via the <CODE>
+tf</CODE>
+ (<A HREF=../headers/pk_entity_range_vector.html>PK_ENTITY_range_vector</A> only), <CODE>
+tf_1</CODE>
+ and <CODE>
+tf_2</CODE>
+ arguments. Only rigid transformations are supported (i.e reflections, translations, rotations or a combination of these).</P>
+<P>
+<A NAME="50422098_pgfId-380726"></A>If these arguments are set to PK_ENTITY_null, the entities in the array are not transformed.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422098_pgfId-296972"></A>28.3	<A NAME="50422098_86882"></A>Options available 
+
+
+</H1>
+<P>
+<A NAME="50422098_pgfId-296973"></A>The following table describes the options available to all of the functions that calculate either a global minimum or maximum distance. </P>
+<P>
+<A NAME="50422098_pgfId-376331"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422098_pgfId-376345"></A>Note: Not all options are available to all functions. Details are provided where relevant.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-297058"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296976"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296978"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-296980"></A>have_tolerance</PRE>
+<PRE><A NAME="50422098_pgfId-296981"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-296986"></A>By default, Parasolid performs maximum and minimum distance calculations to within Parasolid linear precision. By using these options, you can specify a tolerance on the accuracy of the calculation, allowing for a slacker computation of minimum or maximum distance.</P>
+<P>
+<A NAME="50422098_pgfId-296990"></A>Using these options does not affect the accuracy of either:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-296991"></A>The entities you are measuring the distance between. That is, increasing the tolerance of the calculation does not mean that entities that are close to each other will be interpreted by the function as touching or intersecting.</LI>
+<LI>
+<A NAME="50422098_pgfId-296992"></A>The precision of the data returned. Although the end points returned may not be optimal values for the distance calculation, they are still accurate to within Parasolid linear precision. </LI>
+</UL>
+<P>
+<A NAME="50422098_pgfId-296997"></A><STRONG>
+Available in:</STRONG> all functions, except <A HREF=../headers/pk_entity_range.html>PK_ENTITY_range</A> and <A HREF=../headers/pk_entity_range_vector.html>PK_ENTITY_range_vector</A>.</P>
+<ADDRESS>
+<A NAME="50422098_pgfId-376535"></A>Note: The <CODE>
+have_tolerance</CODE>
+ option (PK_LOGICAL_false by default) should be used whenever you supply a <CODE>
+tolerance</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-296999"></A>bound</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297001"></A>Lets you specify a maximum or minimum limit on the distance returned. This is a structure consisting of the following fields:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297002"></A><CODE>
+upper_bound/have_upper_bound</CODE>
+ - defines an upper bound on the distance to be computed. If you supply this, the function only returns a distance if it is less than this value.</LI>
+<LI>
+<A NAME="50422098_pgfId-297003"></A><CODE>
+lower_bound/have_lower_bound</CODE>
+ - defines a lower bound on the distance to be computed. If you supply this, the function only returns a distance if it is greater than this value.</LI>
+</UL>
+<P>
+<A NAME="50422098_pgfId-297004"></A><STRONG>
+Available in:</STRONG> all functions.</P>
+<ADDRESS>
+<A NAME="50422098_pgfId-297005"></A>Note: If both lower and upper bounds are supplied, the lower bound must be less than the upper bound.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297007"></A>opt_level</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297009"></A>Lets you specify the level of analysis that is used by the function to resolve closely separated local maxima or minima. You can choose between two values:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297010"></A><A HREF=../headers/pk_range_opt_t.html>PK_range_opt_performance_c</A> - return a result that is optimised for performance. Using this value ensures that results are returned as quickly as possible, but in complex cases, a local minimum or maximum may be returned, rather than the global solution. This is the default. </LI>
+<LI>
+<A NAME="50422098_pgfId-297011"></A><A HREF=../headers/pk_range_opt_t.html>PK_range_opt_accuracy_c</A> - return a result that is optimised for accuracy. In complex cases, using this value may return more accurate results than <A HREF=../headers/pk_range_opt_t.html>PK_range_opt_performance_c</A>, but at the expense of performance. </LI>
+</UL>
+<P>
+<A NAME="50422098_pgfId-297012"></A><STRONG>
+Available in:</STRONG> all functions, except <A HREF=../headers/pk_entity_range.html>PK_ENTITY_range</A> and <A HREF=../headers/pk_entity_range_vector.html>PK_ENTITY_range_vector</A>.</P>
+<ADDRESS>
+<A NAME="50422098_pgfId-297013"></A>Note: This option is also available in functions for calculating local minimum distance, as described in <A HREF="fd_chap.029.html#50422098_38608">Section 28.6, “Local minimum distance”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297018"></A>guess</PRE>
+<PRE><A NAME="50422098_pgfId-297019"></A>guessesguesses_1guesses_2</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297024"></A>You can sometimes improve Parasolid’s performance when calculating minimum or maximum distances if you can estimate where on the supplied entities the end points of that distance are likely to be found. You can use these options to supply parameters that you think are near to the end points of the maximum or minimum distance.</P>
+<P>
+<A NAME="50422098_pgfId-297028"></A>See <A HREF="fd_chap.029.html#50422098_58726">Section 28.4, “Using estimates to improve performance”</A> for more information.</P>
+<P>
+<A NAME="50422098_pgfId-297029"></A><STRONG>
+Available in:</STRONG> all functions except <A HREF=../headers/pk_geom_range_array.html>PK_GEOM_range_array</A>, <A HREF=../headers/pk_topol_range_array.html>PK_TOPOL_range_array</A> and <A HREF=../headers/pk_topol_range_geom_array.html>PK_TOPOL_range_geom_array</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297031"></A>range_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297033"></A>Specifies whether to find the global minimum or the global maximum distance between the given entities. This can be one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297034"></A><A HREF=../headers/pk_range_type_t.html>PK_range_type_minimum_c</A>: find the minimum distance (the default).</LI>
+<LI>
+<A NAME="50422098_pgfId-297035"></A><A HREF=../headers/pk_range_type_t.html>PK_range_type_maximum_c</A>: find the maximum distance.</LI>
+</UL>
+<P>
+<A NAME="50422098_pgfId-297036"></A><STRONG>
+Available in:</STRONG> all functions except vector functions.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297038"></A>param_bound</PRE>
+<PRE><A NAME="50422098_pgfId-297039"></A>param_boundsparam_bounds_1param_bounds_2</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297041"></A>Specifies bounds for any geometrical entities. You supply bounds using a <A HREF=../headers/pk_range_param_bound_t.html>PK_range_param_bound_t</A> structure, which should include either:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297042"></A>An interval, if the unbounded geometry is a curve</LI>
+<LI>
+<A NAME="50422098_pgfId-297043"></A>A uv-box, if the unbounded geometry is a surface.</LI>
+</UL>
+<P>
+<A NAME="50422098_pgfId-297044"></A>You can supply bounds for both bounded and unbounded geometrical entities.</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297045"></A>For a bounded entity, this just limits the range of interest for that entity. </LI>
+<LI>
+<A NAME="50422098_pgfId-297046"></A>For an unbounded entity, this guarantees that maximum distance calculations do not return infinite values. </LI>
+</UL>
+<P>
+<A NAME="50422098_pgfId-297048"></A><STRONG>
+Available in: </STRONG>all standard and array functions that involve at least one geometrical entity.</P>
+<ADDRESS>
+<A NAME="50422098_pgfId-376595"></A>Note: You must use this option if you are calculating maximum distances using at least one unbounded geometry; failure to do this results in a function error. </ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297050"></A><CODE>param_entity</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297052"></A>Specifies whether to return a vector and parameter on the <CODE>
+sub_entity </CODE>
+in the returned range_data, when the point of minimum separation between the topological entity and a vector is found on the sub-entity.This option will only affect the behaviour of functions when a face, edge or fin is passed in. Default: <A HREF=../headers/pk_range_param_entity_t.html>PK_range_param_entity_topol_c</A></P>
+<P>
+<A NAME="50422098_pgfId-297053"></A><STRONG>
+Available in:</STRONG> all vector functions that involve at least one topological entity and <A HREF=../headers/pk_entity_range.html>PK_ENTITY_range</A>.</P>
+<P>
+<A NAME="50422098_pgfId-297054"></A><STRONG>
+Note:</STRONG> This option is also available in functions for calculating local minimum and maximum distance between a topological entity and a position, as described in <A HREF="fd_chap.029.html#50422098_38608">Section 28.6, “Local minimum distance”</A>. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422098_pgfId-297060"></A>28.4	<A NAME="50422098_58726"></A>Using estimates to improve performance 
+
+
+</H1>
+<P>
+<A NAME="50422098_pgfId-297061"></A>The <CODE>
+guess</CODE>
+, <CODE>
+guesses</CODE>
+, <CODE>
+guesses_1</CODE>
+ and <CODE>
+guesses_2</CODE>
+ options (the name is different depending on which function you call it from) let you provide either a parameter or a vector that represents a place on the entity that you believe is close to an end position of the minimum or maximum distance on that entity. If you can provide such estimates, it can improve Parasolid’s performance when using any of these functions. </P>
+<P>
+<A NAME="50422098_pgfId-355906"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422098_pgfId-355925"></A>Note: Where parameter information is known, a parameter-space guess is recommended over a vector guess. Internally, any vector guess is converted to a parameter guess by projecting the vector to the surface. This requires extra computation time and vector positions near complex areas of the surfaces (e.g high-curvature) could potentially result in UV guesses that lead to sub-optimal solutions.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-297068"></A><A HREF="fd_chap.029.html#50422098_10856"><EM>
+Figure 28-2</EM></A> shows a simple example in which <A HREF=../headers/pk_geom_range.html>PK_GEOM_range</A> is used to calculate the minimum distance between two curves. For each curve, the parameter highlighted is passed to the function as an estimate, using the <CODE>
+guesses</CODE>
+ option. <A HREF=../headers/pk_geom_range.html>PK_GEOM_range</A> then starts looking for a solution from the supplied parameter, thereby improving performance. </P>
+<P>
+<A NAME="50422098_pgfId-318264"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-218.gif">
+
+<P>
+<A NAME="50422098_pgfId-297114"></A>Figure 28-2 <A NAME="50422098_10856"></A>Providing estimates when calculating minimum distance between two curves</P>
+<P>
+<A NAME="50422098_pgfId-297115"></A>To use this option, you provide a separate estimate for any entity that you are measuring the distance between as follows:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297116"></A>For standard functions you can either provide one or two estimates. Performance is likely to be improved most if you can provide two estimates. The option name is <CODE>
+guesses</CODE>
+</LI>
+<LI>
+<A NAME="50422098_pgfId-374836"></A>For the array function <A HREF=../headers/pk_entity_range.html>PK_ENTITY_range</A> you can only provide an estimate for a single entity input. The option names are <CODE>
+guesses_1</CODE>
+ and <CODE>
+guesses_2</CODE>
+</LI>
+<LI>
+<A NAME="50422098_pgfId-297117"></A>For vector functions (except for <A HREF=../headers/pk_geom_range_vector_many.html>PK_GEOM_range_vector_many</A>) you only provide a single estimate, since providing an estimate for a known vector would be meaningless. The option name is <CODE>
+guess</CODE>
+.</LI>
+<LI>
+<A NAME="50422098_pgfId-377778"></A>For <A HREF=../headers/pk_geom_range_vector_many.html>PK_GEOM_range_vector_many</A> you provide an array of estimates, one for each position supplied to the function. The option name is <CODE>
+guesses</CODE>
+. </LI>
+</UL>
+<P>
+<A NAME="50422098_pgfId-297126"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422098_pgfId-297125"></A>Note: You cannot provide estimates for any of the following array functions: <A HREF=../headers/pk_geom_range_array.html><A HREF=../headers/pk_geom_range_array.html>PK_GEOM_range_array</A></A>, <A HREF=../headers/pk_topol_range_array.html>PK_TOPOL_range_array</A>, and <A HREF=../headers/pk_topol_range_geom_array.html>PK_TOPOL_range_geom_array</A>. If you are using array functions to measure distances, and you have enough information to provide an estimate, then you should use the corresponding standard function instead (for example, use <A HREF=../headers/pk_geom_range.html>PK_GEOM_range</A> rather than <A HREF=../headers/pk_geom_range_array.html><A HREF=../headers/pk_geom_range_array.html>PK_GEOM_range_array</A></A>). </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-297127"></A>You provide each estimate using a <A HREF=../headers/pk_range_guess_t.html>PK_range_guess_t</A> structure. This contains the following fields: </P>
+<P>
+<A NAME="50422098_pgfId-297151"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297130"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297132"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297134"></A>type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297136"></A>The type of data you are supplying for your estimate. This is one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297137"></A><A HREF=../headers/pk_range_guess_t.html>PK_range_guess_no_c</A>: no estimate (the default)</LI>
+<LI>
+<A NAME="50422098_pgfId-297138"></A><A HREF=../headers/pk_range_guess_t.html>PK_range_guess_param_c</A>: a parameter</LI>
+<LI>
+<A NAME="50422098_pgfId-297139"></A><A HREF=../headers/pk_range_guess_t.html>PK_range_guess_vector_c</A>: a position</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297141"></A>parameters</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297143"></A>If <CODE>
+type</CODE>
+ is <A HREF=../headers/pk_range_guess_t.html>PK_range_guess_param_c</A>, this field contains the corresponding parameter information. It is an array containing up to two parameters.</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297144"></A>If you are supplying data for a curve or edge, supply a curve parameter in <CODE>
+parameters[0]</CODE>
+.</LI>
+<LI>
+<A NAME="50422098_pgfId-297145"></A>If you are supplying data for a surface or face, supply a surface parameter using both <CODE>
+parameters[0]</CODE>
+ and <CODE>
+parameters[1]</CODE>
+. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297147"></A>vector</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297149"></A>If <CODE>
+type</CODE>
+ is <A HREF=../headers/pk_range_guess_t.html>PK_range_guess_vector_c</A>, this field contains the corresponding position. You can supply a vector if the solution is to be found on an edge of a face. </P>
+<ADDRESS>
+<A NAME="50422098_pgfId-297150"></A>Note: You should not supply both parameter and position estimates within a single <A HREF=../headers/pk_range_guess_t.html>PK_range_guess_t</A> structure. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-297155"></A> &nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422098_pgfId-297154"></A>Note: Estimates are not allowed for calculations involving bodies. For example, if you are looking for the minimum distance between a face and a body, you cannot provide an estimate for the body. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422098_pgfId-297156"></A>28.5	Results returned 
+
+
+</H1>
+<P>
+<A NAME="50422098_pgfId-297157"></A>The following tables provides a summary of the data returned by the maximum/minimum distance functions:</P>
+<P>
+<A NAME="50422098_pgfId-378003"></A>All functions except <A HREF=../headers/pk_entity_range.html>PK_ENTITY_range</A> and <A HREF=../headers/pk_entity_range_vector.html>PK_ENTITY_range_vector</A> have the following results structure:</P>
+<P>
+<A NAME="50422098_pgfId-377955"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297160"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297162"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297164"></A>range_result</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297166"></A>A token that indicates the result of the operation. This is one of the following values:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297167"></A><A HREF=../headers/pk_range_result_t.html>PK_range_result_found_c</A>: a minimum or maximum distance was successfully found.</LI>
+<LI>
+<A NAME="50422098_pgfId-297168"></A><A HREF=../headers/pk_range_result_t.html>PK_range_result_lower_c</A>: no distance greater than the <CODE>
+lower_bound</CODE>
+ provided was found.</LI>
+<LI>
+<A NAME="50422098_pgfId-297169"></A><A HREF=../headers/pk_range_result_t.html>PK_range_result_upper_c</A>: no distance less than the <CODE>
+upper_bound</CODE>
+ provided was found.</LI>
+<LI>
+<A NAME="50422098_pgfId-371127"></A><A HREF=../headers/pk_range_result_t.html>PK_range_result_not_found_c</A>: failed to identify the separation</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422098_pgfId-297171"></A>range</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297173"></A>A structure that contains the computed <CODE>
+distance</CODE>
+, together with details about the end positions that describes where the distance lies. </P>
+<P>
+<A NAME="50422098_pgfId-297174"></A>The exact structure used depends on the calling function:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-297175"></A>For all vector functions, a <A HREF=../headers/pk_range_1_r_t.html>PK_range_1_r_t</A> is returned which contains details about the <CODE>
+end</CODE>
+ position on the single entity received by the vector function.</LI>
+<LI>
+<A NAME="50422098_pgfId-297176"></A>For all other functions, a <A HREF=../headers/pk_range_2_r_t.html>PK_range_2_r_t</A> is returned which contains details about the <CODE>
+ends</CODE>
+ of both entities received by the function.</LI>
+</UL>
+<P>
+<A NAME="50422098_pgfId-297177"></A>The details for each end position are contained in a <A HREF=../headers/pk_range_end_t.html>PK_range_end_t</A> structure. A description of the information that is returned for each function is available in the header documentation for the relevant function: see the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-377968"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422098_pgfId-377967"></A>Note: For <A HREF=../headers/pk_geom_range_vector_many.html>PK_GEOM_range_vector_many</A>, an array of range results and ranges is returned, one for each minimum distance calculated (and hence each position received by the function). Consequently, the returned fields for this function are called <CODE>
+range_results</CODE>
+ and <CODE>
+ranges</CODE>
+ respectively.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-297181"></A><A HREF=../headers/pk_entity_range.html>PK_ENTITY_range</A> and <A HREF=../headers/pk_entity_range_vector.html>PK_ENTITY_range_vector</A> functions have a results structure with the following fields:</P>
+<P>
+<A NAME="50422098_pgfId-372181"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-371650"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-371652"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-371654"></A><CODE>
+results</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-371850"></A>A token that indicates the result of the operation. This is one of the following values:</P>
+<UL>
+<LI>
+<A NAME="50422098_pgfId-371851"></A><A HREF=../headers/pk_range_result_t.html>PK_range_result_found_c</A>: a minimum or maximum distance was successfully found.</LI>
+<LI>
+<A NAME="50422098_pgfId-371852"></A><A HREF=../headers/pk_range_result_t.html>PK_range_result_lower_c</A>: no distance greater than the <CODE>
+lower_bound</CODE>
+ provided was found.</LI>
+<LI>
+<A NAME="50422098_pgfId-371853"></A><A HREF=../headers/pk_range_result_t.html>PK_range_result_upper_c</A>: no distance less than the <CODE>
+upper_bound</CODE>
+ provided was found.</LI>
+<LI>
+<A NAME="50422098_pgfId-371854"></A><A HREF=../headers/pk_range_result_t.html>PK_range_result_not_found_c</A>: failed to identify the separation.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-371658"></A><CODE>
+distances</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-371660"></A>Double array that indicates the separation distance between entities.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-371662"></A><CODE>
+ends</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-378244"></A>The details for each end position that describes where the <CODE>
+distance</CODE>
+ lies are contained in a <A HREF=../headers/pk_entity_range_end_t.html>PK_ENTITY_range_end_t</A> structure. A description of the information that is returned for each function is available in the header documentation for the relevant function: see the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422098_pgfId-297187"></A>28.6	<A NAME="50422098_38608"></A>Local minimum distance 
+
+
+</H1>
+<P>
+<A NAME="50422098_pgfId-297191"></A>In addition to finding the global minimum distance between two entities, Parasolid provides support for finding local minimum distance. The following functions are available for this purpose:</P>
+<P>
+<A NAME="50422098_pgfId-297227"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297194"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297196"></A>Finds</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297198"></A>Supported entities</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297201"></A><A NAME="50422098_marker-297200"></A><A HREF=../headers/pk_geom_range_local.html>PK_GEOM_range_local</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297203"></A>The local minimum distance between two geometrical entities</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297205"></A>Point, curve, surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297208"></A><A NAME="50422098_marker-297207"></A><A HREF=../headers/pk_topol_range_local.html>PK_TOPOL_range_local</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297210"></A>The local minimum distance between two topological entities</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297212"></A>Vertex, edge, face, body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297215"></A><A NAME="50422098_marker-297214"></A><A HREF=../headers/pk_geom_range_local_vector.html>PK_GEOM_range_local_vector</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297217"></A>The local minimum distance between a geometrical entity and a position</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297219"></A>Point, curve, surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297222"></A><A NAME="50422098_marker-297221"></A><A HREF=../headers/pk_topol_range_local_vector.html>PK_TOPOL_range_local_vector</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297224"></A>The local minimum or maximum distance between a topological entity and a position</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422098_pgfId-297226"></A>Vertex, fin, edge, face, body</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422098_pgfId-297231"></A>See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information.</P>
+<P>
+<A NAME="50422098_pgfId-297234"></A><A NAME="50422098_40285"></A><A NAME="50422098_marker-297233"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.028.html">Mass Properties</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.030.html">Clash Detection Of Bodies</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

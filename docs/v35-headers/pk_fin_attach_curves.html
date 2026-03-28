@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FIN_attach_curves</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FIN_attach_curves</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_FIN_attach_curves
+(
+<I>--- received arguments ---
+</I>int                 n_fins,       --- number of fins
+const <A HREF=../headers/pk_fin_t.html>PK_FIN_t</A>      fins[],       --- fins to have curves attached
+const <A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>    curves[],     --- curves to be attached to fins
+const <A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A> intervals[]   --- parametric bounds of each curve
+
+<I>--- returned arguments ---
+</I>)
+</B>
+<A NAME="description"></A>
+<I>This function attaches curves to fins.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_has_parent           <B>'curve'</B> is already attached
+    PK_ERROR_bad_shared_dep       attempt to illegally share a dependant
+                                  of <B>'curve'</B>
+    PK_ERROR_bad_shared_entity    attempt to illegally share <B>'curve'</B>
+    PK_ERROR_geom_not_needed      'fin' already owns geometry
+    PK_ERROR_inconsistent_geom    inconsistent geometry
+    PK_ERROR_invalid_geometry     geometry does not pass checks
+    PK_ERROR_bad_parameter        <B>'interval'</B> is invalid on <B>'curve'</B>
+
+
+<A NAME="documentation"></A>
+The arrays <B>'fins'</B>, <B>'curves'</B> and <B>'intervals'</B> are all of the length <B>'n_fins'</B>.
+All the <B>'fins'</B> must belong to the same body.
+
+Curves may only be attached to the fins of approximate edges.
+
+All of the <B>'curves'</B> must be of class PK_CLASS_spcurve or PK_CLASS_pline. For
+each curve of class PK_CLASS_spcurve, there must also be supplied the
+parametric interval which defines the part of the curve to be used. For each
+curve of class PK_CLASS_pline, the supplied parametric interval must be the
+interval returned from <A HREF=../headers/pk_curve_ask_interval.html>PK_CURVE_ask_interval</A>. If the fin's edge has a vertex
+or vertices, then the parameter bounds must correspond to the vertex
+positions; that is, they must indicate positions which are within tolerance of
+the vertices.
+
+A curve may occur more than once in <B>'curves'</B> and if this
+is the case then the curve will be shared, providing the sharing is
+legal.
+
+PK_FIN_attach_curves will not copy any curves, thus attachments are
+further restricted by constraints on the sharing of geometry:
+
+    o No curve may belong to a different body.
+
+    o An orphan curve may be attached to an edge as long as it has no
+      dependents attached to topology and it has no dependents shared with
+      any other orphan entity.
+
+The curve must be capable of passing Parasolid's geometry checking.
+
+The self intersection check is only performed if the appropriate interface
+parameter is set. See <A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>.
+
+The G1 continuity check is only performed if the appropriate interface
+parameter is set. See <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A>.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

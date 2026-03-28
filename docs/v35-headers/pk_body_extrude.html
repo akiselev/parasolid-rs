@@ -1,0 +1,238 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_extrude</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_extrude</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_BODY_extrude
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                  profile,     --- minimum, wire or sheet profile
+                                        --- to extrude
+<A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>               path,        --- direction of linear extrusion
+const <A HREF=../headers/pk_body_extrude_o_t.html>PK_BODY_extrude_o_t</A> *options,     --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>           *const body,        --- resulting extruded body
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>  *const tracking,    --- tracking information
+<A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A>  *const results      --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a new body by performing a linear extrusion of a given
+profile.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_distance_le_0         distance over which profile is to be
+                                   extruded is zero or negative (MILD)
+    PK_ERROR_unsuitable_entity     profile is unsuitable for extrusion (MILD)
+    PK_ERROR_general_body          can't extrude general body (MILD)
+    PK_ERROR_non_manifold          can't extrude body with non-manifold
+                                   boundary (MILD)
+    PK_ERROR_impossible_sweep      can't determine swept geometry (SERIOUS)
+    PK_ERROR_su_self_intersect     extrusion would produce a self intersecting
+                                   surface (SERIOUS)
+    PK_ERROR_no_division           bound does not divide extruded body
+                                   (SERIOUS)
+    PK_ERROR_no_nth_division       nth division does not exist
+                                   (SERIOUS)
+    PK_ERROR_disjoint              disjoint extruded body is not allowed
+                                   (SERIOUS)
+    PK_ERROR_not_implemented       option not implemented
+                                   (MILD)
+    PK_ERROR_failed_to_bound       extrude failed to stop at supplied bound
+                                   (SERIOUS)
+    PK_ERROR_distance_too_large    extruded body would protrude outside the
+                                   size box (MILD/SERIOUS)
+
+
+<A NAME="documentation"></A>
+The new <B>'body'</B> is created by extruding the given <B>'profile'</B> body along the
+given <B>'path'</B> vector between two bounds.
+
+The <B>'profile'</B> may be a minimum, wire or sheet body, the resulting <B>'body'</B> then
+being a wire, sheet or solid body respectively.
+
+For a profile with facet geometry, if a laminar edge of a sheet profile or any
+edge of a wireframe profile self-intersects when viewed down the direction of
+extrusion, then that edge will be split to avoid said self-intersection. This
+does not apply if an <B>'extruded_body'</B> is provided.
+
+Bounds are defined in terms of extrusion divisions.  An extrusion division is
+where a potentially infinite body extruded in the direction of and in the
+opposite direction to the <B>'path'</B> vector would be divided into two.
+
+An extrusion division may be a copy of the given <B>'profile'</B> at a given distance
+along the <B>'path'</B>, or it may be defined by the intersection between the
+potentially infinite body and a given entity.  Intersections with a given
+entity which do not divide the infinite body in two in the direction of the
+path are not extrusion divisions and are ignored.
+
+The resulting <B>'body'</B> is bounded in the <B>'path'</B> direction by extrusion
+divisions selected by the <B>'start_bound'</B> and <B>'end_bound'</B> fields of the options
+structure.  The <B>'forward'</B> fields of the <B>'start_bound'</B> and <B>'end_bound'</B>
+structures indicate whether each respective bound is on the side of the
+<B>'profile'</B> in the positive direction of the <B>'path'</B> or on the other side.
+
+The given <B>'profile'</B> will be contained in the result body if the <B>'start_bound'</B>
+of the <B>'options'</B> has its <B>'forward'</B> field set to PK_LOGICAL_false and the
+<B>'end_bound'</B> of the <B>'options'</B> has its <B>'forward'</B> field set to PK_LOGICAL_true.
+If both <B>'forward'</B> fields are given the same value then the resulting <B>'body'</B> is
+entirely on one side of the given <B>'profile'</B>.
+
+The intersection between the potentially infinite body and a given entity
+may produce more than one division.  If the given <B>'profile'</B> is contained in
+the result <B>'body'</B> then divisions are ordered by increasing distance from the
+<B>'profile'</B>.  When both bounds are on the same side of the <B>'profile'</B> then
+divisions for the bound nearest the <B>'profile'</B> are ordered by increasing
+distance from the <B>'profile'</B>, and divisions for the bound furthest from the
+<B>'profile'</B> are ordered by increasing distance from the bound nearest to
+the <B>'profile'</B>.  The ordering of divisions may be reversed ( <B>'nearest'</B> field
+of the <B>'start_bound'</B> and <B>'end_bound'</B> structures ) so that furthest rather than
+nearest divisions may be selected.
+
+If the bounding entities intersect the <B>'profile'</B>, the first division can be
+specified using the <B>'side'</B> field of the <B>'start_bound'</B> and <B>'end_bound'</B>
+structures.  For the option <A HREF=../headers/pk_bound_side_t.html>PK_bound_side_both_c</A>, such profile divisions are
+ignored.  For <A HREF=../headers/pk_bound_side_t.html>PK_bound_side_out_c</A> or <A HREF=../headers/pk_bound_side_t.html>PK_bound_side_in_c</A>, the outside or inside
+parts respectively of the bound entity at the profile are counted as the first
+division.
+
+If the start and end divisions intersect each other then the result <B>'body'</B> is
+undefined.
+
+If the divisions produce a disjoint extrusion and the <B>'allow_disjoint'</B> option
+is PK_LOGICAL_true then the resulting <B>'body'</B> will contain disjoint components.
+The components will clash if the result would be non-manifold.  In this case
+the status will be set to <A HREF=../headers/pk_local_status_t.html>PK_local_status_fa_fa_fail_c</A> and the user should call
+<A HREF=../headers/pk_body_disjoin.html>PK_BODY_disjoin</A> on the resulting <B>'body'</B>.
+
+The <B>'end_bound'</B> must be on the side of the <B>'start_bound'</B> in the positive
+direction of the <B>'path'</B> vector.
+
+The given <B>'profile'</B> is unaffected by this function.
+
+Pre-extruded body options:
+
+    If the option <B>'extruded_body'</B> is not PK_ENTITY_null, this body is used to
+    create the resulting <B>'body'</B> instead of extruding the <B>'profile'</B> along the
+    <B>'path'</B>. Any extrusion divisions selected by the <B>'start_bound'</B> and
+    <B>'end_bound'</B> must divide the <B>'extruded_body'</B>.
+
+    The bound method <A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A> cannot be used with this option.
+    <A HREF=../headers/pk_bound_t.html>PK_bound_none_c</A> can be used with this option and indicates no extrusion
+    divisions for that bound.
+
+    The resulting <B>'body'</B> is not guaranteed to have the same tag as
+    <B>'extruded_body'</B>. If the <B>'profile'</B> is within the <B>'extruded_body'</B> (i.e.
+    if the start bound is backward and the end bound is forward) then it
+    should be an exact section of <B>'extruded_body'</B>. This lets you to specify
+    a region to include, and is necessary to resolve any ambiguities where
+    multiple solutions are possible. Otherwise spurious results may be
+    returned.
+
+Tracking:
+
+    The <A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A> structure contains track records of the type
+    PK_TOPOL_track_create_c.
+
+    When <B>'extruded_body'</B> is PK_ENTITY_null:
+
+    For a sheet body <B>'profile'</B> there is a track record for every face in
+    the result <B>'body'</B>.  For each face the original class may be:
+     -  PK_CLASS_edge: the face is produced be sweeping an edge of the
+        <B>'profile'</B>,
+     -  PK_CLASS_face: the face is derived from a face of the <B>'profile'</B> or
+        from a face of a bounding body,
+     -  any subclass of PK_CLASS_surf: the face is produced from a surface
+        in a <A HREF=../headers/pk_bound_t.html>PK_bound_surf_c</A> bound.
+
+    For a wire body <B>'profile'</B>, there is a track record for every face showing
+    the edge it has been swept from, and a track record for the bound edges
+    relating them to the bounds.  For each bound edge the original class may
+    be:
+     -  PK_CLASS_face: the edge was produced by intersection with the face
+        of a bounding body,
+     -  PK_CLASS_edge: the edge was produced by intersection with a bounding
+        body which coincided with an edge of that bounding body, or the edge
+        was produced as a result of a <A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A> bound from a profile
+        edge,
+     -  any subclass of PK_CLASS_surf: the edge is produced by intersection
+        with a surface in a <A HREF=../headers/pk_bound_t.html>PK_bound_surf_c</A> bound.
+
+    For a minimum body <B>'profile'</B>, there is a track record for the edge
+    relating it to the vertex it was swept from, and a track record for each
+    resulting vertex showing how that was obtained.  For these vertices, the
+    original class may be:
+     -  PK_CLASS_vertex: the vertex is produced by a <A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A>
+        bound,
+     -  PK_CLASS_face: the vertex is produced at an intersection with a face
+        at a <A HREF=../headers/pk_bound_t.html>PK_bound_face_c</A>, <A HREF=../headers/pk_bound_t.html>PK_bound_body_c</A> or <A HREF=../headers/pk_bound_t.html>PK_bound_sheet_c</A> bound
+     -  any subclass of PK_CLASS_surf: the vertex is produced at the
+        intersection with a surface given with a <A HREF=../headers/pk_bound_t.html>PK_bound_surf_c</A> bound.
+
+    When <B>'extruded_body'</B> is provided in the options structure:
+
+    If the <B>'extruded_body'</B> is a solid body for each face the original class
+    may be:
+     -  PK_CLASS_face: the face is derived from a face of the <B>'extruded_body'</B>
+        or from a face of a bounding body.
+     -  any subclass of PK_CLASS_surf: the face is produced from a surface
+        in a <A HREF=../headers/pk_bound_t.html>PK_bound_surf_c</A> bound.
+
+    If the <B>'extruded_body'</B> is a sheet body then track records are created for
+    all faces and edges of the result body.  For each face of the
+    result body the original class may be:
+     -  PK_CLASS_face: the face is derived from the face of the
+        <B>'extruded_body'</B>
+    For each edge the original class may be:
+     -  PK_CLASS_face: the edge was produced by intersection with the face
+        of a bounding body,
+     -  PK_CLASS_edge: the edge was produced by intersection with a bounding
+        body which coincided with an edge of that bounding body, or the edge
+        is derived from an edge of <B>'extruded_body'</B>,
+     -  any subclass of PK_CLASS_surf: the edge is produced by intersection
+        with a surface in a <A HREF=../headers/pk_bound_t.html>PK_bound_surf_c</A> bound.
+
+The <B>'results'</B> argument is currently only used if the <B>'allow_disjoint'</B> option
+is PK_LOGICAL_true and the disjoint <B>'body'</B> components clash.  In this case,
+the <B>'status'</B> field of the <A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A> structure will be set to
+<A HREF=../headers/pk_local_status_t.html>PK_local_status_fa_fa_fail_c</A>.  Otherwise, the <B>'status'</B> field is always set to
+<A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,292 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Parasolid View Matrices</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Parasolid View Matrices</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.110.html">Tabular Output Of Faceting</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.112.html">Picking Topology</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.111.html#50422191_pgfId-294730">110.1	Introduction </A>
+<LI> <A HREF="fd_chap.111.html#50422191_pgfId-294734">110.2	Viewing transformations </A>
+<LI> <A HREF="fd_chap.111.html#50422191_pgfId-294744">110.3	View matrices </A>
+<UL>
+<LI> <A HREF="fd_chap.111.html#50422191_pgfId-294774">110.3.1	The rotation matrix </A>
+<LI> <A HREF="fd_chap.111.html#50422191_pgfId-294788">110.3.2	Parallel and perspective views </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422191_pgfId-294730"></A>110.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422191_pgfId-294731"></A>Parasolid specifies the viewing data (position, direction and type) for rendering and faceting functions using a view matrix. This chapter describes the general form of such a matrix.</P>
+<P>
+<A NAME="50422191_pgfId-330295"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422191_pgfId-329966"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422191_pgfId-329949"></A><A HREF="fd_chap.105.html#50422185_16951">Chapter 104, “Rendering Functions”</A></LI>
+<LI>
+<A NAME="50422191_pgfId-329984"></A><A HREF="fd_chap.105.html#50422185_Rendering">Section 104.4, “Viewing transformation”</A></LI>
+<LI>
+<A NAME="50422191_pgfId-330004"></A><A HREF="fd_chap.108.html#50422188_19551">Section 107.1.2, “Viewing transformation”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422191_pgfId-294734"></A>110.2	<A NAME="50422191_marker-294732"></A><A NAME="50422191_marker-294733"></A>Viewing transformations 
+
+
+</H1>
+<P>
+<A NAME="50422191_pgfId-294736"></A><A NAME="50422191_Rendering"></A>A <STRONG>
+viewing transformation</STRONG> is needed when:</P>
+<UL>
+<LI>
+<A NAME="50422191_pgfId-294737"></A><A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> is used to generate silhouette and hidden-line data</LI>
+<LI>
+<A NAME="50422191_pgfId-294738"></A><A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A> and <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A> generate a view-dependent facet mesh</LI>
+</UL>
+<P>
+<A NAME="50422191_pgfId-294739"></A>The <STRONG>
+view matrix</STRONG> referenced by the viewing transformation entity is constructed such that:</P>
+<UL>
+<LI>
+<A NAME="50422191_pgfId-294740"></A>the direction which you wish to look in is mapped onto the z axis</LI>
+<LI>
+<A NAME="50422191_pgfId-294741"></A>your eye is at some positive value of z on the axis looking towards the origin</LI>
+</UL>
+<P>
+<A NAME="50422191_pgfId-294742"></A>A <STRONG>
+perspective view</STRONG> is generated if the view matrix contains non-zero perspective terms.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422191_pgfId-294744"></A>110.3	<A NAME="50422191_98372"></A>View matrices 
+
+
+</H1>
+<P>
+<A NAME="50422191_pgfId-294745"></A>A view matrix is a PK transformation entity, which is created from a <A HREF=../headers/pk_transf_sf_t.html>PK_TRANSF_sf_t</A> structure containing a 4*4 homogeneous matrix. </P>
+<P>
+<A NAME="50422191_pgfId-294746"></A>If the space is allocated as a 4 by 4 array in C using</P>
+<P>
+<A NAME="50422191_pgfId-294747"></A>double M[4][4];</P>
+<P>
+<A NAME="50422191_pgfId-294748"></A>(as it is in <A HREF=../headers/pk_transf_sf_t.html>PK_TRANSF_sf_t</A>) then in what follows, regard the matrix as:</P>
+<P>
+<A NAME="50422191_pgfId-294752"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1231.gif">
+
+<P>
+<A NAME="50422191_pgfId-294753"></A>Such a view matrix is used as a post multiplier of a homogeneous row vector:</P>
+<P>
+<A NAME="50422191_pgfId-294757"></A><IMG SRC="../graphics/fd_chap-1232.gif">
+ &nbsp;</P>
+<P>
+<A NAME="50422191_pgfId-294758"></A>The matrix M can be split up as:</P>
+<P>
+<A NAME="50422191_pgfId-294762"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1233.gif">
+
+<P>
+<A NAME="50422191_pgfId-294763"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422191_pgfId-294764"></A>The top left hand 3 by 3 matrix is the rotation matrix.</LI>
+<LI>
+<A NAME="50422191_pgfId-294765"></A>The row vector <STRONG>
+( M[0][3] M[1][3] M[2][3] )</STRONG> is the <EM>
+translation vector</EM>, henceforth called T.</LI>
+<LI>
+<A NAME="50422191_pgfId-294766"></A>The column vector <STRONG>
+( M[3][0] M[3][1] M[3][2] )</STRONG> is the <EM>
+perspective vector</EM>, henceforth called P.</LI>
+<LI>
+<A NAME="50422191_pgfId-294767"></A>The term <STRONG>
+M[3][3]</STRONG> is the <EM>
+scale term</EM>, henceforth called S.</LI>
+</UL>
+<P>
+<A NAME="50422191_pgfId-294768"></A>You can use <A HREF=../headers/pk_transf_create_view.html>PK_TRANSF_create_view</A> to conveniently create a view matrix that incorporates a specified view direction and, optionally, a specific eye position from which to view a model with a perspective vector. You can then use this matrix with Parasolid’s rendering functions.</P>
+
+<H3>
+<A NAME="50422191_pgfId-294774"></A>	110.3.1 	<A NAME="50422191_marker-294772"></A><A NAME="50422191_marker-294773"></A>The rotation matrix </H3>
+<P>
+<A NAME="50422191_pgfId-294775"></A>The <EM>
+rotation matrix</EM> may be considered as the column vectors:</P>
+<P>
+<A NAME="50422191_pgfId-294779"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1234.gif">
+
+<P>
+<A NAME="50422191_pgfId-294780"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422191_pgfId-294781"></A>H is the direction in model space of the horizontal axis of the view</LI>
+<LI>
+<A NAME="50422191_pgfId-294782"></A>V is the direction in model space of the vertical axis of the view</LI>
+<LI>
+<A NAME="50422191_pgfId-294783"></A>D is the direction pointing out of the view plane towards the eye point. It is thus minus the view direction </LI>
+</UL>
+<P>
+<A NAME="50422191_pgfId-294784"></A>The rotation matrix must be orthonormal: each row/column is a unit vector and the rows/columns are each three mutually orthogonal vectors.</P>
+<P>
+<A NAME="50422191_pgfId-294785"></A>The determinant of the rotation matrix must be +1. The magnitude of the determinant is bound to be 1 if the orthonormal condition is satisfied, but the requirement for the determinant rules out the ability to specify reflections.</P>
+
+
+<H3>
+<A NAME="50422191_pgfId-294788"></A>	110.3.2 	<A NAME="50422191_marker-294786"></A><A NAME="50422191_71433"></A>Parallel and perspective views </H3>
+<P>
+<A NAME="50422191_pgfId-294789"></A>The scalar:</P>
+<P>
+<A NAME="50422191_pgfId-294793"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1235.gif">
+
+<P>
+<A NAME="50422191_pgfId-294794"></A>is the reciprocal of the distance between the eye point and the view plane. </P>
+<P>
+<A NAME="50422191_pgfId-294795"></A>If the magnitude of w is less than:</P>
+<P>
+<A NAME="50422191_pgfId-294796"></A>( session angle precision / session precision )</P>
+<P>
+<A NAME="50422191_pgfId-294797"></A>then the eye point is deemed to be at infinity and the view is a <EM>
+parallel view</EM>. </P>
+<P>
+<A NAME="50422191_pgfId-294798"></A>If the magnitude of w is greater than </P>
+<P>
+<A NAME="50422191_pgfId-294799"></A>( session angle precision / session precision )</P>
+<P>
+<A NAME="50422191_pgfId-294800"></A>then the view is a <EM>
+perspective view</EM>.</P>
+<P>
+<A NAME="50422191_pgfId-294807"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422191_pgfId-294803"></A>Note: The limit on the value of w below which all views are deemed to be parallel is set at a value below which Parasolid cannot detect the difference between a parallel and a perspective view.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422191_pgfId-294808"></A>If P is the zero vector, then w is also zero, and the view is a parallel view.</P>
+<P>
+<A NAME="50422191_pgfId-294809"></A>For parallel views, the scale term, S, is the reciprocal of the scale of the picture and it must be greater than session precision. </P>
+<P>
+<A NAME="50422191_pgfId-294810"></A>For perspective views, the recommended way of creating a view matrix that contains perspective information is by using the function <A HREF=../headers/pk_transf_create_view.html>PK_TRANSF_create_view</A>, and passing an <CODE>
+eye_position</CODE>
+ to the function via its options structure. The <CODE>
+eye_position</CODE>
+ is a vector that represents the position from which the part is viewed along the specified <CODE>
+view_direction</CODE>
+. All parts being rendered should be visible from the specified <CODE>
+eye_position</CODE>
+, and the <CODE>
+eye_position</CODE>
+ should also be located outside the volume bounding all the parts that you are rendering. Using this function ensures that the perspective matrix is valid to within Parasolid precision.</P>
+<P>
+<A NAME="50422191_pgfId-294814"></A>If you need to perform the calculation of perspective information from within your application code for any reason, then you can do this as follows;</P>
+<P>
+<A NAME="50422191_pgfId-294815"></A>For perspective views, the perspective vector P must be parallel to the view direction (that is, anti-parallel to D) and the scale term must satisfy:</P>
+<P>
+<A NAME="50422191_pgfId-294819"></A> &nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1236.gif">
+
+<P>
+<A NAME="50422191_pgfId-294820"></A>In other words:</P>
+<P>
+<A NAME="50422191_pgfId-294824"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1237.gif">
+
+<P>
+<A NAME="50422191_pgfId-294825"></A>Where d = 1/w is the distance from the eye point to the view plane.</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.110.html">Tabular Output Of Faceting</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.112.html">Picking Topology</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

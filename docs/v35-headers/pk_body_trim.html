@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_trim</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_trim</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_BODY_trim
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>         body,         --- a body
+int               n_edges,      --- number of edges
+const <A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>   edges[],      --- edges
+int               n_faces,      --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>   faces[],      --- faces
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>      keep          --- Logical to determine whether we keep
+                                --- <B>'faces'</B> or remove <B>'faces'</B>
+)
+</B>
+<A NAME="description"></A>
+<I>This function trims the <B>'body'</B> which must be a sheet.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_fragment            (SERIOUS) Trim would fragment the sheet body
+                                           into two or more sheets.
+
+    PK_ERROR_failed_to_trim      (MILD)    Edges not sufficient to trim sheet.
+
+    PK_ERROR_all_faces_in_body   (MILD)    Trim would either delete whole
+                                           sheet or remove nothing at all.
+
+    PK_ERROR_topol_not_from_body (MILD)    Some of the <B>'edges'</B> or <B>'faces'</B> do
+                                           not belong to <B>'body'</B>.
+
+
+<A NAME="documentation"></A>
+The <B>'edges'</B> provided must divide the body into at least two sets of faces. The
+function trims off some of these facesets.
+
+If <B>'keep'</B> is set to PK_LOGICAL_true then any sets of faces which have a face
+in the <B>'faces'</B> array will survive and all others will be deleted.
+
+If <B>'keep'</B> is set to PK_LOGICAL_false the converse applies - all sets of faces
+with a face in the <B>'faces'</B> array are deleted.
+
+The operation must not fragment the sheet.
+
+<B>'edges'</B> and <B>'faces'</B> must all belong to <B>'body'</B>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

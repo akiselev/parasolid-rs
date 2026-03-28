@@ -1,0 +1,1354 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Expressions</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Expressions</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.024.html">Reading and Writing Parasolid Data</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.026.html">Introduction To Model Interrogation </A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-338202">24.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-382376">24.1.1	Standard form of an expression </A>
+</UL>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-372729">24.2	Operators </A>
+<UL>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-378034">24.2.1	Order of precedence </A>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-385082">24.2.2	Contents of an expression </A>
+</UL>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-372759">24.3	Maths functions </A>
+<UL>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-373315">24.3.1	Functions that return a constant </A>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-373204">24.3.2	Single-variable functions </A>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-373522">24.3.3	Two-variable functions </A>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-373493">24.3.4	Variadic functions </A>
+</UL>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-372731">24.4	Modelling functions </A>
+<LI> <A HREF="fd_chap.025.html#50422056_pgfId-378746">24.5	Examples </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422056_pgfId-338202"></A>24.1	<A NAME="50422056_39132"></A><A NAME="50422056_marker-367630"></A><A NAME="50422056_marker-367631"></A><A NAME="50422056_marker-367632"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422056_pgfId-332434"></A>This chapter provides information on expressions.Expressions allow an application to supply a mathematical formula to be evaluated. The expressions are supplied in the form of strings. For example, the expression &quot;position + vector(0.1, 0.0, 0.0)&quot; evaluates the result of adding the vector (0.1, 0.0, 0.0) to the variable position, which should also be a vector.</P>
+<P>
+<A NAME="50422056_pgfId-386909"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422056_pgfId-383536"></A>Note: Expressions are calculated in double precision.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422056_pgfId-383500"></A>Evaluators can be used an inputs when performing deformation using <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. See <A HREF="fd_chap.073.html#50422148_50739">Section 72.4.8, “Deformation options”</A> for more information.</P>
+
+<H3>
+<A NAME="50422056_pgfId-382376"></A>	24.1.1 	<A NAME="50422056_27432"></A>Standard form of an expression </H3>
+<P>
+<A NAME="50422056_pgfId-382075"></A><A HREF=../headers/pk_expr_sf_t.html>PK_EXPR_sf_t</A> is the standard form of an expression. It contains fields that specify:</P>
+<UL>
+<LI>
+<A NAME="50422056_pgfId-383885"></A>the root expression </LI>
+<LI>
+<A NAME="50422056_pgfId-383911"></A>sub-expression names and definitions </LI>
+<LI>
+<A NAME="50422056_pgfId-383944"></A>constant names and values </LI>
+</UL>
+<P>
+<A NAME="50422056_pgfId-383969"></A>The expression's overall value comes from evaluating the root expression.</P>
+<P>
+<A NAME="50422056_pgfId-382782"></A>The use of sub-expressions is optional. If you choose to use them, their names must begin with the prefix &quot;sbx_&quot; and consist of alphanumeric characters or underscore &quot;_&quot;.Sub-expressions can be referenced by name in either the <CODE>
+root_expr</CODE>
+ field or the <CODE>
+sub_expr_defs</CODE>
+ field in the <A HREF=../headers/pk_expr_sf_t.html>PK_EXPR_sf_t</A> structure.</P>
+<P>
+<A NAME="50422056_pgfId-383102"></A>The use of constants are also optional and their names must begin with the prefix &quot;c_&quot; and consist of alphanumeric characters or underscore &quot;_&quot;. A constant is referenced by its name in either the <CODE>
+root_expr</CODE>
+ field or the <CODE>
+sub_expr_defs</CODE>
+ field in the <A HREF=../headers/pk_expr_sf_t.html>PK_EXPR_sf_t</A> structure.</P>
+<P>
+<A NAME="50422056_pgfId-383397"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422056_pgfId-380890"></A>Note: Sub-expression and constant names are case-insensitive.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422056_pgfId-383251"></A>See <A HREF=../headers/pk_expr_sf_t.html>PK_EXPR_sf_t</A> for more information.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422056_pgfId-372729"></A>24.2	Operators 
+
+
+</H1>
+<P>
+<A NAME="50422056_pgfId-378351"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373100"></A>Operator</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373102"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373104"></A>+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373106"></A>plus (infix), </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373108"></A>-</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373110"></A>minus (infix), negative (unary)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373112"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373114"></A>multiply (real*real or real*vector), cross product (vector*vector)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373116"></A>/</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373118"></A>divide</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373120"></A>^</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373122"></A>power</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373124"></A>==</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373126"></A>equality test</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373128"></A>!=</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373130"></A>non-equality test</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373132"></A>&lt;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373134"></A>less than</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373136"></A>&gt;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373138"></A>greater than</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373140"></A>&lt;=</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373142"></A>less than or equal to</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373144"></A>&gt;=</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373146"></A>greater than or equal to</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373148"></A>&amp;&amp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373150"></A>logical and</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373152"></A>||</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373154"></A>logical or</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378429"></A>!</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378431"></A>logical not</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378487"></A>if condition then <CODE>
+action_true</CODE>
+ else <CODE>
+action_false</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378489"></A>Evaluates to <CODE>
+action_true</CODE>
+ if condition is true, else evaluates to <CODE>
+action_false</CODE>
+</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422056_pgfId-378034"></A>	24.2.1 	Order of precedence </H3>
+<P>
+<A NAME="50422056_pgfId-378036"></A>Operators have the following order of precedence:</P>
+<P>
+<A NAME="50422056_pgfId-380608"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380169"></A>Operators</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380171"></A>!, - (unary negation)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380173"></A>^</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380175"></A>*, /</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380177"></A>+, - (subtraction)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380179"></A>&lt; ,&gt; , &lt;=, &gt;=</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380181"></A>==, !=</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380183"></A>&amp;&amp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380185"></A>||</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-380333"></A>Any other operator</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422056_pgfId-380076"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422056_pgfId-380638"></A>Note: Operators listed higher in the table have higher precedence.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422056_pgfId-378052"></A>Operators of equal precedence such as multiplication and division are evaluated from left to right. Parentheses may be used to force the ordering of the mathematical operations.</P>
+<P>
+<A NAME="50422056_pgfId-378054"></A>For example:</P>
+<UL>
+<LI>
+<A NAME="50422056_pgfId-378055"></A>4/2*5 evaluates to 10</LI>
+<LI>
+<A NAME="50422056_pgfId-378056"></A>4*2/5 evaluates to 1.6</LI>
+<LI>
+<A NAME="50422056_pgfId-378057"></A>4/2/5 evaluates to 0.4</LI>
+<LI>
+<A NAME="50422056_pgfId-378058"></A>4/(2*5) evaluates to 0.4</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422056_pgfId-385082"></A>	24.2.2 	Contents of an expression </H3>
+<P>
+<A NAME="50422056_pgfId-385140"></A>An expression string forms a mathematical formula consisting of identifiers combined by operators and functions. Identifiers may be:</P>
+<UL>
+<LI>
+<A NAME="50422056_pgfId-385349"></A>the names of sub-expressions and constants defined in the <A HREF=../headers/pk_expr_sf_t.html>PK_EXPR_sf_t</A>. These are defined by the application.</LI>
+<LI>
+<A NAME="50422056_pgfId-385515"></A>the names of variable parameters specific to the context in which the expression is being used. These will be documented in the PK function using <A HREF=../headers/pk_expr_sf_t.html>PK_EXPR_sf_t</A>.</LI>
+</UL>
+<P>
+<A NAME="50422056_pgfId-385740"></A>An object referred to by an identifier, received or returned by a function can be of type bool, integer, real, vector, or PK_ENTITY or any of its sub-classes. The form of a vector is an array of three reals.</P>
+<P>
+<A NAME="50422056_pgfId-386046"></A>The operators are mathematical or logical and the functions are mathematical or geometric as illustrated in the following expression string example:</P>
+<P>
+<A NAME="50422056_pgfId-386218"></A>position + c_offset_dist * pkx_normal(c_surf, sbx_projection)</P>
+<UL>
+<LI>
+<A NAME="50422056_pgfId-386264"></A>position would be a vector variable defined by the PK function</LI>
+<LI>
+<A NAME="50422056_pgfId-386349"></A>c_offset_dist and c_surf would be names of constants</LI>
+<LI>
+<A NAME="50422056_pgfId-386415"></A>sbx_projection would be the name of a sub-expression</LI>
+<LI>
+<A NAME="50422056_pgfId-386475"></A>+, * are mathematical operators</LI>
+<LI>
+<A NAME="50422056_pgfId-386519"></A>pkx_normal is a geometric function</LI>
+</UL>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422056_pgfId-372759"></A>24.3	Maths functions 
+
+
+</H1>
+
+<H3>
+<A NAME="50422056_pgfId-373315"></A>	24.3.1 	Functions that return a constant </H3>
+<P>
+<A NAME="50422056_pgfId-373294"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373259"></A>Return type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373261"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373263"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373265"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373267"></A>pi()</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-373269"></A>Returns pi</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422056_pgfId-373204"></A>	24.3.2 	Single-variable functions </H3>
+<P>
+<A NAME="50422056_pgfId-375198"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375033"></A>Return type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375035"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375037"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375039"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375041"></A>abs (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375043"></A>Returns absolute value of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375051"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375053"></A>acos (real x) </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375055"></A>Returns inverse cosine of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384266"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384268"></A>acosh (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384270"></A>Returns inverse hyperbolic cosine of x</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375057"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375059"></A>asin (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375061"></A>Returns inverse sine of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384332"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384334"></A>asinh (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384336"></A>Returns inverse hyperbolic sine of x</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375063"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375065"></A>atan (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375067"></A>Returns inverse tangent of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384214"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384216"></A>atanh (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384218"></A>Returns inverse hyperbolic tangent of x</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384672"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384674"></A>base_angle (real x) </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384676"></A>Returns x shifted to the base period [0,2pi).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375069"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375071"></A>ceiling (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375073"></A>Returns immediately greater integer to x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375075"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375077"></A>cos (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375079"></A>Returns cosine of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384555"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384557"></A>cosh (real x))</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384559"></A>Returns hyperbolic cosine of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384302"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384304"></A>degrees (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384306"></A>Convert radians to degrees.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375081"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375083"></A>exp (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375085"></A>Returns natural exponent of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375087"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375089"></A>floor (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375091"></A>Returns immediately lower integer to x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384744"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384746"></A>length (vector v)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384748"></A>Returns the magnitude of the supplied vector v.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375111"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375113"></A>log (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375115"></A>Returns natural logarithm of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375117"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375119"></A>log10 (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375121"></A>Returns logarithm base 10 of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384790"></A>vector</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384792"></A>normalise (vector v)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384794"></A>Returns a unit vector parallel to v, of the zero vector if v has zero magnitude.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375135"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375137"></A>radians (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375139"></A>Convert degrees to radians.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375141"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375143"></A>round (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375145"></A>Returns x rounded to nearest integer.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375147"></A>integer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375149"></A>sign (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375151"></A>Returns sign of x as -1 if negative, +1 if positive, or 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375159"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375161"></A>sin (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375163"></A>Returns sine of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384684"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384686"></A>sinh (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384688"></A>Returns hyperbolic sine of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375165"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375167"></A>sqrt (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375169"></A>Returns square root of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384700"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384702"></A>tan (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384704"></A>Returns tangent of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384630"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384632"></A>tanh (real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384634"></A>Returns hyperbolic tangent of x.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422056_pgfId-373522"></A>	24.3.3 	Two-variable functions </H3>
+<P>
+<A NAME="50422056_pgfId-375593"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375520"></A>Return type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375522"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375524"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375526"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375528"></A>atan2 (real y, real x)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375530"></A>Returns angle of (x,y) turned from +x axis.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375538"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375540"></A>ceiling (real x, real y)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375542"></A>Returns x rounded up to the nearest integer multiple of y.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384896"></A>real </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384898"></A>dot (vector v0, vector v1)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384900"></A>Returns the dot product (v0 . v1).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384848"></A>real </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384850"></A>element (vector v, integer index)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384852"></A>Returns the index-th component of the supplied vector v. The index must be 1, 2 or 3.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375550"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375552"></A>floor (real x, real y)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375554"></A>Returns x rounded down to the nearest integer multiple of y.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375562"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375564"></A>mod (real x, real y)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375566"></A>Returns x modulo y.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384944"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384946"></A>nthroot (real x, real y)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-384948"></A>Returns the y-th root of x.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375568"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375570"></A>round (real x, real y)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375572"></A>Returns x rounded the nearest integer multiple of y.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422056_pgfId-373493"></A>	24.3.4 	Variadic functions </H3>
+<P>
+<A NAME="50422056_pgfId-375846"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375849"></A>Return type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375851"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375853"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375855"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375857"></A>avg (real x0, ... )</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375859"></A>Returns mean average of the supplied arguments.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375867"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375869"></A>max (real x0, ... )</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375871"></A>Returns maximum of the supplied arguments.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375879"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375881"></A>min (real x0, ... )</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375883"></A>Returns minimum of the supplied arguments.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375891"></A>vector</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375893"></A>vector (real x, real y, real z) </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-375895"></A>Creates a vector value.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422056_pgfId-372731"></A>24.4	Modelling functions 
+
+
+</H1>
+<P>
+<A NAME="50422056_pgfId-372931"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-372896"></A>Return type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-372898"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-372900"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386648"></A>real</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386650"></A>pkx_arc_length</P>
+<P>
+<A NAME="50422056_pgfId-386651"></A>(<A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A> entity, vector start, vector end)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386653"></A>Evaluates the arc length of an edge or curve between the supplied start and end positions.The entity may be an edge or curve.The start and end must lie on the curve.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386718"></A>vector</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386720"></A>pkx_closest_position</P>
+<P>
+<A NAME="50422056_pgfId-386721"></A>(<A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A> entity, vector position)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386723"></A>Finds the global minimum separation between the supplied entity and position. The function returns a point on the entity that is the minimum separation distance from the position. The entity may be a body, face, edge, fin, vertex, surface, curve, or point.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-372902"></A>vector </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-372904"></A>pkx_normal</P>
+<P>
+<A NAME="50422056_pgfId-376260"></A>(<A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A> entity, vector position, bool <CODE>
+is_parameters</CODE>
+ = false)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-381801"></A>Evaluates the normal on a face or surface, at the supplied position.The entity may be a face or surface. If the entity is a face, the function evaluates on the face's surface, taking into account the face orientation. If the optional argument <CODE>
+is_parameters</CODE>
+ is set to false (the default), then the position is a three space point, which must lie on the surface. If <CODE>
+is_parameters</CODE>
+ is set to true, then the position will be interpreted as u and v parameters on the surface, supplied as the first and second components of the vector respectively.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386697"></A>vector</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386699"></A>pkx_parameters</P>
+<P>
+<A NAME="50422056_pgfId-386700"></A>(<A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A> geom, vector position)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386702"></A>Finds the parameter(s) of the supplied position on a curve or surface.The geom may be a curve or surface. For a curve, the parameter t is returned as the vector (t, 0, 0). For a surface, the parameters u and v are returned as the vector (u, v, 0).The position must lie on the curve or surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386669"></A>vector </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386671"></A>pkx_position</P>
+<P>
+<A NAME="50422056_pgfId-386672"></A>(<A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A> geom, vector parameters)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-386674"></A>Evaluates a point on the curve or surface, at the supplied parameters.The geom may be a curve or surface. For a curve, the parameter should be supplied as the first component of the parameters vector. For a surface, the u and v parameters should be supplied as the first and second components of the parameters vector respectively.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-388367"></A>vector</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-388369"></A>pkx_tangent</P>
+<P>
+<A NAME="50422056_pgfId-388410"></A>(<A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A> entity, vector position, bool <CODE>
+is_parameters</CODE>
+ = false</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-388452"></A>Evaluates the tangent on an edge, fin or curve, at the supplied position The entity may be an edge, fin or curve. If the entity is an edge or fin, the function evaluates on the edge's or fin's geometry, taking into account the edge or fin orientation. If the optional argument <CODE>
+is_parameters</CODE>
+ is set to false (the default), then the position is a three space point, which must lie on the curve. If <CODE>
+is_parameters</CODE>
+ is set to true, then the position will be interpreted as the parameter on the curve, supplied as the first component of the vector</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422056_pgfId-378746"></A>24.5	Examples 
+
+
+</H1>
+<P>
+<A NAME="50422056_pgfId-378844"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378781"></A>Expression string</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378783"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378785"></A>abs(-3.0)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378787"></A>Returns the absolute value of -3.0, i.e., 3.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378789"></A>min(3,7,1,9,14)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378791"></A>Returns the minimum of the supplied values, i.e, 1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378793"></A>if x&gt;0 then sin(x) else 0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-378795"></A>Returns sin(x) for positive x, else returns 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-379182"></A>position + 0.1*pkx_normal(face, position)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-379184"></A>Offsets the supplied position by a distance 0.1 in the direction of the face normal at the position</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422056_pgfId-378068"></A>An example involving sub-expressions and constants is as follows:</P>
+<P>
+<A NAME="50422056_pgfId-379494"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-379475"></A>Expression </P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-379477"></A>Expression string</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-379479"></A>Root expression</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-379481"></A>position + c_offset_dist * pkx_normal(c_s0, sbx_projection)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-379483"></A>sbx_projection</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422056_pgfId-379485"></A>pkx_closest_position(c_s0, position)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422056_pgfId-378074"></A>This example expression offsets the position by a distance c_offset_dist in the direction of the normal of the surface with tag c_s0 at the point sbx_projection. sbx_projection is the closest point on the surface to the position. In this example, c_s0 and c_offset_dist are supplied as constants in the <A HREF=../headers/pk_expr_sf_t.html>PK_EXPR_sf_t</A> standard form. </P>
+<P>
+<A NAME="50422056_pgfId-372719"></A>&nbsp;</P>
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.024.html">Reading and Writing Parasolid Data</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.026.html">Introduction To Model Interrogation </A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -84,8 +84,8 @@ pub(crate) fn build_frustrum(config: &FrustrumConfig) -> PK_SESSION_frustrum_t {
 
     PK_SESSION_frustrum_t {
         fstart: Some(default_fstart),
+        fabort: Some(default_fabort),
         fstop: Some(default_fstop),
-        fabort: None,
         ftmkey: None,
         ffoprd: Some(default_ffoprd),
         ffopwr: Some(default_ffopwr),
@@ -97,6 +97,21 @@ pub(crate) fn build_frustrum(config: &FrustrumConfig) -> PK_SESSION_frustrum_t {
         goopsg: None,
         gosgmt: None,
         goclsg: None,
+        fgcrcu: None,
+        fgevcu: None,
+        fgprcu: None,
+        fgcrsu: None,
+        fgevsu: None,
+        fgprsu: None,
+        ffoprb: None,
+        ffseek: None,
+        fftell: None,
+        ffskxt: None,
+        ucoprd: None,
+        ucopwr: None,
+        gooppx: None,
+        gopixl: None,
+        goclpx: None,
     }
 }
 
@@ -136,10 +151,17 @@ fn guise_extension(guise: c_int) -> &'static str {
 // =============================================================================
 
 unsafe extern "C" fn default_fstart(ifail: *mut c_int) {
+    eprintln!("[frustrum] FSTART called");
     unsafe { *ifail = 0 };
 }
 
+unsafe extern "C" fn default_fabort(ifail: *const c_int) {
+    let code = unsafe { *ifail };
+    eprintln!("[frustrum] FABORT called with error code: {code} (0x{code:x})");
+}
+
 unsafe extern "C" fn default_fstop(ifail: *mut c_int) {
+    eprintln!("[frustrum] FSTOP called");
     // Close all open streams
     if let Ok(mut table) = STREAM_TABLE.lock() {
         table.clear();
@@ -158,6 +180,7 @@ unsafe extern "C" fn default_fmallo(
 ) {
     let result = catch_unwind(AssertUnwindSafe(|| unsafe {
         let size = *nbytes as usize;
+        eprintln!("[frustrum] FMALLO called: size={size}");
         if size == 0 {
             *memory = std::ptr::null_mut();
             *ifail = 0;
@@ -167,6 +190,7 @@ unsafe extern "C" fn default_fmallo(
             .expect("invalid allocation layout");
         let ptr = std::alloc::alloc_zeroed(layout);
         if ptr.is_null() {
+            eprintln!("[frustrum] FMALLO: alloc FAILED for {size} bytes");
             *ifail = 1;
         } else {
             *memory = ptr as *mut c_char;
@@ -174,6 +198,7 @@ unsafe extern "C" fn default_fmallo(
         }
     }));
     if result.is_err() {
+        eprintln!("[frustrum] FMALLO: PANIC caught");
         unsafe { *ifail = 1 };
     }
 }

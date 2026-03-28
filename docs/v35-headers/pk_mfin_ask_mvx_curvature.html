@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_MFIN_ask_mvx_curvature</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MFIN_ask_mvx_curvature</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_MFIN_ask_mvx_curvature
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_mfin_t.html>PK_MFIN_t</A>                            mfin,                  --- the <B>'mfin'</B>
+const <A HREF=../headers/pk_mfin_ask_mvx_curvature_o_t.html>PK_MFIN_ask_mvx_curvature_o_t</A> *options,               --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>                  *const mvx_normal,            --- mvertex normal
+<A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>                  *const principal_direction_1, --- principal
+                                                            --- direction 1
+<A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>                  *const principal_direction_2, --- principal
+                                                            --- direction 2
+double                        *const principal_curvature_1, --- principal
+                                                            --- curvature 1
+double                        *const principal_curvature_2  --- principal
+                                                            --- curvature 2
+
+)
+</B>
+<A NAME="description"></A>
+<I>This function calculates the normal, principal directions and curvatures
+associated with the mvertex of the given <B>'mfin'</B>.  Where the mvertex of the
+<B>'mfin'</B> has multiple normals, only the normal, principal directions and
+curvatures associated with the given <B>'mfin'</B> will be returned.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_eval_failure   It was not possible to obtain the <B>'mvx_normal'</B> or
+                            the curvatures. (MILD)
+
+<A NAME="documentation"></A>
+The mvertex normal and principal directions are returned as unit vectors.
+
+If the principal curvatures are equal (in both sign and magnitude) then the
+principal directions are not significant.
+
+Maximum and minimum curvatures are returned as the principal curvature values.
+The principal curvature with the smaller absolute value is always returned as
+<B>'principal_curvature_1'</B>, irrespective of whether it represents the maximum or
+minimum curvature.  Likewise the principal curvature with the larger absolute
+value is returned as <B>'principal_curvature_2'</B>.
+
+If the mvertex of the <B>'mfin'</B> has a unique normal the sign of the curvature is
+positive if the mesh curves away from the <B>'mvx_normal'</B> direction.
+
+If the mvertex of the <B>'mfin'</B> has multiple normals the sign of the curvature is
+positive if the facets with fins at the mvertex which share the <B>'mvx_normal'</B>
+curve away from the <B>'mvx_normal'</B> direction.
+
+If the mvertex of the <B>'mfin'</B> has a unique normal and the principal curvatures
+are not equal, the mvx_normal, principal directions and curvatures returned by
+this function will be the same as those returned by <A HREF=../headers/pk_surf_eval_curvature.html>PK_SURF_eval_curvature</A> at
+parameters associated with the mvertex of the given <B>'mfin'</B>.  If the principal
+curvatures are equal then the mvx_normal and principal curvatures will be the
+same as those returned by <A HREF=../headers/pk_surf_eval_curvature.html>PK_SURF_eval_curvature</A> but the principal directions
+may differ.
+
+If the mvertex of the <B>'mfin'</B> has multiple normals, each of these will be
+associated with a subset of the mfins at the mvertex.  In this case there will
+also be multiple principal directions and curvatures associated with the
+mvertex and each set of mfins which share a normal will also share principal
+directions and curvatures.  This function will return the mvertex normal,
+principal directions and principal curvatures for the subset containing the
+given <B>'mfin'</B>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

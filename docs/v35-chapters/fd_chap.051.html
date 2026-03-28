@@ -1,0 +1,2910 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Imprinting and Curve Projection</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Imprinting and Curve Projection</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.050.html">Introduction To Imprinting and Booleans</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.052.html">Introduction to Booleans</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-566571">50.1	 Introduction </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-560884">50.2	Curve projection and imprinting </A>
+<UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-362382">50.2.1	Received arguments </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-544733">50.2.2	Returned arguments </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-546147">50.2.3	Update control </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-544749">50.2.4	Project or imprint curves </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-513588">50.2.5	Summary of options </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-545534">50.2.6	Choosing the projection method for the curve </A>
+<UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-1101079">50.2.6.1	Normal projection </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-1100979">50.2.6.2	Vector projection </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-1101032">50.2.6.3	Perspective projection </A>
+</UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-556522">50.2.7	Limiting the distance of the projection </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-362580">50.2.8	Projecting to hidden faces </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-362653">50.2.9	Connecting disjoint components </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-523953">50.2.10	Splitting output curves </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-362820">50.2.11	Projecting curves to points </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-508152">50.2.12	Setting precision of imprints </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-508202">50.2.13	Attaching nominal geometry </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-508251">50.2.14	Completing imprints </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-851026">50.2.15	Limiting the distance of imprint completion </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-643962">50.2.16	Tracking information </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-942276">50.2.17	Reporting function results </A>
+</UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-732883">50.3	Direct imprinting </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-624322">50.4	Boolean imprinting </A>
+<UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-526689">50.4.1	Imprinting </A>
+<UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-526837">50.4.1.1	Completing imprints </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-526914">50.4.1.2	Adding extra faces to face-imprints </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-527411">50.4.1.3	Ensuring imprinted edges have consistent direction </A>
+</UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-527466">50.4.2	Identifying face sets </A>
+</UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-517356">50.5	Legacy curve imprinting </A>
+<UL>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-549574">50.5.1	Connecting disjoint components of an imprint </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-295211">50.5.2	Imprinting in both directions at once </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-295227">50.5.3	Dealing with faces that obscure the imprint </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-295393">50.5.4	Dealing with curves that intersect within the view direction </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-295513">50.5.5	Restricting imprints to nearby faces </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-295712">50.5.6	Imprint completion </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-296271">50.5.7	Controlling how curves are imprinted along a vector </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-296299">50.5.8	Controlling continuity when imprinting along face normals </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-296323">50.5.9	Tracking information for imprint functions </A>
+<LI> <A HREF="fd_chap.051.html#50422124_pgfId-296688">50.5.10	Imprinting vertices </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422124_pgfId-566571"></A>50.1	 Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422124_pgfId-566575"></A>You can use Parasolid’s imprinting or projection functionality to imprint or project entities onto a body, sheet, surface or a set of faces. This chapter describes this functionality using:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-559995"></A><A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A>, see <A HREF="fd_chap.051.html#50422124_19654">Section 50.2, “Curve projection and imprinting”</A>, for more information.</LI>
+<LI>
+<A NAME="50422124_pgfId-732685"></A><A HREF=../headers/pk_face_imprint_curves_2.html>PK_FACE_imprint_curves_2</A>, see <A HREF="fd_chap.051.html#50422124_86613">Section 50.3, “Direct imprinting”</A>, for more information.</LI>
+<LI>
+<A NAME="50422124_pgfId-560322"></A>Boolean tools, see <A HREF="fd_chap.051.html#50422124_34334">Section 50.4, “Boolean imprinting”</A>, for more information.</LI>
+<LI>
+<A NAME="50422124_pgfId-560375"></A>Other imprinting functions, see <A HREF="fd_chap.051.html#50422124_68678">Section 50.5, “Legacy curve imprinting”</A>, for more information.</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-785942"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-746753"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-746736"></A><A HREF="fd_chap.037.html#50422108_">Chapter 36, “Creating Profiles”</A></LI>
+<LI>
+<A NAME="50422124_pgfId-746772"></A><A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422124_pgfId-560884"></A>50.2	<A NAME="50422124_19654"></A>Curve projection and imprinting 
+
+
+</H1>
+<P>
+<A NAME="50422124_pgfId-559656"></A>You can use <A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A> for normal and vector projection or imprinting of a set of curves to a body, surface or a set of faces. A projection down the face normal is performed, unless a vector is supplied, in which case a projection in a vector direction is performed. The resultant projected curves and points are either orphan or construction geometry.</P>
+<P>
+<A NAME="50422124_pgfId-722398"></A>For examples of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Projecting</CODE>
+ <CODE>
+Curves</CODE>
+ <CODE>
+and</CODE>
+ <CODE>
+Imprinting </CODE>
+folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422124_pgfId-998659"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-998658"></A>Note: Projection down the face normal is intended for use with close curves that are related in some way to the body or faces onto which they are being projected. Furthermore, it is recommended that you set <CODE>
+max_projection_dist</CODE>
+ to avoid inconsistent results.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422124_pgfId-362382"></A>	50.2.1 	<A NAME="50422124_32726"></A>Received arguments </H3>
+<P>
+<A NAME="50422124_pgfId-362383"></A><A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A> receives the following arguments:</P>
+<P>
+<A NAME="50422124_pgfId-544732"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544702"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544704"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544706"></A><CODE>
+n_curves</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544708"></A>The number of tool curves</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544710"></A><CODE>
+curves</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544712"></A>An array describing the tool curves. It cannot contain self-intersecting curves or foreign geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544714"></A><CODE>
+intervals</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544716"></A>An array describing the curve intervals</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544718"></A><CODE>
+n_targets</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544720"></A>The number of target entities</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544722"></A><CODE>
+targets</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544724"></A>An array describing the target entities</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544726"></A><CODE>
+options</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544728"></A>A set of options to control the results of the curve projection or imprint. See <A HREF="fd_chap.051.html#50422124_67042">Section 50.2.5, “Summary of options”</A>, for an introduction to these options.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-544733"></A>	50.2.2 	Returned arguments </H3>
+<P>
+<A NAME="50422124_pgfId-544734"></A><A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A> returns the following arguments:</P>
+<P>
+<A NAME="50422124_pgfId-362432"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362421"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362423"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362425"></A><CODE>
+results</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362427"></A>The resultant projected geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362429"></A><CODE>
+tracking</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362431"></A>Tracking information for the operation. See <A HREF="fd_chap.051.html#50422124_54067">Section 50.2.16, “Tracking information”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-546147"></A>	50.2.3 	<A NAME="50422124_76135"></A>Update control </H3>
+<P>
+<A NAME="50422124_pgfId-546151"></A>If your application relies on reproducing behaviour when updating models built using earlier versions of Parasolid, you can use the <CODE>
+update</CODE>
+ option to preserve old behaviour and help eliminate differences in rebuild results. This option lets you turn off some of the projecting enhancements that have been added at different Parasolid versions. Doing this ensures that curve projection gives the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_proj_update_t.html>PK_proj_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<P>
+<A NAME="50422124_pgfId-603281"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-603280"></A>Note: The default value is <A HREF=../headers/pk_proj_update_t.html>PK_proj_update_default_c</A> which uses all appropriate projecting enhancements. Setting to a non-default value disables all appropriate projecting enhancements.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-544749"></A>	50.2.4 	<A NAME="50422124_85368"></A>Project or imprint curves </H3>
+<P>
+<A NAME="50422124_pgfId-544750"></A>You can choose to only project curves, only imprint curves or to project and imprint curves using the <CODE>
+function</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-544768"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544753"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544755"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544757"></A><A HREF=../headers/pk_proj_function_t.html>PK_proj_function_project_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544759"></A>The input curves are projected onto the target producing new geometry. This new geometry can be returned as orphan geometry or associated with the body as construction geometry. The target topology and input curves are unaffected. This is the default value.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544761"></A><A HREF=../headers/pk_proj_function_t.html>PK_proj_function_imprint_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544763"></A>The input curves are projected onto the target and then imprinted producing new edges and vertices. No orphan or construction geometry is produced and the input curves are unaffected.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544765"></A><A HREF=../headers/pk_proj_function_t.html>PK_proj_function_both_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-544767"></A>This combines the behaviour of <A HREF=../headers/pk_proj_function_t.html>PK_proj_function_project_c</A> and <A HREF=../headers/pk_proj_function_t.html>PK_proj_function_imprint_c</A>. Projected geometry is created, and a copy is made, thereby creating two identical sets of projected geometry. One set is imprinted, and attached to the edges and vertices created by the imprint. The other set is attached to the body as orphan or construction geometry.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-544769"></A>Different options are available depending on what value of the <CODE>
+function</CODE>
+ option you choose. See <A HREF="fd_chap.051.html#50422124_67042">Section 50.2.5, “Summary of options”</A> for more information. </P>
+<P>
+<A NAME="50422124_pgfId-544776"></A><A HREF="fd_chap.051.html#50422124_13976"><EM>
+Figure 50-1</EM></A> illustrates the results of choosing different values of the <CODE>
+function</CODE>
+ option.</P>
+<P>
+<A NAME="50422124_pgfId-544811"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-496.gif">
+
+<P>
+<A NAME="50422124_pgfId-544813"></A>Figure 50-1 <A NAME="50422124_13976"></A>Choosing whether to project, imprint, or project and imprint input curves</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-513588"></A>	50.2.5 	<A NAME="50422124_67042"></A>Summary of options </H3>
+<P>
+<A NAME="50422124_pgfId-513589"></A>You can set a number of options when either projecting curves, imprinting curves or doing both operations simultaneously using the <A HREF=../headers/pk_curve_project_o_t.html>PK_CURVE_project_o_t</A> option structure. All options are available for all values of <CODE>
+function</CODE>
+ unless otherwise stated. This contains the following:</P>
+<P>
+<A NAME="50422124_pgfId-786635"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362438"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362440"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-555378"></A><CODE>
+function</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-555380"></A>Whether to perform projection only, imprint only, or both a projection and an imprint (Default: <A HREF=../headers/pk_proj_function_t.html>PK_proj_function_project_c</A>). See <A HREF="fd_chap.051.html#50422124_85368">Section 50.2.4, “Project or imprint curves”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-1099557"></A><CODE>
+method</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-1099559"></A>Whether to perform a normal, vector, or perspective projection. See <A HREF="fd_chap.051.html#50422124_53518">Section 50.2.6, “Choosing the projection method for the curve”</A>, for more information. Default: <A HREF=../headers/pk_proj_method_t.html>PK_proj_method_unset_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362449"></A><CODE>
+direction</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362453"></A>The direction of the vector projection of the curve when <CODE>
+method</CODE>
+ is set to <A HREF=../headers/pk_proj_method_t.html>PK_proj_method_vector_c</A>. See <A HREF="fd_chap.051.html#50422124_81139">Section 50.2.6, “Choosing the projection method for the curve”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-1099561"></A><CODE>
+eye_position</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-1099563"></A>If <CODE>
+method</CODE>
+ is <A HREF=../headers/pk_proj_method_t.html>PK_proj_method_perspective_c</A>, <CODE>
+eye_position</CODE>
+ specifies the position for the source of rays needed to define the perspective projection. See <A HREF="fd_chap.051.html#50422124_53518">Section 50.2.6, “Choosing the projection method for the curve”</A>, for more information. Default: (0.0 0.0 0.0)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362456"></A><CODE>
+bidirectional</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362458"></A>Whether the <CODE>
+direction</CODE>
+ of the vector projection is both positive and negative (Default: PK_LOGICAL_false). See <A HREF="fd_chap.051.html#50422124_81139">Section 50.2.6, “Choosing the projection method for the curve”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362463"></A><CODE>
+use_max_dist</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362465"></A>Whether to limit the curve projection to within <CODE>
+max_dist</CODE>
+ of the input curve (Default: <A HREF=../headers/pk_proj_max_dist_t.html>PK_proj_max_dist_no_c</A>). See <A HREF="fd_chap.051.html#50422124_63421">Section 50.2.7, “Limiting the distance of the projection”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362470"></A><CODE>
+max_dist</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362472"></A>The maximum distance of the curve projection from the input curve. The distance of a vector projection is measured along <CODE>
+direction</CODE>
+. See <A HREF="fd_chap.051.html#50422124_63421">Section 50.2.7, “Limiting the distance of the projection”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362477"></A><CODE>
+hidden</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362479"></A>How to project to hidden faces. (Default: <A HREF=../headers/pk_proj_face_hidden_t.html>PK_proj_face_hidden_body_c</A>). See <A HREF="fd_chap.051.html#50422124_96398">Section 50.2.8, “Projecting to hidden faces”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362484"></A><CODE>
+connect</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362486"></A>How to connect disjoint components of the projection.This option can only be used for vector projections to faces or bodies (Default: <A HREF=../headers/pk_proj_connect_t.html>PK_proj_connect_none_c</A>). See <A HREF="fd_chap.051.html#50422124_54392">Section 50.2.9, “Connecting disjoint components”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362491"></A><CODE>
+banned_classes</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362493"></A>An array of output curve classes that are not to be produced by the operation.This array cannot contain both PK_CLASS_bcurve and PK_CLASS_spcurve.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362495"></A><CODE>
+split_clash </CODE>
+(projecting only)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362497"></A>How to split the projected curves at clashes and intersections (Default: <A HREF=../headers/pk_proj_split_clash_t.html>PK_proj_split_clash_all_c</A>). See <A HREF="fd_chap.051.html#50422124_39825">Section 50.2.10, “Splitting output curves”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362502"></A><CODE>
+create_points</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362504"></A>How to project curves to points for point-like projections (Default: <A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_no_c</A>). See <A HREF="fd_chap.051.html#50422124_92861">Section 50.2.11, “Projecting curves to points”</A>, for more information.</P>
+<ADDRESS>
+<A NAME="50422124_pgfId-789565"></A>Note: When clashing the end-points of point-like projections, Parasolid considers the tolerance as applying to both ends which can lead to vertex tolerances (or achieved tolerances) that are up to twice the input <CODE>
+tolerance</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362509"></A><CODE>
+construction </CODE>
+(projecting or both)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362511"></A>Whether to add the projection as construction geometry. If the projection is to a surface or the option is set to PK_LOGICAL_false, orphan geometry is produced. This is in addition to nominal geomtery on tolerant edges controlled by the <CODE>
+nominal</CODE>
+ option (Default: PK_LOGICAL_true).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362513"></A><CODE>
+tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362515"></A>Controls the accuracy of resultant projected curves, where an accurate projection is not possible and conversion to a b-curve or SP-curve is necessary. Also used where conversion to a b-curve is requested (<CODE>
+banned_classes</CODE>
+ option), and in computing tolerant clashes (<CODE>
+split_clash</CODE>
+ option). All resultant curves will lie exactly in the surface into which they were projected unless <CODE>
+banned_classes</CODE>
+ forces conversion to B-curves, in which case the resulting B-curves will lie within operation tolerance of the surface (Default: 1.0e-6).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-506978"></A><CODE>
+imprint_precision</CODE>
+ (imprinting or both)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-506980"></A>Controls how the precision of the imprinted edges and vertices is applied (Default: <A HREF=../headers/pk_imprint_precision_t.html>PK_imprint_precision_auto_c</A>). See <A HREF="fd_chap.051.html#50422124_35140">Section 50.2.12, “Setting precision of imprints”</A>. for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-507553"></A><CODE>
+nominal</CODE>
+ (imprinting or both)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-507555"></A>Whether to attach projected curves to tolerant imprinted edges as nominal geometry. This is in addition to any geometry controlled by the <CODE>
+construction</CODE>
+ option (Default: <A HREF=../headers/pk_proj_nominal_t.html>PK_proj_nominal_no_c</A>.) See <A HREF="fd_chap.051.html#50422124_72577">Section 50.2.13, “Attaching nominal geometry”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-507760"></A><CODE>
+complete</CODE>
+ (imprinting or both)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-507762"></A>How to complete the imprinted edges (Default: <A HREF=../headers/pk_proj_complete_t.html>PK_proj_complete_no_c</A>). See <A HREF="fd_chap.051.html#50422124_39752">Section 50.2.14, “Completing imprints”</A>. for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-507888"></A><CODE>
+update</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-507890"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid (Default: <A HREF=../headers/pk_proj_update_t.html>PK_proj_update_default_c</A>). See <A HREF="fd_chap.051.html#50422124_76135">Section 50.2.3, “Update control”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-599876"></A><CODE>
+tracking</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-599878"></A>Controls the format of the tracking records (Default: <A HREF=../headers/pk_proj_tracking_t.html>PK_proj_tracking_basic_c</A>). See <A HREF="fd_chap.051.html#50422124_54067">Section 50.2.16, “Tracking information”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-941707"></A><CODE>
+results_output</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-941709"></A>Whether to output results in the return structure or in the Parasolid Report. (Default: <A HREF=../headers/pk_results_output_t.html>PK_results_output_return_c</A>). See <A HREF="fd_chap.051.html#50422124_28862">Section 50.2.17, “Reporting function results”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-941727"></A><CODE>
+want_orig_intervals</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-941729"></A>Whether to return the originating intervals for each projection in the Parasolid Report. (Default: PK_LOGICAL_false). See <A HREF="fd_chap.051.html#50422124_28862">Section 50.2.17, “Reporting function results”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-545534"></A>	50.2.6 	<A NAME="50422124_53518"></A><A NAME="50422124_81139"></A>Choosing the projection method for the curve </H3>
+<P>
+<A NAME="50422124_pgfId-362519"></A>The <CODE>
+method</CODE>
+ option allows you to choose whether to project a curve using a normal, vector, or perspective projection. All of these options are discussed in this section.</P>
+<P>
+<A NAME="50422124_pgfId-1100759"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-1100839"></A>Note: We recommend that you do not leave the <CODE>
+method</CODE>
+ option set to the default value.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422124_pgfId-1101079"></A>50.2.6.1 Normal projection </H4>
+<P>
+<A NAME="50422124_pgfId-1142417"></A>To produce a normal projection, where a curve is projected down the normal of a face, the <CODE>
+method</CODE>
+ option must be set to <A HREF=../headers/pk_proj_method_t.html>PK_proj_method_normal_c</A>. </P>
+<P>
+<A NAME="50422124_pgfId-1146390"></A>Although normal projections are performed down the face normal, they are also implicitly bidirectional. Therefore, if the projection curves are within the normal field of the face but lie behind it, they will project onto the target. Normal projections are best used when projecting curves that are close to and related to the faces that they are being projected onto. When performing a normal projection, we recommend that you limit the maximum distance to avoid unexpected projections on distant faces. See <A HREF="fd_chap.051.html#50422124_63421">Section 50.2.7, “Limiting the distance of the projection”</A> for more information on maximum distance.</P>
+<P>
+<A NAME="50422124_pgfId-1103783"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-497.gif">
+
+<P>
+<A NAME="50422124_pgfId-1103760"></A>Figure 50-2 Normal projection</P>
+
+
+<H4>
+<A NAME="50422124_pgfId-1100979"></A>50.2.6.2 Vector projection </H4>
+<P>
+<A NAME="50422124_pgfId-919402"></A>To produce a vector projection, where a given point on the curve is projected from the curve in the direction specified by <CODE>
+direction</CODE>
+, the <CODE>
+method</CODE>
+ option must be set to <A HREF=../headers/pk_proj_method_t.html>PK_proj_method_vector_c</A>. </P>
+<P>
+<A NAME="50422124_pgfId-1101147"></A>For vector projections, <CODE>
+bidirectional</CODE>
+ allows you to project curves in the positive and negative <CODE>
+direction</CODE>
+. <A HREF="fd_chap.051.html#50422124_59947"><EM>
+Figure 50-3</EM></A> shows an upward vector projection of a curve onto a body.</P>
+<P>
+<A NAME="50422124_pgfId-556518"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-498.gif">
+
+<P>
+<A NAME="50422124_pgfId-558787"></A>Figure 50-3 <A NAME="50422124_59947"></A>Curve projection using the <CODE>
+bidirectional</CODE>
+ option.</P>
+
+
+<H4>
+<A NAME="50422124_pgfId-1101032"></A>50.2.6.3 Perspective projection </H4>
+<P>
+<A NAME="50422124_pgfId-1101423"></A>To produce a perspective projection, where a curve is projected along a ray away from a given eye point onto a target, the <CODE>
+method</CODE>
+ option must be set to <A HREF=../headers/pk_proj_method_t.html>PK_proj_method_perspective_c</A>. The origin of the projection is specified by <CODE>
+eye_position</CODE>
+. This is illustrated in <A HREF="fd_chap.051.html#50422124_33839"><EM>
+Figure 50-4</EM></A>.</P>
+<P>
+<A NAME="50422124_pgfId-1102100"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-499.gif">
+
+<P>
+<A NAME="50422124_pgfId-1101944"></A>Figure 50-4 <A NAME="50422124_33839"></A>Perspective projection</P>
+
+
+
+<H3>
+<A NAME="50422124_pgfId-556522"></A>	50.2.7 	<A NAME="50422124_63421"></A>Limiting the distance of the projection </H3>
+<P>
+<A NAME="50422124_pgfId-362564"></A>You can limit the distance of the projection from the input curve using the <CODE>
+use_max_dist</CODE>
+ and <CODE>
+max_dist</CODE>
+ options. The <CODE>
+use_max_dist</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-996356"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362567"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362569"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362571"></A><A HREF=../headers/pk_proj_max_dist_t.html>PK_proj_max_dist_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362573"></A>Ignore the projection distance between the curve projection and the input curve. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362575"></A><A HREF=../headers/pk_proj_max_dist_t.html>PK_proj_max_dist_whole_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362577"></A>For each input curve, only produce projections which lie fully within the specified <CODE>
+max_dist</CODE>
+ of its originating curve. If a projection is only partially within this distance, no projection curve is produced.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-996401"></A>If <CODE>
+use_max_dist</CODE>
+ is set to a non-default value, the value of <CODE>
+max_dist</CODE>
+ must be greater than zero.</P>
+<P>
+<A NAME="50422124_pgfId-362578"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-975472"></A>Note: This option does not support vector projections to surfaces.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-362580"></A>	50.2.8 	<A NAME="50422124_96398"></A>Projecting to hidden faces </H3>
+<P>
+<A NAME="50422124_pgfId-362581"></A>You can control how to project to hidden faces using the<CODE>
+ hidden</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-362599"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362584"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362586"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362588"></A><A HREF=../headers/pk_proj_face_hidden_t.html>PK_proj_face_hidden_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362590"></A>Faces cannot be hidden.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362592"></A><A HREF=../headers/pk_proj_face_hidden_t.html>PK_proj_face_hidden_array_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362594"></A>Faces can be hidden by faces in the input array</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362596"></A><A HREF=../headers/pk_proj_face_hidden_t.html>PK_proj_face_hidden_body_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362598"></A>Faces can be hidden by the parent body.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-362603"></A><A HREF="fd_chap.051.html#50422124_46266"><EM>
+Figure 50-5</EM></A> shows three cases of a downward vector projection of a curve onto a body. </P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-362604"></A>If you supply three faces as input faces and set <A HREF=../headers/pk_proj_face_hidden_t.html>PK_proj_face_hidden_no_c</A>, all faces are projected to. </LI>
+<LI>
+<A NAME="50422124_pgfId-362605"></A>If you supply three faces and set <A HREF=../headers/pk_proj_face_hidden_t.html>PK_proj_face_hidden_array_c</A>, one face is fully projected to and part of a second face that is not hidden by either of the other two faces is also projected to. </LI>
+<LI>
+<A NAME="50422124_pgfId-362606"></A>If you supply three faces and set <A HREF=../headers/pk_proj_face_hidden_t.html>PK_proj_face_hidden_body_c</A>, one face is fully projected to and part of a second face that is not hidden by any of the faces of the body. </LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-362645"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-500.gif">
+
+<P>
+<A NAME="50422124_pgfId-558906"></A>Figure 50-5 <A NAME="50422124_46266"></A>Vector projection of a curve using <CODE>
+hidden </CODE>
+option</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-362653"></A>	50.2.9 	<A NAME="50422124_54392"></A>Connecting disjoint components </H3>
+<P>
+<A NAME="50422124_pgfId-362654"></A>You can control the connection of disjoint components of a curve projection using the <CODE>
+connect</CODE>
+ option. With this option, resultant curves that would otherwise have been disjointed can be connected. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-975025"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362657"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362659"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362661"></A><A HREF=../headers/pk_proj_connect_t.html>PK_proj_connect_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362663"></A>Do not connect disjoint projected curves,</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362665"></A><A HREF=../headers/pk_proj_connect_t.html>PK_proj_connect_side_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362667"></A>Connect, if possible, with projections on faces that are side on when viewed in the direction of the projection.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362669"></A><A HREF=../headers/pk_proj_connect_t.html>PK_proj_connect_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362671"></A>Connect with side and hidden faces if possible.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362673"></A><A HREF=../headers/pk_proj_connect_t.html>PK_proj_connect_side_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362675"></A>Project to all faces that are side on when viewed in the direction of the projection, even if they do not connect disjoint components of the projection.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362677"></A><A HREF=../headers/pk_proj_connect_t.html>PK_proj_connect_hidden_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362679"></A>Project to all faces that are side on or hidden when viewed from the direction of the projection, regardless of whether they connect disjoint components of the projection. </P>
+<ADDRESS>
+<A NAME="50422124_pgfId-975345"></A>Note: This value is not supported if <CODE>
+use_max_dist</CODE>
+ is set to <A HREF=../headers/pk_proj_max_dist_t.html>PK_proj_max_dist_whole_c</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-362680"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-975070"></A>Note: If <CODE>
+use_max_dist</CODE>
+ is set to <A HREF=../headers/pk_proj_max_dist_t.html>PK_proj_max_dist_whole_c</A>, all connect projections must lie entirely within the <CODE>
+max_dist</CODE>
+ of the input curve.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-362684"></A><A HREF="fd_chap.051.html#50422124_71508"><EM>
+Figure 50-6</EM></A> illustrates this option.</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-362685"></A>If you supply the whole body as the input body and use <A HREF=../headers/pk_proj_connect_t.html>PK_proj_connect_none_c</A>, the curve is projected onto two faces. </LI>
+<LI>
+<A NAME="50422124_pgfId-362686"></A>If you supply the whole body as the input body and use <A HREF=../headers/pk_proj_connect_t.html>PK_proj_connect_side_c</A>, the curve is projected onto all three faces. </LI>
+<LI>
+<A NAME="50422124_pgfId-362687"></A>If you supply a single side-on face from the sheet as the input body and use <A HREF=../headers/pk_proj_connect_t.html>PK_proj_connect_side_all_c</A>, the curve is projected onto the face.</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-362726"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-501.gif">
+
+<P>
+<A NAME="50422124_pgfId-558986"></A>Figure 50-6 <A NAME="50422124_71508"></A>Curve projection using the <CODE>
+connect</CODE>
+ option</P>
+<P>
+<A NAME="50422124_pgfId-523951"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-523950"></A>Note: This option can only be used for vector projection of curves to faces or bodies.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-523953"></A>	50.2.10 	<A NAME="50422124_39825"></A>Splitting output curves </H3>
+<P>
+<A NAME="50422124_pgfId-685081"></A>Projected curves are split at G1 discontinuities.You can control how they are further split at clashes and self-intersections with the <CODE>
+split_clash</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-362753"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362738"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362740"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362742"></A><A HREF=../headers/pk_proj_split_clash_t.html>PK_proj_split_clash_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362744"></A>Do not split the projected curves at clashes or self-intersections.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362746"></A><A HREF=../headers/pk_proj_split_clash_t.html>PK_proj_split_clash_self_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362748"></A>Only split individual projected curves at self-intersections.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362750"></A><A HREF=../headers/pk_proj_split_clash_t.html>PK_proj_split_clash_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362752"></A>Split projection curves if they are individually self-intersecting or if multiple projected curves intersect. This is the default.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-362757"></A><A HREF="fd_chap.051.html#50422124_11129"><EM>
+Figure 50-7</EM></A> shows a B-curve and a line as the two input curves being projected onto a body. These input curves clash and the resultant projection shows this clash. </P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-362758"></A>By setting <CODE>
+split_clash</CODE>
+ to <A HREF=../headers/pk_proj_split_clash_t.html>PK_proj_split_clash_no_c</A>, the projected curves are not split. </LI>
+<LI>
+<A NAME="50422124_pgfId-362759"></A>By setting <CODE>
+split_clash</CODE>
+ to <A HREF=../headers/pk_proj_split_clash_t.html>PK_proj_split_clash_self_c</A>, the projected B-curve is split at the point of self-intersection. </LI>
+<LI>
+<A NAME="50422124_pgfId-362760"></A>By setting <CODE>
+split_clash</CODE>
+ to <A HREF=../headers/pk_proj_split_clash_t.html>PK_proj_split_clash_all_c</A>, the projected B-curve is split at the point of self-intersection and the projected line curve and B-curve are both split where they clash with each other.</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-362795"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-502.gif">
+
+<P>
+<A NAME="50422124_pgfId-559057"></A>Figure 50-7 <A NAME="50422124_11129"></A>Curve projection using the <CODE>
+split_clash</CODE>
+ option</P>
+<P>
+<A NAME="50422124_pgfId-362801"></A>If no split occurs, a record of type <A HREF=../headers/pk_report_record_3_t.html>PK_REPORT_record_3_t</A> will be written to a Parasolid Report with the following status:</P>
+<P>
+<A NAME="50422124_pgfId-362811"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362804"></A>Status</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362806"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362808"></A><A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_proj_cu_split_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362810"></A>The record lists information on clashes of projected curves</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-362818"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A> for more information about the Parasolid Report mechanism.</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-362820"></A>	50.2.11 	<A NAME="50422124_92861"></A>Projecting curves to points </H3>
+<P>
+<A NAME="50422124_pgfId-362821"></A>You can control the projection of lines and linear B-curves to point-like projections using the <CODE>
+create_points</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-787561"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362824"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362826"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362828"></A><A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362830"></A>Do not create point projections, unless it is necessary for the validity of the model. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-760685"></A><A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_end_on_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-760687"></A>Create point projections and vertex imprints if the input line is a straight line that lies in the direction of the projection, or if it is necessary for the validity of the model.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362832"></A><A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_tol_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362834"></A>Create point projections and vertex imprints in all cases listed for <A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_end_on_c</A>,and additionally for all projected curves that are tolerantly point-like, with respect to operation and local topological tolerances.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362836"></A><A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-362838"></A>This value is deprecated and should not be used in new code. Use <A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_end_on_c</A> instead.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-362843"></A><A HREF="fd_chap.051.html#50422124_78232"><EM>
+Figure 50-8</EM></A> illustrates a point-like projection from a line that is vertically projected down onto a body. By setting the option to <A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_no_c</A>, no point-like projections are created. By setting <A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_end_on_c</A>, a point-like projection is created where the input line intersects the target face.</P>
+<P>
+<A NAME="50422124_pgfId-362878"></A><A NAME="50422124_97384"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-503.gif">
+
+<P>
+<A NAME="50422124_pgfId-559100"></A>Figure 50-8 <A NAME="50422124_78232"></A>Projecting a vertical line down onto a face to create a point-like projection</P>
+<P>
+<A NAME="50422124_pgfId-362884"></A><A HREF="fd_chap.051.html#50422124_57819"><EM>
+Figure 50-9</EM></A> shows three input lines that are projected down onto an input body. With the option set to <A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_no_c</A>, three edges are projected onto the body, one from each input line. With <A HREF=../headers/pk_proj_to_points_t.html>PK_proj_to_points_tol_c</A>, two edges and a point (tolerant vertex) are projected. This is because the projection of the red line is shorter than two times the tolerance passed into <A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A> and is therefore projected as a point. </P>
+<P>
+<A NAME="50422124_pgfId-362921"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-504.gif">
+
+<P>
+<A NAME="50422124_pgfId-559129"></A>Figure 50-9 <A NAME="50422124_57819"></A>Creating point and line projections from three lines</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-508152"></A>	50.2.12 	<A NAME="50422124_41242"></A><A NAME="50422124_35140"></A>Setting precision of imprints </H3>
+<P>
+<A NAME="50422124_pgfId-511079"></A>You can control how precision is applied to imprinted edges and vertices using the <CODE>
+imprint_precision</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-511136"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-511151"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-511153"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-511155"></A><A HREF=../headers/pk_imprint_precision_t.html>PK_imprint_precision_auto_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-511157"></A>Exact projections will result in accurate edges. Exact projections can occur in the following cases:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-652426"></A>analytic to analytic projections</LI>
+<LI>
+<A NAME="50422124_pgfId-652444"></A>input curves that are coincident with the target</LI>
+<LI>
+<A NAME="50422124_pgfId-652457"></A>B-curves that are projected onto planes</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-652470"></A>Where a tolerance was used to compute the projected curve (see <CODE>
+tolerance</CODE>
+ option) a precision equal to tolerance is applied to the corresponding edges and vertices resulting from the imprint of that curve. (Default) </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-511159"></A><A HREF=../headers/pk_imprint_precision_t.html>PK_imprint_precision_accurate_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-511161"></A>All new imprinted edges are accurate. Imprinted vertices may be tolerant if this is necessary to ensure chaining of successive imprinted edges.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-546576"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-546590"></A>Note: This option controls the precision of imprinted topology only. It does not affect the accuracy of projected geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-508202"></A>	50.2.13 	<A NAME="50422124_72577"></A>Attaching nominal geometry </H3>
+<P>
+<A NAME="50422124_pgfId-510554"></A>You can choose whether to attach the projected curves as nominal geometry using the <CODE>
+nominal</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-510611"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-510699"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-510701"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-510703"></A><A HREF=../headers/pk_proj_nominal_t.html>PK_proj_nominal_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-510705"></A>Attached projected curves to the tolerant imprinted edges as nominal geometry. If this value is set and nominal geometry is disabled for a body, an error will occur.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-510707"></A><A HREF=../headers/pk_proj_nominal_t.html>PK_proj_nominal_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-510709"></A>Do not attach the projected curves as nominal geometry. (Default)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-508251"></A>	50.2.14 	<A NAME="50422124_39752"></A>Completing imprints </H3>
+<P>
+<A NAME="50422124_pgfId-509331"></A>You can choose whether to complete an imprint such that the end vertices of the imprint lie on an edge of the body or face using the <CODE>
+complete</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-643960"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-675915"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-675917"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-675919"></A><A HREF=../headers/pk_proj_complete_t.html>PK_proj_complete_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-675921"></A>Do not complete the imprint. This is the default value.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-675923"></A><A HREF=../headers/pk_proj_complete_t.html>PK_proj_complete_edge_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-675925"></A>Complete the imprint and stop at the first edge encountered.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-675931"></A><A HREF=../headers/pk_proj_complete_t.html>PK_proj_complete_faceset_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-675933"></A>Complete the imprint and stop at the first laminar or boundary edge. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-679335"></A><A HREF="fd_chap.051.html#50422124_38327"><EM>
+Figure 50-10</EM></A> shows the effect of using the <CODE>
+complete</CODE>
+ option for <A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A>. For <A HREF=../headers/pk_proj_complete_t.html>PK_proj_complete_edge_c</A>, the edge is extended to the first edge encountered in each direction; for <A HREF=../headers/pk_proj_complete_t.html>PK_proj_complete_faceset_c</A>, the edge is extended to the first laminar or boundary edge in each direction. </P>
+<P>
+<A NAME="50422124_pgfId-678161"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-505.gif">
+
+<P>
+<A NAME="50422124_pgfId-678646"></A>Figure 50-10 <A NAME="50422124_38327"></A>Effect of the <CODE>
+complete</CODE>
+ option for <A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A></P>
+<P>
+<A NAME="50422124_pgfId-858320"></A>See <A HREF="fd_chap.051.html#50422124_71013">Section 50.2.15, “Limiting the distance of imprint completion”</A> for information on how to limit the distance of the imprint completion.</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-851026"></A>	50.2.15 	<A NAME="50422124_71013"></A>Limiting the distance of imprint completion </H3>
+<P>
+<A NAME="50422124_pgfId-851103"></A>As described in <A HREF="fd_chap.051.html#50422124_39752">Section 50.2.14, “Completing imprints”</A>, you can use the <CODE>
+complete</CODE>
+ option to control whether imprint completion can be extended up to an edge, or to the boundary of a supplied faceset. You can also optionally choose to limit the distance of an imprint completion using the <CODE>
+complete_bound</CODE>
+ and <CODE>
+complete_bound_distance</CODE>
+ options. With these options, an imprint will not be extended if the completion distance is greater than the supplied bound distance.</P>
+<P>
+<A NAME="50422124_pgfId-859359"></A>The <CODE>
+complete_bound</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-859800"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-859789"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-859791"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-859793"></A><A HREF=../headers/pk_complete_bound_t.html>PK_complete_bound_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-859795"></A>No bound is applied to the imprint completion. Default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-859797"></A><A HREF=../headers/pk_complete_bound_t.html>PK_complete_bound_if_within_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-859799"></A>The imprint will be extended only if the completion edge lies within the supplied <CODE>
+complete_bound_distance</CODE>
+ of the vertex </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-1048776"></A>The <CODE>
+complete_bound_distance</CODE>
+ option is the distance used to bound the imprint completion. If <CODE>
+complete_bound</CODE>
+ is set to a non-default value, <CODE>
+complete_bound_distance</CODE>
+ must be greater than <CODE>
+tolerance</CODE>
+.</P>
+<P>
+<A NAME="50422124_pgfId-1048991"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-1049021"></A>Note: The <CODE>
+complete_bound</CODE>
+ option can only be set to a non-default value if the <CODE>
+complete</CODE>
+ option is also set to a non-default value.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-853069"></A><A HREF="fd_chap.051.html#50422124_22815"><EM>
+Figure 50-11</EM></A> illustrates the result of using these options when <CODE>
+complete</CODE>
+ is set to <A HREF=../headers/pk_proj_complete_t.html>PK_proj_complete_edge_c</A>. In (a) the completion edge is not within the bound limits and therefore the imprint will not be extended. In (b) the completion edge is within the bound limit set by <CODE>
+complete_bound_distance</CODE>
+ and therefore the imprint will be extended.</P>
+<P>
+<A NAME="50422124_pgfId-851581"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-506.gif">
+
+<P>
+<A NAME="50422124_pgfId-851313"></A>Figure 50-11 <A NAME="50422124_22815"></A>Limiting the extension of the imprint using <CODE>
+complete_bound</CODE>
+ and <CODE>
+complete_bound_distance </CODE>
+options</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-643962"></A>	50.2.16 	<A NAME="50422124_54067"></A>Tracking information </H3>
+<P>
+<A NAME="50422124_pgfId-643963"></A>You can track edges produced by imprint completion from projected curves using the <CODE>
+tracking</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-919990"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-632136"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-632138"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-632140"></A><A HREF=../headers/pk_proj_tracking_t.html>PK_proj_tracking_basic_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-632142"></A>Returns a track record with basic tracking information about entities arising from imprint completion. These entities have a zero tag as their originator curve to identify their origin (Default).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-632144"></A><A HREF=../headers/pk_proj_tracking_t.html>PK_proj_tracking_completion_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-665098"></A>Returns a track record that relates the imprinted edge to its original input curve. Edges arising from imprint completion will have at least three originators; </P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-665100"></A>the tag of the originating curve</LI>
+<LI>
+<A NAME="50422124_pgfId-669253"></A>the tag of the face which the originating curve is imprinted into</LI>
+<LI>
+<A NAME="50422124_pgfId-654388"></A>a zero tag, to identify it as an imprint completion</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-632147"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-920012"></A>Note: Only those edges that are imprinted as a result of the operation are returned by the <CODE>
+tracking</CODE>
+ option. Existing edges or faces that are split as a result of the operation, are not returned.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-648901"></A><A HREF="fd_chap.051.html#50422124_59392"><EM>
+Figure 50-12</EM></A> illustrates the tracking information that is returned when a curve A is projected onto a face B creating two new edges, C and D. Two track records are returned, one for each edge created by the imprint:</P>
+<P>
+<A NAME="50422124_pgfId-642583"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-507.gif">
+
+<P>
+<A NAME="50422124_pgfId-624320"></A>Figure 50-12 <A NAME="50422124_59392"></A>Tracking information returned when projecting curves</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-942276"></A>	50.2.17 	<A NAME="50422124_28862"></A>Reporting function results </H3>
+<P>
+<A NAME="50422124_pgfId-942335"></A>You can use the <CODE>
+results_output</CODE>
+ option to choose whether to output the results of the operation in the return and tracking arguments of <A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A>, or in the Parasolid Report. This option has the following values:</P>
+<P>
+<A NAME="50422124_pgfId-946832"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-942519"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-942521"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-942523"></A><A HREF=../headers/pk_results_output_t.html>PK_results_output_return_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-942525"></A>The results of the operation are output in the return and tracking arguments. Default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-942527"></A><A HREF=../headers/pk_results_output_t.html>PK_results_output_report_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-942529"></A>The results are output in the Parasolid Report via a record of type PK_REPORT_record_type_3_t with <CODE>
+status</CODE>
+ <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_proj_cu_map_c</A> that contains all the projection results for each projection. </P>
+<P>
+<A NAME="50422124_pgfId-946008"></A><STRONG>
+Note</STRONG>: If you choose to return information via the Parasolid Report, the tracking and return arguments will be empty.</P>
+<P>
+<A NAME="50422124_pgfId-946689"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A> for more information on the Parasolid Report mechanism.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-944966"></A>If you choose to output the results to the Parasolid Report, you can optionally choose to return the originating intervals for each projection in the report using the <CODE>
+want_orig_intervals</CODE>
+ option. When set to PK_LOGICAL_true, the parameter intervals on the input curves that produced the projection or imprint are returned. This is illustrated in <A HREF="fd_chap.051.html#50422124_15028"><EM>
+Figure 50-13</EM></A>.</P>
+<P>
+<A NAME="50422124_pgfId-948667"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-948721"></A>Note: Intervals will only be defined for direct imprints and they can only be returned when <CODE>
+results_output</CODE>
+ is set to <A HREF=../headers/pk_results_output_t.html>PK_results_output_report_c</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-943577"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-508.gif">
+
+<P>
+<A NAME="50422124_pgfId-943672"></A>Figure 50-13 <A NAME="50422124_15028"></A>Returning the originating parameter interval of the input curve</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422124_pgfId-732883"></A>50.3	<A NAME="50422124_86613"></A>Direct imprinting 
+
+
+</H1>
+<P>
+<A NAME="50422124_pgfId-732925"></A>Parasolid also provides imprinting functionality in the form of direct imprinting. Unlike the more general imprinting functionality provided by <A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A> (see <A HREF="fd_chap.051.html#50422124_19654">Section 50.2</A>), direct imprinting requires that the set of curves to be imprinted are coincident with the surface of the face onto which they are imprinted. Direct imprinting is a convenient way, for example, to create a set of profiles by imprinting sets of planar curves on planar sheets. </P>
+<P>
+<A NAME="50422124_pgfId-734016"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-509.gif">
+
+<P>
+<A NAME="50422124_pgfId-733957"></A>Figure 50-14 Creating profiles on a face using direct imprinting</P>
+<P>
+<A NAME="50422124_pgfId-733440"></A>You can perform direct imprinting using <A HREF=../headers/pk_face_imprint_curves_2.html>PK_FACE_imprint_curves_2</A>. This function receives a face and a set of curves and intervals, and creates new edges and faces. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422124_pgfId-624322"></A>50.4	<A NAME="50422124_34334"></A>Boolean imprinting 
+
+
+</H1>
+<P>
+<A NAME="50422124_pgfId-530221"></A>Parasolid provides several imprinting tools that you can use for your own purposes. These tools can be used to implement your own manual boolean functionality, should you want to include unique features in your application that could not be done conveniently using the standard Parasolid boolean functionality. For example, using these tools you could add features such as a higher degree of user interaction, or some kind of preview functionality.</P>
+<P>
+<A NAME="50422124_pgfId-526673"></A>Two boolean tools are provided:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-526674"></A>Imprint edges on a target and tool body to show where the two bodies intersect. See <A HREF="fd_chap.051.html#50422124_51040">Section 50.4.1</A>.</LI>
+<LI>
+<A NAME="50422124_pgfId-526678"></A>Divide faces on a body (usually those created as a result of the imprinting operation) into distinct face sets so that you can decide which parts of the body to keep, and which to throw away. See <A HREF="fd_chap.051.html#50422124_41182">Section 50.4.2</A>.</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-526682"></A>To implement your own manual boolean functionality, you could imprint edges on a target and tool, identify the distinct face sets on the target and tool, and then use <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A> to remove the ones you don’t want. Finally, you could use <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A> to fuse the remaining face sets into a single body. </P>
+<P>
+<A NAME="50422124_pgfId-526683"></A>Boolean tools could also be used for a range of other operations. For example, you could use them in conjunction with other Parasolid tools to remove unwanted areas of overlapping sheet bodies before sewing them.</P>
+<P>
+<A NAME="50422124_pgfId-806123"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-806155"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422124_pgfId-526689"></A>	50.4.1 	<A NAME="50422124_51040"></A><A NAME="50422124_marker-526688"></A>Imprinting </H3>
+<P>
+<A NAME="50422124_pgfId-526690"></A>The initial stage of a boolean operation is to intersect the target and tool entities and imprint edges and vertices on them where they intersect. These imprinted edges and vertices form the boundaries of intersection between target and tool entities.</P>
+<P>
+<A NAME="50422124_pgfId-526691"></A>You can create sets of imprinted edges and vertices on a target and tool entity using <A NAME="50422124_marker-526692"></A><A HREF=../headers/pk_body_imprint_body.html>PK_BODY_imprint_body</A>, <A HREF=../headers/pk_body_imprint_faces_2.html>PK_BODY_imprint_faces_2</A>, and <A NAME="50422124_marker-526693"></A><A HREF=../headers/pk_face_imprint_faces_2.html>PK_FACE_imprint_faces_2</A>. These functions create imprinted edges and vertices on the supplied entities and return these edges and vertices as paired sets.</P>
+<P>
+<A NAME="50422124_pgfId-526766"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-510.gif">
+
+<P>
+<A NAME="50422124_pgfId-526768"></A>Figure 50-15 <A NAME="50422124_27819"></A>Imprinting a cylindrical tool on a target cube resulting in four pairs of imprinted edges</P>
+<P>
+<A NAME="50422124_pgfId-526769"></A>These functions receive option structures to control the imprinting process. These contain the following options:</P>
+<P>
+<A NAME="50422124_pgfId-526819"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526772"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526774"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-526776"></A>imprint_tool</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526778"></A>Whether to imprint edges and vertices on the tool as well as the target. Default: PK_LOGICAL_true.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-526780"></A>imprint_overlapping</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526782"></A>For sheet bodies, whether to imprint the boundaries of overlapping areas of faces that share the same surface. See <A HREF="fd_chap.052.html#50422125_65586">Section 51.4.7, “Imprinting the boundaries of overlapping areas”</A>, for more information. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-526787"></A>extend_face_list</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526789"></A>Whether to add neighboring faces from either the target or the tool to the list of imprint faces, in order to prevent open loops of edges. See <A HREF="fd_chap.051.html#50422124_60392">Section 50.4.1.2, “Adding extra faces to face-imprints”</A>, for more information. </P>
+<P>
+<A NAME="50422124_pgfId-526793"></A>Default: <A HREF=../headers/pk_imprint_face_list_t.html>PK_imprint_face_list_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-526795"></A>matched_region</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526797"></A>Structure that supplies the function with matched topology, using the same format as the boolean option structure. See <A HREF="fd_chap.052.html#50422125_34853">Section 51.4.5, “Matched topology in local and global boolean operations”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-526802"></A>imprint_complete_targ</PRE>
+<PRE><A NAME="50422124_pgfId-526803"></A>imprint_complete_tool</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526805"></A>Controls whether to complete the imprint such that end vertices of an imprinted edge may be extended until they meet an edge of the body or face. See <A HREF="fd_chap.051.html#50422124_46501">Section 50.4.1.1, “Completing imprints”</A> for more information.</P>
+<P>
+<A NAME="50422124_pgfId-526809"></A>Default: <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-526811"></A>imprint_extend_targ</PRE>
+<PRE><A NAME="50422124_pgfId-526812"></A>imprint_extend_tool</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-673436"></A>The orientation in which to complete the imprint on the target or tool, respectively. See <A HREF="fd_chap.051.html#50422124_46501">Section 50.4.1.1, “Completing imprints”</A> for more information.</P>
+<P>
+<A NAME="50422124_pgfId-526818"></A>Default: <A HREF=../headers/pk_imprint_extend_t.html>PK_imprint_extend_tangent_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-673447"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-673986"></A>This option lets you maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.053.html#50422126_11534">Section 52.4, “Specialised boolean operations”</A> for more information.</P>
+<ADDRESS>
+<A NAME="50422124_pgfId-674145"></A>Note: For the imprinting functions <A HREF=../headers/pk_body_imprint_body.html>PK_BODY_imprint_body</A>, <A HREF=../headers/pk_body_imprint_faces_2.html>PK_BODY_imprint_faces_2</A> and <A HREF=../headers/pk_face_imprint_faces_2.html>PK_FACE_imprint_faces_2</A>, the update values <A HREF=../headers/pk_boolean_update_t.html>PK_boolean_update_5_c</A> and older give the same behaviour.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-708742"></A>have_tolerance</PRE>
+<PRE><A NAME="50422124_pgfId-708777"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-711892"></A>If <CODE>
+have_tolerance</CODE>
+ is PK_LOGICAL_true, <CODE>
+tolerance</CODE>
+ specifies a value to which the imprint operation can assume that entities are coincident.</P>
+<P>
+<A NAME="50422124_pgfId-711437"></A>The <CODE>
+have_tolerance</CODE>
+ option (Default: PK_LOGICAL_false) should be used whenever you supply a <CODE>
+tolerance</CODE>
+ (Default: 0.0).</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-526820"></A>In addition, <A HREF=../headers/pk_body_imprint_faces_2.html>PK_BODY_imprint_faces_2</A> and <A HREF=../headers/pk_face_imprint_faces_2.html>PK_FACE_imprint_faces_2</A> contain the following option:</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526823"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526825"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-526827"></A>imprint_dir</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526831"></A>Whether imprinted edges should have consistent direction. See <A HREF="fd_chap.051.html#50422124_14897">Section 50.4.1.3, “Ensuring imprinted edges have consistent direction”</A>, for more information. </P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422124_pgfId-526837"></A>50.4.1.1 <A NAME="50422124_46501"></A><A NAME="50422124_marker-526834"></A><A NAME="50422124_marker-526835"></A><A NAME="50422124_marker-526836"></A>Completing imprints </H4>
+<P>
+<A NAME="50422124_pgfId-526838"></A>You can complete an imprint on the target or tool - that is, extend the imprinted edge to another nearby edge on the body so as to create a closed loop of edges - from any vertex of an imprinted edge that has been created by an intersection with a laminar edge on the other body. Four options in <A HREF=../headers/pk_body_imprint_o_t.html>PK_BODY_imprint_o_t</A>, <A HREF=../headers/pk_body_imprint_faces_o_t.html>PK_BODY_imprint_faces_o_t</A>, and <A HREF=../headers/pk_face_imprint_faces_o_t.html>PK_FACE_imprint_faces_o_t</A> are used to control how this behaviour can be used.</P>
+<P>
+<A NAME="50422124_pgfId-526867"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526841"></A>To ...</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526843"></A>Use ...</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526845"></A>switch on imprint completion</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526847"></A>the <CODE>
+imprint_complete</CODE>
+ options, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-526848"></A>Use <CODE>
+imprint_complete_targ</CODE>
+ to complete imprinted edges on the target</LI>
+<LI>
+<A NAME="50422124_pgfId-526849"></A>Use <CODE>
+imprint_complete_tool</CODE>
+ to complete imprinted edges on the tool (if <CODE>
+imprint_tool</CODE>
+ is PK_LOGICAL_true).</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-526850"></A>Both these options can be set to any of the following:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-526851"></A>Do not complete the imprint (<A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_no_c</A>).</LI>
+<LI>
+<A NAME="50422124_pgfId-526852"></A>Complete the imprint, stopping at the first edge encountered (<A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_edge_c</A>).</LI>
+<LI>
+<A NAME="50422124_pgfId-526853"></A>Complete the imprint, stopping at the first laminar edge encountered (<A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_laminar_c</A>).</LI>
+<LI>
+<A NAME="50422124_pgfId-526854"></A>For local boolean functionality, complete the imprint, stopping at either the first laminar edge encountered, or the first edge that is a boundary to the set of supplied faces (<A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_faceset_c</A>). </LI>
+<P>
+<A NAME="50422124_pgfId-526855"></A>This value is most useful when used in combination with the <CODE>
+extend_face_list</CODE>
+ option, described in <A HREF="fd_chap.051.html#50422124_60392">Section 50.4.1.2, “Adding extra faces to face-imprints”</A>. When <CODE>
+extend_face_list</CODE>
+ is set to its default value, <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_faceset_c</A> behaves in the same way as <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_laminar_c</A>.</P>
+</UL>
+<P>
+<A NAME="50422124_pgfId-526859"></A>Specified tools must come from sheet bodies. Specified targets can come from sheet or solid bodies, unless <CODE>
+imprint_complete_targ</CODE>
+ is <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_laminar_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526861"></A>control the direction in which imprinted edges are completed</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526863"></A>the <CODE>
+imprint_extend</CODE>
+ options, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-526864"></A>Use <CODE>
+imprint_extend_targ</CODE>
+ to control the direction of completions on the target.</LI>
+<LI>
+<A NAME="50422124_pgfId-526865"></A>Use <CODE>
+imprint_extend_tool</CODE>
+ to control the direction of completions on the tool.</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-526866"></A>You can choose to extend along a plane that either lies tangential to or orthogonal to the imprinted edge.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-526901"></A>The effect of these options is illustrated in <A HREF="fd_chap.051.html#50422124_97868"><EM>
+Figure 50-16</EM></A>. </P>
+<P>
+<A NAME="50422124_pgfId-526905"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-511.gif">
+
+<P>
+<A NAME="50422124_pgfId-526907"></A>Figure 50-16 <A NAME="50422124_97868"></A>Completing imprinted edges on target bodies</P>
+<P>
+<A NAME="50422124_pgfId-526908"></A>The corresponding imprinted (or original) edges and vertices are returned in matching arrays contained within the results structure. In the case of <A HREF=../headers/pk_face_imprint_faces_2.html>PK_FACE_imprint_faces_2</A>, where an entity has been created because of imprint completion, the matched element in the other list will be PK_ENTITY_null. </P>
+
+
+<H4>
+<A NAME="50422124_pgfId-526914"></A>50.4.1.2 <A NAME="50422124_marker-526909"></A><A NAME="50422124_marker-526910"></A><A NAME="50422124_marker-526911"></A><A NAME="50422124_marker-526912"></A><A NAME="50422124_60392"></A>Adding extra faces to face-imprints </H4>
+<P>
+<A NAME="50422124_pgfId-526915"></A>When using <A HREF=../headers/pk_face_imprint_faces_2.html>PK_FACE_imprint_faces_2</A>, <A HREF=../headers/pk_body_imprint_faces_2.html>PK_BODY_imprint_faces_2</A>, <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>, or <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A>, you may also be able to prevent open loops of edges by adding neighboring faces from either the target or tool (or both) into the imprint. This is done using the following option:</P>
+<P>
+<A NAME="50422124_pgfId-526931"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526918"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526920"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-526922"></A>extend_face_list</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-526924"></A>If the imprint operation results in incomplete loops of edges, include any neighboring faces and imprint them accordingly. Continue adding neighboring faces until either the loops are closed, or there are no more faces in the body to include. </P>
+<P>
+<A NAME="50422124_pgfId-526925"></A>You can choose between the following:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-526926"></A>Do not add any neighboring faces (<A HREF=../headers/pk_imprint_face_list_t.html>PK_imprint_face_list_no_c</A>)</LI>
+<LI>
+<A NAME="50422124_pgfId-526927"></A>Add neighboring faces of the target body (<A HREF=../headers/pk_imprint_face_list_t.html>PK_imprint_face_list_target_c</A>)</LI>
+<LI>
+<A NAME="50422124_pgfId-526928"></A>Add neighboring faces of the tool body (<A HREF=../headers/pk_imprint_face_list_t.html>PK_imprint_face_list_tool_c</A>)</LI>
+<LI>
+<A NAME="50422124_pgfId-526929"></A>Add neighboring faces of the target and tool bodies (<A HREF=../headers/pk_imprint_face_list_t.html>PK_imprint_face_list_both_c</A>)</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-526930"></A>The default behaviour is not to add neighboring faces (<A HREF=../headers/pk_imprint_face_list_t.html>PK_imprint_face_list_no_c</A>).</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-526932"></A>Careful use of this option allows an effect similar to blend propagation. For example, you can pass a single tool face, and request that the tool faces are extended, and Parasolid creates a complete closed imprint on the target automatically.</P>
+<P>
+<A NAME="50422124_pgfId-526939"></A>The behaviour of <CODE>
+extend_face_list</CODE>
+ is explained in <A HREF="fd_chap.051.html#50422124_71920"><EM>
+Figure 50-17</EM></A>, which shows how an imprint on a target and tool may be extended. All four values for extend_face_list are illustrated.</P>
+<P>
+<A NAME="50422124_pgfId-527251"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-512.gif">
+
+<P>
+<A NAME="50422124_pgfId-527253"></A>Figure 50-17 <A NAME="50422124_71920"></A>Extending the list of faces in a face imprint on the target and the tool</P>
+<P>
+<A NAME="50422124_pgfId-527254"></A>The extend_face_list options take effect before any <CODE>
+imprint_complete</CODE>
+ options (see <A HREF="fd_chap.051.html#50422124_32632">Section 50.5.6, “Imprint completion”</A>) that have been specified.</P>
+<P>
+<A NAME="50422124_pgfId-527258"></A>If, when using <CODE>
+extend_face_list</CODE>
+, you want to ensure that the results of imprint completion during a local boolean operation are limited to the target or tool faces specified in the function call, you should set <CODE>
+imprint_complete_targ</CODE>
+ or <CODE>
+imprint_complete_tool</CODE>
+ (as appropriate) to <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_faceset_c</A>. If you do not do this, <CODE>
+extend_face_list</CODE>
+ adds neighboring faces up to the laminar edges of the body, as shown in <A HREF="fd_chap.051.html#50422124_90097"><EM>
+Figure 50-18</EM></A>. </P>
+<P>
+<A NAME="50422124_pgfId-527388"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-513.gif">
+
+<P>
+<A NAME="50422124_pgfId-527390"></A>Figure 50-18 <A NAME="50422124_90097"></A>Combining <CODE>
+imprint_complete_targ</CODE>
+ and <CODE>
+extend_face_list</CODE>
+ options</P>
+<P>
+<A NAME="50422124_pgfId-527409"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-527396"></A>Note: Parasolid also provides imprinting functionality for:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-527399"></A>Creating sketches from scratch or by scribing directly onto existing faces (see <A HREF="fd_chap.016.html#50422085_14205">Section 15.5.2, “Imprint”</A>).</LI>
+<LI>
+<A NAME="50422124_pgfId-527403"></A>Projecting sketches onto existing faces (see <A HREF="fd_chap.051.html#50422124_68678">Section 50.5, “Legacy curve imprinting”</A>).</LI>
+<LI>
+<A NAME="50422124_pgfId-527407"></A>Dividing faces into regions that require taper, and regions that don’t (see <A HREF="tapering.html#31282">Section 64.1, “Introduction”</A>).</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422124_pgfId-527411"></A>50.4.1.3 <A NAME="50422124_14897"></A>Ensuring imprinted edges have consistent direction </H4>
+<P>
+<A NAME="50422124_pgfId-527412"></A>You can use the <CODE>
+imprint_dir</CODE>
+ option in <A HREF=../headers/pk_body_imprint_faces_o_t.html>PK_BODY_imprint_faces_o_t</A> and <A HREF=../headers/pk_face_imprint_faces_o_t.html>PK_FACE_imprint_faces_o_t</A> to control whether the directions of any imprinted edges are consistent with the original topology that created them. This option takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-527432"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-527415"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-527417"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-527419"></A><A HREF=../headers/pk_imprint_dir_t.html>PK_imprint_dir_no_check_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-527421"></A>Do not perform any checks on imprinted edge direction. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-527423"></A><A HREF=../headers/pk_imprint_dir_t.html>PK_imprint_dir_consistent_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-527425"></A>Inspect imprinted edges and, where necessary, reverse the direction of any edges whose direction is inconsistent. Report any imprinted edges for which a direction cannot be determined using a report status of <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_imp_dir_undef_c</A>. See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for information on using the Parasolid report mechanism. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-527433"></A>When identifying whether the edge direction is consistent, it is compared to various test directions derived from the edge's originating topology:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-527434"></A><STRONG>
+Face-pair direction:</STRONG> the cross product of the normal of a target face with the normal of a tool face (in that order). Faces from face pairs that have parallel or anti-parallel normals are only used in the calculation of a consistent direction where needed.</LI>
+<LI>
+<A NAME="50422124_pgfId-527435"></A><STRONG>
+Laminar edge fin direction:</STRONG> the direction of the (only) fin of a laminar edge.</LI>
+<LI>
+<A NAME="50422124_pgfId-527436"></A><STRONG>
+Original edge direction:</STRONG> the direction of an originating non-laminar edge.</LI>
+<LI>
+<A NAME="50422124_pgfId-527437"></A><STRONG>
+Imprint edge direction:</STRONG> the direction of a newly imprinted edge.</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-527438"></A>A consistent direction for an imprinted edge is produced by applying the following tests:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-527439"></A>Considering all face-pair directions at the imprint edge, if there is a unique direction, the edge is made consistent with that direction. In <A HREF="fd_chap.051.html#50422124_32379"><EM>
+Figure 50-19</EM></A>, this test is used to determine the direction of the purple edge created as a result of imprinting the L-shaped body consisting of red and blue faces onto the yellow body.</LI>
+<LI>
+<A NAME="50422124_pgfId-527443"></A>If there is no consistent face-pair direction, but the imprint arose from a laminar edge, the imprint edge is made consistent with the laminar edge fin direction. <A HREF="fd_chap.051.html#50422124_32379"><EM>
+Figure 50-19</EM></A>, this test would be used for the three edges (between the red and the yellow faces) not shown in purple.</LI>
+<LI>
+<A NAME="50422124_pgfId-527447"></A>If there is no consistent face-pair or laminar edge fin direction, but there is an originating target or tool edge, the imprint edge is made consistent with the original edge direction (choosing the target edge in cases where there were both target and tool edges). These imprint edges will be included in the Parasolid report.</LI>
+<LI>
+<A NAME="50422124_pgfId-527448"></A>If the edge arose from imprint completion, then it will be made consistent with the direction of the imprint edge it completed from. If that edge was included in the Parasolid report, then so too will be the imprint completion edge.</LI>
+<LI>
+<A NAME="50422124_pgfId-527449"></A>All other imprint edges do not have a defined consistent direction, and so will be included in the Parasolid report.<A HREF="fd_chap.051.html#50422124_30945"><EM>
+Figure 50-20</EM></A> shows the result of imprinting two cylindrical faces, each of which have coincident edges representing the respective seam lines of the cylindrical surface. </LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-527456"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-514.gif">
+
+<P>
+<A NAME="50422124_pgfId-527458"></A>Figure 50-19 <A NAME="50422124_32379"></A>Imprinted edges arising from original edges</P>
+<P>
+<A NAME="50422124_pgfId-527462"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-515.gif">
+
+<P>
+<A NAME="50422124_pgfId-527464"></A>Figure 50-20 <A NAME="50422124_30945"></A>Imprinted edges due to touching cylinders</P>
+
+
+
+<H3>
+<A NAME="50422124_pgfId-527466"></A>	50.4.2 	<A NAME="50422124_41182"></A>Identifying face sets </H3>
+<P>
+<A NAME="50422124_pgfId-527467"></A>Once edges and vertices has been imprinted on a target and tool body, you need to identify which face sets (on both the target and tool) would survive a boolean operation.</P>
+<P>
+<A NAME="50422124_pgfId-527469"></A><A NAME="50422124_marker-527468"></A><A HREF=../headers/pk_body_identify_facesets.html>PK_BODY_identify_facesets</A> receives loops of coincident edges, points of contact and a boolean operation (unite, subtract and intersect) and then calculates which face sets would survive the operation and which face sets would be deleted. The loops of coincident edges and points of contact would typically be obtained via calls to the imprinting functions described in <A HREF="fd_chap.051.html#50422124_51040">Section 50.4.1</A>: <A HREF=../headers/pk_body_imprint_body.html>PK_BODY_imprint_body</A> and <A HREF=../headers/pk_face_imprint_faces_2.html>PK_FACE_imprint_faces_2</A>.</P>
+<P>
+<A NAME="50422124_pgfId-527548"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-516.gif">
+
+<P>
+<A NAME="50422124_pgfId-527549"></A>Figure 50-21 Simulating a subtract operation based on imprinted edges from Figure 46-11.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422124_pgfId-517356"></A>50.5	<A NAME="50422124_68678"></A><A NAME="50422124_marker-517353"></A><A NAME="50422124_marker-517354"></A><A NAME="50422124_marker-517355"></A>Legacy curve imprinting 
+
+
+</H1>
+<P>
+<A NAME="50422124_pgfId-517360"></A>You can use Parasolid’s imprinting functionality to imprint curves, faces, or planes onto a sheet body.</P>
+<P>
+<A NAME="50422124_pgfId-294807"></A>In each of the methods described, edges created by the imprint operation are returned, including those existing edges along which the intersection occurred.</P>
+<P>
+<A NAME="50422124_pgfId-294808"></A>To solve any precision problems, a tolerance is supplied; this value may also be used in the creation of SP-curves on the imprinted edges.</P>
+<P>
+<A NAME="50422124_pgfId-294812"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-294811"></A>Note: The behaviour of the imprint operations as described here applies specifically to their use with sheet bodies. In general, these imprinting functions can also be used with other body types.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-550075"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-550046"></A>Method</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-550048"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-550050"></A>Imprinting with finite curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-550052"></A>You can imprint curves on to a body using two different methods, by projecting them as follows:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-550054"></A>Down the face normal of the body, using <A NAME="50422124_marker-550053"></A><A HREF=../headers/pk_body_imprint_cus_normal.html>PK_BODY_imprint_cus_normal</A>, and <A NAME="50422124_marker-550055"></A><A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A>.</LI>
+<LI>
+<A NAME="50422124_pgfId-550057"></A>In a specified direction, using <A NAME="50422124_marker-550056"></A><A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A> (imprint curves on a body) and <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A> (imprint curves on specified faces of a body).</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-550058"></A>Edges and vertices are added to the body which are the image of the curves under either projection method.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-550060"></A>Imprinting with a set of faces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-550063"></A>You can imprint a face on to a body using <A NAME="50422124_marker-550062"></A><A HREF=../headers/pk_body_imprint_faces_2.html>PK_BODY_imprint_faces_2</A>. This adds edges and vertices to the body where the faces intersect with the body (except where they already exist). See <A HREF="fd_chap.051.html#50422124_51040">Section 50.4.1, “Imprinting”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-550068"></A>Imprinting with a plane</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-550071"></A>You can imprint a plane on to a body using <A NAME="50422124_marker-550070"></A><A HREF=../headers/pk_body_imprint_plane_2.html>PK_BODY_imprint_plane_2</A>. This adds edges and vertices to the body where the plane intersects with the body (except where they already exist). You can also demand that the imprinted edges have consistent direction. See <A HREF="fd_chap.051.html#50422124_51040">Section 50.4.1, “Imprinting”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-550076"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-550092"></A>Note: These functions are used to maintain old behaviour for the purpose of version updates. However, you are encouraged to use <A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A> in any new code.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422124_pgfId-549574"></A>	50.5.1 	<A NAME="50422124_marker-549570"></A><A NAME="50422124_marker-549571"></A><A NAME="50422124_marker-549572"></A><A NAME="50422124_46245"></A>Connecting disjoint components of an imprint </H3>
+<P>
+<A NAME="50422124_pgfId-294850"></A><A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A> and <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A> support a <CODE>
+connect</CODE>
+ option that you can use to connect together disjoint components that are created during a single call to those functions. This option lets you control the extent to which imprinted curves are connected together, giving you control over the creation of imprints on both side faces and back-facing faces. It takes the following values, which are illustrated in <A HREF="fd_chap.051.html#50422124_78192"><EM>
+Figure 50-22</EM></A>:</P>
+<P>
+<A NAME="50422124_pgfId-294879"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294856"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294858"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294860"></A><A HREF=../headers/pk_imprint_connect_t.html>PK_imprint_connect_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294862"></A>Do not attempt to connect disjoint imprint components. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294864"></A><A HREF=../headers/pk_imprint_connect_t.html>PK_imprint_connect_side_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294866"></A>If possible, connect disjoint imprint components by imprinting additional components that are side-on (i.e. parallel to the imprint direction) when viewed from the imprint direction. This will only imprint side-on components if they connect disjoint components.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294868"></A><A HREF=../headers/pk_imprint_connect_t.html>PK_imprint_connect_side_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294870"></A>Imprint all components that are side-on when viewed from the imprint direction, whether they connect disjoint components of the imprint or not. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294872"></A><A HREF=../headers/pk_imprint_connect_t.html>PK_imprint_connect_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294874"></A>If possible, connect disjoint imprint components by imprinting components that are side-on, or separated by back-facing faces, when viewed from the imprint direction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294876"></A><A HREF=../headers/pk_imprint_connect_t.html>PK_imprint_connect_hidden_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-294878"></A>Connect all disjoint imprint components by imprinting components that are side-on, or separated by back-facing faces, when viewed from the imprint direction. This option also imprints any back-facing components that cannot be connected to other components, such as those on a sheet boundary.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-470030"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-517.gif">
+
+<P>
+<A NAME="50422124_pgfId-295205"></A>Figure 50-22 <A NAME="50422124_78192"></A>Connecting disjoint components of an imprint</P>
+<P>
+<A NAME="50422124_pgfId-295209"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-295208"></A>Note: This behaviour applies when imprinting curves on to either solid or sheet bodies.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-295211"></A>	50.5.2 	<A NAME="50422124_74819"></A>Imprinting in both directions at once </H3>
+<P>
+<A NAME="50422124_pgfId-295212"></A>When creating vector imprints, you often want to imprint in both directions along the specified vector. Using the default options, you can only do this with two function calls, which as well as being a performance overhead may also introduce unwanted vertices into the imprint that you then have to remove. </P>
+<P>
+<A NAME="50422124_pgfId-295213"></A><A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A> and <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A> support a <CODE>
+bidirectional</CODE>
+ option that let you imprint in both directions using a single function call. This improves performance, and also automatically removes any mergeable vertices that are created as a result of the imprint. </P>
+<P>
+<A NAME="50422124_pgfId-593107"></A><A HREF="fd_chap.051.html#50422124_37837"><EM>
+Figure 50-23</EM></A> shows a simple example in which a curve is imprinted onto a sheet. Because the curve intersects the sheet, imprints in both directions need to be created in order to imprint the entire extent of the curve onto the sheet. <A HREF="fd_chap.051.html#50422124_37837"><EM>
+Figure 50-23</EM></A> shows the difference in the results obtained by making two function calls compared to using the <CODE>
+bidirectional</CODE>
+ option. </P>
+<P>
+<A NAME="50422124_pgfId-593144"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-518.gif">
+
+<P>
+<A NAME="50422124_pgfId-593146"></A>Figure 50-23 <A NAME="50422124_37837"></A>Imprinting in both directions at once</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-295227"></A>	50.5.3 	Dealing with faces that obscure the imprint </H3>
+<P>
+<A NAME="50422124_pgfId-295228"></A>When imprinting curves on faces using the local function <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A>, Parasolid provides additional control over the imprint operation with the <CODE>
+hidden</CODE>
+ option. This option lets you control the effect of other faces that obscure the faces being imprinted. The <CODE>
+hidden</CODE>
+ option can take any of the following values:</P>
+<P>
+<A NAME="50422124_pgfId-295249"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295234"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295236"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295238"></A>PK_FACE_imprint_hidden_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295240"></A>Imprint curves on the faces supplied to <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A> regardless of any other faces that may obscure the imprint.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295242"></A>PK_FACE_imprint_hidden_body_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295244"></A>Imprint curves on the faces supplied, taking into account any other faces from the parent body of the supplied faces that obscure the imprint. This value produces a result similar to <A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A>, but restricted to only the supplied faces. It is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295246"></A>PK_FACE_imprint_hidden_array_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295248"></A>Imprint curves on the faces supplied, taking into account any faces supplied to the parent function, but no others. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-295253"></A>The effect of these values is shown in <A HREF="fd_chap.051.html#50422124_66096"><EM>
+Figure 50-24</EM></A>, which shows the effect, in cross-section, of imprinting a subset of the faces of a body.</P>
+<P>
+<A NAME="50422124_pgfId-475587"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-519.gif">
+
+<P>
+<A NAME="50422124_pgfId-295384"></A>Figure 50-24 <A NAME="50422124_66096"></A>Allowing for faces that obscure the imprint</P>
+<P>
+<A NAME="50422124_pgfId-295391"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-295387"></A>Note: If the <CODE>
+bidirectional</CODE>
+ option is used as well as <CODE>
+hidden</CODE>
+, then the effect of the value for <CODE>
+hidden</CODE>
+ is treated independently for each imprint direction: some faces may obscure the imprint in one direction but not the other. See <A HREF="fd_chap.051.html#50422124_74819">Section 50.5.2, “Imprinting in both directions at once”</A>, for more details about <CODE>
+bidirectional</CODE>
+. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-295393"></A>	50.5.4 	<A NAME="50422124_14743"></A>Dealing with curves that intersect within the view direction </H3>
+<P>
+<A NAME="50422124_pgfId-295394"></A>Sometimes, when projecting curves onto a face along a vector using <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A> or <A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A>, one or more curves will appear to intersect when viewed along the projection vector. This can be problematic: to produce a valid body, additional vertices need to be imprinted at the points where the intersections occur. If you do not wish these vertices to be imprinted, there is no way for the imprint operation to complete successfully. Parasolid lets you control the behaviour in such circumstances using the <CODE>
+process_intersections</CODE>
+ option, which can take the following values:</P>
+<P>
+<A NAME="50422124_pgfId-295424"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295400"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295402"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295404"></A><A HREF=../headers/pk_imprint_intersect_t.html>PK_imprint_intersect_fix_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295406"></A>If the supplied curves appear to intersect when viewed along the projection vector, the curves at the points of intersection are broken up, and additional vertices imprinted so as to produce a valid body. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295408"></A><A HREF=../headers/pk_imprint_intersect_t.html>PK_imprint_intersect_fail_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295410"></A>If the supplied curves appears to intersect when viewed along the projection vector, the function call fails with PK_ERROR_cant_do_imprint. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295412"></A><A HREF=../headers/pk_imprint_intersect_t.html>PK_imprint_intersect_update_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295417"></A>This value is reserved for updating models built using Parasolid V22.1 or earlier (<A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A>) or Parasolid V24.1 and earlier (<A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A>), and preserves old behaviour. When working with models created in newer versions of Parasolid, you should not use this value. This is the default. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-295428"></A><A HREF="fd_chap.051.html#50422124_27057"><EM>
+Figure 50-25</EM></A> shows a simple example in which a single helical curve is imprinted onto a face. Because the helical curve appears to intersect itself when viewed in the direction of the project vector, a successful imprint is only possible if <CODE>
+process_intersections</CODE>
+ is set to <A HREF=../headers/pk_imprint_intersect_t.html>PK_imprint_intersect_fix_c</A>. </P>
+<P>
+<A NAME="50422124_pgfId-295462"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-520.gif">
+
+<P>
+<A NAME="50422124_pgfId-295464"></A>Figure 50-25 <A NAME="50422124_27057"></A>Imprinting a helical curve onto a face</P>
+<P>
+<A NAME="50422124_pgfId-295468"></A><A HREF="fd_chap.051.html#50422124_58528"><EM>
+Figure 50-26</EM></A> shows an example in which two curves that only appear to intersect when viewed along the projection vector can be successfully imprinted onto a body by setting <CODE>
+process_intersections</CODE>
+ to <A HREF=../headers/pk_imprint_intersect_t.html>PK_imprint_intersect_fix_c</A>.</P>
+<P>
+<A NAME="50422124_pgfId-295509"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-521.gif">
+
+<P>
+<A NAME="50422124_pgfId-295511"></A>Figure 50-26 <A NAME="50422124_58528"></A>Imprinting several curves that only intersect along the projection vector</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-295513"></A>	50.5.5 	<A NAME="50422124_39187"></A>Restricting imprints to nearby faces </H3>
+<P>
+<A NAME="50422124_pgfId-295514"></A>You can control which faces in a body receive imprints when imprinting down the face normal of the body using either <A HREF=../headers/pk_body_imprint_cus_normal.html>PK_BODY_imprint_cus_normal</A> or <A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A>. </P>
+<P>
+<A NAME="50422124_pgfId-295515"></A>One way to do this is simply to pass in a specific subset of faces in a body to <A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A>. However, in some circumstances this might not be possible or desirable. In such cases, you can restrict imprinting so that only faces that are within a specified distance of the imprinting curves receive imprints, using the following options: </P>
+<P>
+<A NAME="50422124_pgfId-295531"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295518"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295520"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-295522"></A>use_max_projection_dist</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295524"></A>Whether to restrict imprints to faces that are within a specified distance of the curves. This can take the following values:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-295525"></A><A HREF=../headers/pk_imprint_proj_dist_t.html>PK_imprint_proj_dist_no_c</A> (the default): do not restrict the imprint to faces near the curves. </LI>
+<LI>
+<A NAME="50422124_pgfId-295526"></A><A HREF=../headers/pk_imprint_proj_dist_t.html>PK_imprint_proj_dist_whole_c</A>: only imprint a face if the curves are within the specified <CODE>
+max_project_dist</CODE>
+ for the entire length of the imprint.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-295528"></A>max_projection_dist</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295530"></A>A projection distance for the imprint operation. If <CODE>
+use_max_projection_dist</CODE>
+ is <A HREF=../headers/pk_imprint_proj_dist_t.html>PK_imprint_proj_dist_whole_c</A>, then a face is only imprinted if the portion of the curve that imprints on the face is within this distance from the face.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-295535"></A><A HREF="fd_chap.051.html#50422124_48789"><EM>
+Figure 50-27</EM></A> illustrates a simple case where a curve is imprinted onto a block. By default, edges are imprinted on both the front and back faces of the block (A). By specifying a <CODE>
+max_projection_dist</CODE>
+, you can restrict the imprint so that only the nearest face is imprinted (B). </P>
+<P>
+<A NAME="50422124_pgfId-295536"></A>However, for an edge to be imprinted, <CODE>
+max_projection_dist</CODE>
+ must be large enough such that the part of the curve that is imprinted is close enough to the nearest face:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-295537"></A>If only part of the curve is close enough, then no edge is imprinted (C). </LI>
+<LI>
+<A NAME="50422124_pgfId-295538"></A>If only part of the curve would be imprinted, and that part is close enough, then an edge is imprinted (D).</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-484140"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-522.gif">
+
+<P>
+<A NAME="50422124_pgfId-484023"></A>Figure 50-27 <A NAME="50422124_48789"></A>Restricting imprints to nearby faces</P>
+
+
+<H3>
+<A NAME="50422124_pgfId-295712"></A>	50.5.6 	<A NAME="50422124_32632"></A>Imprint completion </H3>
+<P>
+<A NAME="50422124_pgfId-295713"></A>The functions <A HREF=../headers/pk_body_imprint_cus_normal.html>PK_BODY_imprint_cus_normal</A>, <A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A>, <A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A> and <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A> allow you to specify whether an edge imprinted on a body should be extended to meet an existing edge. This is done with the <CODE>
+imprint_complete</CODE>
+ option, which takes the following values:</P>
+<P>
+<A NAME="50422124_pgfId-295731"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295716"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295718"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295720"></A><A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295722"></A>Do not extend the edge once it has been imprinted. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295724"></A><A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_edge_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295726"></A>Extend the imprinted edge to the nearest existing edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295728"></A><A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_laminar_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-295730"></A>Extend the imprinted edge to the nearest existing laminar edge.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-295738"></A><A HREF="fd_chap.051.html#50422124_73719"><EM>
+Figure 50-28</EM></A> and <A HREF="fd_chap.051.html#50422124_95489"><EM>
+Figure 50-29</EM></A> show the effect of the <CODE>
+imprint_complete</CODE>
+ option for <A HREF=../headers/pk_body_imprint_cus_vec.html><A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A></A> and <A HREF=../headers/pk_face_imprint_cus_vec.html><A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A></A>, respectively. For <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_edge_c</A>, the edge is extended to the nearest existing edge in each direction; for <A HREF=../headers/pk_imprint_complete_t.html><A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_laminar_c</A></A>, the edge is extended to the nearest laminar edge in each direction. In all cases, the extension is tangential to the imprinted edge (i.e. in the direction of the imprinted edge). The difference in the two functions is only evident for <A HREF=../headers/pk_imprint_complete_t.html><A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_laminar_c</A></A>, where those edges that are considered laminar edges by <A HREF=../headers/pk_face_imprint_cus_vec.html><A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A></A> are not laminar edges for <A HREF=../headers/pk_body_imprint_cus_vec.html><A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A></A>.</P>
+<P>
+<A NAME="50422124_pgfId-476913"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-523.gif">
+
+<P>
+<A NAME="50422124_pgfId-295999"></A>Figure 50-28 <A NAME="50422124_73719"></A>Effect of the <CODE>
+imprint_complete</CODE>
+ option for <A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A> and <A HREF=../headers/pk_body_imprint_cus_normal.html>PK_BODY_imprint_cus_normal</A></P>
+<P>
+<A NAME="50422124_pgfId-477479"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-524.gif">
+
+<P>
+<A NAME="50422124_pgfId-296262"></A>Figure 50-29 <A NAME="50422124_95489"></A>Effect of the <CODE>
+imprint_complete</CODE>
+ option for <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A> and <A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A></P>
+<P>
+<A NAME="50422124_pgfId-296269"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-296265"></A>Note: The value <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_faceset_c</A> should only be used when completing imprints created by local booleans, as described in <A HREF="fd_chap.052.html#50422125_98716">Section 51.4.13, “Imprint completion”</A>. If you use this value with one of the local imprinting functions described here, it has the same effect as <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_laminar_c</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-296271"></A>	50.5.7 	<A NAME="50422124_56989"></A>Controlling how curves are imprinted along a vector </H3>
+<P>
+<A NAME="50422124_pgfId-296272"></A>By default, the positions on a body of edges and vertices that are imprinted from curves along a vector are calculated by projecting the curves along that vector. </P>
+<P>
+<A NAME="50422124_pgfId-296273"></A>Sometimes, for example if curves are close to or coincident with the model, this can introduce unnecessary tolerance information into the model. To avoid this, you can use the following options to ensure that the edges and vertices imprinted on a model are exact. </P>
+<P>
+<A NAME="50422124_pgfId-296274"></A>These options are available to both <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A> and <A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A>:</P>
+<P>
+<A NAME="50422124_pgfId-296293"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296277"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296279"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-296281"></A>imprint_coi_exactly</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-650798"></A>A switch that controls whether curves that are coincident with the body are imprinted using an exact method:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-650799"></A>If PK_LOGICAL_false (Default), all imprinted edges and vertices for coincident curves are calculated by projecting the supplied curves onto the body. </LI>
+<LI>
+<A NAME="50422124_pgfId-631937"></A>If PK_LOGICAL_true, then any curves that are coincident with the surface geometry of the body are imprinted onto the body exactly, rather than by projection. Curves that are not coincident are imprinted by projection in the normal manner.</LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-296286"></A>Imprinting exactly is usually faster than imprinting by projection.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-296288"></A>imprint_exactly</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296290"></A>A switch that controls whether the imprinted edges and vertices are exact (regardless of whether the imprinting curves are coincident with the body):</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-296291"></A>If PK_LOGICAL_false (the default), edges and vertices imprinted onto the body may not be exact. </LI>
+<LI>
+<A NAME="50422124_pgfId-296292"></A>If PK_LOGICAL_true, edges and vertices imprinted on the body are exact, irrespective of the setting of <CODE>
+imprint_coi_exactly</CODE>
+. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-296297"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-296296"></A>Note: The <CODE>
+imprint_coi_exactly</CODE>
+ option is also available in <A HREF=../headers/pk_body_imprint_cus_normal.html>PK_BODY_imprint_cus_normal</A> and <A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A>. You should ensure that the curves to be imprinted are close to the body when using the option from these functions. The <CODE>
+imprint_exactly</CODE>
+ option is not available in either <A HREF=../headers/pk_body_imprint_cus_normal.html>PK_BODY_imprint_cus_normal</A> or <A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A>. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-296299"></A>	50.5.8 	<A NAME="50422124_77343"></A>Controlling continuity when imprinting along face normals </H3>
+<P>
+<A NAME="50422124_pgfId-296300"></A>You can specify the continuity of projection curves that are imprinted using either of the normal imprinting functions <A HREF=../headers/pk_body_imprint_cus_normal.html>PK_BODY_imprint_cus_normal</A> and <A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A>. You do this using the <CODE>
+preferred_continuity</CODE>
+ option, which can take the following values:</P>
+<P>
+<A NAME="50422124_pgfId-296317"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296303"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296305"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296307"></A><A HREF=../headers/pk_continuity_t.html>PK_continuity_g1_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296309"></A>Any projected curves are G1 continuous, unless they have been imprinted exactly. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296311"></A><A HREF=../headers/pk_continuity_t.html>PK_continuity_c2_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296313"></A>Any projected curves are C2 continuous, unless they have been imprinted exactly (in which case they have the continuity of the original curve). You should also set <CODE>
+tracking_type</CODE>
+ to <A HREF=../headers/pk_imprint_tracking_t.html>PK_imprint_tracking_curves_c</A> when using this value; see <A HREF="fd_chap.051.html#50422124_89268">Section 50.5.9, “Tracking information for imprint functions”</A>, for more details. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422124_pgfId-296321"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422124_pgfId-296320"></A>Note: The <CODE>
+preferred_continuity</CODE>
+ option takes a value of type <A HREF=../headers/pk_continuity_t.html>PK_continuity_t</A>. This datatype contains a number of additional values that are not listed here, and should not be used in the context of this option. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-296323"></A>	50.5.9 	<A NAME="50422124_89268"></A>Tracking information for imprint functions </H3>
+<P>
+<A NAME="50422124_pgfId-296324"></A>All four of the curve imprinting functions - <A HREF=../headers/pk_body_imprint_cus_normal.html>PK_BODY_imprint_cus_normal</A>, <A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A>, <A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A>, and <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A> - can return detailed tracking information that relates the curves used for the imprinting function to both the edges imprinted and the topology on which those edges were imprinted. </P>
+<P>
+<A NAME="50422124_pgfId-296328"></A><A HREF="fd_chap.051.html#50422124_98447"><EM>
+Figure 50-30</EM></A> shows the tracking information returned in the <CODE>
+track_records</CODE>
+ sub-structure when imprinting two curves onto the sheet body shown. One curve creates an imprinted edge on a face in the body, and the other curve creates an imprinted edge on an existing edge. Two track records are returned, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-296329"></A>One contains the curve used for the imprint (A), the face that received the imprint (B), and the imprinted edge (C).</LI>
+<LI>
+<A NAME="50422124_pgfId-296330"></A>The other contains the curve used for the imprint (D), the edge that received the imprint (E), and the newly created edge (F). </LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-478084"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-525.gif">
+
+<P>
+<A NAME="50422124_pgfId-296507"></A>Figure 50-30 <A NAME="50422124_98447"></A>Tracking the results of imprint operations</P>
+<P>
+<A NAME="50422124_pgfId-296510"></A>If you use the <CODE>
+imprint_complete</CODE>
+ option (as described in <A HREF="fd_chap.051.html#50422124_32632">Section 50.5.6, “Imprint completion”</A>), then any edges that are created as a result of the completion are also returned in <CODE>
+product_topols</CODE>
+. The corresponding <CODE>
+original_topols</CODE>
+ contains the topology on which the completion has been imprinted, but it does not contain a corresponding originating curve, since no such curve exists. <A HREF="fd_chap.051.html#50422124_34408"><EM>
+Figure 50-31</EM></A> illustrates the tracking information that is returned when a curve A is imprinted onto a face B and imprint completion is turned on, creating two new edges, C and D. Two track records are returned, one for each edge created by the imprint:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-296515"></A>The record for edge C includes the new edge (C), the face used for the imprint (B), and the originating curve (A). </LI>
+<LI>
+<A NAME="50422124_pgfId-296516"></A>The record for edge D includes the new edge (D), the face used for the imprint (B), but does not include an originating curve, since no such curve exists. </LI>
+</UL>
+<P>
+<A NAME="50422124_pgfId-478572"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-526.gif">
+
+<P>
+<A NAME="50422124_pgfId-296673"></A>Figure 50-31 <A NAME="50422124_34408"></A>Tracking information returned when using imprint completion</P>
+<P>
+<A NAME="50422124_pgfId-296674"></A>This tracking information is available by default in <A HREF=../headers/pk_body_imprint_cus_vec.html>PK_BODY_imprint_cus_vec</A> and <A HREF=../headers/pk_face_imprint_cus_vec.html>PK_FACE_imprint_cus_vec</A>. In <A HREF=../headers/pk_body_imprint_cus_normal.html>PK_BODY_imprint_cus_normal</A> and <A HREF=../headers/pk_face_imprint_cus_normal.html>PK_FACE_imprint_cus_normal</A>, it needs to be enabled using the following option:</P>
+<P>
+<A NAME="50422124_pgfId-296686"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296677"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296679"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422124_pgfId-296681"></A>tracking_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422124_pgfId-296683"></A>Choose the amount of tracking information returned by the imprint operation. This can take the following values:</P>
+<UL>
+<LI>
+<A NAME="50422124_pgfId-296684"></A><A HREF=../headers/pk_imprint_tracking_t.html>PK_imprint_tracking_basic_c</A>: Return a single track record that contains only basic tracking information about the edges created by the imprint operation. Using this value does not return tracking information that relates the imprinted edges to the original entities. This is the default setting. </LI>
+<LI>
+<A NAME="50422124_pgfId-296685"></A><A HREF=../headers/pk_imprint_tracking_t.html>PK_imprint_tracking_curves_c</A>: Return multiple track records that contain full tracking information for the imprint operation.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422124_pgfId-296688"></A>	50.5.10 	<A NAME="50422124_88979"></A>Imprinting vertices </H3>
+<P>
+<A NAME="50422124_pgfId-296692"></A><A NAME="50422124_marker-296689"></A><A NAME="50422124_marker-296690"></A><A NAME="50422124_marker-296691"></A><A HREF=../headers/pk_edge_imprint_point.html>PK_EDGE_imprint_point</A> adds a vertex to an edge at specified coordinates, providing that a vertex does not already exist at that position. The added vertex splits all edges, except for a ring edge, into two.</P>
+<P>
+<A NAME="50422124_pgfId-296696"></A><A NAME="50422124_marker-296693"></A><A NAME="50422124_marker-296694"></A><A NAME="50422124_marker-296695"></A><A HREF=../headers/pk_face_imprint_point.html>PK_FACE_imprint_point</A> adds a vertex to a face on a sheet, solid or general body. The new vertex is an isolated vertex, and a new loop is created to contain it.</P>
+<P>
+<A NAME="50422124_pgfId-296700"></A><A NAME="50422124_marker-296697"></A><A NAME="50422124_marker-296698"></A><A NAME="50422124_marker-296699"></A><A HREF=../headers/pk_region_imprint_point.html>PK_REGION_imprint_point</A> adds a vertex to a region of a general body. The new vertex is an acorn vertex in the region, and a corresponding acorn shell is created to contain it.</P>
+<P>
+<A NAME="50422124_pgfId-275053"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.050.html">Introduction To Imprinting and Booleans</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.052.html">Introduction to Booleans</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

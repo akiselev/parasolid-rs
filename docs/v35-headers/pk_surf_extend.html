@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SURF_extend</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SURF_extend</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_SURF_extend
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                      surf,        --- surface
+const <A HREF=../headers/pk_surf_extend_o_t.html>PK_SURF_extend_o_t</A>      *options,     --- options structure [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_surf_extend_status_t.html>PK_SURF_extend_status_t</A> *const status       --- status
+)
+</B>
+<A NAME="description"></A>
+<I>This function extends a surface.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_illegal_owner      Indicates that the extension could not be
+                                performed because the surface is owned by
+                                other geometry and the <B>'extension_shape'</B>
+                                option was not <A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_linear_c</A>
+                                (MILD)
+
+    PK_ERROR_is_attached        Indicates that the extension could not be
+                                performed because the surface is attached
+                                to topology and either the surface is a mesh or
+                                the `extension shape' option was not
+                                <A HREF=../headers/pk_extension_shape_t.html>PK_extension_shape_linear_c</A> (MILD)
+
+
+<A NAME="documentation"></A>
+This function extends a surface.  Options are available to specify parameter
+and 3-space extensions, and the shape of the extension.  A status value will
+be returned to indicate the result of the extension.
+
+The original surface will be extended and its parameterisation maintained.
+However, note that if the surface is of class <B>'PK_CLASS_offset'</B> the
+underlying surface will be extended. The surface will remain unchanged if the
+extension would result in the surface becoming invalid; however, see the
+<B>'allow_partial_extension'</B> option.
+
+The surface may be of any class recognised by Parasolid except
+<B>'PK_CLASS_fsurf'</B>, and may be attached to topology or be orphan; however,
+see the <B>'extension_shape'</B> option.
+
+
+Received arguments:
+
+option structure:
+This function takes an option structure that defines the extension required.
+The default options will result in no change to the surface and a return
+status of <B>'PK_SURF_extend_unextended_c'</B>.  Details of the option structure
+can be found in its documentation.
+
+Returned arguments:
+
+status
+<B>'status'</B> indicates the result of the extend operation.  Possible values are:
+
+
+PK_SURF_extend_ok_c:  Indicates that the surface was successfully extended as
+requested.
+
+
+PK_SURF_extend_unextended_c:  Indicates that the surface has remained unchanged
+as the existing surface is large enough.
+
+
+PK_SURF_extend_partial_c:  Indicates that the surface was extended, but not
+by the full amount requested.  It is returned when the
+<B>'allow_partial_extension'</B> option has been provided and the entire extension
+could not be performed without invalidating the surface.
+
+
+PK_SURF_extend_invalid_c:  Indicates that the surface was not extended as it
+would become invalid, for example self-intersecting.
+
+
+PK_SURF_extend_failure_c:  Indicates that the extension algorithm failed.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

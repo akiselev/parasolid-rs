@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_project</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_project</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>              PK_CURVE_project
+(
+<I>--- received arguments ---
+</I>int                          n_curves,       --- number of tool curves
+const <A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>             curves[],       --- array of tool curves
+const <A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>          intervals[],    --- array of curve intervals
+int                          n_targets,      --- number of target entities
+const <A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A>            targets[],      --- array of target entities
+const <A HREF=../headers/pk_curve_project_o_t.html>PK_CURVE_project_o_t</A>  *options,        --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_curve_project_r_t.html>PK_CURVE_project_r_t</A>  *const results,        --- results structure
+<A HREF=../headers/pk_entity_track_r_t.html>PK_ENTITY_track_r_t</A>   *const tracking        --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function projects and/or imprints the supplied curves onto the
+given target entities.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_invalid_geometry       (MILD)     An input curve or target entity
+                                               is invalid or self-intersecting.
+    PK_ERROR_not_in_same_body       (MILD)     The <B>'targets'</B> array contains
+                                               faces from different bodies.
+    PK_ERROR_bad_combination        (MILD)     An invalid combination of
+                                               options has been provided.
+    PK_ERROR_unsupported_operation  (MILD)     Cannot project to a wire body
+                                               or imprint on a surface.
+    PK_ERROR_curve_nmnl_off         (MILD)     Nominal curves are not enabled
+                                               on the target body.
+    PK_ERROR_failed_to_project      (SERIOUS)  Failed to project curve.
+    PK_ERROR_cant_do_imprint        (SERIOUS)  Failed to imprint curve.
+    PK_ERROR_ambiguous_imprint      (SERIOUS)  Failed to complete imprint
+                                               because the completion is
+                                               not unique.
+    PK_ERROR_cant_complete_imprint  (SERIOUS)  Other failure of the imprint
+                                               completion algorithm.
+
+
+<A NAME="documentation"></A>
+This function will produce a set of curves and points which are coincident with
+the target entities. Depending on the value of the <B>'function'</B> option, the
+projections will be returned as pure geometry and/or imprinted on the target as
+edges and vertices. The projection is performed according to the specified
+<B>'method'</B>.
+
+The <B>'targets'</B> array may contain a single body, a single surface, or a list of
+faces from the same body. This function does not support wire bodies, or bodies
+whose faces have no attached geometry. If an imprint operation is chosen in
+<B>'function'</B>, the target may not be a surface.
+
+The <B>'curves'</B> array may not contain self-intersecting curves or foreign
+geometry.  The resulting curves will be split at g1 discontinuities. Further
+splitting of projected curves is controlled by the <B>'split_clash'</B> option. The
+default splitting is compulsory if an imprint operation is chosen in
+<B>'function'</B>.
+
+Where possible, the direction of a projected curve will be the same as the
+input curve. When this is ambiguous (e.g. side faces) the curve will be in
+the direction of projection.
+
+The results structure contains the projected and imprinted items, along with
+the appropriate curve interval (or a zero interval for points) and the achieved
+tolerance of the projection. An achieved tolerance of 0.0 indicates that the
+projection has been performed exactly.
+
+When clashing the end-points of projections (for ensuring the chaining of
+imprints, or for identifying point-like projections) Parasolid considers
+the tolerance as applying to both ends. In this scenario, this can lead to
+vertex tolerances (or achieved tolerances) which are up to twice the input
+<B>'tolerance'</B>.
+
+The returned tracking contains a track record for each projected or imprinted
+entity in <B>'product_entities'</B>. Each of these is mapped to two
+<B>'original_entities'</B>: an input curve and a target. The target entity is usually
+a face or surface, but may be an edge or vertex if the projection is coincident
+with existing topology on the target. Edges arising from imprint completion are
+tracked in the same way, but the original curve will be tracked as a zero tag.
+
+If no projections can be determined (e.g. there is no projection in the
+supplied vector direction), an empty results structure is returned.
+
+Under normal projection (<B>'method'</B> is <A HREF=../headers/pk_proj_method_t.html>PK_proj_method_normal_c</A>), best results are
+obtained when the input curve remains close to the target, so that the
+projection is well-defined. For this reason it is advisable always to use
+the <B>'max_dist'</B> option in such cases. Normal projection from beyond the local
+radius of curvature of the target is not defined.
+
+Finer control over the output may be provided through the options structure.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

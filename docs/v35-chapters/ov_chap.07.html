@@ -1,0 +1,538 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Working with Sheets and Wires</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Working with Sheets and Wires</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.06.html">Local Operations</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.08.html">B-Spline Curves and Surfaces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-280624">6.1	Introduction</A>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-291232">6.2	Sheet modelling</A>
+<UL>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-291244">6.2.1	Creating and modifying sheets</A>
+<UL>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-291304">6.2.1.1	Trimming sheets</A>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-291347">6.2.1.2	Extending sheets</A>
+</UL>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-291263">6.2.2	Blending sheets</A>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-291264">6.2.3	Sewing sheets</A>
+<UL>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-291367">6.2.3.1	Knitting bodies together</A>
+</UL>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-291265">6.2.4	Other operations with sheets</A>
+</UL>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-317420">6.3	Wire modelling</A>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-277473">6.4	Creating profiles</A>
+<UL>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-277492">6.4.1	Imprinting</A>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-277533">6.4.2	Creating primitive sheet bodies</A>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-277539">6.4.3	Using existing entities</A>
+<LI> <A HREF="ov_chap.07.html#50446372_pgfId-277545">6.4.4	Outline curves, perspective outlines, spun outlines and shadow curves</A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446372_pgfId-280624"></A>6.1	<A NAME="50446372_marker-340597"></A><A NAME="50446372_marker-340715"></A><A NAME="50446372_marker-340713"></A><A NAME="50446372_marker-340815"></A><A NAME="50446372_marker-340799"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446372_pgfId-280627"></A>Many Parasolid operations work equally well with sheet, wire and solid bodies. This chapter describes Parasolid functionality that is specifically aimed at modelling with wire bodies and sheet bodies, or whose behaviour with wire and sheet bodies is significantly different to its behaviour with solid bodies. Although Parasolid&#8217;s primary focus is creating solid models, there are many occasions when you need to work with sheets or wires. For example:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-280673"></A><A NAME="50446372_marker-341093"></A><A NAME="50446372_marker-341403"></A>You may need to import data from another modeler that is expressed in terms of surface data, rather than solid. This data needs to be imported, cleaned up and then represented in such a way that the user can continue to model with it in Parasolid.</LI>
+<LI>
+<A NAME="50446372_pgfId-280677"></A><A NAME="50446372_marker-341097"></A><A NAME="50446372_marker-341401"></A>You often need to create wire or sheet profiles that are going to be used as the basis of further modelling operations, as described in <A HREF="ov_chap.10.html#50446338_31925">Chapter 9, &#8220;Building Bodies from Profiles&#8221;</A>.</LI>
+<LI>
+<A NAME="50446372_pgfId-280757"></A><A NAME="50446372_marker-341101"></A><A NAME="50446372_marker-341411"></A>You may want to provide your users with a workflow that lets them work with sheet data, converting it to solid data only at specific points in the modelling process.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-320453"></A>The functionality described in this chapter makes all of these techniques possible. </P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-320485"></A><A HREF="ov_chap.07.html#50446372_60094">Section 6.2, &#8220;Sheet modelling&#8221;</A>, describes functionality specifically aimed at sheet modelling. This is particularly useful when importing surface data into Parasolid.</LI>
+<LI>
+<A NAME="50446372_pgfId-320496"></A><A HREF="ov_chap.07.html#50446372_69825">Section 6.3, &#8220;Wire modelling&#8221;</A>, describes functionality aimed at wire modelling. Much of this functionality is analogous to the functionality available for sheets.</LI>
+<LI>
+<A NAME="50446372_pgfId-280888"></A><A HREF="ov_chap.07.html#50446372_98206">Section 6.4, &#8220;Creating profiles&#8221;</A>, explains how you can create profile bodies. These are acorns, wires, or sheets that you use to create more complex bodies using further Parasolid functionality. There are many ways of modelling with profiles (and these are described in <A HREF="ov_chap.10.html#50446338_31925">Chapter 9, &#8220;Building Bodies from Profiles&#8221;</A>), but for now, think of them as representing a cross-section through a body that you want to create.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446372_pgfId-291232"></A>6.2	<A NAME="50446372_60094"></A><A NAME="50446372_marker-340599"></A><A NAME="50446372_marker-340749"></A>Sheet modelling
+
+
+</H1>
+<P>
+<A NAME="50446372_pgfId-291600"></A>Despite the superiority of solid modelling applications such as those based on Parasolid, there are still CAD applications that rely on surface modelling techniques, particularly for parts containing free-form geometry. Models created in these applications often need to be imported into Parasolid-based applications, as described in <A HREF="ov_chap.12.html#50446348_71658">Chapter 11, &#8220;Importing Foreign Data&#8221;</A>, and the sheet bodies resulting from such imports need to be cleaned up and reworked so that modelling on the body can continue. </P>
+<P>
+<A NAME="50446372_pgfId-292028"></A>Parasolid provides you with a wide variety of operations specifically aimed at sheet modelling, making it easy to create, modify, blend and &#8220;solidify&#8221; sheets. These complement the core solid modelling capabilities offered, enabling your application to tightly integrate the two so as to provide advanced modelling systems that combine the strengths of both paradigms. This section describes this functionality:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-292120"></A><A HREF="ov_chap.07.html#50446372_12961">Section 6.2.1</A> describes how you can create and modify sheets, respectively. </LI>
+<LI>
+<A NAME="50446372_pgfId-320571"></A><A HREF="ov_chap.07.html#50446372_27078">Section 6.2.2</A> describes how sheets can be blended.</LI>
+<LI>
+<A NAME="50446372_pgfId-292138"></A><A HREF="ov_chap.07.html#50446372_15301">Section 6.2.3</A> describes how you can use sewing and knitting techniques to join sheets together. </LI>
+<LI>
+<A NAME="50446372_pgfId-292143"></A><A HREF="ov_chap.07.html#50446372_86164">Section 6.2.4</A> describes other miscellaneous sheet operations that are available. </LI>
+</UL>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446372_pgfId-291244"></A>	6.2.1 	<A NAME="50446372_12961"></A><A NAME="50446372_marker-340601"></A><A NAME="50446372_marker-340725"></A><A NAME="50446372_marker-340681"></A><A NAME="50446372_marker-340707"></A>Creating and modifying sheets</H2>
+<P>
+<A NAME="50446372_pgfId-320600"></A>Parasolid provides operations to let you create sheet bodies from scratch from a collection of faces. You can also create primitive sheet bodies such as circles, polygons and rectangles directly, by calling efficient dedicated functionality.</P>
+<P>
+<A NAME="50446372_pgfId-291461"></A>You can modify existing sheets by trimming them (making them smaller) and extending them (making them larger). </P>
+<P>
+<A NAME="50446372_pgfId-494166"></A>You can create a set of neutral (mid-surface) sheets from a solid body, as shown in <A HREF="ov_chap.07.html#50446372_92028"><EM>
+Figure 6-1</EM></A>, or from faces of sheet bodies.</P>
+<P>
+<A NAME="50446372_pgfId-494181"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-71.gif">
+
+<P>
+<A NAME="50446372_pgfId-494191"></A>Figure 6-1 <A NAME="50446372_92028"></A>Creating neutral sheets from a solid body</P>
+
+<H4>
+<A NAME="50446372_pgfId-291304"></A>6.2.1.1 <A NAME="50446372_marker-340603"></A><A NAME="50446372_marker-340755"></A>Trimming sheets</H4>
+<P>
+<A NAME="50446372_pgfId-291498"></A>Trimming sheets to a specified boundary is generally a two-part process:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-778194"></A>Imprint additional curves on the sheet to divide the sheet into at least two distinct sets of faces.</LI>
+<LI>
+<A NAME="50446372_pgfId-778656"></A>Trim the sheet to the specified boundary, selecting which faces should be kept.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-778162"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-72.gif">
+
+<P>
+<A NAME="50446372_pgfId-557574"></A>Figure 6-2 Trimming sheet bodies</P>
+<P>
+<A NAME="50446372_pgfId-292528"></A>There are many ways that you can imprint curves onto a body. The most common methods involve:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-320706"></A>Specifying the curves explicitly</LI>
+<LI>
+<A NAME="50446372_pgfId-320711"></A>Imprinting a set of faces onto the sheet</LI>
+<LI>
+<A NAME="50446372_pgfId-320712"></A>Intersecting a plane with the sheet</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-320714"></A>See <A HREF="ov_chap.07.html#50446372_75575">Section 6.4.1</A> for more methods of imprinting. Parasolid can also join together disconnected parts of an imprinted curve automatically, thereby ensuring that sheets are reliably divided into face sets ready for trimming. </P>
+
+
+<H4>
+<A NAME="50446372_pgfId-291347"></A>6.2.1.2 <A NAME="50446372_marker-340605"></A><A NAME="50446372_marker-340709"></A>Extending sheets</H4>
+<P>
+<A NAME="50446372_pgfId-291503"></A>As well as trimming sheets, you can extend sheets beyond their current boundaries, following the underlying surface wherever possible. When a sheet is extended to a point where no underlying surface is available, you can control the shape of the extension that is created.</P>
+<P>
+<A NAME="50446372_pgfId-544009"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-73.gif">
+
+<P>
+<A NAME="50446372_pgfId-299750"></A>Figure 6-3 Creating sheet bodies by combining sheet extension and boolean operations</P>
+<P>
+<A NAME="50446372_pgfId-436585"></A>Parasolid can extend sheets either by a specific distance, or by extending until the sheet reaches a specified target body. </P>
+<P>
+<A NAME="50446372_pgfId-479644"></A>When extending by a specific distance, you can control whether to create a precise or a loose boundary. Creating a loose boundary can improve performance in cases where the exact boundary shape is irrelevant for your needs, for example if you intend to trim away some of the extension using subsequent modelling operations.</P>
+<P>
+<A NAME="50446372_pgfId-479749"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-74.gif">
+
+<P>
+<A NAME="50446372_pgfId-479751"></A>Figure 6-4 <A NAME="50446372_39383"></A>Creating precise and loose boundaries when extending sheets</P>
+<P>
+<A NAME="50446372_pgfId-788307"></A>When extending to a target, you can control whether to extend until the sheet first reaches the target, or until the sheet leaves the target, as shown in <A HREF="ov_chap.07.html#50446372_33496"><EM>
+Figure 6-5</EM></A></P>
+<P>
+<A NAME="50446372_pgfId-788350"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-75.gif">
+
+<P>
+<A NAME="50446372_pgfId-680145"></A>Figure 6-5 <A NAME="50446372_33496"></A>Controlling the result when extending a sheet to a target body</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446372_pgfId-291263"></A>	6.2.2 	<A NAME="50446372_27078"></A><A NAME="50446372_marker-340607"></A><A NAME="50446372_marker-340693"></A>Blending sheets</H2>
+<P>
+<A NAME="50446372_pgfId-291509"></A>Blending operations (described in more detail in <A HREF="ov_chap.11.html#50446340_64660">Chapter 10, &#8220;Blending&#8221;</A>) can be performed on sheets as well as solids. </P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-634511"></A>Separate sheets can be bonded by creating face-face blends between them, as shown in <A HREF="ov_chap.07.html#50446372_18449"><EM>
+Figure 6-6</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-855360"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-76.gif">
+
+<P>
+<A NAME="50446372_pgfId-634516"></A>Figure 6-6 <A NAME="50446372_18449"></A>Creating blends between sheets</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-788468"></A><A NAME="50446372_marker-788466"></A><A NAME="50446372_marker-788467"></A>The shape of a sheet can be modified by blending vertices at non-smooth points on a sheet boundary, as shown in <A HREF="ov_chap.07.html#50446372_11488"><EM>
+Figure 6-7</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-788544"></A><CODE>
+</CODE>
+&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-77.gif">
+
+<P>
+<A NAME="50446372_pgfId-592128"></A>Figure 6-7 <A NAME="50446372_11488"></A>Creating blends between sheets</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446372_pgfId-291264"></A>	6.2.3 	<A NAME="50446372_15301"></A><A NAME="50446372_marker-340609"></A><A NAME="50446372_marker-340743"></A>Sewing sheets</H2>
+<P>
+<A NAME="50446372_pgfId-298114"></A>You can sew together sets of sheets that are geometrically close. This is particularly useful when importing trimmed surface data from another, non-Parasolid, application (see <A HREF="ov_chap.12.html#50446348_72522">Section 11.2</A>). In such cases, because Parasolid expects extremely accurate geometry and rich topological information, the result of an import can often be a set of disconnected sheets with no information available about how each sheet should connect to the others. Parasolid make it possible to heal such bodies without requiring any topological information. </P>
+<P>
+<A NAME="50446372_pgfId-309310"></A><A NAME="50446372_marker-309307"></A><A NAME="50446372_marker-309308"></A><A NAME="50446372_marker-309309"></A>A collection of sheet bodies can be sewn together by gluing them where their edges meet, resulting in a single connected body. Parasolid sews together all pairs of edges which are less than a specified distance apart, as shown in <A HREF="ov_chap.07.html#50446372_83338"><EM>
+Figure 6-8</EM></A>.</P>
+<P>
+<A NAME="50446372_pgfId-675043"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-78.gif">
+
+<P>
+<A NAME="50446372_pgfId-309611"></A>Figure 6-8 <A NAME="50446372_83338"></A>Sewing together collections of closely spaced sheets.</P>
+<P>
+<A NAME="50446372_pgfId-314814"></A>Several options are provided, including:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-465706"></A>Whether to remove duplicate sheets in the result.</LI>
+<LI>
+<A NAME="50446372_pgfId-465711"></A>Whether to return sheet or solid bodies (in cases where sewing creates a void region). </LI>
+<LI>
+<A NAME="50446372_pgfId-465721"></A>The ability to optimise performance and reliability when sewing sheets that are part of an assembly</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-465705"></A>In addition, Parasolid supports <STRONG>
+incremental sewing</STRONG><A NAME="50446372_marker-340627"></A><A NAME="50446372_marker-340711"></A><A NAME="50446372_marker-340825"></A>. This is a technique whereby sewing is repeated several times on the same set of sheets, increasing the maximum gap that will be sewn across with each iteration. The effect of this is to maximise the preservation of small details on parts where significant details are present over a wide range of scales. </P>
+
+<H4>
+<A NAME="50446372_pgfId-291367"></A>6.2.3.1 <A NAME="50446372_marker-340611"></A><A NAME="50446372_marker-340719"></A><A NAME="50446372_marker-340717"></A>Knitting bodies together</H4>
+<P>
+<A NAME="50446372_pgfId-314893"></A>Parasolid also supports <STRONG>
+knitting</STRONG> operations. Knitting is similar to sewing, but can be used in cases where you want to combine sheets with solid bodies, or combinations of bodies. Parasolid can knit entities that are coincident to within a tolerance set by your application. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446372_pgfId-291265"></A>	6.2.4 	<A NAME="50446372_86164"></A><A NAME="50446372_marker-340613"></A><A NAME="50446372_marker-340723"></A><A NAME="50446372_marker-340721"></A>Other operations with sheets</H2>
+<P>
+<A NAME="50446372_pgfId-314979"></A>Parasolid supports a number of other miscellaneous operations with sheets. These include:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-326094"></A>Thickening sheets so as to produce solid bodies (described in more detail in <A HREF="ov_chap.06.html#50446369_53846">Section 5.2.3</A>)</LI>
+<LI>
+<A NAME="50446372_pgfId-326114"></A><A NAME="50446372_marker-341175"></A><A NAME="50446372_marker-341405"></A>Deleting holes</LI>
+<LI>
+<A NAME="50446372_pgfId-326126"></A><A NAME="50446372_marker-341179"></A><A NAME="50446372_marker-341409"></A>Replacing the surfaces of faces in sheet bodies. </LI>
+</UL>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446372_pgfId-317420"></A>6.3	<A NAME="50446372_69825"></A><A NAME="50446372_marker-340615"></A><A NAME="50446372_marker-340757"></A>Wire modelling
+
+
+</H1>
+<P>
+<A NAME="50446372_pgfId-317431"></A>As with sheet bodies, Parasolid provides specific functionality for modelling with wire bodies. This includes:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-317524"></A><A NAME="50446372_marker-341187"></A><A NAME="50446372_marker-341415"></A>Creating wire bodies from sets of curves or edges.</LI>
+<LI>
+<A NAME="50446372_pgfId-317569"></A><A NAME="50446372_marker-341191"></A><A NAME="50446372_marker-341407"></A>Creating faces to fit wire bodies.</LI>
+<LI>
+<A NAME="50446372_pgfId-317434"></A><A NAME="50446372_marker-341195"></A><A NAME="50446372_marker-341395"></A>Blending vertices on wire bodies.</LI>
+<LI>
+<A NAME="50446372_pgfId-317647"></A><A NAME="50446372_marker-341199"></A><A NAME="50446372_marker-341413"></A>Splitting wire bodies.</LI>
+<LI>
+<A NAME="50446372_pgfId-317436"></A><A NAME="50446372_marker-341203"></A><A NAME="50446372_marker-341417"></A>Offsetting planar wire bodies.</LI>
+<LI>
+<A NAME="50446372_pgfId-508741"></A>Performing boolean unite and subtract operations on wire bodies.</LI>
+<LI>
+<A NAME="50446372_pgfId-533748"></A>Uniting wire bodies with sheet bodies.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-533778"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-79.gif">
+
+<P>
+<A NAME="50446372_pgfId-317497"></A>Figure 6-9 Various offsets of a star-shaped wire body </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446372_pgfId-277473"></A>6.4	<A NAME="50446372_98206"></A><A NAME="50446372_marker-340617"></A><A NAME="50446372_marker-340705"></A>Creating profiles
+
+
+</H1>
+<P>
+<A NAME="50446372_pgfId-277758"></A>A profile is a general term for a simple zero-, one- or two-dimensional body that is subsequently used to create new bodies with free-form geometry. Creating profiles is an important technique in solid modelling, and Parasolid provides functionality to make it simple.This section describes how you can create profiles from a set of curves, by creating sheet bodies directly or from existing entities. </P>
+<P>
+<A NAME="50446372_pgfId-277474"></A>There are four general approaches to creating profiles:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-277478"></A>Imprint a series of curves to create a sketch. See <A HREF="ov_chap.07.html#50446372_75575">Section 6.4.1</A>.</LI>
+<LI>
+<A NAME="50446372_pgfId-277481"></A>Create primitive sheet bodies directly using built-in functionality. See <A HREF="ov_chap.07.html#50446372_70877">Section 6.4.2</A>.</LI>
+<LI>
+<A NAME="50446372_pgfId-277486"></A>Create profiles from existing edges or curves in a body. See <A HREF="ov_chap.07.html#50446372_78355">Section 6.4.3</A>.</LI>
+<LI>
+<A NAME="50446372_pgfId-277487"></A>Create profiles by finding the outline of an existing body when viewed from a particular direction. See <A HREF="ov_chap.07.html#50446372_67591">Section 6.4.4</A>.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-286572"></A><A HREF="ov_chap.10.html#50446338_31925">Chapter 9, &#8220;Building Bodies from Profiles&#8221;</A>, tells you about how you can use profiles to create new bodies.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446372_pgfId-277492"></A>	6.4.1 	<A NAME="50446372_75575"></A><A NAME="50446372_marker-340619"></A><A NAME="50446372_marker-340817"></A><A NAME="50446372_marker-340801"></A>Imprinting</H2>
+<P>
+<A NAME="50446372_pgfId-277493"></A>The most basic way of creating a profile is to build it piecemeal by imprinting a series of curves:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-834169"></A><STRONG>
+You can scribe new curves directly onto existing entities.</STRONG><A NAME="50446372_marker-834166"></A><A NAME="50446372_marker-834167"></A><A NAME="50446372_marker-834168"></A> You can create new faces by scribing onto a solid body, or you can extend a wire body by scribing onto the wire body or onto its region.</LI>
+<LI>
+<A NAME="50446372_pgfId-834173"></A><STRONG>
+You can project existing curves onto a body.</STRONG><A NAME="50446372_marker-834170"></A><A NAME="50446372_marker-834171"></A><A NAME="50446372_marker-834172"></A> Different effects can be achieved, depending on whether you project the curve along the normal of the faces onto which you are imprinting, or whether you project the curve along a specified vector.</LI>
+<LI>
+<A NAME="50446372_pgfId-833391"></A><STRONG>
+You can also imprint projected curves onto a body.</STRONG> Curves are first projected then imprinted on the body.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-622940"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-80.gif">
+
+<P>
+<A NAME="50446372_pgfId-833693"></A>&nbsp;</P>
+<P>
+<A NAME="50446372_pgfId-622868"></A>Figure 6-10 Imprinting curves by scribing and projecting</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446372_pgfId-277533"></A>	6.4.2 	<A NAME="50446372_70877"></A><A NAME="50446372_marker-340621"></A><A NAME="50446372_marker-340703"></A><A NAME="50446372_marker-340701"></A><A NAME="50446372_marker-340699"></A>Creating primitive sheet bodies</H2>
+<P>
+<A NAME="50446372_pgfId-277537"></A><A NAME="50446372_marker-341247"></A><A NAME="50446372_marker-341399"></A>As mentioned in <A HREF="ov_chap.07.html#50446372_12961">Section 6.2.1</A>, Parasolid provides a range of functionality to let you create primitive sheet bodies such as circles, polygons and rectangles.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446372_pgfId-277539"></A>	6.4.3 	<A NAME="50446372_78355"></A><A NAME="50446372_marker-340623"></A><A NAME="50446372_marker-340697"></A><A NAME="50446372_marker-340695"></A>Using existing entities</H2>
+<P>
+<A NAME="50446372_pgfId-277543"></A>Parasolid provides tools to create a wire profile from a set of existing edges or curves in a single operation, and to turn a closed wire into a sheet body if required.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446372_pgfId-277545"></A>	6.4.4 	<A NAME="50446372_67591"></A><A NAME="50446372_marker-1073299"></A><A NAME="50446372_marker-1073300"></A><A NAME="50446372_marker-1073301"></A><A NAME="50446372_marker-1073302"></A><A NAME="50446372_marker-1073303"></A><A NAME="50446372_marker-1073304"></A><A NAME="50446372_marker-1073305"></A><A NAME="50446372_marker-1073306"></A><A NAME="50446372_marker-1073307"></A><A NAME="50446372_marker-1073308"></A><A NAME="50446372_marker-1073309"></A><A NAME="50446372_marker-1073310"></A>Outline curves, perspective outlines, spun outlines and shadow curves</H2>
+<P>
+<A NAME="50446372_pgfId-277546"></A>Another way of creating profiles is to use outlines. This is specialised functionality that creates a profile from the outline of an existing body. Parasolid supports the following types of outline:</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-277550"></A>An <STRONG>
+outline curve</STRONG><A NAME="50446372_marker-1078694"></A><A NAME="50446372_marker-1078695"></A> is the outline created by drawing around the boundary of a set of bodies, as seen from a specified view direction. This is illustrated in <A HREF="ov_chap.07.html#50446372_96504"><EM>
+Figure 6-11</EM></A>. Parasolid also supports the creation of outlines of wire components or sheet components that are edge-on when viewed in a specified direction as illustrated in <A HREF="ov_chap.07.html#50446372_82383"><EM>
+Figure 6-12</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-690474"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-81.gif">
+
+<P>
+<A NAME="50446372_pgfId-277620"></A>Figure 6-11 <A NAME="50446372_96504"></A>Creating outline curves for a body</P>
+<P>
+<A NAME="50446372_pgfId-1078380"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-82.gif">
+
+<P>
+<A NAME="50446372_pgfId-1078271"></A>Figure 6-12 <A NAME="50446372_82383"></A>Creating an outline of an edge-on sheet body</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-1018339"></A>A <STRONG>
+perspective outline</STRONG> is created by drawing around the boundary of a body or a set of bodies, as seen from a perspective view point as shown in <A HREF="ov_chap.07.html#50446372_58141"><EM>
+Figure 6-13</EM></A>. In addition, Parasolid gives you the option to clip these outline curves so only those that fall within a specified range are generated as shown in <A HREF="ov_chap.07.html#50446372_25959"><EM>
+Figure 6-14</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-1018580"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-83.gif">
+
+<P>
+<A NAME="50446372_pgfId-1018539"></A>Figure 6-13 <A NAME="50446372_58141"></A>Creating a perspective outline for a body</P>
+<P>
+<A NAME="50446372_pgfId-1078895"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-84.gif">
+
+<P>
+<A NAME="50446372_pgfId-1078789"></A>Figure 6-14 <A NAME="50446372_25959"></A>Clipping perspective outline curves</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-277621"></A>A <STRONG>
+spun outline</STRONG><A NAME="50446372_marker-1075209"></A><A NAME="50446372_marker-1075210"></A> is the rotational equivalent of an outline curve. Consider spinning a set of bodies around an axis: the spun outline represents a cross-section through the resulting spun body. If the spun outline is projected onto a plane that passes through the spin axis, its resulting profile describes the hole that would need to be cut in order for the bodies to pass through, as shown in <A HREF="ov_chap.07.html#50446372_70043"><EM>
+Figure 6-15</EM></A>. This functionality also enables you to create outlines of features which are hidden by other portions of the model as shown in <A HREF="ov_chap.07.html#50446372_79100"><EM>
+Figure 6-16</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-695481"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-85.gif">
+
+<P>
+<A NAME="50446372_pgfId-277470"></A>Figure 6-15 <A NAME="50446372_70043"></A>Creating spun outlines for two bodies</P>
+<P>
+<A NAME="50446372_pgfId-1079518"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-86.gif">
+
+<P>
+<A NAME="50446372_pgfId-1079414"></A>Figure 6-16 <A NAME="50446372_79100"></A>Creating invisible outlines of a body with holes</P>
+<UL>
+<LI>
+<A NAME="50446372_pgfId-287239"></A>A <STRONG>
+shadow curve</STRONG><A NAME="50446372_marker-340639"></A><A NAME="50446372_marker-340745"></A> is basically an outline curve that is projected directly onto a body. Shadow curves are the curves that are projected onto a set of bodies when viewed from a specific direction, splitting the bodies into visible and invisible areas when they are viewed from that direction. They are known as shadow curves because they represent areas of light and dark if you assume that a light source is placed at the view direction.</LI>
+</UL>
+<P>
+<A NAME="50446372_pgfId-734265"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-87.gif">
+
+<P>
+<A NAME="50446372_pgfId-287315"></A>Figure 6-17 Shadow curves on a set of bodies</P>
+<P>
+<A NAME="50446372_pgfId-277386"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.06.html">Local Operations</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.08.html">B-Spline Curves and Surfaces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

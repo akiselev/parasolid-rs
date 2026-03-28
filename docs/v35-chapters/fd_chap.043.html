@@ -1,0 +1,1109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Creating Emboss Features</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Creating Emboss Features</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.042.html">Shadow Curves</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.044.html">Introduction To Sheets and Wires</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-294743">42.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295033">42.1.1	Arguments </A>
+</UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295251">42.2	Options </A>
+<UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295313">42.2.1	Convexity </A>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295325">42.2.2	Profile location </A>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295330">42.2.3	Sidewalls </A>
+<UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295349">42.2.3.1	Tapered sidewalls </A>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295588">42.2.3.2	Specifying multiple angles for tapered sidewalls </A>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295686">42.2.3.3	Ruled sidewalls </A>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295734">42.2.3.4	Swept sidewalls </A>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295790">42.2.3.5	Supplying your own sidewall </A>
+</UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-295846">42.2.4	Overflow </A>
+<UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-296071">42.2.4.1	Specifying interior overflow behaviour </A>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-296682">42.2.4.2	Specifying laminar overflow behaviour </A>
+</UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-296991">42.2.5	Returning the embossed feature separately </A>
+</UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-297596">42.3	Constraints </A>
+<UL>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-297604">42.3.1	Topological constraints </A>
+<LI> <A HREF="fd_chap.043.html#50422114_pgfId-297629">42.3.2	Orientation constraints </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422114_pgfId-294743"></A>42.1	<A NAME="50422114_marker-294741"></A><A NAME="50422114_marker-294742"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422114_pgfId-294744"></A>The functions <A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A> and <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A> provide you with generic, high-level functionality for adding protruding (pad) or indented (pocket) emboss features to a target body, the general shape of which can be described using supplied profiles. </P>
+<UL>
+<LI>
+<A NAME="50422114_pgfId-294745"></A><A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A> provides global emboss functionality, letting you add emboss features across a whole body in one operation.</LI>
+<LI>
+<A NAME="50422114_pgfId-327815"></A><A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A> provides local emboss functionality, letting you add emboss features to a selected set of faces within a body. </LI>
+</UL>
+<P>
+<A NAME="50422114_pgfId-327816"></A>For both functions, Parasolid automatically creates sidewalls for emboss features, based on a range of criteria you supply.</P>
+<P>
+<A NAME="50422114_pgfId-390735"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422114_pgfId-390734"></A>Note: This functionality supports facet geometry in the target body but only if the facet geometry is not modified in the result.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-344366"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-406.gif">
+
+<P>
+<A NAME="50422114_pgfId-295029"></A>Figure 42-1 Creating pad and pocket emboss features on a target body</P>
+<P>
+<A NAME="50422114_pgfId-378083"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-377939"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422114_pgfId-377943"></A><A HREF="fd_chap.045.html#50422117_30749">Chapter 44, “Wire Modeling”</A></LI>
+<LI>
+<A NAME="50422114_pgfId-377947"></A><A HREF="fd_chap.046.html#50422118_34338">Chapter 45, “Sheet Modeling”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422114_pgfId-295033"></A>	42.1.1 	<A NAME="50422114_marker-377987"></A><A NAME="50422114_marker-377988"></A><A NAME="50422114_marker-377989"></A>Arguments </H3>
+<P>
+<A NAME="50422114_pgfId-295034"></A>In order to create an emboss feature, you need to supply:</P>
+<UL>
+<LI>
+<A NAME="50422114_pgfId-295035"></A>A target body (for <A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A>) or a set of faces from the same body (for <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A>) that the emboss feature is placed onto</LI>
+<LI>
+<A NAME="50422114_pgfId-295036"></A>A profile that describes the shape of the emboss on that target</LI>
+<LI>
+<A NAME="50422114_pgfId-328001"></A>An end cap that describes how far the emboss feature should protrude from the target (for pads) or indent into the target (for pockets)</LI>
+</UL>
+<P>
+<A NAME="50422114_pgfId-328002"></A>Parasolid then creates a sidewall around the profile, limited by the target (or the specified faces) and the end cap, and based on further constraints supplied in the form of options to the function (described in <A HREF="fd_chap.043.html#50422114_13360">Section 42.2, “Options”</A>). The received bodies are described in more detail in the following table:</P>
+<P>
+<A NAME="50422114_pgfId-295064"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295044"></A>Body</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295046"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295048"></A>Profile</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295050"></A>The profile describes the general shape of the emboss feature you want to create, depending also on constraints supplied by the other input bodies and data for the operation: for example, a circular profile will in general create circular emboss features. </P>
+<P>
+<A NAME="50422114_pgfId-295051"></A>The profile supplied must be either a closed oriented wire or an open sheet without holes. It survives unchanged after the operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295053"></A>End cap</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295055"></A>The end cap places either a “roof” (for pads) or a “floor” (for pockets) on the emboss feature. Parasolid confines the sidewall so that it exists between the profile area projected on the target, and the end cap.</P>
+<P>
+<A NAME="50422114_pgfId-295056"></A>The end cap supplied must be either a solid or sheet. It survives unchanged after the operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295058"></A>Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295060"></A>For any emboss operation, the target is the body on which you want to place the emboss feature. </P>
+<UL>
+<LI>
+<A NAME="50422114_pgfId-295061"></A><A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A> receives the whole target body as input, and creates an emboss feature bounded by that target.</LI>
+<LI>
+<A NAME="50422114_pgfId-295062"></A><A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A> receives a set of faces from the target body as input, and creates an emboss feature that is bounded by those faces.</LI>
+</UL>
+<P>
+<A NAME="50422114_pgfId-295063"></A>For both global and local emboss, the target body must be either a solid or sheet. It survives, and is modified after the operation.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-338994"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-407.gif">
+
+<P>
+<A NAME="50422114_pgfId-295247"></A>Figure 42-2 Orientation of input bodies in pad and pocket emboss features</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422114_pgfId-295251"></A>42.2	<A NAME="50422114_13360"></A><A NAME="50422114_marker-295249"></A><A NAME="50422114_marker-295250"></A>Options 
+
+
+</H1>
+<P>
+<A NAME="50422114_pgfId-295252"></A>In addition to the input bodies, you can supply an extensive set of options that further describe the nature of the emboss feature. This section describes the options that are available. </P>
+<P>
+<A NAME="50422114_pgfId-295253"></A>The table below provides a summary of the options that you can specify in both <A HREF=../headers/pk_body_emboss_o_t.html>PK_BODY_emboss_o_t</A> and <A HREF=../headers/pk_face_emboss_o_t.html>PK_FACE_emboss_o_t</A>.</P>
+<P>
+<A NAME="50422114_pgfId-295309"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295256"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295258"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295260"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295262"></A>Tolerance information for the emboss operation. Default: 1.0e-5</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295264"></A>convexity</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295266"></A>Whether emboss features should protrude from the target, indent into the target, or a combination of both. See <A HREF="fd_chap.043.html#50422114_71124">Section 42.2.1, “Convexity”</A>, for more information. Default: <A HREF=../headers/pk_emboss_convexity_t.html>PK_emboss_convexity_both_c</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295271"></A>profile_on</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295275"></A>Where the profile for the operation is located. See <A HREF="fd_chap.043.html#50422114_39245">Section 42.2.2, “Profile location”</A>, for more information. Default: <A HREF=../headers/pk_emboss_profile_on_t.html>PK_emboss_profile_on_any_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295278"></A>sidewall_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295280"></A>A data structure containing information that specifies how the sidewalls for the emboss operation should be constructed. Construction of the sidewalls is a major part of the emboss operation, and there are a number of ways that you can control the final result. See <A HREF="fd_chap.043.html#50422114_55516">Section 42.2.3, “Sidewalls”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295285"></A>overflow_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295287"></A>A data structure containing information that specifies how the emboss feature should be constructed in the event that the sidewall lies beyond the boundary of the target body (in the case of <A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A>) or the specified faces on the target (in the case of <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A>). See <A HREF="fd_chap.043.html#50422114_28173">Section 42.2.4, “Overflow”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295292"></A>unite</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295294"></A>Whether emboss features should be attached to the target (to create a single body) or produced separately. See <A HREF="fd_chap.043.html#50422114_16268">Section 42.2.5, “Returning the embossed feature separately”</A>, for more information. Default: <A HREF=../headers/pk_emboss_unite_sidewall_t.html>PK_emboss_unite_sidewall_yes_c</A> (attach features to target).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295299"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295301"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422114_pgfId-295308"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422114_pgfId-295313"></A>	42.2.1 	<A NAME="50422114_71124"></A><A NAME="50422114_marker-295311"></A><A NAME="50422114_marker-295312"></A>Convexity </H3>
+<P>
+<A NAME="50422114_pgfId-295317"></A>You can choose the convexity of the emboss features that Parasolid creates using the <CODE>
+convexity</CODE>
+ option. By default, Parasolid creates both protruding embosses (pads) and indented embosses (pockets), but if required, you can specify that only one or other type is created. </P>
+<P>
+<A NAME="50422114_pgfId-295321"></A>When a non-default convexity is specified, attempting to create an emboss feature of the opposite convexity results in the error PK_emboss_bad_position.</P>
+
+
+<H3>
+<A NAME="50422114_pgfId-295325"></A>	42.2.2 	<A NAME="50422114_39245"></A><A NAME="50422114_marker-295323"></A><A NAME="50422114_marker-295324"></A>Profile location </H3>
+<P>
+<A NAME="50422114_pgfId-295326"></A>By default, the profile you specify can be located anywhere. However, if required, you can use the <CODE>
+profile_on</CODE>
+ option to indicate that the profile must be located on either the target or the end cap. </P>
+
+
+<H3>
+<A NAME="50422114_pgfId-295330"></A>	42.2.3 	<A NAME="50422114_55516"></A><A NAME="50422114_marker-295328"></A><A NAME="50422114_marker-295329"></A>Sidewalls </H3>
+<P>
+<A NAME="50422114_pgfId-295331"></A>A major part of the emboss functionality involves the construction of the sidewall, and Parasolid provides you with a number of different methods and controls for you to specify its final appearance. </P>
+<P>
+<A NAME="50422114_pgfId-295338"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422114_pgfId-295334"></A>Note: In areas where the emboss feature overflows the boundary of the target body or the specified faces in the target, sidewalls are trimmed where necessary using the overflow data supplied in the options structure. See <A HREF="fd_chap.043.html#50422114_28173">Section 42.2.4, “Overflow”</A>, for details.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-295339"></A>Parasolid can construct a sidewall for you using one of three methods:</P>
+<UL>
+<LI>
+<A NAME="50422114_pgfId-295340"></A>Tapered sidewalls can be created based on a specified draw direction and taper angle.</LI>
+<LI>
+<A NAME="50422114_pgfId-295341"></A>Ruled sidewalls can be created using the normals of faces in the supplied profile.</LI>
+<LI>
+<A NAME="50422114_pgfId-295342"></A>Swept sidewalls can be created based on a specified sweep direction.</LI>
+</UL>
+<P>
+<A NAME="50422114_pgfId-295343"></A>In all three cases, the geometry of the sidewall is formed by a set of ruled surfaces that pass through the boundary of the profile.</P>
+<P>
+<A NAME="50422114_pgfId-295344"></A>In addition to these methods of internal construction, you can supply a sidewall yourself. </P>
+<P>
+<A NAME="50422114_pgfId-295345"></A>The data required for sidewalls is supplied using the <CODE>
+sidewall_data</CODE>
+ option, which uses the <A HREF=../headers/pk_emboss_sidewall_data_t.html>PK_emboss_sidewall_data_t</A> sub-structure. </P>
+
+<H4>
+<A NAME="50422114_pgfId-295349"></A>42.2.3.1 <A NAME="50422114_marker-295346"></A><A NAME="50422114_marker-295347"></A><A NAME="50422114_marker-295348"></A>Tapered sidewalls </H4>
+<P>
+<A NAME="50422114_pgfId-295350"></A>If the <CODE>
+sidewall</CODE>
+ field of <CODE>
+sidewall_data</CODE>
+ is <A HREF=../headers/pk_emboss_sidewall_t.html>PK_emboss_sidewall_tapered_c</A>, then Parasolid creates sidewalls that are tapered between the specified target and end cap, usually based on a supplied draw direction and taper angle. </P>
+<P>
+<A NAME="50422114_pgfId-345408"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-408.gif">
+
+<P>
+<A NAME="50422114_pgfId-295400"></A>Figure 42-3 Pad emboss feature with tapered sidewalls</P>
+<P>
+<A NAME="50422114_pgfId-295401"></A>For tapered sidewalls, you should also set the following fields (some of which are optional).</P>
+<P>
+<A NAME="50422114_pgfId-295442"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295404"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295406"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295408"></A>taper_method</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295410"></A>The method used to created tapered sidewalls. Any of the following taper methods are allowed: </P>
+<UL>
+<LI>
+<A NAME="50422114_pgfId-295411"></A>Isocline: this is the default. </LI>
+<LI>
+<A NAME="50422114_pgfId-295412"></A>Normal: the sidewall is tapered with respect to the normals of the faces of the supplied profile. This method can produce taper results in which the taper angle is not dependent on the draw direction, as shown in <A HREF="fd_chap.043.html#50422114_60156"><EM>
+Figure 42-4</EM></A>.</LI>
+<LI>
+<A NAME="50422114_pgfId-295416"></A>Offset.</LI>
+<LI>
+<A NAME="50422114_pgfId-295417"></A>Curve.</LI>
+</UL>
+<P>
+<A NAME="50422114_pgfId-295418"></A>If offset tapering is used, additional information needs to be supplied using the <CODE>
+offset</CODE>
+ and <CODE>
+top_surface</CODE>
+ fields. For more information about the differences between the different tapering methods allowed, see <A HREF="tapering.html#71566">Section 64.2.12, “Taper methods”</A>. Default: <A HREF=../headers/pk_taper_method_t.html>PK_taper_method_isocline_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295423"></A>draw_direction</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295425"></A>The direction of taper. This must be a unit vector. Default: (0,0,1).</P>
+<P>
+<A NAME="50422114_pgfId-295426"></A>The draw direction also acts as a general reference direction for the face normals of the cap of the resulting emboss feature. See <A HREF="fd_chap.043.html#50422114_12414">Section 42.3, “Constraints”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295431"></A>taper_angle</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295433"></A>The angle of taper. Default: 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295435"></A>offset</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295437"></A>For offset tapering: the offset distance for the operation. This should be left at its default value if any other tapering method is used. Default: 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295439"></A>top_surface</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295441"></A>For offset tapering: the surface on which the profile edge's curve is projected to create the relevant offset curve. This should be left at its default value if any other tapering method is used. Default: PK_ENTITY_null</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-345778"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-409.gif">
+
+<P>
+<A NAME="50422114_pgfId-295581"></A>Figure 42-4 <A NAME="50422114_60156"></A>Pad emboss feature with normal tapered sidewalls</P>
+<P>
+<A NAME="50422114_pgfId-295583"></A><A NAME="50422114_marker-295582"></A>Tapered sidewalls (when <CODE>
+taper_method</CODE>
+ is not <A HREF=../headers/pk_taper_method_t.html>PK_taper_method_offset_c</A>) are generally constructed such that they draft outwards from the end cap body to the target body. This ensures that the emboss feature created will be non die-lock, that is, it would be physically possible to draw the part from a mold in the specified draw direction. You can model a die-lock emboss feature, such as a dovetail, by supplying a negative <CODE>
+taper_angle</CODE>
+. </P>
+
+
+<H4>
+<A NAME="50422114_pgfId-295588"></A>42.2.3.2 <A NAME="50422114_marker-295584"></A><A NAME="50422114_marker-295585"></A><A NAME="50422114_marker-295586"></A><A NAME="50422114_marker-295587"></A>Specifying multiple angles for tapered sidewalls </H4>
+<P>
+<A NAME="50422114_pgfId-295589"></A>By default, if tapered sidewalls are created then a single taper angle is used for all faces in the sidewall. However, you can specify that different taper angles are used for any of the faces in the sidewall, as shown in <A HREF="fd_chap.043.html#50422114_31040"><EM>
+Figure 42-5</EM></A>.</P>
+<P>
+<A NAME="50422114_pgfId-345938"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-410.gif">
+
+<P>
+<A NAME="50422114_pgfId-295663"></A>Figure 42-5 <A NAME="50422114_31040"></A>Pad emboss feature with tapered sidewalls using different angles</P>
+<P>
+<A NAME="50422114_pgfId-295664"></A>For sidewalls with multiple taper angles, you should set the following fields:</P>
+<P>
+<A NAME="50422114_pgfId-295682"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295667"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295669"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295671"></A>n_multi_taper_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295673"></A>The number of edges in the profile for which multiple taper angles are specified. Default: 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295675"></A>multi_taper_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295677"></A>An array of edges in the profile for which multiple taper angles are specified. Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-295679"></A>multi_taper_angles</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-295681"></A>An array of taper angles for each of the edges specified in <CODE>
+multi_taper_edges</CODE>
+. Default: NULL.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422114_pgfId-295686"></A>42.2.3.3 <A NAME="50422114_marker-295683"></A><A NAME="50422114_marker-295684"></A><A NAME="50422114_marker-295685"></A>Ruled sidewalls </H4>
+<P>
+<A NAME="50422114_pgfId-295687"></A>If the <CODE>
+sidewall</CODE>
+ field of <CODE>
+sidewall_data</CODE>
+ is <A HREF=../headers/pk_emboss_sidewall_t.html>PK_emboss_sidewall_ruled_c</A>, then Parasolid creates sidewalls that are ruled along the normals of the faces in the supplied profile. </P>
+<P>
+<A NAME="50422114_pgfId-295691"></A>No additional information needs to be supplied in order to create this type of sidewall. </P>
+<P>
+<A NAME="50422114_pgfId-340586"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-411.gif">
+
+<P>
+<A NAME="50422114_pgfId-295730"></A>Figure 42-6 Pad emboss feature with ruled sidewalls</P>
+
+
+<H4>
+<A NAME="50422114_pgfId-295734"></A>42.2.3.4 <A NAME="50422114_marker-295731"></A><A NAME="50422114_marker-295732"></A><A NAME="50422114_marker-295733"></A>Swept sidewalls </H4>
+<P>
+<A NAME="50422114_pgfId-295735"></A>If the <CODE>
+sidewall</CODE>
+ field of <CODE>
+sidewall_data</CODE>
+ is <A HREF=../headers/pk_emboss_sidewall_t.html>PK_emboss_sidewall_swept_c</A>, then Parasolid creates sidewalls that are swept. </P>
+<P>
+<A NAME="50422114_pgfId-295739"></A>For swept sidewalls, the sweep direction is taken from the specified <CODE>
+draw_direction</CODE>
+, which must be a unit vector. No other information needs to be supplied. </P>
+<P>
+<A NAME="50422114_pgfId-346716"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-412.gif">
+
+<P>
+<A NAME="50422114_pgfId-295786"></A>Figure 42-7 Pad emboss feature with swept sidewalls</P>
+
+
+<H4>
+<A NAME="50422114_pgfId-295790"></A>42.2.3.5 <A NAME="50422114_marker-295787"></A><A NAME="50422114_marker-295788"></A><A NAME="50422114_marker-295789"></A>Supplying your own sidewall </H4>
+<P>
+<A NAME="50422114_pgfId-295791"></A>If the <CODE>
+sidewall</CODE>
+ field of <CODE>
+sidewall_data</CODE>
+ is <A HREF=../headers/pk_emboss_sidewall_t.html>PK_emboss_sidewall_supplied_c</A>, then you can supply your own pre-constructed sidewall to use in the emboss operation. The sidewall itself is supplied using the <CODE>
+sidewall_body</CODE>
+ field in the <CODE>
+sidewall_data</CODE>
+ structure.</P>
+<P>
+<A NAME="50422114_pgfId-295792"></A>The sidewall supplied must be a sheet body, and is usually duct-like in shape. A supplied sidewall must be manifold and must not be disjoint. It should also be large enough to reach both the target and end cap.</P>
+<P>
+<A NAME="50422114_pgfId-295796"></A>When supplying a sidewall yourself, the profile received by Parasolid may be PK_ENTITY_null. </P>
+<P>
+<A NAME="50422114_pgfId-347267"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-413.gif">
+
+<P>
+<A NAME="50422114_pgfId-295842"></A>Figure 42-8 Pad emboss feature with user-supplied sidewalls</P>
+
+
+
+<H3>
+<A NAME="50422114_pgfId-295846"></A>	42.2.4 	<A NAME="50422114_28173"></A><A NAME="50422114_marker-295844"></A><A NAME="50422114_marker-295845"></A>Overflow </H3>
+<P>
+<A NAME="50422114_pgfId-295847"></A>Sometimes, the target body (for <A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A>), or the supplied target faces (for <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A>) may not provide a complete base for the emboss feature. In other words, some of the profile’s projection along the sidewall lies outside the target area, and prevents the emboss feature from being completely defined. </P>
+<P>
+<A NAME="50422114_pgfId-295851"></A>In such cases, Parasolid can either trim the emboss feature so that it fits in the available area, or modify the feature so that it overflows onto adjacent faces. </P>
+<P>
+<A NAME="50422114_pgfId-295855"></A><A HREF="fd_chap.043.html#50422114_76518"><EM>
+Figure 42-9</EM></A> shows an example where the profile’s projection overflows the target body on several sides. The resulting pad has been successfully created by trimming the pad on two overflow boundaries, and creating a new swept sidewall on the third boundary. </P>
+<P>
+<A NAME="50422114_pgfId-341365"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-414.gif">
+
+<P>
+<A NAME="50422114_pgfId-296043"></A>Figure 42-9 <A NAME="50422114_76518"></A>Creating an emboss feature using a profile that overflows the target</P>
+<P>
+<A NAME="50422114_pgfId-296044"></A>You use the <CODE>
+overflow_data</CODE>
+ structure in both <A HREF=../headers/pk_face_emboss_o_t.html>PK_FACE_emboss_o_t</A> and <A HREF=../headers/pk_body_emboss_o_t.html>PK_BODY_emboss_o_t</A> to control emboss overflow behaviour. It has the following fields:</P>
+<P>
+<A NAME="50422114_pgfId-296066"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296047"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296049"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-296051"></A>interior_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296053"></A>Overflow behaviour along any interior edges in the target body that the area of profile projection runs outside. This behaviour applies only to <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A>. Default: <A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_added_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-296055"></A>laminar_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296057"></A>Overflow behaviour along any laminar edges in the target body that the area of profile projection runs outside. This behaviour applies to both <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A> and <A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A>. Default: <A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_swept_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-296059"></A>sweep_direction</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296061"></A>The direction along which the overflow boundary is swept to produce a sheet. Default: (0, 0, 1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422114_pgfId-296063"></A>laminar_walled</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296065"></A>Whether to add side faces at laminar edges that overflow. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-296067"></A>Overflow behaviour is different at laminar edges in the target body than it is at non-laminar, or interior, edges. Both interior overflow and laminar overflow are specified using a <A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_t</A> sub-structure.</P>
+
+<H4>
+<A NAME="50422114_pgfId-296071"></A>42.2.4.1 <A NAME="50422114_marker-296068"></A><A NAME="50422114_marker-296069"></A><A NAME="50422114_marker-296070"></A>Specifying interior overflow behaviour </H4>
+<P>
+<A NAME="50422114_pgfId-296072"></A>Interior overflow behaviour only applies to local emboss operations performed using <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A>. You should not specify interior overflow behaviour for a global emboss operation using <A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A>. </P>
+<P>
+<A NAME="50422114_pgfId-296073"></A>If a locally created emboss feature overflows an interior edge on a target body, then several approaches are possible, depending on the configuration of the faces adjacent to the edge, and the information provided in the <CODE>
+interior_overflow</CODE>
+ field.</P>
+<UL>
+<LI>
+<A NAME="50422114_pgfId-296074"></A>At a concave edge, the approach is always to trim the emboss feature to the adjacent face. </LI>
+<LI>
+<A NAME="50422114_pgfId-296075"></A>At a convex edge, the emboss feature can be trimmed by extending the adjacent face so that it meets the end cap. Alternatively, the emboss feature can be extended so that it overflows onto the adjacent face. </LI>
+</UL>
+<P>
+<A NAME="50422114_pgfId-296100"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296078"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296080"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296082"></A><A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_added_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296084"></A>Include additional faces from the target body to allow the emboss feature to be extended, where necessary. This is the default, and is the same as the result created by a global emboss using the same configuration. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296086"></A><A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_mixed_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296088"></A>At a concave edge, trim the emboss feature to adjacent faces. At a convex edge, trim the emboss feature by extending adjacent faces until they meet the end cap. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296090"></A><A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296092"></A>Do not modify the emboss feature if it overflows the interior edge. In this case, the emboss operation fails if overflow is detected.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296094"></A><A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_laminar_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296096"></A>Limit the embossed feature by treating the interior overflow boundary as a laminar overflow boundary. This can only be used when the embossed feature is to be returned separately; see <A HREF="fd_chap.043.html#50422114_16268">Section 42.2.5, “Returning the embossed feature separately”</A> for more details.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-296101"></A>Convex and concave edges along an interior boundary are determined by the direction in which the adjacent faces bend with respect to the direction of the emboss feature:</P>
+<UL>
+<LI>
+<A NAME="50422114_pgfId-296102"></A>An edge is convex if its adjacent outer faces bend away from the emboss feature</LI>
+<LI>
+<A NAME="50422114_pgfId-296103"></A>An edge is concave if its adjacent outer faces bend towards from the emboss feature</LI>
+</UL>
+<P>
+<A NAME="50422114_pgfId-296104"></A>The convexity of a given edge is therefore dependent on whether you are creating a pad or a pocket. </P>
+<P>
+<A NAME="50422114_pgfId-296111"></A><A HREF="fd_chap.043.html#50422114_19463"><EM>
+Figure 42-10</EM></A> and <A HREF="fd_chap.043.html#50422114_27086"><EM>
+Figure 42-11</EM></A> show the result of mixed and added overflow on a pad and a pocket respectively. Notice that the concave and convex edges are reversed for the pocket example, compared to the pad example. In each case, the face specified in the call to <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A> is shown in blue. </P>
+<P>
+<A NAME="50422114_pgfId-296121"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422114_pgfId-296114"></A>Note: Interior edges are always defined in terms of the entire target body, rather than the faces specified in the call to <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A>. Thus, in <A HREF="fd_chap.043.html#50422114_19463"><EM>
+Figure 42-10</EM></A> and <A HREF="fd_chap.043.html#50422114_27086"><EM>
+Figure 42-11</EM></A>, the overflowing edges are considered interior, even though only a single face is specified in the function call.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-335522"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-415.gif">
+
+<P>
+<A NAME="50422114_pgfId-296394"></A>Figure 42-10 <A NAME="50422114_19463"></A>Trimming pads at interior edges</P>
+<P>
+<A NAME="50422114_pgfId-342175"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-416.gif">
+
+<P>
+<A NAME="50422114_pgfId-296677"></A>Figure 42-11 <A NAME="50422114_27086"></A>Trimming pockets at interior edges</P>
+
+
+<H4>
+<A NAME="50422114_pgfId-296682"></A>42.2.4.2 <A NAME="50422114_marker-296678"></A><A NAME="50422114_marker-296679"></A><A NAME="50422114_marker-296680"></A><A NAME="50422114_44883"></A>Specifying laminar overflow behaviour </H4>
+<P>
+<A NAME="50422114_pgfId-296683"></A>If an emboss feature overflows a laminar edge on a target sheet body, when using either global or local emboss, Parasolid’s general approach is to attempt to trim the emboss back to the laminar edge. The precise behaviour of overflow in these circumstances is actually a combination of two pieces of information:</P>
+<UL>
+<LI>
+<A NAME="50422114_pgfId-296687"></A>How to trim the sidewall at the laminar edge in order to finish the emboss feature suitably</LI>
+<LI>
+<A NAME="50422114_pgfId-296688"></A>Whether or not to add new side faces in order to preserve the original laminar edges on the target.</LI>
+</UL>
+<P>
+<A NAME="50422114_pgfId-296689"></A>You control the first of these using the <CODE>
+laminar_overflow</CODE>
+ field, which can take any of the following values.</P>
+<P>
+<A NAME="50422114_pgfId-296707"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296692"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296694"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296696"></A><A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_ruled_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296698"></A>Trim the end cap along the intersection with a sheet of ruled surfaces that touches the laminar edge and lies in the direction of the normal of the face adjacent to the laminar edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296700"></A><A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_swept_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296702"></A>Trim the end cap along the intersection with a sheet of swept surfaces that touches the existing laminar edge and lies in the direction given by the <CODE>
+sweep_direction</CODE>
+ field of <CODE>
+overflow_data</CODE>
+. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296704"></A><A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296706"></A>Do not modify the emboss feature if it overflows the laminar edge. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-336082"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-417.gif">
+
+<P>
+<A NAME="50422114_pgfId-296931"></A>Figure 42-12 <A NAME="50422114_33913"></A>Trimming emboss features at laminar edges</P>
+<P>
+<A NAME="50422114_pgfId-296932"></A>You can control whether additional side faces are created during laminar overflow using the <CODE>
+laminar_walled</CODE>
+ field of <CODE>
+overflow_data</CODE>
+. If PK_LOGICAL_true, side faces are created from the laminar edges whose surfaces are the ruled or swept surfaces used to trim the sidewall. <A HREF="fd_chap.043.html#50422114_93159"><EM>
+Figure 42-13</EM></A> shows the swept overflow result from <A HREF="fd_chap.043.html#50422114_33913"><EM>
+Figure 42-12</EM></A> with an additional side face. By default, side faces are not created at laminar edges. </P>
+<P>
+<A NAME="50422114_pgfId-343211"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-418.gif">
+
+<P>
+<A NAME="50422114_pgfId-296989"></A>Figure 42-13 <A NAME="50422114_93159"></A>Adding additional side faces at laminar edges</P>
+
+
+
+<H3>
+<A NAME="50422114_pgfId-296991"></A>	42.2.5 	<A NAME="50422114_16268"></A>Returning the embossed feature separately </H3>
+<P>
+<A NAME="50422114_pgfId-296992"></A>By default, Parasolid returns a single body containing the embossed feature. Alternatively, you can choose to leave the target body unaltered and return the faces of the embossed feature in the <CODE>
+tracking</CODE>
+ information for the function. You do this by specifying the value of the <CODE>
+unite</CODE>
+ field of the options structure as follows:</P>
+<P>
+<A NAME="50422114_pgfId-297006"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296995"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296997"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-296999"></A><A HREF=../headers/pk_emboss_unite_sidewall_t.html>PK_emboss_unite_sidewall_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297001"></A>The embossed feature is attached to the target body. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297003"></A><A HREF=../headers/pk_emboss_unite_sidewall_t.html>PK_emboss_unite_sidewall_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297005"></A>The embossed feature is created separately; the target body is unaltered. The faces of the embossed feature are returned in the <CODE>
+track_records-&gt;product_topols[]</CODE>
+ array of the <CODE>
+tracking</CODE>
+ structure.<BR>
+<BR>
+To recover the body comprising the embossed feature, you can call <A HREF=../headers/pk_face_ask_body.html>PK_FACE_ask_body</A> with one of the faces in this array as the input to the function.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-343457"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-419.gif">
+
+<P>
+<A NAME="50422114_pgfId-297317"></A>Figure 42-14 <A NAME="50422114_51071"></A>Embossed feature returned united or separate by <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A></P>
+<P>
+<A NAME="50422114_pgfId-297321"></A>In <A HREF="fd_chap.043.html#50422114_51071"><EM>
+Figure 42-14</EM></A>, the profile overlaps the target sheet body with the end cap positioned above as shown in diagram (a). By default, <A HREF=../headers/pk_face_emboss.html>PK_FACE_emboss</A> returns the embossed attached to the target body. If <CODE>
+unite</CODE>
+ is set to <A HREF=../headers/pk_emboss_unite_sidewall_t.html>PK_emboss_unite_sidewall_no_c</A>, however, the embossed feature is returned separately (with the target unaffected).</P>
+<P>
+<A NAME="50422114_pgfId-297322"></A>If you choose to have the embossed feature returned separately, you can limit the sidewalls by treating the interior overflow boundary as a laminar overflow boundary; for details of laminar overflow processing, see “<A HREF="fd_chap.043.html#50422114_44883" CLASS="XRef">Specifying laminar overflow behaviour</A>” in <A HREF="fd_chap.043.html#50422114_28173">Section 42.2.4, “Overflow”</A>. Limiting the sidewalls is done by setting the <CODE>
+interior_overflow</CODE>
+ field of the <CODE>
+overflow_data</CODE>
+ structure to <A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_laminar_c</A>. <A HREF="fd_chap.043.html#50422114_43986"><EM>
+Figure 42-15</EM></A> shows the difference in setting <CODE>
+interior_overflow</CODE>
+ to <A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_mixed_c</A> and to <A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_laminar_c</A>.</P>
+<P>
+<A NAME="50422114_pgfId-297335"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422114_pgfId-297334"></A>Note: <CODE>
+interior_overflow</CODE>
+ may be set to <A HREF=../headers/pk_emboss_overflow_t.html>PK_emboss_overflow_laminar_c</A> only when <CODE>
+unite</CODE>
+ is set to <A HREF=../headers/pk_emboss_unite_sidewall_t.html>PK_emboss_unite_sidewall_no_c</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-343748"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-420.gif">
+
+<P>
+<A NAME="50422114_pgfId-297592"></A>Figure 42-15 <A NAME="50422114_43986"></A>The effect of <CODE>
+interior_overflow</CODE>
+ on the embossed feature.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422114_pgfId-297596"></A>42.3	<A NAME="50422114_12414"></A><A NAME="50422114_marker-297594"></A><A NAME="50422114_marker-297595"></A>Constraints 
+
+
+</H1>
+<P>
+<A NAME="50422114_pgfId-297600"></A>For emboss operations to be successful, Parasolid places a number of constraints on both the topology supplied to the operation, and the orientation of the input bodies. This section describes the constraints that you should be aware of. </P>
+
+<H3>
+<A NAME="50422114_pgfId-297604"></A>	42.3.1 	<A NAME="50422114_marker-297601"></A><A NAME="50422114_marker-297602"></A><A NAME="50422114_marker-297603"></A>Topological constraints </H3>
+<P>
+<A NAME="50422114_pgfId-297605"></A>The topology of the input bodies are checked for their suitability for the emboss operation. The following constraints should also be observed:</P>
+<P>
+<A NAME="50422114_pgfId-297626"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297608"></A>Input body</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297610"></A>Constraints</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297612"></A>Target</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297614"></A>The target must contain a sufficiently large area to support the base of the emboss feature.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297616"></A>End cap</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297618"></A>The end cap must contain a sufficiently large area to cap the sidewall of the emboss feature.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297620"></A>Profile</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297622"></A>The peripheral edges of the profile define a cross-section of the resulting sidewall geometry. </P>
+<P>
+<A NAME="50422114_pgfId-297623"></A>If <CODE>
+sidewall</CODE>
+ is <A HREF=../headers/pk_emboss_sidewall_t.html>PK_emboss_sidewall_ruled_c</A>, you must specify a sheet profile. </P>
+<P>
+<A NAME="50422114_pgfId-297624"></A>If <CODE>
+taper_method</CODE>
+ is <A HREF=../headers/pk_taper_method_t.html>PK_taper_method_normal_c</A>, you must specify a sheet profile. </P>
+<P>
+<A NAME="50422114_pgfId-297625"></A>You can only specify a profile of PK_ENTITY_null if you supply the sidewall body yourself. If you supply a sidewall body, <A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A> assumes that the profile, if not PK_ENTITY_null, lies on the supplied sidewall.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422114_pgfId-297629"></A>	42.3.2 	<A NAME="50422114_marker-297627"></A><A NAME="50422114_marker-297628"></A>Orientation constraints </H3>
+<P>
+<A NAME="50422114_pgfId-297630"></A>You should observe a number of constraints regarding the orientation of the various bodies received by <A HREF=../headers/pk_body_emboss.html>PK_BODY_emboss</A>:</P>
+<P>
+<A NAME="50422114_pgfId-297651"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297633"></A>Orientation</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297635"></A>Constraint</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297637"></A>Emboss direction</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297639"></A>Any draw direction or sweep direction specified, whether it is used for a tapered sidewall or a swept sidewall, must be a unit vector. The extent of an emboss feature is determined by the position of the end cap.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297641"></A>Face normals</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297643"></A>The face normals on both the base area of the target and the cap area of the end cap must point to the positive side of the draw direction. </P>
+<P>
+<A NAME="50422114_pgfId-297644"></A>When supplying a sheet profile, the face normals should point to the positive side of the draw direction. </P>
+<P>
+<A NAME="50422114_pgfId-297645"></A>A wire profile should encircle the draw direction in a right-handed manner. </P>
+<P>
+<A NAME="50422114_pgfId-297646"></A>When supplying your own sidewall body, the face normals of the duct-like sheet forming the sidewall body must point outwards for pad emboss features and inwards for pocket emboss features.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297648"></A>Positional constraints</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422114_pgfId-297650"></A>The constraints on orientations also provide a simple way of describing the correct positional relationship between the target and the end cap. When measured relative to the draw direction, the cap area on the end cap must be above (for pads), or below (for pockets), the base area on the target.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422114_pgfId-275053"></A>&nbsp;</P>
+
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.042.html">Shadow Curves</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.044.html">Introduction To Sheets and Wires</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

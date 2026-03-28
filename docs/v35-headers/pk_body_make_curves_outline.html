@@ -1,0 +1,152 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_curves_outline</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_curves_outline</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                        PK_BODY_make_curves_outline
+(
+<I>--- received arguments ---
+</I>const int                              n_bodies,        --- number of bodies
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                        bodies[],        --- bodies
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>                      transfs[],       --- body transformation
+const <A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>                     view_direction,  --- viewing direction
+const <A HREF=../headers/pk_body_make_curves_outline_o_t.html>PK_BODY_make_curves_outline_o_t</A> *options,         --- option structure
+
+<I>--- returned arguments ---
+</I>int                             *const n_curves,        --- number of curves
+<A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                     **const curves,          --- boundary curves
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                  **const intervals,       --- parametric
+                                                        --- interval
+                                                        --- of curves
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                     **const topols,          --- edges/faces of
+                                                        --- curves
+int                            **const outlines,        --- indicates which
+                                                        --- curves belong to
+                                                        --- which outline
+double                         **const curve_tolerances,--- curve tolerance
+double                          *const max_separation   --- largest gap
+                                                        --- between adjacent
+                                                        --- ends of the curves
+)
+</B>
+<A NAME="description"></A>
+<I>This function outputs one or more outlines of a body or bodies for a given
+view direction as a set of ordered curves together with their intervals.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_component          (MILD)  <B>'transfs'</B> is inappropriate
+    PK_ERROR_unsuitable_entity      (MILD)  Supplied body is neither sheet, nor
+                                            solid, nor wire, nor general body.
+                                            Supplied body contains component
+                                            of zero dimension.
+    PK_ERROR_bad_tolerance          (MILD)  Supplied tolerance is less than
+                                            1.0e-7 if not <A HREF=../headers/pk_outline_update_t.html>PK_outline_update_0_c</A>
+    PK_ERROR_non_manifold           (MILD)  Outline is non-manifold
+    PK_ERROR_failed_to_make_outline (MILD)  Function failure
+    PK_ERROR_failed_to_facet        (MILD)  Failed to facet
+    PK_ERROR_not_edge_on            (MILD)  body contains a non-edge-on face
+                                            and the <B>'edge_on'</B> option is set to
+                                            <A HREF=../headers/pk_outline_edge_on_t.html>PK_outline_edge_on_all_c</A>
+
+<A NAME="documentation"></A>
+The function is only implemented for entities of type PK_BODY_type_solid_c,
+PK_BODY_type_sheet_c, PK_BODY_type_wire_c or PK_BODY_type_general_c. Bodies of
+type PK_BODY_type_general_c must not contain any zero dimensional components.
+
+PK_ERROR_non_manifold will be returned if any part of the outline does not
+consist of a closed loop with non-empty interior and the <B>'edge_on'</B> option is
+the default value of <A HREF=../headers/pk_outline_edge_on_t.html>PK_outline_edge_on_none_c</A>. This could happen if
+a portion of a sheet body is edge-on in the view direction for example.
+
+PK_ERROR_not_edge_on will be returned if the <B>'edge_on'</B> option is set to
+<A HREF=../headers/pk_outline_edge_on_t.html>PK_outline_edge_on_all_c</A> and the input bodies contains any solid or non-edge-on
+sheet components.
+
+If the <B>'transfs'</B> argument is NULL, no transforms are applied to the bodies and
+the bodies array must not contain duplicates.
+
+If the <B>'transfs'</B> argument is not NULL, it refers to an array of <B>'n_bodies'</B>
+<A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A> entities. Each body is transformed by its corresponding entry in
+<B>'transfs'</B>. The bodies array may contain duplicates. Instancing transforms may
+contain reflection, translation and rotation but not perspective terms.
+If an instance does not need to be transformed, its <B>'transfs'</B> entry can be
+set to PK_ENTITY_null.
+
+<B>'topols'</B> returns the edges or faces of these curves.
+    An edge is returned when it coincides with an edge.
+    A face is returned when its outline is a silhouette curve of that face.
+    See <A HREF="../chapters/fd_chap.037.html#50434396_pgfId-309049">Returning topological entities</A> for more information.
+
+The one or more outlines of the body or bodies are represented by the curves
+and their intervals which make up the boundary(s) of the body(s) for the given
+view direction. The curves are returned as a set of ordered curves such that
+the body, when viewed in the view direction, lies to the left of the curve when
+looking in the direction of the curve. When two or more bodies overlap in the
+view direction, the outline will be that of the combination of the bodies.
+
+<B>'outlines'</B> returns a set of integers indicating which curves belong to which
+outline. For instance if this function was used on a body with a hole in it
+and 9 curves were returned, 5 of which belonged to the outer outline and 4 to
+the inner outline then <B>'outlines'</B> would return ( 0 0 0 0 0 1 1 1 1 ).
+
+In cases where the value of <B>'edge_on'</B> is set to <A HREF=../headers/pk_outline_edge_on_t.html>PK_outline_edge_on_both_c</A>,
+the outlines from solid and non-edge-on sheet components will have zero and
+positive integers, the outlines from wire and edge-on sheet components will
+have negative integers. If the value of <B>'want_body'</B> is set to PK_LOGICAL_true,
+the function may produce up to two result bodies in cases where the value of
+<B>'edge_on'</B> is set to <A HREF=../headers/pk_outline_edge_on_t.html>PK_outline_edge_on_both_c</A>. The outlines with negative
+integers always produce a body with maximum dimension 1. The outlines with
+positive integers produce a body with dimension specified by the value of
+<B>'body_dimension'</B>.
+
+Note: Where the function returns several outlines the order of those outlines
+is undefined.
+
+See <A HREF="../chapters/fd_chap.037.html#50434396_pgfId-309140">Differentiating between several outlines</A> for more information.
+
+<B>'curve_tolerances'</B> returns the accuracy to which each curve represents the
+outline.
+
+When modelling with tolerant bodies the curves will meet to tolerance and gaps
+may occur. <B>'max_separation'</B> will return the largest gap between the ends of
+the adjacent curves.
+
+See <A HREF="../chapters/fd_chap.037.html#50434396_pgfId-390153">Creating outline curves and spun outlines</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

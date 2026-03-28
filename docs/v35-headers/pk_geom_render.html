@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_GEOM_render</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_GEOM_render</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>           PK_GEOM_render
+(
+<I>--- received arguments ---
+</I>int                       n_geoms,   --- number of entities to be rendered
+const <A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A>           geoms[],   --- geometric entities to be rendered
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>         transfs[], --- transformations to be applied to geoms
+const <A HREF=../headers/pk_geom_render_o_t.html>PK_GEOM_render_o_t</A> *options    --- options structure
+)
+</B>
+<A NAME="description"></A>
+<I>This function generates a view-independent representation of geometric entities
+and returns this through the GO interface.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_unsuitable_entity      <B>'geoms'</B> contains a geometric
+                                    entity of an unsupported type
+                                    (MILD)
+    PK_ERROR_duplicate_array_item   <B>'geoms'</B> contains duplicates but
+                                    <B>'transfs'</B> is NULL
+                                    (MILD)
+    PK_ERROR_bad_component          <B>'transfs'</B> contains a transform of an
+                                    inappropriate type
+                                    (MILD)
+
+<A NAME="documentation"></A>
+Action on received entities
+---------------------------
+
+This function produces a 3D render of geometric entities in the world
+coordinate system via GO. The geometric entities supported are B-curves
+and B-surfaces, foreign geometry curves and surfaces, offsets of B-surfaces
+and foreign geometry surfaces, and lattices.
+
+All supported geometry types are rendered as 3D line drawings by default.
+Lattices can also optionally be rendered using rendering primitives
+corresponding to spheres, cylinders and cones.
+
+
+Rendering geometry with transforms
+----------------------------------
+
+If <B>'transfs'</B> is not NULL, it should be an array containing one <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A> for
+each entity in <B>'geoms'</B>. Each entity in <B>'geoms'</B> is then transformed by its
+corresponding entity in <B>'transfs'</B>. Any entity in <B>'transfs'</B> can be
+PK_ENTITY_null, indicating that the corresponding entity in <B>'geoms'</B> is not to
+be transformed.
+
+If <B>'transfs'</B> is set to NULL the <B>'geoms'</B> are not transformed. The <B>'geoms'</B>
+array may not contain duplicates in this case. If <B>'transfs'</B> is not NULL,
+it should be an array of PK_TRANSF_ts of length <B>'n_geoms'</B>. The <B>'geoms'</B>
+array may contain duplicates in this case.
+
+Transforms may only contain translation, rotation, and reflection components;
+scales, shears and perspective components are not allowed.
+
+Reports
+-------
+
+A report is returned via the Parasolid report mechanism of type
+<A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_3_c</A>. This record will have a <B>'status'</B> of
+<A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_render_curve_tols_c</A> and contain the three tolerance values used by
+Parasolid, whether supplied or calculated internally.
+
+If <B>'geoms'</B> contains a blended lattice and the option <B>'lattice'</B> is set to
+<A HREF=../headers/pk_render_lattice_t.html>PK_render_lattice_solid_c</A>, the lattice will be rendered with the blends
+ignored and a report of type <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_3_c</A> will be returned.
+This record will have a <B>'status'</B> of <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_render_lattice_c</A> and contain
+all such lattices in <B>'geoms'</B>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

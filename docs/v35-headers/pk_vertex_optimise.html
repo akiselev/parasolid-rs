@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_VERTEX_optimise</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_VERTEX_optimise</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                    PK_VERTEX_optimise
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_vertex_t.html>PK_VERTEX_t</A>                        vertex,              --- vertex to be
+                                                        --- optimised
+const <A HREF=../headers/pk_vertex_optimise_o_t.html>PK_VERTEX_optimise_o_t</A>      *options,             --- option structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_vertex_optimise_result_t.html>PK_VERTEX_optimise_result_t</A> *const result,              --- whether the vertex
+                                                        --- has been modified
+double                      *const achieved_deviation   --- best measured
+                                                        --- deviation
+)
+</B>
+<A NAME="description"></A>
+<I>Given a tolerant vertex, this function attempts to modify the position of
+the vertex and the end points of any trimmed curves, such that the maximum
+deviation falls within the given target value. It is also possible the vertex
+tolerance will be modified or set to the optimised maximum deviation.
+
+</I>
+<A NAME="documentation"></A>
+
+Definitions
+
+Deviation             This is a measure of the distance from a vertex
+                      to each of the curves of the edges or fins meeting
+                      at the vertex.
+
+                      In the case of trimmed curves this will be the
+                      distance to the end the trimmed curve.
+
+                      In the case of non-trimmed curves this will be the
+                      distance to the closest point on the curve.
+
+Maximum deviation     The maximum deviation is the greatest deviation
+                      between the vertex and the curves of all fins or
+                      edges meeting at the vertex. Although nominal
+                      geometry is not used to calculate maximum deviation,
+                      nominal geometry will be trimmed to maintain
+                      consistency where necessary.
+
+
+The function returns a <B>'result'</B>, of type <A HREF=../headers/pk_vertex_optimise_result_t.html>PK_VERTEX_optimise_result_t</A>
+which has two values PK_VERTEX_optimise_success_c and
+PK_VERTEX_optimise_failure_c.
+
+PK_VERTEX_optimise_success_c indicates that the vertex position has been
+modified (if required) such that the maximum deviation for the given vertex
+satisfies the target value specified by the requested maximum deviation.
+It does not necessarily indicate that the vertex tolerance has been modified
+or set to the optimised maximum deviation (see Constraints).
+
+PK_VERTEX_optimise_failure_c indicates that Parasolid was unable to find a new
+position for the vertex such that the maximum deviation satisfies the target
+value specified by the arguments.
+
+The <B>'achieved_deviation'</B> is always returned (regardless of whether the vertex
+was optimised) and reflects the best measured deviation.
+
+
+Constraints
+
+Parasolid may not be able to modify the vertex tolerance to reflect the
+optimised value for maximum deviation. For instance, a vertex is not allowed
+a tolerance smaller in magnitude than any edges meeting at that vertex.
+
+If constraints prevent Parasolid reducing the vertex tolerance to the
+optimised maximum deviation, but still allows for a reduction, then Parasolid
+will modify the vertex accordingly.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

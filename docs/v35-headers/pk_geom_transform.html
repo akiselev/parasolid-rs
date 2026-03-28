@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_GEOM_transform</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_GEOM_transform</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_GEOM_transform
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A>           in_geom,   --- geometric entity to be transformed
+<A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>         transf,    --- transformation
+double              tolerance, --- precision for replacing geometry
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A>    *const out_geom,  --- transformed entity
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> *const exact      --- whether result is exact
+)
+</B>
+<A NAME="description"></A>
+<I>This function transforms the given geometric entity by the given
+transformation.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_geom_transform_2.html>PK_GEOM_transform_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_request_not_supported  bad combination of geometry and transf
+    PK_ERROR_bad_component          transformation matrix has perspective terms
+
+<A NAME="documentation"></A>
+<B>'out_geom'</B> is a new entity which is the result of applying transformation
+<B>'transf'</B> to geometric entity <B>'in_geom'</B>.
+
+If <B>'in_geom'</B> is a point then <B>'out_geom'</B> is a point.
+
+For curves and surfaces, <B>'out_geom'</B> will satisfy the first possible of the
+following list of criteria:
+
+ 1 - be of the same class as <B>'in_geom'</B>,
+ 2 - be exactly coincident with the transformation of <B>'in_geom'</B>,
+ 3 - not deviate by more than the given tolerance from the transformation of
+     <B>'in_geom'</B>.
+
+The returned argument <B>'exact'</B> is PK_LOGICAL_true if either <B>'in_geom'</B> is a
+point, or criterion 1 or 2 has been satisfied.  If <B>'out_geom'</B> only satisfies
+criterion 3, then <B>'exact'</B> is returned as PK_LOGICAL_false.
+
+If <B>'in_geom'</B> has any geometric dependents then new geometric entities are
+created as transformations of these.
+
+If <B>'in_geom'</B> is a cone, then it is not possible to transform it by a
+transformation involving non-uniform scale.  An attempt to do this will lead to
+the error PK_ERROR_request_not_supported.
+
+The transformation matrix must not contain perspective terms
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

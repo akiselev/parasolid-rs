@@ -1,0 +1,826 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Hollowing</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Hollowing</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.059.html">Offsetting</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.061.html">Thickening</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-294721">59.1	Introduction </A>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-294792">59.2	Basic usage of hollowing functionality </A>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-294921">59.3	Specifying pierce faces </A>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-298958">59.4	Creating walls of different thicknesses </A>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-299000">59.5	Creating step faces along smooth edges </A>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-299564">59.6	Local hollowing </A>
+<UL>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-299602">59.6.1	Adding to an existing hollowed body </A>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-299652">59.6.2	Excluding faces from a hollow operation </A>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-299697">59.6.3	Constraints on local hollowing functionality </A>
+</UL>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-299789">59.7	Creating blends from offset edges </A>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-299883">59.8	Controlling the growth of overflowing faces </A>
+<LI> <A HREF="fd_chap.060.html#50422134_pgfId-299938">59.9	Offsetting specific faces in a body </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422134_pgfId-294721"></A>59.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422134_pgfId-294722"></A>Hollowing is the process of offsetting all (or most of) the faces in a body, and then creating solid and void regions appropriately so as to create a hollowed version of the original body. </P>
+<P>
+<A NAME="50422134_pgfId-294723"></A>At a rudimentary level, hollowing a given body consists of the following steps: </P>
+<UL>
+<LI>
+<A NAME="50422134_pgfId-294724"></A>Create a new body by offsetting the faces in the original body by a specific distance, either inward or outward.</LI>
+<LI>
+<A NAME="50422134_pgfId-294725"></A>(For inward offsets) subtract the offset body from the original body.</LI>
+<LI>
+<A NAME="50422134_pgfId-294726"></A>(For outward offsets) subtract the original body from the offset body.</LI>
+</UL>
+<P>
+<A NAME="50422134_pgfId-294730"></A>When you hollow a body, Parasolid offsets all the faces in the body by the specified distance automatically, rather than requiring you to specify each offset face individually. In addition, Parasolid handles the subtraction of the original and offset versions of the body in order to produce the hollowed result. This makes Parasolid’s hollowing functionality easy to use, removing the need for you to think about the algorithmic details required to produce a hollowed body. </P>
+<P>
+<A NAME="50422134_pgfId-294740"></A>Although Parasolid’s offsetting functionality is fundamental to the hollowing process, a complete understanding of offsetting is not required in order to use hollowing. However, it is useful to understand how the two types of functionality are related. </P>
+<P>
+<A NAME="50422134_pgfId-294744"></A>Offsetting every face in a body creates a hollow body with an internal void region. More often, you need to give access to the void region by opening up the body. You do this by designating one or more faces from the body as <STRONG>
+pierce faces</STRONG>. During the hollow operation, pierce faces are not offset, and instead the relevant parts of those faces are removed so as to open up the void region. A simple example is shown in <A HREF="fd_chap.060.html#50422134_49677"><EM>
+Figure 59-1</EM></A>.</P>
+<P>
+<A NAME="50422134_pgfId-294781"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-650.gif">
+
+<P>
+<A NAME="50422134_pgfId-294783"></A>Figure 59-1 <A NAME="50422134_49677"></A>Using pierce faces to open up a hollowed body</P>
+<P>
+<A NAME="50422134_pgfId-294787"></A>Hollowing is also related to thickening.</P>
+<P>
+<A NAME="50422134_pgfId-294788"></A>The changes to topology and geometry that are permitted during hollowing operations are similar to those permitted for offsetting operations. See <A HREF="fd_chap.059.html#50422133_18987">Section 58.11, “Changes to topology and geometry”</A>, for more details.</P>
+<P>
+<A NAME="50422134_pgfId-447710"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-435481"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422134_pgfId-435462"></A><A HREF="fd_chap.059.html#50422133_22949">Chapter 58, “Offsetting”</A></LI>
+<LI>
+<A NAME="50422134_pgfId-435502"></A><A HREF="fd_chap.061.html#50422135_34338">Chapter 60, “Thickening”</A></LI>
+<LI>
+<A NAME="50422134_pgfId-435523"></A><A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422134_pgfId-435644"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422134_pgfId-447723"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422134_pgfId-294792"></A>59.2	Basic usage of hollowing functionality 
+
+
+</H1>
+<P>
+<A NAME="50422134_pgfId-294793"></A>You hollow a solid using the function <A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A>. This function receives a <CODE>
+body</CODE>
+ and creates a hollowed body by offsetting all the faces by the specified <CODE>
+offset</CODE>
+. Under some circumstances it may be necessary to replace exact edge geometry with tolerant geometry. Parasolid uses the supplied <CODE>
+tolerance</CODE>
+ when calculating approximate geometry.</P>
+<P>
+<A NAME="50422134_pgfId-294797"></A>As with offsetting, the supplied <CODE>
+offset</CODE>
+ can be positive or negative:</P>
+<UL>
+<LI>
+<A NAME="50422134_pgfId-294798"></A>A positive distance offsets outwards, creating a slightly larger hollowed body.</LI>
+<LI>
+<A NAME="50422134_pgfId-294799"></A>A negative distance offsets inwards, creating a hollowed body the same size as the original.</LI>
+</UL>
+<P>
+<A NAME="50422134_pgfId-294800"></A>The following table provides a summary of the options available in <A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A>. These are described in more detail throughout the rest of this chapter. </P>
+<P>
+<A NAME="50422134_pgfId-294916"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294803"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294805"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294807"></A><CODE>
+pierce_faces</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294811"></A>An array of faces that should be pierced. See <A HREF="fd_chap.060.html#50422134_21565">Section 59.3, “Specifying pierce faces”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294814"></A><CODE>
+offset_faces</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294816"></A>An array of faces that should be offset by a distance other than the default. See <A HREF="fd_chap.060.html#50422134_50419">Section 59.4, “Creating walls of different thicknesses”</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294821"></A><CODE>
+offset_values</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294823"></A>An array of offset distances corresponding to the array of faces in <CODE>
+offset_faces</CODE>
+. Zero distances are treated as pierce faces. See <A HREF="fd_chap.060.html#50422134_50419">Section 59.4, “Creating walls of different thicknesses”</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294828"></A><CODE>
+check_fa_fa</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294830"></A>Whether to check for face-face inconsistencies. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294840"></A><CODE>
+offset_method</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294842"></A>The method by which self-intersections are removed when hollowing. This is the same option as available in Parasolid’s offsetting functionality. See <A HREF="fd_chap.059.html#50422133_69049">Section 58.3, “Removing self-intersections”</A> for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422134_pgfId-294850"></A>report_sx</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294857"></A>Whether to report such self-intersections in the Parasolid report. See <A HREF="fd_chap.059.html#50422133_69049">Section 58.3, “Removing self-intersections”</A>. Also available in all offsetting and thickening operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294860"></A><CODE>
+offset_step</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294862"></A>Whether to create side faces between faces that are offset by different distances during the hollowing operation. See <A HREF="fd_chap.060.html#50422134_96521">Section 59.5, “Creating step faces along smooth edges”</A>, for more details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422134_pgfId-294867"></A><CODE>fix_degens</CODE>
+</PRE>
+<PRE><A NAME="50422134_pgfId-294868"></A><CODE>report_fix_degens</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294870"></A>Whether to fix degeneracies in the input body prior to hollowing. Whether to report such degeneracies in the Parasolid report. See <A HREF="fd_chap.059.html#50422133_56624">Section 58.4, “Dealing with degenerate faces”</A>. Also available in all offsetting and thickening operations. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422134_pgfId-294875"></A>hollow_local</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294879"></A>Whether to hollow all the faces in the body (the default), or a subset. See <A HREF="fd_chap.060.html#50422134_59958">Section 59.6, “Local hollowing”</A>, for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422134_pgfId-294882"></A>local_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294884"></A>If hollowing a subset of faces, this array describes the faces that should be hollowed. See <A HREF="fd_chap.060.html#50422134_59958">Section 59.6, “Local hollowing”</A>, for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422134_pgfId-294889"></A>blend_edges</PRE>
+<PRE><A NAME="50422134_pgfId-294890"></A>blend_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294892"></A>Whether to create blend faces from edges that are offset, and the radius to use for those blend faces. See <A HREF="fd_chap.060.html#50422134_36844">Section 59.7, “Creating blends from offset edges”</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422134_pgfId-294897"></A>grow</PRE>
+<PRE><A NAME="50422134_pgfId-294898"></A>grow_data</PRE>
+<PRE><A NAME="50422134_pgfId-294899"></A>grow_cb</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-294901"></A>How to heal models when features of different convexity overflow each other. See <A HREF="fd_chap.060.html#50422134_25126">Section 59.8, “Controlling the growth of overflowing faces”</A>. Also available in all hollowing and thickening operations. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422134_pgfId-294906"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-427832"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422134_pgfId-294915"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422134_pgfId-294921"></A>59.3	<A NAME="50422134_21565"></A><A NAME="50422134_marker-294918"></A><A NAME="50422134_marker-294919"></A><A NAME="50422134_marker-294920"></A>Specifying pierce faces 
+
+
+</H1>
+<P>
+<A NAME="50422134_pgfId-294922"></A>Generally, you need to open up a body when it is hollowed, so as to create, for instance, an open box from a solid block. You do this by specifying that one or more faces in the body should be <STRONG>
+pierce faces</STRONG>, that is, faces whose offset distance is zero, using the <CODE>
+pierce_faces</CODE>
+ option in <A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A>. </P>
+<P>
+<A NAME="50422134_pgfId-294923"></A>As part of the hollowing operation, each pierce face is reduced in size by performing a local boolean using any shared edges in their pre-offset and offset positions, so as to leave only the solid portion of the pierce face that remains after hollowing has taken place. This is illustrated in <A HREF="fd_chap.060.html#50422134_21519"><EM>
+Figure 59-2</EM></A>. </P>
+<P>
+<A NAME="50422134_pgfId-294960"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-651.gif">
+
+<P>
+<A NAME="50422134_pgfId-298726"></A>Figure 59-2 <A NAME="50422134_21519"></A>Body with several pierce faces, before and after hollowing</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422134_pgfId-298958"></A>59.4	<A NAME="50422134_50419"></A>Creating walls of different thicknesses 
+
+
+</H1>
+<P>
+<A NAME="50422134_pgfId-298959"></A>By default, all faces in a body (except for any pierce faces) are offset by the same distance during the hollow operation. You can optionally choose to offset a subset of those faces by different distances by using the <CODE>
+offset_faces</CODE>
+ and <CODE>
+offset_values</CODE>
+ options. Each face listed in the <CODE>
+offset_faces</CODE>
+ array is offset by the corresponding value in <CODE>
+offset_values</CODE>
+. If any of the values are zero, then the corresponding face is treated as a pierce face. <A HREF="fd_chap.060.html#50422134_19164"><EM>
+Figure 59-3</EM></A> shows an example of this. </P>
+<P>
+<A NAME="50422134_pgfId-298996"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-652.gif">
+
+<P>
+<A NAME="50422134_pgfId-298998"></A>Figure 59-3 <A NAME="50422134_19164"></A>Hollowed body where the offset distances are varied</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422134_pgfId-299000"></A>59.5	<A NAME="50422134_96521"></A>Creating step faces along smooth edges 
+
+
+</H1>
+<P>
+<A NAME="50422134_pgfId-299001"></A>If you are offsetting adjacent faces by different distances, and if those faces are joined smoothly, then side faces may be required between the resulting offset faces in order for the hollow operation to succeed. This is particularly important if you have specified tangent pierce faces, where a pierce face is joined smoothly to adjacent faces; side faces are always required in these circumstances.</P>
+<P>
+<A NAME="50422134_pgfId-299002"></A>You can use the <CODE>
+offset_step</CODE>
+ field in the options structure to create side faces between smoothly-joined faces automatically. This option takes the following values:</P>
+<P>
+<A NAME="50422134_pgfId-299024"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299005"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299007"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299009"></A>PK_offset_step_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299011"></A>Do not create any side faces. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299013"></A>PK_offset_step_all_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299015"></A>Create side faces where required between faces that are smoothly joined to their neighbors. As well as creating side faces for any pierce faces in the resulting body, this option creates side faces between faces that are offset by different amounts. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-618141"></A>PK_offset_step_site_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-618143"></A>Only create side faces along smooth boundary edges if it cannot be done by growing the faces on either end of the boundary edges. Site faces that contain facet geometry will not be grown.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299017"></A>PK_offset_step_pierce_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299019"></A>Create side faces along edges that are smoothly joined to a pierce face. This value is useful if you need to support legacy behaviour that was available in Parasolid v18.0 and earlier. If there are no pierce faces, this option produces the same result as PK_offset_step_no_c. </P>
+<P>
+<A NAME="50422134_pgfId-299023"></A>In general, you should use PK_offset_step_all_c if you want to create side faces for pierce faces.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422134_pgfId-299028"></A><A HREF="fd_chap.060.html#50422134_85142"><EM>
+Figure 59-4</EM></A> shows an example in which a body has been hollowed, with the top two faces specified as pierce faces. The corresponding two faces on the bottom, which are joined smoothly, have been given different offsets. <A HREF="fd_chap.060.html#50422134_85142"><EM>
+Figure 59-4</EM></A> illustrates the difference between a hollowed body with side faces, and one without. </P>
+<P>
+<A NAME="50422134_pgfId-364346"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-653.gif">
+
+<P>
+<A NAME="50422134_pgfId-299298"></A>Figure 59-4 <A NAME="50422134_85142"></A>Generating side faces when hollowing a body</P>
+<P>
+<A NAME="50422134_pgfId-299302"></A><A HREF="fd_chap.060.html#50422134_62375"><EM>
+Figure 59-5</EM></A> shows an example of a tangent pierce face. Because the pierce face specified is joined smoothly to all the adjacent faces, side faces need to be created in order for the hollow operation to succeed. If <CODE>
+offset_step</CODE>
+ was left at its default setting, the example in <A HREF="fd_chap.060.html#50422134_62375"><EM>
+Figure 59-5</EM></A> would fail.</P>
+<P>
+<A NAME="50422134_pgfId-299339"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-654.gif">
+
+<P>
+<A NAME="50422134_pgfId-299558"></A>Figure 59-5 <A NAME="50422134_62375"></A>Hollowing a body using a tangent pierce face</P>
+<P>
+<A NAME="50422134_pgfId-299562"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422134_pgfId-299561"></A>Note: Creating step faces at smooth edges splits the end vertices of those edges. You can supply a maximum of two different offset distances (including zero) for the faces that share that vertex. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422134_pgfId-299564"></A>59.6	<A NAME="50422134_59958"></A>Local hollowing 
+
+
+</H1>
+<P>
+<A NAME="50422134_pgfId-299565"></A>By default, <A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A> hollows an entire body, by offsetting all the faces in the body (except for those you specify as pierce faces). However, if you want, you can choose to hollow out only part of a body. This can be useful in a variety of situations, for example:</P>
+<UL>
+<LI>
+<A NAME="50422134_pgfId-299566"></A>If you are designing a bath-tub with four legs, you can hollow out the tub while leaving the legs unhollowed.</LI>
+<LI>
+<A NAME="50422134_pgfId-299567"></A>If you have added a feature to a body that has already been hollowed, you can hollow out just the new feature.</LI>
+</UL>
+<P>
+<A NAME="50422134_pgfId-299568"></A>You use the <CODE>
+hollow_local</CODE>
+ option to control the use of local hollowing, as follows:</P>
+<P>
+<A NAME="50422134_pgfId-299592"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299571"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299573"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299575"></A><A HREF=../headers/pk_hollow_local_t.html>PK_hollow_local_add_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299577"></A>Hollow only specified faces. This value should only be used if you want to hollow some new features on a body that is already hollowed. See <A HREF="fd_chap.060.html#50422134_63918">Section 59.6.1, “Adding to an existing hollowed body”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299582"></A><A HREF=../headers/pk_hollow_local_t.html>PK_hollow_local_exclude_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299584"></A>Hollow everything except specified faces. This is useful if you are hollowing a body for the first time, but want to omit certain parts of the body (such as the handle of a cup) from the hollow operation. See <A HREF="fd_chap.060.html#50422134_17258">Section 59.6.2, “Excluding faces from a hollow operation”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299589"></A><A HREF=../headers/pk_hollow_local_t.html>PK_hollow_local_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422134_pgfId-299591"></A>Hollow the entire body. This is the default setting. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422134_pgfId-299593"></A>You specify the set of faces you want to hollow, or exclude from hollowing, using the <CODE>
+local_faces</CODE>
+ option. This takes an array of faces, which should be connected together in such a way as to represent one or more elements of the body that can be independently hollowed or excluded from a hollow operation. For example, the faces that form a boss on a body can be successfully hollowed locally. However, specifying two disjoint and unrelated faces on a body would typically result in a failed hollow operation. For a fuller description of constraints on local hollowing functionality, see <A HREF="fd_chap.060.html#50422134_84358">Section 59.6.3, “Constraints on local hollowing functionality”</A>.</P>
+<P>
+<A NAME="50422134_pgfId-299600"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422134_pgfId-299599"></A>Note: Local hollowing is independent from the pierce face functionality. For example if you use <A HREF=../headers/pk_hollow_local_t.html>PK_hollow_local_exclude_c</A>, the specified faces are <STRONG>
+not</STRONG> treated as pierce faces. They are simply not hollowed.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422134_pgfId-299602"></A>	59.6.1 	<A NAME="50422134_63918"></A>Adding to an existing hollowed body </H3>
+<P>
+<A NAME="50422134_pgfId-299606"></A><A HREF="fd_chap.060.html#50422134_73209"><EM>
+Figure 59-6</EM></A> shows an example in which new bosses that have been added to a hollowed body are themselves hollowed. </P>
+<UL>
+<LI>
+<A NAME="50422134_pgfId-299607"></A>To add to the existing hollowed body, <CODE>
+hollow_local</CODE>
+ is set to to <A HREF=../headers/pk_hollow_local_t.html>PK_hollow_local_add_c</A>. </LI>
+<LI>
+<A NAME="50422134_pgfId-299608"></A>To specify the bosses to hollow, <CODE>
+local_faces</CODE>
+ is set to the eight faces that comprise both bosses (four faces for each boss, not including the top face).</LI>
+<LI>
+<A NAME="50422134_pgfId-299609"></A>To open up the hollowed body again, the top face (common to both bosses) is specified in <CODE>
+pierce_faces</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422134_pgfId-421876"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-655.gif">
+
+<P>
+<A NAME="50422134_pgfId-299649"></A>Figure 59-6 <A NAME="50422134_73209"></A>Adding faces to a hollow operation</P>
+<P>
+<A NAME="50422134_pgfId-299650"></A>When adding to an existing hollowed body, the offset values you supply need not be the same as the offsets used when hollowing the original body. </P>
+
+
+<H3>
+<A NAME="50422134_pgfId-299652"></A>	59.6.2 	<A NAME="50422134_17258"></A>Excluding faces from a hollow operation </H3>
+<P>
+<A NAME="50422134_pgfId-299656"></A><A HREF="fd_chap.060.html#50422134_80956"><EM>
+Figure 59-7</EM></A> shows an example in which an element in an unhollowed body is excluded from the hollow operation. The example shows an unhollowed wine glass; clearly, hollowing the stem of the wine glass is undesirable. However, you can create the correct hollowed body in a single call to <A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A> as follows:</P>
+<UL>
+<LI>
+<A NAME="50422134_pgfId-299657"></A>To exclude faces from the hollow operation, <CODE>
+hollow_local</CODE>
+ is set to to <A HREF=../headers/pk_hollow_local_t.html>PK_hollow_local_exclude_c</A>. </LI>
+<LI>
+<A NAME="50422134_pgfId-299658"></A>To specify the faces to exclude, <CODE>
+local_faces</CODE>
+ is set to the six faces that comprise the stem of the glass.</LI>
+<LI>
+<A NAME="50422134_pgfId-299659"></A>To open up the wine glass, the top face is specified in <CODE>
+pierce_faces</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422134_pgfId-299693"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-656.gif">
+
+<P>
+<A NAME="50422134_pgfId-299695"></A>Figure 59-7 <A NAME="50422134_80956"></A>Excluding faces from a hollow operation</P>
+
+
+<H3>
+<A NAME="50422134_pgfId-299697"></A>	59.6.3 	<A NAME="50422134_84358"></A>Constraints on local hollowing functionality </H3>
+<P>
+<A NAME="50422134_pgfId-299698"></A>Local hollowing is not guaranteed to be successful in every case. Sometimes, if given inappropriate input, the hollow operation fails. This section describes some of the most common constraints on local hollowing functionality, so that you can avoid any obvious pitfalls. </P>
+<P>
+<A NAME="50422134_pgfId-299699"></A>The most basic constraint in local hollowing is that of the faces passed to the <CODE>
+local_faces</CODE>
+ array. This array must consist of collections of connected faces that, broadly speaking, describe locally one or more solid features in the body being hollowed. Passing in isolated faces that do not sensibly describe solid features results in a failure. </P>
+<P>
+<A NAME="50422134_pgfId-299700"></A>When adding faces to a hollowed operation, the body that you are operating on must already be hollowed. Adding faces to an unhollowed body may lead to undesirable results. </P>
+<P>
+<A NAME="50422134_pgfId-299704"></A>When excluding faces during hollowing (<A HREF="fd_chap.060.html#50422134_63918" CLASS="XRef">Section 59.6.1</A>), if you offset outwards, thereby creating a larger body, the elements you are trying to exclude may be consumed by the hollow operation. <A HREF="fd_chap.060.html#50422134_33841"><EM>
+Figure 59-8</EM></A> shows an example where a boss is to be excluded from the hollow. By offsetting outwards, the boss is consumed by the hollowed body, resulting in a blind hole. </P>
+<P>
+<A NAME="50422134_pgfId-299741"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-657.gif">
+
+<P>
+<A NAME="50422134_pgfId-299743"></A>Figure 59-8 <A NAME="50422134_33841"></A>Consuming an excluded boss by offsetting outwards</P>
+<P>
+<A NAME="50422134_pgfId-299744"></A>Similarly, if you exclude faces that form a pocket, and subsequently hollow by offsetting inwards, the excluded elements may be consumed, as shown in <A HREF="fd_chap.060.html#50422134_62001"><EM>
+Figure 59-9</EM></A>.</P>
+<P>
+<A NAME="50422134_pgfId-299781"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-658.gif">
+
+<P>
+<A NAME="50422134_pgfId-299783"></A>Figure 59-9 <A NAME="50422134_62001"></A>Consuming an excluded pocket by offsetting inwards</P>
+<P>
+<A NAME="50422134_pgfId-299784"></A>More generally, depending on the feature being excluded, hollowing may result in any of the following:</P>
+<UL>
+<LI>
+<A NAME="50422134_pgfId-299785"></A>A blind hole if an outward offset completely passes the boss.</LI>
+<LI>
+<A NAME="50422134_pgfId-299786"></A>A thin bottomed pocket if an inward offset completely passes the pocket.</LI>
+<LI>
+<A NAME="50422134_pgfId-299787"></A>A through hole if an outward offset trims the boss or the inward offset trims the pocket.</LI>
+</UL>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422134_pgfId-299789"></A>59.7	<A NAME="50422134_36844"></A>Creating blends from offset edges 
+
+
+</H1>
+<P>
+<A NAME="50422134_pgfId-299790"></A>When you hollow a body, you can optionally choose to round off the edges of the body that are offset during the hollow operation. </P>
+<P>
+<A NAME="50422134_pgfId-299791"></A>To do this, you can use the <CODE>
+blend_edges</CODE>
+ and <CODE>
+blend_radius</CODE>
+ options available in <A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A>, which let you replace offset edges in a hollowed body with constant-radius rolling-ball blends. </P>
+<P>
+<A NAME="50422134_pgfId-299792"></A>You use these options in the same way as the identical options available in offsetting operations, and they are subject to the same constraints. See <A HREF="fd_chap.059.html#50422133_41359">Section 58.8, “Creating blends from offset edges”</A>, for more information. </P>
+<P>
+<A NAME="50422134_pgfId-299799"></A><A HREF="fd_chap.060.html#50422134_40644"><EM>
+Figure 59-10</EM></A> illustrates the configurations in which edges are offset to blend faces.</P>
+<P>
+<A NAME="50422134_pgfId-299833"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-659.gif">
+
+<P>
+<A NAME="50422134_pgfId-299835"></A>Figure 59-10 <A NAME="50422134_40644"></A>Constraints for replacing offset edges with blends</P>
+<P>
+<A NAME="50422134_pgfId-299839"></A>An example of this functionality is shown in <A HREF="fd_chap.060.html#50422134_98204"><EM>
+Figure 59-11</EM></A>. </P>
+<P>
+<A NAME="50422134_pgfId-299873"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-660.gif">
+
+<P>
+<A NAME="50422134_pgfId-299875"></A>Figure 59-11 <A NAME="50422134_98204"></A>Creating blends from offset edges during hollow operations</P>
+<P>
+<A NAME="50422134_pgfId-299876"></A>Blends can be created from offset edges in all hollowing and thickening operations. The <CODE>
+blend_edges</CODE>
+ and <CODE>
+blend_radius</CODE>
+ options are available in the following options structures:</P>
+<UL>
+<LI>
+<A NAME="50422134_pgfId-299877"></A><A HREF=../headers/pk_body_hollow_o_t.html>PK_BODY_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422134_pgfId-299878"></A><A HREF=../headers/pk_body_offset_o_t.html>PK_BODY_offset_o_t</A></LI>
+<LI>
+<A NAME="50422134_pgfId-299879"></A><A HREF=../headers/pk_body_thicken_o_t.html>PK_BODY_thicken_o_t</A></LI>
+<LI>
+<A NAME="50422134_pgfId-299880"></A><A HREF=../headers/pk_face_hollow_o_t.html>PK_FACE_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422134_pgfId-299881"></A><A HREF=../headers/pk_face_offset_o_t.html>PK_FACE_offset_o_t</A></LI>
+</UL>
+<P>
+<A NAME="50422134_pgfId-607957"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422134_pgfId-607956"></A>Note: The <CODE>
+blend_edges</CODE>
+ value PK_EDGE_offset_blend_convex_c is not supported for mixed edges.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422134_pgfId-299883"></A>59.8	<A NAME="50422134_25126"></A>Controlling the growth of overflowing faces 
+
+
+</H1>
+<P>
+<A NAME="50422134_pgfId-299884"></A>When features with different convexities overflow each other as a result of hollowing, you can control which of the clashing features is grown to heal the model using the <CODE>
+grow</CODE>
+ option. </P>
+<P>
+<A NAME="50422134_pgfId-299888"></A><A HREF="fd_chap.060.html#50422134_28250"><EM>
+Figure 59-12</EM></A> shows a simple example of the effects that you can achieve using this functionality. </P>
+<P>
+<A NAME="50422134_pgfId-299922"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-661.gif">
+
+<P>
+<A NAME="50422134_pgfId-299924"></A>Figure 59-12 <A NAME="50422134_28250"></A>Controlling the growth of overflowing features with different convexity</P>
+<P>
+<A NAME="50422134_pgfId-299925"></A>This option is available in a range of different functional areas, including local operations, hollowing, and thickening. </P>
+<P>
+<A NAME="50422134_pgfId-299929"></A>In addition you can override Parasolid’s behaviour using the <CODE>
+grow_data</CODE>
+ and <CODE>
+grow_cb</CODE>
+ fields.</P>
+<P>
+<A NAME="50422134_pgfId-299932"></A>For a full description, see <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422134_pgfId-299938"></A>59.9	<A NAME="50422134_23120"></A><A NAME="50422134_marker-299935"></A><A NAME="50422134_marker-299936"></A><A NAME="50422134_marker-299937"></A>Offsetting specific faces in a body 
+
+
+</H1>
+<P>
+<A NAME="50422134_pgfId-299939"></A>As an alternative to <A HREF=../headers/pk_body_hollow_2.html><A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A></A>, the function <A HREF=../headers/pk_face_hollow_3.html><A HREF=../headers/pk_face_hollow_3.html>PK_FACE_hollow_3</A></A> lets you create hollowed bodies by specifying exactly which faces should be offset, and by how much. This function receives a list of faces and a list of offsets, and produces a hollowed body by offsetting each face by the specified amount. The behaviour of <A HREF=../headers/pk_face_hollow_3.html><A HREF=../headers/pk_face_hollow_3.html>PK_FACE_hollow_3</A></A> differs from <A HREF=../headers/pk_body_hollow_2.html><A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A></A> in that any faces not specified are treated as pierce faces. </P>
+<P>
+<A NAME="50422134_pgfId-299940"></A>You may want to use this function on rare occasions if for example, you have a large number of pierce faces. In the majority of cases, however, <A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A> is the recommended function to use. </P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.059.html">Offsetting</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.061.html">Thickening</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,158 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_change</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_change</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>              PK_FACE_change
+(
+<I>--- received arguments ---
+</I>int                          n_faces,         --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>              faces[],         --- faces to change
+const int                    mapping[],       --- face-operation mapping
+int                          n_operations,    --- number of operations
+<A HREF=../headers/pk_face_change_t.html>PK_FACE_change_t</A>             operations[],    --- change operations to apply
+                                              --- [PF]
+double                       tolerance,       --- tolerance
+const <A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A>    *options,         --- options [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>    *const tracking,        --- tracking information
+<A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A>    *const results          --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function changes the given faces by applying the related given operation
+to each of them.
+This function combines the features of : <A HREF=../headers/pk_face_offset_2.html>PK_FACE_offset_2</A>, <A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A>,
+<A HREF=../headers/pk_face_transform_2.html>PK_FACE_transform_2</A>, <A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> and some of <A HREF=../headers/pk_face_make_blend.html>PK_FACE_make_blend</A>.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_wrong_entity_in_array (MILD)    given topols are not from same
+                                             body
+    PK_ERROR_unsuitable_topology   (MILD)    laminar reference edge(s) for
+                                             normal method taper
+    PK_ERROR_bad_tolerance         (MILD)    proposed tolerance is too small
+    PK_ERROR_bad_angle             (MILD)    inconsistent taper angles
+                                             specified for multi angle taper
+    PK_ERROR_duplicate_array_item  (MILD)    duplication in faces array
+    PK_ERROR_wrong_transf          (MILD)    transform type is not compatible
+                                             with transform step face option
+    PK_ERROR_not_in_same_partition (MILD)    faces and replacement orphan
+                                             geometry not in same partition
+    PK_ERROR_laminar_edge          (MILD)    face to be replaced in a patch
+                                             operation has a laminar edge and
+                                             the face to be replaced isn't part
+                                             of patch data associated with the
+                                             patch operation
+    PK_ERROR_not_on_surface        (MILD)    geometry of given edges is not
+                                             coincident with geometry of faces
+    PK_ERROR_bad_combination       (MILD)    a mixture of facet and classic
+                                             geometry has been supplied
+    PK_ERROR_wrong_surface         (MILD)    the surface of a face in a radiate
+                                             operation does not have an axis of
+                                             rotation
+    PK_ERROR_non_manifold          (SERIOUS) <B>'faces'</B> are not locally manifold
+                                             and <B>'edge_geom_data'</B> has not been
+                                             supplied for non-manifold edges
+                                             that are to be modified which have
+                                             more than 2 surfaces belonging to
+                                             their adjacent faces.
+    PK_ERROR_evaluator_failed      (SERIOUS) user-supplied evaluator failed, or
+                                             failed to evaluate user-supplied
+                                             expression
+    PK_ERROR_failed_to_bend        (SERIOUS) bend operation failed
+    PK_ERROR_failed_to_blend       (SERIOUS) blend operation failed
+    PK_ERROR_failed_to_deform      (SERIOUS) deform operation failed
+    PK_ERROR_failed_to_offset      (SERIOUS) offset operation failed
+    PK_ERROR_failed_to_radiate     (SERIOUS) radiate operation failed
+    PK_ERROR_failed_to_replace     (SERIOUS) replace face operation failed
+    PK_ERROR_failed_to_taper       (SERIOUS) taper operation failed
+    PK_ERROR_failed_to_transform   (SERIOUS) transform operation failed
+    PK_ERROR_failed_to_change      (SERIOUS) a fault was generated and the
+                                             results have been output to the
+                                             Parasolid report.
+
+
+<A NAME="documentation"></A>
+
+Introduction
+See also <A HREF="../chapters/fd_chap.073.html#50434436_pgfId-300732">Local Ops: Generic Face Editing</A> for more information.
+
+To each face in <B>'faces'</B> is applied the associated operation from <B>'operations'</B>.
+The face/operation association is realised through the <B>'mapping'</B> array,
+parallel to the <B>'faces'</B> array. It contains the indexes of the operations to
+apply to the faces.
+For a face of index i_fa in <B>'faces'</B>, its associated operation is :
+        operations[mapping[i_fa]]
+
+An operation is defined by its type, its parameters and its eventual specific
+options.
+The operation types, their parameters and their specific options are passed
+to the function using the <B>'operations'</B> array of <A HREF=../headers/pk_face_change_t.html>PK_FACE_change_t</A> types.
+
+See <A HREF="../chapters/fd_chap.073.html#50434436_pgfId-302323">Specifying operations</A> for more information.
+
+If the faces belong to a general body, non-manifold edges can be modified,
+provided either
+*the geometry for them has been explicitly supplied via <B>'edge_geom_data'</B> or
+*there are no more than 2 unique surfaces belonging to their adjacent faces.
+The operation cannot cause topology change along non-manifold edges of the
+body.
+
+User options
+The <A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A> structure contains user control options. See
+its documentation for detail.
+
+Tracking
+The <A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A> structure contains topology tracking information on
+the operation. See its documentation for details.
+
+Error handling
+If this function returns PK_ERROR_no_errors, the result of the operation
+will be indicated by the value of the <B>'status'</B> field of the <B>'results'</B>
+structure. When this value is not <A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A> or
+<A HREF=../headers/pk_local_status_t.html>PK_local_status_nocheck_c</A>, it indicates an operation failure and an array
+of entities involved in this failure is returned through the field
+<B>'error_entities'</B> of the <B>'results'</B> structure, when possible.
+For more information regarding the failure status code and the error_entities,
+refer to the PK documentation of the <A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A> structure.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

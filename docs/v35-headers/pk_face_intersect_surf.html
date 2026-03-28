@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_intersect_surf</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_intersect_surf</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                   PK_FACE_intersect_surf
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                         face,       --- face
+<A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                         surf,       --- surface
+const <A HREF=../headers/pk_face_intersect_surf_o_t.html>PK_FACE_intersect_surf_o_t</A> *options,    --- options structure [PF]
+
+<I>--- returned arguments ---
+</I>int                        *const n_vectors,  --- number of point intersections
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>               **const vectors,    --- posns of point intersections
+int                        *const n_curves,   --- number of intersection curves
+<A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                **const curves,     --- intersection curves
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>             **const bounds,     --- bounds of curves
+<A HREF=../headers/pk_intersect_curve_t.html>PK_intersect_curve_t</A>      **const types       --- types of intersections
+)
+</B>
+<A NAME="description"></A>
+<I>PK_FACE_intersect_surf finds the intersections between a face and a surface.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_option_data    (MILD)    bad option structure data
+    PK_ERROR_missing_geom       (MILD)    missing geometry
+    PK_ERROR_bad_shared_entity  (MILD)    face and surface from different
+                                          bodies
+    PK_ERROR_bad_combination    (MILD)    an unsupported combination of facet
+                                          and classic geometry has been
+                                          supplied
+    PK_ERROR_not_on_curve       (SERIOUS) seed vector provided does not lie on
+                                          intersection of face and surface
+    PK_ERROR_cant_do_intersect  (SERIOUS) intersection cannot be done
+
+<A NAME="documentation"></A>
+
+ PK_FACE_intersect_surf finds the intersections between a face (<B>'face'</B>)
+ and a surface (<B>'surface'</B>), returning intersection points (<B>'vectors'</B>)
+ and curves of intersection (<B>'curves'</B>).
+
+ The surface (<B>'surf'</B>) must be an orphan or owned by the same body as <B>'face'</B>.
+ If <B>'surf'</B> is not an orphan any curves will be created as construction
+ geometry in the body.
+
+ If <B>'surf'</B> is an orphan and any of the curves returned are of type
+ intersection curve then these curves will refer to <B>'surf'</B> and a copy
+ of the surface of the face.
+
+ No attempt is made to define surface regions of partial coincidence, and
+ if the surfaces are fully coincident no intersection data will be returned.
+
+ Currently, curves returned from mixed geometry intersections are always
+ polylines.
+
+ The returned points (<B>'vectors'</B>) will be returned at points where the surface
+ and face make point contact. <B>'n_vectors'</B> indicates the number of intersection
+ points.
+
+ The curves returned (<B>'curves'</B>) will be the basis curves of trimmed curves,
+ and their corresponding bound in <B>'bounds'</B>,  <B>'n_curves'</B> indicates
+ the number of curves returned.
+
+ <B>'types'</B> classifies curves as being either:
+
+      <A HREF=../headers/pk_intersect_curve_t.html>PK_intersect_curve_simple_c</A> : Simple intersection curves
+   or <A HREF=../headers/pk_intersect_curve_t.html>PK_intersect_curve_tangent_c</A>: Tangent intersection curves
+
+ For facet geometry <A HREF=../headers/pk_intersect_curve_t.html>PK_intersect_curve_tangent_c</A> is not returned as
+ tangent intersections are not detected.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

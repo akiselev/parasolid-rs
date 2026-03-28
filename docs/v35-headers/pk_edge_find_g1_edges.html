@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_find_g1_edges</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_find_g1_edges</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_EDGE_find_g1_edges
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>         edge,         --- starting edge
+double            tolerance,    --- angular tolerance on tangency
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>      convexity,    --- convexity checking switch
+
+<I>--- returned arguments ---
+</I>int        *const n_edges,      --- number of edges (&gt;= 1)
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A> **const edges         --- received edge and tangent edges
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns the set of tangent edges for a given edge.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_edge         received edge unsuitable for function.
+                              (MILD)
+    PK_ERROR_bad_angle        received angular tolerance out of range.
+                              (MILD)
+
+<A NAME="documentation"></A>
+The function receives an edge, an angular tolerance and a logical switch and
+returns an unordered array containing the received edge and connected tangent
+edges lying within the given angular tolerance.
+
+If <B>'convexity'</B> is PK_LOGICAL_true, then the function only considers tangent
+edges with the same convexity as the received edge.
+
+If <B>'convexity'</B> is PK_LOGICAL_true then the body must be of type solid
+or sheet otherwise the function returns PK_ERROR_bad_edge. If <B>'convexity'</B>
+is PK_LOGICAL_false then the function accepts all body types.
+
+The function returns PK_ERROR_bad_edge if <B>'convexity'</B> is PK_LOGICAL_true
+and the convexity of the first edge, as returned by <A HREF=../headers/pk_edge_ask_convexity.html>PK_EDGE_ask_convexity</A>, is
+PK_EDGE_convexity_smooth_var_c or PK_EDGE_convexity_variable_c.
+
+If, while searching along a chain of edges, the function encounters a vertex
+with more than one possible tangent edge, then no attempt is made to propagate
+the search beyond the vertex.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

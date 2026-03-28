@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TOPOL_clash</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TOPOL_clash</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>           PK_TOPOL_clash
+(
+<I>--- received arguments ---
+</I>const int                 n_targets,    --- Number of target topologies
+const <A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>          targets[],    --- Array of target topols
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>         tf1[],        --- Transforms for targets
+const int                 n_tools,      --- Number of tool topologies
+const <A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>          tools[],      --- Array of tool topols
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>         tf2[],        --- Transforms for tools
+const <A HREF=../headers/pk_topol_clash_o_t.html>PK_TOPOL_clash_o_t</A> *options,      --- Options to be used [PF]
+
+<I>--- returned arguments ---
+</I>int                *const n_clash,      --- Number of clashes found
+<A HREF=../headers/pk_topol_clash_t.html>PK_TOPOL_clash_t</A>  **const clashes       --- Returned array of clashes
+)
+</B>
+<A NAME="description"></A>
+<I>This function clashes sets of topologies and returns the (list of)
+body, face or edge pairs which clash; the test can be comprehensive, or just
+find the first set, and can also return types of clashes.
+
+This function supports body v body, body v face, and face v face clashing.
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_combination (MILD) cannot clash classic and facet geometry
+                                    unless all <B>'targets'</B> and <B>'tools'</B> are sheet
+                                    or solid bodies.
+
+<A NAME="documentation"></A>
+See also <A HREF="../chapters/fd_chap.030.html#50434387_pgfId-294921">Clash detection of bodies</A> for more information.
+
+Terminology
+Two entities have a "clash" if they have a one, two, or three-
+dimensional overlap. Two entities are "clashed" together when we
+inspect them to see if they have a clash.
+
+Clashing entities of the same topological dimension:
+
+Entities with the same topological dimesion may be two solid bodies (but
+not a solid body with a wire or sheet body), or two faces etc. If the
+two entities clash, the bounding topologies of the entities (faces in
+the case of solid bodies, edges in the case of faces, and vertices in
+the case of edges) which clash are returned; if there is no such
+clash of bounding topologies, then the entities are examined to see
+whether one lies within the other.
+
+Clashing entities of differing topological dimension:
+
+Entities with different topological dimension may also be considered; for
+example, a three-dimensional solid body may be clashed with a
+two-dimensional sheet body, or a single face with a vertex etc. The
+clashes returned will depend on the types of topological entities
+under consideration. Clashes are first sought at the level of the
+entity with the lowest topological dimension; if no clash exists at this
+level, the next highest topological dimension is examined and so on. If no
+clash exists, the topology with the lower topological dimension is
+examined to see if it lies entirely within the topology with the
+higher topological dimension. Thus when clashing a vertex with a solid
+body, vertex - vertex  clashes are first sought. If no such clashes
+exist, vertex - edge clashes are then examined, then vertex - face and
+finally if no clashes are detected, the vertex is examined to see
+whether it lies within the body.
+
+Clash classifications:
+
+Clashes between two entities may be classified as "interference",
+"abutment" or "containment". The distinction between the three types
+of classification is made by considering shared points in space
+between the two entities.
+
+Two entities interfere if there exists a point in space which lies
+within, but not touching, the bounding topologies of both
+entities. Thus two solid bodies will interfere if they share a common
+volume, faces will interfere if they share a common area.
+
+If one entity is confined entirely within the bounding topologies of
+the other, and their bounding topologies do not touch, then that
+entity is said to contain the other. This is a special case of
+interference.
+
+Where the bounding topologies of the two entities touch, yet they do
+not fulfill the requirements of interfere and containment mentioned
+above, then the entities are said to abut. While abutment is possible
+for real-world solid objects, interference is not. Solid bodies will
+abut if they have faces which touch, but do not share a common volume.
+
+Special cases:
+
+When clashing two vertices, no attempt is made to classify the
+particular type of clash. If the two vertices lie within their local
+tolerance, then a clash type of PK_TOPOL_clash_exists will be returned.
+
+Similarly, no attempt is made to classify clashes between wire
+bodies. Any edge clashes returned will be of type
+PK_TOPOL_clash_exists. No examination of whether one wire body lies
+within another is made - only edge clashes will be returned.
+
+The clash classifications described above, which rely on the bounding
+topology of the two entities, do not always apply in the case of sheet
+bodies with multiple faces and / or wire bodies that have multiple
+edges. For example, a wire body and sheet body will only interfere if
+one or more edges of the wire body pass through an interior point of a
+face or faces  of the sheet body.
+
+Two sheet bodies will abut if their face clashes lie coincident with
+each other. They will only interfere if the clashing faces cross.
+
+
+Returned information
+If no clashes are found then <B>'n_clash'</B> is set to zero and <B>'clashes'</B> to NULL.
+
+If clashes are found, then <B>'n_clash'</B> is the number of clashes found
+and <B>'clashes'</B> points to a list of the clashes.
+
+When clashing a face with a body, the types of clashes returned (if
+requested) will be the same as those produced when clashing the
+equivalent single-faced sheet body with the body.
+
+
+Dealing with transforms
+If you supply PK_ENTITY_null in place of a transform,
+PK_TOPOL_clash substitutes an identity transform internally.
+
+This can be used as a shortcut to supply identity transforms for all
+the topologies in the target and/or tool lists. Leave the
+mul_target_tf (and/or mul_tool_tf) field in the options structure as
+PK_LOGICAL_false, and supply PK_ENTITY_null as the first element  of
+tf1 (and/or tf2).  PK_TOPOL_clash will use the same transform for each
+member of the list, and will substitute an identity transform for the
+PK_ENTITY_null.
+
+The <B>'tf1'</B> and <B>'tf2'</B> arguments may not be NULL pointers, and
+perspective terms are not permitted in transforms supplied
+to PK_TOPOL_clash.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

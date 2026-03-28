@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TRANSF_create_view</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TRANSF_create_view</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                   PK_TRANSF_create_view
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>                      view_direction,      --- view direction
+                                                       --- (normalised)
+const <A HREF=../headers/pk_transf_create_view_o_t.html>PK_TRANSF_create_view_o_t</A>  *options,             --- option structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A> *const                transf               --- the view transform
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns a valid viewing transform given a unit vector that
+designates the desired <B>'view_direction'</B>. Optionally an <B>'eye_position'</B> can be
+provided via the options structure in order to add perspective behaviour to the
+transform. This can be done by setting the flag <B>'have_eye_position'</B> to
+PK_LOGICAL_true.
+</I>
+<A NAME="documentation"></A>
+Note: This function supersedes <A HREF=../headers/pk_vector_make_view_transf.html>PK_VECTOR_make_view_transf</A>.
+
+This function accepts a normalised direction vector and creates a viewing
+transform entity from it with zero translation and perspective components,
+unit scale and a rotation sub matrix with determinant 1.
+The viewing matrix is right handed.
+
+The following table describes the view matrix in "column major" order
+(using the notation of the Parasolid Functional Description manual).
+
+           [    Hi       Vi       Di     Px=0.0    ]
+           [    Hj       Vj       Dj     Py=0.0    ]
+           [    Hk       Vk       Dk     Pz=0.0    ]
+           [  Tx=0.0   Ty=0.0   Tz=0.0   Sc=1.0    ]
+
+The rotation sub matrix defines 3 three orthogonal axes H, V, D where
+
+             D = -( <B>'view_direction'</B> )
+
+and V and H are calculated so that when D is parallel to a principal
+axis, these vectors will be parallel to the other two principal axes.
+
+In addition, one can add a perspective scaling to the view matrix by setting
+the <B>'have_eye_position'</B> option to true and providing an appropriate eye
+position from which to view the part along the view direction already given.
+It is important that this location be such that all parts are visible in this
+direction when using the view matrix for rendering parts. It must be located
+outside of the volume bounding all visible parts to be rendered.
+For more detailed information refer to the Parasolid Functional Description:
+<A HREF="../chapters/fd_chap.111.html#50434479_pgfId-294730">Parasolid View Matrices</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

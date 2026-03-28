@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_imprint_curve</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_imprint_curve</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_FACE_imprint_curve
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>         face,             --- face
+<A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>        curve,            --- curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>     bounds,           --- bounds of curve
+
+<I>--- returned arguments ---
+</I>int        *const n_new_edges,      --- number of new edges
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A> **const new_edges,        --- new edges (optional)
+int        *const n_new_faces,      --- number of new faces
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A> **const new_faces         --- new faces (optional)
+)
+</B>
+<A NAME="description"></A>
+<I>This function imprints a curve onto a face, thereby creating a new edge or
+edges.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_face_imprint_curves_2.html>PK_FACE_imprint_curves_2</A>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_missing_geom           <B>'face'</B> does not have geometry
+    PK_ERROR_not_on_surface         <B>'curve'</B> does not lie on <B>'face'</B>s surface
+                                    or bounds not within face
+    PK_ERROR_bad_basis_surf         SP curve basis surface differs from
+                                    <B>'face'</B>s surface.
+    PK_ERROR_invalid_geometry       curve does not pass checks
+    PK_ERROR_not_on_face            no new edges created
+    PK_ERROR_cant_do_imprint        failed to imprint curve
+
+<A NAME="documentation"></A>
+If the <B>'curve'</B> does not lie on the <B>'face'</B>s surface, then
+the error PK_ERROR_not_on_surface is returned.
+
+If none of the <B>'interval'</B> of the <B>'curve'</B> lies inside the <B>'face'</B> i.e. no
+new edges are created as a result of the imprint, then the error
+PK_ERROR_not_on_face is returned.
+
+Otherwise, each part of the <B>'interval'</B> of the <B>'curve'</B> which lies within the
+<B>'face'</B> will be imprinted on the face as a new edge.  The new edges are returned
+in <B>'new_edges'</B>, and the number of them in <B>'n_new_edges'</B>.  The new edges may
+split the face into several faces.  The new faces are returned in <B>'new_faces'</B>
+and the number of them in <B>'n_new_faces'</B>.  If new faces are created, the old
+face will lie on the right of one of the new edges, which will all go in the
+direction of the curve.
+
+Both the <B>'new_edges'</B> and <B>'new_faces'</B> arguments are optional.  If they are set
+to NULL then only the number of new edges and/or faces will be returned.
+
+If <B>'curve'</B> was an orphan, then it will be attached to the new edge(s).  If
+<B>'curve'</B> may be shared with the new edge(s) then it will be.  Otherwise
+a copy of the curve will be made and attached to the new edge(s).  When
+several new edges are created by imprinting one curve, then all of the edges
+will share the same geometry.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

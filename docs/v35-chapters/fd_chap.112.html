@@ -1,0 +1,605 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Picking Topology</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Picking Topology</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.111.html">Parasolid View Matrices</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.113.html">Introduction To Session Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-300566">111.1	Introduction </A>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-325006">111.2	Controlling the number and type of entities selected </A>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-325228">111.3	Constraining the space in which you can select entities </A>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-300727">111.4	Ordering the entities returned </A>
+<UL>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-300756">111.4.1	Axial ordering </A>
+<UL>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-300865">111.4.1.1	Picking from hidden-line drawings </A>
+</UL>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-300893">111.4.2	Axial ordering by absolute distance </A>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-418042">111.4.3	Radial ordering </A>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-301004">111.4.4	Ratio ordering </A>
+</UL>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-301074">111.5	Getting the best out of topology picking </A>
+<UL>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-301117">111.5.1	Approximate versus accurate picking </A>
+<LI> <A HREF="fd_chap.112.html#50422192_pgfId-301160">111.5.2	Rendering and picking </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422192_pgfId-300566"></A>111.1	<A NAME="50422192_30704"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422192_pgfId-326790"></A><A NAME="50422192_marker-404236"></A><A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> selects faces, edges or vertices (or combinations of these entities) from an array of bodies based on whether those entities intersect, or are within a specified tolerance of, a straight line ray defined using a location and a unit vector. The ray is defined in the same (world) coordinate system as the bodies. If an array of transforms is provided, then entities are picked from the body instances defined by those transforms, rather than the bodies themselves. Instance transforms can contain translation, reflection, rotation and uniform scaling, but not non-uniform scaling, shearing or perspective terms.</P>
+<P>
+<A NAME="50422192_pgfId-329372"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Inquiries\Model</CODE>
+ <CODE>
+Analysis\Picking</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422192_pgfId-326791"></A>When picking faces, the ray must always intersect the face. When picking edges and vertices, the ray should come within a specified distance of the edge or vertex. See <A HREF="fd_chap.112.html#50422192_57324">Section 111.2, “Controlling the number and type of entities selected”</A>, for more information.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422192_pgfId-325006"></A>111.2	<A NAME="50422192_marker-325004"></A><A NAME="50422192_57324"></A>Controlling the number and type of entities selected 
+
+
+</H1>
+<P>
+<A NAME="50422192_pgfId-325007"></A>You can use the <CODE>
+max_faces</CODE>
+, <CODE>
+max_edges</CODE>
+, and <CODE>
+max_vertices</CODE>
+ options to control the maximum number of those entity types that you want <A HREF=../headers/pk_body_pick_topols.html><A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A></A> to return. By default, <A HREF=../headers/pk_body_pick_topols.html><A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A></A> returns only a single face. </P>
+<P>
+<A NAME="50422192_pgfId-300620"></A>You can change these options to find, for example:</P>
+<P>
+<A NAME="50422192_pgfId-300634"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300623"></A>When finding</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300625"></A>Use this test</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300627"></A>The closest single entity</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300629"></A><CODE>
+max_faces</CODE>
+, <CODE>
+max_edges</CODE>
+ or <CODE>
+max_vertices</CODE>
+ set to 1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300631"></A>An array of nearby entities</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300633"></A><CODE>
+max_faces</CODE>
+, <CODE>
+max_edges</CODE>
+ or <CODE>
+max_vertices</CODE>
+ set to an arbitrary upper limit such as 20</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422192_pgfId-300635"></A>A face is considered picked when the ray intersects it. This is not possible with edges and vertices, however. Therefore, when picking edges and vertices, you should also set the <CODE>
+max_edge_dist</CODE>
+ and <CODE>
+max_vertex_dist</CODE>
+ options to specify the maximum distance that is allowed between the ray and either a vertex or edge for it to be considered selected.</P>
+<P>
+<A NAME="50422192_pgfId-300636"></A>When picking faces, you can use the <CODE>
+geom_classes</CODE>
+ option to filter the results such that only faces attached to certain surface classes are selected. </P>
+<P>
+<A NAME="50422192_pgfId-300640"></A>By default, Parasolid warns you if the potential number of picked entities exceeds these specified maximum values. This is done by returning the count of excess faces, edges or vertices, in the <CODE>
+e_faces</CODE>
+, <CODE>
+e_edges</CODE>
+, and <CODE>
+e_vertices</CODE>
+ fields of the return structure respectively. </P>
+<P>
+<A NAME="50422192_pgfId-300657"></A>When picking faces (<CODE>
+max_faces</CODE>
+ &gt; 0), you can improve the performance of <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> by setting the <CODE>
+ignore_excess_entities</CODE>
+ option to PK_LOGICAL_true. This sets <CODE>
+e_faces</CODE>
+, <CODE>
+e_edges</CODE>
+, and <CODE>
+e_vertices</CODE>
+ to 0 and stops <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> searching for further intersections with faces once the number of selected faces is equal to <CODE>
+max_faces</CODE>
+.</P>
+<P>
+<A NAME="50422192_pgfId-300661"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422192_pgfId-300660"></A>Note: You can use the excess counts to monitor whether the <CODE>
+max_edge_dist</CODE>
+ or <CODE>
+max_vertex_dist</CODE>
+ values are too large. These values can then be reduced dynamically when the excess count indicates that picking is being made from a locally dense regions of the model, or reduce the sampling rate if the picking function is being called dynamically.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422192_pgfId-325228"></A>111.3	Constraining the space in which you can select entities 
+
+
+</H1>
+<P>
+<A NAME="50422192_pgfId-325229"></A>You can use the <CODE>
+near_plane</CODE>
+ and <CODE>
+far_plane</CODE>
+ options to restrict which entities in model space can be selected by <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A>:</P>
+<P>
+<A NAME="50422192_pgfId-300711"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300700"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300702"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422192_pgfId-300704"></A>near_plane</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300706"></A>If you use this option, <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> only picks entities near the ray that lie behind the specified plane as shown in <A HREF="fd_chap.112.html#50422192_22840"><EM>
+Figure 111-1</EM></A>(A). In this case the red entity is picked.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422192_pgfId-300708"></A>far_plane</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300710"></A>If you use this option, <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> only picks entities near the ray that lie in front of the specified plane as shown in <A HREF="fd_chap.112.html#50422192_22840"><EM>
+Figure 111-1</EM></A>(B). In this case the blue entity is picked.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422192_pgfId-300692"></A>Using these options can improve the performance of <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A>. </P>
+<P>
+<A NAME="50422192_pgfId-354492"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1239.gif">
+
+<P>
+<A NAME="50422192_pgfId-354451"></A>Figure 111-1 <A NAME="50422192_22840"></A>Restricting which entities can be selected by <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A></P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422192_pgfId-300727"></A>111.4	Ordering the entities returned 
+
+
+</H1>
+<P>
+<A NAME="50422192_pgfId-300761"></A>You can use the <CODE>
+method</CODE>
+ option to control the order in which edges and vertices are returned by <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A>. This option allows you to choose between the following values:</P>
+<P>
+<A NAME="50422192_pgfId-300795"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300764"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300766"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300768"></A>PK_BODY_pick_axial_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300770"></A>Return entities in the order they are encountered along the ray. This is the default. See <A HREF="fd_chap.112.html#50422192_54602">Section 111.4.1</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300775"></A>PK_BODY_pick_axial_location_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300777"></A>Return entities in the order they are encountered along the ray from an absolute location. See <A HREF="fd_chap.112.html#50422192_18980">Section 111.4.2, “Axial ordering by absolute distance”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300782"></A>PK_BODY_pick_radial_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300786"></A>Return entities in the order of their distance from the ray. See <A HREF="fd_chap.112.html#50422192_45435">Section 111.4.3</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300789"></A>PK_BODY_pick_ratio_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-300791"></A>Return entities using a combination of the axial and radial methods. See <A HREF="fd_chap.112.html#50422192_62445">Section 111.4.4, “Ratio ordering”</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422192_pgfId-300799"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422192_pgfId-300798"></A>Note: PK_BODY_pick_radial_c and PK_BODY_pick_ratio_c only affect the ordering of edges and vertices in the return structure. Faces are always returned in the order that they are encountered along the ray (i.e. axial ordering), when these values are used. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422192_pgfId-300756"></A>	111.4.1 	<A NAME="50422192_marker-308012"></A><A NAME="50422192_54602"></A>Axial ordering </H3>
+<P>
+<A NAME="50422192_pgfId-300849"></A>The default method of ordering picked entities in the return structure of <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> is known as <STRONG>
+axial ordering</STRONG>. With this method, entities are returned in the order of their relative positions along the specified ray, measured in the same direction as the ray. </P>
+<P>
+<A NAME="50422192_pgfId-300853"></A><A HREF="fd_chap.112.html#50422192_49081"><EM>
+Figure 111-2</EM></A> shows four edges (viewed end-on) that are within <CODE>
+max_edge_dist</CODE>
+ of the specified ray. When <CODE>
+method</CODE>
+ is PK_BODY_pick_axial_c they are returned in the order ABCD.</P>
+<P>
+<A NAME="50422192_pgfId-307827"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1240.gif">
+
+<P>
+<A NAME="50422192_pgfId-300859"></A>Figure 111-2 <A NAME="50422192_49081"></A>Axial ordering of edges and vertices along a ray</P>
+
+<H4>
+<A NAME="50422192_pgfId-300865"></A>111.4.1.1 <A NAME="50422192_marker-300860"></A><A NAME="50422192_marker-300861"></A><A NAME="50422192_marker-300862"></A><A NAME="50422192_marker-300863"></A><A NAME="50422192_marker-300864"></A>Picking from hidden-line drawings </H4>
+<P>
+<A NAME="50422192_pgfId-300866"></A>The axial ordering method allows faces, edges and vertices to be picked at the same time using the same ordering method. This is appropriate when simulating picking edges and vertices from a <STRONG>
+hidden-line</STRONG> drawing, when only those entities which are closest to the eye-point can be considered as candidates for picking.</P>
+<P>
+<A NAME="50422192_pgfId-300832"></A>If you are picking faces from a hidden-line drawing, ensure that the <CODE>
+ignore_back_faces</CODE>
+ option is PK_LOGICAL_true (this is its default value).  In all other cases, set <CODE>
+ignore_back_faces</CODE>
+ to PK_LOGICAL_false. .</P>
+
+
+
+<H3>
+<A NAME="50422192_pgfId-300893"></A>	111.4.2 	<A NAME="50422192_18980"></A>Axial ordering by absolute distance </H3>
+<P>
+<A NAME="50422192_pgfId-300921"></A>You can also choose to return entities based on an axial ordering that uses an absolute value based on the <CODE>
+location</CODE>
+ supplied in the definition of the ray. When using this ordering, the first entity returned is the entity that is closest to the supplied <CODE>
+location</CODE>
+ along the ray <EM>
+in either direction</EM>. </P>
+<P>
+<A NAME="50422192_pgfId-300925"></A><A HREF="fd_chap.112.html#50422192_44515"><EM>
+Figure 111-3</EM></A> shows four edges (viewed end-on) that are within <CODE>
+max_edge_dist</CODE>
+ of the specified ray. When <CODE>
+method</CODE>
+ is PK_BODY_pick_axial_location_c they are returned in the order ABCD. Because the ray’s <CODE>
+location</CODE>
+ is taken into account, the order of entities is different compared to axial ordering (as shown in <A HREF="fd_chap.112.html#50422192_49081"><EM>
+Figure 111-2</EM></A>).</P>
+<P>
+<A NAME="50422192_pgfId-307866"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1241.gif">
+
+<P>
+<A NAME="50422192_pgfId-300934"></A>Figure 111-3 <A NAME="50422192_44515"></A>Absolute axial ordering of edges and vertices along a ray</P>
+<P>
+<A NAME="50422192_pgfId-300916"></A>This method can be useful, for example, to find the front and back faces of a thin walled body, given a <CODE>
+location</CODE>
+ on the mid-surface of the wall. To do this for a single pair of faces, set <CODE>
+max_faces</CODE>
+ = 2, <CODE>
+ignore_back_faces</CODE>
+ = PK_LOGICAL_false, and <CODE>
+ignore_excess_entities</CODE>
+ = PK_LOGICAL_true.</P>
+
+
+<H3>
+<A NAME="50422192_pgfId-418042"></A>	111.4.3 	<A NAME="50422192_marker-307888"></A><A NAME="50422192_45435"></A>Radial ordering </H3>
+<P>
+<A NAME="50422192_pgfId-300978"></A>You can also choose to return entities  according to the <STRONG>
+radial</STRONG> distance between an edge or vertex and the ray.</P>
+<P>
+<A NAME="50422192_pgfId-300979"></A>The radial ordering method can be used to provide your users with a method for picking edges and vertices from a <STRONG>
+wire-frame</STRONG> drawing on a screen, where the closest entities are those which appear closest to the screen cursor.</P>
+<P>
+<A NAME="50422192_pgfId-300983"></A><A HREF="fd_chap.112.html#50422192_13203"><EM>
+Figure 111-4</EM></A> shows four edges (viewed end-on) that are within <CODE>
+max_edge_dist</CODE>
+ of the specified ray. When <CODE>
+method</CODE>
+ is PK_BODY_pick_radial_c they are returned in the order ABCD.</P>
+<P>
+<A NAME="50422192_pgfId-307904"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1242.gif">
+
+<P>
+<A NAME="50422192_pgfId-300973"></A>Figure 111-4 <A NAME="50422192_13203"></A>Radial ordering of edges and vertices along a ray</P>
+
+
+<H3>
+<A NAME="50422192_pgfId-301004"></A>	111.4.4 	<A NAME="50422192_62445"></A>Ratio ordering </H3>
+<P>
+<A NAME="50422192_pgfId-301049"></A>A final method of ordering entities, ratio ordering, provides a way of combining both the axial and radial ordering methods. To use this method, you supply an additional ratio option. Radial and axial methods are then used in different proportions to calculate an entity ordering, depending on the value of ratio supplied. </P>
+<UL>
+<LI>
+<A NAME="50422192_pgfId-301050"></A>If ratio is 0, then the effect of ratio ordering is the same as using axial ordering.</LI>
+<LI>
+<A NAME="50422192_pgfId-301051"></A>If ratio is large, then the effect of ratio ordering is the same as using radial ordering.</LI>
+</UL>
+<P>
+<A NAME="50422192_pgfId-301035"></A>See the documentation for <A HREF=../headers/pk_body_pick_topols_o_t.html>PK_BODY_pick_topols_o_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on exactly how entities are ordered using a supplied ratio when ratio ordering is chosen. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422192_pgfId-301074"></A>111.5	Getting the best out of topology picking 
+
+
+</H1>
+<P>
+<A NAME="50422192_pgfId-301097"></A>This section discusses performance and reliability issues relating to <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A>. </P>
+
+<H3>
+<A NAME="50422192_pgfId-301117"></A>	111.5.1 	<A NAME="50422192_marker-307942"></A><A NAME="50422192_99964"></A>Approximate versus accurate picking </H3>
+<P>
+<A NAME="50422192_pgfId-301140"></A>By default, <A HREF=../headers/pk_body_pick_topols.html><A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A></A> uses approximate representations of curves in a body, rather than accurate geometry. You can choose the degree of approximation by specifying tolerance values in <A HREF=../headers/pk_body_pick_topols_o_t.html>PK_BODY_pick_topols_o_t</A>. You are strongly recommended to use approximate representations of curves in a body to improve the performance of <A HREF=../headers/pk_body_pick_topols.html><A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A></A>. </P>
+<P>
+<A NAME="50422192_pgfId-301167"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422192_pgfId-301166"></A>Warning: When using approximate picking, intersection point and distance values returned by <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> are approximate, and must not be used as arguments to modelling functions.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422192_pgfId-301183"></A>If necessary, you can force <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> to use accurate geometry rather than an approximation by setting the <CODE>
+pick_approx</CODE>
+ option in <A HREF=../headers/pk_body_pick_topols_o_t.html>PK_BODY_pick_topols_o_t</A> to <A HREF=../headers/pk_pick_approximate_t.html>PK_pick_approximate_no_c</A>. </P>
+<P>
+<A NAME="50422192_pgfId-301184"></A>If you are making a large number of calls to <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A>, you may be able to improve performance by using accurate picking and pre-populating faces on the body with approximate edge representations. To do this:</P>
+<P>
+<A NAME="50422192_pgfId-301220"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-301205"></A>Function to call</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-301207"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-301209"></A><A HREF=../headers/pk_face_set_approx.html>PK_FACE_set_approx</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-301211"></A>Pass in all the faces of the bodies from which you want to select topology. This creates an approximate representation of the edges in those faces, which can then be used by <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-301213"></A><A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A>, with pick_approx set to <A HREF=../headers/pk_pick_approximate_t.html>PK_pick_approximate_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-301215"></A>For each call to <A HREF=../headers/pk_body_pick_topols.html><A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A></A>, ensure that accurate picking is used. <A HREF=../headers/pk_body_pick_topols.html><A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A></A> uses the approximate edge representations you have already created. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-301217"></A><A HREF=../headers/pk_face_unset_approx.html>PK_FACE_unset_approx</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-301219"></A>After the calls to <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A>, call this function with the same set of faces as you used for <A HREF=../headers/pk_face_set_approx.html>PK_FACE_set_approx</A>. This removes the approximate representations of those faces, allowing you to continue with modelling. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422192_pgfId-301199"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422192_pgfId-301274"></A>Performance issue: Using accurate geometry with <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> slows down performance and is not generally recommended for any interactive picking operations. The only exception to this is when edges in the supplied bodies already have approximate edge representations, as described above.</ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422192_pgfId-301160"></A>	111.5.2 	<A NAME="50422192_12108"></A>Rendering and picking </H3>
+<P>
+<A NAME="50422192_pgfId-301328"></A>If you use <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> to provide your users with functionality to select displayed entities on screen, you should use the function in conjunction with <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A>, so that entities that have been rendered previously can be checked for intersection or proximity to a ray which passes through the current view point and in the current viewing direction (transformed from 2-D screen coordinates into 3-D world coordinates). See <A HREF="fd_chap.112.html#50422192_99964">Section 111.5.1, “Approximate versus accurate picking”</A> for more information.</P>
+<P>
+<A NAME="50422192_pgfId-301335"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422192_pgfId-301331"></A>Note: To enhance performance and reliability, <A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A> should be called with the <STRONG>
+same chordal tolerance values</STRONG> as used in preceding calls to <A HREF=../headers/pk_topol_render_line.html><A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A></A>. These tolerance values can be found in the Parasolid Report returned by <A HREF=../headers/pk_topol_render_line.html><A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A></A>. See <A HREF="fd_chap.107.html#50422187_22629">Section 106.2, “Curve approximation tolerances”</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422192_pgfId-301323"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422192_pgfId-390658"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422192_pgfId-390645"></A><A HREF="fd_chap.107.html#50422187_37771">Chapter 106, “Display Tolerances”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.111.html">Parasolid View Matrices</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.113.html">Introduction To Session Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

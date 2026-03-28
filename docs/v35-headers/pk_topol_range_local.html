@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TOPOL_range_local</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TOPOL_range_local</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                 PK_TOPOL_range_local
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                      topol_1,        --- first topological entity
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                      topol_2,        --- second topological entity
+const <A HREF=../headers/pk_topol_range_local_o_t.html>PK_TOPOL_range_local_o_t</A> *options,        --- options structure
+
+<I>--- returned arguments ---
+</I>int                      *const n_ranges,       --- no. local minima
+<A HREF=../headers/pk_range_2_r_t.html>PK_range_2_r_t</A>          **const ranges          --- range data
+)
+</B>
+<A NAME="description"></A>
+<I>This function finds the local minimum separations between two topological
+entities.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_option_data       bad option data given (MILD)
+    PK_ERROR_wrong_entity          given topology is of the wrong type (MILD)
+    PK_ERROR_missing_geom          given topology has missing geometry (MILD)
+    PK_ERROR_bad_parameter         bad parameter given (MILD)
+    PK_ERROR_no_closest_approach   failed to find closest approach (MILD)
+
+<A NAME="documentation"></A>
+
+
+PK_TOPOL_range_local will find the local closest approaches between <B>'topol_1'</B>
+and <B>'topol_2'</B>.
+
+The following topology types are supported:
+    - vertex, edge, face, and body.
+
+
+
+An array of range data will be returned in <B>'ranges'</B>, this consists of an array
+of structures of type <A HREF=../headers/pk_range_2_r_t.html>PK_range_2_r_t</A>, each of which contains a double
+<B>'distance'</B>, which is the separation distance between the two topological
+entities provided, and an array of two structures of type <A HREF=../headers/pk_range_end_t.html>PK_range_end_t</A>,
+which provide information on each end of the line of separation as follows:
+
+<B>'entity'</B>           : in the first structure this will contain the topology
+                     supplied in <B>'topol_1'</B> and in the second structure this
+                     will contain the topology supplied in <B>'topol_2'</B>.
+<B>'sub_entity'</B>       : the topology of the lowest dimensionality which contains
+                     the end position.  e.g if a body is passed in as <B>'topol_1'</B>
+                     and the end position is found on a vertex then <B>'entity'</B>
+                     will return the body and <B>'sub_entity'</B> will return the
+                     vertex. If <B>'sub_entity'</B> would be the same as <B>'entity'</B>
+                     then no <B>'sub_entity'</B> will be returned.
+<B>'vector'</B>           : the end position on <B>'entity'</B>.
+<B>'parameters'</B>       : an array of two parameters of the end position holding
+                     curve or surface parameter(s). Which parameterisation is
+                     used is firstly dependent upon the geometry of the
+                     entity returned and secondly upon the geometry of the
+                     sub_entity (if identified). If curve parameterisation
+                     is used the 2nd parameter should be ignored.
+                     The table below indicates which parameterisation
+                     is used and when:
+
+                      -------------------------------------------------------
+                     |  Entity   |  Identified  |     Geometry used for      |
+                     |           |  Sub-Entity  | solution parameterisation  |
+                     |-----------|--------------|----------------------------|
+                     |           |              |                            |
+                     |  vertex   |     none     |          none              |
+                     |           |              |                            |
+                     |   edge    |     none     |     curve of the edge      |
+                     |   edge    |    vertex    |     curve of the edge      |
+                     |           |              |                            |
+                     |    face   |     none     |    surface of the face     |
+                     |    face   |     edge     |    surface of the face     |
+                     |    face   |    vertex    |    surface of the face     |
+                     |           |              |                            |
+                     |    body   |     face     |    surface of the face     |
+                     |    body   |     edge     |     curve of the edge      |
+                     |    body   |    vertex    |          none              |
+                     |           |              |                            |
+                      -------------------------------------------------------
+
+                     The curve and surface parameter values returned
+                     will be the same as would be returned by the
+                     parameterisation functions <A HREF=../headers/pk_curve_parameterise_vector.html>PK_CURVE_parameterise_vector</A>
+                     and <A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A>.
+
+<B>'region'</B>           : a logical value - whether the solution is regional. If
+                     PK_LOGICAL_true, the solution is a regional solution upon
+                     the entity (ie. it is possible to move from solution point
+                     pair without the distance changing )
+                     The identification of such a regional solution is not
+                     guaranteed.
+
+<B>'negative'</B>         : a logical value - whether the point lies inside or outside
+                     the body.
+                     If <B>'entity'</B> is a body and the point at the other end of
+                     the separation lies inside the body, <B>'negative'</B> will
+                     return PK_LOGICAL_true, otherwise PK_LOGICAL_false will
+                     be returned.
+
+See <A HREF="../chapters/fd_chap.029.html#50434386_pgfId-296591">Calculating minimum and maximum distance</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

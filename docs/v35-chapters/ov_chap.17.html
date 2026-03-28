@@ -1,0 +1,426 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Writing Parasolid Applications</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Writing Parasolid Applications</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.16.html">Application Support</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.18.html">Multi-Processing Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-274301">16.1	Introduction</A>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-274101">16.2	Downward interfaces</A>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-274118">16.3	Calling Parasolid functions</A>
+<UL>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-279291">16.3.1	Design of functions and related data</A>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-281081">16.3.2	Structures</A>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-281093">16.3.3	Memory management</A>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-274132">16.3.4	Naming conventions</A>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-289507">16.3.5	Calling Parasolid from .NET applications</A>
+</UL>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-289512">16.4	Implementation decisions</A>
+<UL>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-279533">16.4.1	Managing errors</A>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-110680">16.4.2	Roll-back</A>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-279556">16.4.3	Tracking entities</A>
+<LI> <A HREF="ov_chap.17.html#50446371_pgfId-279598">16.4.4	Session parameters</A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446371_pgfId-274301"></A>16.1	<A NAME="50446371_marker-284786"></A><A NAME="50446371_marker-284784"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446371_pgfId-280845"></A>Parasolid is supplied as a single library of <A NAME="50446371_marker-285055"></A><A NAME="50446371_marker-285353"></A>C-callable functions, together with associated header files, and in order to perform solid modelling operations, you call these functions from within your application code. Before this can be done, Parasolid needs to be integrated with whatever development environment you are using. This is simply a case of specifying the location of the required library, headers and so on. In addition, your application needs to include code that ensures that it can interact with Parasolid correctly. </P>
+<P>
+<A NAME="50446371_pgfId-283515"></A>This chapter gives you an overview of how you approach the development of a Parasolid application, and discusses:</P>
+<UL>
+<LI>
+<A NAME="50446371_pgfId-283564"></A>What code you need to supply before you can make calls to Parasolid operations.</LI>
+<LI>
+<A NAME="50446371_pgfId-283700"></A>The overall structure of the Parasolid API, and how it can help you to make the development process easier.</LI>
+<LI>
+<A NAME="50446371_pgfId-283673"></A>What design decisions you need to take before you progress too far with your application development.</LI>
+</UL>
+<P>
+<A NAME="50446371_pgfId-281033"></A>You can deliver Parasolid to your customers with your application just by including a few files (including the library file itself) with the other components of your product. Any commonly available installer package will ensure that it gets installed on the customer&#8217;s computer in the correct location for the operating system they are running. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446371_pgfId-274101"></A>16.2	<A NAME="50446371_marker-284722"></A>Downward interfaces
+
+
+</H1>
+<P>
+<A NAME="50446371_pgfId-274102"></A>Your application must control all interaction between Parasolid and the operating system. In order to do this, you need to provide a number of modules, referred to generically as <EM>
+downward interfaces</EM><A NAME="50446371_marker-284744"></A>. There are usually two such modules, each of which defines a small suite of functions:</P>
+<P>
+<A NAME="50446371_pgfId-280265"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-280287"></A>Module</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-280289"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-280291"></A>Frustrum<A NAME="50446371_marker-285066"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-280328"></A>Contains functions that deal with:</P>
+<UL>
+<LI>
+<A NAME="50446371_pgfId-280332"></A><STRONG>
+File handling:</STRONG><A NAME="50446371_marker-284746"></A><A NAME="50446371_marker-284778"></A><A NAME="50446371_marker-284834"></A><A NAME="50446371_marker-284818"></A> Saving and retrieving Parasolid part files and other data.</LI>
+<LI>
+<A NAME="50446371_pgfId-280333"></A><STRONG>
+Memory management:</STRONG><A NAME="50446371_marker-284748"></A><A NAME="50446371_marker-284792"></A> Allocating memory for internal calculations and data structure storage.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-280295"></A>Graphical Output (GO)<A NAME="50446371_marker-285087"></A><A NAME="50446371_marker-285365"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-280297"></A>Functions that encapsulate the graphical information output by Parasolid&#8217;s rendering functions in a form suitable for passing to a graphics library, such as OpenGL or DirectX. See <A HREF="ov_chap.15.html#50446351_91215">Chapter 14, &#8220;Displaying Data&#8221;</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446371_pgfId-280441"></A>If you also wish to support Parasolid&#8217;s roll-back functionality (see <A HREF="ov_chap.17.html#50446371_50146">Section 16.4.2</A>), you also need to provide a <STRONG>
+delta frustrum</STRONG><A NAME="50446371_marker-284750"></A><A NAME="50446371_marker-284772"></A>, containing functions specific to that functionality.</P>
+<P>
+<A NAME="50446371_pgfId-280532"></A>You need to provide the required downward interfaces before you can successfully call Parasolid operations from your own application code. Parasolid ships with example code to help you write your own versions of them. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446371_pgfId-274118"></A>16.3	<A NAME="50446371_marker-284724"></A><A NAME="50446371_marker-284770"></A><A NAME="50446371_marker-284768"></A>Calling Parasolid functions
+
+
+</H1>
+<P>
+<A NAME="50446371_pgfId-281363"></A>Calling Parasolid functionality from your application code is a simple process. Parasolid has a long history of strong design principles and offers its functionality through a consistent interface that is accompanied by complete and thorough reference documentation. This consistency gives you the freedom to structure your own application code in the way that suits you best, without having to make compromises because of any requirements imposed due to integration with Parasolid. This section introduces you to the structure of the Parasolid API. </P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446371_pgfId-279291"></A>	16.3.1 	<A NAME="50446371_marker-284726"></A><A NAME="50446371_marker-284836"></A><A NAME="50446371_marker-284852"></A><A NAME="50446371_marker-284820"></A><A NAME="50446371_marker-284850"></A><A NAME="50446371_marker-284780"></A>Design of functions and related data</H2>
+<P>
+<A NAME="50446371_pgfId-281535"></A>Parasolid entities are organised in an object-oriented class hierarchy such that a function that is called on a given class can also be called on all its subclasses. For example, any function that is defined on curves can also be called on circles, lines, B-curves and so on. </P>
+<P>
+<A NAME="50446371_pgfId-281444"></A><A NAME="50446371_marker-285125"></A><A NAME="50446371_marker-285361"></A><A NAME="50446371_marker-285359"></A><A NAME="50446371_marker-285357"></A>Each function has a fixed set of arguments: some of these are used to supply data, and others are used to return information. Arguments are expressed as simple values, arrays, and structures of the types described in <A HREF="ov_chap.17.html#50446371_67176" CLASS="XRef">Section 16.3.2</A>. The overall relationship between these different elements is illustrated in <A HREF="ov_chap.17.html#50446371_25608"><EM>
+Figure 16-1</EM></A>.</P>
+<P>
+<A NAME="50446371_pgfId-306926"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-178.gif">
+
+<P>
+<A NAME="50446371_pgfId-281850"></A>Figure 16-1 <A NAME="50446371_25608"></A>Structure of a typical function group</P>
+<P>
+<A NAME="50446371_pgfId-283422"></A>You must set each argument explicitly when calling Parasolid functions, rather than omitting them completely. This is made easier by the use of <A NAME="50446371_marker-285131"></A><A NAME="50446371_marker-285369"></A>option structures and <A NAME="50446371_marker-285137"></A><A NAME="50446371_marker-285367"></A>initialisation macros, as described in <A HREF="ov_chap.17.html#50446371_67176">Section 16.3.2</A>.</P>
+<P>
+<A NAME="50446371_pgfId-283917"></A><A NAME="50446371_marker-285141"></A><A NAME="50446371_marker-285355"></A>For many functions, helper functions are provided that free the memory used for return arguments when it is no longer required: see <A HREF="ov_chap.17.html#50446371_94769">Section 16.3.3</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446371_pgfId-281081"></A>	16.3.2 	<A NAME="50446371_67176"></A><A NAME="50446371_marker-284728"></A><A NAME="50446371_marker-284848"></A><A NAME="50446371_marker-284838"></A><A NAME="50446371_marker-284822"></A>Structures</H2>
+<P>
+<A NAME="50446371_pgfId-281121"></A>Much of the information passed in Parasolid function code is collected together in related groups, or structures. There are three basic structures that you use in your code. </P>
+<P>
+<A NAME="50446371_pgfId-281145"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-281167"></A>Structure</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-281169"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-281191"></A>Options structure<A NAME="50446371_marker-285163"></A><A NAME="50446371_marker-285371"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-281173"></A>These structures are used to contain optional arguments and option switches that are passed to Parasolid functions. Every options structure has an accompanying macro that you should use to initialise all the fields in the structure to their default values, prior to setting any specific values that you require. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-281197"></A>Return structure<A NAME="50446371_marker-285174"></A><A NAME="50446371_marker-285373"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-281177"></A>These structures are used to pass related information back to your application. For example, tracking information is passed back to your application using a return structure. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-281203"></A>Standard form<A NAME="50446371_marker-285183"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-281181"></A>These structures are used as templates for specifying information when you create entities. For example, when creating a circle, you need to pass a standard form into the relevant creation function that specifies the radius, center point and reference direction for the circle. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446371_pgfId-281093"></A>	16.3.3 	<A NAME="50446371_94769"></A><A NAME="50446371_marker-284730"></A><A NAME="50446371_marker-284842"></A><A NAME="50446371_marker-284840"></A><A NAME="50446371_marker-284826"></A><A NAME="50446371_marker-284824"></A><A NAME="50446371_marker-284790"></A>Memory management</H2>
+<P>
+<A NAME="50446371_pgfId-281284"></A>Return arguments in Parasolid functions consume variable amounts of data that are returned from Parasolid as C arrays. While Parasolid allocates most of the memory required automatically, your application must ensure that memory is freed correctly when it is no longer required. Parasolid provides functionality to let you allocate and free memory.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446371_pgfId-274132"></A>	16.3.4 	<A NAME="50446371_marker-284732"></A><A NAME="50446371_marker-284796"></A><A NAME="50446371_marker-284794"></A>Naming conventions</H2>
+<P>
+<A NAME="50446371_pgfId-281251"></A>All Parasolid interfaces follow strict naming conventions that make them easy to use and identify. For example, function names always include the class of entity on which they can be called (BODY, FACE, etc.), as well as words that describe the operation to be performed. Different types of structures can easily be identified according to the suffix used on the structure name, and options structures and their macros are named according to the functions to which they apply.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446371_pgfId-289507"></A>	16.3.5 	Calling Parasolid from .NET applications</H2>
+<P>
+<A NAME="50446371_pgfId-289508"></A>A Microsoft .NET binding DLL for Parasolid is available. This allows Parasolid-based applications to be written in the C# programming language. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446371_pgfId-289512"></A>16.4	<A NAME="50446371_marker-289509"></A><A NAME="50446371_marker-289510"></A><A NAME="50446371_marker-289511"></A>Implementation decisions
+
+
+</H1>
+<P>
+<A NAME="50446371_pgfId-279676"></A>Like any complex application, when you start building a Parasolid-based application you need to plan what functionality you want to provide to your users. Many of these considerations affect the whole of your application, rather than just parts of it, and so you need to make decisions about them early on in the development process. This is equally true whether you are developing an application from scratch (in which case you need to decide the strategy you want to follow), or whether you are integrating Parasolid into an existing application (in which case you need to decide how Parasolid can best support your existing strategy, or consider improvements in your current design that Parasolid makes possible).</P>
+<P>
+<A NAME="50446371_pgfId-279724"></A>This section discusses some of the more important implementation decisions you will need to make early on in the development process, and what options Parasolid provides. </P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446371_pgfId-279533"></A>	16.4.1 	<A NAME="50446371_marker-284736"></A><A NAME="50446371_marker-284846"></A><A NAME="50446371_marker-284832"></A><A NAME="50446371_marker-284788"></A>Managing errors</H2>
+<P>
+<A NAME="50446371_pgfId-288450"></A>All Parasolid functions return an error code as the function value to the calling routine. This value broadly indicates whether the intended operation has succeeded (if zero) or failed (non-zero); in the case of failure, the error code describes the probable cause. In other situations, more details concerning the nature of the failure can be returned via the output arguments of the function. In these cases, a value of zero is returned as the error code, and the corresponding output arguments must also be examined.</P>
+<P>
+<A NAME="50446371_pgfId-288451"></A>To ease the handling of situations where non-zero error codes are returned, your application can register an <A NAME="50446371_marker-288452"></A>error handling function with Parasolid. This function is called automatically whenever an error with a non-zero code occurs, and can be used to perform any clean-up operations needed as a result of the error.</P>
+<P>
+<A NAME="50446371_pgfId-279540"></A>If you wish, your application can also register <A NAME="50446371_marker-288453"></A>signal handlers with the operating system in order to recover from <A NAME="50446371_marker-288455"></A>run-time errors and enable <A NAME="50446371_marker-288456"></A>user interrupts.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446371_pgfId-110680"></A>	16.4.2 	<A NAME="50446371_50146"></A><A NAME="50446371_marker-284738"></A>Roll-back</H2>
+<P>
+<A NAME="50446371_pgfId-280199"></A>As discussed in <A HREF="ov_chap.16.html#50446385_81921">Section 15.3</A>, Parasolid provides two types of roll-back.</P>
+<UL>
+<LI>
+<A NAME="50446371_pgfId-279567"></A><A NAME="50446371_marker-285243"></A><A NAME="50446371_marker-285377"></A>Session-level roll-back allows your application to roll back the contents of the entire session.</LI>
+<LI>
+<A NAME="50446371_pgfId-279572"></A><A NAME="50446371_marker-279568"></A><A NAME="50446371_marker-279569"></A><A NAME="50446371_marker-285247"></A><A NAME="50446371_marker-285375"></A>Partition-level roll-back allows your application to roll back an individual <A NAME="50446371_marker-279570"></A><A NAME="50446371_marker-279571"></A>partition independently of any other partitions. </LI>
+</UL>
+<P>
+<A NAME="50446371_pgfId-280210"></A>You need to decide which, if either, of these mechanisms you want to implement, and whether you want your users to be able to roll sessions and partitions forward, as well as backward. </P>
+<P>
+<A NAME="50446371_pgfId-279583"></A>For example, you could implement <A NAME="50446371_marker-279579"></A><A NAME="50446371_marker-279580"></A>partition-level roll-back so that a new partition is created for each individual part. Users could then make changes to individual parts and roll them back or forward without affecting the other parts in the session. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446371_pgfId-279556"></A>	16.4.3 	<A NAME="50446371_marker-284740"></A><A NAME="50446371_marker-284800"></A>Tracking entities</H2>
+<P>
+<A NAME="50446371_pgfId-279601"></A>Your application may need to track various entities within any Parasolid session. For example, tracking is required in order to:</P>
+<UL>
+<LI>
+<A NAME="50446371_pgfId-279602"></A>Update graphical display information </LI>
+<LI>
+<A NAME="50446371_pgfId-279603"></A>Track entities in a feature-based system</LI>
+</UL>
+<P>
+<A NAME="50446371_pgfId-279604"></A>Parasolid provides several methods for tracking entities, discussed in <A HREF="ov_chap.16.html#50446385_71012">Section 15.5</A>. You need to decide which of these methods is best suited to you. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446371_pgfId-279598"></A>	16.4.4 	<A NAME="50446371_marker-284742"></A><A NAME="50446371_marker-284798"></A>Session parameters</H2>
+<P>
+<A NAME="50446371_pgfId-279634"></A><A NAME="50446371_marker-279633"></A>There are a number of session-level options you can control that alter the behaviour for the whole Parasolid session. You might decide to give your users control over these options (via a scheme of application preferences), or you might decide to hard code them into your application. Examples of these options include:</P>
+<P>
+<A NAME="50446371_pgfId-279666"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-279637"></A>Parameter</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-279639"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-279641"></A>Continuity and self-intersection checking</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-279645"></A><A NAME="50446371_marker-279643"></A>Whether checks are performed by various operations, and whether to attach discontinuous or self-intersecting geometry to topology. See <A HREF="ov_chap.04.html#50446350_19613">Section 3.7.3</A>.<A NAME="50446371_marker-285264"></A><A NAME="50446371_marker-285351"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-279648"></A><A NAME="50446371_marker-279647"></A>General topology</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-279650"></A>Whether to create general bodies from boolean operations. See <A HREF="ov_chap.04.html#50446350_99561">Section 3.7.2</A>.<A NAME="50446371_marker-285271"></A><A NAME="50446371_marker-285363"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-279657"></A><A NAME="50446371_marker-279656"></A>SMP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446371_pgfId-279659"></A>Whether to use SMP when more than one processor is available. See <A HREF="ov_chap.18.html#50446373_35587">Chapter 17, &#8220;Multi-Processing Support&#8221;</A>.<A NAME="50446371_marker-285278"></A><A NAME="50446371_marker-285379"></A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446371_pgfId-279630"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.16.html">Application Support</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.18.html">Multi-Processing Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

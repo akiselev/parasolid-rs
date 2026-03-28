@@ -1,0 +1,2621 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Graphical Output</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Graphical Output</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.04.html">File Header Structure</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.06.html">Registering the Frustrum</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274038">4.1	Introduction</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274047">4.2	Graphical output functions</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274060">4.3	Structure of line data output</A>
+<UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274065">4.3.1	Segment hierarchy</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274080">4.3.2	Graphical data for assemblies</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274238">4.3.3	Notes</A>
+</UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274254">4.4	Segment output functions</A>
+<UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274268">4.4.1	Tags</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274273">4.4.2	Line type</A>
+<UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274290">4.4.2.1	Line type</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274318">4.4.2.2	Completeness</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274324">4.4.2.3	Visibility</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274364">4.4.2.4	Smoothness</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274376">4.4.2.5	Regional data</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-322707">4.4.2.6	Coincidence with sharp mfins</A>
+</UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274386">4.4.3	Geometry</A>
+<UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274396">4.4.3.1	Straight line: L3TPSL</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274417">4.4.3.2	Complete circle: L3TPCC</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274437">4.4.3.3	Partial circle: L3TPCI</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274465">4.4.3.4	Complete ellipse: L3TPCE</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274493">4.4.3.5	Partial ellipse: L3TPEL</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274529">4.4.3.6	Poly-line: L3TPPY</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274551">4.4.3.7	For facet vertices</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274571">4.4.3.8	For facet vertices plus surface normals</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274603">4.4.3.9	For facet vertices plus parameters</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274627">4.4.3.10	For facet vertices plus normals plus parameters</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274659">4.4.3.11	Non-rational B-curves: L3TPPC</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274679">4.4.3.12	Rational B-curves: L3TPRC</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274711">4.4.3.13	Non-rational B-curves in NURBs form: L3TPNC</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274744">4.4.3.14	Rational B-curves in NURBs form: L3TPRN</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274789">4.4.3.15	For facet vertices + normals + parameters + 1st derivatives</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274837">4.4.3.16	For facet vertices + normals + parameters + all derivatives</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-335004">4.4.3.17	Complete sphere L3TPCS</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-335062">4.4.3.18	Complete cylinder L3TPCY</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-335099">4.4.3.19	Complete truncated cone L3TPCN</A>
+</UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274911">4.4.4	Segment types</A>
+<UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274919">4.4.4.1	Body: SGTPBY</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274926">4.4.4.2	Face: SGTPFA</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274934">4.4.4.3	Edge: SGTPED</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274950">4.4.4.4	Silhouette line: SGTPSI</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274960">4.4.4.5	Planar hatch-line: SGTPPH</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274964">4.4.4.6	Radial hatch-line: SGTPRH</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274968">4.4.4.7	Rib line on unfixed blend: SGTPRU</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274973">4.4.4.8	Blend-boundary line on unfixed blend: SGTPBB</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274986">4.4.4.9	Parametric Hatch line: SGTPPL</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-274990">4.4.4.10	Facet: SGTPFT</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-275011">4.4.4.11	Error Segment: SGTPER</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-275017">4.4.4.12	Geometric Segments: SGTPGC, SGTPGS, SGTPGB</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-275021">4.4.4.13	Mangled Facet: SGTPMF</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-275026">4.4.4.14	Visibility Segment: SGTPVT</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-275130">4.4.4.15	Facet Strip: SGTPTS</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-275188">4.4.4.16	Parametrized Visibility Segment: SGTPVP</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-277934">4.4.4.17	Interference curve: SGTPIC</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-286625">4.4.4.18	Clip line: SGTPCL</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-320756">4.4.4.19	Sharp mfin line: SGTPSF</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-335760">4.4.4.20	Lattice geometric segments: SGTPLB, SGTPLR</A>
+</UL>
+</UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-286629">4.5	Interpreting regional data</A>
+<UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-275315">4.5.1	Adjacent faces</A>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-275321">4.5.2	Point indices</A>
+</UL>
+<LI> <A HREF="di_chap.05.html#50548801_pgfId-275326">4.6	Graphical output of pixel data</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548801_pgfId-274038"></A>4.1	Introduction
+
+
+</H1>
+<P>
+<A NAME="50548801_pgfId-274039"></A>When a call is made to the PK rendering functions, the graphical data generated is output through a set of functions known as the GO (Graphical Output) Interface</P>
+<P>
+<A NAME="50548801_pgfId-299674"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548801_pgfId-300159"></A>Note: You should not call heavyweight functions from the GO. See <A HREF="fd_chap.121.html#70940">Section 120.2.1, “State of the code in execution”</A>, of the Parasolid <EM><A HREF=../fd_index.html>Functional Description</A></EM> for more information on heavyweight functions.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50548801_pgfId-300102"></A>See the Function Exclusivity list in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> to find out if a function is heavyweight or lightweight.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<ADDRESS>
+<A NAME="50548801_pgfId-299936"></A>Warning: This chapter describes the GO interface which you must provide to receive graphical data from Parasolid. <A NAME="50548801_marker-299937"></A><A NAME="50548801_marker-299938"></A>The GO Interface consists of a number of functions that must meet the specifications in <A HREF="di_chap.08.html#50548804_18688">Appendix B, “Graphical Output Functions”</A>. There are dummy versions of these functions in the Frustrum library which is supplied with Parasolid, so that you can link your programs. They do not do anything, however, so if you want to use any rendering functions you must write your own GO functions, or no graphical data is forthcoming.</ADDRESS><BR>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548801_pgfId-274047"></A>4.2	Graphical output functions
+
+
+</H1>
+<P>
+<A NAME="50548801_pgfId-274050"></A><A NAME="50548801_marker-274048"></A><A NAME="50548801_marker-274049"></A>Line Data is produced by <A HREF=../headers/pk_geom_render.html>PK_GEOM_render</A>, <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> and <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>. It is output through the GO functions GOOPSG, GOSGMT and GOCLSG.</P>
+<P>
+<A NAME="50548801_pgfId-274051"></A>There are two values which GO functions should return in the ifail argument, both defined as tokens in the Parasolid failure codes include file. All GO functions should return one of:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274054"></A><A NAME="50548801_marker-274052"></A><A NAME="50548801_marker-274053"></A>CONTIN, if the graphical operation is to continue</LI>
+<LI>
+<A NAME="50548801_pgfId-274057"></A><A NAME="50548801_marker-274055"></A><A NAME="50548801_marker-274056"></A>ABORT, if there is an error gross enough that the rendering operation should end. In this case the rendering functions return with the error code PK_ERROR_abort_from_go.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548801_pgfId-274060"></A>4.3	<A NAME="50548801_marker-274058"></A><A NAME="50548801_marker-274059"></A>Structure of line data output
+
+
+</H1>
+<P>
+<A NAME="50548801_pgfId-274064"></A>Data output through the GO is organised into <STRONG>
+segments</STRONG><A NAME="50548801_marker-274061"></A><A NAME="50548801_marker-274062"></A><A NAME="50548801_marker-274063"></A>, which correspond to identifiable portions of the model (not necessarily entities in the Kernel sense). </P>
+
+<H3>
+<A NAME="50548801_pgfId-274065"></A>	4.3.1 	<A NAME="50548801_64561"></A>Segment hierarchy</H3>
+<P>
+<A NAME="50548801_pgfId-274066"></A>There are two classes of segment:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274067"></A>Hierarchical segments are opened by a call to GOOPSG and remain open until explicitly closed by GOCLSG. Other hierarchical or single-level segments may be produced in between, and these can be regarded as contained in the hierarchical segment. They may contain any number of other segments.</LI>
+<LI>
+<A NAME="50548801_pgfId-274068"></A>Single-level segments are opened and closed by a single call to GOSGMT. They do not contain any other segments. The kernel never creates single-level segments on their own, they are always included in a hierarchical segment.</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274070"></A>Every segment has a <STRONG>
+type</STRONG><A NAME="50548801_marker-274069"></A>, which governs (among other things) whether it is a hierarchical segment or not. </P>
+<P>
+<A NAME="50548801_pgfId-274071"></A>Single level segments always contain the data for a line to be drawn, as well as information about what kind of line it is. </P>
+<P>
+<A NAME="50548801_pgfId-274072"></A>Hierarchical segments usually contain other segments. Note that graphical data is always output hierarchically: using the <CODE>
+hierarch</CODE>
+ option in <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> affects the level of hierarchy.</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274073"></A>When faceting, both the body segment SGTPBY and the face segment SGTPFA are hierarchical, therefore there can be three levels of segment at one time: a body; a face; and another segment. </LI>
+<LI>
+<A NAME="50548801_pgfId-274074"></A>When creating hidden line graphical data the body segment SGTPBY is hierarchical. If the <CODE>
+hierarch</CODE>
+ option is used then edge segment SGTPED; silhouette segment SGTPSI; and hatch-lines SGTPPH (planar) SGTPRH (radial) SGTPPL (parametric) are hierarchical.</LI>
+<LI>
+<A NAME="50548801_pgfId-274075"></A>For all other options the only type of segment which is hierarchical is the body segment SGTPBY. Therefore as bodies cannot be contained in bodies, there can be at most two levels of segment at one time: a body and another segment.</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274076"></A>For example, after a request by the application for view-dependent topology information by a call to <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A>, a hierarchical segment is opened for each body. Data for each silhouette line is then given in a single-level segment, and each is contained wholly within the hierarchical segment of the corresponding body.</P>
+<P>
+<A NAME="50548801_pgfId-274077"></A>A single body segment is not guaranteed to contain data for the whole body - for example, sometimes the kernel can output part of a body, close the body segment, open and close another body segment, and then open a new segment for the first body, and output the rest of it.</P>
+
+
+<H3>
+<A NAME="50548801_pgfId-274080"></A>	4.3.2 	<A NAME="50548801_marker-274078"></A><A NAME="50548801_marker-274079"></A>Graphical data for assemblies</H3>
+<P>
+<A NAME="50548801_pgfId-274081"></A>Assemblies constructed with KI routines must be flattened and their constituent body tags and transformation matrices copied into entity arrays before they can be rendered by the PK functions. For further information see <A HREF="ki_chap.02.html#24264">Chapter 1, “Parasolid KI Programming Concepts”</A>, of the Parasolid <EM><A HREF=../ki_index.html>KI Programming Reference</A> Manual</EM>.</P>
+<P>
+<A NAME="50548801_pgfId-274088"></A>All such body segments have a unique occurrence number when they are rendered - this number is the index of the body (in the entity array) plus 1.</P>
+<P>
+<A NAME="50548801_pgfId-274089"></A>The tags associated with each of these body segments are likely to be different. There are two circumstances when you could receive separate body segments with the same tag:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274090"></A>a body is instanced more than once in the entity array, and each instance is output in a separate segment (or segments). The occurrence number is different in each case.</LI>
+<LI>
+<A NAME="50548801_pgfId-274091"></A>a single body is being output piecemeal, e.g. if the body has been split into two sections in a hidden line drawing because part of it is obscured by another body, as for the block shown in <A HREF="di_chap.05.html#50548801_13482">Figure 4-1</A>:</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274234"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/di_chap-7.gif">
+
+<P>
+<A NAME="50548801_pgfId-274236"></A>Figure 4-1 <A NAME="50548801_13482"></A>Hidden line drawing of a single body</P>
+<UL>
+<P>
+<A NAME="50548801_pgfId-274237"></A>In this case, the lines comprising each visible portion of the body might be output in separate body segments.</P>
+</UL>
+
+
+<H3>
+<A NAME="50548801_pgfId-274238"></A>	4.3.3 	Notes</H3>
+<P>
+<A NAME="50548801_pgfId-274239"></A>You should note that geometrical data output through the segment output functions is:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274240"></A>in <EM>
+three dimensions</EM>; it is up to you to project it into two dimensions if required</LI>
+<LI>
+<A NAME="50548801_pgfId-274241"></A>relative to <EM>
+model space</EM> (i.e. the same coordinate system as would be returned by the PK geometry enquiry functions)</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274242"></A>The application must transform all of the received GO data by a viewing matrix before projecting the data into two dimensions:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274243"></A>if the GO data includes view-dependent or hidden line data, this matrix must be the same as the one referenced by the <CODE>
+view_transf</CODE>
+ argument when calling <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A></LI>
+<LI>
+<A NAME="50548801_pgfId-274244"></A>if the GO data includes no view-dependent or hidden line data, the viewing matrix can be defined wholly by the application</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274245"></A>If the viewing matrix specifies a parallel orthographic projection, the 3D GO data can be projected into 2D form simply by replacing the third column of the matrix by a zero vector:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274248"></A>i.e. using the same notation as used in <A HREF="fd_chap.110.html#25646">Chapter 109, “Parasolid View Matrices”</A>, of the Parasolid <EM><A HREF=../fd_index.html>Functional Description</A></EM>, the combined matrix is formed by setting Dx Dy Dz Tz to zero.</LI>
+</UL>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548801_pgfId-274254"></A>4.4	<A NAME="50548801_marker-274253"></A>Segment output functions
+
+
+</H1>
+<P>
+<A NAME="50548801_pgfId-274258"></A>See <A HREF="di_chap.08.html#50548804_18688">Appendix B, “Graphical Output Functions”</A>, for detailed descriptions of each function. The three functions (GOOPSG, GOSGMT, GOCLSG) all have the same arguments, but interpret them in different ways. The arguments are:</P>
+<PRE><A NAME="50548801_pgfId-274259"></A>GO....( segtyp, ntags, tags, ngeom, geom, nlntp, lntp, ifail )</PRE>
+<P>
+<A NAME="50548801_pgfId-274260"></A>The first argument of each function is an integer <CODE>
+segtyp</CODE>
+. Parasolid always sets this to the token representing the <STRONG>
+segment type</STRONG><A NAME="50548801_marker-274261"></A>. These tokens are listed in <A HREF="di_chap.15.html#50548811_20754">Appendix I, “Go Tokens and Error Codes”</A>, of this manual. The different types of segment are discussed in a later section.</P>
+<P>
+<A NAME="50548801_pgfId-274265"></A>The values of some of the arguments to the segment functions, and therefore how you should interpret them, vary depending on the segment type. The arguments to which this applies are noted as such, below. The remaining arguments are pairs of integers and arrays.</P>
+
+<H3>
+<A NAME="50548801_pgfId-274268"></A>	4.4.1 	<A NAME="50548801_marker-274266"></A><A NAME="50548801_marker-274267"></A>Tags</H3>
+<P>
+<A NAME="50548801_pgfId-274269"></A>The integer <CODE>
+ntags</CODE>
+ gives the length of the <CODE>
+tags</CODE>
+ array. The contents of this array depend on the segment type. For example, for a hierarchical body segment, <CODE>
+tags</CODE>
+ contains the tag of the body; for a single level edge segment, <CODE>
+tags</CODE>
+ contains the tag of the edge.</P>
+
+
+<H3>
+<A NAME="50548801_pgfId-274273"></A>	4.4.2 	<A NAME="50548801_marker-274270"></A><A NAME="50548801_marker-274271"></A><A NAME="50548801_18433"></A>Line type</H3>
+<P>
+<A NAME="50548801_pgfId-274274"></A>The integer <CODE>
+nlntp</CODE>
+ gives the length of the <CODE>
+lntp</CODE>
+ array. This is an array of integers, the first of which is always the <STRONG>
+occurrence number</STRONG> of the segment, and the rest of which are tokens. For hierarchical segments (i.e. in calls to GOOPSG and GOCLSG) the <CODE>
+lntp</CODE>
+ array contains only the occurrence number of the segment.</P>
+<P>
+<A NAME="50548801_pgfId-274275"></A>Occurrence numbers link the segment to the entity which was passed to the rendering function. You can use them to associate the segments with the Parasolid entities (perhaps using identifiers to identify them). You can then identify what a particular line represents, and the entity it belongs to.</P>
+<P>
+<A NAME="50548801_pgfId-274280"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548801_pgfId-274278"></A>Note: You should use identifiers rather than tags to identify entities.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50548801_pgfId-274279"></A>Identifiers are saved with the part when you archive it and are therefore always the same, whereas the tags of a part and its entities can be different in every Parasolid session.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548801_pgfId-274286"></A>See also <A HREF="fd_chap.104.html#27683">Section 103.3.2, “Occurrence numbers”</A> in the Parasolid <EM><A HREF=../fd_index.html>Functional Description</A></EM>.</P>
+<P>
+<A NAME="50548801_pgfId-274288"></A>Silhouettes are produced by the <CODE>
+silhouette</CODE>
+ option in <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A>. These automatically have each silhouette on a face labelled with a different integer, i.e. 1, 2, 3, etc.</P>
+<P>
+<A NAME="50548801_pgfId-274289"></A>The remaining array entries, which are given as well as the occurrence number for all single-level segment types, are as follows.</P>
+
+<H4>
+<A NAME="50548801_pgfId-274290"></A>4.4.2.1 Line type</H4>
+<P>
+<A NAME="50548801_pgfId-274291"></A>Line type specifies the type of geometry of the curve or lattice element which the segment represents. This is one of:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274292"></A>Straight line</LI>
+<LI>
+<A NAME="50548801_pgfId-274293"></A>Complete circle</LI>
+<LI>
+<A NAME="50548801_pgfId-274294"></A>Partial circle</LI>
+<LI>
+<A NAME="50548801_pgfId-274295"></A>Complete ellipse</LI>
+<LI>
+<A NAME="50548801_pgfId-274296"></A>Partial ellipse</LI>
+<LI>
+<A NAME="50548801_pgfId-274297"></A>Poly-line</LI>
+<LI>
+<A NAME="50548801_pgfId-274298"></A>Facet vertices</LI>
+<LI>
+<A NAME="50548801_pgfId-274299"></A>Facet strip vertices</LI>
+<LI>
+<A NAME="50548801_pgfId-274300"></A>Facet vertices + surface normals</LI>
+<LI>
+<A NAME="50548801_pgfId-274301"></A>Facet strip vertices + surface normals</LI>
+<LI>
+<A NAME="50548801_pgfId-274302"></A>Facet vertices + parameters</LI>
+<LI>
+<A NAME="50548801_pgfId-274303"></A>Facet strip vertices + parameters</LI>
+<LI>
+<A NAME="50548801_pgfId-274304"></A>Facet vertices + normals + parameters</LI>
+<LI>
+<A NAME="50548801_pgfId-274305"></A>Facet strip vertices + normals + parameters</LI>
+<LI>
+<A NAME="50548801_pgfId-274306"></A>Non-rational B-curves (Bezier form)</LI>
+<LI>
+<A NAME="50548801_pgfId-274307"></A>Rational B-curves (Bezier form)</LI>
+<LI>
+<A NAME="50548801_pgfId-274308"></A>Non-rational B-curves (NURBs form)</LI>
+<LI>
+<A NAME="50548801_pgfId-274309"></A>Rational B-curves (NURBs form)</LI>
+<LI>
+<A NAME="50548801_pgfId-274310"></A>Facet vertices + normals + parameters + 1st derivatives</LI>
+<LI>
+<A NAME="50548801_pgfId-274311"></A>Facet strip vertices + normals + parameters + 1st derivatives</LI>
+<LI>
+<A NAME="50548801_pgfId-274312"></A>Facet vertices + normals + parameters + all derivatives</LI>
+<LI>
+<A NAME="50548801_pgfId-274313"></A>Facet strip vertices + normals + parameters + all derivatives</LI>
+<LI>
+<A NAME="50548801_pgfId-334810"></A>Complete sphere</LI>
+<LI>
+<A NAME="50548801_pgfId-334864"></A>Complete cylinder</LI>
+<LI>
+<A NAME="50548801_pgfId-334893"></A>Complete truncated cone</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274316"></A>The different types of line are discussed in detail under <A HREF="di_chap.05.html#50548801_24250">Section 4.4.3, “Geometry”</A>, below. They are defined by tokens of the form “L3TP...”</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274318"></A>4.4.2.2 Completeness</H4>
+<P>
+<A NAME="50548801_pgfId-274321"></A><A NAME="50548801_marker-274319"></A><A NAME="50548801_marker-274320"></A>Completeness codes indicate whether a segment represents a complete item or is part of a larger item. The codes returned may be any of the following:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-285281"></A>CODCOM: the segment is complete and represents a complete item.</LI>
+<LI>
+<A NAME="50548801_pgfId-285291"></A>CODINC: the segment is incomplete. An incomplete segment is part of a larger item which might in other circumstances have been output as a single segment.</LI>
+<LI>
+<A NAME="50548801_pgfId-285356"></A>CODUNC: it is not known whether the segment is complete or incomplete.</LI>
+<LI>
+<A NAME="50548801_pgfId-285363"></A>CODOVP: if viewport clipping is on, the segment is outside of the viewport. Your application may choose not to render such a segment. No visibility code is specified if this completeness code is returned.</LI>
+<LI>
+<A NAME="50548801_pgfId-285370"></A>CODCVP: if viewport clipping is on, the segment coincides with a viewport boundary. This information can be useful in helping your application decide how to render segments that lie on a viewport boundary. If, for instance, you are rendering a large body in a number steps using several viewports, this code can help your application ensure that segments on the boundaries are only rendered once.</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-285625"></A>For more information about viewports, see <A HREF="fd_chap.1-5.html#93025">Section 104.3.23, “Using viewports to render specific entities”</A> in the Parasolid <EM><A HREF=../fd_index.html>Functional Description</A></EM>.</P>
+<P>
+<A NAME="50548801_pgfId-285261"></A> Completeness codes are only calculated in a hidden line drawing, so segments output from a view independent or view dependent wireframe drawing has code CODUNC (unknown completeness).</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274324"></A>4.4.2.3 Visibility<A NAME="50548801_marker-274323"></A></H4>
+<P>
+<A NAME="50548801_pgfId-274326"></A><A NAME="50548801_marker-274325"></A>Visibility specifies that the line is visible, invisible or of unknown visibility. This value is only relevant to hidden line pictures, so all segments produced in view independent or view dependent wireframe drawings have unknown visibility (CODUNV). </P>
+<P>
+<A NAME="50548801_pgfId-274327"></A>In hidden line drawing:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274328"></A>Visible segments have visibility code CODVIS.</LI>
+<LI>
+<A NAME="50548801_pgfId-274329"></A>Invisible segments have visibility code CODINV. Invisible segments are output only if selected specifically by the <CODE>
+visibility</CODE>
+ field of the <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> option structure.</LI>
+<LI>
+<A NAME="50548801_pgfId-274330"></A>Drafting segments have visibility code CODDRV.</LI>
+<LI>
+<A NAME="50548801_pgfId-274331"></A>Invisible segments which are obscured only by their own body occurrence have visibility code CODISH (<EM>
+see Note below</EM>). This type of invisible segment is output only if selected specifically by the ‘extended visibility’ and ‘self-hidden’ fields of the <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> option structure.</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274332"></A>The effects of the PK_render_vis_... options are as follows:</P>
+<P>
+<A NAME="50548801_pgfId-274363"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274335"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274337"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274339"></A>vis_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274341"></A>no visibility evaluated (topology is output as a view-dependent wireframe drawing)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274343"></A>vis_hid_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274345"></A>only truly visible lines are output, all tagged CODVIS</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274347"></A>vis_inv_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274349"></A>all lines are output:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274350"></A>the truly visible ones tagged CODVIS;</LI>
+<LI>
+<A NAME="50548801_pgfId-274351"></A>the remainder tagged CODINV</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274353"></A>vis_inv_draft_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274355"></A>all lines are output:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274356"></A>the truly visible ones tagged CODVIS</LI>
+<LI>
+<A NAME="50548801_pgfId-274357"></A>those obscured by others tagged CODINV</LI>
+<LI>
+<A NAME="50548801_pgfId-274358"></A>the remainder being lines obscured by the body tagged CODDRV</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274360"></A>vis_extended_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274362"></A>lines are output subject to the ‘invisible’, ‘drafting’ and ‘self-hidden’ fields of the <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> option structure</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274364"></A>4.4.2.4 <A NAME="50548801_80646"></A>Smoothness</H4>
+<P>
+<A NAME="50548801_pgfId-274367"></A><A NAME="50548801_marker-323593"></A><A NAME="50548801_marker-323594"></A>Smoothness indicates whether a line is smooth (i.e. the normals of the faces either side of the edge vary smoothly across it). Blend boundaries are smooth by definition. This code is provided because sometimes you may wish to leave smooth edges out of your pictures, to make them look more realistic.</P>
+<P>
+<A NAME="50548801_pgfId-274371"></A>For further information see <A HREF="fd_chap.105.html#34259">Section 104.3.24, “Regional data”</A> in the Parasolid <EM><A HREF=../fd_index.html>Functional Description</A></EM>.</P>
+<P>
+<A NAME="50548801_pgfId-274375"></A>CODSMS is a special code which can be returned only from a hidden line drawing. It indicates that an edge is smooth, but that it is also coincident with a silhouette line which is not output. In this case you need to draw the edge even though it is smooth, because otherwise the silhouette is missing, making the picture look wrong.</P>
+<P>
+<A NAME="50548801_pgfId-326329"></A>CODNSS is a special code which can be returned only from a hidden line drawing when rendering sharp mfins. It indicates that the mfin line (which is sharp) is coincident with a silhouette line which is not output.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274376"></A>4.4.2.5 Regional data</H4>
+<P>
+<A NAME="50548801_pgfId-274377"></A>If regional data was requested from a hidden line drawing, edge and silhouette segments are output with start and end <STRONG>
+point indices</STRONG><A NAME="50548801_marker-320923"></A><A NAME="50548801_marker-320924"></A>. These are output only when the regional data option is specified, and allow the line segment to be linked correctly with other lines. See <A HREF="di_chap.05.html#50548801_93469">Section 4.5, “Interpreting regional data”</A>, for more information.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-322707"></A>4.4.2.6 <A NAME="50548801_94642"></A>Coincidence with sharp mfins</H4>
+<P>
+<A NAME="50548801_pgfId-322768"></A>If sharp mfins were requested then edge segments are output with a code describing whether the segment lies on a chain of connected sharp mfins as follows:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-323325"></A>CODESF: the edge segment is coincident with sharp mfins</LI>
+<LI>
+<A NAME="50548801_pgfId-323344"></A>CODNES: the edge segment is not coincident with sharp mfins</LI>
+<LI>
+<A NAME="50548801_pgfId-323358"></A>CODUES: the edge segment coincidence with sharp mfins is unknown</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-323226"></A>These codes are only output for edge segments when the <CODE>
+sharp_mfins</CODE>
+ option in <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> is set to PK_render_sharp_mfin_yes. </P>
+<P>
+<A NAME="50548801_pgfId-323218"></A>See <A HREF="di_chap.05.html#50548801_52094">Section 4.4.4.19, “Sharp mfin line: SGTPSF”</A> for more information.</P>
+
+
+
+<H3>
+<A NAME="50548801_pgfId-274386"></A>	4.4.3 	<A NAME="50548801_marker-323208"></A><A NAME="50548801_marker-323209"></A><A NAME="50548801_24250"></A>Geometry</H3>
+<P>
+<A NAME="50548801_pgfId-274387"></A>For hierarchical body segments the <CODE>
+geom</CODE>
+ array always contains the model space box of the body, and <CODE>
+ngeom</CODE>
+ is 6. See <A HREF="di_chap.05.html#50548801_20517">Section 4.4.4, “Segment types”</A> for more details.</P>
+<P>
+<A NAME="50548801_pgfId-274391"></A>For a single level segment the <CODE>
+geom</CODE>
+ array is an array of real numbers specifying the geometry of the line it represents. The length and contents of this array depend on the line type, as specified by the second entry of <CODE>
+lntp</CODE>
+ (see <A HREF="di_chap.05.html#50548801_18433">Section 4.4.2, “Line type”</A>). The length of the array is <CODE>
+ngeom</CODE>
+ unless otherwise stated. This concept of a <EM>
+line</EM> does not correspond exactly to any type of entity at the PK Interface: it is either a set of data describing an analytic curve with a start-point and an end-point, or a poly-line. </P>
+<P>
+<A NAME="50548801_pgfId-274395"></A>The types of line which can be returned are:</P>
+
+<H4>
+<A NAME="50548801_pgfId-274396"></A>4.4.3.1 Straight line: L3TPSL</H4>
+<P>
+<A NAME="50548801_pgfId-274415"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274400"></A>ngeom = 9</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274404"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274406"></A>start point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274408"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274410"></A>end point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274412"></A>geom[6...8]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274414"></A>direction</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548801_pgfId-274416"></A>The explicit direction is generally more accurate than that obtained from the start and end points. </P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274417"></A>4.4.3.2 Complete circle: L3TPCC</H4>
+<P>
+<A NAME="50548801_pgfId-274436"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274421"></A>ngeom = 7</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274425"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274427"></A>center point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274429"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274431"></A>axis direction</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274433"></A>geom[6]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274435"></A>radius</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274437"></A>4.4.3.3 Partial circle: L3TPCI </H4>
+<P>
+<A NAME="50548801_pgfId-274464"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274441"></A>ngeom = 13</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274445"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274447"></A>center point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274449"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274451"></A>axis direction</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274453"></A>geom[6]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274455"></A>radius</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274457"></A>geom[7...9]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274459"></A>start point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274461"></A>geom[10...12]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274463"></A>end point</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274465"></A>4.4.3.4 Complete ellipse: L3TPCE </H4>
+<P>
+<A NAME="50548801_pgfId-274492"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274469"></A>ngeom = 11</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274473"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274475"></A>center point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274477"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274479"></A>major axis direction</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274481"></A>geom[6...8]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274483"></A>minor axis direction</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274485"></A>geom[9]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274487"></A>major radius</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274489"></A>geom[10]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274491"></A>minor radius</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274493"></A>4.4.3.5 Partial ellipse: L3TPEL </H4>
+<P>
+<A NAME="50548801_pgfId-274528"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274497"></A>ngeom = 17</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274501"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274503"></A>center point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274505"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274507"></A>major axis direction</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274509"></A>geom[6...8]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274511"></A>minor axis direction</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274513"></A>geom[9]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274515"></A>major radius</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274517"></A>geom[10]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274519"></A>minor radius</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274521"></A>geom[11...13]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274523"></A>start point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274525"></A>geom[14...16]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274527"></A>end point</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274529"></A>4.4.3.6 Poly-line: L3TPPY </H4>
+<P>
+<A NAME="50548801_pgfId-274548"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274533"></A>ngeom = the number of 3D vectors</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274537"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274539"></A>start point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274541"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274543"></A>second point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274545"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274547"></A>nth point, where i = 3(n-1)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548801_pgfId-274549"></A>Note that the double type array holding a poly-line is of length 3*ngeom.</P>
+<P>
+<A NAME="50548801_pgfId-274550"></A>The poly-line is a chordal approximation to a line which can not be held explicitly within the Kernel. It defines a series of points, each of which lies on the corresponding Parasolid curve. If you join the points of a poly line with straight line segments, this produces an approximation to the curve which is adequate for most viewing purposes. Splining the points produces a more accurate approximation if one is required.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274551"></A>4.4.3.7 For facet vertices</H4>
+<P>
+<A NAME="50548801_pgfId-274552"></A>L3TPFV and facet strip vertices - L3TPTS</P>
+<P>
+<A NAME="50548801_pgfId-274570"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274555"></A>ngeom = the number of facet vertices</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274559"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274561"></A>first facet vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274563"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274565"></A>second facet vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274567"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274569"></A>last facet vertex, where i = 3(ngeom-1)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274571"></A>4.4.3.8 For facet vertices plus surface normals </H4>
+<P>
+<A NAME="50548801_pgfId-274572"></A>L3TPFN; and facet strip vertices plus surface normals - L3TPTN</P>
+<P>
+<A NAME="50548801_pgfId-274602"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274575"></A>ngeom = 2 times the number of facet vertices</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274579"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274581"></A>first facet vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274583"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274585"></A>second facet vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274587"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274589"></A>last facet vertex, where i = 3((ngeom/2)-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274591"></A>geom[i+3...i+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274593"></A>first facet vertex normal</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274595"></A>geom[i+6...i+8]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274597"></A>second facet vertex normal</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274599"></A>geom[k...k+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274601"></A>last facet vertex normal, where k = 3(ngeom-1)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274603"></A>4.4.3.9 For facet vertices plus parameters</H4>
+<P>
+<A NAME="50548801_pgfId-274604"></A>L3TPFP; and facet strip vertices plus parameters - L3TPTP</P>
+<P>
+<A NAME="50548801_pgfId-274626"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274607"></A>ngeom = 2 times the number of facet vertices</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274611"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274613"></A>first facet vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274615"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274617"></A>last facet vertex, where i = 3 (ngeom/2-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274619"></A>geom[i+3...i+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274621"></A>first facet vertex (u,v,t) information</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274623"></A>geom[k...k+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274625"></A>last facet vertex (u,v,t), where k = 3(ngeom-1)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274627"></A>4.4.3.10 For facet vertices plus normals plus parameters</H4>
+<P>
+<A NAME="50548801_pgfId-274628"></A>L3TPFI; and facet strip vertices plus normal plus parameters - L3TPTI</P>
+<P>
+<A NAME="50548801_pgfId-274658"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274631"></A>ngeom = 3 times the number of facet vertices</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274635"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274637"></A>first facet vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274639"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274641"></A>last facet vertex, where i = ngeom-3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274643"></A>geom[i+3...i+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274645"></A>first facet vertex normal</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274647"></A>geom[k...k+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274649"></A>last facet vertex normal, where k = 2(ngeom-3)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274651"></A>geom[k+3...k+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274653"></A>first facet vertex (u,v,t) information</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274655"></A>geom[l...l+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274657"></A>last facet vertex (u,v,t), where l = 3(ngeom-1)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274659"></A>4.4.3.11 Non-rational B-curves: L3TPPC</H4>
+<P>
+<A NAME="50548801_pgfId-274678"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274663"></A>ngeom = the number of Bezier vertices defining the curve</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274667"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274669"></A>first Bezier vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274671"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274673"></A>second Bezier vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274675"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274677"></A>last Bezier vertex, where i = 3(ngeom-1)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274679"></A>4.4.3.12 Rational B-curves: L3TPRC</H4>
+<P>
+<A NAME="50548801_pgfId-274710"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274683"></A>ngeom = the number of points</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274687"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274689"></A>first Bezier vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274691"></A>geom[3]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274693"></A>first weight</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274695"></A>geom[4...6]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274697"></A>second Bezier vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274699"></A>geom[7]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274701"></A>second weight</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274703"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274705"></A>last Bezier vertex, where i = 4(ngeom-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274707"></A>geom[i+3]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274709"></A>last weight, where i = 4(ngeom-1)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274711"></A>4.4.3.13 Non-rational B-curves in NURBs form: L3TPNC</H4>
+<P>
+<A NAME="50548801_pgfId-274742"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274715"></A>ngeom = 3 (number of b-spline vertices) + number of knots</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274719"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274721"></A>first b-spline vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274723"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274725"></A>second b-spline vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274727"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274729"></A>last b-spline vertex, where i = 3(nvertices-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274731"></A>geom[3(nvertices)]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274733"></A>first knot, (3(nvertices) = i+3)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274735"></A>geom[3(nvertices)+1]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274737"></A>second knot</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274739"></A>geom[3(nvertices)+nknots -1]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274741"></A>last knot</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548801_pgfId-274743"></A>The number of b-spline vertices is supplied in the 9th element of the integer array and the number of knots is supplied in the 10th element of the integer array.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274744"></A>4.4.3.14 Rational B-curves in NURBs form: L3TPRN</H4>
+<P>
+<A NAME="50548801_pgfId-274787"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274748"></A>ngeom = 4 (nvertices) + nknots</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274752"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274754"></A>first b-spline vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274756"></A>geom[3]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274758"></A>first weight</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274760"></A>geom[4...6]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274762"></A>second b-spline vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274764"></A>geom[7]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274766"></A>second weight</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274768"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274770"></A>last b-spline vertex, where i = 4(nvertices-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274772"></A>geom[i+3]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274774"></A>last weight,</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274776"></A>geom[4(nvertices)]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274778"></A>first knot, (4(nvertices) = i+4)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274780"></A>geom[4(nvertices)+1]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274782"></A>second knot</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274784"></A>geom[4(nvertices)+nknots-1]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274786"></A>last knot</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548801_pgfId-274788"></A>The number of b-spline vertices is supplied in the 9th element of the integer array and the number of knots is supplied in the 10th element of the integer array.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274789"></A>4.4.3.15 For facet vertices + normals + parameters + 1st derivatives </H4>
+<P>
+<A NAME="50548801_pgfId-274790"></A>L3TPF1; and facet strip vertices + normals + parameters + 1st derivatives - L3TPT1</P>
+<P>
+<A NAME="50548801_pgfId-274836"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274793"></A>ngeom = 5 times the number of facet vertices</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274797"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274799"></A>first facet vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274801"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274803"></A>last facet vertex, where i = ngeom-3</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274805"></A>geom[i+3...i+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274807"></A>first facet vertex normal</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274809"></A>geom[k...k+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274811"></A>last facet vertex normal, where k = 3(2ngeom/5-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274813"></A>geom[k+3...k+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274815"></A>first facet vertex (u, v, t) information</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274817"></A>geom[l...l+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274819"></A>last facet vertex (u, v, t), where l = 3(3ngeom/5-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274821"></A>geom[l+3...l+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274823"></A>first dP/du derivative</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274825"></A>geom[m...m+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274827"></A>last dP/du derivative where m = 3(4ngeom/5-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274829"></A>geom[m+3...m+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274831"></A>first dP/dv derivative</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274833"></A>geom[n...n+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274835"></A>last dP/dv derivative where n = 3(ngeom-3)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-274837"></A>4.4.3.16 For facet vertices + normals + parameters + all derivatives</H4>
+<P>
+<A NAME="50548801_pgfId-274838"></A>L3TPF2; and facet strip vertices + normals + parameters + all derivatives - L3TPT2</P>
+<P>
+<A NAME="50548801_pgfId-334988"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-274841"></A>ngeom = 8 times the number of facet vertices</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274845"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274847"></A>first facet vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274849"></A>geom[i...i+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274851"></A>last facet vertex, where i = 3(ngeom/8-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274853"></A>geom[i+3...i+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274855"></A>first facet vertex normal</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274857"></A>geom[k...k+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274859"></A>last facet vertex normal, where k = 3(2ngeom/8-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274861"></A>geom[k+3...k+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274863"></A>first facet vertex (u, v, t) information</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274865"></A>geom[l...l+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274867"></A>last facet vertex (u, v, t), where l = 3(3ngeom/8-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274869"></A>geom[l+3...l+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274871"></A>first dP/du derivative</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274873"></A>geom[m...m+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274875"></A>last dP/du derivative, where m = 3(ngeom/2-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274877"></A>geom[m+3...m+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274879"></A>first dP/dv derivative</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274881"></A>geom[n...n+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274883"></A>last dP/dv derivative, where n = 3(5ngeom/8-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274885"></A>geom[n+3...n+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274887"></A>first d2P/du2 derivative</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274889"></A>geom[p...p+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274891"></A>last d2P/du2 derivative, where p = 3(6ngeom/8-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274893"></A>geom[p+3...p+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274895"></A>first d2P/dudv derivative</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274897"></A>geom[q...q+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274899"></A>last d2P/dudv derivative, where q = 3(7ngeom/8-1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274901"></A>geom[q+3...q+5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274903"></A>first d2P/dv2 derivative</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274905"></A>geom[r...r+2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-274907"></A>last d2P/dv2 derivative, where r = 3(ngeom/8-1)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-335004"></A>4.4.3.17 Complete sphere L3TPCS</H4>
+<P>
+<A NAME="50548801_pgfId-335260"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-335245"></A>ngeom = 4</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335249"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335251"></A>center point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335253"></A>geom[3]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335255"></A>radius</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-335062"></A>4.4.3.18 Complete cylinder L3TPCY</H4>
+<P>
+<A NAME="50548801_pgfId-335346"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-335331"></A>ngeom = 7</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335335"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335337"></A>start point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335339"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335341"></A>end point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335343"></A>geom[6]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335345"></A>radius</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50548801_pgfId-335099"></A>4.4.3.19 Complete truncated cone L3TPCN</H4>
+<P>
+<A NAME="50548801_pgfId-335424"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50548801_pgfId-335409"></A>ngeom = 8</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335413"></A>geom[0...2]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335415"></A>start point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335417"></A>geom[3...5]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-335419"></A>end point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-336582"></A>geom[6]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-336584"></A>start radius</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-336612"></A>geom[7]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-336614"></A>end radius</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50548801_pgfId-274911"></A>	4.4.4 	<A NAME="50548801_marker-274909"></A><A NAME="50548801_20517"></A>Segment types</H3>
+<P>
+<A NAME="50548801_pgfId-274912"></A>As stated earlier, the first argument of each segment output function is the segment type. A segment of a particular <STRONG>
+type</STRONG> is always of the same class:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274913"></A><STRONG>
+body</STRONG> segments are always <STRONG>
+hierarchical</STRONG> (they cannot be output by GOSGMT, only by GOOPSG and GOCLSG)</LI>
+<LI>
+<A NAME="50548801_pgfId-274914"></A><STRONG>
+edge</STRONG> segments, <STRONG>
+silhouette</STRONG> segments, <STRONG>
+hatch-line</STRONG> segments are hierarchical when the <CODE>
+hierarch</CODE>
+ option is used (like bodies, they cannot be output by GOSGMT, only by GOOPSG and GOCLSG)</LI>
+<LI>
+<A NAME="50548801_pgfId-274915"></A>when the <CODE>
+hierarch</CODE>
+ option isn’t used they are all <STRONG>
+single-level</STRONG> (and therefore are only output by GOSGMT)</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274916"></A>The segment types with their dependent data are as follows.</P>
+
+<H4>
+<A NAME="50548801_pgfId-274919"></A>4.4.4.1 <A NAME="50548801_marker-274917"></A><A NAME="50548801_marker-274918"></A>Body: SGTPBY</H4>
+<P>
+<A NAME="50548801_pgfId-274920"></A>This type of hierarchical segment corresponds to an occurrence of a body in the model. If an entity within a body is passed to a rendering function, Parasolid still opens the body segment with GOOPSG before outputting the requested entity, and closes the body segment afterwards. This lets you build a graphical data structure and subsequently update it.</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274921"></A><CODE>
+tags</CODE>
+ holds the tag of the body</LI>
+<LI>
+<A NAME="50548801_pgfId-274922"></A><CODE>
+ngeom</CODE>
+ is 6 and <CODE>
+geom</CODE>
+ holds the model space box of the body, in the order: xmin, ymin, zmin, xmax, ymax, zmax. </LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274923"></A>There is no geometric data apart from the body box, as all the lines which make up the body in the picture form separate segments within the body segment.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274926"></A>4.4.4.2 <A NAME="50548801_marker-274924"></A><A NAME="50548801_marker-274925"></A>Face: SGTPFA</H4>
+<P>
+<A NAME="50548801_pgfId-274927"></A>This type of hierarchical segment corresponds to an occurrence of a face in a model. GOOPSG allows you to build a graphical data structure in the same way as for bodies as explained above.</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274928"></A><CODE>
+tags</CODE>
+ holds the tag of the face</LI>
+<LI>
+<A NAME="50548801_pgfId-274929"></A><CODE>
+ngeom</CODE>
+ is 6 and <CODE>
+geom</CODE>
+ holds the model space box of the face, defined in the same way as the body box, as described above.</LI>
+<P>
+<A NAME="50548801_pgfId-274930"></A>This segment type is only produced by faceting.</P>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274931"></A>The following are all single-level segment types which may be output by GOSGMT:</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274934"></A>4.4.4.3 <A NAME="50548801_marker-274932"></A><A NAME="50548801_marker-274933"></A>Edge: SGTPED</H4>
+<P>
+<A NAME="50548801_pgfId-274935"></A>These represent edges or portions of edges. They are produced by <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> if you specified the <CODE>
+edge</CODE>
+ option. An edge segment may be a complete edge (E) of the model or may be only part of an edge, for example:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274936"></A>If rendering view independent topology with unfixed blends, where an adjacent edge has a blend attribute, and an effect of the blend is to shorten the edge (E): only the part unaffected by the blend is drawn. If you are drawing the part a few edges at a time, the edge (E) is shortened only if you rendered it in the same call to <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> as the edge which is blended.</LI>
+<LI>
+<A NAME="50548801_pgfId-274937"></A>In hidden line drawings when the edge is partly visible and partly not, visible portions of (E) are output in separate calls to GOSGMT. If the <CODE>
+invisible</CODE>
+ or <CODE>
+drafting</CODE>
+ options are used, the invisible portions of (E) are also output by further calls to GOSGMT.</LI>
+<LI>
+<A NAME="50548801_pgfId-274938"></A>In hidden line drawings with the regional data option: if the edge bounds a face being rendered with regional data, or divides such a face into visible and invisible parts, the places where the representation of (E) should meet other lines on the 2-dimensional drawing divide (E) up into separate parts which are output by separate calls to GOSGMT (see <A HREF="di_chap.05.html#50548801_93469">Section 4.5</A>).</LI>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274942"></A>If regional data is not required <CODE>
+tags</CODE>
+ contains the tag of the edge in the model.</LI>
+<LI>
+<A NAME="50548801_pgfId-274943"></A>If regional data is required <CODE>
+tags</CODE>
+ contains the tag of the edge in the model and two extra tags, identifying the faces either side of the line in the 2-dimensional drawing. Either or both of these face-tags may be PK_ENTITY_null.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274944"></A>If regional data is required <CODE>
+lntp</CODE>
+ contains two extra integer values: the indices of the start and end points of the line (see <A HREF="di_chap.05.html#50548801_93469">Section 4.5</A>).</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274950"></A>4.4.4.4 <A NAME="50548801_marker-274948"></A><A NAME="50548801_marker-274949"></A>Silhouette line: SGTPSI</H4>
+<P>
+<A NAME="50548801_pgfId-274951"></A>A silhouette is a line on a single face curving away from the eye where its surface changes from visible to hidden. Both view dependent topology and hidden line drawings produce silhouettes. They may be output whole, or cut or shortened in the same way as for edges, see above.</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274952"></A>If regional data is not required <CODE>
+tags</CODE>
+ contains the tag of face bearing the silhouette.</LI>
+<LI>
+<A NAME="50548801_pgfId-274953"></A>If regional data is required <CODE>
+tags</CODE>
+ contains two extra tags, and <CODE>
+lntp</CODE>
+ contains point indices, as for edges.</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-274957"></A>See <A HREF="di_chap.05.html#50548801_93469">Section 4.5, “Interpreting regional data”</A>, for information on regional data.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274960"></A>4.4.4.5 <A NAME="50548801_marker-274958"></A><A NAME="50548801_marker-274959"></A>Planar hatch-line: SGTPPH</H4>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274961"></A><CODE>
+tags</CODE>
+ contains the tag of the face bearing the hatch-line.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50548801_pgfId-274964"></A>4.4.4.6 <A NAME="50548801_marker-274962"></A><A NAME="50548801_marker-274963"></A>Radial hatch-line: SGTPRH</H4>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274965"></A><CODE>
+tags</CODE>
+ contains the tag of the face bearing the hatch-line.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50548801_pgfId-274968"></A>4.4.4.7 <A NAME="50548801_marker-274966"></A><A NAME="50548801_marker-274967"></A>Rib line on unfixed blend: SGTPRU</H4>
+<P>
+<A NAME="50548801_pgfId-274969"></A>This is a further way of rendering an unfixed blend: adding lines across the blend surface, roughly perpendicular to the original edge. Rib lines can be drawn as well as a blend boundary, but not instead of it. As for blend boundaries, rib lines can only be produced by a view independent drawing.</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274970"></A><CODE>
+tags</CODE>
+ contains the tag of the edge.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50548801_pgfId-274973"></A>4.4.4.8 <A NAME="50548801_marker-274971"></A><A NAME="50548801_marker-274972"></A>Blend-boundary line on unfixed blend: SGTPBB</H4>
+<P>
+<A NAME="50548801_pgfId-274974"></A>If an edge with an unfixed blend is being rendered as view independent topology with unfixed blends, the blend is rendered instead of the edge. The way in which the blend is rendered depends on the option data provided with the unfixed blend option, or if this is absent, on the attribute data associated with the blend. Unfixed blends are ignored by all the other rendering functions.</P>
+<P>
+<A NAME="50548801_pgfId-274981"></A>See the <A HREF="fd_chap.105.html#14255">Section 104.3.19, “Unfixed blends”</A>, in the Parasolid <A HREF=../fd_index.html>Functional Description</A> manual for further information on rendering unfixed blends.</P><P>
+<A NAME="50548801_pgfId-274982"></A>A blend boundary is the line where the blending surface meets the faces or other blends adjacent to the edge.</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-274983"></A><CODE>
+tags</CODE>
+ contains the tag of the blended edge.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50548801_pgfId-274986"></A>4.4.4.9 <A NAME="50548801_marker-274984"></A><A NAME="50548801_marker-274985"></A>Parametric Hatch line: SGTPPL</H4>
+<P>
+<A NAME="50548801_pgfId-274987"></A><CODE>
+tags</CODE>
+ contains the tag of the face.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-274990"></A>4.4.4.10 <A NAME="50548801_marker-274988"></A><A NAME="50548801_marker-274989"></A>Facet: SGTPFT</H4>
+<P>
+<A NAME="50548801_pgfId-274991"></A>A facet is a planar or near planar polygon. A face rendered by the facet rendering function is approximated by a collection of contiguous facets. The data supplied is dependent on the setting of the rendering options to the faceting function.</P>
+<P>
+<A NAME="50548801_pgfId-274997"></A>See <A HREF="../FD_BOOK/facet_mesh_generation.html#30298">Chapter 106, “Facet Mesh Generation”</A> and <A HREF="fd_chap.108.html#27922">Chapter 107, “Faceting Output Via GO”</A> in the Parasolid <A HREF=../fd_index.html>Functional Description</A> manual for further information on faceting.</P><UL>
+<LI>
+<A NAME="50548801_pgfId-274999"></A>If edge tag data is not required, <CODE>
+tags</CODE>
+ contains the tag of the face on which the facet lies.</LI>
+<LI>
+<A NAME="50548801_pgfId-275000"></A>If edge tag data is required, <CODE>
+tags</CODE>
+ contains the tag of the face on which the facet lies and also contains tags of the model edges from which each facet edge is derived. The number of edge tags equals the number of vertices which define the facet. The null tag is supplied if the facet edge is not derived from a model edge. The first edge tag (tag[1]) is the tag of the model edge from which the first facet edge is derived. The first facet edge ends at the first vertex given in the geom array, see below. The second edge tag is for the facet edge which ends at the second vertex in geom, and so on.</LI>
+<LI>
+<A NAME="50548801_pgfId-275001"></A>Extra data is supplied in <CODE>
+lntp</CODE>
+ for this segment type:</LI>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-275002"></A><CODE>
+lntp[2]</CODE>
+ contains the number of loops in the facet</LI>
+<LI>
+<A NAME="50548801_pgfId-275003"></A><CODE>
+lntp[3]</CODE>
+ contains the number of vertices in the first loop</LI>
+<LI>
+<A NAME="50548801_pgfId-275004"></A><CODE>
+lntp[4]</CODE>
+ contains the number of vertices in the second loop</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-275005"></A>and so on.</P>
+<LI>
+<A NAME="50548801_pgfId-275006"></A><CODE>
+ngeom</CODE>
+ and <CODE>
+geom</CODE>
+ depend on the geometry type of this segment as specified in the second element of <CODE>
+lntp</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-275007"></A>If a facet has multiple loops, the outer loop is output first and the inner loops follow. The vertices of the outer loop are ordered counter-clockwise when viewed down the surface normal. The vertices of inner loops are ordered clockwise. Facets are manifold. That is, no vertex coincides with any other in the same facet, nor does it lie in any edge in the same facet.</P>
+<P>
+<A NAME="50548801_pgfId-275008"></A>This type of facet is only produced by the facet drawing function.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-275011"></A>4.4.4.11 <A NAME="50548801_marker-275009"></A><A NAME="50548801_marker-275010"></A>Error Segment: SGTPER</H4>
+<P>
+<A NAME="50548801_pgfId-275012"></A>When rendering a list of entities, Parasolid may encounter a body, face or edge which it is unable to render (e.g. a rubber face). In such a case, Parasolid outputs an error segment giving the tag of the bad entity a code indicating why it was not rendered. When the error segment has been output, Parasolid continues to render the remaining entities.</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-275013"></A><CODE>
+tags</CODE>
+ holds the tag of the entity which could not be rendered.</LI>
+<LI>
+<A NAME="50548801_pgfId-275014"></A><CODE>
+ngeom</CODE>
+ is zero</LI>
+</UL>
+
+
+<H4>
+<A NAME="50548801_pgfId-275017"></A>4.4.4.12 <A NAME="50548801_marker-275015"></A><A NAME="50548801_marker-275016"></A>Geometric Segments: SGTPGC, SGTPGS, SGTPGB</H4>
+<P>
+<A NAME="50548801_pgfId-275018"></A>Geometric segment types SGTPGC (curves), SGTPGS (surfaces), and SGTPGB (surface boundaries) are used to sketch unchecked parametric curves and surfaces as view independent drawings enabling the relevant curve/surface to be visualised. </P>
+
+
+<H4>
+<A NAME="50548801_pgfId-275021"></A>4.4.4.13 <A NAME="50548801_marker-275019"></A><A NAME="50548801_marker-275020"></A>Mangled Facet: SGTPMF</H4>
+<P>
+<A NAME="50548801_pgfId-275022"></A>If during a call to the facet drawing function, user tolerances can't be matched, or facets are created which self intersect or are severely creased, then geometric data is output as a segment type SGTPMF. In this case, the facets are always triangular.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-275026"></A>4.4.4.14 <A NAME="50548801_marker-275023"></A><A NAME="50548801_marker-275024"></A><A NAME="50548801_27076"></A>Visibility Segment: SGTPVT</H4>
+<P>
+<A NAME="50548801_pgfId-275027"></A>If <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> is used to output data hierarchically from a hidden line drawing (that is, if the <CODE>
+hierarch</CODE>
+ option is anything but <A HREF=../headers/pk_render_hierarch_t.html>PK_render_hierarch_no_c</A>), then the single level segments output for each edge, silhouette, or hatch-line are:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-275028"></A>a geometry segment (when <CODE>
+hierarch</CODE>
+ is <A HREF=../headers/pk_render_hierarch_t.html>PK_render_hierarch_yes_c</A> or <A HREF=../headers/pk_render_hierarch_t.html>PK_render_hierarch_param_c</A>)</LI>
+<LI>
+<A NAME="50548801_pgfId-275029"></A>a visibility segment</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-275030"></A>If regional data has been requested, <CODE>
+tags</CODE>
+ holds the regional information for the segments between the visibility transition points. This means that <CODE>
+ntags</CODE>
+ is twice the value of <CODE>
+nlntp</CODE>
+, since <CODE>
+nlntp</CODE>
+ represents the number of visibility code <EM>
+pairs</EM> (see below).</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-275031"></A><CODE>
+tags[0]</CODE>
+ is the tag of the face to the left of the segment after the first transition point</LI>
+<LI>
+<A NAME="50548801_pgfId-275032"></A><CODE>
+tags[1]</CODE>
+ is the tag of the face to the right of the segment after the first transition point </LI>
+<LI>
+<A NAME="50548801_pgfId-275033"></A><CODE>
+tags[2]</CODE>
+ is the tag of the face to the left of the segment after the second transition point </LI>
+<LI>
+<A NAME="50548801_pgfId-275034"></A><CODE>
+tags[2n-2]</CODE>
+ is the tag of the face to the left of the segment after the nth transition point </LI>
+<LI>
+<A NAME="50548801_pgfId-275035"></A><CODE>
+tags[2n-1]</CODE>
+ is the tag of the face to the right of the segment after the nth transition point </LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-275036"></A>If regional data is not requested, then <CODE>
+ntags</CODE>
+ is zero and <CODE>
+tags</CODE>
+ contains no regional information.For more information on regional data, see <A HREF="di_chap.05.html#50548801_93469">Section 4.5, “Interpreting regional data”</A>.</P>
+<P>
+<A NAME="50548801_pgfId-275037"></A><CODE>
+geom</CODE>
+ holds the visibility transition points, i.e. the vectors in model space where the edge changes visibility or smoothness. <CODE>
+ngeom</CODE>
+ holds the number of these visibility transition points.</P>
+<P>
+<A NAME="50548801_pgfId-275045"></A>The <CODE>
+lntp</CODE>
+ array is structured as shown in <A HREF="di_chap.05.html#50548801_24320">Figure 4-2</A> and <A HREF="di_chap.05.html#50548801_30432">Figure 4-3</A>. The array consists of five blocks of data, as follows:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-284276"></A>The first block, of length <CODE>
+nlntp</CODE>
+, holds the visibility codes for the edge.</LI>
+<LI>
+<A NAME="50548801_pgfId-324871"></A>The second block, of length <CODE>
+nlntp</CODE>
+, holds the smoothness codes for the edge. The smoothness property can change along edges which are partially coincident with silhouettes. The smoothness code contained in the geometry segment should be ignored. See <A HREF="di_chap.05.html#50548801_80646">Section 4.4.2.4, “Smoothness”</A> for more information.</LI>
+<LI>
+<A NAME="50548801_pgfId-324871"></A>The third block, of length <CODE>
+ngeom</CODE>
+, holds the point indices for the visibility transition points if regional data has been requested.</LI>
+<LI>
+<A NAME="50548801_pgfId-285229"></A>If the <CODE>
+viewport_clipping</CODE>
+ option in <A HREF=../headers/pk_topol_render_line_o_t.html>PK_TOPOL_render_line_o_t</A> is set to <A HREF=../headers/pk_render_viewport_clip_t.html>PK_render_viewport_clip_yes_c</A>, then the fourth block, of length <CODE>
+nlntp</CODE>
+, holds the viewport codes describing whether an edge is inside, outside, or coincident with a viewport.</LI>
+<LI>
+<A NAME="50548801_pgfId-284975"></A>If the <CODE>
+sharp_mfins</CODE>
+ option in <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> is set to PK_render_sharp_mfin_yes_c and this visibility segment is for an edge line, then the fifth block, of length <CODE>
+nlntp</CODE>
+, holds the codes describing whether or not an edge lies on a chain of sharp mfins. The sharp mfins code can change along edges which are partially coincident with sharp mfins. Therefore, the sharp mfins code contained in the geometry segment should be ignored. See <A HREF="di_chap.05.html#50548801_94642">Section 4.4.2.6, “Coincidence with sharp mfins”</A> for more information.</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-284895"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/di_chap-8.gif">
+
+<P>
+<A NAME="50548801_pgfId-284971"></A>Figure 4-2 <A NAME="50548801_24320"></A>Structure of the <CODE>
+lntp</CODE>
+ array explaining visibility codes, smoothness codes and regional data</P>
+<P>
+<A NAME="50548801_pgfId-321801"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/di_chap-9.gif">
+
+<P>
+<A NAME="50548801_pgfId-321695"></A>Figure 4-3 <A NAME="50548801_30432"></A>Structure of the <CODE>
+lntp</CODE>
+ array explaining viewport codes and sharp mfin codes</P>
+<P>
+<A NAME="50548801_pgfId-284975"></A>&nbsp;</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-275130"></A>4.4.4.15 <A NAME="50548801_marker-321912"></A><A NAME="50548801_marker-321913"></A>Facet Strip: SGTPTS</H4>
+<P>
+<A NAME="50548801_pgfId-275131"></A>Using the ‘facet strip’ option when outputting data from the facet drawing function results in this data being output in the form of a ‘strip’ or ‘ribbon’ consisting of triangular facets. </P>
+<P>
+<A NAME="50548801_pgfId-275132"></A>The number of facets in each strip must be specified in the option data list when using this option.</P>
+<P>
+<A NAME="50548801_pgfId-275133"></A>Triangular facets share vertices between adjacent facets with the geometry specifying the vertices of the triangles in a particular order. For example, in a strip consisting of eight triangular facets the order of the vertices are specified as follows:</P>
+<P>
+<A NAME="50548801_pgfId-275185"></A>&nbsp;</P>
+
+
+
+<IMG SRC="../graphics/di_chap-10.gif">
+
+<P>
+<A NAME="50548801_pgfId-275186"></A>Figure 4-4 The ordering of vertices in a facet strip</P>
+<P>
+<A NAME="50548801_pgfId-275187"></A>As can be seen from the above example, triangular strip geometry only stores ‘n + 2’ vertices, whereas an individual-triangle’s geometry stores ‘3n’ vertices.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-275188"></A>4.4.4.16 Parametrized Visibility Segment: SGTPVP</H4>
+<P>
+<A NAME="50548801_pgfId-275189"></A>If the <CODE>
+hierarch</CODE>
+ option is used to output data hierarchically from a hidden line drawing then the single level segments output for each edge, silhouette, or hatch line is very similar to those output when the other hierarchical options are specified, i.e.</P>
+<UL>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-275190"></A>a geometry segment</LI>
+<LI>
+<A NAME="50548801_pgfId-275191"></A>a visibility segment</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50548801_pgfId-275192"></A>However, when the geometry segment is a polyline, the visibility segment supplied is of type SGTPVP rather than SGTPVT:</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-275193"></A><CODE>
+ntags</CODE>
+ and <CODE>
+tags</CODE>
+ are zero, as this information is provided by the hierarchical segment.</LI>
+<LI>
+<A NAME="50548801_pgfId-275194"></A><CODE>
+ngeom</CODE>
+ holds the number of visibility transition points.</LI>
+<LI>
+<A NAME="50548801_pgfId-275195"></A><CODE>
+geom</CODE>
+ holds the visibility transition points. These points are sets of four values, defining both the vector position of the change in visibility and its parameter along the polyline, i.e.</LI>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-275196"></A>geom[0...2] vector position of first change in visibility</LI>
+<LI>
+<A NAME="50548801_pgfId-275197"></A>geom[3] parameter of first change in visibility</LI>
+<LI>
+<A NAME="50548801_pgfId-275198"></A>geom[i...i+2] nth vector position, where i = 4(n-1)</LI>
+<LI>
+<A NAME="50548801_pgfId-275199"></A>geom[i+3] nth parameter</LI>
+</UL>
+<LI>
+<A NAME="50548801_pgfId-275200"></A><CODE>
+nlntp</CODE>
+ holds the number of visibility codes.</LI>
+<LI>
+<A NAME="50548801_pgfId-275201"></A><CODE>
+lntp</CODE>
+ holds the visibility codes for the edge.</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-275202"></A>The parameterisation of polylines is pseudo arc-length, normalized so that the parameter interval of any polyline is always [0,1]. That is, the parameter of any point on the polyline is equal to the distance between the point and the start measured along the polyline, divided by the total length of the polyline.</P>
+<P>
+<A NAME="50548801_pgfId-275203"></A>The parameters are supplied in order to help the application locate the chord in the polyline on which the associated visibility transition point lies.</P>
+<P>
+<A NAME="50548801_pgfId-275204"></A>Given a polyline P with <EM>
+N</EM> chords, defined by the set of 3-D points:</P>
+<UL>
+<P>
+<A NAME="50548801_pgfId-275211"></A></P>
+<IMG SRC="../graphics/di_chap-11.gif">
+ ( where 0 <IMG SRC="../graphics/di_chap-12.gif">
+ )</UL>
+<P>
+<A NAME="50548801_pgfId-275212"></A>we define the total length of a polyline consisting of <EM>
+N</EM> chords as:</P>
+<UL>
+<P>
+<A NAME="50548801_pgfId-275216"></A></P>
+<IMG SRC="../graphics/di_chap-13.gif">
+<BR>
+&nbsp;</UL>
+<P>
+<A NAME="50548801_pgfId-275217"></A>and define distance <EM>
+D(t)</EM> as the length of the polyline at parameter value <EM>
+t</EM> measured from the point <IMG SRC="../graphics/di_chap-14.gif">
+.</P>
+<P>
+<A NAME="50548801_pgfId-275224"></A>Given a visibility transition point <EM>
+v</EM> with parameter value <IMG SRC="../graphics/di_chap-15.gif">
+ we can find the chord <IMG SRC="../graphics/di_chap-16.gif">
+ on which the point <EM>
+v</EM> lies by finding a point index <EM>
+n</EM> such that</P>
+<UL>
+<P>
+<A NAME="50548801_pgfId-275231"></A></P>
+<IMG SRC="../graphics/di_chap-17.gif">
+&nbsp;</UL>
+<P>
+<A NAME="50548801_pgfId-275232"></A>The position <EM>
+v</EM> is given by:</P>
+
+<IMG SRC="../graphics/di_chap-18.gif">
+
+
+
+<H4>
+<A NAME="50548801_pgfId-277934"></A>4.4.4.17 Interference curve: SGTPIC</H4>
+<P>
+<A NAME="50548801_pgfId-278046"></A>If, in <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A>, overlapping bodies are detected during the rendering process by setting the <CODE>
+overlap</CODE>
+ option to <A HREF=../headers/pk_render_overlap_t.html>PK_render_overlap_intersect_c</A>, then this segment type is used for any curves that are generated as a result of intersections between overlapping faces in the bodies. See <A HREF="fd_chap.105.html#77158">Section 104.3.20, “Overlapping bodies”</A>, in the Parasolid <EM><A HREF=../fd_index.html>Functional Description</A></EM>, for more information.</P>
+
+
+<H4>
+<A NAME="50548801_pgfId-286625"></A>4.4.4.18 Clip line: SGTPCL</H4>
+<P>
+<A NAME="50548801_pgfId-286679"></A>If, in <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A>, 3D viewports are enabled by setting <CODE>
+viewport_type</CODE>
+ to <A HREF=../headers/pk_render_viewport_type_t.html>PK_render_viewport_type_3D_c</A> and viewport clipping is enabled by setting <CODE>
+viewport_clipping</CODE>
+ to <A HREF=../headers/pk_render_viewport_clip_t.html>PK_render_viewport_clip_yes_c</A>, then any clashes between rendering faces and viewport faces will result in the generation of a clip line. Segments on clip lines are marked with the code SGTPCL. See <A HREF="fd_chap.105.html#45643">Section 104.3.23.3, “Clipping entities to viewport boundaries”</A>, in the <EM><A HREF=../fd_index.html>Functional Description</A></EM>, for more information about viewports. </P>
+
+
+<H4>
+<A NAME="50548801_pgfId-320756"></A>4.4.4.19 <A NAME="50548801_52094"></A>Sharp mfin line: SGTPSF</H4>
+<P>
+<A NAME="50548801_pgfId-320744"></A>If, in <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A>, sharp mfins are requested by setting <CODE>
+sharp_mfins</CODE>
+ to <A HREF=../headers/pk_render_sharp_mfins_t.html>PK_render_sharp_mfins_yes_c</A> then polylines that run along chains of connected sharp mfins will be rendered for every face that contains facet geometry. See <A HREF="fd_chap.105.html#23789">Section 104.3.4, “Sharp mfins”</A>, in the <EM><A HREF=../fd_index.html>Functional Description</A></EM>, for more information. </P>
+
+
+<H4>
+<A NAME="50548801_pgfId-335760"></A>4.4.4.20 Lattice geometric segments: SGTPLB, SGTPLR</H4>
+<P>
+<A NAME="50548801_pgfId-336929"></A>Lattice segment types SGTPLB (lattice balls), and SGTPLR (lattice rods) are used to render lattice balls as spheres and lattice rods as straight lines between the 2 balls it connects. See <A HREF="fd_chap.105.html#90929">Section 104.2.4, “Lattice”</A>, in the <EM><A HREF=../fd_index.html>Functional Description</A></EM> for more information.</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548801_pgfId-286629"></A>4.5	<A NAME="50548801_marker-286627"></A><A NAME="50548801_93469"></A>Interpreting regional data
+
+
+</H1>
+<P>
+<A NAME="50548801_pgfId-275240"></A>Regional data is produced in a hidden line drawing when you use the <CODE>
+region</CODE>
+ option in <A HREF=../headers/pk_topol_render_line_o_t.html>PK_TOPOL_render_line_o_t</A>. It tells you how to split a hidden line picture into separate 2D regions, as shown in the <A HREF="di_chap.05.html#50548801_12521">Figure 4-5</A>. </P>
+<P>
+<A NAME="50548801_pgfId-301740"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/di_chap-19.gif">
+
+<P>
+<A NAME="50548801_pgfId-275311"></A>Figure 4-5 <A NAME="50548801_12521"></A>Interpreting regional data</P>
+<P>
+<A NAME="50548801_pgfId-275312"></A>A single edge may bound several regions on the two-dimensional picture (for instance the edge marked in <A HREF="di_chap.05.html#50548801_12521">Figure 4-5</A>, bounds regions A, C, D, E, F and G). When this happens it is divided at the intersections, and output as several segments, with the same basic segment data (and completeness code CODINC), but different regional data. The additional data is of two types: adjacent faces, and point indices.</P>
+
+<H3>
+<A NAME="50548801_pgfId-275315"></A>	4.5.1 	<A NAME="50548801_marker-275313"></A><A NAME="50548801_marker-275314"></A>Adjacent faces</H3>
+<P>
+<A NAME="50548801_pgfId-303209"></A>The order of faces returned in regional data is based on the orientation of the faces either side of the boundary line in question, relative to the direction of the curve and viewing direction. </P>
+<P>
+<A NAME="50548801_pgfId-275316"></A>When a bounding line is output with regional data, the <CODE>
+tags</CODE>
+ array is of length 3 (i.e. <CODE>
+ntags</CODE>
+=3):</P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-304782"></A><CODE>
+tags[0]</CODE>
+ contains the tag of the original model entity: either an edge (if the bounding line is generated from a model edge) or a face (if the bounding line is generated from another source, such as a silhouette)</LI>
+<LI>
+<A NAME="50548801_pgfId-305076"></A><CODE>
+tags[1]</CODE>
+ and <CODE>
+tags[2]</CODE>
+ contain either the tags of faces in the model, or PK_ENTITY_null. These indicate which faces are on each side of the line corresponding to the segment in the 2D picture. (The faces may or may not be adjacent to the original edge or silhouette in the 3D model.)</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-275317"></A>PK_ENTITY_null indicates that the region of the picture on that side of the line is <EM>
+either</EM> part of a face not tagged for regional data <EM>
+or</EM> outside the 2D representation of the model (the “outside” of the picture). </P>
+<P>
+<A NAME="50548801_pgfId-275318"></A>Face tags are returned relative to the direction of the line, which is required to interpret the point indices correctly: <CODE>
+tags[1]</CODE>
+ is the <STRONG>
+left</STRONG> face, and <CODE>
+tags[2]</CODE>
+ the <STRONG>
+right</STRONG>.</P>
+<P>
+<A NAME="50548801_pgfId-302903"></A><A HREF="di_chap.05.html#50548801_28667">Figure 4-6</A> illustrates how regional data is returned when rendering three cubes, with a view direction such that only one face from each cube is visible, two of which are partially obscured. The illustration shows how regional data is returned for a sample of edges in the rendered image, shown in red. For simplicity, PK_ENTITY_null is shown as 0 in the illustration, and <CODE>
+tags[0]</CODE>
+ is not shown. </P>
+<UL>
+<LI>
+<A NAME="50548801_pgfId-303882"></A>For each segment with two adjacent faces, the left face (relative to the direction of the edge) is returned first, and the right face is returned last. </LI>
+<LI>
+<A NAME="50548801_pgfId-304220"></A>For each segment with only one adjacent face, PK_ENTITY_null is returned for the side that has no face.</LI>
+<LI>
+<A NAME="50548801_pgfId-303898"></A>For each segment that is completely obscured in the rendered image, PK_ENTITY_null is returned for both left and right faces.</LI>
+</UL>
+<P>
+<A NAME="50548801_pgfId-302803"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/di_chap-20.gif">
+
+<P>
+<A NAME="50548801_pgfId-302771"></A>Figure 4-6 <A NAME="50548801_28667"></A>Format of regional data for edges</P>
+
+
+<H3>
+<A NAME="50548801_pgfId-275321"></A>	4.5.2 	<A NAME="50548801_marker-275319"></A><A NAME="50548801_marker-275320"></A>Point indices</H3>
+<P>
+<A NAME="50548801_pgfId-275322"></A>The <CODE>
+lntp</CODE>
+ array is of length 7 for a segment with regional data. Elements <CODE>
+lntp[5]</CODE>
+ and <CODE>
+lntp[6]</CODE>
+ are the <STRONG>
+start index</STRONG> and <STRONG>
+end index</STRONG> respectively for the line. They are non-zero integer values, and specify which “points” of the two-dimensional picture the segment joins.</P>
+<P>
+<A NAME="50548801_pgfId-275323"></A>Suppose segment A has end index <EM>
+x</EM>, and segment B has start index <EM>
+x</EM>. Then the end point of A and the start point of B should be regarded as the same point in the two-dimensional picture, <EM>
+even if their geometric projections do not exactly coincide</EM>. (This may happen as the result of numerical approximations in rendering.) You will also find that of all the lines sharing a point index, one with it as an end index and one with it as a start index share an adjacent face on the left, and so these two can be linked up as consecutive portions of the boundary of a region; and similarly with faces on the right. The values used for point indices are not in any meaningful order.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548801_pgfId-275326"></A>4.6	<A NAME="50548801_marker-275324"></A><A NAME="50548801_marker-275325"></A>Graphical output of pixel data
+
+
+</H1>
+<P>
+<A NAME="50548801_pgfId-275327"></A>Another part of the GO consists of three functions for producing pixel data. These were required to support the KI function RRPIXL. These functions do not need to be implemented to support the PK (they can be supplied in dummy form).</P>
+<P>
+<A NAME="50548801_pgfId-275345"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-275330"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-275332"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-275334"></A>GOOPPX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-275336"></A>open output of encoded pixel data</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-275338"></A>GOPIXL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-275340"></A>output encoded pixel data</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-275342"></A>GOCLPX</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548801_pgfId-275344"></A>close output of encoded pixel data</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548801_pgfId-275349"></A>See <A HREF="di_chap.16.html#50548812_10529">Appendix J, “Legacy Functions”</A>, for further information on the interface to these functions.</P>
+<P>
+<A NAME="50548801_pgfId-275350"></A>&nbsp;</P>
+<P>
+<A NAME="50548801_pgfId-110680"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.04.html">File Header Structure</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.06.html">Registering the Frustrum</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

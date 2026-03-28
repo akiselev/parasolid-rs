@@ -1,0 +1,321 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Displaying Data</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Displaying Data</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.14.html">Enquiring Model Data and Identifying Details</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.16.html">Application Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.15.html#50446351_pgfId-274002">14.1	Introduction</A>
+<LI> <A HREF="ov_chap.15.html#50446351_pgfId-288622">14.2	Processing graphical data</A>
+<LI> <A HREF="ov_chap.15.html#50446351_pgfId-274004">14.3	Rendering pictures</A>
+<UL>
+<LI> <A HREF="ov_chap.15.html#50446351_pgfId-274011">14.3.1	Wire-frame pictures</A>
+<LI> <A HREF="ov_chap.15.html#50446351_pgfId-274020">14.3.2	Hidden-line pictures</A>
+<LI> <A HREF="ov_chap.15.html#50446351_pgfId-282041">14.3.3	Rendering options</A>
+</UL>
+<LI> <A HREF="ov_chap.15.html#50446351_pgfId-285808">14.4	Faceting pictures</A>
+<UL>
+<LI> <A HREF="ov_chap.15.html#50446351_pgfId-287815">14.4.1	Faceting options</A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446351_pgfId-274002"></A>14.1	<A NAME="50446351_marker-312060"></A><A NAME="50446351_marker-312058"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446351_pgfId-282960"></A>Parasolid generates rendering, faceting and graphical data that you can use to produce pictures of the models you create. There are several steps to this process:</P>
+<UL>
+<LI>
+<A NAME="50446351_pgfId-280878"></A>First, the model is <STRONG>
+rendered</STRONG>: Parasolid generates graphical data for a particular entity or set of entities, optionally generating <STRONG>
+facet data</STRONG><A NAME="50446351_marker-312000"></A> for those entities if your application requests them. </LI>
+<LI>
+<A NAME="50446351_pgfId-280929"></A>Next, Parasolid passes the graphical data to your application via the <STRONG>
+Graphical Output</STRONG><A NAME="50446351_marker-312002"></A><A NAME="50446351_marker-312170"></A><A NAME="50446351_marker-312154"></A>, or <STRONG>
+GO</STRONG><A NAME="50446351_marker-312004"></A> functions, that you supply as part of your application. </LI>
+<LI>
+<A NAME="50446351_pgfId-289275"></A>Then, your application parses the data that was passed to it as required, finally passing the resulting data to a graphics library for display on the screen. Parasolid is compatible with all graphics libraries and user interface standards. This means that your application can use any graphics library you wish. </LI>
+</UL>
+<P>
+<A NAME="50446351_pgfId-274632"></A>Parasolid provides a number of rendering and faceting functions: the one you choose depends on the type of display your application is generating and the method you are using to produce it. This chapter provides an overview of the functionality offered by these functions:</P>
+<UL>
+<LI>
+<A NAME="50446351_pgfId-289287"></A><A HREF="ov_chap.15.html#50446351_47374">Section 14.2, &#8220;Processing graphical data&#8221;</A>, describes the steps required in order to generate graphical data and render it on an output device.</LI>
+<LI>
+<A NAME="50446351_pgfId-289294"></A><A HREF="ov_chap.15.html#50446351_86850">Section 14.3, &#8220;Rendering pictures&#8221;</A>, describes the different ways that model data can be rendered. </LI>
+<LI>
+<A NAME="50446351_pgfId-289299"></A><A HREF="ov_chap.15.html#50446351_83975">Section 14.4, &#8220;Faceting pictures&#8221;</A>, describes the different ways that facet data can be rendered. </LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446351_pgfId-288622"></A>14.2	<A NAME="50446351_47374"></A><A NAME="50446351_marker-311972"></A><A NAME="50446351_marker-312066"></A><A NAME="50446351_marker-312064"></A>Processing graphical data
+
+
+</H1>
+<P>
+<A NAME="50446351_pgfId-548604"></A><A HREF="ov_chap.15.html#50446351_51957"><EM>
+Figure 14-1</EM></A> gives an overview of the steps involved in creating and processing graphical data for use on an output device.</P>
+<P>
+<A NAME="50446351_pgfId-548605"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-168.gif">
+
+<P>
+<A NAME="50446351_pgfId-289081"></A>Figure 14-1 <A NAME="50446351_51957"></A>Processing graphical data for display on an output device</P>
+<P>
+<A NAME="50446351_pgfId-288893"></A>In order to produce a picture of a model, graphical data is sent from Parasolid to your application using the GO functions that you to supply. These functions encapsulate the graphical data created by Parasolid, and Parasolid calls them whenever your application calls a Parasolid faceting or rendering function. </P>
+<P>
+<A NAME="50446351_pgfId-288958"></A>Once your application has the graphical data, it can further parse it if required, depending on the nature of the data that was requested. For example, if hidden-line data was requested, then Parasolid outputs graphical data with visibility information attached to each data segment. Your application can parse this information so that data segments that are flagged as hidden are displayed using a specific line style, such as that shown in <A HREF="ov_chap.15.html#50446351_44131"><EM>
+Figure 14-4</EM></A>.</P>
+<P>
+<A NAME="50446351_pgfId-289004"></A>Depending on the functionality required by your application, pictures can be displayed on output devices (typically the user&#8217;s computer monitor), or hard copy can be produced on a printer connected to the computer. In order to do this, you must pass the graphical data to a suitable graphics library in order to render the image. You need to provide the graphics library with your application; no graphics library is supplied with Parasolid itself. You can either write one yourself or, more commonly, use a third party library such as <A NAME="50446351_marker-312333"></A><A NAME="50446351_marker-312454"></A>OpenGL or <A NAME="50446351_marker-312337"></A><A NAME="50446351_marker-312450"></A>DirectX.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446351_pgfId-274004"></A>14.3	<A NAME="50446351_86850"></A><A NAME="50446351_marker-311986"></A><A NAME="50446351_marker-312172"></A><A NAME="50446351_marker-312160"></A><A NAME="50446351_marker-312070"></A>Rendering pictures
+
+
+</H1>
+<P>
+<A NAME="50446351_pgfId-274010"></A>Parasolid can generate data that your application can use to create <A NAME="50446351_marker-281042"></A><A NAME="50446351_marker-281043"></A>three kinds of picture: wire-frame, hidden-line and faceted. These are illustrated in <A HREF="ov_chap.15.html#50446351_97821"><EM>
+Figure 14-2</EM></A>.</P>
+<P>
+<A NAME="50446351_pgfId-548768"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-169.gif">
+
+<P>
+<A NAME="50446351_pgfId-280654"></A>Figure 14-2 <A NAME="50446351_97821"></A>Wire-frame (a), hidden-line (b) and faceted (c) pictures</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446351_pgfId-274011"></A>	14.3.1 	<A NAME="50446351_marker-311988"></A><A NAME="50446351_marker-312072"></A>Wire-frame pictures</H2>
+<P>
+<A NAME="50446351_pgfId-274014"></A><A NAME="50446351_marker-274012"></A><A NAME="50446351_marker-274013"></A>Wire-frame pictures depict models by drawing their edges. They can optionally include additional information to give the impression of the surfaces bounding the model, such as silhouette lines and hatching lines. However, they do not include information about which parts of the model are visible and which are hidden. <A HREF="ov_chap.15.html#50446351_47211"><EM>
+Figure 14-3</EM></A> shows a wire-frame picture of a cylinder that could be produced by an application. It includes both silhouette and hatching information.<A NAME="50446351_marker-312358"></A><A NAME="50446351_marker-312456"></A></P>
+<P>
+<A NAME="50446351_pgfId-548822"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-170.gif">
+
+<P>
+<A NAME="50446351_pgfId-284480"></A>Figure 14-3 <A NAME="50446351_47211"></A>Wire-frame rendering with silhouette and hatching information</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446351_pgfId-274020"></A>	14.3.2 	<A NAME="50446351_marker-311990"></A><A NAME="50446351_marker-312056"></A>Hidden-line pictures</H2>
+<P>
+<A NAME="50446351_pgfId-274023"></A><A NAME="50446351_marker-274021"></A><A NAME="50446351_marker-274022"></A>Hidden-line pictures distinguish lines that are visible in the current view from those that are not. Your application can produce pictures in which hidden lines are suppressed entirely (as in <A HREF="ov_chap.15.html#50446351_97821"><EM>
+Figure 14-2</EM></A> (b)), or they may be output in a different style, for example, as dashes, or using a different colour, as shown in <A HREF="ov_chap.15.html#50446351_44131"><EM>
+Figure 14-4</EM></A>. Hidden-line pictures always contain edges and silhouettes, and hatch-lines can also be included if required. </P>
+<P>
+<A NAME="50446351_pgfId-548869"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-171.gif">
+
+<P>
+<A NAME="50446351_pgfId-285658"></A>Figure 14-4 <A NAME="50446351_44131"></A>Displaying hidden lines in a different style</P>
+<P>
+<A NAME="50446351_pgfId-281106"></A>Parasolid&#8217;s hidden-line routines use regional data, so that automatic form-feature recognition and decomposition applications can be implemented. The hidden-line-removal functionality supported by Parasolid also provides data essential for developing advanced &#8220;drafting-from-solid&#8221; applications.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446351_pgfId-282041"></A>	14.3.3 	<A NAME="50446351_marker-311992"></A><A NAME="50446351_marker-312068"></A>Rendering options</H2>
+<P>
+<A NAME="50446351_pgfId-282044"></A>Parasolid provides many options to control the way rendering data is generated. These include support for:</P>
+<UL>
+<LI>
+<A NAME="50446351_pgfId-282047"></A><A NAME="50446351_marker-282045"></A>Ignoring <A NAME="50446351_marker-282046"></A>small features in order to simplify the result.</LI>
+<LI>
+<A NAME="50446351_pgfId-287819"></A>Rendering a body as if it was transparent.</LI>
+<LI>
+<A NAME="50446351_pgfId-282050"></A><A NAME="50446351_marker-282048"></A>Detecting the presence of separate <A NAME="50446351_marker-282049"></A>overlapping bodies and rendering hidden-line views appropriately.</LI>
+<LI>
+<A NAME="50446351_pgfId-282052"></A>Rendering planar and radial <A NAME="50446351_marker-282051"></A>hatching information.</LI>
+<LI>
+<A NAME="50446351_pgfId-282054"></A>Drawing <A NAME="50446351_marker-282053"></A>unfixed blends as they would appear after they are fixed.</LI>
+<LI>
+<A NAME="50446351_pgfId-479415"></A><A NAME="50446351_marker-479414"></A>Hierarchical output of edge, silhouette and hatch lines in a hidden-line drawing for more efficient processing.</LI>
+<LI>
+<A NAME="50446351_pgfId-479428"></A>Supplying <A NAME="50446351_marker-479437"></A>viewports to allow rendering of only a small portion of a larger body.</LI>
+</UL>
+<P>
+<A NAME="50446351_pgfId-479419"></A><A HREF="ov_chap.15.html#50446351_93240"><EM>
+Figure 14-5</EM></A> illustrates several of these options.</P>
+<P>
+<A NAME="50446351_pgfId-548922"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-172.gif">
+
+<P>
+<A NAME="50446351_pgfId-282388"></A>Figure 14-5 <A NAME="50446351_93240"></A>Rendering options: (a) ignoring small features and (b) transparent bodies</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446351_pgfId-285808"></A>14.4	<A NAME="50446351_83975"></A><A NAME="50446351_marker-311994"></A><A NAME="50446351_marker-312050"></A>Faceting pictures
+
+
+</H1>
+<P>
+<A NAME="50446351_pgfId-285809"></A>Faceting is a means of representing faces as a combination of vertices and straight edges that form planar or near planar facets. Facets generally coincide along adjoining edges, and each facet lies close to its &#8220;parent&#8221; face (that is, the face that it represents all or a part of), so that (unless you request otherwise) the edge of a face in the model corresponds closely to the edge of one or more facets. </P>
+<P>
+<A NAME="50446351_pgfId-289878"></A>Faceting does not change the entities in a model, it merely provides a different representation of the entities. </P>
+<P>
+<A NAME="50446351_pgfId-289907"></A>The most common use of facet data is to produce shaded 3D images of models: most graphics libraries require facet data in order to produce a shaded image. </P>
+<P>
+<A NAME="50446351_pgfId-289946"></A>Parasolid can generate graphical data in facet form so that your application can support the creation of faceted images if required. Facets can be output either individually, or as strips of connected facets: facet strips are more economical to represent, and many graphics drivers are optimised for this method of hardware shading.</P>
+<P>
+<A NAME="50446351_pgfId-548972"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-173.gif">
+
+<P>
+<A NAME="50446351_pgfId-287811"></A>Figure 14-6 Coarse and fine facet representations of a torus</P>
+<P>
+<A NAME="50446351_pgfId-293128"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50446351_pgfId-293157"></A>Note: Once calculated, facet data can be passed to your application in two ways:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50446351_pgfId-293158"></A>Via the GO, as is the case with rendering.<A NAME="50446351_marker-312383"></A><A NAME="50446351_marker-312452"></A></LI>
+<LI>
+<A NAME="50446351_pgfId-293141"></A>Via an array table. This option does not use the GO.<A NAME="50446351_marker-312390"></A></LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446351_pgfId-285832"></A>Parasolid&#8217;s powerful faceting functionality can typically be useful in any of the following situations:</P>
+<UL>
+<LI>
+<A NAME="50446351_pgfId-285813"></A>To produce approximate shaded displays quickly where maximum resolution is not essential.</LI>
+<LI>
+<A NAME="50446351_pgfId-285814"></A>To implement incremental graphics functionality that only updates the display for those parts of a model that have changed since the last update.</LI>
+<LI>
+<A NAME="50446351_pgfId-285815"></A>For Stereo Lithography (SLA) applications.<A NAME="50446351_marker-312397"></A></LI>
+<LI>
+<A NAME="50446351_pgfId-285816"></A>For &#8220;workcell simulation&#8221; applications.</LI>
+</UL>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446351_pgfId-287815"></A>	14.4.1 	<A NAME="50446351_marker-311996"></A><A NAME="50446351_marker-312048"></A>Faceting options</H2>
+<P>
+<A NAME="50446351_pgfId-288344"></A>Parasolid provides many options to provide control over the style and number of facets created when generating facet data. These include:</P>
+<UL>
+<LI>
+<A NAME="50446351_pgfId-288345"></A>Control over the size, shape and tolerances within which facets are created.</LI>
+<LI>
+<A NAME="50446351_pgfId-288346"></A>Control over whether facets join together along geometry or topology.</LI>
+<LI>
+<A NAME="50446351_pgfId-288347"></A>Control over the creation of facets in particular view directions, to increase the density of facets in an area of interest, or to prevent creating facets that will be hidden from view.</LI>
+<LI>
+<A NAME="50446351_pgfId-288348"></A>Control over the generation of connectivity data for a facet mesh, so that your application has information on how facets are joined. </LI>
+</UL>
+<P>
+<A NAME="50446351_pgfId-288401"></A>The precise combination of faceting options available depends on whether you return facet data to your application using the GO, or using an array table. </P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.14.html">Enquiring Model Data and Identifying Details</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.16.html">Application Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

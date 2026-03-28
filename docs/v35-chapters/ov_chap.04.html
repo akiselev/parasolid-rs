@@ -1,0 +1,1062 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Model Structure</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Model Structure</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.03.html">About Parasolid</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.05.html">Booleans and Related Functionality</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274061">3.1	Introduction</A>
+<UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-291034">3.1.1	Identifying entities</A>
+</UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274153">3.2	Topological entities</A>
+<UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274162">3.2.1	Bodies</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-491219">3.2.2	Facet bodies</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274249">3.2.3	Regions</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274336">3.2.4	Shells</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-288774">3.2.5	Face normals</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-288926">3.2.6	Direction of loops, fins, edges</A>
+</UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274412">3.3	Geometric entities</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274452">3.4	Other entities</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274490">3.5	Assemblies and instances</A>
+<UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-286120">3.5.1	Restrictions on assemblies</A>
+</UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274847">3.6	Accuracy of Parasolid models</A>
+<UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-289631">3.6.1	Tolerant Modelling</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274849">3.6.2	Nominal geometry</A>
+</UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274855">3.7	More about bodies</A>
+<UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-282389">3.7.1	Manifold bodies</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-274865">3.7.2	General bodies</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-290387">3.7.3	Checking the validity of a body</A>
+<UL>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-290406">3.7.3.1	What gets checked</A>
+<LI> <A HREF="ov_chap.04.html#50446350_pgfId-290703">3.7.3.2	When to use checking</A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446350_pgfId-274061"></A>3.1	<A NAME="50446350_marker-314215"></A><A NAME="50446350_marker-314459"></A><A NAME="50446350_marker-314457"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446350_pgfId-274064"></A><A NAME="50446350_marker-482960"></A><A NAME="50446350_marker-482961"></A>This chapter describes the major modelling entities that Parasolid uses to create its model structure, and how they are combined so as to construct a Parasolid model. The entities available fall into three broad categories: topological, geometric and associated data. Their general relationships are shown in the following diagram:</P>
+<P>
+<A NAME="50446350_pgfId-471146"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-12.gif">
+
+<P>
+<A NAME="50446350_pgfId-274152"></A>Figure 3-1 <A NAME="50446350_24674"></A>Relationships between Parasolid entities<A NAME="50446350_marker-471361"></A><A NAME="50446350_marker-471362"></A> </P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-286325"></A>The major entities shown in <A HREF="ov_chap.04.html#50446350_24674"><EM>
+Figure 3-1</EM></A> are described in <A HREF="ov_chap.04.html#50446350_33933" CLASS="XRef">Section 3.2, &#8220;Topological entities&#8221;</A>, <A HREF="ov_chap.04.html#50446350_49699">Section 3.3, &#8220;Geometric entities&#8221;</A> and <A HREF="ov_chap.04.html#50446350_74163">Section 3.4, &#8220;Other entities&#8221;</A>, respectively.</LI>
+<LI>
+<A NAME="50446350_pgfId-286435"></A><A HREF="ov_chap.04.html#50446350_74959">Section 3.5, &#8220;Assemblies and instances&#8221;</A>, explains how you can combine topological information to create more complex structures.</LI>
+<LI>
+<A NAME="50446350_pgfId-286473"></A><A HREF="ov_chap.04.html#50446350_85083">Section 3.6, &#8220;Accuracy of Parasolid models&#8221;</A>, discusses the default precision that Parasolid uses for its models, and the support that it offers for importing and modelling with data from other, less accurate modelers.</LI>
+<LI>
+<A NAME="50446350_pgfId-286546"></A><A HREF="ov_chap.04.html#50446350_87428">Section 3.7, &#8220;More about bodies&#8221;</A>, explains more about the different types of body that Parasolid supports, and the level of checking that is performed on bodies. </LI>
+</UL>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-291034"></A>	3.1.1 	<A NAME="50446350_marker-314217"></A><A NAME="50446350_marker-314541"></A>Identifying entities</H2>
+<P>
+<A NAME="50446350_pgfId-291131"></A>It is essential for both Parasolid and for your application to be able to identify different entities in a model. Parasolid provides two methods for doing this:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-291059"></A><STRONG>
+Tags</STRONG><A NAME="50446350_marker-314257"></A> are used to identify particular entities within a Parasolid session. Every entity in a model has an associated tag that is created when the entity is created or enquired about (see <A HREF="ov_chap.14.html#50446345_26499">Chapter 13, &#8220;Enquiring Model Data and Identifying Details&#8221;</A>). Each tag is <A NAME="50446350_marker-315525"></A>unique within a session. Tags are held in integer variables which Parasolid functions use as pointers to entities.</LI>
+<LI>
+<A NAME="50446350_pgfId-291069"></A><STRONG>
+Identifiers</STRONG><A NAME="50446350_marker-314259"></A><A NAME="50446350_marker-314675"></A><A NAME="50446350_marker-314591"></A> (IDs) can be used to identify particular entities between Parasolid sessions. Parasolid automatically attaches <A NAME="50446350_marker-315537"></A>unique IDs to entities in a model because Parasolid does not preserve tags between different sessions: when the same part is loaded into two different sessions, its entities may have different tags. </LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-291179"></A>For more information about Parasolid sessions, see <A HREF="ov_chap.16.html#50446385_81921">Section 15.3, &#8220;Partitions and roll-back&#8221;</A> and, in particular, <A HREF="ov_chap.16.html#50446385_64742">Section 15.3.1, &#8220;Concepts&#8221;</A>.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446350_pgfId-274153"></A>3.2	<A NAME="50446350_33933"></A><A NAME="50446350_marker-314219"></A><A NAME="50446350_marker-314509"></A>Topological entities
+
+
+</H1>
+<P>
+<A NAME="50446350_pgfId-274156"></A><A NAME="50446350_marker-274154"></A><A NAME="50446350_marker-274155"></A>Topological entities comprise all the entities that are used to construct the structure or skeleton of a model.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-274162"></A>	3.2.1 	<A NAME="50446350_marker-274161"></A><A NAME="50446350_marker-314221"></A>Bodies<A NAME="50446350_marker-315550"></A></H2>
+<P>
+<A NAME="50446350_pgfId-403812"></A><EM>
+Bodies</EM><A NAME="50446350_marker-403808"></A> are fundamental to modelling with Parasolid. A body is composed of one or more connected entities, or <EM>
+components</EM><A NAME="50446350_marker-403813"></A><A NAME="50446350_marker-403814"></A><A NAME="50446350_marker-403815"></A>. Collections of related bodies that share some physical aspects (for instance, different representations of the same part), can be represented as <EM>
+compound bodies</EM>. Bodies can contain the topological entities shown in <A HREF="ov_chap.04.html#50446350_99958"><EM>
+Figure 3-2</EM></A></P>
+<P>
+<A NAME="50446350_pgfId-403902"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-13.gif">
+
+<P>
+<A NAME="50446350_pgfId-283182"></A>Figure 3-2 <A NAME="50446350_99958"></A>Topological entities in a body</P>
+<P>
+<A NAME="50446350_pgfId-283411"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283433"></A>Topology</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283435"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283437"></A>Face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283526"></A>A <EM>
+face</EM><A NAME="50446350_marker-283525"></A><A NAME="50446350_marker-314265"></A> is a bounded subset of a surface, whose boundary is a collection of zero or more loops. A face with zero loops forms a closed entity, such as a full spherical face.<A NAME="50446350_marker-315565"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283441"></A>Loop</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283587"></A>A <EM>
+loop</EM><A NAME="50446350_marker-283586"></A><A NAME="50446350_marker-314267"></A> is a connected component of a face boundary. A loop can have:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-283588"></A>an ordered ring of distinct fins</LI>
+<LI>
+<A NAME="50446350_pgfId-283589"></A>a set of vertices<A NAME="50446350_marker-315574"></A></LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283445"></A>Fin</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283630"></A><A NAME="50446350_marker-283626"></A><A NAME="50446350_marker-283627"></A><A NAME="50446350_marker-283628"></A>A <EM>
+fin</EM><A NAME="50446350_marker-283629"></A><A NAME="50446350_marker-314269"></A> represents the oriented use of an edge by a loop.<A NAME="50446350_marker-315583"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283449"></A>Edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283659"></A>An <EM>
+edge</EM><A NAME="50446350_marker-283658"></A><A NAME="50446350_marker-314271"></A> is a bounded piece of a single curve. Its boundary is a collection of zero, one or two vertices. <A NAME="50446350_marker-315592"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283453"></A>Vertex</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-283680"></A>A <EM>
+vertex</EM><A NAME="50446350_marker-283679"></A><A NAME="50446350_marker-314273"></A> represents a point in space. A vertex has a single point, which may be null<A NAME="50446350_marker-315601"></A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446350_pgfId-284494"></A>Bodies also contain regions and shells, as described in <A HREF="ov_chap.04.html#50446350_43071">Section 3.2.3</A> and <A HREF="ov_chap.04.html#50446350_30920">Section 3.2.4</A> respectively.</P>
+<P>
+<A NAME="50446350_pgfId-274247"></A>For a fully defined, valid model, every face, edge and vertex in a body requires an attached geometric entity: a surface, curve or point.</P>
+<P>
+<A NAME="50446350_pgfId-478350"></A>More information about bodies is given in <A HREF="ov_chap.04.html#50446350_87428">Section 3.7, &#8220;More about bodies&#8221;</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-491219"></A>	3.2.2 	<A NAME="50446350_83736"></A>Facet bodies</H2>
+<P>
+<A NAME="50446350_pgfId-546906"></A>A facet body is one with Parasolid topology that references geometric data composed of mesh and polyline data (often referred to collectively as facet data), rather than classical Parasolid surface and curve geometry. A mesh is a surface subtype which encapsulates an application&#8217;s mesh data for one or more Parasolid face. A polyline is a curve subtype and describes a connected chain of linear segments. <A NAME="50446350_32861"></A>Parasolid can read in external mesh data in one of four forms; index, strip, fan, and vector, which are shown in <A HREF="ov_chap.04.html#50446350_32861"><EM>
+Figure </EM></A>.</P>
+<P>
+<A NAME="50446350_pgfId-542925"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-14.gif">
+
+<P>
+<A NAME="50446350_pgfId-542927"></A>Figure 3-3 <A NAME="50446350_32861"></A>Types of meshes that are supported</P>
+<P>
+<A NAME="50446350_pgfId-491236"></A>Facet bodies can contain the mesh topologies shown in <A HREF="ov_chap.04.html#50446350_56117"><EM>
+Figure 3-4</EM></A>.</P>
+<P>
+<A NAME="50446350_pgfId-492434"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-15.gif">
+
+<P>
+<A NAME="50446350_pgfId-491272"></A>Figure 3-4 <A NAME="50446350_56117"></A>Mesh topologies on a facet body</P>
+<P>
+<A NAME="50446350_pgfId-491283"></A>The relationship between mesh topologies and Parasolid entities are shown in <A HREF="ov_chap.04.html#50446350_79970"><EM>
+Figure 3-5</EM></A></P>
+<P>
+<A NAME="50446350_pgfId-491317"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-16.gif">
+
+<P>
+<A NAME="50446350_pgfId-491326"></A>Figure 3-5 <A NAME="50446350_79970"></A>Relationship between mesh topologies and Parasolid entities</P>
+<P>
+<A NAME="50446350_pgfId-539526"></A>See <A HREF="ov_chap.09.html#50446376_35587">Chapter 8, &#8220;Convergent Modeling&#8221;</A> for more information on Convergent Modeling.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-274249"></A>	3.2.3 	<A NAME="50446350_marker-539495"></A><A NAME="50446350_43071"></A><A NAME="50446350_marker-539497"></A>Regions<A NAME="50446350_marker-539498"></A></H2>
+<P>
+<A NAME="50446350_pgfId-274251"></A>A <EM>
+region</EM><A NAME="50446350_marker-274250"></A><A NAME="50446350_marker-314275"></A> is a connected subset of 3-dimensional space bounded by a collection of vertices, edges and oriented faces. Regions are either <EM>
+solid</EM><A NAME="50446350_marker-314277"></A><A NAME="50446350_marker-314679"></A><A NAME="50446350_marker-314597"></A> (contain material) or <EM>
+void</EM><A NAME="50446350_marker-314279"></A><A NAME="50446350_marker-314681"></A><A NAME="50446350_marker-314599"></A> (empty). </P>
+<P>
+<A NAME="50446350_pgfId-274252"></A>Bodies always have an infinite void region, which you can think of as all the space outside of the body itself. The sum of all regions in a body comprises the whole of 3D space.</P>
+<P>
+<A NAME="50446350_pgfId-274256"></A>For example, <A HREF="ov_chap.04.html#50446350_21532"><EM>
+Figure 3-6</EM></A> shows a hollow cube that contains three regions:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-274257"></A>The void region in the center of the cube.</LI>
+<LI>
+<A NAME="50446350_pgfId-389872"></A>The solid region occupied by the material of the cube.</LI>
+<LI>
+<A NAME="50446350_pgfId-389902"></A>The (infinite) void region outside the cube.</LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-527164"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-17.gif">
+
+<P>
+<A NAME="50446350_pgfId-274289"></A>Figure 3-6 <A NAME="50446350_21532"></A>Hollow cube consisting of three regions</P>
+<P>
+<A NAME="50446350_pgfId-274332"></A>Regions contain a set of shells that define the topological structure of the parts in the body.</P>
+<P>
+<A NAME="50446350_pgfId-284279"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50446350_pgfId-284355"></A>Note: A face is a two-dimensional analogy of a region. An edge is a one-dimensional analogy of a region. A vertex is the zero-dimensional analogy of a region.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-274336"></A>	3.2.4 	<A NAME="50446350_30920"></A><A NAME="50446350_marker-314225"></A>Shells<A NAME="50446350_marker-315637"></A></H2>
+<P>
+<A NAME="50446350_pgfId-274340"></A><A NAME="50446350_marker-274337"></A><A NAME="50446350_marker-274338"></A>A <EM>
+shell</EM><A NAME="50446350_marker-274339"></A> is a connected collection of oriented faces (each face used by the shell on one or both sides of the face) and edges. The shells in a region do not overlap or share faces, edges or vertices. </P>
+<P>
+<A NAME="50446350_pgfId-284601"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50446350_pgfId-284618"></A>Note: A loop is the two-dimensional analogy of a shell.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-288774"></A>	3.2.5 	<A NAME="50446350_marker-314227"></A><A NAME="50446350_marker-314683"></A><A NAME="50446350_marker-314605"></A><A NAME="50446350_marker-314603"></A><A NAME="50446350_marker-314447"></A>Face normals<A NAME="50446350_marker-315658"></A></H2>
+<P>
+<A NAME="50446350_pgfId-288778"></A>In a solid body, <A NAME="50446350_marker-288775"></A>the <EM>
+</EM><A NAME="50446350_marker-288776"></A><A NAME="50446350_marker-288777"></A>normals of each face must always point away from the solid region:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-288779"></A>For an outer shell, the normals point away from each other. </LI>
+<LI>
+<A NAME="50446350_pgfId-389643"></A>For an inner shell (i.e. a void inside a solid) the face normals point towards each other.</LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-390269"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-18.gif">
+
+<P>
+<A NAME="50446350_pgfId-390270"></A>Figure 3-7 Face normals of (a) solid body and (b) an inner shell</P>
+<P>
+<A NAME="50446350_pgfId-390276"></A>Sometimes, a modelling operation may create a <EM>
+negative body</EM><A NAME="50446350_marker-390271"></A><A NAME="50446350_marker-390272"></A><A NAME="50446350_marker-390273"></A><A NAME="50446350_marker-390274"></A><A NAME="50446350_marker-390275"></A>, that is, a body whose face normals point the wrong way. Such bodies can easily be negated. </P>
+<P>
+<A NAME="50446350_pgfId-288888"></A>For sheet bodies, face normals must also point away from the body. The face normals in a sheet body must be consistent, as shown in <A HREF="ov_chap.04.html#50446350_73398"><EM>
+Figure 3-8</EM></A>.</P>
+<P>
+<A NAME="50446350_pgfId-390464"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-19.gif">
+
+<P>
+<A NAME="50446350_pgfId-288925"></A>Figure 3-8 <A NAME="50446350_73398"></A>Face normals of sheet bodies</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-288926"></A>	3.2.6 	<A NAME="50446350_marker-314229"></A><A NAME="50446350_marker-314433"></A><A NAME="50446350_marker-314405"></A><A NAME="50446350_marker-314435"></A><A NAME="50446350_marker-314403"></A><A NAME="50446350_marker-314437"></A>Direction of loops, fins, edges<A NAME="50446350_marker-315687"></A><A NAME="50446350_marker-316307"></A><A NAME="50446350_marker-316305"></A></H2>
+<P>
+<A NAME="50446350_pgfId-288933"></A><A NAME="50446350_marker-288927"></A>Loops, <A NAME="50446350_marker-288928"></A>fins and <A NAME="50446350_marker-288929"></A>edges have directions, and Parasolid defines the following conventions for their relationships to face normals and to each other:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-288934"></A>The <EM>
+forward direction</EM><A NAME="50446350_marker-314285"></A> of a loop has the face on the left of the loop, when viewing the face down the face normal, as shown in <A HREF="ov_chap.04.html#50446350_20735"><EM>
+Figure 3-9</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-392584"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-20.gif">
+
+<P>
+<A NAME="50446350_pgfId-289029"></A>Figure 3-9 <A NAME="50446350_20735"></A>Loop directions of the top face of a cube with a cylindrical hole</P>
+<P>
+<A NAME="50446350_pgfId-289030"></A>The direction of the loop around a face determines the direction of the edges and fins of that face:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-289031"></A>A loop represents one boundary of a face as a closed set of fins, therefore the direction of the fin is the same as that of the loop that contains the fin.</LI>
+<LI>
+<A NAME="50446350_pgfId-289032"></A>An edge, which (on a manifold solid) has a left and right fin, takes its direction from the left fin (which takes its direction from its loop)</LI>
+</UL>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446350_pgfId-274412"></A>3.3	<A NAME="50446350_49699"></A><A NAME="50446350_marker-314549"></A><A NAME="50446350_marker-314687"></A><A NAME="50446350_marker-314609"></A><A NAME="50446350_marker-314539"></A>Geometric entities
+
+
+</H1>
+<P>
+<A NAME="50446350_pgfId-285307"></A>Geometries entities are used to specify the geometric shape of a body. These geometries are referred to as <EM>
+principal geometry. </EM><A NAME="50446350_marker-539973"></A>In a completely defined part, geometric entities are attached to topological entities according to the relationships shown in <A HREF="ov_chap.04.html#50446350_24674"><EM>
+Figure 3-1</EM></A>.</P>
+<P>
+<A NAME="50446350_pgfId-548994"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-21.gif">
+
+<P>
+<A NAME="50446350_pgfId-548940"></A>Figure 3-10 <A NAME="50446350_72927"></A>Examples of 3D geometric shapes</P>
+<P>
+<A NAME="50446350_pgfId-285315"></A>You can also attach geometry directly to a body to form <EM>
+construction geometry</EM><A NAME="50446350_marker-285313"></A><A NAME="50446350_marker-285314"></A><A NAME="50446350_marker-314289"></A><A NAME="50446350_marker-314431"></A>, as a means of keeping relevant entities with the body. For example, you might want to attach a point to a body that represents its center of gravity. </P>
+<P>
+<A NAME="50446350_pgfId-285318"></A>Parasolid also supports <EM>
+orphan geometry</EM><A NAME="50446350_marker-285316"></A><A NAME="50446350_marker-285317"></A><A NAME="50446350_marker-314291"></A><A NAME="50446350_marker-314489"></A>, which is not attached to any topological entity. This is useful if you want to create geometry prior to using it in a body, for example, to create a surface before incorporating it into a body.</P>
+<P>
+<A NAME="50446350_pgfId-285124"></A><A NAME="50446350_marker-285122"></A><A NAME="50446350_marker-285123"></A>There are four main classes of geometric entity: </P>
+<P>
+<A NAME="50446350_pgfId-285150"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-285127"></A>Geometry</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-285129"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-615525"></A>Lattice</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-615527"></A><EM>
+Lattices</EM> are a geometry type that can be created, enquired of rendered and attached to a part as construction geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-615739"></A>Surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-615741"></A><EM>
+Surfaces</EM> are principally attached to faces. Normally every face has an attached surface, but it may be detached temporarily as the model is being built or modified. There are several subtypes of surface, such as plane, sphere cone and mesh</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-285137"></A>Curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-285142"></A><EM>
+Curves</EM><A NAME="50446350_marker-645272"></A><A NAME="50446350_marker-645273"></A><A NAME="50446350_marker-645274"></A><A NAME="50446350_marker-645275"></A><A NAME="50446350_marker-645276"></A><A NAME="50446350_marker-645277"></A> are principally attached to edges or fins of the model. There are several subtypes of curve, such as circle, ellipse line, and polyline..<A NAME="50446350_marker-645279"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-285144"></A>Point</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-285149"></A><EM>
+Points</EM><A NAME="50446350_marker-645283"></A><A NAME="50446350_marker-645284"></A><A NAME="50446350_marker-645285"></A><A NAME="50446350_marker-645286"></A><A NAME="50446350_marker-645287"></A><A NAME="50446350_marker-645288"></A> are principally attached to vertices. All points are Cartesian<EM>
+</EM></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446350_pgfId-290068"></A>Only entities of surface, curve and point classes may also be attached directly to bodies as construction geometry.</P>
+<P>
+<A NAME="50446350_pgfId-284941"></A><A NAME="50446350_marker-645292"></A><A NAME="50446350_marker-645293"></A><A NAME="50446350_marker-645294"></A>In order to reduce the overall size of a model, geometry can be shared both within a single body, and across collections of bodies. Geometry can be shared in the following ways: </P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-274450"></A>Edges or fins with a common direction can share a common curve</LI>
+<LI>
+<A NAME="50446350_pgfId-274451"></A>Faces can share a common surface</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446350_pgfId-274452"></A>3.4	<A NAME="50446350_74163"></A><A NAME="50446350_marker-314233"></A><A NAME="50446350_marker-314695"></A><A NAME="50446350_marker-314619"></A><A NAME="50446350_marker-314543"></A>Other entities
+
+
+</H1>
+<P>
+<A NAME="50446350_pgfId-274455"></A><A NAME="50446350_marker-274453"></A><A NAME="50446350_marker-274454"></A>Parasolid supports a number of other entities so that you can manipulate and attach additional data to a model. The most useful ones are:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-275422"></A><EM>
+Groups</EM><A NAME="50446350_marker-314627"></A><A NAME="50446350_marker-314625"></A><A NAME="50446350_marker-314623"></A>, which let you group together arbitrary collections of entities within a body. See <A HREF="ov_chap.16.html#50446385_75817">Section 15.4, &#8220;Groups&#8221;</A>, for more information. <A NAME="50446350_marker-315783"></A></LI>
+<LI>
+<A NAME="50446350_pgfId-275426"></A><EM>
+Attributes</EM><A NAME="50446350_marker-314301"></A><A NAME="50446350_marker-314697"></A><A NAME="50446350_marker-314631"></A>, which are data structures containing arbitrary information that can be attached to any other Parasolid entity. See <A HREF="ov_chap.16.html#50446385_22337">Section 15.2, &#8220;Attaching attribute information&#8221;</A>, for more information.<A NAME="50446350_marker-315798"></A></LI>
+<LI>
+<A NAME="50446350_pgfId-274487"></A><EM>
+Transforms</EM><A NAME="50446350_marker-314303"></A><A NAME="50446350_marker-314699"></A><A NAME="50446350_marker-314633"></A>, or transformations, which are used to express geometric operations such translation, reflection, rotation or scale. You can use transforms to specify certain modelling and rendering operations, such as creating assemblies. See <A HREF="ov_chap.04.html#50446350_74959">Section 3.5, &#8220;Assemblies and instances&#8221;</A>.<A NAME="50446350_marker-315815"></A></LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446350_pgfId-274490"></A>3.5	<A NAME="50446350_74959"></A><A NAME="50446350_marker-314235"></A><A NAME="50446350_marker-314639"></A><A NAME="50446350_marker-314637"></A><A NAME="50446350_marker-314635"></A>Assemblies and instances<A NAME="50446350_marker-315840"></A><A NAME="50446350_marker-316301"></A>
+
+
+</H1>
+<P>
+<A NAME="50446350_pgfId-274491"></A>You can create more complex models in Parasolid by combining any number of bodies into larger <EM>
+assemblies</EM> that contain information about how the bodies contained in the assembly are structured. <A HREF="ov_chap.04.html#50446350_87673"><EM>
+Figure 3-11</EM></A> shows a trivial example in which a toy car assembly is created by combining a body part with a wheel assembly, which is itself created from a wheel part and an axle part.</P>
+<P>
+<A NAME="50446350_pgfId-424007"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-22.gif">
+
+<P>
+<A NAME="50446350_pgfId-285529"></A>Figure 3-11 <A NAME="50446350_87673"></A>Combining different bodies into more complex assemblies</P>
+<P>
+<A NAME="50446350_pgfId-285781"></A>Each component in an assembly is an <EM>
+instance</EM><A NAME="50446350_marker-314307"></A><A NAME="50446350_marker-314701"></A><A NAME="50446350_marker-314645"></A> of a part:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-285806"></A>The car assembly contains an instance of the body part, and two instances of the wheel assembly</LI>
+<LI>
+<A NAME="50446350_pgfId-285870"></A>The wheel assembly contains an instance of the axle part, and two instances of the wheel part.</LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-274494"></A>An <A NAME="50446350_marker-274493"></A>assembly is therefore just a collection of instances, where each instance is a pointer to a part used in the assembly that references:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-274495"></A>The <EM>
+part</EM><A NAME="50446350_marker-314309"></A><A NAME="50446350_marker-314703"></A><A NAME="50446350_marker-314647"></A> itself (either a body or another assembly).</LI>
+<LI>
+<A NAME="50446350_pgfId-274496"></A>A <EM>
+transform</EM><A NAME="50446350_marker-314311"></A><A NAME="50446350_marker-314705"></A><A NAME="50446350_marker-314649"></A> that positions the part in the coordinate frame of the assembly. </LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-286244"></A>To support reuse of modelling data, assemblies can contain any number of instances of the same part. You can also attach construction geometry to an assembly.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-286120"></A>	3.5.1 	<A NAME="50446350_marker-314237"></A><A NAME="50446350_marker-314531"></A>Restrictions on assemblies</H2>
+<P>
+<A NAME="50446350_pgfId-290933"></A>Assemblies in Parasolid can only convey structural information about the components in the assembly. In particular, they do not in themselves constitute a complete assembly management system.</P>
+<P>
+<A NAME="50446350_pgfId-286914"></A>Assembly information in Parasolid is subject to a number of basic restrictions:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-286915"></A>Instances cannot exist outside an assembly.</LI>
+<LI>
+<A NAME="50446350_pgfId-286916"></A>Instances cannot reference a null part.</LI>
+<LI>
+<A NAME="50446350_pgfId-286075"></A>Instances must reference a <STRONG>
+rigid</STRONG> transform: scale, shear, reflection, and perspective are not supported within the context of assemblies.</LI>
+<LI>
+<A NAME="50446350_pgfId-381683"></A>Assemblies cannot directly or indirectly instance themselves. Cyclic trees of assemblies and parts, as shown in <A HREF="ov_chap.04.html#50446350_38854"><EM>
+Figure 3-12</EM></A>, are not allowed.</LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-382034"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-23.gif">
+
+<P>
+<A NAME="50446350_pgfId-274541"></A>Figure 3-12 <A NAME="50446350_38854"></A>Cyclic and acyclic trees of assemblies and parts</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446350_pgfId-274847"></A>3.6	<A NAME="50446350_85083"></A><A NAME="50446350_marker-314239"></A><A NAME="50446350_marker-314413"></A><A NAME="50446350_marker-314411"></A><A NAME="50446350_marker-314707"></A><A NAME="50446350_marker-314653"></A>Accuracy of Parasolid models<A NAME="50446350_marker-315890"></A>
+
+
+</H1>
+<P>
+<A NAME="50446350_pgfId-289107"></A>A Parasolid model is very precise. All calculations are performed to fixed accuracies called the <EM>
+session precision</EM><A NAME="50446350_marker-289105"></A><A NAME="50446350_marker-289106"></A><A NAME="50446350_marker-314313"></A><A NAME="50446350_marker-314709"></A><A NAME="50446350_marker-314655"></A><A NAME="50446350_marker-314501"></A> and <EM>
+session angle precision</EM><A NAME="50446350_marker-289108"></A><A NAME="50446350_marker-289109"></A><A NAME="50446350_marker-314315"></A><A NAME="50446350_marker-314499"></A><A NAME="50446350_marker-314497"></A>.</P>
+<P>
+<A NAME="50446350_pgfId-289125"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-289112"></A>Precision</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-289114"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-289116"></A>Session precision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-289118"></A>The linear precision of the modeler. Parasolid session precision is 1.0e-8 units. Distances less than this value are treated as zero and distances that differ by no more than this value are treated as equal. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-289121"></A>Session angle precision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-289123"></A>The smallest angle (in radians) that is treated as different from zero. Parasolid session angle precision is 1.0e-11 units. Angles less than this value are treated as zero and angles that differ by no more than this value are treated as equal. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446350_pgfId-289128"></A><A NAME="50446350_marker-648471"></A>To handle precision correctly, all parts of a body must lie inside the Parasolid <EM>
+size box</EM><A NAME="50446350_marker-648475"></A><A NAME="50446350_marker-648476"></A><A NAME="50446350_marker-648477"></A><A NAME="50446350_marker-648478"></A><A NAME="50446350_marker-648479"></A><A NAME="50446350_marker-648480"></A><A NAME="50446350_marker-648481"></A>. This is a box, 1000 units on each side and centered at the origin, that represents the whole of model space. Typically, the default unit in your application is set to one meter, giving 1 kilometer as the maximum size, in any one direction, that can be modeled. </P>
+<P>
+<A NAME="50446350_pgfId-648857"></A>Parasolid also supports the use of large transformations in situations where a body lies within the size box but can be positioned by a large transform outside the size box. This can be useful for example in designing factories when deciding where to position objects (such as machinery) around the factory. Each component of the factory is &#8220;small&#8221; but the factory itself may extend to a few kilometers in size. </P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-289631"></A>	3.6.1 	<A NAME="50446350_marker-648484"></A><A NAME="50446350_marker-648485"></A>Tolerant Modelling</H2>
+<P>
+<A NAME="50446350_pgfId-289317"></A>Parts created by other modelers can be imported into Parasolid and used in modelling operations. However, such parts will almost certainly have been created in a modeler that uses a lower precision. Once imported, they may contain inconsistencies between their topological and geometric data: edges which, topologically, should meet at a common point have attached geometric data that does not intersect.</P>
+<P>
+<A NAME="50446350_pgfId-289321"></A>To enable Parasolid to model successfully with imported parts, you can set a <EM>
+local precision</EM><A NAME="50446350_marker-314319"></A><A NAME="50446350_marker-314461"></A> on the edges and vertices of any externally created part. The use of such local precisions is known as <EM>
+Tolerant Modelling</EM><A NAME="50446350_marker-314321"></A><A NAME="50446350_marker-314507"></A>.</P>
+<P>
+<A NAME="50446350_pgfId-289552"></A>When using Tolerant Modelling, think of edges as tubes and vertices as spheres. If you lower the precision, the tubes become thicker and the spheres become larger. To use Tolerant Modelling effectively, you need to examine the topology for each part and, where there is inconsistency in the data, lower the local precision until the geometric data intersects. </P>
+<P>
+<A NAME="50446350_pgfId-289553"></A>Edges and vertices which don&#8217;t have a local precision set are considered <EM>
+exact</EM><A NAME="50446350_marker-314547"></A><A NAME="50446350_marker-314445"></A><A NAME="50446350_marker-314545"></A><A NAME="50446350_marker-314443"></A> by Parasolid, and have a precision of one half of the session precision.</P>
+<P>
+<A NAME="50446350_pgfId-289348"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50446350_pgfId-289344"></A>Note: Tolerant Modelling is intrinsic to Parasolid, and its use spreads far wider than data import. Although the vast majority of calculations are performed to very precise fixed accuracies, so as to maintain session precision and consistency between topological and geometric data, many modelling operations (for instance, many involving B-surfaces) use tolerances (to a user-supplied precision) to allow operations to succeed where an accurate solution is not possible. All Parasolid operations work on both accurate and tolerant models.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446350_pgfId-290175"></A>For a typical example of how Tolerant Modelling is used within Parasolid, see <A HREF="ov_chap.12.html#50446348_72522">Section 11.2, &#8220;Trimmed surface import&#8221;</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-274849"></A>	3.6.2 	<A NAME="50446350_27206"></A><A NAME="50446350_marker-314243"></A><A NAME="50446350_marker-314473"></A>Nominal geometry</H2>
+<P>
+<A NAME="50446350_pgfId-274851"></A><EM>
+Nominal geometry</EM><A NAME="50446350_marker-274850"></A><A NAME="50446350_marker-314325"></A><A NAME="50446350_marker-314475"></A> is a mechanism whereby edges that are locally tolerant may also reference a notional accurate curve.</P>
+<P>
+<A NAME="50446350_pgfId-274852"></A>Any edge which has local precision can have nominal geometry that defines the Parasolid body attached to its fins. These nominal curves must all lie within a <EM>
+precision pipe</EM><A NAME="50446350_marker-314327"></A> whose diameter is the edge&#8217;s local precision. Exact edges cannot have nominal geometry attached, because to do so would be meaningless.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446350_pgfId-274855"></A>3.7	<A NAME="50446350_87428"></A>More about bodies
+
+
+</H1>
+<P>
+<A NAME="50446350_pgfId-274858"></A><A NAME="50446350_marker-274856"></A><A NAME="50446350_marker-274857"></A>Bodies in Parasolid are divided into the following broad categories: </P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-423462"></A>Manifold bodies. See <A HREF="ov_chap.04.html#50446350_39368">Section 3.7.1</A>.</LI>
+<LI>
+<A NAME="50446350_pgfId-423466"></A>General bodies. See <A HREF="ov_chap.04.html#50446350_99561">Section 3.7.2</A>.</LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-423474"></A>Parasolid also provides functionality to check whether a body is valid. This is described in <A HREF="ov_chap.04.html#50446350_19613">Section 3.7.3</A>.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-282389"></A>	3.7.1 	<A NAME="50446350_marker-282387"></A><A NAME="50446350_39368"></A><A NAME="50446350_marker-314247"></A><A NAME="50446350_marker-314715"></A><A NAME="50446350_marker-314665"></A><A NAME="50446350_marker-314463"></A>Manifold bodies<A NAME="50446350_marker-315974"></A></H2>
+<P>
+<A NAME="50446350_pgfId-282390"></A>A manifold body is, broadly speaking, any body that can exist in the real world or could be manufactured. The following manifold body types are supported by Parasolid:</P>
+<P>
+<A NAME="50446350_pgfId-282425"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282396"></A>Body type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282398"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282400"></A>Acorn</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282403"></A><A NAME="50446350_marker-282402"></A>This is the simplest type of body: a body of zero dimensions comprising one or more points in space. An acorn body has one infinite void region, containing any number of shells, each of which contains only a single vertex. </P>
+<P>
+<A NAME="50446350_pgfId-282404"></A>A <EM>
+minimum body</EM><A NAME="50446350_marker-314329"></A><A NAME="50446350_marker-314717"></A><A NAME="50446350_marker-314667"></A><A NAME="50446350_marker-314465"></A> is a special case of an acorn body that must consist of a single void region with a single shell consisting of a single acorn vertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282406"></A>Wire</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282410"></A><A NAME="50446350_marker-282408"></A><A NAME="50446350_marker-282409"></A>A wire body is one step up from a minimum body: a topologically one-dimensional body. Each component in a wire body is a set of connected edges:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-282412"></A><A NAME="50446350_marker-282411"></A>an <EM>
+open</EM><A NAME="50446350_marker-314331"></A><A NAME="50446350_marker-314481"></A><A NAME="50446350_marker-314479"></A><A NAME="50446350_marker-314477"></A> component in a wire body has two ends</LI>
+<LI>
+<A NAME="50446350_pgfId-282414"></A><A NAME="50446350_marker-282413"></A>a <EM>
+closed</EM><A NAME="50446350_marker-314333"></A><A NAME="50446350_marker-314535"></A><A NAME="50446350_marker-314421"></A><A NAME="50446350_marker-314419"></A> component in a wire body has no ends</LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-282915"></A>A wire body has one infinite void region containing any number of shells, each of which contains a single set of connected edges. <A NAME="50446350_marker-316013"></A><A NAME="50446350_marker-316315"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282416"></A>Sheet</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282419"></A><A NAME="50446350_marker-282418"></A>A sheet body is topologically two-dimensional. Each component in a sheet body is either <EM>
+open</EM><A NAME="50446350_marker-314335"></A><A NAME="50446350_marker-314487"></A><A NAME="50446350_marker-314485"></A><A NAME="50446350_marker-314483"></A> (e.g. a bounded plane) or <EM>
+closed</EM><A NAME="50446350_marker-314337"></A><A NAME="50446350_marker-314537"></A><A NAME="50446350_marker-314427"></A><A NAME="50446350_marker-314425"></A> (e.g. a hollow sphere or torus whose walls have zero thickness). A sheet body that contains only open components has one infinite void region containing any number of shells, each of which contains a single set of connected faces. For each closed component, there is an extra bounded void region representing the interior of the closed component. Parasolid supports both single-faced and multiple-faced sheet bodies.<A NAME="50446350_marker-316042"></A><A NAME="50446350_marker-316311"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282421"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-282424"></A><A NAME="50446350_marker-315410"></A>A solid body is three-dimensional and occupies a finite volume. The volume of each component in a solid body is continuous. Each solid component has a continuous bound volume. A solid body has one infinite void region, one solid region for each continuous solid volume, and one void region for each bounded continuous void volume.<A NAME="50446350_marker-316051"></A><A NAME="50446350_marker-316313"></A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446350_pgfId-282426"></A>You might frequently progress through all of the manifold body types in the process of making a solid. Beginning with a minimal body, you can turn it into a wire by scribing lines onto it. Closing the profile turns it into a sheet, which needs a new surface. You can then sweep or swing the sheet to form a solid.</P>
+<P>
+<A NAME="50446350_pgfId-282427"></A>Any type of manifold body may be disjoint, that is, comprising several disconnected pieces. Using a single body to represent disjoint components in this way is a useful method of tracking data in a feature modeler. For example, <A HREF="ov_chap.04.html#50446350_81314"><EM>
+Figure 3-13</EM></A> shows the result of subtracting a cylinder from a block.</P>
+<P>
+<A NAME="50446350_pgfId-398225"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-24.gif">
+
+<P>
+<A NAME="50446350_pgfId-398227"></A>Figure 3-13 <A NAME="50446350_81314"></A>Manifold body consisting of four disconnected pieces</P>
+<P>
+<A NAME="50446350_pgfId-302030"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50446350_pgfId-302029"></A>Note: The body in <A HREF="ov_chap.04.html#50446350_81314"><EM>
+Figure 3-13</EM></A> could be represented as either a single disjoint solid or four separate solids.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-274865"></A>	3.7.2 	<A NAME="50446350_99561"></A><A NAME="50446350_marker-314249"></A><A NAME="50446350_marker-314719"></A><A NAME="50446350_marker-314669"></A><A NAME="50446350_marker-314451"></A><A NAME="50446350_marker-314671"></A>General bodies<A NAME="50446350_marker-316073"></A></H2>
+<P>
+<A NAME="50446350_pgfId-274868"></A><A NAME="50446350_marker-274866"></A><A NAME="50446350_marker-274867"></A>A general body is a collection of entities (faces, edges and vertices) and connected three dimensional regions into which space is divided by the entities. Each region is either solid or void, indicating whether or not it represents material. General bodies differ from manifold bodies in that they usually cannot exist in the real world. </P>
+<P>
+<A NAME="50446350_pgfId-421937"></A>General bodies can be any of the following:</P>
+<P>
+<A NAME="50446350_pgfId-422098"></A><A NAME="50446350_84426"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422060"></A>Body type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422062"></A>Usage</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422064"></A>Example</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422066"></A>Bodies with internal partitions</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422068"></A>You can use internal partition faces to subdivide solids for use in, for example, cellular modelling applications. Your application can also model bodies of mixed material using this body type.<A NAME="50446350_marker-422069"></A><A NAME="50446350_marker-422070"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422075"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-25.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422077"></A>Bodies of mixed dimensions</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422079"></A>These let you create idealized representations of bodies. For example, a cooling hole in a body could be represented by a wire edge with no thickness.<A NAME="50446350_marker-422080"></A><A NAME="50446350_marker-422081"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422086"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-26.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422088"></A>Non-manifold bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422090"></A>Non-manifold bodies can sometimes occur at an intermediate stage during a modelling operation, such as a boolean.</P>
+<P>
+<A NAME="50446350_pgfId-422091"></A>In this example the edge between the two bosses is non-manifold: there are four faces meeting at this edge.<A NAME="50446350_marker-422092"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-422097"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-27.gif">
+
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446350_pgfId-290387"></A>	3.7.3 	<A NAME="50446350_19613"></A><A NAME="50446350_marker-314251"></A><A NAME="50446350_marker-314533"></A><A NAME="50446350_marker-314521"></A>Checking the validity of a body<A NAME="50446350_marker-316113"></A></H2>
+<P>
+<A NAME="50446350_pgfId-290554"></A>When creating models, it is important to ensure that the model remains valid throughout (or, at least, at significant points in the design process). Parasolid supports functionality to let you check whether or not a body is valid, in order to:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-290589"></A>help you to debug your application code</LI>
+<LI>
+<A NAME="50446350_pgfId-290590"></A>validate the results of modelling operations</LI>
+<LI>
+<A NAME="50446350_pgfId-290591"></A>help you to create valid models from imported data</LI>
+<LI>
+<A NAME="50446350_pgfId-290592"></A>help your users to repair invalid models</LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-290582"></A><A NAME="50446350_marker-290388"></A><A NAME="50446350_marker-290389"></A>Parasolid provides two methods for checking whether or not a body is valid:</P>
+<P>
+<A NAME="50446350_pgfId-290636"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-290642"></A>Type of check</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-290644"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-290646"></A>Full body checking</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-290668"></A><A NAME="50446350_marker-290666"></A><A NAME="50446350_marker-290667"></A>When a full body check is performed, every entity in the body is checked. Full body checking is called using a specific function call. By default, Parasolid performs all the checks appropriate to a given entity. However, you can control which checks are applied by supplying relevant options. Different checks are performed in groups and in a certain sequence, where each group of checks only proceeds if the previous checks have all passed; therefore, checks which rely on the results of previous checks are omitted if these have failed. <A NAME="50446350_marker-316120"></A><A NAME="50446350_marker-316297"></A><A NAME="50446350_marker-316295"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-290650"></A>Local checking</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446350_pgfId-290692"></A><A NAME="50446350_marker-290690"></A><A NAME="50446350_marker-290691"></A>Local checking only performs checks on entities that are affected by specific local operations, to test whether a body has been invalidated by the operation. Local checking is switched on using an option in the local operation call itself. If the body was already invalid before the operation, in a region not affected by the operation, local checking does not guaranteed to identify the body as invalid.<A NAME="50446350_marker-316127"></A><A NAME="50446350_marker-316299"></A></P>
+<P>
+<A NAME="50446350_pgfId-290693"></A>When Parasolid performs local operations with checking off, only relevant simple checks are performed on the integrity of the body after the operation. This is useful if the resulting body is an intermediate stage which you expect to be invalid.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50446350_pgfId-290406"></A>3.7.3.1 <A NAME="50446350_marker-314253"></A><A NAME="50446350_marker-314441"></A>What gets checked</H4>
+<P>
+<A NAME="50446350_pgfId-290708"></A>In the case of full body checking, Parasolid offers options to let you control exactly what gets checked. You can choose to check for problems such as:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-290716"></A>Inconsistencies in topology or geometry</LI>
+<LI>
+<A NAME="50446350_pgfId-290728"></A>Self-intersecting faces,</LI>
+<LI>
+<A NAME="50446350_pgfId-290733"></A>Corrupt data<A NAME="50446350_marker-316140"></A><A NAME="50446350_marker-316291"></A></LI>
+<LI>
+<A NAME="50446350_pgfId-290738"></A>Violations of the size box<A NAME="50446350_marker-316147"></A><A NAME="50446350_marker-316317"></A></LI>
+</UL>
+<P>
+<A NAME="50446350_pgfId-290753"></A>If local checking is on for a given function call, a standard set of checks are performed, as follows:</P>
+<UL>
+<LI>
+<A NAME="50446350_pgfId-290776"></A><A NAME="50446350_marker-316151"></A>Self-intersecting faces are identified</LI>
+<LI>
+<A NAME="50446350_pgfId-290784"></A>Pairs of affected faces are selected and checked in turn to ensure that they intersect correctly</LI>
+<LI>
+<A NAME="50446350_pgfId-290793"></A><A NAME="50446350_marker-316155"></A>Shells are checked, to determine if the body needs negating, and negations are performed as necessary.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50446350_pgfId-290703"></A>3.7.3.2 <A NAME="50446350_marker-314255"></A><A NAME="50446350_marker-314513"></A><A NAME="50446350_marker-314511"></A>When to use checking</H4>
+<P>
+<A NAME="50446350_pgfId-290547"></A><A NAME="50446350_marker-290407"></A>Checking can be a time consuming operation. For instance, when local checking is on, each affected face is checked to ensure it is consistent with itself and with every other face in the body. Despite this, local checking is usually much more efficient than full body checking, especially if the local operation only affects a small proportion of the body&#8217;s entities. </P>
+<P>
+<A NAME="50446350_pgfId-290537"></A>To save time, you can turn local checking off to when you are performing a sequence of local operations, or if you want one of the intermediate operations to create an invalid body. However, you should perform a full body check on the final body and, if this indicates an invalidity, you should roll back to a point before the appropriate local operation and try a different approach.</P>
+<P>
+<A NAME="50446350_pgfId-290384"></A>&nbsp;</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.03.html">About Parasolid</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.05.html">Booleans and Related Functionality</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

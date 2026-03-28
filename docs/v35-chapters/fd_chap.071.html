@@ -1,0 +1,448 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Moving Faces</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Moving Faces</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.070.html">Filling Holes In A Body</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.072.html">Creating New Bodies From Existing Entities</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-325148">70.1	Introduction </A>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-294728">70.2	Transforming faces </A>
+<UL>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-294774">70.2.1	Creating step faces </A>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-294819">70.2.2	Controlling the growth of overflowing faces </A>
+</UL>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-296493">70.3	Spinning or sweeping an entity </A>
+<UL>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-296571">70.3.1	Direction of spin </A>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-296608">70.3.2	Use of spin/sweep </A>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-296768">70.3.3	New entities from spin/sweep </A>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-296777">70.3.4	Effect on existing edges </A>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-296784">70.3.5	Creating general bodies when spinning </A>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-296870">70.3.6	Spinning B-surface geometry </A>
+</UL>
+<LI> <A HREF="fd_chap.071.html#50422146_pgfId-296487">70.4	Offsetting faces </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422146_pgfId-325148"></A>70.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422146_pgfId-325174"></A>This chapter describes how faces can be transformed, swept, spun or offset using Parasolid functionality. </P>
+<P>
+<A NAME="50422146_pgfId-324642"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-324537"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422146_pgfId-324522"></A><A HREF="fd_chap.073.html#50422148_">Chapter 72, “Generic Face Editing”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422146_pgfId-294728"></A>70.2	<A NAME="50422146_70612"></A>Transforming faces 
+
+
+</H1>
+<P>
+<A NAME="50422146_pgfId-294730"></A><A NAME="50422146_marker-294729"></A><A HREF=../headers/pk_face_transform_2.html>PK_FACE_transform_2</A> transforms the geometry of sets of faces in a body. It fails if you attempt transforms on faces where no surface geometry exists. All faces in a face set must belong to the same body, so it is not possible to transform two bodies at the same time.</P>
+<P>
+<A NAME="50422146_pgfId-294734"></A><A HREF="fd_chap.071.html#50422146_59731"><EM>
+Figure 70-1</EM></A> shows a body in which one face has been translated, and two have been rotated.</P>
+<P>
+<A NAME="50422146_pgfId-295683"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-823.gif">
+
+<P>
+<A NAME="50422146_pgfId-295685"></A>Figure 70-1 <A NAME="50422146_59731"></A>Transformation applied to a list of faces</P>
+<P>
+<A NAME="50422146_pgfId-294771"></A><A HREF=../headers/pk_face_transform_2.html>PK_FACE_transform_2</A> allows you to perform the transformation in a variety of ways, by passing in both the following:</P>
+<UL>
+<LI>
+<A NAME="50422146_pgfId-294772"></A>Either a face, an array of faces, or an array of face arrays</LI>
+<LI>
+<A NAME="50422146_pgfId-294773"></A>Either a transform, or an array of transforms</LI>
+</UL>
+<P>
+<A NAME="50422146_pgfId-373302"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422146_pgfId-373301"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422146_pgfId-294774"></A>	70.2.1 	Creating step faces </H3>
+<P>
+<A NAME="50422146_pgfId-294775"></A>You can use the <CODE>
+transform_step</CODE>
+ option to choose whether to create step faces when performing rotation or translation transforms. This option provides the same functionality as is available for the function <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>: see <A HREF="fd_chap.073.html#50422148_10386" CLASS="XRef">Section 72.4.3, “Transform options”</A>, for a full description. <A HREF="fd_chap.071.html#50422146_74822"><EM>
+Figure 70-2</EM></A> shows a simple example in which a step face is created when translating a face imprinted on a block.</P>
+<P>
+<A NAME="50422146_pgfId-294815"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-824.gif">
+
+<P>
+<A NAME="50422146_pgfId-294817"></A>Figure 70-2 <A NAME="50422146_74822"></A>Creating step faces when transforming faces</P>
+
+
+<H3>
+<A NAME="50422146_pgfId-294819"></A>	70.2.2 	<A NAME="50422146_33665"></A>Controlling the growth of overflowing faces </H3>
+<P>
+<A NAME="50422146_pgfId-294820"></A>When features with different convexities overflow each other as a result of transformations, you can control which of the clashing features is grown to heal the model using the <CODE>
+grow</CODE>
+ option. </P>
+<P>
+<A NAME="50422146_pgfId-294824"></A><A HREF="fd_chap.071.html#50422146_28250"><EM>
+Figure 70-3</EM></A> shows a simple example of the effects that you can achieve using this functionality. </P>
+<P>
+<A NAME="50422146_pgfId-294858"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-825.gif">
+
+<P>
+<A NAME="50422146_pgfId-294860"></A>Figure 70-3 <A NAME="50422146_28250"></A>Controlling the growth of overflowing features with different convexity</P>
+<P>
+<A NAME="50422146_pgfId-294861"></A>This option is available in a range of different functional areas, including local operations, hollowing, and thickening. For a full description, see <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A>.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422146_pgfId-296493"></A>70.3	<A NAME="50422146_62726"></A>Spinning or sweeping an entity 
+
+
+</H1>
+<P>
+<A NAME="50422146_pgfId-296494"></A>The following functions let you spin or sweep an entity as follows:</P>
+<P>
+<A NAME="50422146_pgfId-373434"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50422146_pgfId-296497"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296501"></A>Entity</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296503"></A>Result</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="4" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296506"></A><A NAME="50422146_marker-373595"></A><A HREF=../headers/pk_body_spin.html>PK_BODY_spin</A></P>
+</TD>
+<TD ROWSPAN="4" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296509"></A><A NAME="50422146_marker-373598"></A><A HREF=../headers/pk_body_sweep.html>PK_BODY_sweep</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296511"></A>minimal body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296513"></A>wire body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296519"></A>wire body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296521"></A>sheet body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296527"></A>sheet body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296529"></A>solid body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296535"></A>general body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296537"></A>general body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296540"></A><A NAME="50422146_marker-373629"></A><A HREF=../headers/pk_curve_spin_2.html>PK_CURVE_spin_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296543"></A><A NAME="50422146_marker-373632"></A><A HREF=../headers/pk_curve_sweep.html>PK_CURVE_sweep</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296545"></A>curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296547"></A>surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296550"></A><A NAME="50422146_marker-373639"></A><A HREF=../headers/pk_face_spin.html>PK_FACE_spin</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296553"></A><A NAME="50422146_marker-373642"></A><A HREF=../headers/pk_face_sweep.html>PK_FACE_sweep</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296555"></A>one or more faces of a solid or sheet body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296557"></A>solid body or sheet body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296560"></A><A NAME="50422146_marker-373649"></A><A HREF=../headers/pk_vertex_spin.html>PK_VERTEX_spin</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296563"></A><A NAME="50422146_marker-373652"></A><A HREF=../headers/pk_vertex_sweep.html>PK_VERTEX_sweep</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296565"></A>end vertex of a wire body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422146_pgfId-296567"></A>wire body</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422146_pgfId-333510"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422146_pgfId-333532"></A>Note: Except for <A HREF=../headers/pk_vertex_spin.html>PK_VERTEX_spin</A> and <A HREF=../headers/pk_vertex_sweep.html>PK_VERTEX_sweep</A>, the functionality described in this section does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422146_pgfId-296571"></A>	70.3.1 	<A NAME="50422146_marker-373663"></A><A NAME="50422146_marker-373664"></A>Direction of spin </H3>
+<P>
+<A NAME="50422146_pgfId-296572"></A>When an entity is spun, the right hand corkscrew rule is applied to determine the direction of the spin.</P>
+<P>
+<A NAME="50422146_pgfId-296606"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-826.gif">
+
+<P>
+<A NAME="50422146_pgfId-296607"></A>Figure 70-4 The spin axis</P>
+
+
+<H3>
+<A NAME="50422146_pgfId-296608"></A>	70.3.2 	Use of spin/sweep </H3>
+<P>
+<A NAME="50422146_pgfId-296609"></A>It is often easiest to create a new entity to sweep or spin, rather than using an existing one. For example, when sweeping or spinning a face, you can create a face by scribing lines onto the face of a solid or sheet body to create new edges on that face. If these lines divide the existing face into several pieces, then all but one of the pieces becomes a new face. You can then sweep or spin one of the faces to extend the original solid. This technique allows you to use existing geometry to create a new entity, ensuring that the profile for the spin or sweep operation is in the right place. <A HREF="fd_chap.071.html#50422146_71999"><EM>
+Figure 70-5</EM></A> shows an example of this technique, in which a pocket is created on the face of a solid:</P>
+<P>
+<A NAME="50422146_pgfId-296762"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-827.gif">
+
+<P>
+<A NAME="50422146_pgfId-296764"></A>Figure 70-5 <A NAME="50422146_71999"></A>Scribing and sweeping to create a pocket</P>
+
+
+<H3>
+<A NAME="50422146_pgfId-296768"></A>	70.3.3 	<A NAME="50422146_marker-296765"></A><A NAME="50422146_marker-296766"></A><A NAME="50422146_marker-296767"></A>New entities from spin/sweep </H3>
+<P>
+<A NAME="50422146_pgfId-296769"></A>When entities are spun or swept, extra faces and edges are produced.</P>
+<P>
+<A NAME="50422146_pgfId-296770"></A>Any new surfaces created are analytic surfaces if possible. If it is not possible to use an analytic surface then the class of the new surface depends upon the most recent call to <A NAME="50422146_marker-296771"></A><A HREF=../headers/pk_session_set_swept_spun_surfs.html>PK_SESSION_set_swept_spun_surfs</A> The surface may be PK_CLASS_spun or PK_CLASS_swept if allowed, otherwise it is PK_CLASS_bsurf. The current setting is returned by <A NAME="50422146_marker-296772"></A><A HREF=../headers/pk_session_ask_swept_spun_surfs.html>PK_SESSION_ask_swept_spun_surfs</A>.</P>
+
+
+<H3>
+<A NAME="50422146_pgfId-296777"></A>	70.3.4 	<A NAME="50422146_marker-296773"></A><A NAME="50422146_marker-296774"></A><A NAME="50422146_marker-296775"></A><A NAME="50422146_marker-296776"></A>Effect on existing edges </H3>
+<P>
+<A NAME="50422146_pgfId-296778"></A>The edges that were present before the operation still exist after the operation in general, though it is possible that they are translated or rotated as a consequence of the operation.</P>
+<P>
+<A NAME="50422146_pgfId-296779"></A>The exception to this rule occurs when <A HREF=../headers/pk_body_spin.html>PK_BODY_spin</A> is called with a spin of 360&#176;. If the surface that is attached to the face that is created by a spin of 360&#176; is analytic or generated then the edges of the original body disappear. For example, this happens when a circle or ellipse is spun about an axis orthogonal to the circle or ellipse normal and the point, about which the circle or ellipse is spun, lies in the plane of the circle or ellipse.</P>
+
+
+<H3>
+<A NAME="50422146_pgfId-296784"></A>	70.3.5 	<A NAME="50422146_marker-296780"></A><A NAME="50422146_marker-296781"></A><A NAME="50422146_marker-296782"></A><A NAME="50422146_marker-296783"></A>Creating general bodies when spinning </H3>
+<P>
+<A NAME="50422146_pgfId-296788"></A>When general topology is enabled in Parasolid, you can spin single faced sheet bodies that touch the spin axis at point contacts (at vertices) by 360&#176;. This results in a general body with non-manifold vertices for every &quot;point contact&quot;. </P>
+<P>
+<A NAME="50422146_pgfId-304289"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-828.gif">
+
+<P>
+<A NAME="50422146_pgfId-296858"></A>Figure 70-6 Spinning sheet bodies that touch the spin axis at point contacts</P>
+<P>
+<A NAME="50422146_pgfId-296862"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422146_pgfId-296861"></A>Note: Your application must merge out the edges of the original sheet body itself, if this is required.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422146_pgfId-296865"></A>For information on how to enable the creation of general topology, see <A HREF="fd_chap.016.html#50422085_32511">Section 15.8, “Creating general bodies”</A>.</P>
+
+
+<H3>
+<A NAME="50422146_pgfId-296870"></A>	70.3.6 	<A NAME="50422146_marker-296867"></A><A NAME="50422146_marker-296868"></A><A NAME="50422146_marker-296869"></A>Spinning B-surface geometry </H3>
+<P>
+<A NAME="50422146_pgfId-296874"></A>When the edges and faces are not split, as shown in <A HREF="fd_chap.071.html#50422146_16124"><EM>
+Figure 70-9</EM></A>, Parasolid represents spun B-surface geometry as rational cubics, creating one patch for each 180 degrees of spin. When this occurs the edges are split corresponding to the patch boundary between the faces, as illustrated:</P>
+<P>
+<A NAME="50422146_pgfId-304578"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-829.gif">
+
+<P>
+<A NAME="50422146_pgfId-296941"></A>Figure 70-7 <A NAME="50422146_23926"></A>Spinning an ellipse or circular arc, that is greater than 180 degrees, by less than 180 degrees - resulting in the edge being split</P>
+<P>
+<A NAME="50422146_pgfId-304751"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-830.gif">
+
+<P>
+<A NAME="50422146_pgfId-296984"></A>Figure 70-8 <A NAME="50422146_17277"></A>Spinning an ellipse or arc, that is less than 180 degrees, or B-curve by more than 180 degrees - resulting in the face being split</P>
+<P>
+<A NAME="50422146_pgfId-304874"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-831.gif">
+
+<P>
+<A NAME="50422146_pgfId-297033"></A>Figure 70-9 <A NAME="50422146_16124"></A>A combination of the operations in <A HREF="fd_chap.071.html#50422146_23926"><EM>
+Figure 70-7</EM></A> and <A HREF="fd_chap.071.html#50422146_17277"><EM>
+Figure 70-8</EM></A></P>
+<P>
+<A NAME="50422146_pgfId-297034"></A>There is still an edge with the same tag as the original edge of the body, but it may split at one or more vertices.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422146_pgfId-296487"></A>70.4	Offsetting faces 
+
+
+</H1>
+<P>
+<A NAME="50422146_pgfId-297697"></A>For information on offsetting operations see <A HREF="fd_chap.059.html#50422133_22949">Chapter 58, “Offsetting”</A>.</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.070.html">Filling Holes In A Body</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.072.html">Creating New Bodies From Existing Entities</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

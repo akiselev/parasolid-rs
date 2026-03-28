@@ -1,0 +1,103 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_ENTITY_find_reparam</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_ENTITY_find_reparam</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                   PK_ENTITY_find_reparam
+(
+<I>--- received arguments ---
+</I>int                               n_entities,
+<A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A>                      *entities,     --- entities whose
+                                                --- parameterisation
+                                                --- quality should be
+                                                --- assessed
+const <A HREF=../headers/pk_entity_find_reparam_o_t.html>PK_ENTITY_find_reparam_o_t</A> *options,      --- find reparam options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_entity_find_reparam_r_t.html>PK_ENTITY_find_reparam_r_t</A> *const results       --- find reparam results
+)
+</B>
+<A NAME="description"></A>
+<I>This function identifies classic geometries, associated with the entities
+received in <B>'entities'</B>, for which the reliability of Parasolid operations could
+be improved by modifying their parameterisation.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity   (MILD)    <B>'entities'</B> contains an entity
+                                            of class other than body, face
+                                            or surface, or is an array of
+                                            more than one body.
+
+<A NAME="documentation"></A>
+The given <B>'entities'</B> should be an array of one of the following: a single body
+(PK_CLASS_body), a collection of one or more faces (PK_CLASS_face) or a
+collection of one or more surfaces (PK_CLASS_surf).
+
+This function searches the entities received in <B>'entities'</B> for classic
+geometries for which the reliability of Parasolid operations could be improved
+by modifying their parameterisation. All of the relevant geometries found are
+grouped into sets in which all the contained geometries share a common
+parameterisation and must be reparameterised simultaneously to preserve the
+geometric dependencies between them (e.g. a collection of offsets of a common
+underlying surface and the underlying surface itself.)
+
+The sets are complete in that all geometries not found in the search but whose
+parameterisation depends on or supports a geometry in the set are also
+included. The parameterisation of geometries within a set will therefore not
+be affected by reparameterisations of geometries outside of it. Conversely the
+parameterisation of geometries outside of the set will not be affected by
+reparameterisation of those within it.
+
+Each set is also associated with a recommended revised parameterisation of the
+geometries it contains.
+
+The return structure <A HREF=../headers/pk_entity_find_reparam_r_t.html>PK_ENTITY_find_reparam_r_t</A> contains the sets of geometries
+and recommended reparameterisations. See its documentation for more details.
+
+Surfaces of the following classes are checked for reparameterisation:
+
+    PK_CLASS_bsurf
+    PK_CLASS_spun ( with the underlying curve of the class PK_CLASS_bcurve )
+    PK_CLASS_swept ( with the underlying curve of the class PK_CLASS_bcurve )
+    PK_CLASS_offset ( with the underlying surface of one of the above )
+
+The structure <A HREF=../headers/pk_entity_find_reparam_o_t.html>PK_ENTITY_find_reparam_o_t</A> contains user control options. See its
+documentation for more details.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

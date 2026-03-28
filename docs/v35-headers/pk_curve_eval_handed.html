@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_eval_handed</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_eval_handed</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> PK_CURVE_eval_handed
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>      curve,              --- curve
+double          t,                  --- curve parameter
+int             n_derivs,           --- number of derivatives
+<A HREF=../headers/pk_hand_t.html>PK_HAND_t</A>       hand_direction,     --- evaluation direction
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>     p[]                 --- point and derivatives.
+)
+</B>
+<A NAME="description"></A>
+<I>The function behaves like <A HREF=../headers/pk_curve_eval.html>PK_CURVE_eval</A> but takes an additional argument to
+control the direction of the evaluation.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_at_terminator            unable to calculate 2nd derivatives at
+                                      a terminator of <B>'curve'</B> (MILD)
+    PK_ERROR_bad_parameter            not permitted to evaluate outside of
+                                      range (MILD)
+    PK_ERROR_too_many_derivatives     too many derivatives requested (MILD)
+    PK_ERROR_eval_failure             internal evaluator failure (MILD)
+
+<A NAME="documentation"></A>
+This function is the handed version of <A HREF=../headers/pk_curve_eval.html>PK_CURVE_eval</A>, which evaluates the point
+ and derivatives at a given parameter of a curve.
+
+The point and derivatives at a given parameter are determined using the
+curve segment that the parameter lies in. If the parameter lies on a
+segment boundary then there are two possible curve segments that can be used.
+They are the segment before the boundary (hand_direction == <A HREF=../headers/pk_hand_t.html>PK_HAND_left_c</A> )
+and the segment after the boundary (hand_direction == <A HREF=../headers/pk_hand_t.html>PK_HAND_right_c</A>).
+
+        0            1            2          3          4          5
+        |------------|------------|----------|----------|----------|
+                                    on_left  |
+                                   &lt;---------| on_right
+                                             |---------&gt;
+                                             t
+
+Where derivative discontinuities exist at the parameter, the derivatives
+calculated by the left segment may be different from those calculated
+using the right segment.
+
+If the curve is periodic, the left (or right) segment of the beginning of
+the periodic range equals to the left (or right) segment of the end of the
+periodic range.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

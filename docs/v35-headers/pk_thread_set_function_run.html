@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_THREAD_set_function_run</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_THREAD_set_function_run</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_THREAD_set_function_run
+(
+<I>--- received arguments ---
+</I>int                                   n_functions,  --- number of functions
+const <A HREF=../headers/pk_function_t.html>PK_FUNCTION_t</A>                   functions[],  --- functions
+const <A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_t</A>               run_values[], --- how functions run
+const <A HREF=../headers/pk_thread_set_function_run_o_t.html>PK_THREAD_set_function_run_o_t</A> *options       --- options structure
+)
+</B>
+<A NAME="description"></A>
+<I>This function sets whether the given PK functions will be run concurrently
+or exclusively in this thread.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_value      Parasolid cannot change how at least one of the
+                            functions will be run to the new value (MILD)
+
+<A NAME="documentation"></A>
+For each function specified in the <B>'functions'</B> array, the corresponding value
+in the <B>'run_values'</B> array can be used to change how that function will be run.
+These changes will persist until a different value is set or the modeller is
+restarted.
+
+The only allowed values for each of the <B>'functions'</B> are those returned by
+<A HREF=../headers/pk_function_find.html>PK_FUNCTION_find</A> when given these function names:
+    "<A HREF=../headers/pk_topol_facet.html>PK_TOPOL_facet</A>"
+    "<A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A>"
+    "<A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>"
+    "<A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A>"
+    "<A HREF=../headers/pk_geom_render.html>PK_GEOM_render</A>"
+
+The only allowed values for each of the <B>'run_values'</B> are
+<A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_conc_c</A> and <A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_exc_c</A>.
+
+While a thread has locked partitions, setting values in the <B>'run_values'</B> array
+to <A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_exc_c</A> specifies running the corresponding PK
+functions with local exclusivity, meaning they will be run concurrently with
+other threads with locked partitions.
+
+If any values in either of the arrays are not allowed then no changes will
+be set.
+
+This function can only be called when the modeller is started.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,130 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_set_precision</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_set_precision</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_EDGE_set_precision
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>         edge,        --- edge
+double            precision,   --- required precision
+
+<I>--- returned arguments ---
+</I>int        *const n_new_edges, --- number of new edges
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A> **const new_edges    --- new edges
+)
+</B>
+<A NAME="description"></A>
+<I>This function sets the <B>'precision'</B> of the given <B>'edge'</B>.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_general_body          generalised topology not enabled (MILD)
+    PK_ERROR_missing_geom          the adjacent faces have no surfaces (MILD)
+    PK_ERROR_bad_tolerance         either the edge is too short or the
+                                   tolerance is too small (MILD/SERIOUS)
+    PK_ERROR_failed_to_create_sp   SP-curve generator failed for unknown
+                                   reason (MILD)
+    PK_ERROR_tolerances_too_tight  SP-curve generator could not achieve
+                                   tolerance (MILD/SERIOUS)
+
+<A NAME="documentation"></A>
+The action of this function depends on whether the <B>'edge'</B> previously had no
+geometry attached,  the <B>'edge'</B> previously had a non-default precision
+associated with it or the <B>'edge'</B> previously did not have a precision
+associated with it (i.e. whether Parasolid regarded the edge as "exact").
+
+The action for an edge with no geometry attached is as follows:
+
+An edge with no geometry attached to it or any fin has special behaviour.  On
+such an edge, if <B>'precision'</B> is greater than 5.0e-9 then the precision of the
+edge will become <B>'precision'</B> and the application will have the ability to
+attach SP-curves to its fins.  If <B>'precision'</B> is less than or equal to 5.0e-9,
+then the edge will be made accurate and the application will lose the ability
+to attach SP-curves to the fins.  The edge may belong to a general body.
+
+
+The action for an exact edge is as follows:
+
+The 3-space edge curve is used to create SP-curves on the adjacent
+surfaces, which are subsequently attached to the fins of the edge.
+The precision of the edge is to be viewed as a band of uncertainty within
+which all defining SP-curves lie.
+There will always be the following side-effects:
+. The original 3-space curve will be detached and deleted if possible.
+. The precisions of all vertices on the edge will be increased if
+  necessary so as to be greater than or at least equal to <B>'precision'</B>.
+  The point on the vertex will be recomputed.
+. It will be impossible to make the edge "exact" again by using
+  PK_EDGE_set_precision. Once this routine has been used on an edge,
+  it will continue to be represented geometrically by means of SP-curves
+  attached to the fins unless <A HREF=../headers/pk_edge_reset_precision.html>PK_EDGE_reset_precision</A> is called.
+Additionally, the following may occur:
+. It may not always be possible to compute one SP-curve from the
+  original curve and the relevant face surface. This will be due
+  to G1 discontinuities (in the surface parameter space) which will
+  have to be represented as extra vertices. The edge may therefore
+  be split a number of times, once for every surface singularity or
+  discontinuity which lay on the original curve. Any new edges created
+  by this process will be returned to the application in <B>'new_edges'</B>.
+
+It is an error if the edge is shorter than twice the given <B>'precision'</B>.
+
+
+The action for an edge already possessing a precision is as follows:
+
+The SP-curve(s) already present on the fins of the edge will be
+unchanged. The precision of the edge will be set to <B>'precision'</B>.
+The precisions of vertices of the edge will be increased if
+necessary so as to be greater than or at least equal to the supplied
+precision. It should be noted that reducing the precision value on
+an already inexact edge is not recommended, as the existing
+SP-curve(s) will not be replaced in this case. Hence such an edge
+may fail checking.
+
+
+If the edge belongs to a general body and generalised topology is not enabled
+(see PK function <A HREF=../headers/pk_session_set_general_topology.html>PK_SESSION_set_general_topology</A>) the error
+PK_ERROR_general_body will be returned.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

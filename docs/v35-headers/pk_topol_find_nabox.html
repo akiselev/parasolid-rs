@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TOPOL_find_nabox</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TOPOL_find_nabox</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_TOPOL_find_nabox
+(
+<I>--- received arguments ---
+</I>int                            n_topols,  --- number of entities
+const <A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>               topols[],  --- entities to be boxed
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>              transfs[], --- transformations to be applied
+                                          --- to <B>'topols'</B>
+const <A HREF=../headers/pk_topol_find_nabox_o_t.html>PK_TOPOL_find_nabox_o_t</A> *options,   --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_nabox_sf_t.html>PK_NABOX_sf_t</A>           *const nabox      --- returned non-aligned box
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns a non-aligned box bounding the given topological
+entities.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_wrong_entity          (MILD) a member of <B>'topols'</B> is of incorrect
+                                   type
+    PK_ERROR_wrong_transf          (MILD) an entry in <B>'transfs'</B> has
+                                    perspective or is general affine
+    PK_ERROR_duplicate_array_item  (MILD) <B>'transfs'</B> is NULL and <B>'topols'</B>
+                                   contains duplicates
+
+<A NAME="documentation"></A>
+The class of each entry in <B>'topols'</B> must be one of:
+    PK_CLASS_body
+    PK_CLASS_face
+    PK_CLASS_edge
+    PK_CLASS_vertex
+
+The entities in <B>'topols'</B> may be transformed by providing transformations in
+<B>'transfs'</B>.
+
+If <B>'transfs'</B> is set to NULL then none of the <B>'topols'</B> are transformed and
+<B>'topols'</B> may not contain duplicates.
+
+If <B>'transfs'</B> is not NULL then it must be an array of length <B>'n_topols'</B>
+containing <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A> entities.  The <B>'topols'</B> array may contain duplicates
+if transforms are provided.  Each entity in <B>'topols'</B> is transformed by the
+corresponding entity in <B>'transfs'</B>. Any entry in <B>'transfs'</B> may be PK_ENTITY_null
+indicating that the corresponding entity in <B>'topols'</B> is not to be transformed.
+Entries in <B>'transfs'</B> may only contain rotation, translation, equal scale and
+reflection components.
+
+The returned non-aligned box will contain the given <B>'topols'</B>, transformed if
+necessary, and this containment will usually be tight but this is not
+guaranteed.
+
+See <A HREF="../chapters/fd_chap.027.html#50434384_pgfId-309071">here</A> for more information.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Importing Foreign Data</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Importing Foreign Data</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.11.html">Blending</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.13.html">Storing Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.12.html#50446348_pgfId-274423">11.1	Introduction</A>
+<LI> <A HREF="ov_chap.12.html#50446348_pgfId-274431">11.2	Trimmed surface import</A>
+<LI> <A HREF="ov_chap.12.html#50446348_pgfId-274457">11.3	B-rep import</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446348_pgfId-274423"></A>11.1	<A NAME="50446348_marker-280983"></A><A NAME="50446348_marker-280981"></A><A NAME="50446348_marker-280979"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446348_pgfId-274565"></A>Sharing digital model data as part of the collaborative process of design and manufacture is becoming an increasingly important requirement in product life-cycle management. Organisations require reliable associative interoperability, regular exchange of data, and the confidence to be able to re-use their design information in all possible situations. </P>
+<P>
+<A NAME="50446348_pgfId-276622"></A>In an ideal world, companies sharing data would all use the same system, but this is usually not the case. Different organisations standardize on different systems, specific parts of the product life-cycle require applications suited to their particular needs (for example, <A NAME="50446348_marker-281090"></A>FEA), and the formats these applications use to store model data may not be compatible.</P>
+<P>
+<A NAME="50446348_pgfId-274751"></A>Mindful of the requirements and realities of the PLM world, Parasolid supports several ways of reading in parts that were created using applications not based on Parasolid. You can use this functionality either to read data directly into your application, or to develop dedicated translators for importing data into Parasolid-powered applications.</P>
+<P>
+<A NAME="50446348_pgfId-274569"></A>In order to support the widest possible range of application types, Parasolid provides two general methods for importing external model data:</P>
+<P>
+<A NAME="50446348_pgfId-274583"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446348_pgfId-274572"></A>Method</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446348_pgfId-274574"></A>To be used when ...</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446348_pgfId-274576"></A>Trimmed surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446348_pgfId-274578"></A>the originating system does not work with topological data. To use this method, the data must be supplied in the form of <STRONG>
+trimmed surfaces</STRONG><A NAME="50446348_marker-280971"></A><A NAME="50446348_marker-280989"></A> (surfaces bounded by loops of surface parameter curves). See <A HREF="ov_chap.12.html#50446348_72522">Section 11.2, &#8220;Trimmed surface import&#8221;</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446348_pgfId-274580"></A>B-rep </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446348_pgfId-274582"></A>the originating system knows the B-rep topology of the model. See <A HREF="ov_chap.12.html#50446348_98612">Section 11.3, &#8220;B-rep import&#8221;</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446348_pgfId-274527"></A>These methods are described in more detail in the rest of this chapter.</P>
+<P>
+<A NAME="50446348_pgfId-276645"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50446348_pgfId-276651"></A>Note: You can also purchase dedicated two-way translator technology from Siemens Digital Industries Software. These solutions can be plugged into your application directly with no additional development beyond basic integration requirements. See <A HREF="ov_chap.02.html#50446337_83175">Section 1.4, &#8220;The Parasolid product portfolio&#8221;</A>, for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446348_pgfId-274431"></A>11.2	<A NAME="50446348_72522"></A><A NAME="50446348_marker-280967"></A><A NAME="50446348_marker-280987"></A><A NAME="50446348_marker-280985"></A>Trimmed surface import
+
+
+</H1>
+<P>
+<A NAME="50446348_pgfId-274444"></A>You should use the trimmed surface import method when the data you want to read into Parasolid was generated in a surface modeler that does not attempt to represent a solid model at all.</P>
+<P>
+<A NAME="50446348_pgfId-303155"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-162.gif">
+
+<P>
+<A NAME="50446348_pgfId-276707"></A>Figure 11-1 Trimmed surface import method</P>
+<P>
+<A NAME="50446348_pgfId-276055"></A>When your application creates sheet bodies, you can set a wide variety of options (such as tolerance) to reflect your understanding about the validity of the data being imported.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446348_pgfId-274457"></A>11.3	<A NAME="50446348_98612"></A><A NAME="50446348_marker-280973"></A><A NAME="50446348_marker-281003"></A><A NAME="50446348_marker-280993"></A>B-rep import
+
+
+</H1>
+<P>
+<A NAME="50446348_pgfId-274685"></A>Even with data created using a true solid modelling application, there is a good chance that Parasolid may be unable to model reliably with the data as originally created in the other system, because different modelers have their own criteria about what represents a valid model.</P>
+<P>
+<A NAME="50446348_pgfId-274481"></A>Typically, data imported into Parasolid from another solid modeler will have a lower resolution than data created directly in Parasolid. Instead of a set of well defined touching faces, Parasolid perceives gaps and overlaps along every edge, and these must be dealt with before any downstream modelling operations can occur.</P>
+<P>
+<A NAME="50446348_pgfId-274736"></A><A NAME="50446348_marker-281118"></A>Parasolid uses Tolerant Modelling (see <A HREF="ov_chap.04.html#50446350_85083">Section 3.6, &#8220;Accuracy of Parasolid models&#8221;</A>) to modify the low resolution data by applying local tolerance information. This approach allows the intentions of the original designer to be preserved in the faces and surfaces of the model, while treating edges and vertices as entities derived from this data that inherit the resolution used by the original modeler. After applying tolerance information, downstream modelling operations may proceed without causing problems due to the nature of the imported data. </P>
+<P>
+<A NAME="50446348_pgfId-303416"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-163.gif">
+
+<P>
+<A NAME="50446348_pgfId-276703"></A>Figure 11-2 B-rep import method</P>
+<P>
+<A NAME="50446348_pgfId-276733"></A>If you need to import a geometry type present in the originating application that is not available in Parasolid, you can approximate it using a B-surface or B-curve. <A NAME="50446348_marker-281127"></A></P>
+<P>
+<A NAME="50446348_pgfId-274290"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.11.html">Blending</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.13.html">Storing Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

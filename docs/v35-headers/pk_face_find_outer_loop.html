@@ -1,0 +1,82 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_find_outer_loop</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_find_outer_loop</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                    PK_FACE_find_outer_loop
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                          face,       --- face to find outer loop
+const <A HREF=../headers/pk_face_find_outer_loop_o_t.html>PK_FACE_find_outer_loop_o_t</A> *options,    --- provided options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_loop_t.html>PK_LOOP_t</A> *const                   outer_loop  --- the outer loop returned
+)
+</B>
+<A NAME="description"></A>
+<I>The function returns the outer loop of the given face.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_missing_geom         Face does not have geometry. (MILD)
+    PK_ERROR_failure              The function has failed to find the outer
+                                  loop, e.g. due to a failure in finding loop
+                                  types. (MILD)
+    PK_ERROR_loop_is_sliver       Sliver loop (long thin loop without
+                                  interior) has been found. (MILD)
+
+<A NAME="documentation"></A>
+Where one of the face loops can be readily interpreted as defining the overall
+extent of the face on the surface with the remaining loops subtracting regions
+from it, PK_FACE_find_outer_loop will return that loop.
+
+The types of loops on a given face (see loop types in documentation of
+<A HREF=../headers/pk_loop_ask_type.html>PK_LOOP_ask_type</A>) depend on the behaviour of the underlying surface of the
+face which requires that the face has a surface attached. Attempting to find
+the outer loop of a face with no surface geometry will result in the error
+PK_ERROR_missing_geom.
+
+If the face has no loops, for example, a whole face on a sphere, then
+PK_ENTITY_null will be returned.
+
+If the outer loop cannot be determined because a parameter seam is not
+imprinted, then PK_ENTITY_null will be returned.
+
+If the face has facet geometry, PK_ENTITY_null will be returned.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

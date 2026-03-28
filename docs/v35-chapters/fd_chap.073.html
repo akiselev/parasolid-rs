@@ -1,0 +1,4523 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Generic Face Editing</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Generic Face Editing</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.072.html">Creating New Bodies From Existing Entities</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.074.html">Introduction To Blending</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-300732">72.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-302132">72.1.1	Possible operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-302251">72.1.2	PK_FACE_change arguments </A>
+</UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-302323">72.2	Specifying operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-302569">72.3	Operation parameters </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-302575">72.3.1	Data for offset operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-302635">72.3.2	Data for taper operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-302665">72.3.3	Data for transform operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-302684">72.3.4	Data for replace operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-443095">72.3.5	Data for blend operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-436831">72.3.6	Data for bend operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-503185">72.3.7	Data for patch operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-303243">72.3.8	Data for deformation operations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-925047">72.3.9	Data for radiate operations </A>
+</UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-303416">72.4	Operation-specific options </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-303428">72.4.1	Offset options </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-303973">72.4.2	Taper options </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-304068">72.4.3	Transform options </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-852595">72.4.3.1	Specifying the destination for boundary loops</A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-744245">72.4.3.2	Creating step faces when performing rotations or translations </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-745056">72.4.3.3	Choosing the direction of a rotational transform </A>
+</UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-304915">72.4.4	Replace options </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305045">72.4.5	Blend options </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305123">72.4.5.1	Reblending rolling ball blends </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305126">72.4.5.2	Reblending blend-like faces </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305191">72.4.5.3	Reblending chamfers </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305423">72.4.5.4	Specifying overflow when reblending </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-458820">72.4.5.5	Constraints when reapplying blends </A>
+</UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305528">72.4.6	Bend options </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305566">72.4.7	Patch options </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305589">72.4.7.1	Treating patch faces as fixed or moving when resolving clashes </A>
+</UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305785">72.4.8	Deformation options </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-926633">72.4.9	Radiate options </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-1117145">72.4.9.1	Creating radiate step faces </A>
+</UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-305916">72.4.10	Combining different operations </A>
+</UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-306411">72.5	Specifying options </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-306656">72.5.1	Controlling the geometry of edges in the body </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-863202">72.5.1.1	Controlling edge or step face geometry using the methods option </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-863283">72.5.1.2	Controlling the creation of step faces using the steps option </A>
+</UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-306878">72.5.2	Retaining vertices in the body </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-306998">72.5.3	Dealing with multiple solutions </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-307023">72.5.4	Controlling face adjacency </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-307195">72.5.5	Controlling the growth of overflowing faces </A>
+<UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-307371">72.5.5.1	Overriding the specified overflow behaviour </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-307527">72.5.5.2	Preserving areas of the model </A>
+</UL>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-307606">72.5.6	Repairing face-face inconsistencies </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-495225">72.5.7	Repairing invalid faces </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-307710">72.5.8	Tracking laminar edges </A>
+<LI> <A HREF="fd_chap.073.html#50422148_pgfId-307675">72.5.9	Reporting function results </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422148_pgfId-300732"></A>72.1	<A NAME="50422148_47035"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422148_pgfId-300733"></A>You may sometimes need to perform a number of different local operations to different faces in the same body. Some faces might need offsetting, while others require tapering. Blend faces may need to be reconstructed after moving other faces in the body. There are two approaches to this type of problem: </P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-300734"></A>Perform each local operation individually using the functionality described in previous chapters</LI>
+<LI>
+<A NAME="50422148_pgfId-300736"></A>Perform all local operations in a single call to <A NAME="50422148_marker-606444"></A><A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. </LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-300737"></A>The second approach can have a number of benefits over the first:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-300738"></A>It lets you reposition blended features in a model, remove the blend surfaces and recalculate them in a single operation, as shown in <A HREF="fd_chap.073.html#50422148_70522"><EM>
+Figure 72-1</EM></A>.</LI>
+<LI>
+<A NAME="50422148_pgfId-300720"></A>It lets you perform operations on models that would be difficult or impossible using a piecemeal approach, because intermediate stages in the model would yield invalid bodies, as shown in <A HREF="fd_chap.073.html#50422148_62118"><EM>
+Figure 72-2</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-743691"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-743690"></A>Note: This functionality partially supports facet geometry. See <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-391905"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-837.gif">
+
+<P>
+<A NAME="50422148_pgfId-301360"></A>Figure 72-1 <A NAME="50422148_70522"></A>Moving a blended boss feature using generic face editing</P>
+<P>
+<A NAME="50422148_pgfId-393241"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-838.gif">
+
+<P>
+<A NAME="50422148_pgfId-302127"></A>Figure 72-2 <A NAME="50422148_62118"></A>Performing operations without yielding invalid bodies</P>
+<P>
+<A NAME="50422148_pgfId-542507"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-505886"></A>Note: <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> accepts general bodies in each of the following circumstances:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-983057"></A>If the supplied face sets are locally manifold. See <A HREF="fd_chap.063.html#50422138_40800">Section 62.5.4, “Local operations on general bodies”</A> for more information.</LI>
+<LI>
+<A NAME="50422148_pgfId-982643"></A>If the supplied face sets have non-manifold edges, whose geometry is included in the <CODE>
+edge_geom_data</CODE>
+ option. See <A HREF="fd_chap.073.html#50422148_51695">Section 72.5.1, “Controlling the geometry of edges in the body”</A>.</LI>
+<LI>
+<A NAME="50422148_pgfId-996485"></A>If the supplied face sets have non-manifold edges and there are no more than two unique surfaces belonging to their adjacent faces.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-542577"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-541966"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-541953"></A><A HREF="fd_chap.022.html#50422091_39132">Chapter 21, “Transformations”</A></LI>
+<LI>
+<A NAME="50422148_pgfId-541982"></A><A HREF="fd_chap.059.html#50422133_22949">Chapter 58, “Offsetting”</A></LI>
+<LI>
+<A NAME="50422148_pgfId-541997"></A><A HREF="fd_chap.066.html#50422141_22949">Chapter 65, “Replacing The Surfaces Of Faces”</A></LI>
+<LI>
+<A NAME="50422148_pgfId-542030"></A><A HREF="tapering.html#22949">Chapter 64, “Tapering”</A></LI>
+<LI>
+<A NAME="50422148_pgfId-542083"></A><A HREF="fd_chap.069.html#50422144_22949">Chapter 68, “Patching”</A></LI>
+<LI>
+<A NAME="50422148_pgfId-542098"></A><A HREF="fd_chap.071.html#50422146_22949">Chapter 70, “Moving Faces”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422148_pgfId-302132"></A>	72.1.1 	<A NAME="50422148_87158"></A><A NAME="50422148_marker-302129"></A><A NAME="50422148_marker-302130"></A><A NAME="50422148_marker-302131"></A>Possible operations </H3>
+<P>
+<A NAME="50422148_pgfId-302133"></A><A HREF=../headers/pk_face_change.html>PK_FACE_change</A> lets you perform any combination of a range of local operations, as described below:</P>
+<P>
+<A NAME="50422148_pgfId-515356"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302155"></A>Operation</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302157"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302159"></A>Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302161"></A>You can offset any face by a specified distance, either relatively from each changed face, or from the resultant position of an optional supplied reference face. A positive offset indicates an offset outwards (in the direction of the face normal) and a negative offset an offset inwards. This operation allows a subset of the functionality offered by <A HREF=../headers/pk_face_offset_2.html>PK_FACE_offset_2</A>: see <A HREF="fd_chap.059.html#50422133_22949">Chapter 58, “Offsetting”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302166"></A>Taper</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302170"></A>You can replace the surface of any face with a taper surface: see <A HREF="tapering.html#22949">Chapter 64, “Tapering”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302173"></A>Transform</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302177"></A>You can transform the geometry of any face: see <A HREF="fd_chap.071.html#50422146_22949" CLASS="XRef">Chapter 70, “Moving Faces”</A>. You can also transform a set of faces in a manner very similar to patterning: see the relevant section in <A HREF="fd_chap.073.html#50422148_26938">Section 72.3, “Operation parameters”</A>, and also <A HREF="fd_chap.055.html#50422128_67894">Section 54.3.5, “General patterning”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302186"></A>Replace</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302190"></A>You can replace the geometry of any face with a new surface: see <A HREF="fd_chap.066.html#50422141_22949">Chapter 65, “Replacing The Surfaces Of Faces”</A>, for more information. </P>
+<P>
+<A NAME="50422148_pgfId-369725"></A>See also <A HREF="fd_chap.069.html#50422144_97779">Section 68.6, “Replacing a set of faces with a single face”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302193"></A>Blend</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302195"></A>You can recalculate blends and reconstruct blend faces after moving other faces in a body. This operation may only be used on faces with blend surfaces. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302197"></A>Bend</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302199"></A>You can bend or unbend faces between two groups of faces that are being transformed. This functionality can be particularly useful for sheet metal bending operations. See <A HREF="fd_chap.073.html#50422148_67385">Section 72.3.6, “Data for bend operations”</A>, for information on bending operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302204"></A>Patch</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302206"></A>You can replace a set of target faces within a body with a set of tool faces from another body. This operation provides the same functionality as that offered by <A HREF=../headers/pk_face_replace_with_sheet.html>PK_FACE_replace_with_sheet</A>: see <A HREF="fd_chap.069.html#50422144_20490">Section 68.1, “Introduction”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302211"></A>Deform</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302213"></A>You can perform local deformation of a set of target faces in a body, by providing an evaluation function that maps three-space points on the target faces to deformed three-space points. See <A HREF="fd_chap.073.html#50422148_27165">Section 72.3.8, “Data for deformation operations”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-932616"></A>Radiate</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-932618"></A>You can radially displace a rotational surface of a face with respect to its spin axis. See <A HREF="fd_chap.073.html#50422148_57088">Section 72.3.9, “Data for radiate operations”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-302217"></A>For examples of this functionality, see the code examples in the <CODE>
+C++\Code Examples\Modelling\LOP\Face Change</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422148_pgfId-792534"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-792533"></A>Note: The blend and bend operations described in this chapter cannot be used on bodies that contain facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-502217"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-504598"></A>Note: Where possible you should use the above local operations for their chosen functions. For example, although it might be possible to use deform to create a bend, we do not recommend you do this. Instead you should use the most appropriate operation for the task at hand.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-302251"></A>	72.1.2 	<A HREF=../headers/pk_face_change.html>PK_FACE_change</A> arguments </H3>
+<P>
+<A NAME="50422148_pgfId-302252"></A><A HREF=../headers/pk_face_change.html>PK_FACE_change</A> takes the following arguments:</P>
+<P>
+<A NAME="50422148_pgfId-302307"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302255"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302257"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302259"></A>n_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302261"></A>The number of faces to change.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302263"></A>faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302265"></A>The faces to change. These faces can come from more than one body, but there are restrictions in this case. See <A HREF="fd_chap.073.html#50422148_75725">Section 72.2, “Specifying operations”</A>, for details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302270"></A>mapping </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302274"></A>An array mapping operations onto faces. See <A HREF="fd_chap.073.html#50422148_75725">Section 72.2, “Specifying operations”</A>, for details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302277"></A>n_operations</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302279"></A>The number of different operations to perform.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302281"></A>operations</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302283"></A>The operations to perform. This is an array of <A HREF=../headers/pk_face_change_t.html>PK_FACE_change_t</A> types, and can be any combination of the following operations:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-302284"></A>Blend</LI>
+<LI>
+<A NAME="50422148_pgfId-302285"></A>Replace</LI>
+<LI>
+<A NAME="50422148_pgfId-302286"></A>Transform</LI>
+<LI>
+<A NAME="50422148_pgfId-302287"></A>Taper</LI>
+<LI>
+<A NAME="50422148_pgfId-302288"></A>Offset</LI>
+<LI>
+<A NAME="50422148_pgfId-302289"></A>Bend</LI>
+<LI>
+<A NAME="50422148_pgfId-302290"></A>Patch</LI>
+<LI>
+<A NAME="50422148_pgfId-302291"></A>Deform</LI>
+<LI>
+<A NAME="50422148_pgfId-926485"></A>Radiate</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-302295"></A>See <A HREF="fd_chap.073.html#50422148_75725">Section 72.2, “Specifying operations”</A>, for details of how to specify operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302297"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302299"></A>A supplied tolerance.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302301"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302305"></A>Options structure specifying options for the call. See <A HREF="fd_chap.073.html#50422148_28023">Section 72.5, “Specifying options”</A>, for details.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422148_pgfId-302323"></A>72.2	<A NAME="50422148_75725"></A>Specifying operations 
+
+
+</H1>
+<P>
+<A NAME="50422148_pgfId-302324"></A>Supplied faces are mapped onto different operations using the <CODE>
+mapping</CODE>
+ array. This array should contain the same number of elements as the <CODE>
+faces</CODE>
+ array. Each integer in <CODE>
+mapping</CODE>
+ indicates the operation to perform on the corresponding face in <CODE>
+faces</CODE>
+. This is illustrated in <A HREF="fd_chap.073.html#50422148_54328"><EM>
+Figure 72-3</EM></A>.</P>
+<P>
+<A NAME="50422148_pgfId-402155"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-839.gif">
+
+<P>
+<A NAME="50422148_pgfId-302500"></A>Figure 72-3 <A NAME="50422148_54328"></A>Mapping faces onto operations</P>
+<P>
+<A NAME="50422148_pgfId-302501"></A>An operation in the <CODE>
+operations</CODE>
+ array is specified using <A HREF=../headers/pk_face_change_t.html>PK_FACE_change_t</A>. This contains the following fields:</P>
+<P>
+<A NAME="50422148_pgfId-302560"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302526"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302528"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302530"></A>op_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302532"></A>The type of operation to perform on a face. This is one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-302533"></A>PK_FACE_change_type_none_c</LI>
+<LI>
+<A NAME="50422148_pgfId-302534"></A>PK_FACE_change_type_offset_c</LI>
+<LI>
+<A NAME="50422148_pgfId-302535"></A>PK_FACE_change_type_taper_c</LI>
+<LI>
+<A NAME="50422148_pgfId-302536"></A>PK_FACE_change_type_transform_c</LI>
+<LI>
+<A NAME="50422148_pgfId-302537"></A>PK_FACE_change_type_replace_c</LI>
+<LI>
+<A NAME="50422148_pgfId-302538"></A>PK_FACE_change_type_blend_c</LI>
+<LI>
+<A NAME="50422148_pgfId-302539"></A>PK_FACE_change_type_bend_c</LI>
+<LI>
+<A NAME="50422148_pgfId-302540"></A>PK_FACE_change_type_patch_c</LI>
+<LI>
+<A NAME="50422148_pgfId-302541"></A>PK_FACE_change_type_deform_c</LI>
+<LI>
+<A NAME="50422148_pgfId-926516"></A>PK_FACE_change_type_radiate_c</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-302545"></A>The default value is PK_FACE_change_none. See <A HREF="fd_chap.073.html#50422148_87158">Section 72.1.1</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302547"></A>op_param</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302549"></A>Parameters for the change operation. This field is a union of the parameters for each individual operation. See <A HREF="fd_chap.073.html#50422148_26938">Section 72.3, “Operation parameters”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302554"></A>op_opts</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302556"></A>Change-specific options. This field is a union of the options for each individual operation. See <A HREF="fd_chap.073.html#50422148_94482">Section 72.4, “Operation-specific options”</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-302564"></A>Faces in different bodies cannot share the same mapping. Thus, in <A HREF="fd_chap.073.html#50422148_54328"><EM>
+Figure 72-3</EM></A>, <CODE>
+face_1</CODE>
+ and <CODE>
+face_2</CODE>
+ must come from the same body, and <CODE>
+face_4</CODE>
+ and <CODE>
+face_5</CODE>
+ must come from the same body (though this could be a different body to <CODE>
+face_1</CODE>
+ and <CODE>
+face_2</CODE>
+). </P>
+<P>
+<A NAME="50422148_pgfId-302565"></A>If you want to perform the same operation on faces from different bodies, then you must duplicate identical operations in the <CODE>
+operations</CODE>
+ array. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422148_pgfId-302569"></A>72.3	<A NAME="50422148_26938"></A><A NAME="50422148_marker-302567"></A><A NAME="50422148_marker-302568"></A>Operation parameters 
+
+
+</H1>
+<P>
+<A NAME="50422148_pgfId-302570"></A>Data for an operation is specified in the <CODE>
+op_param</CODE>
+ field, which itself contains fields for each type of operation supported by <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. The <CODE>
+op_param</CODE>
+ field is a union of any data supplied in each of these operation-specific fields. </P>
+<P>
+<A NAME="50422148_pgfId-302571"></A>The fields available, together with the data you can specify, are described below</P>
+
+<H3>
+<A NAME="50422148_pgfId-302575"></A>	72.3.1 	<A NAME="50422148_marker-302572"></A><A NAME="50422148_marker-302573"></A><A NAME="50422148_marker-302574"></A>Data for offset operations </H3>
+<P>
+<A NAME="50422148_pgfId-302576"></A>You need to supply the following data for each face you are offsetting using <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>:</P>
+<P>
+<A NAME="50422148_pgfId-302589"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302579"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302581"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302583"></A>distance </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302585"></A>The offset distance for the faces, relative to their current position. If used in combination with the <CODE>
+reference</CODE>
+ offset option (see <A HREF="fd_chap.073.html#50422148_94482">Section 72.4, “Operation-specific options”</A>), then this is measured from the resultant position of the supplied reference face. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-302630"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-302629"></A>Note: You can offset different faces in different ways in a single function call, but you need to define a separate offset operation for each unique offset configuration (i.e. combination of distance and offset options.)</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-302635"></A>	72.3.2 	<A NAME="50422148_marker-302631"></A><A NAME="50422148_marker-302632"></A><A NAME="50422148_marker-302633"></A><A NAME="50422148_31970"></A>Data for taper operations </H3>
+<P>
+<A NAME="50422148_pgfId-302636"></A>You need to supply the following data for each face you are tapering using <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>:</P>
+<P>
+<A NAME="50422148_pgfId-715001"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302639"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302641"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302643"></A>direction</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302645"></A>Direction of the taper.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302647"></A>angle </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302649"></A>Angle for the taper (in radians).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302651"></A>n_refs </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302653"></A>Number of reference entities for the taper.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302655"></A>references</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302659"></A>Array of reference entities for the taper.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-677594"></A>Multiple faces can be mapped to a single taper operation. In this case, the value of <CODE>
+n_refs</CODE>
+ must be either one, or the number of faces mapped to the operation. If <CODE>
+n_refs</CODE>
+ is the latter, each face entry in the array is mapped to a single reference entity in the corresponding position in the <CODE>
+references</CODE>
+ array.</P>
+
+
+<H3>
+<A NAME="50422148_pgfId-302665"></A>	72.3.3 	<A NAME="50422148_marker-790348"></A><A NAME="50422148_marker-790349"></A><A NAME="50422148_marker-790350"></A>Data for transform operations </H3>
+<P>
+<A NAME="50422148_pgfId-302666"></A>You need to supply the following data for each face you are transforming or otherwise altering using <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>:</P>
+<P>
+<A NAME="50422148_pgfId-302676"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302669"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302671"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-302673"></A>transform</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-302675"></A>A transform to apply to the faces.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-302677"></A>When you are transforming a set of faces such that the boundary loops move out of their original face, you also need to supply these loops and their destination faces in the options structure for this operation. See <A HREF="fd_chap.073.html#50422148_94482">Section 72.4, “Operation-specific options”</A> for more information.</P>
+
+
+<H3>
+<A NAME="50422148_pgfId-302684"></A>	72.3.4 	<A NAME="50422148_marker-302681"></A><A NAME="50422148_marker-302682"></A><A NAME="50422148_marker-302683"></A>Data for replace operations </H3>
+<P>
+<A NAME="50422148_pgfId-302685"></A>You need to supply the following data for each face you are replacing using <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>:</P>
+<P>
+<A NAME="50422148_pgfId-515403"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-436809"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-436811"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-436813"></A>surface </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-436815"></A>Replacement surface for the relevant face.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-436817"></A>sense </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-436819"></A>Orientation of <CODE>
+surface</CODE>
+. For a given face/surface combination, this is either:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-436820"></A>PK_LOGICAL_true - the face normal with <CODE>
+surface</CODE>
+ attached is in the same direction as the natural surface normal (as calculated by <A NAME="50422148_marker-436821"></A><A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A>).</LI>
+<LI>
+<A NAME="50422148_pgfId-436822"></A>PK_LOGICAL_false - the face normal with <CODE>
+surface</CODE>
+ attached is in the opposite direction to the natural surface normal (as calculated by <A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A>).</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-443095"></A>	72.3.5 	<A NAME="50422148_marker-443094"></A>Data for blend operations </H3>
+<P>
+<A NAME="50422148_pgfId-443096"></A>Blend faces are reconstructed automatically by <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. No data for blend operations needs to be supplied.</P>
+
+
+<H3>
+<A NAME="50422148_pgfId-436831"></A>	72.3.6 	<A NAME="50422148_marker-436827"></A><A NAME="50422148_marker-436828"></A><A NAME="50422148_marker-436829"></A><A NAME="50422148_67385"></A>Data for bend operations </H3>
+<P>
+<A NAME="50422148_pgfId-504300"></A><A HREF=../headers/pk_face_change.html>PK_FACE_change</A> provides support for bending and unbending pairs of faces. This functionality generates ruled side surfaces between the resultant bent faces, and ensures that the geometry for the boundaries between the bend face and adjacent transformed or stationary faces is taken from the transformed or stationary adjacent face. </P>
+<P>
+<A NAME="50422148_pgfId-504301"></A>For each bend operation, you need to associate the following faces with the PK_FACE_change_type_bend_c <CODE>
+op_type</CODE>
+ via the <CODE>
+mapping</CODE>
+ array:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-302739"></A>The inner and outer bend faces (that is, the faces that will be bent as a result of the operation). Bend faces should be offsets of each other.</LI>
+<LI>
+<A NAME="50422148_pgfId-302740"></A>Any appropriate side faces (that is, any faces adjacent to a pair of bend faces). You can associate any number of side faces with a bend face, though you cannot use the same side face for more than one bend face.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-302741"></A>The faces associated with a bend operation are usually adjacent to a group of faces that are being transformed using <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>, though this is not mandatory for the operation. When a bend surface shares a smooth edge with such a transformed surface (or a stationary surface), the bend geometry must match the transformed geometry along that smooth edge (that is, the bend is a transition surface between that transform and something else).</P>
+<P>
+<A NAME="50422148_pgfId-302745"></A>Parasolid generates new inner and outer bend faces by offsetting a tool entity that you supply. The shape of the tool entity should be the exact shape of the resultant bent faces because Parasolid generates ruled surfaces for any side faces using an appropriate edge from the tool entity.The tool entity is therefore used as a “template” for both the bend faces and the side faces. These components are illustrated in <A HREF="fd_chap.073.html#50422148_34012"><EM>
+Figure 72-4</EM></A>. </P>
+<P>
+<A NAME="50422148_pgfId-394189"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-840.gif">
+
+<P>
+<A NAME="50422148_pgfId-302975"></A>Figure 72-4 <A NAME="50422148_34012"></A>Components in a bend operation</P>
+<P>
+<A NAME="50422148_pgfId-302976"></A>After the bend operation, bend faces are still offsets of each other, and side faces have ruled surfaces as geometry. </P>
+<P>
+<A NAME="50422148_pgfId-302977"></A>You need to supply the following data for each face in a bend operation:</P>
+<P>
+<A NAME="50422148_pgfId-504638"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-504331"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-504333"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-504335"></A>type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-504337"></A>Each face in a bend operation is either a bend face or a side face.</P>
+<P>
+<A NAME="50422148_pgfId-504338"></A>Each bend face is bent by offsetting <CODE>
+tool_entity</CODE>
+ by the distance specified in <CODE>
+offset</CODE>
+. </P>
+<P>
+<A NAME="50422148_pgfId-504339"></A>A ruled surface is generated for each side face by offsetting the <CODE>
+tool_entity</CODE>
+ forward (with respect to the normal of the <CODE>
+tool_entity</CODE>
+) by <CODE>
+offset</CODE>
+ and backward by <CODE>
+backward_offset</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-504341"></A>tool_entity</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-504343"></A>Each face in a bend operation requires an associated <CODE>
+tool_entity</CODE>
+. </P>
+<P>
+<A NAME="50422148_pgfId-504344"></A>For a bend face, the <CODE>
+tool_entity</CODE>
+ is a “template” face from which the resultant bent face is generated by offsetting by the specified <CODE>
+offset</CODE>
+. You should specify the same <CODE>
+tool_entity</CODE>
+ for both the inner and outer bend faces.</P>
+<P>
+<A NAME="50422148_pgfId-504345"></A>For a side face, the <CODE>
+tool_entity</CODE>
+ is an appropriate edge from the tool entity of the associated bend faces. This edge is offset according to the supplied <CODE>
+offset</CODE>
+ and <CODE>
+backward_offset</CODE>
+ so as to produce a ruled side surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-504347"></A>offset</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-504349"></A>For a bend face, this is the distance the <CODE>
+tool_entity</CODE>
+ is offset to produce the resultant bent face.</P>
+<P>
+<A NAME="50422148_pgfId-504350"></A>For a side face, this is the distance forward the <CODE>
+tool_entity</CODE>
+ is offset (with respect to the face normal of the tool entity specified for the associated bend faces) in order to generate the ruled surface that is used for the side face. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-504352"></A>backward_offset</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-504354"></A>For a side face, this is the distance backward the <CODE>
+tool_entity</CODE>
+ needs to be offset in order to generate the ruled surface. </P>
+<P>
+<A NAME="50422148_pgfId-504355"></A>This parameter is ignored for a bend face.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-504360"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\LOP\Bending</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+
+<H3>
+<A NAME="50422148_pgfId-503185"></A>	72.3.7 	<A NAME="50422148_24624"></A>Data for patch operations </H3>
+<P>
+<A NAME="50422148_pgfId-303045"></A>You need to supply the following data for each set of faces you are patching using <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>:</P>
+<P>
+<A NAME="50422148_pgfId-303055"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303048"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303050"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303052"></A>sheet</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303054"></A>A set of faces to use as replacement faces for the specified faces. This can either be a sheet body or a shell of connected faces from a solid or sheet body. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-303059"></A><A HREF="fd_chap.073.html#50422148_10662"><EM>
+Figure 72-5</EM></A> shows an example of a face change operation in which a set of faces in a body are patched at the same time as a bend operation is performed.</P>
+<P>
+<A NAME="50422148_pgfId-309772"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-841.gif">
+
+<P>
+<A NAME="50422148_pgfId-309774"></A>Figure 72-5 <A NAME="50422148_10662"></A>Patching faces during a face change operation</P>
+<P>
+<A NAME="50422148_pgfId-303128"></A>Generally, the replacement faces need to be at least as large as the original faces. However, you can supply a smaller set of replacement faces if the replacement faces imprint exactly onto the originals, such that one end of the set of original faces is split off, creating a boundary that needs to be healed. <A HREF="fd_chap.073.html#50422148_75836"><EM>
+Figure 72-6</EM></A> shows an example in which two through holes (a total of four faces) have been replaced by two shorter blind holes (a total of six faces), while other faces in the body have been tapered during the same call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. </P>
+<P>
+<A NAME="50422148_pgfId-310477"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-842.gif">
+
+<P>
+<A NAME="50422148_pgfId-303200"></A>Figure 72-6 <A NAME="50422148_75836"></A>Patching faces using smaller replacement faces</P>
+<P>
+<A NAME="50422148_pgfId-303201"></A>In addition, the supplied faces must have no laminar edges, unless those faces form part of the <CODE>
+patch_data</CODE>
+ associated with the patch operation. See <A HREF="fd_chap.073.html#50422148_21143">Section 72.4.7, “Patch options”</A>, for more information. </P>
+<P>
+<A NAME="50422148_pgfId-303226"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-303222"></A>Note: In order to take advantage of this behaviour, you must supply <CODE>
+patch_data</CODE>
+. See <A HREF="fd_chap.073.html#50422148_21143">Section 72.4.7, “Patch options”</A>, for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-303241"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-303229"></A>Note: Faces to be patched by the supplied <CODE>
+sheet</CODE>
+ can only be adjacent to faces that have blend operations applied to them in the same call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> if any of the following is true: </ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-303230"></A>The reblend face itself is being patched</LI>
+<LI>
+<A NAME="50422148_pgfId-303231"></A>None of the underlying faces of the blend are also faces that are being patched. </LI>
+<LI>
+<A NAME="50422148_pgfId-303232"></A>Any underlying faces of the blend that are also involved in the patch operation are supplied as <CODE>
+patch_data</CODE>
+.</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422148_pgfId-303236"></A>See <A HREF="fd_chap.073.html#50422148_30814">Section 72.4.5, “Blend options”</A>, for more information about the underlying faces of a blend operation in <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422148_pgfId-303240"></A>See <A HREF="fd_chap.073.html#50422148_21143">Section 72.4.7, “Patch options”</A>, for more information about supplying <CODE>
+patch_data</CODE>
+ for the patch operation. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-303243"></A>	72.3.8 	<A NAME="50422148_27165"></A>Data for deformation operations </H3>
+<P>
+<A NAME="50422148_pgfId-303244"></A><A HREF=../headers/pk_face_change.html>PK_FACE_change</A> allows you to perform arbitrary deformation of a set of target faces in a body by providing you with the ability to call an evaluator function that you provide in your own application code. This powerful functionality allows you to perform sophisticated manipulations to a body while retaining the ability to automatically reapply blends, preserve dependent offsets, and so on. </P>
+<P>
+<A NAME="50422148_pgfId-515503"></A>For examples of this functionality, see the code examples in the <CODE>
+C++\Code Examples\Modelling\LOP\Global</CODE>
+ <CODE>
+Deformation </CODE>
+folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422148_pgfId-303248"></A><A HREF="fd_chap.073.html#50422148_37195"><EM>
+Figure 72-7</EM></A> shows an example in which the side faces of an open box have been deformed by applying a twist and non-linear scale. A number of blends on the inside of the box are automatically recalculated as part of the call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. </P>
+<P>
+<A NAME="50422148_pgfId-311311"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-843.gif">
+
+<P>
+<A NAME="50422148_pgfId-303303"></A>Figure 72-7 <A NAME="50422148_37195"></A>Deforming faces in a body</P>
+<P>
+<A NAME="50422148_pgfId-303304"></A>In order to perform deformations such as this, you need to supply one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-1372947"></A>an evaluator function, together with data to be used in a call to that function, using the <A HREF=../headers/pk_face_change_data_deform_t.html>PK_FACE_change_data_deform_t</A> structure.</LI>
+<LI>
+<A NAME="50422148_pgfId-1372959"></A>an expression evaluator function that describes how the faces should be deformed. For more information on supplying the expression evaluator, see <A HREF="fd_chap.073.html#50422148_50739">Section 72.4.8, “Deformation options”</A>. </LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-1372863"></A>The <A HREF=../headers/pk_face_change_data_deform_t.html>PK_FACE_change_data_deform_t</A> structure has the following fields:</P>
+<P>
+<A NAME="50422148_pgfId-303318"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303307"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303309"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303311"></A>eval_fn</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303313"></A>An evaluator function that describes how a supplied face is to be deformed.</P>
+<ADDRESS>
+<A NAME="50422148_pgfId-1373436"></A>Note: If the <CODE>
+eval_expr</CODE>
+ option in <A HREF=../headers/pk_face_change_deform_o_t.html>PK_FACE_change_deform_o_t</A> structure is supplied, this field must be set to NULL.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303315"></A>eval_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303317"></A>A pointer to the data required by the supplied <CODE>
+eval_fn</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-303319"></A>The supplied <CODE>
+eval_fn</CODE>
+ receives the following arguments:</P>
+<P>
+<A NAME="50422148_pgfId-303345"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303322"></A>Parameter</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303324"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303326"></A>position</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303328"></A>An input position on the specified <CODE>
+face</CODE>
+. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303330"></A>face</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303332"></A>The face being deformed. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303334"></A>have_params</PRE>
+<PRE><A NAME="50422148_pgfId-303335"></A>params</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303337"></A>If available, the corresponding surface parameters for the supplied position may be supplied in <CODE>
+params</CODE>
+. The evaluator function should check the value of the boolean <CODE>
+have_params</CODE>
+ to see if this data is available. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303339"></A>external_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303341"></A>A pointer to any external data required by the function. This data is supplied to Parasolid via the <CODE>
+eval_data</CODE>
+ field in <A HREF=../headers/pk_face_change_data_deform_t.html>PK_FACE_change_data_deform_t</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-303386"></A>The supplied <CODE>
+eval_fn</CODE>
+ returns the corresponding deformed position using the <CODE>
+deformed_position</CODE>
+ argument. For all points shared by several faces (e.g. on edges between adjacent faces), the function must return the same <CODE>
+deformed_position</CODE>
+ for a given <CODE>
+position</CODE>
+, regardless of the <CODE>
+face</CODE>
+ supplied: the face and surface parameters are merely provided to potentially improve performance, rather than affect the result. </P>
+<P>
+<A NAME="50422148_pgfId-303387"></A><A HREF=../headers/pk_face_change.html>PK_FACE_change</A> supports a number of options that let you control how the deformation operation behaves. These are described in <A HREF="fd_chap.073.html#50422148_50739">Section 72.4.8, “Deformation options”</A>.</P>
+<P>
+<A NAME="50422148_pgfId-303391"></A>If a deform operation fails but some surfaces were successfully created, these surfaces will be reported in the Parasolid Report. This report is of <CODE>
+type </CODE>
+<A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_1_c</A>, which contains the following information:</P>
+<P>
+<A NAME="50422148_pgfId-852112"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303397"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303399"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303401"></A>status</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303403"></A>This has the value <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_deform_surf_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303405"></A><CODE>old_items</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303407"></A>Faces from the original body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303409"></A><CODE>
+new_items</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303411"></A>B-surfaces successfully created by the operation prior to the failure.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-925047"></A>	72.3.9 	<A NAME="50422148_57088"></A>Data for radiate operations </H3>
+<P>
+<A NAME="50422148_pgfId-926406"></A>You need to supply the following data for each face you are radially displacing using <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>:</P>
+<P>
+<A NAME="50422148_pgfId-945392"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-932833"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-932835"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-932845"></A><CODE>
+radial_displacement</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-932847"></A>Each point on the surface of the face is displaced radially by this amount.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-933272"></A><A HREF=../headers/pk_face_change.html>PK_FACE_change</A> supports a number of options that let you control how the radiate operation works. These are described in <A HREF="fd_chap.073.html#50422148_16052">Section 72.4.9, “Radiate options”</A>. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422148_pgfId-303416"></A>72.4	<A NAME="50422148_94482"></A><A NAME="50422148_marker-852141"></A><A NAME="50422148_marker-852142"></A>Operation-specific options 
+
+
+</H1>
+<P>
+<A NAME="50422148_pgfId-303417"></A>The <CODE>
+op_opts</CODE>
+ field (<A HREF=../headers/pk_face_change_opts_t.html>PK_FACE_change_opts_t</A>) in <A HREF=../headers/pk_face_change_t.html>PK_FACE_change_t</A> contains options specific to individual operations. It is a union of all data specified in the options structures it contains. There is one options structure for each operation that <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> can perform.</P>
+<P>
+<A NAME="50422148_pgfId-303426"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-303422"></A>Note: Do not confuse these options with those described in <A HREF="fd_chap.073.html#50422148_28023">Section 72.5, “Specifying options”</A>.</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-303424"></A><A HREF=../headers/pk_face_change_opts_t.html>PK_FACE_change_opts_t</A> contains options specific to each individual operation.</LI>
+<LI>
+<A NAME="50422148_pgfId-303425"></A><A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A> contains options that apply to the whole of the call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422148_pgfId-303428"></A>	72.4.1 	<A NAME="50422148_12828"></A>Offset options </H3>
+<P>
+<A NAME="50422148_pgfId-303429"></A>The following offset-specific options are available in <A HREF=../headers/pk_face_change_offset_o_t.html>PK_FACE_change_offset_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-316790"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-316767"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-316769"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-316771"></A>offset_methods</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-316839"></A>The offset method used. This can be one of:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-316840"></A>PK_offset_method_sx_trim_c (the default)</LI>
+<LI>
+<A NAME="50422148_pgfId-316841"></A>PK_offset_method_sx_repair_1_c</LI>
+<LI>
+<A NAME="50422148_pgfId-316842"></A>PK_offset_method_sx_repair_2_c</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-316773"></A>See <A HREF="fd_chap.059.html#50422133_69049">Section 58.3, “Removing self-intersections”</A> for information on the use of this option.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-316775"></A>offset_steps</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-316777"></A>Control whether step faces are created along smooth boundary edges. The default is PK_offset_step_no_c. See <A HREF="fd_chap.059.html#50422133_31188">Section 58.5, “Creating offset steps”</A> for information on the use of this option. See <A HREF="fd_chap.073.html#50422148_70554">Section 72.4.3.2, “Creating step faces when performing rotations or translations”</A> if you want to avoid creating step faces along smooth boundary edges in cases where adjacent faces can be extended. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-316779"></A>references</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-316928"></A>A reference face from which to measure the offset distance. The default is PK_ENTITY_null. If you supply a <CODE>
+reference</CODE>
+, then the offset is measured from the resultant position of this face, rather than relative to the current position of the offset face, thereby creating a dependent offset. In addition, the face normal of the offset face is opposed to the normal of the reference face. The final appearance of the dependent offset depends on whether the <CODE>
+reference</CODE>
+ itself is changed by the operation, as well as whether the offset face was originally an offset of the <CODE>
+reference</CODE>
+, as shown in <A HREF="fd_chap.073.html#50422148_33874"><EM>
+Figure 72-8</EM></A>. </P>
+<P>
+<A NAME="50422148_pgfId-316782"></A>The supplied <CODE>
+reference</CODE>
+ can come from a different body than the offset faces. The same <CODE>
+reference</CODE>
+ can be used for different offsets with different offset faces. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-316784"></A>ref_alignment</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-316967"></A>Control the orientation of faces that are offset with respect to the reference face. This can take one of the following values:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-316968"></A><A HREF=../headers/pk_ref_alignment_t.html>PK_ref_alignment_opposed_c</A>. The offset faces are oriented in the opposite direction to the reference face.This is the default.</LI>
+<LI>
+<A NAME="50422148_pgfId-316969"></A><A HREF=../headers/pk_ref_alignment_t.html>PK_ref_alignment_aligned_c</A> The offset faces are oriented in the same direction as the reference face.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-316786"></A>This option can only be used when <CODE>
+reference</CODE>
+ is supplied. <A HREF="fd_chap.073.html#50422148_73966"><EM>
+Figure 72-10</EM></A> illustrates this option.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-303544"></A><A HREF="fd_chap.073.html#50422148_33874"><EM>
+Figure 72-8</EM></A> shows an example in which the outside faces (shown in orange) of a pocket-like body have been tapered, and the inside faces (shown in red) have been offset dependently, so as to create the correct body in a single operation. </P>
+<P>
+<A NAME="50422148_pgfId-303537"></A>In order to achieve this, the red faces are specified as offset faces, and the orange faces are specified as <CODE>
+reference</CODE>
+ faces (as well as being specified as taper faces, in order to achieve the taper). Each dependent offset needs to be specified using a separate operation: in this case, three offset operations should be specified, one for each supplied reference face. </P>
+<P>
+<A NAME="50422148_pgfId-422382"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-844.gif">
+
+<P>
+<A NAME="50422148_pgfId-303647"></A>Figure 72-8 <A NAME="50422148_33874"></A>Creating dependent offsets by specifying offset reference faces</P>
+<P>
+<A NAME="50422148_pgfId-303651"></A><A HREF="fd_chap.073.html#50422148_33766"><EM>
+Figure 72-9</EM></A> illustrates how dependent offsets behave when patch operations are used to replace a single face with several faces. If the outer face of the dome is supplied as the <CODE>
+reference</CODE>
+ for the inner face of the dome, then, when that outer face is replaced with several faces using the patch operation (see <A HREF="fd_chap.073.html#50422148_24624">Section 72.3.7</A>), the dependent offset face is replaced with multiple offset faces. </P>
+<P>
+<A NAME="50422148_pgfId-312389"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-845.gif">
+
+<P>
+<A NAME="50422148_pgfId-317207"></A>Figure 72-9 <A NAME="50422148_33766"></A>Behaviour of dependent offsets when supplying multiple face patch data <A NAME="50422148_89514"></A></P>
+<P>
+<A NAME="50422148_pgfId-317176"></A><A HREF="fd_chap.073.html#50422148_73966"><EM>
+Figure 72-10</EM></A> illustrates how you can control the alignment of dependent offset faces using the <CODE>
+ref_alignment</CODE>
+ option. The model has one reference face in red and two offset faces in teal (one is behind the reference face and hidden from view). The visible offset face is aligned in the same direction as the reference face (the face normals are in the same direction), so <CODE>
+ref_alignment</CODE>
+ is set to <A HREF=../headers/pk_ref_alignment_t.html>PK_ref_alignment_aligned_c</A>. The offset face hidden behind the reference face is aligned in the opposite direction to the reference face (the face normals are in the opposite direction), so <CODE>
+ref_alignment</CODE>
+ is set to <A HREF=../headers/pk_ref_alignment_t.html>PK_ref_alignment_opposed_c</A>. When the reference face undergoes a rotation transformation, the transformed surface is then used to produce new surfaces for the dependent offset faces. This shows an example where the dependent offsets match the original offset distance.</P>
+<P>
+<A NAME="50422148_pgfId-303944"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-846.gif">
+
+<P>
+<A NAME="50422148_pgfId-303946"></A>Figure 72-10 <A NAME="50422148_73966"></A>Controlling the alignment of dependent offset faces</P>
+
+
+<H3>
+<A NAME="50422148_pgfId-303973"></A>	72.4.2 	<A NAME="50422148_33410"></A>Taper options </H3>
+<P>
+<A NAME="50422148_pgfId-303974"></A>The following taper-specific options are available in <A HREF=../headers/pk_face_change_taper_o_t.html>PK_FACE_change_taper_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-304042"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303977"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303979"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303981"></A>tapered_edges </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303983"></A>The edges from which tapered step faces are created. The surfaces on which these edges lie satisfy the taper condition. Edges that appear in this array should <EM>
+not</EM> also appear in the <CODE>
+normal_edges</CODE>
+ array.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303985"></A>normal_edges </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303987"></A>The edges from which normal step faces are created. The surfaces on which these edges lie do not necessarily satisfy the taper condition. Edges that appear in this array should <EM>
+not</EM> appear in the <CODE>
+tapered_edges</CODE>
+ array as well.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-303989"></A>method </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-303991"></A>The tapering method used. This can be one of:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-303992"></A><A HREF=../headers/pk_taper_method_t.html>PK_taper_method_curve_c</A></LI>
+<LI>
+<A NAME="50422148_pgfId-303993"></A><A HREF=../headers/pk_taper_method_t.html>PK_taper_method_surface_c</A></LI>
+<LI>
+<A NAME="50422148_pgfId-303994"></A><A HREF=../headers/pk_taper_method_t.html>PK_taper_method_isocline_c</A></LI>
+<LI>
+<A NAME="50422148_pgfId-303995"></A><A HREF=../headers/pk_taper_method_t.html>PK_taper_method_normal_c</A></LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-303999"></A>The default is PK_method_curve_c. See <A HREF="fd_chap.067.html#50422142_57713">Section 66.3, “Taper methods”</A> for more detail.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-304001"></A>taper_smooth_step</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304003"></A>Automatically create side faces at edges between taper faces and non-taper faces that are smooth. See <A HREF="fd_chap.067.html#50422142_25319">Section 66.4.2, “Automatic step tapering”</A>, for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-304008"></A>taper_step_face</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304010"></A>Control the creation of step faces between taper faces that become separated as a result of the taper operation. See <A HREF="fd_chap.067.html#50422142_62022">Section 66.4.3, “Creating steps between taper faces”</A>, for more details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-304015"></A>position</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304019"></A>Control the position of laminar edges on tapered faces. See <A HREF="fd_chap.067.html#50422142_60296">Section 66.6, “Controlling laminar edges”</A>, for more details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-304022"></A>parting_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304024"></A>Edges that are used to create step faces from <CODE>
+parting_body</CODE>
+. Default is null. See <A HREF="fd_chap.067.html#50422142_48121">Section 66.4.4, “Creating step faces from a parting body”</A>, for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-304029"></A>n_parting_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304033"></A>Number of <CODE>
+parting_edges</CODE>
+. Default is zero. See <A HREF="fd_chap.067.html#50422142_48121">Section 66.4.4, “Creating step faces from a parting body”</A>, for more details,</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-304036"></A>parting_body</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304038"></A>The body used to create step faces from the parting edges. This must be a sheet body. Default is PK_ENTITY_null. See <A HREF="fd_chap.067.html#50422142_48121">Section 66.4.4, “Creating step faces from a parting body”</A>, for more details.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-304045"></A>For more information about creating tapered surfaces, see <A HREF="tapering.html#18895">Section 64.2, “Adding draft”</A>.</P>
+
+
+<H3>
+<A NAME="50422148_pgfId-304068"></A>	72.4.3 	<A NAME="50422148_10386"></A>Transform options </H3>
+<P>
+<A NAME="50422148_pgfId-304069"></A>The following transform-specific options are available in <A HREF=../headers/pk_face_change_transform_o_t.html>PK_FACE_change_transform_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-857921"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304072"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304074"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-852999"></A>n_loops</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-853001"></A>The number of boundary loops contained in the feature. (Default 0). See <A HREF="fd_chap.073.html#50422148_87683">Section 72.4.3.1, “Specifying the destination for boundary loops”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-853003"></A>base_loops</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-853005"></A>The boundary loops of the feature. (Default NULL). See <A HREF="fd_chap.073.html#50422148_87683">Section 72.4.3.1, “Specifying the destination for boundary loops”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-853007"></A>target_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-853009"></A>The destination face of each boundary loop. (Default NULL). See <A HREF="fd_chap.073.html#50422148_87683">Section 72.4.3.1, “Specifying the destination for boundary loops”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-304076"></A>transform_step</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304078"></A>Whether to create step faces when performing rotation or translation transforms. See <A HREF="fd_chap.073.html#50422148_70554">Section 72.4.3.2, “Creating step faces when performing rotations or translations”</A> for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-744228"></A>transform_intent</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-744230"></A>Whether the rotation will add material, remove material, or produce the minimal rotation. Default: <A HREF=../headers/pk_transform_intent_t.html>PK_transform_intent_minimal_c</A>.</P>
+<P>
+<A NAME="50422148_pgfId-744850"></A>See <A HREF="fd_chap.073.html#50422148_73367">Section 72.4.3.3, “Choosing the direction of a rotational transform”</A>.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422148_pgfId-852595"></A>72.4.3.1 <A NAME="50422148_87683"></A>Specifying the destination for boundary loops</H4>
+<P>
+<A NAME="50422148_pgfId-304557"></A>The <CODE>
+base_loops</CODE>
+ and <CODE>
+target_faces</CODE>
+ options enable you to efficiently transform the set of faces (the “feature”) supplied in the <CODE>
+faces</CODE>
+ array such that the boundary loops of the feature move out of their original face. These loops are given in the <CODE>
+base_loops</CODE>
+ array and the corresponding destination faces in the <CODE>
+target_faces</CODE>
+ array. The effect is the same as for patterning to a different face (see <A HREF="fd_chap.055.html#50422128_67894">Section 54.3.5, “General patterning”</A>), and the options work in exactly the same way, except for the fact that the feature is <EM>
+moved</EM> (transformed)<STRONG>
+ </STRONG>rather than copied (therefore only a single new instance of the feature is created).</P>
+<P>
+<A NAME="50422148_pgfId-304564"></A>As mentioned in <A HREF="fd_chap.055.html#50422128_67894">Section 54.3.5, “General patterning”</A>, these options should not be specified if the target faces are not known beforehand or the new instances might cross existing edges. In these cases, Parasolid can still carry out the operation but the performance may not be optimal (since Parasolid would need to calculate the target_faces internally).</P>
+<P>
+<A NAME="50422148_pgfId-304568"></A><A HREF="fd_chap.073.html#50422148_30148"><EM>
+Figure 72-11</EM></A> shows an example of a feature that constitutes a hollow cylinder through the solid, with boundary loops on two faces as shown in the diagram. The base_loops array contains two boundary loops and the target_faces array two destination faces as shown. The corresponding new instance is shown on the right-hand side. For comparison, see <A HREF="fd_chap.073.html#50422148_30148"><EM>
+Figure 72-11</EM></A> of <A HREF="fd_chap.055.html#50422128_67894">Section 54.3.5, “General patterning”</A>.</P>
+<P>
+<A NAME="50422148_pgfId-394869"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-847.gif">
+
+<P>
+<A NAME="50422148_pgfId-304709"></A>Figure 72-11 <A NAME="50422148_30148"></A>New instance lies in different faces than the original feature and transformed boundary loops are not coincident with their destination faces</P>
+<P>
+<A NAME="50422148_pgfId-304713"></A><A HREF="fd_chap.073.html#50422148_35768"><EM>
+Figure 72-12</EM></A> shows a sheet body where the new instance of the feature crosses the boundary of the target body. In this case, the <CODE>
+target_faces</CODE>
+ are not known, and <CODE>
+n_loops</CODE>
+ and <CODE>
+base_loops</CODE>
+ should not be set.</P>
+<P>
+<A NAME="50422148_pgfId-395544"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-848.gif">
+
+<P>
+<A NAME="50422148_pgfId-788714"></A>Figure 72-12 <A NAME="50422148_35768"></A>New instance crosses existing edges: transform-specific options are not specified</P>
+
+
+<H4>
+<A NAME="50422148_pgfId-744245"></A>72.4.3.2 <A NAME="50422148_70554"></A>Creating step faces when performing rotations or translations </H4>
+<P>
+<A NAME="50422148_pgfId-867790"></A>The <CODE>
+transform_step</CODE>
+ option lets you control whether <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> creates step faces when performing rotations or translations. <A HREF="fd_chap.073.html#50422148_99798"><EM>
+Figure 72-13</EM></A> shows two examples of this behaviour. In the first example, a face is translated along the direction shown, thereby creating a side face. In the second, more complex, example, a set of faces are rotated, thereby creating a set of side faces, as well as reblending a chain of blend faces. </P>
+<P>
+<A NAME="50422148_pgfId-304167"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-849.gif">
+
+<P>
+<A NAME="50422148_pgfId-304169"></A>Figure 72-13 <A NAME="50422148_99798"></A>Creating step faces during translation and rotation operations</P>
+<P>
+<A NAME="50422148_pgfId-863793"></A>The <CODE>
+transform_step</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422148_pgfId-863820"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863797"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863799"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863801"></A><A HREF=../headers/pk_transform_step_t.html>PK_transform_step_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863803"></A>Do not create step faces (Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863805"></A><A HREF=../headers/pk_transform_step_t.html>PK_transform_step_smooth_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863807"></A>Create step faces at all smooth boundary edges</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863809"></A><A HREF=../headers/pk_transform_step_t.html>PK_transform_step_smooth_site_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863811"></A>Only create step faces at smooth boundary edges, if it cannot be done by growing the faces on either end of the boundary edges. Site faces that contain facet geometry will not be grown.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863813"></A><A HREF=../headers/pk_transform_step_t.html>PK_transform_step_not_coi_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863815"></A>Create step faces at boundary edges where the surface of the step face is not coincident with the surface of the adjacent face.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863817"></A><A HREF=../headers/pk_transform_step_t.html>PK_transform_step_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-863819"></A>Create step faces at all boundary edges</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-304173"></A><A HREF="fd_chap.073.html#50422148_89383"><EM>
+Figure 72-14</EM></A> shows the effect of using <A HREF=../headers/pk_transform_step_t.html>PK_transform_step_not_coi_c</A> to specify that step faces should only be created at boundary edges where the surfaces of the step face and the adjacent face are not coincident. </P>
+<P>
+<A NAME="50422148_pgfId-304261"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-850.gif">
+
+<P>
+<A NAME="50422148_pgfId-304263"></A>Figure 72-14 <A NAME="50422148_89383"></A>Creating step faces at all non-coincident boundary edges</P>
+<P>
+<A NAME="50422148_pgfId-304264"></A>You can also choose to avoid creating step faces at any smooth boundary edges where faces on either end of the boundary edge can be extended and merged (<A HREF=../headers/pk_transform_step_t.html>PK_transform_step_smooth_site_c</A>). These neighboring faces, called <STRONG>
+site faces</STRONG>, need to;</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-586586"></A>be coincident with each other and</LI>
+<LI>
+<A NAME="50422148_pgfId-586587"></A>share a single smooth boundary edge</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-304295"></A>However, if the shared smooth boundary edge is not mergeable and it does not lie on the surface of the site faces, then a step face will be created.</P>
+<P>
+<A NAME="50422148_pgfId-303934"></A><A HREF="fd_chap.073.html#50422148_64624"><EM>
+Figure 72-15</EM></A> shows how <A HREF=../headers/pk_transform_step_t.html>PK_transform_step_smooth_site_c</A> can be used to avoid the creation of step faces when the site faces are coincident</P>
+<P>
+<A NAME="50422148_pgfId-313627"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-851.gif">
+
+<P>
+<A NAME="50422148_pgfId-304402"></A>Figure 72-15 <A NAME="50422148_64624"></A>Using <A HREF=../headers/pk_transform_step_t.html>PK_transform_step_smooth_site_c</A> with coincident site faces</P>
+<P>
+<A NAME="50422148_pgfId-304403"></A>If you use <A HREF=../headers/pk_transform_step_t.html>PK_transform_step_smooth_site_c</A> and the site faces are not coincident, then a step face will be created. This is the same behaviour as <A HREF=../headers/pk_transform_step_t.html>PK_transform_step_smooth_c</A>. <A HREF="fd_chap.073.html#50422148_99258"><EM>
+Figure 72-16</EM></A> illustrates this behaviour.</P>
+<P>
+<A NAME="50422148_pgfId-313677"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-852.gif">
+
+<P>
+<A NAME="50422148_pgfId-304511"></A>Figure 72-16 <A NAME="50422148_99258"></A>Creation of step faces with non coincident site faces </P>
+<P>
+<A NAME="50422148_pgfId-304512"></A>The <CODE>
+transform_step</CODE>
+ option offers the same behaviour for <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> that the <CODE>
+offset_step</CODE>
+ options do for offsetting (<A HREF="fd_chap.059.html#50422133_22949" CLASS="XRef">Chapter 58, “Offsetting”</A>), hollowing (<A HREF="fd_chap.060.html#50422134_22949">Chapter 59, “Hollowing”</A>), and thickening (<A HREF="fd_chap.061.html#50422135_34338">Chapter 60, “Thickening”</A>) operations.</P>
+
+
+<H4>
+<A NAME="50422148_pgfId-745056"></A>72.4.3.3 <A NAME="50422148_73367"></A>Choosing the direction of a rotational transform </H4>
+<P>
+<A NAME="50422148_pgfId-745190"></A>If the supplied transformation is a rotation, you can use the <CODE>
+transform_intent</CODE>
+ option to choose the direction of the rotation and whether its intent is to add material, remove material, or produce the minimal rotation needed for the transformation. It takes the following values:</P>
+<P>
+<A NAME="50422148_pgfId-749133"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-745391"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-745393"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-745395"></A><A HREF=../headers/pk_transform_intent_t.html>PK_transform_intent_minimal_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-745397"></A>Apply the rotation in the direction that applies the minimal rotation to the transformation regardless of whether it adds or removes or adds and removes material. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-745399"></A><A HREF=../headers/pk_transform_intent_t.html>PK_transform_intent_grow_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-745401"></A>Apply the rotation in the direction that adds material to the transformation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-745403"></A><A HREF=../headers/pk_transform_intent_t.html>PK_transform_intent_trim_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-745405"></A>Apply the rotation in the direction that removes material from the transformation.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-745369"></A><A HREF="fd_chap.073.html#50422148_16322"><EM>
+Figure 72-17</EM></A> illustrates the effect of rotating and either growing or trimming a face. When <CODE>
+transform_intent</CODE>
+ is set to <A HREF=../headers/pk_transform_intent_t.html>PK_transform_intent_trim_c</A>, the blue face is rotated 90 degrees in the clockwise direction and material is trimmed. </P>
+<P>
+<A NAME="50422148_pgfId-758074"></A>If the same blue face is rotated 90 degrees in the same direction but its intent is to grow the face (i.e. <CODE>
+transform_intent</CODE>
+ is set to <A HREF=../headers/pk_transform_intent_t.html>PK_transform_intent_grow_c</A>), material is added to the transformation and a complete rotation is produced. In this example setting <CODE>
+transform_intent</CODE>
+ to <A HREF=../headers/pk_transform_intent_t.html>PK_transform_intent_minimal_c</A> will produce the same result as setting the option to <A HREF=../headers/pk_transform_intent_t.html>PK_transform_intent_trim_c</A>.</P>
+<P>
+<A NAME="50422148_pgfId-748835"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-853.gif">
+
+<P>
+<A NAME="50422148_pgfId-745160"></A>Figure 72-17 <A NAME="50422148_16322"></A>The effects of rotating and either growing or trimming a face</P>
+
+
+
+<H3>
+<A NAME="50422148_pgfId-304915"></A>	72.4.4 	<A NAME="50422148_marker-304912"></A><A NAME="50422148_marker-304913"></A><A NAME="50422148_63900"></A>Replace options </H3>
+<P>
+<A NAME="50422148_pgfId-304916"></A>The following replace-specific options are available in <A HREF=../headers/pk_face_change_replace_o_t.html>PK_FACE_change_replace_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-304970"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304944"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304946"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-304948"></A>merge</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304953"></A>Control whether Parasolid merges adjacent faces that become mergeable as a result of replacing the surfaces of some faces. See <A HREF="fd_chap.066.html#50422141_70995">Section 65.2, “Merging adjacent faces”</A>, for more information. By default, faces that become mergeable are not merged automatically.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-304958"></A>variation</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-304960"></A>Allows you to perform a variational replacement operation. Typical examples of variational replacement operations include deformations and variable offsets.</P>
+<P>
+<A NAME="50422148_pgfId-304961"></A>Performing a variational replacement operation improves regeneration of nearly smooth edges and vertices in the result body. See <A HREF="fd_chap.066.html#50422141_66433">Section 65.3, “Using variational surfaces to improve regeneration of smooth geometry”</A>, for more information. </P>
+<P>
+<A NAME="50422148_pgfId-304965"></A>By default, replacement surfaces are not assumed to be variational surfaces, and so regeneration of smooth geometry is not improved. </P>
+<P>
+<A NAME="50422148_pgfId-304969"></A><A HREF="fd_chap.073.html#50422148_76445"><EM>
+Figure 72-18</EM></A> shows an example in which two surfaces in a body are being replaced, while reblending two chains of blends. Both replacement surfaces are variable offsets of the original surfaces, and so by using the <CODE>
+variation</CODE>
+ option, the geometry between the two replacements surfaces can be improved. As part of the call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>, the chains of blends are also reblended as shown.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-314158"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-854.gif">
+
+<P>
+<A NAME="50422148_pgfId-305040"></A>Figure 72-18 <A NAME="50422148_76445"></A>Improving nearly smooth geometry using variational replacement surfaces</P>
+
+
+<H3>
+<A NAME="50422148_pgfId-305045"></A>	72.4.5 	<A NAME="50422148_marker-1176004"></A><A NAME="50422148_marker-1176005"></A><A NAME="50422148_marker-1176006"></A><A NAME="50422148_30814"></A>Blend options </H3>
+<P>
+<A NAME="50422148_pgfId-305048"></A>When you specify a blend operation (see <A HREF="fd_chap.073.html#50422148_75725">Section 72.2, “Specifying operations”</A>), <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> can reapply blends that need to be updated as a result of a generic modelling operation: this is a process often referred to as <STRONG>
+reblending</STRONG>. </P>
+<P>
+<A NAME="50422148_pgfId-305050"></A><A HREF=../headers/pk_face_change.html>PK_FACE_change</A> can reblend any constant radius rolling ball blend that needs to be updated. All you need to do to achieve this is to supply the faces to be reblended and set their <CODE>
+operations.op_type</CODE>
+ to PK_FACE_change_type_blend_c: no further information is required in order to reapply any blends using their original radii. </P>
+<P>
+<A NAME="50422148_pgfId-305085"></A>However, if you want more control over how the reblending takes place, you can supply additional information using the <A HREF=../headers/pk_face_change_blend_o_t.html>PK_FACE_change_blend_o_t</A> options structure. Supplying such information lets you:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-305086"></A>Reblend using a different radius.</LI>
+<LI>
+<A NAME="50422148_pgfId-305087"></A>Control how blend overflow should be applied. </LI>
+<LI>
+<A NAME="50422148_pgfId-305091"></A>Reblend faces that Parasolid cannot identify as blends, including chamfers.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-305092"></A>This section tells you how to use these options. </P>
+<P>
+<A NAME="50422148_pgfId-791440"></A>The following table provides a summary of the blend-specific options that are available in <A HREF=../headers/pk_face_change_blend_o_t.html>PK_FACE_change_blend_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-305121"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305096"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305098"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305100"></A>xs_shape</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305102"></A>The cross-section shape of the blend after it is reblended. You only need to specify this option when reblending chamfers.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305104"></A>radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305106"></A>The blend radius to use when reapplying the blend.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305108"></A>n_unders</PRE>
+<PRE><A NAME="50422148_pgfId-305109"></A>unders</PRE>
+<PRE><A NAME="50422148_pgfId-305110"></A>orientations</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305112"></A>The faces underlying the blend, and the direction of the blend face relative to these underlying faces. You only need to use these options when reblending faces that are not recognised as blends, or when reblending chamfers.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305114"></A>ranges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305116"></A>The ranges on each of the faces underlying the blend. You only need to use this option when reblending chamfers.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305118"></A>ov_smooth</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305120"></A>The conditions in which to allow smooth overflow when recalculating blends. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-305122"></A>These options are described in more detail throughout the rest of this section. </P>
+
+<H4>
+<A NAME="50422148_pgfId-305123"></A>72.4.5.1 Reblending rolling ball blends </H4>
+<P>
+<A NAME="50422148_pgfId-305124"></A>By default, rolling ball blends are reapplied without you having to supply any additional information in the call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> beyond the blend operation itself. However, if you wish, you can use the <CODE>
+radius</CODE>
+ option to specify a new radius for the reapplied blend. </P>
+<P>
+<A NAME="50422148_pgfId-305125"></A>If <CODE>
+radius</CODE>
+ is 0.0 (the default), then the radius used when reapplying the blend is the same as the radius of the original blend.</P>
+
+
+<H4>
+<A NAME="50422148_pgfId-305126"></A>72.4.5.2 Reblending blend-like faces </H4>
+<P>
+<A NAME="50422148_pgfId-305127"></A>By default, <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> reblends faces whose surfaces lie within tolerance of a rolling ball blend (i.e. faces that would be returned by <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A>).</P>
+<P>
+<A NAME="50422148_pgfId-305131"></A>If you want to reblend a blend-like face that Parasolid doesn’t recognise as a blend (for example if editing a model that has been created to a looser tolerance in a different system), then you must supply the following options: </P>
+<P>
+<A NAME="50422148_pgfId-305150"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305134"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305136"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305138"></A>n_unders</PRE>
+<PRE><A NAME="50422148_pgfId-305139"></A>unders</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305141"></A>The faces underlying the faces to be reblended. This must be 0, 2, or 3. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305143"></A>orientations</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305145"></A>An array of length <CODE>
+n_unders</CODE>
+ that provides the direction of the blend face, relative to the normal of the corresponding underlying face in <CODE>
+unders</CODE>
+. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305147"></A>radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305149"></A>The radius of the reapplied blend. When reblending blend-like faces, this field must be supplied. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-305178"></A>The way you use these options depends on the type of blend you are reblending:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-305179"></A>For an edge blend, set <CODE>
+n_unders</CODE>
+=2, and supply <CODE>
+unders</CODE>
+ and <CODE>
+orientations</CODE>
+, together with a <CODE>
+radius</CODE>
+.</LI>
+<LI>
+<A NAME="50422148_pgfId-305183"></A>For a branch face blend, set <CODE>
+n_unders</CODE>
+=3, and supply only <CODE>
+unders</CODE>
+. <A HREF="fd_chap.073.html#50422148_65215"><EM>
+Figure 72-21</EM></A> shows an example using a chamfer.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-305190"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-305189"></A>Note: When using these options to reblend faces, Parasolid replaces the original faces with a rolling ball blend. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422148_pgfId-305191"></A>72.4.5.3 Reblending chamfers </H4>
+<P>
+<A NAME="50422148_pgfId-305192"></A>If you supply sufficient additional information, <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> can also reapply chamfers. <A HREF="fd_chap.073.html#50422148_86907"><EM>
+Figure 72-19</EM></A> shows two simple examples:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-305196"></A>In the first example, an existing chamfer has been reapplied with new ranges. The new chamfer successfully resolves the clash with the nearby boss on the top of the body.</LI>
+<LI>
+<A NAME="50422148_pgfId-305197"></A>In the second example, a blend has been reapplied with a new radius, causing the chamfers to be recalculated. In particular, the configuration of the chamfers has been changed so that the middle chamfer is no longer degenerate.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-314599"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-855.gif">
+
+<P>
+<A NAME="50422148_pgfId-314481"></A>Figure 72-19 <A NAME="50422148_86907"></A>Reblending chamfers</P>
+<P>
+<A NAME="50422148_pgfId-305257"></A>To reblend chamfers, you need to supply the underlying faces of the chamfers, together with their orientations, using the <CODE>
+n_unders</CODE>
+, <CODE>
+unders</CODE>
+, and <CODE>
+orientations</CODE>
+ options already described, in combination with the following options:</P>
+<P>
+<A NAME="50422148_pgfId-305274"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305260"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305262"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305264"></A>xs_shape</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305266"></A>The cross-section shape of the blend after it has been reapplied. By default, this is <A HREF=../headers/pk_blend_xs_shape_t.html>PK_blend_xs_shape_conic_c</A>. To reblend a chamfer, set it to <A HREF=../headers/pk_blend_xs_shape_t.html>PK_blend_xs_shape_chamfer_c</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305268"></A>ranges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305270"></A>An array of length <CODE>
+n_unders</CODE>
+ that specifies the distance of the chamfer from the corresponding underlying faces, as shown in <A HREF="fd_chap.073.html#50422148_40051"><EM>
+Figure 72-20</EM></A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-305292"></A>The way you use these options depends on the type of chamfer you are reblending:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-305293"></A>For an edge chamfer, set <CODE>
+n_unders</CODE>
+=2, and supply <CODE>
+unders</CODE>
+ and <CODE>
+orientations</CODE>
+, together with a pair of <CODE>
+ranges</CODE>
+.</LI>
+<LI>
+<A NAME="50422148_pgfId-305240"></A>For a branch face chamfer, set <CODE>
+n_unders</CODE>
+=3, and supply only <CODE>
+unders</CODE>
+, as shown in <A HREF="fd_chap.073.html#50422148_65215"><EM>
+Figure 72-21</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-456021"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-856.gif">
+
+<P>
+<A NAME="50422148_pgfId-456023"></A>Figure 72-20 <A NAME="50422148_40051"></A>Specifying ranges for edge chamfers</P>
+<P>
+<A NAME="50422148_pgfId-314970"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-857.gif">
+
+<P>
+<A NAME="50422148_pgfId-305418"></A>Figure 72-21 <A NAME="50422148_65215"></A>Specifying underlying faces for branch face chamfers</P>
+<P>
+<A NAME="50422148_pgfId-305422"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-305421"></A>Note: It is an error to set <CODE>
+xs_shape</CODE>
+ to either <A HREF=../headers/pk_blend_xs_shape_t.html>PK_blend_xs_shape_g2_c</A> or <A HREF=../headers/pk_blend_xs_shape_t.html>PK_blend_xs_shape_unset_c</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422148_pgfId-305423"></A>72.4.5.4 Specifying overflow when reblending </H4>
+<P>
+<A NAME="50422148_pgfId-305424"></A>You can use the <CODE>
+ov_smooth</CODE>
+ option to control how blend overflow when reblending. By default, when a blend overflows a smooth edge, smooth overflow is only possible when the blend face and the face on the other side of the smooth edge have different convexities. If they have the same convexity, then a notch overflow is created instead. This option lets you specify that smooth overflow be used in cases when they have the same convexity as well.</P>
+<P>
+<A NAME="50422148_pgfId-305428"></A><A HREF="fd_chap.073.html#50422148_45487"><EM>
+Figure 72-22</EM></A> shows an example in which a blend has been repositioned such that it overflows a smooth edge. The faces on either side of the smooth edge have the same convexity as the blend face that needs to be recalculated. By default, a notch overflow is created (<A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_diff_c</A>), but by setting <CODE>
+ov_smooth</CODE>
+ to <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_any_c</A>, a smooth overflow can be created. </P>
+<P>
+<A NAME="50422148_pgfId-315022"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-858.gif">
+
+<P>
+<A NAME="50422148_pgfId-305517"></A>Figure 72-22 <A NAME="50422148_45487"></A>Specifying notch or smooth overflow when overflowing smooth edges with the same convexity as the blend</P>
+<P>
+<A NAME="50422148_pgfId-305521"></A>To find out more about blend overflow behaviour, see <A HREF="fd_chap.077.html#50422153_39578">Chapter 76, “Edge Blend Overflows”</A>.</P>
+<P>
+<A NAME="50422148_pgfId-305525"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-305524"></A>Note: It is an error to set <CODE>
+ov_smooth</CODE>
+ to <A HREF=../headers/pk_blend_ov_smooth_t.html>PK_blend_ov_smooth_no_c</A>. This value is reserved for edge blend functionality. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422148_pgfId-458820"></A>72.4.5.5 Constraints when reapplying blends </H4>
+<P>
+<A NAME="50422148_pgfId-466972"></A>The constraints on when reblend options may be combined are moderately complex. If you have a problem with bad option combinations, please refer to this list of invalid combinations of options:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-466973"></A><CODE>
+n_unders</CODE>
+ &gt; 0 and no <CODE>
+unders</CODE>
+ have been supplied.</LI>
+<LI>
+<A NAME="50422148_pgfId-459059"></A><CODE>
+n_unders</CODE>
+ = 2 and no <CODE>
+orientations</CODE>
+ have been supplied.</LI>
+<LI>
+<A NAME="50422148_pgfId-459060"></A><CODE>
+n_unders</CODE>
+ = 2 and neither <CODE>
+radius</CODE>
+ nor <CODE>
+ranges</CODE>
+ have been supplied.</LI>
+<LI>
+<A NAME="50422148_pgfId-459061"></A><CODE>
+n_unders</CODE>
+ = 3 and <CODE>
+radius</CODE>
+ not set to 0.0, <CODE>
+ranges</CODE>
+ or <CODE>
+orientations</CODE>
+ not set to NULL.</LI>
+<LI>
+<A NAME="50422148_pgfId-459062"></A><CODE>
+xs_shape</CODE>
+ set to <A HREF=../headers/pk_blend_xs_shape_t.html>PK_blend_xs_shape_chamfer_c</A> but no <CODE>
+unders</CODE>
+ have been supplied.</LI>
+<LI>
+<A NAME="50422148_pgfId-459063"></A><CODE>
+xs_shape</CODE>
+ set to <A HREF=../headers/pk_blend_xs_shape_t.html>PK_blend_xs_shape_chamfer_c</A> and <CODE>
+radius</CODE>
+ not set to 0.0.</LI>
+<LI>
+<A NAME="50422148_pgfId-459064"></A><CODE>
+xs_shape</CODE>
+ set to <A HREF=../headers/pk_blend_xs_shape_t.html>PK_blend_xs_shape_conic_c</A> and <CODE>
+ranges</CODE>
+ not set to NULL.</LI>
+<LI>
+<A NAME="50422148_pgfId-459419"></A><CODE>
+n_unders</CODE>
+ = 3 and not all members of <CODE>
+unders</CODE>
+ are being reapplied as blends/chamfers with their <CODE>
+xs_shape</CODE>
+ set to same value as <CODE>
+xs_shape</CODE>
+.</LI>
+</UL>
+
+
+
+<H3>
+<A NAME="50422148_pgfId-305528"></A>	72.4.6 	<A NAME="50422148_marker-305526"></A><A NAME="50422148_marker-305527"></A>Bend options </H3>
+<P>
+<A NAME="50422148_pgfId-305529"></A>The following bend-specific option is  available in <A HREF=../headers/pk_face_change_bend_o_t.html>PK_FACE_change_bend_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-791049"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305554"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305556"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305558"></A>merge</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305560"></A>Whether to merge faces that become mergeable as a result of a bend operation. Three settings are possible:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-305561"></A>Do not merge any mergeable faces after the bend operation</LI>
+<LI>
+<A NAME="50422148_pgfId-305562"></A>Merge together any mergeable faces that were produced by this bend operation, together with any adjacent mergeable faces produced by other bend operations in the call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>, so long as those adjacent faces are themselves also marked as mergeable.</LI>
+<LI>
+<A NAME="50422148_pgfId-305563"></A>Merge together mergeable faces that were produced by this bend operation, together with any other mergeable faces that share at least one common edge with them</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-305566"></A>	72.4.7 	<A NAME="50422148_21143"></A>Patch options </H3>
+<P>
+<A NAME="50422148_pgfId-305567"></A>The following patch-specific options are available in <A HREF=../headers/pk_face_change_patch_o_t.html>PK_FACE_change_patch_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-791257"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305570"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305572"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305574"></A>patch_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305576"></A>A structure that lets you explicitly map faces in the supplied <CODE>
+sheet</CODE>
+ onto faces to be patched in the target body. This option offers the same functionality as the <CODE>
+patch_data</CODE>
+ option in <A HREF=../headers/pk_face_replace_with_sheet.html>PK_FACE_replace_with_sheet</A>. See <A HREF="fd_chap.069.html#50422144_78033">Section 68.3, “Replacing specific target faces with specific tool faces”</A>, for more details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305581"></A>mobility</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305583"></A>Whether to treat patch faces as fixed or moving faces when resolving clashes with other parts of the model. This lets you control whether or not patch faces are extended to resolve clashes, depending on the value of the <CODE>
+grow</CODE>
+ option in <A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A>. See <A HREF="fd_chap.073.html#50422148_79693">Section 72.4.7.1, “Treating patch faces as fixed or moving when resolving clashes”</A>, below, for more details.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422148_pgfId-305589"></A>72.4.7.1 <A NAME="50422148_79693"></A>Treating patch faces as fixed or moving when resolving clashes </H4>
+<P>
+<A NAME="50422148_pgfId-305590"></A>Patch faces supplied to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> are introduced into the model in their supplied positions. If these new faces clash with other areas of the model, they are treated in the same way as faces that have not moved when using the <CODE>
+grow</CODE>
+ option (described in <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5</A>), because they are not part of the original body. This has an effect on whether or not they can be extended in order to resolve the clashes.</P>
+<P>
+<A NAME="50422148_pgfId-305594"></A>Because the patch faces replace input faces in the call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>, this default behaviour might not always be convenient; you might want to treat patch faces as moving faces instead, so as to produce behaviour similar to what would be seen if an operation other than patching had been applied to the input faces.</P>
+<P>
+<A NAME="50422148_pgfId-305595"></A>You can use the patch-specific <CODE>
+mobility</CODE>
+ option to perform this task. This takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-305596"></A><A HREF=../headers/pk_patch_mobility_t.html>PK_patch_mobility_moving_c</A>: treat patch faces as moving faces.</LI>
+<LI>
+<A NAME="50422148_pgfId-305597"></A><A HREF=../headers/pk_patch_mobility_t.html>PK_patch_mobility_fixed_c</A>: do not treat patch faces as moving faces. This is the default.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-305621"></A>The exact behaviour of the mobility option (i.e., whether patch faces are extended, or whether the faces they clash with are extended, in order to resolve the clash) depends on the values of both <CODE>
+mobility</CODE>
+ and <CODE>
+grow</CODE>
+, and also how the faces they are clashing with are treated. The following table describes all possible combinations of values. </P>
+<P>
+<A NAME="50422148_pgfId-542224"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305624"></A>mobility</PRE>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305626"></A>grow</PRE>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305628"></A>Clash with ...</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305630"></A>Behaviour</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305632"></A>fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305634"></A>moving_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305636"></A>fixed face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305641"></A>Parasolid determines which faces to grow.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305643"></A>fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305645"></A>moving_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305647"></A>moving face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305649"></A>Other faces grown.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305651"></A>fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305653"></A>fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305655"></A>fixed face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305660"></A>Parasolid determines which faces to grow.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305662"></A>fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305664"></A>fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305666"></A>moving face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305668"></A>Patch faces grown.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305670"></A>moving_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305672"></A>moving_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305674"></A>fixed face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305676"></A>Patch faces grown.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305678"></A>moving_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305680"></A>moving_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305682"></A>moving face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305687"></A>Parasolid determines which faces to grow.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305689"></A>moving_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305691"></A>fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305693"></A>fixed face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305695"></A>Other faces grown.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305697"></A>moving_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305699"></A>fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305701"></A>moving face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305706"></A>Parasolid determines which faces to grow.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-305707"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-542234"></A>Note: The <CODE>
+mobility</CODE>
+ option only has an effect if the <CODE>
+grow</CODE>
+ option is set to PK_FACE_grow_moving_c or PK_FACE_grow_fixed_c. See <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A>, for more information. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-305715"></A><A HREF="fd_chap.073.html#50422148_46310"><EM>
+Figure 72-23</EM></A> shows an example in which a blind hole replaced by a sheet. The resulting new hole clashes with the upright part of the L-shaped block, which is itself treated as fixed. By choosing different values for <CODE>
+mobility</CODE>
+, you can choose whether or not to extend the patch faces into the upright part of the block, or the upright block into the patch faces, as shown. </P>
+<P>
+<A NAME="50422148_pgfId-315345"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-859.gif">
+
+<P>
+<A NAME="50422148_pgfId-305783"></A>Figure 72-23 <A NAME="50422148_46310"></A>Controlling the growth of patch faces that clash with overflowing features</P>
+
+
+
+<H3>
+<A NAME="50422148_pgfId-305785"></A>	72.4.8 	<A NAME="50422148_50739"></A>Deformation options </H3>
+<P>
+<A NAME="50422148_pgfId-305786"></A>You can control the behaviour of a deformation operation using the following options, which are available in <A HREF=../headers/pk_face_change_deform_o_t.html>PK_FACE_change_deform_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-305862"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305824"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305826"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305828"></A>n_matched_edges</PRE>
+<PRE><A NAME="50422148_pgfId-305829"></A>matched_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305831"></A>You can use the <CODE>
+matched_edges</CODE>
+ array in cases where you are applying different operations on adjacent faces in the model, or deforming adjacent faces using different evaluator functions. In such cases, you can specify any shared edges between these adjacent faces as <CODE>
+matched_edges</CODE>
+ if you know that the deformation on one face matches the change to the other face along that edge. This can improve the reliability and performance of the deform operation. </P>
+<P>
+<A NAME="50422148_pgfId-305835"></A><A HREF="fd_chap.073.html#50422148_20777"><EM>
+Figure 72-24</EM></A> shows a simple example in which two faces are deformed using the same evaluator function, while a third face has no operation performed on it. By specifying the unmoving shared edge between these faces as a matched edge, you can improve the reliability of the result.</P>
+<ADDRESS>
+<A NAME="50422148_pgfId-305836"></A>Note: Because of the constraints of the operator used by the <CODE>
+eval_fn</CODE>
+, edges between adjacent faces that use the same <CODE>
+eval_fn</CODE>
+ and <CODE>
+eval_data</CODE>
+ do not need to be specified as matched edges. </ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-305838"></A>thread_safe</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-305840"></A>Whether or not the supplied <CODE>
+eval_fn</CODE>
+ can be called from more than one Parasolid thread simultaneously. </P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-305847"></A>If PK_LOGICAL_false, Parasolid ensures the supplied <CODE>
+eval_fn</CODE>
+ is only called from one thread at a time, even if Parasolid SMP is enabled. (Default)</LI>
+<LI>
+<A NAME="50422148_pgfId-305851"></A>If PK_LOGICAL_true, the supplied <CODE>
+eval_fn</CODE>
+ may be called from multiple threads at once if Parasolid SMP is enabled. It is the application’s responsibility to ensure that the function is thread-safe.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-305860"></A>For more information about Parasolid SMP, see <A HREF="fd_chap.115.html#50422196_23582">Chapter 114, “Symmetric Multi-Processing In Parasolid”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-506170"></A>deform_uv</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-506172"></A>How to determine the range of the original surface that the deformation is evaluated on, and whether to share geometry. This option takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-506320"></A><A HREF=../headers/pk_deform_uv_t.html>PK_deform_uv_face_box_c</A>. The deformation is evaluated over the UV box of the original face. The UV box of the deformed B-surface matches the UV box of the original face, unless the B-surface needs to be extended. No geometry is shared. (Default)</LI>
+<LI>
+<A NAME="50422148_pgfId-556382"></A><A HREF=../headers/pk_deform_uv_t.html>PK_deform_uv_all_c</A>: For bounded geometry, the deformation is evaluated over the entire UV box of the original surface. For unbounded geometry, the deformation is evaluated over a range large enough to cover all the deforming faces shared by the original surface. Geometry sharing is preserved where possible: if original faces share a single surface, then the resulting deformed faces also share a single surface. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-1371549"></A>eval_expr</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1371551"></A>Whether to use an expression evaluator instead of a callback function to describe how the input faces should be deformed. </P>
+<P>
+<A NAME="50422148_pgfId-1374048"></A>To supply an expression, you need to set the <CODE>
+root_expr</CODE>
+ field of the <A HREF=../headers/pk_expr_sf_t.html>PK_EXPR_sf_t</A> standard form to a non-NULL value and optionally supply the sub-expressions and constants field. See <A HREF="fd_chap.025.html#50422056_27432">Section 24.1.1, “Standard form of an expression”</A> for more information.</P>
+<ADDRESS>
+<A NAME="50422148_pgfId-1371797"></A>If an expression evaluator is supplied then:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-1372167"></A><CODE>
+thread_safe</CODE>
+ must be set to PK_LOGICAL_false</LI>
+<LI>
+<A NAME="50422148_pgfId-1372238"></A><CODE>
+eval_fn</CODE>
+ option in <A HREF=../headers/pk_face_change_data_deform_t.html>PK_FACE_change_data_deform_t</A> must be set to NULL.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-1372347"></A>See <A HREF="fd_chap.025.html#50422056_70390">Chapter 24, “Expressions”</A> for more information on using expression functions.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-315605"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-860.gif">
+
+<P>
+<A NAME="50422148_pgfId-305913"></A>Figure 72-24 <A NAME="50422148_20777"></A>Improving reliability by specifying matched edges</P>
+
+
+<H3>
+<A NAME="50422148_pgfId-926633"></A>	72.4.9 	<A NAME="50422148_16052"></A>Radiate options </H3>
+<P>
+<A NAME="50422148_pgfId-941920"></A>You can control the behaviour of a radiate operation using the following options which are available in <A HREF=../headers/pk_face_change_radiate_o_t.html>PK_FACE_change_radiate_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-944350"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-941550"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-941552"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-941554"></A><CODE>
+have_axis</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-941556"></A>Whether <CODE>
+axis</CODE>
+ is supplied. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-941558"></A><CODE>
+axis</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1022080"></A>The <CODE>
+axis</CODE>
+ of rotation of the surface of the face.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-941562"></A><CODE>
+axial_displacement</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-941564"></A>The radiated surface is moved along the supplied <CODE>
+axis</CODE>
+ by this amount. Default: (0.0)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117037"></A><CODE>
+radiate_step</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117039"></A>Whether to create a radiate step face. Default: <A HREF=../headers/pk_radiate_step_t.html>PK_radiate_step_no_c</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-949401"></A>Every point on the supplied surface is displaced by the value of <CODE>
+radial_displacement</CODE>
+ (see <A HREF="fd_chap.073.html#50422148_57088">Section 72.3.9</A> for more information on this option). The radiated surface can be optionally moved along the axis by the value specified in <CODE>
+axial_displacement</CODE>
+. By default, <CODE>
+axial_displacement</CODE>
+ is set to 0.0 and the resultant radiated surface is not moved along the supplied axis, as illustrated in <A HREF="fd_chap.073.html#50422148_39956"><EM>
+Figure 72-25</EM></A> (a). </P>
+<P>
+<A NAME="50422148_pgfId-949757"></A><A HREF="fd_chap.073.html#50422148_39956"><EM>
+Figure 72-25</EM></A> (b) illustrates how setting the <CODE>
+axial_displacement</CODE>
+ to a value other than the default allows the radiated surface to be moved along the supplied axis. </P>
+<P>
+<A NAME="50422148_pgfId-942241"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-861.gif">
+
+<P>
+<A NAME="50422148_pgfId-937577"></A>Figure 72-25 <A NAME="50422148_39956"></A>Radiating a surface and optionally moving it along a supplied axis</P>
+
+<H4>
+<A NAME="50422148_pgfId-1117145"></A>72.4.9.1 <A NAME="50422148_78173"></A>Creating radiate step faces </H4>
+<P>
+<A NAME="50422148_pgfId-1117290"></A>The <CODE>
+radiate_step</CODE>
+ option lets you control whether <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> creates step faces when performing a radiate operation. </P>
+<P>
+<A NAME="50422148_pgfId-1117552"></A>The <CODE>
+radiate_step</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422148_pgfId-1117316"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117293"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117295"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117297"></A><A HREF=../headers/pk_radiate_step_t.html>PK_radiate_step_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117299"></A>Do not create step faces (Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117301"></A><A HREF=../headers/pk_radiate_step_t.html>PK_radiate_step_smooth_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117303"></A>Create step faces at all smooth boundary edges as shown in <A HREF="fd_chap.073.html#50422148_33780"><EM>
+Figure 72-26</EM></A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117305"></A><A HREF=../headers/pk_radiate_step_t.html>PK_radiate_step_smooth_site_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117307"></A>Only create step faces at smooth boundary edges, if it cannot be done by growing the faces on either end of the boundary edges.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117309"></A><A HREF=../headers/pk_radiate_step_t.html>PK_radiate_step_not_coi_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117311"></A>Create step faces at boundary edges where the surface of the step face is not coincident with the surface of the adjacent face.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117313"></A><A HREF=../headers/pk_radiate_step_t.html>PK_radiate_step_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1117315"></A>Create step faces at all boundary edges as shown in <A HREF="fd_chap.073.html#50422148_33780"><EM>
+Figure 72-26</EM></A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-1117796"></A>A boundary edge is an edge between a face which is being radiated and one which is not, or between two faces being radiated differently.</P>
+<P>
+<A NAME="50422148_pgfId-1141250"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-862.gif">
+
+<P>
+<A NAME="50422148_pgfId-1140825"></A>Figure 72-26 <A NAME="50422148_33780"></A>Creating step faces when performing a radiate operation</P>
+
+
+
+<H3>
+<A NAME="50422148_pgfId-305916"></A>	72.4.10 	<A NAME="50422148_marker-937557"></A><A NAME="50422148_marker-937558"></A>Combining different operations </H3>
+<P>
+<A NAME="50422148_pgfId-305917"></A>Various combinations of operations are possible using <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> and the effects may differ depending on the options used.</P>
+<P>
+<A NAME="50422148_pgfId-305921"></A>An example of this is shown in <A HREF="fd_chap.073.html#50422148_32620"><EM>
+Figure 72-27</EM></A>, where a call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> involves a single face supplied for offsetting (with <CODE>
+offset_step</CODE>
+ set to PK_offset_step_yes_c) and another (above the offset face) for reblending. Two step faces are introduced along the smooth edges between the <EM>
+moving </EM>faces (the offset and blend faces indicated in the diagram) and the adjacent<EM>
+ stationary </EM>faces. This operation would fail if <CODE>
+offset_step</CODE>
+ were left at PK_offset_step_no_c because the surrounding faces could not be extended to cover the hole (they are all orthogonal to it).</P>
+<P>
+<A NAME="50422148_pgfId-403657"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-863.gif">
+
+<P>
+<A NAME="50422148_pgfId-306407"></A>Figure 72-27 <A NAME="50422148_32620"></A>Combination of offsetting and reblending in a single call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A></P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422148_pgfId-306411"></A>72.5	<A NAME="50422148_28023"></A><A NAME="50422148_marker-306409"></A><A NAME="50422148_marker-306410"></A>Specifying options 
+
+
+</H1>
+<P>
+<A NAME="50422148_pgfId-306412"></A>You can set a number of options for <A HREF=../headers/pk_face_change.html><A HREF=../headers/pk_face_change.html>PK_FACE_change</A></A> using the <A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A> option structure. Unlike the options described in <A HREF="fd_chap.073.html#50422148_94482">Section 72.4, “Operation-specific options”</A>, the options described in this section apply to all the operations specified in the call to <A HREF=../headers/pk_face_change.html><A HREF=../headers/pk_face_change.html>PK_FACE_change</A></A>. The options available are described below.</P>
+<P>
+<A NAME="50422148_pgfId-306620"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464378"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464380"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464382"></A>merge_face </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464384"></A>If this is PK_LOGICAL_true, then any new faces created by the call are merged with their neighbors, if this is possible. </P>
+<P>
+<A NAME="50422148_pgfId-784052"></A>Default: PK_LOGICAL_true</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464386"></A>allow_disjoint </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464388"></A>Whether or not to allow disjoint bodies in the result:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-464389"></A>PK_LOGICAL_true - if the body is split as a result of the call, all the components of the body are preserved in a single disjoint body. </LI>
+<LI>
+<A NAME="50422148_pgfId-464390"></A>PK_LOGICAL_false - if the body is split, only one component is returned. </LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-464391"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464393"></A>check_fa_fa </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464397"></A>Whether to check for face-face inconsistencies. See <A HREF="fd_chap.073.html#50422148_72743">Section 72.5.6, “Repairing face-face inconsistencies”</A>, for more information. </P>
+<P>
+<A NAME="50422148_pgfId-784065"></A>Default: <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_yes_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464400"></A>edge_geom_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464402"></A>Structure containing data that controls the geometry you want edges to have after any modeling operations specified in the call. Any edge that is adjacent to a modified face that is <EM>
+not</EM> in this array will have its geometry recalculated. See <A HREF="fd_chap.073.html#50422148_51695">Section 72.5.1, “Controlling the geometry of edges in the body”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464407"></A>edge_data </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464409"></A>Performs a similar role to <CODE>
+edge_geom_data</CODE>
+, but with more limited behaviour. Supported for legacy reasons. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464421"></A>vertex_data </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464423"></A>Structure containing the geometry that you want the vertex to have after any modeling operations specified in the call. Any vertex that is adjacent to a modified face that is <EM>
+not</EM> in this array will have its geometry recalculated. See <A HREF="fd_chap.073.html#50422148_16101">Section 72.5.2, “Retaining vertices in the body”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464428"></A>edge_help </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464430"></A>Structure containing edge geometry that is used in cases where the change operation results in multiple possible solutions. If several outcomes are possible, the one with the closest curve to the supplied geometry is chosen. See <A HREF="fd_chap.073.html#50422148_23575">Section 72.5.3, “Dealing with multiple solutions”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464435"></A>vertex_help </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464437"></A>Structure containing vertex geometry that is used in cases where the change operation results in multiple possible solutions. If several outcomes are possible, the one with the closest point to the supplied geometry is chosen. See <A HREF="fd_chap.073.html#50422148_23575">Section 72.5.3, “Dealing with multiple solutions”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464442"></A>replace_update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464444"></A>This option has been replaced by the <CODE>
+update</CODE>
+ option and has been deprecated. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464446"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464448"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422148_pgfId-464455"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464457"></A>adjacency</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464459"></A>When performing operations on a body, whether to maintain the adjacency between faces, or change the topology such that new faces are adjacent to each other. See <A HREF="fd_chap.073.html#50422148_47018">Section 72.5.4, “Controlling face adjacency”</A>, for more information. </P>
+<P>
+<A NAME="50422148_pgfId-784110"></A>Default: PK_FACE_prefer_adj_keep_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464464"></A>grow</PRE>
+<PRE><A NAME="50422148_pgfId-464465"></A>grow_data</PRE>
+<PRE><A NAME="50422148_pgfId-464466"></A>grow_cb</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464468"></A>When features with different convexities overflow each other as a result of model editing, you can control which of the clashing features is grown to heal the model. See <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464473"></A>vertex_limit</PRE>
+<PRE><A NAME="50422148_pgfId-464474"></A>edge_limit</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464476"></A>How to constrain the maximum tolerance used by each vertex or edge, as appropriate. This is identical functionality to that available in Parasolid’s offsetting operations. See <A HREF="fd_chap.059.html#50422133_55498">Section 58.10, “Constraining edge and vertex tolerance when offsetting”</A>, for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464484"></A>repair_fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464486"></A>Whether to repair face inconsistencies identified by the <CODE>
+check_fa_fa</CODE>
+ option. See <A HREF="fd_chap.073.html#50422148_72743">Section 72.5.6, “Repairing face-face inconsistencies”</A>, for more information. </P>
+<P>
+<A NAME="50422148_pgfId-784156"></A>Default: <A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464535"></A>repair_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464537"></A>Whether to repair any face inconsistencies. See <A HREF="fd_chap.073.html#50422148_21466">Section 72.5.7, “Repairing invalid faces”</A>, for more information.</P>
+<P>
+<A NAME="50422148_pgfId-486954"></A>Default: <A HREF=../headers/pk_repair_fa_t.html>PK_repair_fa_yes_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464491"></A>trim_data</PRE>
+<PRE><A NAME="50422148_pgfId-464492"></A>trim_cb</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464494"></A>Used in conjunction with <CODE>
+grow_data</CODE>
+ and <CODE>
+grow_cb</CODE>
+ to preserve areas of the model that might otherwise be altered as a result of resolving a clash. See <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464499"></A>report_surf_extension</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464501"></A>Whether to record information on the surfaces that were extended during the operation. If this is PK_LOGICAL_true, then the Parasolid report stream contains a record of type <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_3_c</A>. This has a status of <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_surf_extended_c</A> and contains information on the surfaces that were extended. </P>
+<P>
+<A NAME="50422148_pgfId-464511"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information on the Parasolid report mechanism. See the documentation for <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_t</A> for details of the information recorded when this option is PK_LOGICAL_true. </P>
+<P>
+<A NAME="50422148_pgfId-464512"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464514"></A>track_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464516"></A>Whether to track new laminar edges that are created as a result of the face change operation. See <A HREF="fd_chap.073.html#50422148_15805">Section 72.5.8, “Tracking laminar edges”</A>, for more information.</P>
+<P>
+<A NAME="50422148_pgfId-464520"></A>Default: <A HREF=../headers/pk_change_track_edges_t.html>PK_change_track_edges_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-464522"></A>results_output</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-464524"></A>Whether the results of the function are output as a returned argument or through the Parasolid Report. See <A HREF="fd_chap.073.html#50422148_63832">Section 72.5.9, “Reporting function results”</A>.</P>
+<P>
+<A NAME="50422148_pgfId-464531"></A>Default: <A HREF=../headers/pk_results_output_t.html>PK_results_output_return_c</A>.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422148_pgfId-306656"></A>	72.5.1 	<A NAME="50422148_51695"></A>Controlling the geometry of edges in the body </H3>
+<P>
+<A NAME="50422148_pgfId-306657"></A>You can control the geometry created for edges during a face change operation. To do this, you can supply a curve for the edge that is required in the result body. If supplying this curve is not straightforward, and the edge is laminar, you can supply a surface or face that you know the curve must lie in. </P>
+<P>
+<A NAME="50422148_pgfId-1176082"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-306660"></A>Note: When supplying a face or surface, this must not be the face that the laminar edge already lies in, or the surface of that face. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-306662"></A>You can use the <CODE>
+edge_geom_data</CODE>
+ field in <A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A> to control the geometry of the associated edges after a face change operation. </P>
+<P>
+<A NAME="50422148_pgfId-1173982"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-1173981"></A>Note: If the model is being changed such that any edges adjacent to faces with a non-variational replace operation will be smooth and tolerant in the resulting model, then it is recommended that you supply information on the resulting geometry of the edge via the <CODE>
+edge_geom_data</CODE>
+ option. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-1221393"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-1221420"></A>Note: In general, <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> can create mixed edges on a face that is changing. However, edges that will be mixed after the operation must be supplied in <CODE>
+edge_geom_data</CODE>
+ if any adjacent face which is being changed has a bend operation. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-1178919"></A>This structure has the following fields:</P>
+<P>
+<A NAME="50422148_pgfId-1176107"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306665"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306667"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306669"></A>n_edge_arrays</PRE>
+<PRE><A NAME="50422148_pgfId-306670"></A>edge_arrays</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306672"></A>Arrays of edges for which you are providing the data to control the geometry created in the result body. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306674"></A>entities</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306676"></A>An array of entities to use when defining the curves attached to the associated array of edges. Each individual entity can either be a curve, a surface, a face, or PK_ENTITY_null.</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-306677"></A>If a curve is supplied, any associated edges have geometry that is within tolerance of this curve attached in the result body. The associated <CODE>
+methods</CODE>
+ can be set to any value except <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_ruled_c</A>.</LI>
+<LI>
+<A NAME="50422148_pgfId-306678"></A>If a surface is supplied, any associated edges are expected to lie within tolerance of this surface in the result body. The associated <CODE>
+methods</CODE>
+ must be <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_entity_c</A>.</LI>
+<LI>
+<A NAME="50422148_pgfId-306679"></A>If a face is supplied, any associated edges are expected to have geometry that lies within tolerance of this face in the result body. The associated <CODE>
+methods</CODE>
+ must be <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_entity_c</A>.</LI>
+<LI>
+<A NAME="50422148_pgfId-306680"></A>If PK_ENTITY_null is supplied, then the edge’s original geometry should be used in the result body.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-592786"></A>methods</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-916831"></A>An array of <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_t</A> values that determines the method for controlling the geometry of the corresponding edges. The default is NULL indicating that <CODE>
+methods</CODE>
+ is set to PK_change_edge_methods_entity_c.</P>
+<P>
+<A NAME="50422148_pgfId-867416"></A>See <A HREF="fd_chap.073.html#50422148_83940">Section 72.5.1.1, “Controlling edge or step face geometry using the methods option”</A> for more information.</P>
+<P>
+<A NAME="50422148_pgfId-592803"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-862244"></A>steps</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-862246"></A>An array used to control the creation of step faces for specific edges. The default is NULL, indicating that the operation will use PK_EDGE_step_default_c and the data is only used to control the geometry of the edge.</P>
+<P>
+<A NAME="50422148_pgfId-866612"></A>See <A HREF="fd_chap.073.html#50422148_63988">Section 72.5.1.2, “Controlling the creation of step faces using the steps option”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-592805"></A>directions</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-592807"></A>An array defining the sweep direction if <CODE>
+methods</CODE>
+ is <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_swept_c</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306682"></A>reversals</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306684"></A>An array of <A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> values that indicates whether the direction of the associated arrays of edges should be reversed. </P>
+<P>
+<A NAME="50422148_pgfId-306685"></A>The default is NULL, indicating that no edges are reversed. </P>
+<P>
+<A NAME="50422148_pgfId-306686"></A>See the PK Reference documentation for <A HREF=../headers/pk_change_edge_geom_data_t.html>PK_change_edge_geom_data_t</A> for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306688"></A>offsets</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306690"></A>An array of signed distances that indicates the distance to offset each corresponding entity in <CODE>
+entities</CODE>
+. </P>
+<P>
+<A NAME="50422148_pgfId-306691"></A>The default is NULL, indicating that no entities or swept surfaces should be offset. </P>
+<P>
+<A NAME="50422148_pgfId-579318"></A>See the PK Reference documentation for <A HREF=../headers/pk_change_edge_geom_data_t.html>PK_change_edge_geom_data_t</A> for information on how this option is used with <CODE>
+methods</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306693"></A>transforms</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306695"></A>An array of transforms to be used on the corresponding entities. Scaling, shearing, perspective, and reflection components are not allowed in the transforms.</P>
+<P>
+<A NAME="50422148_pgfId-306696"></A>The default is NULL, indicating that no entities are to be transformed. </P>
+<P>
+<A NAME="50422148_pgfId-578856"></A>See the PK Reference documentation for <A HREF=../headers/pk_change_edge_geom_data_t.html>PK_change_edge_geom_data_t</A> for information on how this option is used with <CODE>
+methods</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306698"></A>tolerances</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306700"></A>An array of tolerances associated with the corresponding edges in the <CODE>
+edge_arrays</CODE>
+. Parasolid attempts to apply this tolerance, or a lower one, to the associated edges, but does not guarantee to do so. </P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-306704"></A>A value of 0.0 indicates that the edges should be treated as accurate. </LI>
+<LI>
+<A NAME="50422148_pgfId-306705"></A>A value of -1.0 indicates that the original edge tolerance should be used. </LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-1067004"></A>The default is NULL, indicating that original tolerances should be used for all edges. </P>
+<ADDRESS>
+<A NAME="50422148_pgfId-1064081"></A>Note: Edges which will be mixed after the operation must have a tolerance of at least 5 times the session precision. For such edges, you must supply tolerances of at least that amount. </ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306708"></A>replace_uses</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306710"></A>An array of <A HREF=../headers/pk_replace_use_t.html>PK_replace_use_t</A> values that controls behaviour when the specified entity cannot be used as required. This option is used in the following circumstances:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-306711"></A>If the entity is PK_ENTITY_null, but the edges’ existing geometry cannot be used.</LI>
+<LI>
+<A NAME="50422148_pgfId-306712"></A>If the entity is a curve, but the edges in the resulting body cannot use this curve. </LI>
+<LI>
+<A NAME="50422148_pgfId-306713"></A>If the entity is a surface, but the edges in the resulting body cannot have geometry that lies within <CODE>
+tolerance</CODE>
+ of the surface. </LI>
+<LI>
+<A NAME="50422148_pgfId-306714"></A>If the entity is a face, but the edges in the resulting body cannot have geometry that lies on the surface of this face. </LI>
+<LI>
+<A NAME="50422148_pgfId-579004"></A>If <CODE>
+methods</CODE>
+ is set to <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_swept_c</A>, <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_ruled_c</A> or <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_proj_c</A> but the edges in the resulting body cannot have geometry that lies within the tolerance of the generated curve.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-306715"></A>You can set <CODE>
+replace_use</CODE>
+ to one of the following values:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-306716"></A><A HREF=../headers/pk_replace_use_t.html>PK_replace_use_attempt_c</A>: try to use the entity or the method, but create a new curve if this is not possible. You must not use this value if the entity is a surface or a face or if <CODE>
+methods</CODE>
+ is set to anything other than <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_entity_c</A>. </LI>
+<LI>
+<A NAME="50422148_pgfId-306717"></A><A HREF=../headers/pk_replace_use_t.html>PK_replace_use_yes_c</A>: return a fault if the entity or the method cannot be used. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-306757"></A><A HREF="fd_chap.073.html#50422148_21679"><EM>
+Figure 72-28</EM></A> shows two examples where edges can be retained by specifying a suitable surface or face. </P>
+<P>
+<A NAME="50422148_pgfId-306758"></A>The first example shows an open sheet body with a hole in the bottom face that has been cut using a cylindrical surface. If the bottom face of the sheet is replaced with a new surface, the laminar edge around the hole can be retained in the result body by passing the cylindrical surface that the edge lies in as the entity to use. </P>
+<P>
+<A NAME="50422148_pgfId-306759"></A>The second example is a more complicated example that shows the behaviour when a cylindrical face (shown in green) is transformed, while at the same time replacing another face (shown in red), where the geometry of the laminar edge of the cylinder and the hole in the replaced face are dependent on each other. </P>
+<P>
+<A NAME="50422148_pgfId-306760"></A>To achieve this effect five arrays of edges are passed to <CODE>
+edge_arrays</CODE>
+, with associated additional information as described:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-306761"></A>The laminar edge of the cylindrical face (shown in dark red) is supplied as edge data, with the red face as its associated entity, and an associated offset. </LI>
+<LI>
+<A NAME="50422148_pgfId-306762"></A>The laminar hole in the red face (shown in light green) is supplied as edge data with the green face as its associated entity. </LI>
+<LI>
+<A NAME="50422148_pgfId-306763"></A>Each of the laminar edges of the red face (shown in purple) is supplied as edge data with different a vertical planar face (not shown) as the associated entity. </LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-315710"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-864.gif">
+
+<P>
+<A NAME="50422148_pgfId-315712"></A>Figure 72-28 <A NAME="50422148_21679"></A>Retaining edges in a body by specifying a surface</P>
+
+<H4>
+<A NAME="50422148_pgfId-863202"></A>72.5.1.1 <A NAME="50422148_83940"></A>Controlling edge or step face geometry using the methods option </H4>
+<P>
+<A NAME="50422148_pgfId-866711"></A>You can use the <CODE>
+methods</CODE>
+ option to control the geometry of the corresponding edges as described in this section. It takes the following values:</P>
+<P>
+<A NAME="50422148_pgfId-890632"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867114"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867116"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867118"></A><A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_entity_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867120"></A>Try to use the supplied entity from <CODE>
+entities</CODE>
+ to define the geometry of the new edge. If no entity is supplied, use the existing edge geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867122"></A><A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_swept_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867124"></A>The supplied entity or existing edge curve should be swept in the direction specified by <CODE>
+directions</CODE>
+ as illustrated in <A HREF="fd_chap.073.html#50422148_68399"><EM>
+Figure 72-29</EM></A>. Any offset or transformation operations are applied to the swept surface before it is intersected to form the new edge geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867126"></A><A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_ruled_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867128"></A>The existing edge curve should be swept along the normals of the original face to generate a ruled surface, as illustrated in <A HREF="fd_chap.073.html#50422148_68399"><EM>
+Figure 72-29</EM></A>. Any offset or transformation operations are applied to the swept surface before it is intersected to form the new edge geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867130"></A><A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_proj_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-867132"></A>The existing edge curve or the supplied entity should be projected onto the corresponding new face along the normals of the new face, as illustrated in <A HREF="fd_chap.073.html#50422148_68399"><EM>
+Figure 72-29</EM></A>. Any transformation operations are applied to the edge curve or supplied entity before they are projected. </P>
+<ADDRESS>
+<A NAME="50422148_pgfId-868309"></A>Note: Offset operations cannot be used with <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_proj_c</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-866711"></A>The <CODE>
+methods</CODE>
+ option can also be used to control the geometry of any associated step faces if the <CODE>
+steps</CODE>
+ option is set to PK_EDGE_step_method_c. See <A HREF="fd_chap.073.html#50422148_63988">Section 72.5.1.2, “Controlling the creation of step faces using the steps option”</A> for more information.</P>
+<P>
+<A NAME="50422148_pgfId-890063"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-871726"></A>Note: If the <CODE>
+methods</CODE>
+ option is anything other than <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_entity_c</A>, the associated edges must be laminar unless a step face is requested by the associated <CODE>
+steps</CODE>
+ option.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-582120"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-865.gif">
+
+<P>
+<A NAME="50422148_pgfId-579918"></A>Figure 72-29 <A NAME="50422148_68399"></A>Controlling edge geometry using the <CODE>
+methods</CODE>
+ option</P>
+
+
+<H4>
+<A NAME="50422148_pgfId-863283"></A>72.5.1.2 <A NAME="50422148_63988"></A>Controlling the creation of step faces using the steps option </H4>
+<P>
+<A NAME="50422148_pgfId-862246"></A>The <CODE>
+steps</CODE>
+ option is used to control the creation of step faces for corresponding edges. It takes the following values:</P>
+<P>
+<A NAME="50422148_pgfId-879208"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-868490"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-868492"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-868494"></A>PK_EDGE_step_default_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-868496"></A>Do not override the operation specific step option.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-877069"></A>PK_EDGE_step_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-877071"></A>Do not create a step face for the associated edges. <A HREF="fd_chap.073.html#50422148_12819"><EM>
+Figure 72-30</EM></A> shows an example of this where a specified face is offset and no step face is created for its associated edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-868498"></A>PK_EDGE_step_auto_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-868500"></A>Create a step face along the associated edges with Parasolid creating the step face surface geometry. An example of this is shown in <A HREF="fd_chap.073.html#50422148_12819"><EM>
+Figure 72-30</EM></A>, where a specified face is tapered and a step face is created.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-868502"></A>PK_EDGE_step_method_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-868504"></A>Create a step face along the associated edges with surface creation from the corresponding <CODE>
+methods</CODE>
+ option. An example of this is shown in <A HREF="fd_chap.073.html#50422148_12819"><EM>
+Figure 72-30</EM></A> where a specified face is offset and a step face is created for the associated edge with the <CODE>
+methods</CODE>
+ option set to <A HREF=../headers/pk_change_edge_method_t.html>PK_change_edge_method_swept_c</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-876604"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-866.gif">
+
+<P>
+<A NAME="50422148_pgfId-871566"></A>Figure 72-30 <A NAME="50422148_12819"></A>Controlling edge geometry using the <CODE>
+steps</CODE>
+ option</P>
+
+
+
+<H3>
+<A NAME="50422148_pgfId-306878"></A>	72.5.2 	<A NAME="50422148_16101"></A>Retaining vertices in the body </H3>
+<P>
+<A NAME="50422148_pgfId-306879"></A>If you have vertex data that you want to ensure is present in a body after a face change operation, you can use the <CODE>
+vertex_data</CODE>
+ field. This field takes the information shown below. The default values for this type are such that no vertex data is specified for the body. </P>
+<P>
+<A NAME="50422148_pgfId-306901"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306882"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306884"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306886"></A>n_vertices </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306888"></A>The number of vertices to preserve. The <CODE>
+vertices</CODE>
+, <CODE>
+positions</CODE>
+, and <CODE>
+tolerances</CODE>
+ arrays must all be this length. Default: 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306890"></A>vertices </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306892"></A>An array of vertices to preserve. Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306894"></A>positions </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-306896"></A>An array of replacement positions attached to each vertex in <CODE>
+vertices</CODE>
+. The direction of each curve must be appropriate for the specified edges. Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-306898"></A>tolerances </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-1067010"></A>An array of tolerances within which to work. A separate value is supplied for each set of vertex data. Values of 0.0 indicate accurate edges. Default: NULL.</P>
+<ADDRESS>
+<A NAME="50422148_pgfId-1064257"></A>Note: Vertices which will be mixed after the operation must have a tolerance of at least 5 times the session precision. For such vertices, you must supply tolerances of at least that amount.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-306998"></A>	72.5.3 	<A NAME="50422148_23575"></A><A NAME="50422148_marker-306903"></A><A NAME="50422148_marker-306904"></A><A NAME="50422148_marker-306905"></A><A NAME="50422148_marker-306906"></A><A NAME="50422148_marker-306907"></A><A NAME="50422148_marker-306908"></A><A NAME="50422148_89791"></A>Dealing with multiple solutions </H3>
+<P>
+<A NAME="50422148_pgfId-306999"></A>Sometimes a series of modeling operations yields a number of possible different solutions. You can force Parasolid to choose a particular solution by specifying <STRONG>
+help geometry</STRONG> to use with the topological entities that are ambiguous. The solution that is chosen is the one whose topology has attached geometry that is closest to the supplied geometry.</P>
+<P>
+<A NAME="50422148_pgfId-307003"></A>For <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>, help geometry is supplied using the <CODE>
+edge_help</CODE>
+ and <CODE>
+vertex_help</CODE>
+ fields in <A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A>. Both these fields are of the type <A HREF=../headers/pk_replace_help_points_t.html>PK_replace_help_points_t</A>, and take the information described below:</P>
+<P>
+<A NAME="50422148_pgfId-307021"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307006"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307008"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307010"></A>n_topologies </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307012"></A>The number of topological entities that you want to help modify. Default: 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307014"></A>topologies </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307016"></A>The topological entities (edges for <CODE>
+edge_help</CODE>
+ or vertices for <CODE>
+vertex_help</CODE>
+) that you want to help modify. Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307018"></A>positions </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307020"></A>An array of geometric help positions for the supplied <CODE>
+topologies</CODE>
+. The solution chosen is the one for which the geometry attached to <CODE>
+topologies</CODE>
+ is closest to the geometry in <CODE>
+positions</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-307023"></A>	72.5.4 	<A NAME="50422148_47018"></A>Controlling face adjacency </H3>
+<P>
+<A NAME="50422148_pgfId-307027"></A>By default, Parasolid attempts to keep the same faces adjacent to one another after an operation wherever possible, for example by extending those faces where appropriate. There may be times, however, when this does not provide the most desirable solution. You can use the <CODE>
+adjacency</CODE>
+ option (<A HREF=../headers/pk_face_prefer_adj_t.html>PK_FACE_prefer_adj_t</A>) to control this, by setting it as follows:</P>
+<P>
+<A NAME="50422148_pgfId-307041"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307030"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307032"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307034"></A>PK_FACE_prefer_adj_keep_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307036"></A>Wherever possible, ensure that the same faces are adjacent to each other after the operation, for example by extending faces as appropriate. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307038"></A>PK_FACE_prefer_adj_change_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307040"></A>Do not attempt to maintain adjacency of faces. Instead, allow the topology of the resulting body to change. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-307045"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-307044"></A>Note: The <CODE>
+adjacency</CODE>
+ option is currently limited to transformation operations. It does not control trimming of faces for other operations in <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-307072"></A><A HREF="fd_chap.073.html#50422148_98727"><EM>
+Figure 72-31</EM></A> shows an example in which a boss is translated on a graduated block. By default, several faces are extended to ensure that they remain adjacent to one another after the operation. However, the resulting body may not be the desired solution. Instead, setting <CODE>
+adjacency</CODE>
+ to PK_FACE_prefer_adj_change_c can produce the alternative solution shown.</P>
+<P>
+<A NAME="50422148_pgfId-450419"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-867.gif">
+
+<P>
+<A NAME="50422148_pgfId-316067"></A>Figure 72-31 <A NAME="50422148_98727"></A>Changing face adjacency when translating a boss on a block</P>
+<P>
+<A NAME="50422148_pgfId-307193"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-307192"></A>Note: The <CODE>
+adjacency</CODE>
+ option is also available when transforming faces using <A HREF=../headers/pk_face_transform_2.html>PK_FACE_transform_2</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-307195"></A>	72.5.5 	<A NAME="50422148_61645"></A>Controlling the growth of overflowing faces </H3>
+<P>
+<A NAME="50422148_pgfId-307196"></A>When features with different convexities overflow each other as a result of model editing, you can control which of the clashing features is grown to heal the model using the <CODE>
+grow</CODE>
+ option. </P>
+<P>
+<A NAME="50422148_pgfId-307200"></A><A HREF="fd_chap.073.html#50422148_31781"><EM>
+Figure 72-32</EM></A> shows a simple example that illustrates the main values you can specify for this option. In this example, a single face is offset in the direction shown such that it overflows another face of opposite convexity. Three results are possible:</P>
+<P>
+<A NAME="50422148_pgfId-307241"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307226"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307228"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307230"></A>PK_FACE_grow_moving_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307232"></A>Extends the faces that are moving as a result of the edit. In the example, the face that is offset is extended until it intersects the overflowing face.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307234"></A>PK_FACE_grow_fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307236"></A>Extends the faces that are not moving as a result of the edit. In the example, the overflowed face is extended until it intersects the feature that owns the offset face.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307238"></A>PK_FACE_grow_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307240"></A>Does not extend any faces. Instead, cap faces are created as required. In the example, the offset is performed, and a cap face created on the underside of the offset feature so as to make the model valid. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-319876"></A>&nbsp;</P>
+<P>
+<A NAME="50422148_pgfId-316122"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-868.gif">
+
+<P>
+<A NAME="50422148_pgfId-307312"></A>Figure 72-32 <A NAME="50422148_31781"></A>Controlling the growth of overflowing features with different convexity</P>
+<P>
+<A NAME="50422148_pgfId-307313"></A>In addition, you can specify a number of other values for the <CODE>
+grow</CODE>
+ option, although these do not produce different results to the three values illustrated in <A HREF="fd_chap.073.html#50422148_31781"><EM>
+Figure 72-32</EM></A>:</P>
+<P>
+<A NAME="50422148_pgfId-307369"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307338"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307340"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307342"></A>PK_FACE_grow_auto_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307347"></A>Let Parasolid determine automatically which set of faces should be grown in the context of your application, based on which faces are changing. This is particularly useful if two sets of faces are changing as a result of the <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> operation. If you specify PK_FACE_grow_moving_c or PK_FACE_grow_fixed_c and faces from both sides of the clash have moved, this option is used automatically.</P>
+<P>
+<A NAME="50422148_pgfId-307351"></A>When using this value, a report is produced via the Parasolid reporting mechanism that documents what decisions were made for those overflows where the automatic behaviour was used. These decisions are represented using <CODE>
+status</CODE>
+ codes in the <A HREF=../headers/pk_report_2_t.html>PK_REPORT_2_t</A> structure. See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid reporting mechanism.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307359"></A>PK_FACE_grow_update_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307361"></A>Use this value if you are updating a model created in an older version of Parasolid and you want to guarantee identical results. This is the default value. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307366"></A>PK_FACE_grow_fail_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307368"></A>Do not attempt to heal the model: fail the operation instead. </P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422148_pgfId-307371"></A>72.5.5.1 <A NAME="50422148_74994"></A>Overriding the specified overflow behaviour </H4>
+<P>
+<A NAME="50422148_pgfId-307375"></A>For any specified value of <CODE>
+grow</CODE>
+, you can override Parasolid’s behaviour by defining your own criteria. By doing this, for example, you could ensure that only faces that have a particular attribute are grown, or you could always grow the set of faces with the largest surface area. You do this by supplying a callback function to be invoked by <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>, together with any data required by that callback function. </P>
+<P>
+<A NAME="50422148_pgfId-307376"></A>If a callback returns a <CODE>
+grow</CODE>
+ value other than PK_FACE_grow_cb_auto_c, no report record is produced for that overflow. </P>
+<P>
+<A NAME="50422148_pgfId-307377"></A>You can define a callback function and any relevant data using the following fields in <A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A>:</P>
+<P>
+<A NAME="50422148_pgfId-307391"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307380"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307382"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307384"></A>grow_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307386"></A>A pointer to additional data to be used by your callback function. This data is passed into the callback function via the <CODE>
+context</CODE>
+ field, as described below. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307388"></A>grow_cb</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307390"></A>A callback function of type <A HREF=../headers/pk_face_grow_cb_f_t.html>PK_FACE_grow_cb_f_t</A>. This is described below</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-307392"></A>The <CODE>
+grow_cb</CODE>
+ callback function contain the following arguments:</P>
+<P>
+<A NAME="50422148_pgfId-307428"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307395"></A>Field </P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307397"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307399"></A>faces1</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307401"></A>An array of faces that represents the first set of clashing faces in the model.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307403"></A>faces2</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307405"></A>An array of faces that represents the second set of clashing faces in the model.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307407"></A>site</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307409"></A>An array of faces that represents the faces on which the <CODE>
+faces1</CODE>
+ and <CODE>
+faces2</CODE>
+ arrays are situated at the point in time at which the callback is invoked. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307411"></A>context</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307413"></A>A pointer to the application data passed in by <CODE>
+grow_data</CODE>
+. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307415"></A>grow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307417"></A>A field used to hold the return value of your callback function. This value is used by <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> to determine how the faces in <CODE>
+faces1</CODE>
+ and <CODE>
+faces2</CODE>
+ should be grown. It takes a set of values analogous to the values of the <CODE>
+grow</CODE>
+ option in <A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A> described in <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A>.</P>
+<ADDRESS>
+<A NAME="50422148_pgfId-307421"></A>Note: Your callback can return the value PK_FACE_grow_cb_default_c to use the value of the <CODE>
+grow</CODE>
+ option originally specified in the call to <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>, or PK_FACE_grow_cb_auto_c to use Parasolid’s automatic grow behaviour. This allows you to use Parasolid’s behaviour as a fallback strategy, in cases where your own criteria cannot determine a suitable grow method. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-307471"></A><A HREF="fd_chap.073.html#50422148_77073"><EM>
+Figure 72-33</EM></A> shows how the <CODE>
+faces1</CODE>
+, <CODE>
+faces2</CODE>
+, and <CODE>
+site</CODE>
+ arrays are identified using the same example body as shown in <A HREF="fd_chap.073.html#50422148_31781"><EM>
+Figure 72-32</EM></A>. Note that the <CODE>
+faces1</CODE>
+ and <CODE>
+faces2</CODE>
+ arrays are interchangeable.</P>
+<P>
+<A NAME="50422148_pgfId-320033"></A>&nbsp;</P>
+<P>
+<A NAME="50422148_pgfId-316187"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-869.gif">
+
+<P>
+<A NAME="50422148_pgfId-307526"></A>Figure 72-33 <A NAME="50422148_77073"></A>Identifying data for overflow grow callback functions</P>
+
+
+<H4>
+<A NAME="50422148_pgfId-307527"></A>72.5.5.2 Preserving areas of the model </H4>
+<P>
+<A NAME="50422148_pgfId-307528"></A>You can use the <CODE>
+trim_data</CODE>
+ and <CODE>
+trim_cb</CODE>
+ fields, along with the <CODE>
+grow_data</CODE>
+ and <CODE>
+grow_cb</CODE>
+ fields in <A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A> to preserve areas of the model that might be altered as a result of resolving a clash. Unlike <CODE>
+grow_data</CODE>
+ and <CODE>
+grow_cb</CODE>
+, which are primarily for resolving clashes between faces with different convexity, <CODE>
+trim_data</CODE>
+ and <CODE>
+trim_cb</CODE>
+ are primarily used for resolving clashes between faces of the same convexity. </P>
+<P>
+<A NAME="50422148_pgfId-307529"></A>This can be useful if there is a particular area in the model that you do not want to be altered by the operation. When a face or faces from that area appear in a callback, you can ask Parasolid to fail the operation rather than resolving the clash and altering the area.</P>
+<P>
+<A NAME="50422148_pgfId-307566"></A><A HREF="fd_chap.073.html#50422148_36772"><EM>
+Figure 72-34</EM></A> shows an example in which a face (shown in red) is offset until it clashes with another face of the same convexity. Depending on the return value of the callback, you can either choose to resolve the clash automatically, as shown in the illustration, or fail the operation completely.</P>
+<P>
+<A NAME="50422148_pgfId-316209"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-870.gif">
+
+<P>
+<A NAME="50422148_pgfId-307572"></A>Figure 72-34 <A NAME="50422148_36772"></A>Resolving clashes between faces of the same convexity using callbacks</P>
+<P>
+<A NAME="50422148_pgfId-307573"></A>The <CODE>
+trim_data</CODE>
+ and <CODE>
+trim_cb</CODE>
+ fields are very similar to the <CODE>
+grow_data</CODE>
+ and <CODE>
+grow_cb</CODE>
+ fields. You define a callback function using <CODE>
+trim_cb</CODE>
+ and specify the data to use with it using <CODE>
+trim_data</CODE>
+:</P>
+<P>
+<A NAME="50422148_pgfId-307604"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307591"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307593"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307595"></A>trim_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307597"></A>A pointer to additional data to be used by your callback function. This data is passed into the callback function via the <CODE>
+context</CODE>
+ field, as described below. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422148_pgfId-307599"></A>trim_cb</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307601"></A>A callback function of type <A HREF=../headers/pk_face_trim_cb_f_t.html>PK_FACE_trim_cb_f_t</A>. </P>
+<P>
+<A NAME="50422148_pgfId-307602"></A>Like <CODE>
+grow_cb</CODE>
+, the <CODE>
+trim_cb</CODE>
+ callback function receives two sets of clashing faces, together with the site faces where the clash occurs. </P>
+<P>
+<A NAME="50422148_pgfId-307603"></A>It returns a <CODE>
+trim</CODE>
+ field, which is used to hold the return value of your callback function. This value is used by <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> to determine whether to resolve the clash automatically, or whether to fail the operation. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422148_pgfId-307606"></A>	72.5.6 	<A NAME="50422148_72743"></A>Repairing face-face inconsistencies </H3>
+<P>
+<A NAME="50422148_pgfId-307607"></A>You can use the <CODE>
+repair_fa_fa</CODE>
+ option to attempt to repair any face-face inconsistencies that have been identified using the <CODE>
+check_fa_fa</CODE>
+ option. Using this option, you can repair clashes between faces whose boundary loops are in different faces. </P>
+<P>
+<A NAME="50422148_pgfId-307611"></A><A HREF="fd_chap.073.html#50422148_97262"><EM>
+Figure 72-35</EM></A> shows two examples where this option can be used. In both examples, faces are moved in such a way that they clash with other faces that do not share the same boundary loops. In the first example, the faces comprise a block, and in the second, the face comprises a through hole. By setting <CODE>
+repair_fa_fa</CODE>
+ to <A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_yes_c</A>, Parasolid can automatically resolve these clashes as shown.</P>
+<P>
+<A NAME="50422148_pgfId-507730"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-507744"></A>Note: <A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_yes_c</A> only supports solid bodies.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-316235"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-871.gif">
+
+<P>
+<A NAME="50422148_pgfId-307684"></A>Figure 72-35 <A NAME="50422148_97262"></A>Repairing face-face inconsistencies</P>
+<P>
+<A NAME="50422148_pgfId-307685"></A>The default is to check for face-face inconsistencies (<A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_yes_c</A>), but not to attempt to repair them (<A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_no_c</A>). </P>
+<P>
+<A NAME="50422148_pgfId-495223"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-495222"></A>Warning: It is an error to set <CODE>
+repair_fa_fa</CODE>
+ to <A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_yes_c</A> if <CODE>
+check_fa_fa</CODE>
+ is <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_no_c</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-495225"></A>	72.5.7 	<A NAME="50422148_21466"></A>Repairing invalid faces </H3>
+<P>
+<A NAME="50422148_pgfId-495229"></A>As described in <A HREF="fd_chap.073.html#50422148_72743">Section 72.5.6, “Repairing face-face inconsistencies”</A>, the <CODE>
+repair_fa_fa</CODE>
+ option repairs inconsistencies between faces in a body. The <CODE>
+repair_fa</CODE>
+ option repairs inconsistencies within individual faces. It takes the following values:</P>
+<P>
+<A NAME="50422148_pgfId-480527"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-480516"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-480518"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-480520"></A><A HREF=../headers/pk_repair_fa_t.html>PK_repair_fa_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-493179"></A>Repairs are performed to ensure faces are valid. Some inconsistencies between faces in a body will also be repaired depending on the values of <CODE>
+repair_fa_fa</CODE>
+ as follows:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-493180"></A>If <CODE>
+repair_fa_fa</CODE>
+ is <A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_no_c</A>, inconsistencies between faces and immediately adjacent faces are identified and repaired.</LI>
+<LI>
+<A NAME="50422148_pgfId-493340"></A>If <CODE>
+repair_fa_fa</CODE>
+ is <A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_yes_c</A>, inconsistencies between faces and all other faces are identified and repaired.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-480524"></A><A HREF=../headers/pk_repair_fa_t.html>PK_repair_fa_local_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-480526"></A>Repairs are performed so that only inconsistencies within the individual faces are repaired. </P>
+<ADDRESS>
+<A NAME="50422148_pgfId-492833"></A>Note: <CODE>
+repair_fa_fa</CODE>
+ must be <A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_no_c</A> when using this value.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-480531"></A>If <CODE>
+repair_fa</CODE>
+ is <A HREF=../headers/pk_repair_fa_t.html>PK_repair_fa_local_c</A> and the orientation of a face is reversed due to the repair, a Parasolid Report of type <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_t</A> is generated. This report contains the negated faces. </P>
+<P>
+<A NAME="50422148_pgfId-977823"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid Report mechanism.</P>
+
+
+<H3>
+<A NAME="50422148_pgfId-307710"></A>	72.5.8 	<A NAME="50422148_15805"></A>Tracking laminar edges </H3>
+<P>
+<A NAME="50422148_pgfId-307711"></A>You can use the <CODE>
+track_edges</CODE>
+ option to choose whether or not to track the creation of new laminar edges during a face change operation. If you set <CODE>
+track_edges</CODE>
+ to <A HREF=../headers/pk_change_track_edges_t.html>PK_change_track_edges_laminar_c</A>, then laminar edges are tracked and returned in the <CODE>
+tracking.track_records</CODE>
+ substructure. By default, laminar edges are not tracked. </P>
+<P>
+<A NAME="50422148_pgfId-307712"></A>When laminar edge tracking is used, a single track record is returned for each group of original topologies that cause a change to the laminar edges of the faces you are operating on. For example:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-307713"></A>If edge A is split into three laminar edges, A, B, and C, a single track record is created, with edge A as the <CODE>
+original_topols</CODE>
+, and edges A, B, and C as the <CODE>
+product_topols</CODE>
+. </LI>
+<LI>
+<A NAME="50422148_pgfId-307714"></A>If edges A, B, and C are merged to a single laminar edge A, a single track record is created with edges A, B, and C as the <CODE>
+original_topols</CODE>
+, and edge A as the <CODE>
+product_topols</CODE>
+.</LI>
+<LI>
+<A NAME="50422148_pgfId-307715"></A>If a vertex V is split, thereby creating a laminar edge A, a single track record is created, with vertex V and all the edges connected to it as the <CODE>
+original_topols</CODE>
+, and edge A as the <CODE>
+product_topols</CODE>
+. </LI>
+<LI>
+<A NAME="50422148_pgfId-307716"></A>If edge A is replaced by edge B (for example if the edge is reversed), a single track record is created with edge A and the vertices connected to it as the <CODE>
+original_topols</CODE>
+ and edge B as the <CODE>
+product_topols</CODE>
+. </LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-307717"></A>The value of the <CODE>
+track</CODE>
+ field of a given track record depends on the event that caused the track record to be created:</P>
+<P>
+<A NAME="50422148_pgfId-307731"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307720"></A>Event</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307722"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307724"></A>A new edge is derived from splitting or merging existing edges on the body.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307726"></A>The <CODE>
+track</CODE>
+ field is PK_TOPOL_track_derive_c. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307728"></A>A new edge is derived from splitting an existing vertex.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307730"></A>The <CODE>
+track</CODE>
+ field is PK_TOPOL_track_create_c. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-307732"></A>If a single laminar edge is derived from a single originator then a track record is only created if one of the following is true:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-307733"></A>The new edge has a different tag from the originator.</LI>
+<LI>
+<A NAME="50422148_pgfId-307734"></A>The old edge was not a laminar edge.</LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-307738"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422148_pgfId-307737"></A>Note: Track records are not created when laminar edges are deleted. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422148_pgfId-307675"></A>	72.5.9 	<A NAME="50422148_63832"></A>Reporting function results </H3>
+<P>
+<A NAME="50422148_pgfId-307888"></A>You can use the <CODE>
+results_output </CODE>
+option to choose whether to output any local failures and associated topological entity tags in a Parasolid Report format or in the <CODE>
+results </CODE>
+returned argument of <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>.</P>
+<P>
+<A NAME="50422148_pgfId-307843"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307829"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307831"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307833"></A><A HREF=../headers/pk_results_output_t.html>PK_results_output_return_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307835"></A>results output in return arguments.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307837"></A><A HREF=../headers/pk_results_output_t.html>PK_results_output_report_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307842"></A>results output in Parasolid Report.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-307844"></A>If <CODE>
+results_output</CODE>
+ is <A HREF=../headers/pk_results_output_t.html>PK_results_output_report_c</A>, a complete list of multiple fault types and multiple fault entities within each <CODE>
+type</CODE>
+ are returned in the Parasolid Report, unless the returned local status is one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422148_pgfId-307848"></A><A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A></LI>
+<LI>
+<A NAME="50422148_pgfId-307849"></A><A HREF=../headers/pk_local_status_t.html>PK_local_status_nocheck_c</A></LI>
+</UL>
+<P>
+<A NAME="50422148_pgfId-307853"></A>If the Parasolid Report is populated in this way, <A HREF=../headers/pk_face_change.html>PK_FACE_change</A> returns PK_ERROR_failed_to_change.</P>
+<P>
+<A NAME="50422148_pgfId-307854"></A>Each failure reported is saved as a record of type <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_1_c</A>, which contains the following information:</P>
+<P>
+<A NAME="50422148_pgfId-307876"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307857"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307859"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307861"></A><CODE>
+status</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307863"></A>The contained value corresponds to the results status that would have been returned if the results were not returned in a Parasolid Report. For example, <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_cant_get_pt_c</A> is the status value returned with PK_REPORT_record_type_1_t if the geometry for a vertex cannot be located. This corresponds to <A HREF=../headers/pk_local_status_t.html>PK_local_status_cant_get_pt_c</A>, the status value returned by</P>
+<P>
+<A NAME="50422148_pgfId-307867"></A><A HREF=../headers/pk_results_output_t.html>PK_results_output_return_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307869"></A><CODE>
+old_items</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307871"></A>Error entities that existed prior to the operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307873"></A><CODE>
+new_items_array</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422148_pgfId-307875"></A>New error entities created during the operation.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422148_pgfId-307818"></A>&nbsp;</P>
+
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.072.html">Creating New Bodies From Existing Entities</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.074.html">Introduction To Blending</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_VERTEX_spin</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_VERTEX_spin</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>         PK_VERTEX_spin
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_vertex_t.html>PK_VERTEX_t</A>             vertex,        --- end vertex of wire body
+const <A HREF=../headers/pk_axis1_sf_t.html>PK_AXIS1_sf_t</A>    *axis,          --- spin axis
+double                  angle,         --- spin angle
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>            local_check,   --- whether local checking will be done
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>        *const lateral,       --- new edge
+<A HREF=../headers/pk_vertex_t.html>PK_VERTEX_t</A>      *const base,          --- swept vertex
+<A HREF=../headers/pk_local_check_t.html>PK_local_check_t</A> *const check_result   --- result of local check
+)
+</B>
+<A NAME="description"></A>
+<I>This function spins an end vertex of a wire body or the sole vertex of a
+minimum body into an edge.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity     Vertex is unsuitable for spin (MILD)
+    PK_ERROR_wrong_entity          Bad arguments (MILD)
+    PK_ERROR_non_manifold          Can't spin vertex with non-manifold boundary
+                                   (MILD)
+    PK_ERROR_bad_angle             Bad angle (MILD)
+
+<A NAME="documentation"></A>
+The vertex to be spun is moved along an arc specified by the axis leaving
+a lateral edge in its wake resulting in a wire body being produced.
+
+
+
+Suitable Spin Entities:
+
+   . End vertices (in contradistinction to interior vertices) of wire bodies
+   . Sole vertex of minimum body
+   . Spun vertex must not be coincident with the axis of rotation.
+
+Attempting to spin a vertex which is not one of the above will give rise
+to the error PK_ERROR_unsuitable_entity.
+
+
+
+Permissible Spins:
+
+   . A vertex may not be spun through more than 2pi or less than -2pi.
+     It is not possible to perform full spins (where the angle is 2pi or
+     -2pi) on end vertices of a wire.
+
+
+After a spin any coincident topology will not be fused or united.
+
+In general this procedure may give rise to self-intersecting body
+boundaries, which could cause unpredictable errors later.
+
+If local checking <B>'local_check'</B> is PK_LOGICAL_true, consistency checks will be
+made on newly created topological and geometrical entities, and the state
+of the body returned in <B>'check_result'</B>. A result of <B>'<A HREF=../headers/pk_local_check_t.html>PK_local_check_ok_c</A>'</B>
+indicates the body is valid. A result of <B>'<A HREF=../headers/pk_local_check_t.html>PK_local_check_failed_c</A>'</B> indicates
+the body is self-intersecting and further modelling operations on it may fail.
+
+If <B>'local_check'</B> is PK_LOGICAL_false, local checking will be switched off and
+the result returned will be <B>'<A HREF=../headers/pk_local_check_t.html>PK_local_check_no_c</A>'</B>.
+
+A self-intersecting body can be returned.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

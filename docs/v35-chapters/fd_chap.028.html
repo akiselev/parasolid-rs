@@ -1,0 +1,1248 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Mass Properties</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Mass Properties</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.027.html">Enquiry And Output Functions</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.029.html">Calculating Minimum And Maximum Distance </A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-307281">27.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-294700">27.1.1	Received arguments </A>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-294732">27.1.2	Returned arguments </A>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-294761">27.1.3	Summary of options </A>
+</UL>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-294826">27.2	Determining the mass </A>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-294856">27.3	Calculating the periphery </A>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-294914">27.4	Bounds </A>
+<UL>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-294935">27.4.1	Using mass properties to detect model differences </A>
+</UL>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-294941">27.5	Single </A>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-294985">27.6	Dealing with local density attributes </A>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-295133">27.7	Calculating the mass properties of topologies with transformations </A>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-295135">27.8	Using the alternative faceting method </A>
+<UL>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-295228">27.8.1	Chordal tolerance </A>
+</UL>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-295232">27.9	Using mass properties in general bodies and assemblies </A>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-388350">27.10	Identifying zero mass</A>
+<LI> <A HREF="fd_chap.028.html#50422097_pgfId-295312">27.11	Mass properties definitions </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-307281"></A>27.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-294696"></A>This chapter provides information on using the function <A HREF=../headers/pk_topol_eval_mass_props.html><A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A></A> to evaluate mass and other properties such as area, volume, length, centre of gravity and moment of inertia. <A HREF=../headers/pk_topol_eval_mass_props.html><A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A></A> can calculate the mass properties of a single entity or a collection of them, if all entities in the collection are of the same type. It also uses density attributes that are attached to the entity or entities. See <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A> for more information on attributes.</P>
+<P>
+<A NAME="50422097_pgfId-322791"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Inquiries\Model</CODE>
+ <CODE>
+Analysis\Mass</CODE>
+ <CODE>
+Props</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H3>
+<A NAME="50422097_pgfId-294700"></A>	27.1.1 	Received arguments </H3>
+<P>
+<A NAME="50422097_pgfId-294701"></A><A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A> receives the following arguments:</P>
+<P>
+<A NAME="50422097_pgfId-294726"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294704"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294706"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294708"></A><CODE>
+topols</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294710"></A>An array of topological entities.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294712"></A><CODE>
+n_topols</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294714"></A>The number of <CODE>
+topols</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294716"></A><CODE>
+accuracy</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294718"></A>A control of how much work must be done to calculate the requested mass properties. It must lie in the range of 0.0 to 1.0. In practice, values within the range of 0.99 and 0.999999 are the most useful. These values are not percentages but an indicator of the number of iterations in the calculation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294720"></A><CODE>
+options</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294722"></A>A set of options that evaluate mass properties of a given set of topological entities. See <A HREF="fd_chap.028.html#50422097_43847">Section 27.1.3, “Summary of options”</A> for an introduction to these options.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422097_pgfId-294727"></A>A number of arguments are returned by the function providing information on the mass properties of the function. See <A HREF="fd_chap.028.html#50422097_86252">Section 27.1.2, “Returned arguments”</A> for more information.</P>
+
+
+<H3>
+<A NAME="50422097_pgfId-294732"></A>	27.1.2 	<A NAME="50422097_86252"></A>Returned arguments </H3>
+<P>
+<A NAME="50422097_pgfId-294733"></A><A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A> returns the following arguments:</P>
+<P>
+<A NAME="50422097_pgfId-294759"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294736"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294738"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294740"></A><CODE>
+amount</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294742"></A>The quantity of matter in the selected <CODE>
+topols.</CODE>
+This varies on the type of entity. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294744"></A><CODE>
+mass</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294746"></A>The integral of the product of density and the value of the <CODE>
+amount.</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294748"></A><CODE>
+c_of_g</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294750"></A>The integral of the product of the density function at a given position with the position vector itself over the whole amount being considered.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294752"></A><CODE>
+m_of_i</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294754"></A>The inertia tensor about a point, where the point is the centre of gravity.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294756"></A><CODE>
+periphery</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294758"></A>The <CODE>
+amount </CODE>
+of the boundary of the selected <CODE>
+topols</CODE>
+ and it depends on the type of the entity.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422097_pgfId-294761"></A>	27.1.3 	<A NAME="50422097_43847"></A>Summary of options </H3>
+<P>
+<A NAME="50422097_pgfId-294762"></A><A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A> contains a wide variety of options that enables you to control the result of the operation. The following table summarizes the options that are available, full details of which are given in the rest of the chapter.</P>
+<P>
+<A NAME="50422097_pgfId-294824"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294765"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294767"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294769"></A><CODE>
+mass</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294773"></A>Which mass properties are calculated. See <A HREF="fd_chap.028.html#50422097_21159">Section 27.2, “Determining the mass”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294776"></A><CODE>
+periphery</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294780"></A>Whether to calculate the periphery of the entity. See <A HREF="fd_chap.028.html#50422097_71461">Section 27.3, “Calculating the periphery”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294783"></A><CODE>
+bound</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294787"></A>What kind of bound on accuracy to return. See <A HREF="fd_chap.028.html#50422097_32505">Section 27.4, “Bounds”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294790"></A><CODE>
+single</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294792"></A>Whether to use input entities separately or as a single solid. See <A HREF="fd_chap.028.html#50422097_29784">Section 27.6, “Dealing with local density attributes”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294797"></A><CODE>
+use_facets</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294799"></A>Whether to use the alternative faceting method to calculate mass properties. See <A HREF="fd_chap.028.html#50422097_72695">Section 27.8, “Using the alternative faceting method”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294804"></A><CODE>
+facet_tol</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294806"></A>The chordal tolerance for facets used in the alternative faceting method. See <A HREF="fd_chap.028.html#50422097_89036">Section 27.8.1, “Chordal tolerance”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294811"></A><CODE>
+same_dim_density</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294813"></A>How to treat the behaviour when local density attributes are attached to topologies with the same topological dimension as the maximum of topologies passed in as <CODE>
+topols</CODE>
+. See <A HREF="fd_chap.028.html#50422097_77993">Section 27.9, “Using mass properties in general bodies and assemblies”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294818"></A><CODE>
+lower_dim_density</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294820"></A>How to treat the behaviour when local density attributes are attached to topologies with lower topological dimension than the maximum of topologies passed in as <CODE>
+topols</CODE>
+. See <A HREF="fd_chap.028.html#50422097_77993">Section 27.9, “Using mass properties in general bodies and assemblies”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-366371"></A><CODE>
+n_transfs<BR>
+transfs</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-366373"></A>An array of transformations used to transform topologies passed into <CODE>
+topols</CODE>
+. See <A HREF="fd_chap.028.html#50422097_22792">Section 27.7, “Calculating the mass properties of topologies with transformations”</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422097_pgfId-387985"></A>mass_eq_0</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-387987"></A>How to behave when encountering topology that has zero mass and amount.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-294826"></A>27.2	<A NAME="50422097_21159"></A>Determining the mass 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-294827"></A>You can find a number of mass properties of an entity using the <CODE>
+mass </CODE>
+option. This option takes the following values:</P>
+<P>
+<A NAME="50422097_pgfId-294849"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294830"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294832"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294834"></A><A HREF=../headers/pk_mass_t.html>PK_mass_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294836"></A>Do not find any data.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294838"></A><A HREF=../headers/pk_mass_t.html>PK_mass_mass_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294840"></A>Find both the mass and <CODE>
+amount</CODE>
+ of the entities.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294842"></A><A HREF=../headers/pk_mass_t.html>PK_mass_c_of_g_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294844"></A>Find the centre of gravity in addition to the mass and <CODE>
+amount</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294846"></A><A HREF=../headers/pk_mass_t.html>PK_mass_m_of_i_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294848"></A>Find the moment of inertia in addition to the mass, <CODE>
+amount</CODE>
+ and centre of gravity. This is the default value.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422097_pgfId-294850"></A>The mass of an entity is used to find the centre of gravity, which in turn is needed to calculate the moment of inertia.The default value, <A HREF=../headers/pk_mass_t.html>PK_mass_m_of_i_c</A>, will find the mass, <CODE>
+amount</CODE>
+, centre of gravity and moment of inertia for the entity. </P>
+<P>
+<A NAME="50422097_pgfId-294854"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422097_pgfId-294853"></A>Note: Mass properties can be calculated on topological entities that do not have density attributes. These entities will be treated as if they had a density of 1.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-294856"></A>27.3	<A NAME="50422097_71461"></A>Calculating the periphery 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-294857"></A>This option enables you to calculate the total <CODE>
+amount</CODE>
+ of the boundary of the selected topologies of an entity and it takes the following values:</P>
+<P>
+<A NAME="50422097_pgfId-294871"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294860"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294862"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294864"></A><A HREF=../headers/pk_mass_periphery_t.html>PK_mass_periphery_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294866"></A>Do not calculate the periphery of the entities.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294868"></A><A HREF=../headers/pk_mass_periphery_t.html>PK_mass_periphery_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294870"></A>Calculate the periphery of the entities. This is the default value.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422097_pgfId-294872"></A>For general bodies, only the periphery of entities with a face or a solid region (i.e. dimension two and three) can be calculated. For regions, faces and edges, the periphery is calculated as the sum of the peripheries of each individual topology. <A HREF="fd_chap.028.html#50422097_43323"><EM>
+Figure 27-1</EM></A> shows the periphery of two adjoining faces of a unit cube. For these two faces the periphery is calculated to be 8 times the length of an edge in these two faces.</P>
+<P>
+<A NAME="50422097_pgfId-294910"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-205.gif">
+
+<P>
+<A NAME="50422097_pgfId-294912"></A>Figure 27-1 <A NAME="50422097_43323"></A>Calculating the periphery of two selected faces.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-294914"></A>27.4	<A NAME="50422097_32505"></A>Bounds 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-294915"></A>You can request error bounds information using the <CODE>
+bounds</CODE>
+ option.This option takes the following values:</P>
+<P>
+<A NAME="50422097_pgfId-294933"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294918"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294920"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294922"></A><A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294924"></A>No errors are given. This is the default value.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294926"></A><A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_modulus_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294928"></A>The error range is given by a value plus or minus a single modulus.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294930"></A><A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_interval_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294932"></A>The error range is given as a value and an interval</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422097_pgfId-294934"></A>It is strongly recommended that you request error bound information when calculating mass properties. The error bounds provide a very valuable indicator as to the level of accuracy of the calculated values. </P>
+
+<H3>
+<A NAME="50422097_pgfId-294935"></A>	27.4.1 	Using mass properties to detect model differences </H3>
+<P>
+<A NAME="50422097_pgfId-294940"></A>When comparing mass property calculations for identical or similar bodies within or across Parasolid versions, it is essential that the application requests and stores error bounds along with the calculated <CODE>
+amount</CODE>
+. When comparing the <CODE>
+amount</CODE>
+ returned by two different versions of the software it is essential that the error bounds are taken into account in such comparisons. For an identical model it should always be the case that the ranges given by the <CODE>
+amount</CODE>
+ +/- error bounds overlap, but it should not be considered a difference if the <CODE>
+amount</CODE>
+ from version X does not lie within the range from version X+1 or vice versa. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-294941"></A>27.5	Single 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-294942"></A>The <CODE>
+single</CODE>
+ option of <A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A> enables you to treat an array of faces or sheet bodies as a single solid body which can then be used to calculate the required mass properties, with the exception of its mass. Density attributes that are attached to faces or edges are ignored and the moment of inertia is calculated with an assumed density of 1. This option also allows you to calculate the mass properties of a set of an array of unsewn sheets (which when sewn would form a closed volume) as if they were sewn together to form a single body.</P>
+<P>
+<A NAME="50422097_pgfId-294977"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-206.gif">
+
+<P>
+<A NAME="50422097_pgfId-294979"></A>Figure 27-2 <A NAME="50422097_73286"></A>Body with a complex void</P>
+<P>
+<A NAME="50422097_pgfId-294983"></A><A HREF="fd_chap.028.html#50422097_73286"><EM>
+Figure 27-2</EM></A> shows a block with a complex void. To calculate the negative volume of the void, the four faces of the inner cuboid and the six faces of the cylinders are supplied along with the <CODE>
+single</CODE>
+ option. To calculate the approximate volume of one of the cylindrical voids, you need to supply the main face and the two planar faces of the cylinder along with the <CODE>
+single</CODE>
+ option. Using the <CODE>
+single</CODE>
+ option in this way, the cylinder will be treated as a single solid entity for the calculations. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-294985"></A>27.6	<A NAME="50422097_29784"></A>Dealing with local density attributes 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-294989"></A>In Parasolid, density attributes that are attached to regions, faces, edges or vertices are referred to as local densities. See <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A> for more information on how attributes are used in Parasolid. As the name suggests, local densities can be used on specific local topologies to selectively alter the interpretation of the global body density in that area. For example, you may want to let every face but one in a body have a certain density, and a higher density on a specific face. This can be achieved by attaching a body density to the part and a face density to the specified face. The effect of local densities on mass properties calculations is controlled by the options <CODE>
+same_dim_density</CODE>
+ and <CODE>
+lower_dim_density</CODE>
+. </P>
+<P>
+<A NAME="50422097_pgfId-294996"></A>The values for both of these options are:</P>
+<P>
+<A NAME="50422097_pgfId-295019"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-294999"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295001"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295003"></A><A HREF=../headers/pk_mass_local_density_t.html>PK_mass_local_density_additive_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295005"></A>Local density attributes are added to body density to give the total density of the topological entity.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295007"></A><A HREF=../headers/pk_mass_local_density_t.html>PK_mass_local_density_ignore_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295009"></A>Local densities are ignored if present.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295011"></A><A HREF=../headers/pk_mass_local_density_t.html>PK_mass_local_density_unset_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295013"></A>Local density behaviour is not specified. Default for both options.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295015"></A><A HREF=../headers/pk_mass_local_density_t.html>PK_mass_local_density_override_c</A></P>
+<P>
+<A NAME="50422097_pgfId-295016"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295018"></A>Local density will be used when present, otherwise the body density value will be used. Used by <CODE>
+same_dim_density</CODE>
+ only.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422097_pgfId-295023"></A><A HREF="fd_chap.028.html#50422097_16832"><EM>
+Figure 27-3</EM></A> and its accompanying table shows the expectant mass of a cube of unit length sides when using these values. The body has a total body density of 7.0 attached to the body itself and a region density of 2.0 attached to the solid region inside the body. The volume of the body is 1.0.</P>
+<P>
+<A NAME="50422097_pgfId-295058"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-207.gif">
+
+<P>
+<A NAME="50422097_pgfId-295060"></A>Figure 27-3 <A NAME="50422097_16832"></A>Resultant Mass values using the <CODE>
+same_dim_density</CODE>
+ option</P>
+<P>
+<A NAME="50422097_pgfId-295078"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295063"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295065"></A>Mass</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295067"></A>Override/Unset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295069"></A>2.0 x 1.0 =2.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295071"></A>Ignore</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295073"></A>7.0 x 1.0=7.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295075"></A>Additive</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295077"></A>(7.0+2.0) x1.0 =9.0</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422097_pgfId-295082"></A><A HREF="fd_chap.028.html#50422097_22192"><EM>
+Figure 27-4</EM></A> and its accompanying table shows the expected mass of a cube of unit length sides when using <CODE>
+lower_dim_density</CODE>
+. The body has a body density of 7.0, an edge density of 1.0 and two face density attributes of 3.0 and 5.0. The volume of the body is 1.0.</P>
+<P>
+<A NAME="50422097_pgfId-295117"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-208.gif">
+
+<P>
+<A NAME="50422097_pgfId-295119"></A>Figure 27-4 <A NAME="50422097_22192"></A>Resultant Mass values using the <CODE>
+lower_dim_density</CODE>
+ option</P>
+<P>
+<A NAME="50422097_pgfId-366642"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295122"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295124"></A>Mass</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295126"></A>Additive/Unset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295128"></A>(5.0 + 3.0 + 7.0 + 1.0) x 1.0 =16.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295130"></A>Ignore</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295132"></A>7.0 x 1.0 = 7.0</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-295133"></A>27.7	<A NAME="50422097_22792"></A>Calculating the mass properties of topologies with transformations 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-366739"></A>You can use the <CODE>
+transfs</CODE>
+ option to calculate the mass properties of topologies with rigid transformations and reflection transformations. This option takes an array (of size <CODE>
+n_transfs</CODE>
+) of transformations that are applied to the topologies supplied in <CODE>
+topols</CODE>
+. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-295135"></A>27.8	<A NAME="50422097_72695"></A>Using the alternative faceting method 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-295136"></A>The <CODE>
+use_facet</CODE>
+ option of <A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A> is an alternative method that is primarily provided for the purposes of debugging when validating the results produced by the main parameter-space method. It is recommended that you use the default method instead of this faceting method, especially for complex models. No error bounds are returned with this method. </P>
+<P>
+<A NAME="50422097_pgfId-295140"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422097_pgfId-295139"></A>Note:  This requires the model to be tessellated and the operation can take a considerable time to complete especially when tight facet tolerances are supplied</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422097_pgfId-295141"></A>With this option, a triangular facet mesh for each face referenced is generated, calculations are made on each facet and the results for all the facets are combined. The more facets you use, the more accurate the calculations will be. <A HREF="fd_chap.028.html#50422097_38190"><EM>
+Figure 27-5</EM></A> and <A HREF="fd_chap.028.html#50422097_47179"><EM>
+Figure 27-6</EM></A> illustrates using the faceting method with coarser facets and finer facets.You can also use the <CODE>
+facet_tol </CODE>
+option with this option. See <A HREF="fd_chap.028.html#50422097_89036">Section 27.8.1, “Chordal tolerance”</A> for more information on this. </P>
+<P>
+<A NAME="50422097_pgfId-295186"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-209.gif">
+
+<P>
+<A NAME="50422097_pgfId-295188"></A>Figure 27-5 <A NAME="50422097_38190"></A>Calculating the volume of a sphere using the faceting method</P>
+<P>
+<A NAME="50422097_pgfId-295224"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-210.gif">
+
+<P>
+<A NAME="50422097_pgfId-295226"></A>Figure 27-6 <A NAME="50422097_47179"></A>Calculating the volume of a sphere with finer facets</P>
+
+<H3>
+<A NAME="50422097_pgfId-295228"></A>	27.8.1 	<A NAME="50422097_89036"></A>Chordal tolerance </H3>
+<P>
+<A NAME="50422097_pgfId-295229"></A>The <CODE>
+facet_tol</CODE>
+ option allows you to supply the chordal tolerance for facets used in conjunction with the <CODE>
+use_facet</CODE>
+ option. Setting this option gives you control over the facets used in the alternative faceting method.</P>
+<P>
+<A NAME="50422097_pgfId-295230"></A>This option is equivalent to the <CODE>
+curve_chord_tol </CODE>
+and <CODE>
+surface_plane_tol</CODE>
+ as used by <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A>. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-295232"></A>27.9	<A NAME="50422097_77993"></A>Using mass properties in general bodies and assemblies 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-295233"></A>Mass properties can also be calculated for general bodies and assemblies. The following table lists these as follows;</P>
+<P>
+<A NAME="50422097_pgfId-295307"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295236"></A>Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295238"></A>Amount</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295240"></A>Mass</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295242"></A>Centre of gravity</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295244"></A>Moment of inertia</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295246"></A>Periphery</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295248"></A>Assemblies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295250"></A>Total amount</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295252"></A>Mass</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295254"></A>As for components</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295256"></A>As for components</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295258"></A>Total periphery</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295260"></A>General body (dimension 3)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295262"></A>Volume</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295264"></A>Mass</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295266"></A>C_of_g</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295268"></A>M_of_i</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295270"></A>Face area</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295272"></A>General body (dimension 2)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295274"></A>Surface area</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295276"></A>Mass</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295278"></A>C_of_g</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295280"></A>M_of_i</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295282"></A>Edge length</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295284"></A>General body (dimension 1)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295286"></A>Length</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295288"></A>Mass</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295290"></A>C_of_g</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295292"></A>M_of_i</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295294"></A>none</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295296"></A>General body (dimension 0)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295298"></A>none</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295300"></A>Mass</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295302"></A>C_of_g</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295304"></A>M_of_i</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-295306"></A>none</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422097_pgfId-295308"></A>For assemblies, all body occurrences in the assembly and sub-assemblies are taken into account for the calculations. These occurrences must be of the same body type. For information on assemblies See <A HREF="fd_chap.023.html#50422092_40142">Chapter 22, “Assemblies And Instances”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-388350"></A>27.10	<A NAME="50422097_98870"></A>Identifying zero mass
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-391963"></A>You can use the <EM>
+mass_eq_0</EM> option to control the behaviour when at least one of the supplied topologies has zero mass and amount. This option takes the following values:</P>
+<P>
+<A NAME="50422097_pgfId-393961"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-393098"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-393100"></A>Descriptions</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-393102"></A><CODE>
+<A HREF=../headers/pk_mass_eq_0_t.html>PK_mass_eq_0_fail_c</A></CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-393487"></A>Stop calculation and return an error when a topology of zero mass and amount is found. This is the default value.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-397182"></A><CODE>
+<A HREF=../headers/pk_mass_eq_0_t.html>PK_mass_eq_0_report_c</A></CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422097_pgfId-393631"></A>Calculate the mass properties of all input topologies, and return the total mass of all topologies whose mass is greater than zero. Topologies with zero mass and amount will be returned in the Parasolid Report Stream in a record of type <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_3_c</A> and status code <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_mass_eq_0_c</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422097_pgfId-393091"></A>For information about the Parasolid Report mechanism, see <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A></P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422097_pgfId-295312"></A>27.11	Mass properties definitions 
+
+
+</H1>
+<P>
+<A NAME="50422097_pgfId-295316"></A>Parasolid uses specific definitions for mass properties. These are as follows;</P>
+<P>
+<A NAME="50422097_pgfId-295317"></A><STRONG>
+Mass</STRONG> is defined as the integral of the product of a body’s density and its <CODE>
+amount</CODE>
+ when density is constant. The <CODE>
+amount</CODE>
+ represents the quantity of matter in a body, which varies depending on the type of topological entity. For example, for a solid body the <CODE>
+amount</CODE>
+ is the volume of the entity, for a sheet the <CODE>
+amount</CODE>
+ is the area and for a wire body the <CODE>
+amount</CODE>
+ is length.The density is obtained from the attached density attributes. If there is no density attribute attached, density has a default value of one. See <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A> for more information on how attributes are used in Parasolid. <STRONG>
+Mass</STRONG> has the following mathematical equation;</P>
+<P>
+<A NAME="50422097_pgfId-295327"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-211.gif">
+
+<P>
+<A NAME="50422097_pgfId-295328"></A><STRONG>
+Centre of gravity</STRONG> is defined as the integral of the product of the density function at a given position with the position vector itself over the whole volume being considered. It has the following mathematical equation;</P>
+<P>
+<A NAME="50422097_pgfId-295332"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-212.gif">
+
+<P>
+<A NAME="50422097_pgfId-295333"></A>The <STRONG>
+Moment of inertia</STRONG> is defined as follows;</P>
+<P>
+<A NAME="50422097_pgfId-295337"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-213.gif">
+
+<P>
+<A NAME="50422097_pgfId-295341"></A>where <STRONG>
+r</STRONG> is the vector from the center of mass to a point in the volume <EM>
+v</EM>, <IMG SRC="../graphics/fd_chap-214.gif">
+<STRONG>
+ </STRONG>is their outer product <STRONG>
+E</STRONG>3 is the 3X3 identity matrix and <EM>
+V </EM>is a region of space completely containing the object. In Parasolid, the inertia tensor matrix is defined from the moments of inertia as follows,</P>
+<P>
+<A NAME="50422097_pgfId-295348"></A><STRONG>
+</STRONG>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-215.gif">
+
+<P>
+<A NAME="50422097_pgfId-295352"></A>In Parasolid, the tensor returned is the moments of inertia about a point, where the point is the centre of gravity as defined in the standard Parasolid Cartesian coordinate system.</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.027.html">Enquiry And Output Functions</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.029.html">Calculating Minimum And Maximum Distance </A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

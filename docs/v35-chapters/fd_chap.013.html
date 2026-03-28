@@ -1,0 +1,4881 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Calling Parasolid From .NET Code</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Calling Parasolid From .NET Code</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.012.html">Using Reports</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.014.html">Introduction To Basic Concepts In Parasolid</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294742">12.1	Introduction </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294745">12.2	Basic concepts </A>
+<UL>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294790">12.2.1	Requirements and limitations </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294796">12.2.2	Performance </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-325738">12.2.3	Error handling </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294803">12.2.4	Code access security </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294805">12.2.5	Frustrum and callbacks </A>
+</UL>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294809">12.3	Parasolid types and names in C# </A>
+<UL>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294819">12.3.1	Basic types </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294870">12.3.2	Namespaces </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294896">12.3.3	Classes </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294902">12.3.4	Primitives </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294922">12.3.5	Structures </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-294952">12.3.6	Parasolid token types </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-295002">12.3.7	Values of Parasolid token types </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-295056">12.3.8	Logicals </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-295061">12.3.9	Functions </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-295091">12.3.10	Function pointers </A>
+</UL>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-295134">12.4	Exceptions to naming conventions in C# </A>
+<UL>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-295139">12.4.1	Identifiers that begin with a digit </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-295156">12.4.2	Identifiers that are reserved words in C# </A>
+<LI> <A HREF="fd_chap.013.html#50422081_pgfId-295174">12.4.3	Special cases for names of token values </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422081_pgfId-294742"></A>12.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422081_pgfId-294743"></A>This chapter describes the Microsoft .NET binding DLL for Parasolid, which enables Parasolid functions to be called from .NET code and allows Parasolid-based applications to be written in the C# programming language. The following sections assume that you have a working knowledge of C# and some basic familiarity with .NET programming. Use of the .NET binding with Visual Basic is not supported. </P>
+<P>
+<A NAME="50422081_pgfId-294744"></A>An example application written in C# is supplied as part of the Parasolid Jumpstart Kit. For more information, see <A HREF="fd_chap.009.html#50422077_66127">Section 8.3.2, “The C# Example Application for Windows”</A>.</P>
+<P>
+<A NAME="50422081_pgfId-405590"></A>For more information about using Parasolid with C# see “Calling Parasolid from <BR>
+C#: Implementation Advice” in the C# Example Application for Windows User Guide, supplied as part of the Parasolid Jumpstart Kit. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422081_pgfId-294745"></A>12.2	Basic concepts 
+
+
+</H1>
+<P>
+<A NAME="50422081_pgfId-294746"></A>The .NET binding makes the Parasolid functionality available to .NET programs. It does this by calling Parasolid functions compiled from C source code: there is no version of Parasolid written in a .NET language. C# has facilities for calling C functions (<EM>
+Platform Invoke</EM>, also known as <EM>
+P/Invoke</EM>) and for passing data with such calls.</P>
+<P>
+<A NAME="50422081_pgfId-294747"></A>The .NET binding is supplied as a single DLL named <CODE>
+pskernel_net.dll</CODE>
+ that provides C# versions of Parasolid types, values and functions. This enables Parasolid to be called from C# or other .NET languages with compatible data-types. To call a Parasolid function, data must be stored in C# variable types that correspond to the (Parasolid) C types used in that function. The C# version of the function can then be called, which subsequently converts the data to the required C types and calls the corresponding Parasolid (C) function via P/Invoke.</P>
+<P>
+<A NAME="50422081_pgfId-294781"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-53.gif">
+
+<P>
+<A NAME="50422081_pgfId-294785"></A>Figure 12-1 Calling Parasolid functions from C#</P>
+<P>
+<A NAME="50422081_pgfId-294789"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422081_pgfId-294788"></A>Note: The Parasolid PK interface is fully supported. The KI functions are <EM>
+not</EM> supported, although some KI token types and values are provided since they are required for PK-based programming.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422081_pgfId-294790"></A>	12.2.1 	Requirements and limitations </H3>
+<P>
+<A NAME="50422081_pgfId-294791"></A>As the .NET binding is generated automatically from the Parasolid C headers, the entire interface is <EM>
+unsafe</EM>, requiring the use of pointers; therefore it can only be called from unsafe code blocks in C#. This minimises the performance overheads of calling Parasolid (C) functions from C#. Mixing calls to Parasolid made via the .NET binding with ones made directly from “native” code (a language that can be compiled to binary code and be called from, and also call, C) is not supported. We anticipate that users of the .NET binding will create an object-oriented layer on top of the binding, of a design suitable for their application.</P>
+<P>
+<A NAME="50422081_pgfId-294795"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422081_pgfId-294794"></A>Warning: Memory provided to Parasolid by a C# frustrum must be locked, and <EM>
+never</EM> moved by the garbage collector; failure to adhere to this will cause Parasolid to crash. The C# example application demonstrates how to lock memory allocated by the frustrum.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422081_pgfId-294796"></A>	12.2.2 	Performance </H3>
+<P>
+<A NAME="50422081_pgfId-325734"></A>Calling Parasolid (C) code from .NET code involves a performance overhead for the P/Invoke system that manages the transition. This is fairly small in most cases, usually less than 5% (and often as low as 1%), but can become appreciable for applications that make large numbers of simple attribute enquiries and changes as separate calls to Parasolid. Using the attribute callback functions (e.g., <CODE>
+<A HREF=../headers/pk_attdef_register_cb.html>PK_ATTDEF_register_cb</A></CODE>
+) can reduce this overhead considerably. </P>
+
+
+<H3>
+<A NAME="50422081_pgfId-325738"></A>	12.2.3 	Error handling </H3>
+<P>
+<A NAME="50422081_pgfId-325739"></A>The .NET binding does not use C# exceptions apart from certain rare occasions when dealing with .NET string types (see <A HREF="fd_chap.125.html#50422208_37198">Section C.6.6, “Functions with string arguments”</A>): instead, it returns Parasolid error codes. C# exceptions may be thrown from frustrum and callback functions, through Parasolid, to be caught by your application.</P>
+
+
+<H3>
+<A NAME="50422081_pgfId-294803"></A>	12.2.4 	Code access security </H3>
+<P>
+<A NAME="50422081_pgfId-294804"></A>The default .NET Code Access Security settings will allow you to run .NET code that calls C code, provided that the whole program resides on the local machine. If any of it is loaded from a network machine, you must modify the Code Access Security settings, as described in the MSDN documentation library.</P>
+
+
+<H3>
+<A NAME="50422081_pgfId-294805"></A>	12.2.5 	Frustrum and callbacks </H3>
+<P>
+<A NAME="50422081_pgfId-294806"></A>The .NET binding does not provide a frustrum or callback functions for use with Parasolid; you must supply these (just as you would when using Parasolid through the C interface). They may be written in native code (e.g., C or C++) or in C#. They may be registered through the C# interface as <EM>
+delegates</EM>, in a similar way to their usage in a native code Parasolid application. An example of a C# frustrum is provided with the C# example application.</P>
+<P>
+<A NAME="50422081_pgfId-294807"></A>If you register thread-specific memory allocation and freeing functions with <A HREF=../headers/pk_thread_register_memory_cbs.html>PK_THREAD_register_memory_cbs</A>, you must ensure that all of them are both thread-safe and capable of freeing memory allocated by a different thread’s allocator. This is because the .NET garbage collector often calls an object’s destructor from a different thread to the one that constructed the object.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422081_pgfId-294809"></A>12.3	<A NAME="50422081_73684"></A>Parasolid types and names in C# 
+
+
+</H1>
+<P>
+<A NAME="50422081_pgfId-294810"></A>The Parasolid .NET binding is written in C# and uses C# names; these consist of two to four parts, separated by periods (“.”). These periods generally correspond to the underscores (“_”) used in the corresponding name in the Parasolid C interface; however, they have more significance, as they are also scoping operators used to select members of a C# <CODE>
+namespace</CODE>
+, <CODE>
+class</CODE>
+, <CODE>
+struct</CODE>
+ or <CODE>
+enum</CODE>
+ as explained below.</P>
+<P>
+<A NAME="50422081_pgfId-294811"></A>This section describes in general how Parasolid names in C# relate to those in C. There are some additional rules to be applied in certain circumstances, which are covered in <A HREF="fd_chap.013.html#50422081_59715">Section 12.4, “Exceptions to naming conventions in C#”</A>.</P>
+<P>
+<A NAME="50422081_pgfId-294818"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422081_pgfId-294817"></A>Note: Microsoft Visual Studio offers automatic name completion when typing; this can be very useful when using the .NET binding.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422081_pgfId-294819"></A>	12.3.1 	Basic types </H3>
+<P>
+<A NAME="50422081_pgfId-294820"></A>All basic C types used in the Parasolid interface have corresponding C# types, as shown below:</P>
+<P>
+<A NAME="50422081_pgfId-294858"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294823"></A>C type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294825"></A>C# type</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294827"></A><CODE>
+char</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294829"></A><CODE>
+byte</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294831"></A><CODE>
+unsigned char</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294833"></A><CODE>
+byte</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294835"></A><CODE>
+short</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294837"></A><CODE>
+short</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294839"></A><CODE>
+unsigned short</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294841"></A><CODE>
+ushort</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294843"></A><CODE>
+int</CODE>
+ (except for KI token values)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294845"></A><CODE>
+int</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294847"></A><CODE>
+unsigned int</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294849"></A><CODE>
+uint</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294851"></A><CODE>
+double</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294853"></A><CODE>
+double</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294855"></A><CODE>
+size_t</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294857"></A><CODE>
+uint</CODE>
+ on 32-bit platforms, <CODE>
+ulong</CODE>
+ on 64-bit platforms</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-294859"></A>Note that an exception is made for <CODE>
+int</CODE>
+ when appearing in the KI header files (as the type for KI token values), in which case the following conversion is done:</P>
+<P>
+<A NAME="50422081_pgfId-294869"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294862"></A>C type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294864"></A>C# type</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294866"></A><CODE>
+int</CODE>
+ (when used for KI token values)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294868"></A>PK.UNCLASSED.ki_ifails_t</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422081_pgfId-294870"></A>	12.3.2 	Namespaces </H3>
+<P>
+<A NAME="50422081_pgfId-294871"></A>The PK and PK_DEBUG prefixes in the C interface become C# <EM>
+namespaces</EM>. There are several levels of namespace to allow for the possibility of other styles of interface. There are also some standard aliases for the C# namespaces, to make your source code more readable.</P>
+<P>
+<A NAME="50422081_pgfId-294891"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294874"></A>C prefix</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294876"></A>C# namespace</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294878"></A>C# alias</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294880"></A>PK</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294882"></A>PLMComponents.Parasolid.PK_.Unsafe</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294884"></A>PK</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294886"></A>PK_DEBUG</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294888"></A>PLMComponents.Parasolid.PK_DEBUG_.Unsafe</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294890"></A>PKD</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-294892"></A>The “PK_“ field in the C# namespace for the PK prefix has the underscore “_” appended to prevent the C# compiler from becoming confused by two related concepts called “PK“. The aliases can be created in your C# code with the following statements:</P>
+<P>
+<A NAME="50422081_pgfId-294893"></A><CODE>
+using PK = PLMComponents.Parasolid.PK_.Unsafe;</CODE>
+</P>
+<P>
+<A NAME="50422081_pgfId-294894"></A><CODE>
+using PKD = PLMComponents.Parasolid.PK_DEBUG_.Unsafe;</CODE>
+</P>
+<P>
+<A NAME="50422081_pgfId-294895"></A>If you wish, you may use different aliases to those given here.</P>
+
+
+<H3>
+<A NAME="50422081_pgfId-294896"></A>	12.3.3 	Classes </H3>
+<P>
+<A NAME="50422081_pgfId-294897"></A>Where it exists, the upper-case word following the PK or PK_DEBUG prefix denotes the Parasolid <EM>
+class</EM> of a function, type or value in the C interface: examples include “BODY”, “CLASS“, “ENTITY“, “ERROR“ and “SESSION“. These classes provide a grouping mechanism for names used in programming, and reflect the logical hierarchy of entities within Parasolid; for more information concerning Parasolid classes, see <A HREF="fd_chap.003.html#50422070_19856">Chapter 2, “Parasolid Concepts”</A>, of the <A HREF=../fd_index.html>Functional Description</A>. Note that, since Parasolid is written in C, Parasolid classes do not correspond exactly to either C++ classes or C# classes in the .NET binding.</P>
+<P>
+<A NAME="50422081_pgfId-294901"></A>The Parasolid class name in C, if present, becomes a C# class of the same name.</P>
+
+
+<H3>
+<A NAME="50422081_pgfId-294902"></A>	12.3.4 	Primitives </H3>
+<P>
+<A NAME="50422081_pgfId-294903"></A>Parasolid primitive types (types of Parasolid entities and other items that give rise to classes) in C become C# <EM>
+structs</EM> of the same name; these structs are not members of a class.</P>
+<P>
+<A NAME="50422081_pgfId-294917"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294906"></A>Primitive type in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294908"></A>C# struct</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294910"></A><EM>
+&lt;Prefix&gt;_&lt;primitive&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294912"></A><EM>
+&lt;Namespace alias&gt;.&lt;primitive&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294914"></A><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294916"></A>PK.EDGE_t</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-294918"></A>Each primitive type has an associated <EM>
+null constant</EM> in the C# interface, written as “@null”; for example, PK.EDGE_t.@null, where the “@” has been inserted to avoid using a reserved word. (This is explained in <A HREF="fd_chap.013.html#50422081_59715">Section 12.4, “Exceptions to naming conventions in C#”</A>.)</P>
+
+
+<H3>
+<A NAME="50422081_pgfId-294922"></A>	12.3.5 	Structures </H3>
+<P>
+<A NAME="50422081_pgfId-294923"></A>Parasolid structures in C comprise standard forms (whose names end with <CODE>
+_sf_t</CODE>
+ or <CODE>
+_sf_2_t</CODE>
+), options structures (<CODE>
+_o_t</CODE>
+), return structures (<CODE>
+_r_t</CODE>
+) and other non-specific structures whose names end in <CODE>
+_t</CODE>
+. These map to structs in C#; some are members of a class, some are not.</P>
+<P>
+<A NAME="50422081_pgfId-294937"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294926"></A>Structure (with class) in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294928"></A>C# struct</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294930"></A><EM>
+&lt;Prefix&gt;_&lt;class&gt;_&lt;structure&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294932"></A><EM>
+&lt;Namespace alias&gt;.&lt;class&gt;.&lt;structure&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294934"></A><A HREF=../headers/pk_bcurve_array_t.html>PK_BCURVE_array_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294936"></A>PK.BCURVE.array_t</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-294951"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294940"></A>Structure (without class) in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294942"></A>C# struct</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294944"></A><EM>
+&lt;Prefix&gt;_&lt;structure&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294946"></A><EM>
+&lt;Namespace alias&gt;.&lt;structure&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294948"></A><A HREF=../headers/pk_range_1_r_t.html>PK_range_1_r_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294950"></A>PK.range_1_r_t</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422081_pgfId-294952"></A>	12.3.6 	Parasolid token types </H3>
+<P>
+<A NAME="50422081_pgfId-294953"></A>Parasolid token types in C become <EM>
+enum</EM> types in C#; these may or may not belong to a class.</P>
+<P>
+<A NAME="50422081_pgfId-294967"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294956"></A>Token Type (with class) in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294958"></A>C# enum type</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294960"></A><EM>
+&lt;Prefix&gt;_&lt;class&gt;_&lt;token type&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294962"></A><EM>
+&lt;Namespace alias&gt;.&lt;class&gt;.&lt;token type&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294964"></A><A HREF=../headers/pk_face_coi_t.html>PK_FACE_coi_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294966"></A> PK.FACE.coi_t</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-294981"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294970"></A>Token Type (without class) in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294972"></A>C# enum type</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294974"></A><EM>
+&lt;Prefix&gt;_&lt;token type&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294976"></A><EM>
+&lt;Namespace alias&gt;.&lt;token type&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294978"></A><A HREF=../headers/pk_bound_t.html>PK_bound_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294980"></A>PK.bound_t</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-294982"></A>For those KI token types that are necessary, the corresponding C# enum belongs to the “UNCLASSED” class in the PK namespace. This also applies to token types relating to the frustrum.</P>
+<P>
+<A NAME="50422081_pgfId-295000"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294985"></A>KI/frustrum token type in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294987"></A>C# enum type</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294989"></A><EM>
+&lt;KI/frustrum token type&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294991"></A>PK.UNCLASSED<EM>
+.&lt;KI/frustrum token type&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294993"></A>ki_chcken_options_t</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294995"></A>PK.UNCLASSED.ki_chcken_options_t</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294997"></A>fg_ifails_codes_t</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-294999"></A>PK.UNCLASSED.fg_ifails_codes_t</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422081_pgfId-295002"></A>	12.3.7 	<A NAME="50422081_47169"></A>Values of Parasolid token types </H3>
+<P>
+<A NAME="50422081_pgfId-295003"></A>Values of Parasolid token types in C become members of the corresponding enum types in C#. For the majority of token values, the Parasolid name in C starts with the token-type name without the trailing “_t”; this is included in the C# name.</P>
+<P>
+<A NAME="50422081_pgfId-295021"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295006"></A>Value in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295008"></A>C# enum member</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295010"></A><EM>
+&lt;Token-type name without “_t”&gt;_&lt;value&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295012"></A><EM>
+&lt;Token-type name&gt;.&lt;value&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295014"></A>PK_FACE_coi_no_bound_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295016"></A>PK.FACE.coi_t.no_bound_1_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295018"></A><A HREF=../headers/pk_bound_t.html>PK_bound_distance_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295020"></A>PK.bound_t.distance_c</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-295028"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422081_pgfId-295024"></A>Note: There are some token values where the Parasolid name in C does not include the corresponding token-type name (up to the “_t”). In these cases, the C# name must <EM>
+always</EM> include the corresponding enum type. For example, the value PK_knot_bezier_ends_c belongs to the type <A HREF=../headers/pk_knot_type_t.html>PK_knot_type_t</A>; in C#, the enum member is PK.knot_type_t.bezier_ends_c. Details of all such exceptional names of token values are given in <A HREF="fd_chap.013.html#50422081_84908">Section 12.4.3, “Special cases for names of token values”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-295029"></A>For values corresponding to those KI and frustrum token types that are available, the C# names are formed as follows:</P>
+<P>
+<A NAME="50422081_pgfId-295055"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295032"></A>KI/frustrum value in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295034"></A>C# enum member</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295036"></A><EM>
+&lt;KI/frustrum value&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295038"></A>PK.UNCLASSED<EM>
+.&lt;KI/frustrum token type&gt;.&lt;KI/frustrum value&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295040"></A>CHOP00</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295042"></A>PK.UNCLASSED.ki_chcken_options_t.CHOP00</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295044"></A>KI_wrong_version</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295046"></A>PK.UNCLASSED.ki_ifails_t.KI_wrong_version</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295048"></A>FGEVSQ</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295050"></A>PK.UNCLASSED.fg_ifails_codes_t.FGEVSQ</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295052"></A>FR_already_exists</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295054"></A>PK.UNCLASSED.frustrum_ifails_t.FR_already_exists</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422081_pgfId-295056"></A>	12.3.8 	Logicals </H3>
+<P>
+<A NAME="50422081_pgfId-295057"></A>The logical type in the C interface of Parasolid is <A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>; this becomes a struct named PK.LOGICAL_t in C#. The associated values PK_LOGICAL_true and PK_LOGICAL_false become struct members PK.LOGICAL_t.@true and PK.LOGICAL_t.@false, where the “@” has been inserted to avoid using a reserved word. (This is explained in <A HREF="fd_chap.013.html#50422081_59715">Section 12.4, “Exceptions to naming conventions in C#”</A>.)</P>
+
+
+<H3>
+<A NAME="50422081_pgfId-295061"></A>	12.3.9 	Functions </H3>
+<P>
+<A NAME="50422081_pgfId-295062"></A>Parasolid C functions all belong to a Parasolid class except for some of the functions used to free memory allocated by Parasolid (whose names end with <CODE>
+_r_f</CODE>
+). If a function is not a member of a Parasolid class in C, it becomes a member of the “UNCLASSED” class in C#.</P>
+<P>
+<A NAME="50422081_pgfId-295076"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295065"></A>Function (with class) in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295067"></A>C# function</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295069"></A><EM>
+&lt;Prefix&gt;_&lt;class&gt;_&lt;function&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295071"></A><EM>
+&lt;Namespace alias&gt;.&lt;class&gt;.&lt;function&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295073"></A><A HREF=../headers/pk_bb_create.html>PK_BB_create</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295075"></A>PK.BB.create</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-295090"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295079"></A>Function (without class) in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295081"></A>C# function</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295083"></A><EM>
+&lt;Prefix&gt;_&lt;function&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295085"></A><EM>
+&lt;Namespace alias&gt;.</EM>UNCLASSED.<EM>
+&lt;function&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295087"></A><A HREF=../headers/pk_boolean_r_f.html>PK_boolean_r_f</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295089"></A>PK.UNCLASSED.boolean_r_f</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422081_pgfId-295091"></A>	12.3.10 	Function pointers </H3>
+<P>
+<A NAME="50422081_pgfId-295092"></A>Parasolid function-pointer types in C become <EM>
+delegates</EM> in C#. The majority (but not all) of these belong to a class.</P>
+<P>
+<A NAME="50422081_pgfId-295106"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295095"></A>Function pointer (with class) in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295097"></A>C# delegate</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295099"></A><EM>
+&lt;Prefix&gt;_&lt;class&gt;_&lt;function_pointer&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295101"></A><EM>
+&lt;Namespace alias&gt;.&lt;class&gt;.&lt;function_pointer&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295103"></A><A HREF=../headers/pk_debug_session_exit_cb_t.html>PK_DEBUG_SESSION_exit_cb_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295105"></A>PKD.SESSION.exit_cb_t</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-295120"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295109"></A>Function pointer (without class) in C</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295111"></A>C# delegate</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295113"></A><EM>
+&lt;Prefix&gt;_&lt;function_pointer&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295115"></A><EM>
+&lt;Namespace alias&gt;.&lt;function_pointer&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295117"></A><A HREF=../headers/pk_detail_hole_cb_f_t.html>PK_detail_hole_cb_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295119"></A>PK.detail_hole_cb_f_t</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-295127"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422081_pgfId-295123"></A>Warning: For those function pointers that are “registered“ with Parasolid, and may be used at any subsequent time, the C# implementation necessarily produces a small memory leak each time one is registered. See <A HREF="fd_chap.125.html#50422208_96620">Section C.6.4, “Persistent callbacks”</A> for details.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-295128"></A>Each delegate has an associated <EM>
+null constant</EM> in the C# interface, formed by adding “_null” to the end of the name; for example, PKD.SESSION.exit_cb_t_null. It also has an associated ignore constant, formed by adding “_ignore” to the end of the name; for example, PK.FSTART.f_t_ignore. This refers to a function within the binding.</P>
+<P>
+<A NAME="50422081_pgfId-295132"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422081_pgfId-295131"></A>Note: These null and ignore constants <EM>
+must</EM> belong to a class; hence for those function pointers that are not members of a class, the corresponding null constants will become members of the “UNCLASSED” class; for example, PK.UNCLASSED.detail_hole_cb_t_null.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422081_pgfId-295134"></A>12.4	<A NAME="50422081_59715"></A>Exceptions to naming conventions in C# 
+
+
+</H1>
+<P>
+<A NAME="50422081_pgfId-295137"></A>The general rules governing Parasolid names in the C# interface are given in <A HREF="fd_chap.013.html#50422081_73684">Section 12.3, “Parasolid types and names in C#”</A>. There are some identifiers that do not follow these rules exactly, however; this section identifies these special cases.</P>
+
+<H3>
+<A NAME="50422081_pgfId-295139"></A>	12.4.1 	Identifiers that begin with a digit </H3>
+<P>
+<A NAME="50422081_pgfId-295140"></A>Since names of identifiers cannot start with a number in C#, the leading digit is replaced by a word of the same meaning. For example:</P>
+<P>
+<A NAME="50422081_pgfId-295154"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295143"></A>C name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295145"></A>C# name</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295147"></A><A HREF=../headers/pk_3_face_blend_t.html>PK_3_face_blend_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295149"></A>PK.three_face_blend_t</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295151"></A>PK_ATTDEF_class_01_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295153"></A>PK.ATTDEF.class_t.zero1_c</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-295155"></A>Note that the “1” in “PK.ATTDEF.class_t.zero1_c” remains a digit; it is only the leading digit in any such name that must be changed.</P>
+
+
+<H3>
+<A NAME="50422081_pgfId-295156"></A>	12.4.2 	Identifiers that are reserved words in C# </H3>
+<P>
+<A NAME="50422081_pgfId-295157"></A>A leading “@“ is added to the reserved word. For example:</P>
+<P>
+<A NAME="50422081_pgfId-295171"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295160"></A>C name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295162"></A>C# name</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295164"></A><A HREF=../headers/pk_appitem_is.html>PK_APPITEM_is</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295166"></A>PK.APPITEM.@is</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295168"></A>PK_LOGICAL_false</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295170"></A>PK.LOGICAL_t.@false</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-295172"></A>The following reserved words (in C#) are used in the C interface in this way: <CODE>
+char</CODE>
+, <CODE>
+class</CODE>
+, <CODE>
+double</CODE>
+, <CODE>
+false</CODE>
+, <CODE>
+int</CODE>
+, <CODE>
+null</CODE>
+, <CODE>
+string</CODE>
+, <CODE>
+true</CODE>
+, <CODE>
+is</CODE>
+ and <CODE>
+goto</CODE>
+.</P>
+
+
+<H3>
+<A NAME="50422081_pgfId-295174"></A>	12.4.3 	<A NAME="50422081_84908"></A>Special cases for names of token values </H3>
+<P>
+<A NAME="50422081_pgfId-295178"></A>As mentioned in <A HREF="fd_chap.013.html#50422081_47169">Section 12.3.7, “Values of Parasolid token types”</A>, there are some token values where the Parasolid name in C does not include the corresponding token-type name (up to the “_t”). In these cases, the C# name must <EM>
+always</EM> include the corresponding <CODE>
+enum</CODE>
+ type. The most common cases of these are listed below:</P>
+<UL>
+<LI>
+<A NAME="50422081_pgfId-295179"></A>Values of PK error codes are members of the PK.ERROR.code_t enum:</LI>
+</UL>
+<P>
+<A NAME="50422081_pgfId-295193"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295182"></A>C name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295184"></A>C# name</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295186"></A>PK_ERROR<EM>
+_&lt;identifier&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295188"></A>PK.ERROR.code_t<EM>
+.&lt;identifier&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295190"></A>PK_ERROR_bad_fin</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295192"></A>PK.ERROR.code_t.bad_fin</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50422081_pgfId-295194"></A>Values describing a Parasolid “state” (i.e., that have the word “state” in their name) are members of the PK.check_state_t enum:</LI>
+</UL>
+<P>
+<A NAME="50422081_pgfId-295208"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295197"></A>C name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295199"></A>C# name</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295201"></A>PK<EM>
+_&lt;identifier&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295203"></A>PK.check_state_t<EM>
+.&lt;identifier&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295205"></A>PK_EDGE_state_bad_order_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295207"></A>PK.check_state_t.EDGE_state_bad_order_c</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50422081_pgfId-295209"></A>Values that describe a session switch are members of the PK.SESSION.software_option_t enum:</LI>
+</UL>
+<P>
+<A NAME="50422081_pgfId-295223"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295212"></A>C name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295214"></A>C# name</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295216"></A>PK_SESSION_<EM>
+&lt;identifier&gt;</EM></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295218"></A>PK.SESSION.software_option_t<EM>
+.&lt;identifier&gt;</EM></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295220"></A>PK_SESSION_pre_v151_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-295222"></A>PK.SESSION.software_option_t.pre_v151_switch_1_c</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-334613"></A>In addition, the following table lists the remaining special cases:</P>
+<P>
+<A NAME="50422081_pgfId-427517"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412061"></A>C name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412589"></A>C# name</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412063"></A>PK_ATTDEF_callback_normal_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412591"></A>PK.ATTDEF.callback_type_t.normal_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412065"></A>PK_ATTDEF_callback_read_only_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412593"></A>PK.ATTDEF.callback_type_t.read_only_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457390"></A><A HREF=../headers/pk_attdef_copy_callback_f_t.html>PK_ATTDEF_copy_callback_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457354"></A>PK.ATTDEF.copy_callback_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-458162"></A><A HREF=../headers/pk_attdef_delete_callback_f_t.html>PK_ATTDEF_delete_callback_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-458164"></A>PK.ATTDEF.delete_callback_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-458166"></A><A HREF=../headers/pk_attdef_merge_callback_f_t.html>PK_ATTDEF_merge_callback_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-458168"></A>PK.ATTDEF.merge_callback_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-458170"></A><A HREF=../headers/pk_attdef_name_cb_f_t.html>PK_ATTDEF_name_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457393"></A>PK.ATTDEF.name_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457356"></A><A HREF=../headers/pk_attdef_name_cb_t.html>PK_ATTDEF_name_cb_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457358"></A>PK.ATTDEF.name_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457360"></A><A HREF=../headers/pk_attdef_receive_callback_f_t.html>PK_ATTDEF_receive_callback_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457362"></A>PK.ATTDEF.receive_callback_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457364"></A><A HREF=../headers/pk_attdef_split_callback_f_t.html>PK_ATTDEF_split_callback_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457366"></A>PK.ATTDEF.split_callback_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457368"></A><A HREF=../headers/pk_attdef_transmit_callback_f_t.html>PK_ATTDEF_transmit_callback_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457370"></A>PK.ATTDEF.transmit_callback_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457372"></A><A HREF=../headers/pk_attrib_cb_f_t.html>PK_ATTRIB_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457374"></A>PK.ATTRIB.cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457376"></A><A HREF=../headers/pk_attrib_cb_t.html>PK_ATTRIB_cb_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457378"></A>PK.ATTRIB.cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457380"></A>PK_ATTRIB_filter_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457382"></A>PK.ATTRIB.filter_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457384"></A><A HREF=../headers/pk_attrib_reset_cb_f_t.html>PK_ATTRIB_reset_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457386"></A>PK.ATTRIB.reset_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412067"></A>PK_BCURVE_extend_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412595"></A>PK.BCURVE.extend_status_t.failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412069"></A>PK_BCURVE_extend_ok_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412597"></A>PK.BCURVE.extend_status_t.ok_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412071"></A>PK_BCURVE_extend_partial_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412599"></A>PK.BCURVE.extend_status_t.partial_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412073"></A>PK_BCURVE_extend_unextended_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412601"></A>PK.BCURVE.extend_status_t.unextended_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412075"></A>PK_BCURVE_fit_err_closest_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412603"></A>PK.BCURVE.fit_err_method_t.closest_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412077"></A>PK_BCURVE_fit_err_none_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412605"></A>PK.BCURVE.fit_err_method_t.none_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412079"></A>PK_BCURVE_fit_err_parm_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412607"></A>PK.BCURVE.fit_err_method_t.parm_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412081"></A>PK_BCURVE_fit_eval_chain_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412609"></A>PK.BCURVE.fit_eval_type_t.chain_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457271"></A><A HREF=../headers/pk_bcurve_fit_eval_f_t.html>PK_BCURVE_fit_eval_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457273"></A>PK.BCURVE.fit_eval_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412083"></A>PK_BCURVE_fit_eval_user_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412611"></A>PK.BCURVE.fit_eval_type_t.user_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-480816"></A><A HREF=../headers/pk_body_blend_propagate_f_t.html>PK_BODY_blend_propagate_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-480818"></A>PK.BODY.blend_propagate_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412085"></A>PK_BODY_knit_completed_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412613"></A>PK.BODY.knit_status_t.completed_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412087"></A>PK_BODY_knit_not_completed_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412615"></A>PK.BODY.knit_status_t.not_completed_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412089"></A>PK_BODY_loft_bad_clamp_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412617"></A>PK.BODY.loft_fault_t.bad_clamp_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412091"></A>PK_BODY_loft_bad_end_conds_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412619"></A>PK.BODY.loft_fault_t.bad_end_conds_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412093"></A>PK_BODY_loft_bad_guide_match_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412621"></A>PK.BODY.loft_fault_t.bad_guide_match_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412095"></A>PK_BODY_loft_bad_guide_wire_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412623"></A>PK.BODY.loft_fault_t.bad_guide_wire_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412097"></A>PK_BODY_loft_bad_match_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412625"></A>PK.BODY.loft_fault_t.bad_match_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412099"></A>PK_BODY_loft_bad_profile_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412627"></A>PK.BODY.loft_fault_t.bad_profile_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412101"></A>PK_BODY_loft_bad_profile_type_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412629"></A>PK.BODY.loft_fault_t.bad_profile_type_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412103"></A>PK_BODY_loft_bad_simplify_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412631"></A>PK.BODY.loft_fault_t.bad_simplify_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412105"></A>PK_BODY_loft_check_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412633"></A>PK.BODY.loft_fault_t.check_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412107"></A>PK_BODY_loft_clamp_face_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412635"></A>PK.BODY.loft_clamp_type_t.face_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412109"></A>PK_BODY_loft_clamp_no_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412637"></A>PK.BODY.loft_clamp_type_t.no_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412111"></A>PK_BODY_loft_clamp_planar_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412639"></A>PK.BODY.loft_clamp_type_t.planar_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412113"></A>PK_BODY_loft_clamp_vec_face_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412641"></A>PK.BODY.loft_clamp_type_t.vec_face_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412115"></A>PK_BODY_loft_clamp_vec_planar_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412643"></A>PK.BODY.loft_clamp_type_t.vec_planar_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412117"></A>PK_BODY_loft_clamp_vector_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412645"></A>PK.BODY.loft_clamp_type_t.vector_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412119"></A>PK_BODY_loft_clamped_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412647"></A>PK.BODY.loft_curvature_t.clamped_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412121"></A>PK_BODY_loft_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412649"></A>PK.BODY.loft_fault_t.failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412123"></A>PK_BODY_loft_geom_degen_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412651"></A>PK.BODY.loft_fault_t.geom_degen_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412125"></A>PK_BODY_loft_geom_self_int_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412653"></A>PK.BODY.loft_fault_t.geom_self_int_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412127"></A>PK_BODY_loft_natural_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412655"></A>PK.BODY.loft_curvature_t.natural_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412129"></A>PK_BODY_loft_ok_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412657"></A>PK.BODY.loft_fault_t.ok_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412131"></A>PK_BODY_loft_small_profile_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412659"></A>PK.BODY.loft_fault_t.small_profile_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412133"></A>PK_BODY_loft_surf_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412661"></A>PK.BODY.loft_fault_t.surf_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412135"></A>PK_BODY_loft_topol_self_int_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412663"></A>PK.BODY.loft_fault_t.topol_self_int_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412137"></A>PK_BODY_loft_unconstrained_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412665"></A>PK.BODY.loft_curvature_t.unconstrained_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412139"></A>PK_BODY_pick_axial_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412667"></A>PK.BODY.pick_method_t.axial_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412141"></A>PK_BODY_pick_axial_location_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412669"></A>PK.BODY.pick_method_t.axial_location_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412143"></A>PK_BODY_pick_radial_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412671"></A>PK.BODY.pick_method_t.radial_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412145"></A>PK_BODY_pick_ratio_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412673"></A>PK.BODY.pick_method_t.ratio_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412147"></A>PK_BODY_sewing_any_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412675"></A>PK.BODY.sewing_type_t.any_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412149"></A>PK_BODY_sewing_general_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412677"></A>PK.BODY.sewing_type_t.general_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412151"></A>PK_BODY_sewing_non_manifold_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412679"></A>PK.BODY.sewing_problem_t.non_manifold_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412153"></A>PK_BODY_sewing_non_oriented_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412681"></A>PK.BODY.sewing_problem_t.non_oriented_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412155"></A>PK_BODY_sewing_overlapping_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412683"></A>PK.BODY.sewing_problem_t.overlapping_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412157"></A>PK_BODY_sewing_remove_cert_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412685"></A>PK.BODY.sewing_removal_t.remove_cert_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412159"></A>PK_BODY_sewing_remove_none_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412687"></A>PK.BODY.sewing_removal_t.remove_none_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412161"></A>PK_BODY_sewing_remove_poss_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412689"></A>PK.BODY.sewing_removal_t.remove_poss_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412163"></A>PK_BODY_sewing_sheet_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412691"></A>PK.BODY.sewing_type_t.sheet_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412165"></A>PK_BODY_sewing_solid_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412693"></A>PK.BODY.sewing_type_t.solid_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412167"></A>PK_BODY_sewing_unspecified_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412695"></A>PK.BODY.sewing_problem_t.unspecified_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412169"></A>PK_BODY_sweep_align_arclength_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412697"></A>PK.BODY.sweep_alignment_t.arclength_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412171"></A>PK_BODY_sweep_align_normal_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412699"></A>PK.BODY.sweep_alignment_t.normal_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412173"></A>PK_BODY_sweep_align_parallel_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412701"></A>PK.BODY.sweep_alignment_t.parallel_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412175"></A>PK_BODY_sweep_align_parm_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412703"></A>PK.BODY.sweep_alignment_t.parm_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412177"></A>PK_BODY_sweep_bad_guide_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412705"></A>PK.BODY.sweep_fault_t.bad_guide_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412179"></A>PK_BODY_sweep_bad_guide_clamp_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412707"></A>PK.BODY.sweep_fault_t.bad_guide_clamp_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412181"></A>PK_BODY_sweep_bad_lock_dir_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412709"></A>PK.BODY.sweep_fault_t.bad_lock_dir_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412183"></A>PK_BODY_sweep_bad_lock_face_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412711"></A>PK.BODY.sweep_fault_t.bad_lock_face_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412185"></A>PK_BODY_sweep_bad_match_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412713"></A>PK.BODY.sweep_fault_t.bad_match_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412187"></A>PK_BODY_sweep_bad_path_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412715"></A>PK.BODY.sweep_fault_t.bad_path_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412189"></A>PK_BODY_sweep_bad_profile_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412717"></A>PK.BODY.sweep_fault_t.bad_profile_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412191"></A>PK_BODY_sweep_bad_trim_point_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412719"></A>PK.BODY.sweep_fault_t.bad_trim_point_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412193"></A>PK_BODY_sweep_bad_vertex_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412721"></A>PK.BODY.sweep_fault_t.bad_vertex_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412195"></A>PK_BODY_sweep_check_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412723"></A>PK.BODY.sweep_fault_t.check_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412197"></A>PK_BODY_sweep_curve_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412725"></A>PK.BODY.sweep_fault_t.curve_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412199"></A>PK_BODY_sweep_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412727"></A>PK.BODY.sweep_fault_t.failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412201"></A>PK_BODY_sweep_geom_degen_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412729"></A>PK.BODY.sweep_fault_t.geom_degen_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412203"></A>PK_BODY_sweep_geom_self_int_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412731"></A>PK.BODY.sweep_fault_t.geom_self_int_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412205"></A>PK_BODY_sweep_law_curve_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412733"></A>PK.BODY.sweep_law_type_t.curve_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412207"></A>PK_BODY_sweep_law_curve_inv_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412735"></A>PK.BODY.sweep_law_type_t.curve_inv_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412209"></A>PK_BODY_sweep_law_discrete_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412737"></A>PK.BODY.sweep_law_type_t.discrete_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412211"></A>PK_BODY_sweep_law_none_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412739"></A>PK.BODY.sweep_law_type_t.none_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412213"></A>PK_BODY_sweep_non_c2_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412741"></A>PK.BODY.sweep_fault_t.non_c2_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412215"></A>PK_BODY_sweep_non_g1_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412743"></A>PK.BODY.sweep_fault_t.non_g1_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412217"></A>PK_BODY_sweep_ok_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412745"></A>PK.BODY.sweep_fault_t.ok_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412219"></A>PK_BODY_sweep_repaired_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412747"></A>PK.BODY.sweep_fault_t.repaired_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412221"></A>PK_BODY_sweep_scale_both_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412749"></A>PK.BODY.sweep_scale_type_t.both_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412223"></A>PK_BODY_sweep_scale_posn_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412751"></A>PK.BODY.sweep_scale_type_t.posn_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412225"></A>PK_BODY_sweep_scale_size_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412753"></A>PK.BODY.sweep_scale_type_t.size_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412227"></A>PK_BODY_sweep_small_profile_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412755"></A>PK.BODY.sweep_fault_t.small_profile_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412229"></A>PK_BODY_sweep_surf_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412757"></A>PK.BODY.sweep_fault_t.surf_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412231"></A>PK_BODY_sweep_topol_self_int_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412759"></A>PK.BODY.sweep_fault_t.topol_self_int_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412233"></A>PK_BODY_sweep_torsion_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412761"></A>PK.BODY.sweep_fault_t.torsion_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412235"></A>PK_CURVE_general_curve_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412763"></A>PK.CURVE.general_type_t.curve_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457189"></A><A HREF=../headers/pk_curve_general_eval_f_t.html>PK_CURVE_general_eval_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-457191"></A>PK.CURVE.general_eval_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412237"></A>PK_CURVE_general_user_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412765"></A>PK.CURVE.general_type_t.user_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456847"></A><A HREF=../headers/pk_debug_session_create_cb_t.html>PK_DEBUG_SESSION_create_cb_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456831"></A>PKD.SESSION.create_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456833"></A><A HREF=../headers/pk_debug_session_destroy_cb_t.html>PK_DEBUG_SESSION_destroy_cb_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456835"></A>PKD.SESSION.destroy_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456837"></A><A HREF=../headers/pk_debug_session_entry_cb_t.html>PK_DEBUG_SESSION_entry_cb_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456839"></A>PKD.SESSION.entry_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456841"></A><A HREF=../headers/pk_debug_session_exit_cb_t.html>PK_DEBUG_SESSION_exit_cb_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456843"></A>PKD.SESSION.exit_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412239"></A>PK_DEBUG_roll_back_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412767"></A>PKD.roll_direction_t.back_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412241"></A>PK_DEBUG_roll_back_main_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412241"></A>PKD.roll_direction_t.back_main_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412243"></A>PK_DEBUG_roll_both_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412243"></A>PKD.roll_direction_t.both_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412245"></A>PK_DEBUG_roll_fwd_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412773"></A>PKD.roll_direction_t.fwd_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412247"></A>PK_DEBUG_roll_no_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412775"></A>PKD.roll_direction_t.no_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456756"></A><A HREF=../headers/pk_debug_try_error_handler_f_t.html>PK_DEBUG_try_error_handler_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456758"></A>PKD.UNCLASSED.try_error_handler_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456193"></A>PK_DELTA_close_f_t</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456195"></A>PK.DELTA.close_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456197"></A>PK_DELTA_delete_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456199"></A>PK.DELTA.delete_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456219"></A>PK_DELTA_open_for_read_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456203"></A>PK.DELTA.open_for_read_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456205"></A>PK_DELTA_open_for_write_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456207"></A>PK.DELTA.open_for_write_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456209"></A>PK_DELTA_read_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456211"></A>PK.DELTA.read_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456213"></A>PK.DELTA.write_f_t</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456215"></A>PK.DELTA.write_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412249"></A>PK_EDGE_optimise_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412777"></A>PK.EDGE.optimise_result_t.failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412251"></A>PK_EDGE_optimise_success_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412779"></A>PK.EDGE.optimise_result_t.success_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412253"></A>PK_EDGE_type_closed_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412781"></A>PK.EDGE.vertex_type_t.closed_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412255"></A>PK_EDGE_type_general_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412783"></A>PK.EDGE.fins_type_t.general_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412257"></A>PK_EDGE_type_laminar_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412785"></A>PK.EDGE.fins_type_t.laminar_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412259"></A>PK_EDGE_type_normal_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412787"></A>PK.EDGE.fins_type_t.normal_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412261"></A>PK_EDGE_type_open_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412789"></A>PK.EDGE.vertex_type_t.open_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412263"></A>PK_EDGE_type_ring_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412791"></A>PK.EDGE.vertex_type_t.ring_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412265"></A>PK_EDGE_type_wireframe_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412793"></A>PK.EDGE.fins_type_t.wireframe_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412267"></A>PK_ERROR_fatal </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412795"></A>PK.ERROR.severity_t.fatal</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412269"></A>PK_ERROR_mild </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412797"></A>PK.ERROR.severity_t.mild</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412271"></A>PK_ERROR_none </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412799"></A>PK.ERROR.severity_t.none</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412273"></A>PK_ERROR_serious </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412801"></A>PK.ERROR.severity_t.serious</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412275"></A>PK_FACE_change_bend_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412803"></A>PK.FACE.change_bend_type_t.c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412277"></A>PK_FACE_change_bend_side_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412805"></A>PK.FACE.change_bend_type_t.side_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456102"></A><A HREF=../headers/pk_fabort_f_t.html>PK_FABORT_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-456104"></A>PK.FABORT.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454877"></A><A HREF=../headers/pk_face_change_deform_eval_f_t.html>PK_FACE_change_deform_eval_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412807"></A>PK.FACE.change_deform_eval_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-455742"></A><A HREF=../headers/pk_face_grow_cb_f_t.html>PK_FACE_grow_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-455744"></A>PK.FACE.grow_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-455746"></A><A HREF=../headers/pk_face_trim_cb_f_t.html>PK_FACE_trim_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-455748"></A>PK.FACE.trim_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-455750"></A><A HREF=../headers/pk_ffclos_f_t.html>PK_FFCLOS_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-455752"></A>PK.FFCLOS.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412281"></A><A HREF=../headers/pk_ffoprb_f_t.html>PK_FFOPRB_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412809"></A>PK.FFOPRB.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449538"></A><A HREF=../headers/pk_ffoprd_f_t.html>PK_FFOPRD_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449540"></A>PK.FFOPRD.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454829"></A><A HREF=../headers/pk_ffopwr_f_t.html>PK_FFOPWR_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454831"></A>PK.FFOPWR.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454833"></A><A HREF=../headers/pk_ffread_f_t.html>PK_FFREAD_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454835"></A>PK.FFREAD.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454837"></A><A HREF=../headers/pk_ffseek_f_t.html>PK_FFSEEK_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454839"></A>PK.FFSEEK.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454841"></A><A HREF=../headers/pk_ffskxt_f_t.html>PK_FFSKXT_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454843"></A>PK.FFSKXT.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454845"></A><A HREF=../headers/pk_fftell_f_t.html>PK_FFTELL_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454847"></A>PK.FFTELL.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449542"></A><A HREF=../headers/pk_ffwrit_f_t.html>PK_FFWRIT_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449544"></A>PK.FFWRIT.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-453146"></A><A HREF=../headers/pk_fgcrcu_f_t.html>PK_FGCRCU_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449548"></A>PK.FGCRCU.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454095"></A><A HREF=../headers/pk_fgcrsu_f_t.html>PK_FGCRSU_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454097"></A>PK.FGCRSU.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454099"></A><A HREF=../headers/pk_fgevcu_f_t.html>PK_FGEVCU_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454101"></A>PK.FGEVCU.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454103"></A><A HREF=../headers/pk_fgevsu_f_t.html>PK_FGEVSU_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454105"></A>PK.FGEVSU.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454107"></A><A HREF=../headers/pk_fgprcu_f_t.html>PK_FGPRCU_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454109"></A>PK.FGPRCU.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454111"></A><A HREF=../headers/pk_fgprsu_f_t.html>PK_FGPRSU_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454113"></A>PK.FGPRSU.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454115"></A><A HREF=../headers/pk_fmallo_f_t.html>PK_FMALLO_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454117"></A>PK.FMALLO.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449550"></A><A HREF=../headers/pk_fmfree_f_t.html>PK_FMFREE_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449552"></A>PK.FMFREE.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449554"></A><A HREF=../headers/pk_fstart_f_t.html>PK_FSTART_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449556"></A>PK.FSTART.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449558"></A><A HREF=../headers/pk_fstop_f_t.html>PK_FSTOP_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449560"></A>PK.FSTOP.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449562"></A><A HREF=../headers/pk_goclpx_f_t.html>PK_GOCLPX_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449564"></A>PK.GOCLPX.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449566"></A><A HREF=../headers/pk_goclsg_f_t.html>PK_GOCLSG_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449568"></A>PK.GOCLSG.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-453055"></A><A HREF=../headers/pk_gooppx_f_t.html>PK_GOOPPX_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-453057"></A>PK.GOOPPX.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-453059"></A><A HREF=../headers/pk_goopsg_f_t.html>PK_GOOPSG_f_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-453061"></A>PK.GOOPSG.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-453063"></A><A HREF=../headers/pk_gopixl_f_t.html>PK_GOPIXL_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-453065"></A>PK.GOPIXL.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-453067"></A><A HREF=../headers/pk_gosgmt_f_t.html>PK_GOSGMT_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-453069"></A>PK.GOSGMT.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449570"></A><A HREF=../headers/pk_lattice_graph_cb_f_t.html>PK_LATTICE_graph_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449572"></A>PK.LATTICE.graph_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449574"></A><A HREF=../headers/pk_lattice_graph_f.html>PK_LATTICE_graph_f</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449576"></A>PK.LATTICE.graph_f_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449578"></A><A HREF=../headers/pk_lball_cb_f_t.html>PK_LBALL_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449580"></A>PK.LBALL.cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449773"></A><A HREF=../headers/pk_lrod_cb_f_t.html>PK_LROD_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449584"></A>PK.LROD.cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449586"></A>PK_MARK_check_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449588"></A>PK.MARK.check_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450497"></A>PK_MARK_close_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450499"></A>PK.MARK.close_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450501"></A>PK_MARK_delete_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450503"></A>PK.MARK.delete_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450505"></A>PK_MARK_open_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450507"></A>PK.MARK.open_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450509"></A>PK_MARK_read_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450511"></A>PK.MARK.read_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450513"></A>PK_MARK_write_f_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450515"></A>PK.MARK.write_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449780"></A><A HREF=../headers/pk_memory_alloc_f_t.html>PK_MEMORY_alloc_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449780"></A>PK.MEMORY.alloc_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450521"></A><A HREF=../headers/pk_memory_free_f_t.html>PK_MEMORY_free_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450523"></A>PK.MEMORY.free_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450525"></A><A HREF=../headers/pk_mesh_facet_cb_f_t.html>PK_MESH_facet_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-450527"></A>PK.MESH.facet_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449590"></A><A HREF=../headers/pk_mesh_facet_f.html>PK_MESH_facet_f</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449592"></A>PK.MESH.facet_f_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449784"></A><A HREF=../headers/pk_mfacet_cb_f_t.html>PK_MFACET_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449596"></A>PK.MFACET.cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449598"></A><A HREF=../headers/pk_mtopol_map_cb_f_t.html>PK_MTOPOL_map_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449600"></A>PK.MTOPOL.map_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449609"></A><A HREF=../headers/pk_mtopol_select_cb_f_t.html>PK_MTOPOL_select_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449609"></A>PK.MTOPOL.select_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449613"></A><A HREF=../headers/pk_mvertex_cb_f_t.html>PK_MVERTEX_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449615"></A>PK.MVERTEX.cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449617"></A><A HREF=../headers/pk_pmark_goto_attrib_cb_f_t.html>PK_PMARK_goto_attrib_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449619"></A>PK.PMARK.goto_attrib_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449621"></A><A HREF=../headers/pk_pmark_goto_attrib_cb_t.html>PK_PMARK_goto_attrib_cb_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-449623"></A>PK.PMARK.goto_attrib_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454821"></A>PK_PMARK_new_at_current_mark_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454823"></A>PK.PMARK.new_at_mark_t.at_current_mark_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454825"></A>PK_PMARK_new_with_partition_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-454827"></A>PK.PMARK.new_at_mark_t.with_partition_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448975"></A>PK_SESSION_applio_open_rd_2_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448977"></A>PK.SESSION.applio_open_rd_2_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448979"></A>PK_SESSION_applio_open_rd_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448981"></A>PK.SESSION.applio_open_rd_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448983"></A>PK_SESSION_applio_open_uc_rd_2_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448985"></A>PK.SESSION.applio_open_uc_rd_2_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448987"></A>PK_SESSION_applio_open_uc_rd_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448989"></A>PK.SESSION.applio_open_uc_rd_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448991"></A>PK_SESSION_applio_open_uc_wr_2_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448993"></A>PK.SESSION.applio_open_uc_wr_2_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445593"></A>PK_SESSION_applio_open_uc_wr_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445595"></A>PK.SESSION.applio_open_uc_wr_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448276"></A>PK_SESSION_applio_open_wr_2_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448278"></A>PK.SESSION.applio_open_wr_2_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-447795"></A>PK_SESSION_applio_open_wr_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448282"></A>PK.SESSION.applio_open_wr_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448284"></A>PK_SESSION_applio_rd_bytes_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448286"></A>PK.SESSION.applio_rd_bytes_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448288"></A>PK_SESSION_applio_rd_chars_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448290"></A>PK.SESSION.applio_rd_chars_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448292"></A>PK_SESSION_applio_rd_doubles_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448294"></A>PK.SESSION.applio_rd_doubles_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448296"></A>PK_SESSION_applio_rd_ints_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448298"></A>PK.SESSION.applio_rd_ints_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448300"></A>PK_SESSION_applio_rd_shorts_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-448302"></A>PK.SESSION.applio_rd_shorts_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445597"></A>PK_SESSION_applio_wr_bytes_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445599"></A>PK.SESSION.applio_wr_bytes_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-447802"></A>PK_SESSION_applio_wr_chars_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445603"></A>PK.SESSION.applio_wr_chars_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-447803"></A>PK_SESSION_applio_wr_doubles_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445607"></A>PK.SESSION.applio_wr_doubles_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-447804"></A>PK_SESSION_applio_wr_ints_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445611"></A>PK.SESSION.applio_wr_ints_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445533"></A>PK_SESSION_applio_wr_shorts_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445615"></A>PK.SESSION.applio_wr_shorts_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445617"></A>PK_SESSION_indexio_ffclos_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445619"></A>PK.SESSION.indexio_ffclos_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445621"></A>PK_SESSION_indexio_ffoprd_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445623"></A>PK.SESSION.indexio_ffoprd_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445721"></A>PK_SESSION_indexio_ffopwr_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445627"></A>PK.SESSION.indexio_ffopwr_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445629"></A>PK_SESSION_indexio_ffread_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445631"></A>PK.SESSION.indexio_ffread_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445723"></A>PK_SESSION_indexio_ffseek_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445635"></A>PK.SESSION.indexio_ffseek_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445724"></A>PK_SESSION_indexio_ffwrit_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445639"></A>PK.SESSION.indexio_ffwrit_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445641"></A>PK_SESSION_indexio_ucoprd_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445643"></A>PK.SESSION.indexio_ucoprd_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445645"></A>PK_SESSION_indexio_ucopwr_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445647"></A>PK.SESSION.indexio_ucopwr_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445649"></A>PK_SESSION_polling_cb_t </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445651"></A>PK.SESSION.polling_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445728"></A><A HREF=../headers/pk_session_watch_create_cb_t.html>PK_SESSION_watch_create_cb_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445655"></A>PK.SESSION.watch_create_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445657"></A><A HREF=../headers/pk_session_watch_destroy_cb_t.html>PK_SESSION_watch_destroy_cb_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445659"></A>PK.SESSION.watch_destroy_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412283"></A>PK_SURF_extend_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412811"></A>PK.SURF.extend_status_t.failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412285"></A>PK_SURF_extend_invalid_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412813"></A>PK.SURF.extend_status_t.invalid_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412287"></A>PK_SURF_extend_ok_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412815"></A>PK.SURF.extend_status_t.ok_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412289"></A>PK_SURF_extend_partial_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412817"></A>PK.SURF.extend_status_t.partial_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412291"></A>PK_SURF_extend_unextended_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412819"></A>PK.SURF.extend_status_t.unextended_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445454"></A><A HREF=../headers/pk_surf_general_eval_f_t.html>PK_SURF_general_eval_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445456"></A>PK.SURF.general_eval_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412293"></A>PK_SURF_general_surf_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412821"></A>PK.SURF.general_type_t.surf_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412295"></A>PK_SURF_general_user_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412823"></A>PK.SURF.general_type_t.user_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412297"></A><A HREF=../headers/pk_thread_t.html>PK_THREAD_chain_concurrent_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412825"></A>PK.THREAD.chain_type_t.concurrent_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412299"></A><A HREF=../headers/pk_thread_t.html>PK_THREAD_chain_exclusive_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412827"></A>PK.THREAD.chain_type_t.exclusive_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412301"></A><A HREF=../headers/pk_thread_t.html>PK_THREAD_chain_none_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412829"></A>PK.THREAD.chain_type_t.none_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412303"></A>PK_TOPOL_clash_a_in_b </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412831"></A>PK.TOPOL.clash_type_t.a_in_b</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412305"></A>PK_TOPOL_clash_abut_b_in_a </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412833"></A>PK.TOPOL.clash_type_t.abut_b_in_a</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412307"></A>PK_TOPOL_clash_abut_b_out_a </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412835"></A>PK.TOPOL.clash_type_t.abut_b_out_a</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412309"></A>PK_TOPOL_clash_abut_no_class </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412837"></A>PK.TOPOL.clash_type_t.abut_no_class</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412311"></A>PK_TOPOL_clash_b_in_a </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412839"></A>PK.TOPOL.clash_type_t.b_in_a</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412313"></A>PK_TOPOL_clash_exists </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412841"></A>PK.TOPOL.clash_type_t.exists</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412315"></A>PK_TOPOL_clash_interfere </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412843"></A>PK.TOPOL.clash_type_t.interfere</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412317"></A>PK_TOPOL_clash_none </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412845"></A>PK.TOPOL.clash_type_t.none</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445170"></A><A HREF=../headers/pk_topol_facet_tables_cb_f_t.html>PK_TOPOL_facet_tables_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445166"></A>PK.TOPOL.facet_tables_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445186"></A><A HREF=../headers/pk_ucoprd_f_t.html>PK_UCOPRD_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445188"></A>PK.UCOPRD.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445190"></A><A HREF=../headers/pk_ucopwr_f_t.html>PK_UCOPWR_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-445192"></A>PK.UCOPWR.f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412319"></A>PK_VERTEX_optimise_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412847"></A>PK.VERTEX.optimise_result_t.failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412321"></A>PK_VERTEX_optimise_success_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412849"></A>PK.VERTEX.optimise_result_t.success_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412323"></A>PK_abort_frustrum_error_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412851"></A>PK.abort_reason_t.frustrum_error_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412325"></A>PK_abort_runtime_error_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412853"></A>PK.abort_reason_t.runtime_error_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412327"></A>PK_abort_user_interrupt_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412855"></A>PK.abort_reason_t.user_interrupt_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412329"></A>PK_blend_setback_collar_all_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412857"></A>PK.blend_setback_shape_t.collar_all_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412331"></A>PK_blend_setback_collar_none_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412859"></A>PK.blend_setback_shape_t.collar_none_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412333"></A>PK_blend_xs_disc_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412861"></A>PK.blend_xs_plane_t.disc_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412335"></A>PK_blend_xs_isoparameter_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412863"></A>PK.blend_xs_plane_t.isoparameter_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412337"></A>PK_blend_xs_rolling_ball_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412865"></A>PK.blend_xs_plane_t.rolling_ball_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412339"></A>PK_boolean_exclude </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412867"></A>PK.boolean_region_t.exclude</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412341"></A>PK_boolean_exclude_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412869"></A>PK.boolean_region_t.exclude_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412343"></A>PK_boolean_include </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412871"></A>PK.boolean_region_t.include</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412345"></A>PK_boolean_include_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412873"></A>PK.boolean_region_t.include_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412347"></A>PK_boolean_intersect </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412875"></A>PK.boolean_function_t.intersect</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412349"></A>PK_boolean_intersect_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412877"></A>PK.boolean_function_t.intersect_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412351"></A>PK_boolean_mixed_selection_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412879"></A>PK.boolean_region_t.mixed_selection_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412353"></A>PK_boolean_off_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412881"></A>PK.boolean_region_t.off_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412355"></A>PK_boolean_subtract </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412883"></A>PK.boolean_function_t.subtract</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412357"></A>PK_boolean_subtract_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412885"></A>PK.boolean_function_t.subtract_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412359"></A>PK_boolean_unite </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412887"></A>PK.boolean_function_t.unite</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412361"></A>PK_boolean_unite_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412889"></A>PK.boolean_function_t.unite_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-444979"></A><A HREF=../headers/pk_detail_hole_cb_f_t.html>PK_detail_hole_cb_f_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-444971"></A>PK.UNCLASSED.detail_hole_cb_f_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-444969"></A><A HREF=../headers/pk_detail_hole_cb_t.html>PK_detail_hole_cb_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-444975"></A>PK.UNCLASSED.detail_hole_cb_t_ignore</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412363"></A>PK_facet_vx_data_end_spike_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412891"></A>PK.facet_vx_data_type_t.end_spike_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412365"></A>PK_facet_vx_data_fin_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412893"></A>PK.facet_vx_data_type_t.fin_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412367"></A>PK_facet_vx_data_mixed_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412895"></A>PK.facet_vx_data_type_t.mixed_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412369"></A>PK_facet_vx_data_ordinary_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412897"></A>PK.facet_vx_data_type_t.ordinary_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412371"></A>PK_facet_vx_data_spike_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412899"></A>PK.facet_vx_data_type_t.spike_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412373"></A>PK_facet_vx_data_start_spike_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412901"></A>PK.facet_vx_data_type_t.start_spike_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412375"></A>PK_fill_hole_bad_edge_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412903"></A>PK.fill_hole_fault_t.bad_edge_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412377"></A>PK_fill_hole_bdry_general_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412905"></A>PK.fill_hole_fault_t.bdry_general_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412379"></A>PK_fill_hole_cant_match_body_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412907"></A>PK.fill_hole_fault_t.cant_match_body_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412381"></A>PK_fill_hole_cant_match_edge_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412909"></A>PK.fill_hole_fault_t.cant_match_edge_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412383"></A>PK_fill_hole_create_patch_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412911"></A>PK.fill_hole_method_t.create_patch_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412385"></A>PK_fill_hole_didnt_converge_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412913"></A>PK.fill_hole_fault_t.didnt_converge_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412387"></A>PK_fill_hole_duplicate_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412915"></A>PK.fill_hole_fault_t.duplicate_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412389"></A>PK_fill_hole_extend_adjacent_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412917"></A>PK.fill_hole_method_t.extend_adjacent_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412391"></A>PK_fill_hole_face_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412919"></A>PK.fill_hole_fault_t.face_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412393"></A>PK_fill_hole_face_face_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412921"></A>PK.fill_hole_fault_t.face_face_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412395"></A>PK_fill_hole_gap_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412923"></A>PK.fill_hole_fault_t.gap_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412397"></A>PK_fill_hole_no_edge_on_target_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412925"></A>PK.fill_hole_fault_t.no_edge_on_target_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412399"></A><A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412927"></A>PK.fill_hole_preference_t.non_smooth_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412401"></A>PK_fill_hole_not_smooth_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412929"></A>PK.fill_hole_fault_t.not_smooth_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412403"></A>PK_fill_hole_ok_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412931"></A>PK.fill_hole_fault_t.ok_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412405"></A>PK_fill_hole_plane_only_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412933"></A>PK.fill_hole_preference_t.plane_only_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412407"></A>PK_fill_hole_prefer_plane_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412935"></A>PK.fill_hole_preference_t.prefer_plane_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412409"></A>PK_fill_hole_smooth_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412937"></A>PK.fill_hole_preference_t.smooth_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412411"></A>PK_fill_hole_supp_not_smooth_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412939"></A>PK.fill_hole_fault_t.supp_not_smooth_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412413"></A>PK_fill_hole_too_complex_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412941"></A>PK.fill_hole_fault_t.too_complex_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412415"></A>PK_fill_hole_too_many_loops_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412943"></A>PK.fill_hole_fault_t.too_many_loops_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412417"></A>PK_fill_hole_too_small_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412945"></A>PK.fill_hole_fault_t.too_small_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412419"></A>PK_fill_hole_trim_to_hole_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412947"></A>PK.fill_hole_method_t.trim_to_hole_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412421"></A>PK_fill_hole_trim_to_sheet_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412949"></A>PK.fill_hole_method_t.trim_to_sheet_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412423"></A>PK_fill_hole_unknown_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412951"></A>PK.fill_hole_fault_t.unknown_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412425"></A>PK_fill_hole_vertex_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412953"></A>PK.fill_hole_fault_t.vertex_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412427"></A>PK_knot_bezier_ends_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412955"></A>PK.knot_type_t.bezier_ends_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412429"></A>PK_knot_non_uniform_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412957"></A>PK.knot_type_t.non_uniform_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412431"></A>PK_knot_piecewise_bezier_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412959"></A>PK.knot_type_t.piecewise_bezier_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412433"></A>PK_knot_quasi_uniform_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412961"></A>PK.knot_type_t.quasi_uniform_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412435"></A>PK_knot_smooth_seam_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412963"></A>PK.knot_type_t.smooth_seam_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412437"></A>PK_knot_uniform_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412965"></A>PK.knot_type_t.uniform_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412439"></A>PK_knot_unset_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412967"></A>PK.knot_type_t.unset_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412441"></A>PK_neutral_extend_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412969"></A>PK.neutral_error_t.extend_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412443"></A>PK_neutral_fill_hole_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412971"></A>PK.neutral_error_t.fill_hole_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412445"></A>PK_neutral_illegal_input_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412973"></A>PK.neutral_error_t.illegal_input_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412447"></A>PK_neutral_imprint_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412975"></A>PK.neutral_error_t.imprint_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412449"></A>PK_neutral_numerical_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412977"></A>PK.neutral_error_t.numerical_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412451"></A>PK_neutral_success_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412979"></A>PK.neutral_error_t.success_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412453"></A>PK_neutral_unknown_config_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412981"></A>PK.neutral_error_t.unknown_config_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412455"></A><A HREF=../headers/pk_range_guess_t.html>PK_range_guess_no_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412983"></A>PK.range_guess_type_t.no_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412457"></A><A HREF=../headers/pk_range_guess_t.html>PK_range_guess_param_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412985"></A>PK.range_guess_type_t.param_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412459"></A><A HREF=../headers/pk_range_guess_t.html>PK_range_guess_vector_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412987"></A>PK.range_guess_type_t.vector_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412461"></A>PK_set_precision_c2_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412989"></A>PK.set_precision_method_t.c2_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412463"></A>PK_set_precision_default_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412991"></A>PK.set_precision_method_t.default_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412465"></A>PK_step_normal_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412993"></A>PK.step_surf_t.normal_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412467"></A>PK_step_tapered_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412995"></A>PK.step_surf_t.tapered_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412469"></A>PK_sweep_clamp_const_profile_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412997"></A>PK.sweep_clamp_type_t.const_profile_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412471"></A>PK_sweep_clamp_face_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412999"></A>PK.sweep_clamp_type_t.face_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412473"></A>PK_sweep_clamp_none_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413001"></A>PK.sweep_clamp_type_t.none_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412475"></A>PK_sweep_guide_chord_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413003"></A>PK.sweep_guide_method_t.chord_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412477"></A><A HREF=../headers/pk_sweep_guide_clamp_dirn_t.html>PK_sweep_guide_clamp_dirn_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413005"></A>PK.sweep_guide_clamp_type_t.dirn_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412479"></A>PK_sweep_guide_clamp_fixed_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413007"></A>PK.sweep_guide_clamp_type_t.fixed_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412481"></A>PK_sweep_guide_clamp_none_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413009"></A>PK.sweep_guide_clamp_type_t.none_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412483"></A>PK_sweep_guide_curve_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413011"></A>PK.sweep_guide_method_t.curve_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412485"></A>PK_sweep_guide_lateral_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413013"></A>PK.sweep_guide_scale_t.lateral_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412487"></A>PK_sweep_guide_point_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413015"></A>PK.sweep_guide_method_t.point_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412489"></A>PK_sweep_guide_project_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413017"></A>PK.sweep_guide_method_t.project_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412491"></A>PK_sweep_guide_uniform_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413019"></A>PK.sweep_guide_scale_t.uniform_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412493"></A>PK_sweep_tool_bad_lock_dir_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413021"></A>PK.sweep_tool_fault_t.bad_lock_dir_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412495"></A>PK_sweep_tool_bad_path_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413023"></A>PK.sweep_tool_fault_t.bad_path_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412497"></A>PK_sweep_tool_bad_tool_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413025"></A>PK.sweep_tool_fault_t.bad_tool_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412499"></A>PK_sweep_tool_cant_mitre_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413027"></A>PK.sweep_tool_fault_t.cant_mitre_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412501"></A>PK_sweep_tool_check_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413029"></A>PK.sweep_tool_fault_t.check_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412503"></A>PK_sweep_tool_geom_degen_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413031"></A>PK.sweep_tool_fault_t.geom_degen_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412505"></A>PK_sweep_tool_geom_self_int_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413033"></A>PK.sweep_tool_fault_t.geom_self_int_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412507"></A>PK_sweep_tool_missed_target_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413035"></A>PK.sweep_tool_fault_t.missed_target_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412509"></A>PK_sweep_tool_path_bad_geom_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413037"></A>PK.sweep_tool_fault_t.path_bad_geom_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412511"></A>PK_sweep_tool_path_bad_site_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413039"></A>PK.sweep_tool_fault_t.path_bad_site_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412513"></A>PK_sweep_tool_path_disjoint_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413041"></A>PK.sweep_tool_fault_t.path_disjoint_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412515"></A>PK_sweep_tool_path_no_lock_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413043"></A>PK.sweep_tool_fault_t.path_no_lock_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412517"></A>PK_sweep_tool_path_no_vx_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413045"></A>PK.sweep_tool_fault_t.path_no_vx_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412519"></A>PK_sweep_tool_path_not_g1_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413047"></A>PK.sweep_tool_fault_t.path_not_g1_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412521"></A>PK_sweep_tool_path_tight_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413049"></A>PK.sweep_tool_fault_t.path_tight_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412523"></A>PK_sweep_tool_small_tool_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413051"></A>PK.sweep_tool_fault_t.small_tool_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412525"></A>PK_sweep_tool_surf_failure_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413053"></A>PK.sweep_tool_fault_t.surf_failure_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412527"></A>PK_sweep_tool_topol_change_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413055"></A>PK.sweep_tool_fault_t.topol_change_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412529"></A>PK_sweep_tool_topol_self_int_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413057"></A>PK.sweep_tool_fault_t.topol_self_int_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412531"></A>PK_taper_concave_mix_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413059"></A>PK.taper_concave_type_t.mix_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412533"></A>PK_taper_concave_none_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413061"></A>PK.taper_concave_type_t.none_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412535"></A>PK_taper_concave_plane_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413063"></A>PK.taper_concave_type_t.plane_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412537"></A>PK_taper_concave_radius_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413065"></A>PK.taper_concave_type_t.radius_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412539"></A>PK_taper_corner_extend_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413067"></A>PK.taper_corner_type_t.extend_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412541"></A>PK_taper_corner_plane_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413069"></A>PK.taper_corner_type_t.plane_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412543"></A>PK_taper_miter_at_open_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413071"></A>PK.taper_miter_type_t.at_open_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412545"></A>PK_taper_miter_on_ref_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413073"></A>PK.taper_miter_type_t.on_ref_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412547"></A>PK_taper_miter_to_face_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413075"></A>PK.taper_miter_type_t.to_face_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412549"></A>PK_taper_preserve_smooth_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413077"></A>PK.taper_step_face_t.preserve_smooth_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412551"></A><A HREF=../headers/pk_taper_step_face_t.html>PK_taper_step_face_no_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413079"></A>PK.taper_step_face_t.step_face_no_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-412553"></A><A HREF=../headers/pk_taper_step_face_t.html>PK_taper_step_face_yes_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422081_pgfId-413081"></A>PK.taper_step_face_t.step_face_yes_c</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422081_pgfId-322889"></A>&nbsp;</P>
+
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.012.html">Using Reports</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.014.html">Introduction To Basic Concepts In Parasolid</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,2254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Facet Mesh Generation</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Facet Mesh Generation</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.107.html">Display Tolerances</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.109.html">Faceting Output Via GO </A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-957012">107.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-294751">107.1.1	Default values </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-294766">107.1.2	Viewing transformation </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-294781">107.1.3	Setting tolerance values </A>
+</UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-294785">107.2	Mesh generation options </A>
+<UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-294789">107.2.1	Shape </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-294828">107.2.2	Match </A>
+<UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-294862">107.2.2.1	Geometry matching </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-295015">107.2.2.2	Topology matching </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-295150">107.2.2.3	Trimmed facets </A>
+</UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-960851">107.2.3	Increasing facet density for given view directions </A>
+<UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-313228">107.2.3.1	Specifying local density tolerance </A>
+</UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-313250">107.2.4	Culling backward facing facets </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-313292">107.2.5	Loops </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-313302">107.2.6	Maximum number of sides on facets </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-313454">107.2.7	Minimum and maximum facet width </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-314965">107.2.8	Curve tolerance </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-315001">107.2.9	Surface tolerance </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-333073">107.2.10	Local tolerances </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-333107">107.2.11	Vertices at degeneracies </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-333311">107.2.12	Order of constraints </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-333318">107.2.13	Facet planarity tolerance </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-342078">107.2.14	Wire edges in faces </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-342164">107.2.15	Ignoring small features </A>
+<UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-342223">107.2.15.1	Defining small features using a ratio value </A>
+</UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-342259">107.2.16	Incremental faceting </A>
+<UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-1226041">107.2.16.1	Using incremental faceting</A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-1227799">107.2.16.2	Choosing the incremental faceting method </A>
+</UL>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-342857">107.2.17	Improving faceting around points of inflection </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-342999">107.2.18	Improving facet quality </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-343017">107.2.19	Controlling facet vertices on tolerant edges </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-343614">107.2.20	Facet topology at singularities </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-947484">107.2.21	Facet generation on offset faces </A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-1365121">107.2.22	Facet generation on bodies created at different scales</A>
+<LI> <A HREF="fd_chap.108.html#50422188_pgfId-1365917">107.2.23	Using viewports to limit the number of facets returned </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422188_pgfId-957012"></A>107.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422188_pgfId-957014"></A><A NAME="50422188_marker-957013"></A>This chapter describes how the fields of the <A HREF=../headers/pk_topol_facet_mesh_o_t.html>PK_TOPOL_facet_mesh_o_t</A> and <A HREF=../headers/pk_topol_facet_mesh_2_o_t.html>PK_TOPOL_facet_mesh_2_o_t</A> options structures control the generation of the facet mesh. </P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-957026"></A><A HREF=../headers/pk_topol_facet_mesh_o_t.html>PK_TOPOL_facet_mesh_o_t</A> is used by <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>, which outputs the geometry of each facet through GO (see <A HREF="fd_chap.109.html#50422189_27922">Chapter 108, “Faceting Output Via GO”</A>).</LI>
+<LI>
+<A NAME="50422188_pgfId-957030"></A><A HREF=../headers/pk_topol_facet_mesh_2_o_t.html>PK_TOPOL_facet_mesh_2_o_t</A> is used by <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A>, which returns a tabular representation of the facet topology of a part, together with associated geometric information (see <A HREF="fd_chap.110.html#50422190_27922">Chapter 109, “Tabular Output Of Faceting”</A>).</LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-1117653"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-294746"></A>Note: Because these two options structures have many options in common, you should assume that the options described in this chapter are available in both options structures, unless noted otherwise.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-1117675"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1117671"></A>Note: The functionality described here offers partial support for topology that has facet geometry (meshes and plines). See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-988294"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-985453"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-985428"></A><A HREF="fd_chap.109.html#50422189_27922">Chapter 108, “Faceting Output Via GO”</A></LI>
+<LI>
+<A NAME="50422188_pgfId-985488"></A><A HREF="fd_chap.110.html#50422190_27922">Chapter 109, “Tabular Output Of Faceting”</A></LI>
+<LI>
+<A NAME="50422188_pgfId-985511"></A><A HREF="fd_chap.111.html#50422191_25646">Chapter 110, “Parasolid View Matrices”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422188_pgfId-294751"></A>	107.1.1 	<A NAME="50422188_marker-294748"></A><A NAME="50422188_marker-294749"></A><A NAME="50422188_marker-294750"></A>Default values </H3>
+<P>
+<A NAME="50422188_pgfId-294752"></A>The default values in <A HREF=../headers/pk_topol_facet_mesh_o_t.html>PK_TOPOL_facet_mesh_o_t</A> and <A HREF=../headers/pk_topol_facet_mesh_2_o_t.html>PK_TOPOL_facet_mesh_2_o_t</A> demonstrate how to return basic topological data for a facet representation, together with associated geometric data, to your application. </P>
+<P>
+<A NAME="50422188_pgfId-294753"></A>Depending on whether you are calling <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A> or <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A>, you should initialise these options structures using either PK_TOPOL_render_facet_o_m or PK_TOPOL_facet_2_o_m. </P>
+<P>
+<A NAME="50422188_pgfId-294757"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-294756"></A>Warning: Do not initialise these options structures using either PK_TOPOL_facet_mesh_o_m or PK_TOPOL_facet_mesh_2_o_m</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-294761"></A>See <A HREF="fd_chap.110.html#50422190_61016">Section 109.2.2, “Choosing which tables to return”</A>, for more information.</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-294766"></A>	107.1.2 	<A NAME="50422188_marker-294762"></A><A NAME="50422188_marker-294763"></A><A NAME="50422188_marker-294764"></A><A NAME="50422188_marker-294765"></A><A NAME="50422188_19551"></A>Viewing transformation </H3>
+<P>
+<A NAME="50422188_pgfId-294767"></A>Some of the facet mesh options require a viewing matrix to be specified. Parasolid has a number of requirements on such matrices, as explained in <A HREF="fd_chap.108.html#50422188_34332">Section 107.2.3, “Increasing facet density for given view directions”</A> and <A HREF="fd_chap.108.html#50422188_31807">Section 107.2.4, “Culling backward facing facets”</A>.</P>
+<P>
+<A NAME="50422188_pgfId-294777"></A>View matrices are explained in <A HREF="fd_chap.111.html#50422191_25646">Chapter 110, “Parasolid View Matrices”</A>.</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-294781"></A>	107.1.3 	<A NAME="50422188_marker-294778"></A><A NAME="50422188_marker-294779"></A><A NAME="50422188_marker-294780"></A>Setting tolerance values </H3>
+<P>
+<A NAME="50422188_pgfId-294782"></A>A number of the facet mesh options can take a tolerance value. It is assumed that if no explicit tolerance value is provided, Parasolid is free to calculate its own internal tolerance values. These are generally case-specific, rather than using specific fixed values.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422188_pgfId-294785"></A>107.2	<A NAME="50422188_marker-294783"></A><A NAME="50422188_marker-294784"></A>Mesh generation options 
+
+
+</H1>
+<P>
+<A NAME="50422188_pgfId-294786"></A>The following sections describe the fields in the <A HREF=../headers/pk_topol_facet_mesh_o_t.html>PK_TOPOL_facet_mesh_o_t</A> and <A HREF=../headers/pk_topol_facet_mesh_2_o_t.html>PK_TOPOL_facet_mesh_2_o_t</A> options structures.</P>
+
+<H3>
+<A NAME="50422188_pgfId-294789"></A>	107.2.1 	<A NAME="50422188_87405"></A><A NAME="50422188_marker-294788"></A>Shape </H3>
+<P>
+<A NAME="50422188_pgfId-294791"></A><A NAME="50422188_marker-294790"></A>The <CODE>
+shape</CODE>
+ field constrains what shape of facets are allowed in the facet mesh. The options are:</P>
+<P>
+<A NAME="50422188_pgfId-294809"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294794"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294796"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294798"></A><A HREF=../headers/pk_facet_shape_t.html>PK_facet_shape_convex_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294800"></A>facets are generated so that all interior angles are convex and none of the facets contain interior holes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294802"></A><A HREF=../headers/pk_facet_shape_t.html>PK_facet_shape_cut_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294804"></A>the application permits concave interior facet angles, and none of the facets contain interior holes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294806"></A><A HREF=../headers/pk_facet_shape_t.html>PK_facet_shape_any_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294808"></A>the application permits concave interior facet angles, and the application permits facets to contain interior holes</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-294810"></A>The convexity test is made by projecting the facet fins onto the mid-plane of the facet and testing its interior angles. The “mid-plane” is defined in <A HREF="fd_chap.108.html#50422188_42115">Section 107.2.13, “Facet planarity tolerance”</A>.</P>
+<P>
+<A NAME="50422188_pgfId-294814"></A>The <A HREF=../headers/pk_facet_shape_t.html>PK_facet_shape_cut_c</A> and <A HREF=../headers/pk_facet_shape_t.html>PK_facet_shape_any_c</A> settings are only relevant where facets can contain more than three sides, as described in <A HREF="fd_chap.108.html#50422188_11215">Section 107.2.6, “Maximum number of sides on facets”</A>.</P>
+<P>
+<A NAME="50422188_pgfId-294818"></A>If <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A> is being used to return tabular facet data with the <CODE>
+shape</CODE>
+ field set to <A HREF=../headers/pk_facet_shape_t.html>PK_facet_shape_any_c</A>, any facets containing holes are defined in the <CODE>
+facet_fin</CODE>
+ table using the <CODE>
+null_index</CODE>
+ marker to separate the exterior fin boundary from the interior fin boundaries. This format is described in the <A HREF="fd_chap.110.html#50422190_51318">Section 109.4, “Topological information”</A>.</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-294828"></A>	107.2.2 	<A NAME="50422188_40214"></A><A NAME="50422188_marker-294823"></A><A NAME="50422188_marker-294824"></A><A NAME="50422188_marker-294825"></A><A NAME="50422188_marker-294826"></A><A NAME="50422188_marker-294827"></A>Match </H3>
+<P>
+<A NAME="50422188_pgfId-294830"></A><A NAME="50422188_marker-294829"></A>When solid or sheet parts are faceted, the <CODE>
+match</CODE>
+ option allows faces to be faceted independently or faceted together as a complete mesh. The options are:</P>
+<P>
+<A NAME="50422188_pgfId-294856"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294833"></A>Match type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294835"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294837"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294839"></A>geometry matching</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294841"></A><A HREF=../headers/pk_facet_match_t.html>PK_facet_match_geom_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294843"></A>Facet meshes between neighbouring faces meet exactly but are topologically disjoint.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294845"></A>topology matching (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294847"></A><A HREF=../headers/pk_facet_match_t.html>PK_facet_match_topol_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294849"></A>Facet meshes between neighbouring faces meet exactly and have the same topology.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294851"></A>trimmed facets</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294853"></A><A HREF=../headers/pk_facet_match_t.html>PK_facet_match_trimmed_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-294855"></A>Neighbouring faces are not considered and the resultant facet meshes may contain overlapping facets or facets that have gaps between them.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-960694"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-960690"></A>Note: When your application inputs a list of faces, Parasolid recognises faces that belong to the same body and have identical transform entities. The requested matching will be applied to the edges between these faces unless <CODE>
+ignore_scope</CODE>
+ is <A HREF=../headers/pk_facet_ignore_scope_t.html>PK_facet_ignore_scope_local_c</A>. For more information on <CODE>
+ignore_scope</CODE>
+, see <A HREF="fd_chap.108.html#50422188_96135">Section 107.2.15, “Ignoring small features”</A></ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422188_pgfId-294862"></A>107.2.2.1 <A NAME="50422188_40964"></A><A NAME="50422188_marker-294858"></A><A NAME="50422188_marker-294859"></A><A NAME="50422188_marker-294860"></A><A NAME="50422188_marker-294861"></A>Geometry matching </H4>
+<P>
+<A NAME="50422188_pgfId-848814"></A><A NAME="50422188_marker-848813"></A>The geometry matching option (<A HREF=../headers/pk_facet_match_t.html>PK_facet_match_geom_c</A>) can be used when generating faceted output for a simple rendering application.</P>
+<P>
+<A NAME="50422188_pgfId-849557"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1192.gif">
+
+<P>
+<A NAME="50422188_pgfId-962719"></A>Figure 107-1 Geometry matching </P>
+<P>
+<A NAME="50422188_pgfId-962720"></A>The boundaries of neighbouring facet meshes will meet exactly (except in the special circumstances described below) but are topologically disjoint. If <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A> is being used to return tabular facet data, the <CODE>
+fin_fin</CODE>
+ table only matches fins which belong to the same face (the co-fin values of fins on the face mesh boundary are set to a null index value).</P>
+
+<H4>
+<A NAME="50422188_pgfId-294970"></A>When facet meshes may not match</H4>
+<P>
+<A NAME="50422188_pgfId-294971"></A>Facet meshes may not match if faces are faceted using a coarse chordal tolerance. Parasolid checks whether the face contains any inner loops that lie very close to the outer face boundary. If it does, Parasolid reduces its chordal tolerance locally so that the boundary chords do not intersect any inner loops. If geometry matching is switched on, the refined mesh boundary no longer exactly matches the relatively coarse boundary of the adjacent face (small triangular gaps occur between chords on the refined boundary and those on the coarse boundary). You can use topology matching to prevent such gaps occurring.</P>
+
+
+
+<H4>
+<A NAME="50422188_pgfId-295015"></A>107.2.2.2 <A NAME="50422188_marker-295013"></A><A NAME="50422188_marker-295014"></A>Topology matching </H4>
+<P>
+<A NAME="50422188_pgfId-900431"></A><A NAME="50422188_marker-900430"></A>The topology matching option facets all of the faces of a solid or sheet part as a single mesh.</P>
+<P>
+<A NAME="50422188_pgfId-901313"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1193.gif">
+
+<P>
+<A NAME="50422188_pgfId-901427"></A>Figure 107-2 Topology matching </P>
+<P>
+<A NAME="50422188_pgfId-901199"></A>If <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A> is being used to return tabular facet data, the <CODE>
+fin_fin</CODE>
+ table describes matching between fins which belong to the same face and between boundary fins which belong to the neighbouring faces.</P>
+<P>
+<A NAME="50422188_pgfId-295133"></A>The topology matching option checks that the boundary vertices on a facet mesh always match with vertices on the boundaries of neighboring meshes (possibly splitting facets in the neighboring facet mesh in order to meet this condition).</P>
+<P>
+<A NAME="50422188_pgfId-295136"></A>The topology matching option corrects the problem of slight gaps described in <A HREF="fd_chap.108.html#50422188_40964">“Geometry matching”</A>.</P>
+<P>
+<A NAME="50422188_pgfId-963972"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-963980"></A>Note: Topology matching has no effect when faces are faceted individually (where face entities are supplied explicitly as arguments to the PK faceting functions). </ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422188_pgfId-964408"></A>However, when your application has input an array of faces, Parasolid recognises faces from that array that all belong to the same body, and applies topology matching to any boundaries between neighbouring faces in the input array.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422188_pgfId-295150"></A>107.2.2.3 <A NAME="50422188_marker-295146"></A><A NAME="50422188_marker-295147"></A><A NAME="50422188_marker-295148"></A><A NAME="50422188_marker-295149"></A>Trimmed facets </H4>
+<P>
+<A NAME="50422188_pgfId-902416"></A>The trimmed facets option clips facet boundaries to model edge curves.</P>
+<P>
+<A NAME="50422188_pgfId-902417"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1194.gif">
+
+<P>
+<A NAME="50422188_pgfId-295260"></A>Figure 107-3 <A NAME="50422188_30997"></A>Trimmed matching </P>
+<P>
+<A NAME="50422188_pgfId-960831"></A>It gives no matching between facets on the two faces of an edge, but ensures that the gaps or overlaps between such facets are no bigger than the supplied tolerances. <A HREF="fd_chap.108.html#50422188_30997"><EM>
+Figure 107-3</EM></A> shows the gaps occurring along a model edge.</P>
+
+
+
+<H3>
+<A NAME="50422188_pgfId-960851"></A>	107.2.3 	<A NAME="50422188_34332"></A><A NAME="50422188_marker-960846"></A><A NAME="50422188_marker-960847"></A><A NAME="50422188_marker-960848"></A><A NAME="50422188_marker-960849"></A><A NAME="50422188_marker-960850"></A>Increasing facet density for given view directions </H3>
+<P>
+<A NAME="50422188_pgfId-295273"></A><A NAME="50422188_marker-295272"></A>The <CODE>
+density</CODE>
+ option lets you increase the local facet density in either or both of the following cases:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-295274"></A>In areas that contain silhouettes (where the facet normal changes from being front-facing to back-facing) for specified views.</LI>
+<LI>
+<A NAME="50422188_pgfId-295275"></A>In areas where the facet normals are nearly parallel to given view directions. </LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-295276"></A>The option lets you generate view-specific facet meshes that contain enhanced detail where the facet surfaces form silhouettes against, or are nearly parallel to, the specified views. The effect of each value is shown in <A HREF="fd_chap.108.html#50422188_24608"><EM>
+Figure 107-4</EM></A>. </P>
+<P>
+<A NAME="50422188_pgfId-903315"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1195.gif">
+
+<P>
+<A NAME="50422188_pgfId-313184"></A>Figure 107-4 <A NAME="50422188_24608"></A>Increasing facet density for given view directions</P>
+<P>
+<A NAME="50422188_pgfId-313185"></A>It takes the following values:</P>
+<P>
+<A NAME="50422188_pgfId-313207"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313188"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313190"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313192"></A><A HREF=../headers/pk_facet_density_t.html>PK_facet_density_no_view_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313194"></A>Facet density is independent of any views (it is ignored).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313196"></A><A HREF=../headers/pk_facet_density_t.html>PK_facet_density_use_view_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313198"></A>Increase facet density at silhouettes for any specified views. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313200"></A><A HREF=../headers/pk_facet_density_t.html>PK_facet_density_parallel_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313202"></A>Increase facet density in areas where the facet normals are nearly parallel to the given view directions. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313204"></A><A HREF=../headers/pk_facet_density_t.html>PK_facet_density_both_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313206"></A>Increase facet density at both view silhouettes and in areas where the facet normals are nearly parallel to the view directions. The same view directions are used to compute the silhouette and parallel areas in which the facet density is increased.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-313208"></A>Each non-default value requires that view directions and local tolerance values are specified.</P>
+<P>
+<A NAME="50422188_pgfId-313209"></A>If <CODE>
+density</CODE>
+ is set to a non-default value, view directions for increasing facet density are specified using the <CODE>
+view_directions</CODE>
+ option. This takes an array of unit vectors, each unit vector defining a different view direction. A corresponding <CODE>
+n_view_directions</CODE>
+ option contains the number of view directions, and should correspond with the size of the <CODE>
+view_directions</CODE>
+ array. </P>
+<P>
+<A NAME="50422188_pgfId-313210"></A>When using <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>, you can also specify a single view direction using the <CODE>
+view_transf</CODE>
+ argument in the function call. If both <CODE>
+view_directions</CODE>
+ and <CODE>
+view_transf</CODE>
+ are supplied, <CODE>
+view_transf</CODE>
+ is ignored.</P>
+<P>
+<A NAME="50422188_pgfId-313214"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-313213"></A>Note: In any view direction used for increasing facet density, the rotation component of the underlying matrix must not contain reflections, scales, or shears, and it must define a set of orthogonal axes. In addition, any perspective information supplied is ignored.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-313218"></A>See <A HREF="fd_chap.108.html#50422188_31807">Section 107.2.4, “Culling backward facing facets”</A>, for information about how view directions are used when culling back facing facets.</P>
+<P>
+<A NAME="50422188_pgfId-313222"></A>For more information on view matrices, see <A HREF="fd_chap.111.html#50422191_25646">Chapter 110, “Parasolid View Matrices”</A>.</P>
+
+<H4>
+<A NAME="50422188_pgfId-313228"></A>107.2.3.1 <A NAME="50422188_24751"></A><A NAME="50422188_marker-313224"></A><A NAME="50422188_marker-313225"></A><A NAME="50422188_marker-313226"></A><A NAME="50422188_marker-313227"></A>Specifying local density tolerance </H4>
+<P>
+<A NAME="50422188_pgfId-313230"></A><A NAME="50422188_marker-313229"></A>Local density tolerance values are required when <CODE>
+density</CODE>
+ is set to a non-default value. These are specified using the options described below. In each of the following options, you use the boolean <CODE>
+is_...</CODE>
+ option to switch on use of the tolerance, and its companion to specify a tolerance value. If an <CODE>
+is...</CODE>
+ option is PK_LOGICAL_true, then its companion must be a positive, non-zero value.</P>
+<P>
+<A NAME="50422188_pgfId-313244"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313233"></A>Value field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313235"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-313237"></A>local_density_tol</PRE>
+<PRE><A NAME="50422188_pgfId-985306"></A>is_local_density_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313239"></A>A local value for the surface distance tolerance when <CODE>
+density</CODE>
+ is set to a non-default value (replacing the <CODE>
+surface_plane_tol</CODE>
+ value temporarily)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-313241"></A>local_density_ang</PRE>
+<PRE><A NAME="50422188_pgfId-985313"></A>is_local_density_ang</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313243"></A>A local value for the surface angular tolerance when <CODE>
+density</CODE>
+ is set to a non-default value (replacing the <CODE>
+surface_plane_ang</CODE>
+ value temporarily)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-313245"></A>When <CODE>
+density</CODE>
+ is a non-default value, <CODE>
+local_density_tol</CODE>
+ must be supplied. Supplying <CODE>
+local_density_ang</CODE>
+ is optional. </P>
+
+
+
+<H3>
+<A NAME="50422188_pgfId-313250"></A>	107.2.4 	<A NAME="50422188_31807"></A><A NAME="50422188_marker-313247"></A><A NAME="50422188_marker-313248"></A><A NAME="50422188_marker-313249"></A>Culling backward facing facets </H3>
+<P>
+<A NAME="50422188_pgfId-313252"></A><A NAME="50422188_marker-313251"></A>The <CODE>
+cull</CODE>
+ field lets you reduce the total size of the facet mesh by removing any backward facing facets that are hidden when viewed from a given view direction.It takes the following values:</P>
+<P>
+<A NAME="50422188_pgfId-313266"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313255"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313257"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313259"></A><A HREF=../headers/pk_facet_cull_t.html>PK_facet_cull_none_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313261"></A>Do not cull any facets; output them all</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313263"></A><A HREF=../headers/pk_facet_cull_t.html>PK_facet_cull_back_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-313265"></A>Cull back facing facets. This value requires that a view is specified.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-313267"></A>Because perspective information may be required in any view directions used by the culling process, the way that you specify view directions depends on which function you are using:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-313268"></A>If you are calling <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>, specify a single view direction for culling using the <CODE>
+view_transf</CODE>
+ argument.</LI>
+<LI>
+<A NAME="50422188_pgfId-313269"></A>If you are calling <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A>, specify any number of view directions for culling using the <CODE>
+cull_transfs</CODE>
+ option.</LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-313270"></A>The <CODE>
+cull_transfs</CODE>
+ is an array of <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A> objects, each object defining a different view direction. A corresponding <CODE>
+n_cull_transfs</CODE>
+ option contains the number of view directions, and should correspond with the size of the <CODE>
+cull_transfs</CODE>
+ array. </P>
+<P>
+<A NAME="50422188_pgfId-313274"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-313273"></A>Note: The <CODE>
+cull_transf</CODE>
+ array can currently only contain a single view direction. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-313275"></A>In any view direction used for culling, the rotation component of the underlying matrix must not contain reflections, scales, or shears, and it must define a set of orthogonal axes</P>
+<P>
+<A NAME="50422188_pgfId-313282"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-313278"></A>Note: Topology matching (the default type of matching) must be switched off when culling backward facing facets. See <A HREF="fd_chap.108.html#50422188_40214">Section 107.2.2, “Match”</A> for more details.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-313286"></A>For more information on view matrices, see <A HREF="fd_chap.111.html#50422191_25646">Chapter 110, “Parasolid View Matrices”</A>.</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-313292"></A>	107.2.5 	<A NAME="50422188_10348"></A><A NAME="50422188_marker-313288"></A><A NAME="50422188_marker-313289"></A><A NAME="50422188_marker-313290"></A><A NAME="50422188_marker-313291"></A>Loops </H3>
+<P>
+<A NAME="50422188_pgfId-313294"></A><A NAME="50422188_marker-313293"></A>The <CODE>
+n_loops</CODE>
+ and <CODE>
+loops</CODE>
+ options allow specific <A HREF=../headers/pk_loop_t.html>PK_LOOP_t</A> entities to be ignored when a sheet body or a face of a sheet body is faceted. This has the effect that specified holes can be capped when sheet entities are faceted.</P>
+<P>
+<A NAME="50422188_pgfId-313295"></A>Each entity is a loop which is owned by one of the sheet bodies (or faces of a sheet body) which are being faceted.</P>
+<P>
+<A NAME="50422188_pgfId-313296"></A>The default setting is not to ignore any loops.</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-313302"></A>	107.2.6 	<A NAME="50422188_11215"></A><A NAME="50422188_marker-313298"></A><A NAME="50422188_marker-313299"></A><A NAME="50422188_marker-313300"></A><A NAME="50422188_marker-313301"></A>Maximum number of sides on facets </H3>
+<P>
+<A NAME="50422188_pgfId-313304"></A><A NAME="50422188_marker-313303"></A>The <CODE>
+max_facet_sides</CODE>
+ field constrains the maximum number of sides on facets. The default value is 3.</P>
+<P>
+<A NAME="50422188_pgfId-914409"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1196.gif">
+
+<P>
+<A NAME="50422188_pgfId-313450"></A>Figure 107-5 Maximum number of sides on facets</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-313454"></A>	107.2.7 	<A NAME="50422188_marker-1006043"></A><A NAME="50422188_marker-1006044"></A><A NAME="50422188_marker-1006045"></A><A NAME="50422188_75842"></A>Minimum and maximum facet width </H3>
+<P>
+<A NAME="50422188_pgfId-1010757"></A><A NAME="50422188_marker-1006047"></A>The <CODE>
+is_min_facet_width</CODE>
+ and <CODE>
+is_max_facet_width</CODE>
+ options control the minimum and maximum width of any side of a facet. </P>
+<P>
+<A NAME="50422188_pgfId-1023996"></A>The value of <CODE>
+min_facet_width</CODE>
+ overrides other input tolerance values. When <CODE>
+is_min_facet_width</CODE>
+ is set to PK_LOGICAL_true, facets will be repeatedly refined until  the width of each facet is less than <CODE>
+min_facet_width</CODE>
+. Once this happens, Parasolid will not further refine the facet to satisfy the supplied curve, surface or planarity tolerances, which typically results in facet dimensions that are smaller than <CODE>
+min_facet_width</CODE>
+. </P>
+<P>
+<A NAME="50422188_pgfId-1029693"></A>When <CODE>
+is_max_facet_width</CODE>
+ is set to PK_LOGICAL_true, the value of <CODE>
+max_facet_width</CODE>
+ determines the maximum facet width. <A HREF="fd_chap.108.html#50422188_52569"><EM>
+Figure 107-6</EM></A> shows a body where the maximum height of the sides of its facets has been set to 0.4 model units. </P>
+<P>
+<A NAME="50422188_pgfId-998597"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-998673"></A>Note: If both facet widths options are supplied, <CODE>
+min_facet_width</CODE>
+ must be less than <CODE>
+max_facet_width</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-915216"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1197.gif">
+
+<P>
+<A NAME="50422188_pgfId-314960"></A>Figure 107-6 <A NAME="50422188_52569"></A>Maximum width of any side of a facet</P>
+<P>
+<A NAME="50422188_pgfId-1338287"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1338307"></A>Note: The <CODE>
+min_facet_width</CODE>
+ option is ignored on topologies with facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422188_pgfId-314965"></A>	107.2.8 	<A NAME="50422188_19331"></A><A NAME="50422188_marker-1025735"></A><A NAME="50422188_marker-1025736"></A><A NAME="50422188_marker-1025737"></A>Curve tolerance </H3>
+<P>
+<A NAME="50422188_pgfId-314968"></A><A NAME="50422188_marker-1025739"></A><A NAME="50422188_19916"></A>The following sets of fields control how closely the fins on the boundaries of a face mesh match the originating edge geometry.</P>
+<P>
+<A NAME="50422188_pgfId-314994"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314971"></A>Switch field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314973"></A>Value field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314975"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314977"></A>is_curve_chord_tol</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314979"></A>curve_chord_tol</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314981"></A>The maximum permitted distance from a chord (i.e. facet fin) to the curve (i.e. edge entity) which it approximates.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314983"></A>is_curve_chord_max</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314985"></A>curve_chord_max</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314987"></A>The maximum length of chord which can be used to approximate a curve.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314989"></A>is_curve_chord_ang</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314991"></A>curve_chord_ang</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-314993"></A>The maximum angle (in radians) which is allowed between a chord and its originating curve; this is calculated as the sum of the two angles between a chord and the curve tangents, measured at the chord ends. It must be no more than pi/2 radians. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-314995"></A>The default setting of each of <CODE>
+is_curve_chord_tol</CODE>
+, <CODE>
+is_curve_chord_max</CODE>
+ and <CODE>
+is_curve_chord_ang</CODE>
+ is PK_LOGICAL_false. This implies that no explicit curve tolerance values are supplied (Parasolid calculates appropriate tolerance values internally).</P>
+<P>
+<A NAME="50422188_pgfId-314996"></A>One or more of these fields can be set to the value PK_LOGICAL_true with one or more of the corresponding fields - <CODE>
+curve_chord_tol</CODE>
+, <CODE>
+curve_chord_max</CODE>
+, <CODE>
+curve_chord_ang</CODE>
+ - set to a non zero, positive value.</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-315001"></A>	107.2.9 	<A NAME="50422188_33778"></A><A NAME="50422188_marker-1025687"></A><A NAME="50422188_marker-1025688"></A><A NAME="50422188_marker-1025689"></A>Surface tolerance </H3>
+<P>
+<A NAME="50422188_pgfId-315003"></A><A NAME="50422188_marker-1025691"></A>The following sets of fields control how closely each face mesh matches the surface geometry of the originating face.</P>
+<P>
+<A NAME="50422188_pgfId-315023"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-315006"></A>Switch field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-315008"></A>Value field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-315010"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-315012"></A>is_surface_plane_tol</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-315014"></A>surface_plane_tol</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-315016"></A>An upper bound on the distance from a facet to the surface which it approximates.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-315018"></A>is_surface_plane_ang</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-315020"></A>surface_plane_ang</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-315022"></A>The maximum angle (in radians) which is allowed between a facet plane and its originating surface; this is calculated as the sum of the angular deviation between the surface normal and facet planar normal at any two positions within the facet boundary. It must be no more than pi/2 radians. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-315024"></A>The default setting of <CODE>
+is_surface_plane_tol</CODE>
+ and <CODE>
+is_surface_plane_ang</CODE>
+ is PK_LOGICAL_false. These imply that no explicit surface tolerance values are supplied. (Parasolid calculates appropriate tolerance values internally).</P>
+<P>
+<A NAME="50422188_pgfId-315025"></A>One or more of these fields can be set to the value PK_LOGICAL_true with one or both of the corresponding fields, <CODE>
+surface_plane_tol</CODE>
+ or <CODE>
+surface_plane_ang</CODE>
+ set to a non zero, positive value.</P>
+<P>
+<A NAME="50422188_pgfId-917353"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1198.gif">
+
+<P>
+<A NAME="50422188_pgfId-333069"></A>Figure 107-7 Examples of different surface tolerance settings</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-333073"></A>	107.2.10 	<A NAME="50422188_marker-333070"></A><A NAME="50422188_marker-333071"></A><A NAME="50422188_marker-333072"></A><A NAME="50422188_67714"></A>Local tolerances </H3>
+<P>
+<A NAME="50422188_pgfId-333074"></A>You can attach local tolerance to individual or groups of topological entities (either faces or bodies) which then override the faceting tolerances already defined for the face or body using the various curve and surface tolerance options available (see <A HREF="fd_chap.108.html#50422188_19331">Section 107.2.8</A> and <A HREF="fd_chap.108.html#50422188_33778">Section 107.2.9</A> respectively).</P>
+<P>
+<A NAME="50422188_pgfId-333081"></A>Local tolerances are specified using the following options:</P>
+<P>
+<A NAME="50422188_pgfId-333103"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333084"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333086"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-333088"></A>local_tols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333090"></A>A set of tolerances to be attached to entities. This is an array of <A HREF=../headers/pk_facet_local_tolerances_t.html>PK_facet_local_tolerances_t</A>. Default: 0 (empty).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-333092"></A>topols_with_local_tols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333094"></A>An array of unique topological entities (faces or bodies) to which you want to attach local tolerances. </P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-333095"></A>Local tolerances are not used if this is empty. </LI>
+<LI>
+<A NAME="50422188_pgfId-333096"></A>If this is not empty, the parallel array <CODE>
+local_tols_for_topols</CODE>
+ must be completed. </LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-333097"></A>Default: 0 (empty).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-333099"></A>local_tols_for_topols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333101"></A>A list of indexes into the <CODE>
+local_tols</CODE>
+ array for each of the entities in <CODE>
+topols_with_local_tols</CODE>
+. This field specifies which of the specified local tolerances is to be used for each of the specified entities.</P>
+<P>
+<A NAME="50422188_pgfId-333102"></A>The field must be of length <CODE>
+n_topols_with_local_tols</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422188_pgfId-333107"></A>	107.2.11 	<A NAME="50422188_marker-333104"></A><A NAME="50422188_marker-333105"></A><A NAME="50422188_marker-333106"></A>Vertices at degeneracies </H3>
+<P>
+<A NAME="50422188_pgfId-333111"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-333110"></A>Note: This option is only available in <A HREF=../headers/pk_topol_facet_mesh_o_t.html>PK_TOPOL_facet_mesh_o_t</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-333112"></A>There are a number of ways that you can manage facet output at degenerate vertices. Parasolid lets you control:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-333116"></A>How vertices are generated at the degeneracy</LI>
+<LI>
+<A NAME="50422188_pgfId-333117"></A>How values for the degenerate parameter are chosen so as to calculate normals and derivatives at the degeneracy</LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-333118"></A>You use the <CODE>
+degen</CODE>
+ (<A HREF=../headers/pk_facet_degen_t.html>PK_facet_degen_t</A>) option to specify which one you want to use. The values it can take are as follows:</P>
+<P>
+<A NAME="50422188_pgfId-333144"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333121"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333123"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333125"></A><A HREF=../headers/pk_facet_degen_t.html>PK_facet_degen_multiple_vxs_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333127"></A>Each facet adjacent to a degeneracy has a unique vertex at the degeneracy. The value for the degenerate parameter at each vertex is the value of the degenerate parameter found for the previous vertex in the facet. Normals and derivatives for each facet are calculated using the appropriate parameter, and so are guaranteed to be accurate for each facet. However, the topology of the original part is not preserved. This is the default setting.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333129"></A><A HREF=../headers/pk_facet_degen_t.html>PK_facet_degen_single_vx_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333134"></A>Parasolid creates a single vertex which is used by all the facets adjacent to the vertex. The value for the degenerate parameter at this vertex is taken from the lowest value at the other end of <EM>
+one of</EM> the facets. This preserves the topology of the original, but the parameters, normals and derivatives of all other facets are incorrect. </P>
+<P>
+<A NAME="50422188_pgfId-333135"></A>This option only has an effect if using tabular faceting via <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A>. See <A HREF="fd_chap.110.html#50422190_27922">Chapter 109, “Tabular Output Of Faceting”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333140"></A><A HREF=../headers/pk_facet_degen_t.html>PK_facet_degen_average_parms_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333142"></A>Like the default method, each facet adjacent to a degeneracy has a unique vertex at the degeneracy, with a unique parameter. The normals and derivatives are therefore correct for each facet adjacent to the degeneracy, but topology is not preserved.</P>
+<P>
+<A NAME="50422188_pgfId-333143"></A>Unlike the default setting, the value for the degenerate parameter at each vertex is taken from the average value of the degenerate parameters found for the vertices on either side.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-333148"></A>The differences between these three options are illustrated in <A HREF="fd_chap.108.html#50422188_24494"><EM>
+Figure 107-8</EM></A>.</P>
+<P>
+<A NAME="50422188_pgfId-927414"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1199.gif">
+
+<P>
+<A NAME="50422188_pgfId-333307"></A>Figure 107-8 <A NAME="50422188_24494"></A>Creating facet vertices at degeneracies</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-333311"></A>	107.2.12 	<A NAME="50422188_marker-333308"></A><A NAME="50422188_marker-333309"></A><A NAME="50422188_marker-333310"></A>Order of constraints </H3>
+<P>
+<A NAME="50422188_pgfId-333313"></A><A NAME="50422188_marker-333312"></A>This is managed first by the initial division of a face into a small number of facets. Each facet is then tested to see if it meets the tolerance criteria, i.e. surface tolerance, maximum size, etc. If the facet does not meet the criteria it is then split into two and each resulting facet is again tested as before. This process continues until the criteria are satisfied. However, if the process comes to a point where a facet has been produced which is smaller than the minimum width, then the recursion stops, regardless of the other criteria.</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-333318"></A>	107.2.13 	<A NAME="50422188_42115"></A><A NAME="50422188_marker-333315"></A><A NAME="50422188_marker-333316"></A><A NAME="50422188_marker-333317"></A>Facet planarity tolerance </H3>
+<P>
+<A NAME="50422188_pgfId-333320"></A><A NAME="50422188_marker-333319"></A>The following sets of fields control how closely the coordinates of a facet are matched to a common <STRONG>
+mid-plane</STRONG>. This is defined as the plane passing through the center of gravity of the facet vertices whose normal is the normalized sum of the cross products of all ordered pairs of adjacent vertices in the facet. For more details see the documentation for <A HREF=../headers/pk_topol_facet_mesh_2_o_t.html>PK_TOPOL_facet_mesh_2_o_t</A>.</P>
+<P>
+<A NAME="50422188_pgfId-333340"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333323"></A>Switch field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333325"></A>Value field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333327"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-333329"></A>is_facet_plane_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-333331"></A>facet_plane_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333333"></A> an upper bound on the distance from a facet to its mid-plane</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-333335"></A>is_facet_plane_ang</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-333337"></A>facet_plane_ang</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-333339"></A>the maximum permitted ratio between <CODE>
+facet_plane_tol</CODE>
+ and <CODE>
+max_facet_width</CODE>
+</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-333341"></A>The facet planarity tolerance values are only relevant where facets can contain more than three sides.</P>
+<P>
+<A NAME="50422188_pgfId-928539"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1200.gif">
+
+<P>
+<A NAME="50422188_pgfId-342075"></A>Figure 107-9 Examples of different planarity tolerance settings</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-342078"></A>	107.2.14 	<A NAME="50422188_marker-342076"></A><A NAME="50422188_marker-342077"></A>Wire edges in faces </H3>
+<P>
+<A NAME="50422188_pgfId-342079"></A>You can control how facets are created for faces that contain wire edges using the <CODE>
+wire_edges</CODE>
+ option. This takes the following values:</P>
+<P>
+<A NAME="50422188_pgfId-342093"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342082"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342084"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342086"></A><A HREF=../headers/pk_facet_wire_edges_t.html>PK_facet_wire_edges_no_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342088"></A>Faceting ignores wire edges in faces, and they are faceted over</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342090"></A><A HREF=../headers/pk_facet_wire_edges_t.html>PK_facet_wire_edges_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342092"></A>Faceting takes wire edges in faces into account and facets the face in such a way that no facet is intersected by a wire edge.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-342097"></A>The behaviour of this option is illustrated in <A HREF="fd_chap.108.html#50422188_42293"><EM>
+Figure 107-10</EM></A>.</P>
+<P>
+<A NAME="50422188_pgfId-933682"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1201.gif">
+
+<P>
+<A NAME="50422188_pgfId-342158"></A>Figure 107-10 <A NAME="50422188_42293"></A>faceting faces that contain wire edges</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-342164"></A>	107.2.15 	<A NAME="50422188_marker-342159"></A><A NAME="50422188_marker-342160"></A><A NAME="50422188_marker-342161"></A><A NAME="50422188_marker-342162"></A><A NAME="50422188_marker-342163"></A><A NAME="50422188_96135"></A>Ignoring small features </H3>
+<P>
+<A NAME="50422188_pgfId-342165"></A>Small features in a body or model may be ignored during faceting operations. A small feature is a set of connected faces whose box size is smaller than a user-specified value. Doing this can speed up faceting, and reduce the number of facets created. It is useful if you are generating a “draft view” of a model, in order to get a rough idea of what it looks like. </P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-342168"></A>Warning: This option is intended only to improve the performance of faceting. In particular, you should not use it to implement any type of feature suppression functionality in your application.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-342170"></A>You use the <CODE>
+ignore</CODE>
+, <CODE>
+ignore_value</CODE>
+, and <CODE>
+ignore_scope</CODE>
+ options in <A HREF=../headers/pk_topol_facet_mesh_2_o_t.html>PK_TOPOL_facet_mesh_2_o_t</A> or <A HREF=../headers/pk_topol_facet_mesh_o_t.html>PK_TOPOL_facet_mesh_o_t</A> to control whether, and how, small features are ignored. </P>
+<P>
+<A NAME="50422188_pgfId-1100131"></A>Not all small features are ignored. This is determined by the position of the boundary between the small feature and the rest of the model, only if this boundary lies completely within a face of the model is the small feature ignored as illustrated in <A HREF="fd_chap.108.html#50422188_12426"><EM>
+Figure 107-11</EM></A>.</P>
+<P>
+<A NAME="50422188_pgfId-1100988"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1202.gif">
+
+<P>
+<A NAME="50422188_pgfId-1100947"></A>Figure 107-11 <A NAME="50422188_12426"></A>Ignoring small features</P>
+<P>
+<A NAME="50422188_pgfId-342208"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342173"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342175"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-342177"></A>ignore</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342179"></A>Control whether to ignore small features. This can take the following values:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-342180"></A><A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_no_c</A> (default) - all features are faceted, regardless of size.</LI>
+<LI>
+<A NAME="50422188_pgfId-342181"></A><A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_absolute_c</A> - a feature whose box size is smaller than the value specified in <CODE>
+ignore_value</CODE>
+ may be ignored. </LI>
+<LI>
+<A NAME="50422188_pgfId-342182"></A><A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_ratio_c</A> - a feature may be ignored if the ratio of its box size to the overall box size is smaller than the ratio specified in <CODE>
+ignore_value</CODE>
+.</LI>
+<LI>
+<A NAME="50422188_pgfId-342183"></A><A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_body_ratio_c</A> - a feature may be ignored if the ratio of the its box size to the box size of its owning body is smaller than the ratio specified in <CODE>
+ignore_value</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-342186"></A>For a description of the difference between these last two values, see <A HREF="fd_chap.108.html#50422188_13257">Section 107.2.15.1, “Defining small features using a ratio value”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-342189"></A>ignore_value</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342191"></A>Define which features are classed as small. This option takes either:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-342192"></A>An absolute value (if <CODE>
+ignore</CODE>
+ is <A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_absolute_c</A>)</LI>
+<LI>
+<A NAME="50422188_pgfId-342193"></A>A ratio (if <CODE>
+ignore</CODE>
+ is <A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_ratio_c</A> or <A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_body_ratio_c</A>)</LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-342197"></A>The default is 0.0. See <A HREF="fd_chap.108.html#50422188_13257">Section 107.2.15.1, “Defining small features using a ratio value”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-342199"></A>ignore_scope</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342201"></A>This option lets you specify the scope within which loops in a face may be ignored. It only applies when faceting a list of faces. The option can take two values:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-342202"></A><A HREF=../headers/pk_facet_ignore_scope_t.html>PK_facet_ignore_scope_global_c</A> (default) - loops are only ignored if they would have been ignored had the whole of the owning body (rather than just the face) been faceted.</LI>
+<LI>
+<A NAME="50422188_pgfId-342203"></A><A HREF=../headers/pk_facet_ignore_scope_t.html>PK_facet_ignore_scope_local_c</A> - the face is faceted as a separate entity. If it contains holes that can be classed as small according to the settings in <CODE>
+ignore</CODE>
+ and <CODE>
+ignore_value</CODE>
+, then they are ignored.</LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-342204"></A>The value of <CODE>
+local_scope</CODE>
+ also has implications for the ratio values of <CODE>
+ignore</CODE>
+. See <A HREF="fd_chap.108.html#50422188_13257">Section 107.2.15.1, “Defining small features using a ratio value”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-342215"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-342211"></A>Note: If the <CODE>
+loops</CODE>
+ option is used, faceting ignores the specified loops regardless of the value of <CODE>
+ignore</CODE>
+. See <A HREF="fd_chap.108.html#50422188_10348">Section 107.2.5, “Loops”</A>, for information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422188_pgfId-342223"></A>107.2.15.1 <A NAME="50422188_13257"></A><A NAME="50422188_marker-342217"></A><A NAME="50422188_marker-342218"></A><A NAME="50422188_marker-342219"></A><A NAME="50422188_marker-342220"></A><A NAME="50422188_marker-342221"></A><A NAME="50422188_marker-342222"></A>Defining small features using a ratio value </H4>
+<P>
+<A NAME="50422188_pgfId-342224"></A>The <A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_ratio_c</A> and <A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_body_ratio_c</A> values for <CODE>
+ignore</CODE>
+ let you define the size of a small feature in terms of a ratio, rather than an absolute value. This is useful, because you can ignore small features without having to know anything about the overall size of the model. For example, specifying an <CODE>
+ignore_value</CODE>
+ of 0.01 when using one of the ratio values means that any feature whose box size is less than 1% of the size of the entire model or owning body is ignored, regardless of its absolute size.</P>
+<P>
+<A NAME="50422188_pgfId-342225"></A>Two ratio values are available so that you can choose whether to define small features in terms of either the owning body or the entire assembly.</P>
+<P>
+<A NAME="50422188_pgfId-342239"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342228"></A>Value for <CODE>
+ignore</CODE>
+</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342230"></A>Ratio defined relative to</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342232"></A><A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_ratio_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342234"></A>The overall box. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342236"></A><A HREF=../headers/pk_facet_ignore_t.html>PK_facet_ignore_body_ratio_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342238"></A>The owning body. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-342240"></A>If faceting bodies, the overall box is the union of all the <CODE>
+topols</CODE>
+ boxes (with <CODE>
+topol_transfs</CODE>
+ applied) in the call to <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A> or <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>. </P>
+<P>
+<A NAME="50422188_pgfId-342241"></A>If faceting a list of faces, the overall box depends on the value of <CODE>
+local_scope</CODE>
+:</P>
+<P>
+<A NAME="50422188_pgfId-342255"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342244"></A>Value for <CODE>
+local_scope</CODE>
+</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342246"></A>Definition of overall box</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342248"></A><A HREF=../headers/pk_facet_ignore_scope_t.html>PK_facet_ignore_scope_global_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342250"></A>The union of all the <CODE>
+topols</CODE>
+ owning bodies’ boxes (with <CODE>
+topol_transfs</CODE>
+ applied)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342252"></A><A HREF=../headers/pk_facet_ignore_scope_t.html>PK_facet_ignore_scope_local_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342254"></A>The union of all the <CODE>
+topols</CODE>
+ boxes (with <CODE>
+topol_transfs</CODE>
+ applied)</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422188_pgfId-342259"></A>	107.2.16 	<A NAME="50422188_89301"></A><A NAME="50422188_marker-1227162"></A><A NAME="50422188_marker-1227163"></A>Incremental faceting </H3>
+<P>
+<A NAME="50422188_pgfId-1226029"></A>If you are using geometry or topology matching, Parasolid provides support for incremental faceting. When incremental faceting is used, only those faces in a body that have not already been faceted, have been modified, or that need to be refaceted due to refinement of their boundaries are faceted. This can lead to a large performance improvement, for example, in applications that display a shaded image of a model after each feature operation. Incremental faceting is supported by the functions <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A> and <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>.</P>
+<P>
+<A NAME="50422188_pgfId-1285904"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1282987"></A>Note:  Changes to other facet controls may not be honoured while incremental faceting is switched on.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-1226030"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+Support\facetting</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422188_pgfId-1285802"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1283840"></A>Note:  Incremental faceting only supports topology matching if the following are set:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1283921"></A><CODE>
+incremental_method</CODE>
+ is set to <A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_auto_c</A>, </LI>
+<LI>
+<A NAME="50422188_pgfId-1283975"></A><CODE>
+quality</CODE>
+ is set to <A HREF=../headers/pk_facet_quality_t.html>PK_facet_quality_improved_c</A>, </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422188_pgfId-1226041"></A>107.2.16.1 Using incremental faceting</H4>
+<P>
+<A NAME="50422188_pgfId-1226042"></A>Incremental faceting is controlled by the following options in <A HREF=../headers/pk_topol_facet_mesh_o_t.html>PK_TOPOL_facet_mesh_o_t</A> and <A HREF=../headers/pk_topol_facet_mesh_2_o_t.html>PK_TOPOL_facet_mesh_2_o_t</A>:</P>
+<P>
+<A NAME="50422188_pgfId-1283622"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1226045"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1226047"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-1226049"></A>incremental_facetting</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1226051"></A>Whether or not to use incremental faceting. The following settings can be used:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1226052"></A><A HREF=../headers/pk_facet_incr_t.html>PK_facet_incr_no_c</A>: Switch incremental faceting off. Default</LI>
+<LI>
+<A NAME="50422188_pgfId-1226053"></A><A HREF=../headers/pk_facet_incr_t.html>PK_facet_incr_clear_c</A>: Incremental faceting is switched off. Any incremental faceting data on the <CODE>
+topols</CODE>
+ being faceted is deleted. </LI>
+<LI>
+<A NAME="50422188_pgfId-1249643"></A><A HREF=../headers/pk_facet_incr_t.html>PK_facet_incr_refresh_no_c</A>: Incremental faceting is switched on. Any incremental faceting data on the topols being faceted is deleted and new incremental faceting data is generated.</LI>
+<LI>
+<A NAME="50422188_pgfId-1226055"></A><A HREF=../headers/pk_facet_incr_t.html>PK_facet_incr_yes_c</A>: Incremental faceting is switched on. Any existing incremental faceting data will be used and new incremental faceting data is generated as necessary.</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422188_pgfId-1226056"></A>Note: When using concurrent faceting, <CODE>
+incremental_facetting</CODE>
+ must be set to <A HREF=../headers/pk_facet_incr_t.html>PK_facet_incr_no_c</A>. See <A HREF="fd_chap.104.html#50422184_94155">Section 103.4, “Controlling exclusivity of rendering and faceting functions”</A>, for more information.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-1226061"></A>incremental_method</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1226063"></A>Which method to use for <CODE>
+incremental_facetting</CODE>
+</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1226064"></A><A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_attrib_c</A>: Store incremental faceting data in system attributes. Default.</LI>
+<LI>
+<A NAME="50422188_pgfId-1226065"></A><A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_auto_c</A>: Incremental facetting data is not stored in system attributes. Parasolid automatically manages incremental data.</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422188_pgfId-1282312"></A>See <A HREF="fd_chap.108.html#50422188_71963">Section 107.2.16.2, “Choosing the incremental faceting method”</A>, for more information.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422188_pgfId-1227950"></A>Note: When using topology matching, this option must be set to <A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_auto_c</A>. </ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-1226067"></A>incremental_transformation</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1226069"></A>Whether faces that have only been transformed since the last incremental faceting call but have no other modifications are treated as changed by the incremental faceting call.The following settings can be used:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1239087"></A><A HREF=../headers/pk_facet_incr_tf_t.html>PK_facet_incr_tf_no_c</A>: Refacet bodies that have been transformed since the incremental data was set up. Default</LI>
+<LI>
+<A NAME="50422188_pgfId-1239118"></A><A HREF=../headers/pk_facet_incr_tf_t.html>PK_facet_incr_tf_rigid_c</A>: Do not refacet bodies that have had a rigid transform applied since the incremental data was set up.</LI>
+<LI>
+<A NAME="50422188_pgfId-1239153"></A><A HREF=../headers/pk_facet_incr_tf_t.html>PK_facet_incr_tf_reflection_c</A>: Do not refacet bodies that have had a rigid body or reflection transform applied since the incremental data was set up.</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422188_pgfId-1249934"></A>Note: If the application is able to transform the facets displayed, this option can be used to limit the faces that need to be refaceted to those that have been modified rather than just transformed.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422188_pgfId-1240871"></A>Note: If <CODE>
+incremental_method</CODE>
+ is set to <A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_attrib_c</A>, this option is ignored.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-1227421"></A>incremental_refinement</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1250996"></A>Note: If <CODE>
+incremental_method</CODE>
+ is set to <A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_auto_c</A>, this option is ignored and any faces adjacent to an edge that has been refined will be automatically refaceted.</ADDRESS><BR>
+<P>
+<A NAME="50422188_pgfId-1227423"></A>Under certain circumstances, the current tessellation of facets does not satisfy the required faceting controls, and Parasolid needs to refine the facet mesh in order to produce an accurate facet representation. The usual consequence of this is that additional facet vertices are added to model edges. This option controls whether or not such refinement is allowed. The following settings can be used:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1227556"></A>Do not allow refinement. If an edge requires refinement, then a refinement error is reported for each face to be faceted that neighbours that edge, and those faces are not faceted. This does not terminate the faceting operation. If errors occur, you should delete the face attribute from those faces and re-facet. Default.</LI>
+<P>
+<A NAME="50422188_pgfId-1227557"></A><STRONG>
+Note: </STRONG>Depending on the setting for <CODE>
+incremental_report</CODE>
+, refinement errors may also be reported for faces that are not being faceted. </P>
+<LI>
+<A NAME="50422188_pgfId-1227546"></A>Allow refinement. New attributes are added to edges and fins requiring refinement. If faceting a list of faces (rather than a body), and an edge requiring refinement is shared by a face <EM>
+not</EM> being faceted, then geometry matching may not be honoured for that face.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-1227442"></A>incremental_report</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1251048"></A>Note: If <CODE>
+incremental_method</CODE>
+ is set to <A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_auto_c</A>, this option is ignored.</ADDRESS><BR>
+<P>
+<A NAME="50422188_pgfId-1227702"></A>Controls how much additional information is reported when faceting fails. The following settings can be used:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1227703"></A>Do not report any additional error details. Default</LI>
+<LI>
+<A NAME="50422188_pgfId-1227704"></A>When faceting a list of faces (rather than a body), list all additional faces required for faceting to succeed.</LI>
+<LI>
+<A NAME="50422188_pgfId-1227705"></A>If an edge requires refining, report all the faces that share that edge.</LI>
+<LI>
+<A NAME="50422188_pgfId-1227706"></A>Report all additional error details.</LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-1227453"></A>The <CODE>
+incremental_refinement</CODE>
+ option must be switched on before any reported errors can be fixed.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-1285816"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1285812"></A>Note: If <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A> or <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A> is running concurrently in a thread without locked partitions, <CODE>
+incremental_facetting</CODE>
+ must be set to <A HREF=../headers/pk_facet_incr_t.html>PK_facet_incr_no_c</A>. See <A HREF="fd_chap.114.html#50422195_73035">Chapter 113, “Calling Parasolid From Multiple Threads”</A>, for more information on locked partitions.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422188_pgfId-1227799"></A>107.2.16.2 <A NAME="50422188_71963"></A>Choosing the incremental faceting method </H4>
+<P>
+<A NAME="50422188_pgfId-1228189"></A>Parasolid provides two methods for incremental faceting via the <CODE>
+incremental_method</CODE>
+ option. If set to <A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_auto_c</A> Parasolid automatically refacets any faces on a body that need to be faceted for example, due to changes in the body. In addition, any faces that need new facets in order to honour requested matching are also refaceted.</P>
+<P>
+<A NAME="50422188_pgfId-1250387"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1250407"></A>Note: If you are using rollback, we recommend that you set <CODE>
+incremental_method</CODE>
+ to PK_face_incr_method_auto_c to ensure facet information survives all rollback operations.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-1228793"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1228803"></A>Note: If <CODE>
+incremental_method</CODE>
+ is set to <A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_auto_c</A>, the <CODE>
+incremental_report </CODE>
+and <CODE>
+incremental_refinement</CODE>
+ options are ignored.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-1227803"></A>If <CODE>
+incremental_method</CODE>
+ is set to <A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_attrib_c</A>, Parasolid will only refacet faces that do not have one of the following system attributes attached:</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-342275"></A>A system attribute of type SDL/TYSA_INCREMENTAL_FACETTING is attached to every face in a model when it is faceted. The presence of this attribute is use to indicate that the face has been faceted.</LI>
+<LI>
+<A NAME="50422188_pgfId-342276"></A>A system attribute of type SDL/TYSA_FACET_VERTEX_DATA is attached to every edge in a model when it is faceted. In cases where additional data specific to a fin is also required (for example, on a spike), a system attribute of the same type is also attached to the fin. This attribute contains information about the vertices on the edge or fin, as appropriate. </LI>
+</UL>
+<P>
+<A NAME="50422188_pgfId-1248936"></A>Only faces without an attribute of type SDL/TYSA_INCREMENTAL_FACETTING are faceted. Attributes of type SDL/TYSA_FACET_VERTEX_DATA on a face’s edges and fins are used to regenerate the positions of facet vertices.</P>
+<P>
+<A NAME="50422188_pgfId-1248867"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-342279"></A>Note: If attributes are attached to both an edge and its fins, then the fin data must match the edge data, or an error is raised.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-1238768"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422188_pgfId-1238767"></A>Performance issue: Implementing incremental faceting requires a trade-off between speed and application memory: although incremental faceting decreases the time it takes to re-facet a changed body, it also increases the amount of application memory required, due to the incremental faceting data that is stored  on all faces and edges.</ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-342288"></A><A HREF="fd_chap.108.html#50422188_62093"><EM>
+Figure 107-12</EM></A> provides a simple demonstration of how incremental faceting works with both methods:</P>
+<P>
+<A NAME="50422188_pgfId-1244932"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1242806"></A> <A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_auto_c</A></P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1242808"></A>&nbsp;</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1242810"></A><A HREF=../headers/pk_facet_incr_method_t.html>PK_facet_incr_method_attrib_c</A></P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1242954"></A> User creates block.</LI>
+<LI>
+<A NAME="50422188_pgfId-1242955"></A>Application generates faceted display.</LI>
+<LI>
+<A NAME="50422188_pgfId-1242812"></A>Parasolid adds faceting data to every face and edge faceted.</LI>
+</UL>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1242814"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1203.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1243679"></A>User creates block.</LI>
+<LI>
+<A NAME="50422188_pgfId-1243680"></A>Application generates faceted display.</LI>
+<LI>
+<A NAME="50422188_pgfId-1243019"></A>Parasolid adds faceting attributes to every face and edge faceted.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1243566"></A>&nbsp;</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1242990"></A>User creates cylinder and unites with block.</LI>
+<LI>
+<A NAME="50422188_pgfId-1242992"></A>Application refreshes faceted display by calling Parasolid: faces with faceting data are refaceted if needed.</LI>
+<LI>
+<A NAME="50422188_pgfId-1242993"></A>Parasolid adds faceting data to all re-faceted faces.</LI>
+</UL>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1242820"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1204.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1243575"></A>&nbsp;</P>
+<UL>
+<LI>
+<A NAME="50422188_pgfId-1243008"></A>User creates cylinder and unites with block.</LI>
+<LI>
+<A NAME="50422188_pgfId-1243009"></A>Parasolid deletes attributes from changed faces on block.</LI>
+<LI>
+<A NAME="50422188_pgfId-1248550"></A>Application refreshes faceted display by calling Parasolid: faces with faceting attributes are not re-faceted.</LI>
+<LI>
+<A NAME="50422188_pgfId-1243011"></A>Parasolid adds faceting attributes to all re-faceted faces.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-1241842"></A>Figure 107-12 <A NAME="50422188_62093"></A>A simple example of incremental faceting in use</P>
+<P>
+<A NAME="50422188_pgfId-342838"></A><A NAME="50422188_21900"></A>For more details about the specification of the system attributes used for incremental faceting, see <A HREF="fd_chap.123.html#50422206_20280">Section A.4, “System attribute definitions whose presence alone defines a property”</A>.</P>
+<P>
+<A NAME="50422188_pgfId-342852"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-342847"></A>Note: As a side effect, you can use Parasolid’s support for incremental faceting to force the tessellation of faces in a body. You can do this by explicitly adding attributes to the faces and edges in the body yourself. See <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A>, for information on adding attributes to entities.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422188_pgfId-342851"></A>If you use this method, then you need to specify chordal tolerance information if you want to allow incremental refinement to take place.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422188_pgfId-342857"></A>	107.2.17 	<A NAME="50422188_31001"></A><A NAME="50422188_marker-342854"></A><A NAME="50422188_marker-342855"></A><A NAME="50422188_marker-342856"></A>Improving faceting around points of inflection </H3>
+<P>
+<A NAME="50422188_pgfId-342858"></A>Sometimes, around points of inflection, it is possible that a single facet is generated which is large, relative to the surrounding facets. Despite the change in curvature around the point of inflection, this facet can still satisfy the specified <CODE>
+surface_plane_tol</CODE>
+ and the <CODE>
+surface_plane_ang</CODE>
+. This means that, by default, the facet spanning the point of inflection is not split, and this can result in a shaded image that looks “flat” around the inflection, particularly if the graphics library used by your application uses the normals at the facet vertices.</P>
+<P>
+<A NAME="50422188_pgfId-342859"></A>One way of improving the appearance of a faceted image that has points of inflection is simply to generate more facets for the whole image, by specifying a smaller max_facet_width. However, this can have a large performance cost and result in a large number of facets even for those parts of the image that do not require it. </P>
+<P>
+<A NAME="50422188_pgfId-342860"></A>A better method is to use the inflect option to increase the number of facets around points of inflection, while leaving the facet density in other areas the same. This option can take the following values:</P>
+<P>
+<A NAME="50422188_pgfId-342874"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342863"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342865"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342867"></A><A HREF=../headers/pk_facet_inflect_t.html>PK_facet_inflect_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342869"></A>Do not increase the number of facets around points of inflection. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342871"></A><A HREF=../headers/pk_facet_inflect_t.html>PK_facet_inflect_split_near_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-342873"></A>Split facets around the point of inflection so as to increase the number of facets.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-342878"></A><A HREF="fd_chap.108.html#50422188_22029"><EM>
+Figure 107-13</EM></A> shows the superior effects that can be achieved when splitting facets around the point of inflection.</P>
+<P>
+<A NAME="50422188_pgfId-936258"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1205.gif">
+
+<P>
+<A NAME="50422188_pgfId-342997"></A>Figure 107-13 <A NAME="50422188_22029"></A>Increasing the number of facets around points of inflection</P>
+
+
+<H3>
+<A NAME="50422188_pgfId-342999"></A>	107.2.18 	<A NAME="50422188_16434"></A>Improving facet quality </H3>
+<P>
+<A NAME="50422188_pgfId-343000"></A>You can improve the general quality of the facets that are created using the <CODE>
+quality</CODE>
+ option. This option controls whether extra checks are performed during the faceting operation: running additional checks results in better quality facets. Facet quality is improved at the expense of performance, and so you should expect the faceting algorithm to be slower if you use a non-default <CODE>
+quality</CODE>
+ value. In particular, you should only consider using this option if you are using facets for purposes other than visualisation. </P>
+<P>
+<A NAME="50422188_pgfId-343001"></A>The <CODE>
+quality</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422188_pgfId-343015"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343004"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343006"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343008"></A><A HREF=../headers/pk_facet_quality_t.html>PK_facet_quality_standard_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343010"></A>No additional checks are performed to improve facet quality. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343012"></A><A HREF=../headers/pk_facet_quality_t.html>PK_facet_quality_improved_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343014"></A>Extra checks are performed in order to improve the quality of the facets.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422188_pgfId-343017"></A>	107.2.19 	<A NAME="50422188_61786"></A>Controlling facet vertices on tolerant edges </H3>
+<P>
+<A NAME="50422188_pgfId-343019"></A><A NAME="50422188_marker-343018"></A>If a body contains a tolerant edge, switching on the <CODE>
+vertices_on_planar</CODE>
+ option lets you control which of the tolerant edge’s SP-curves the resulting facet vertices lie on. If a tolerant edge has an adjacent face with a planar surface attached, using <CODE>
+vertices_on_planar</CODE>
+ ensures that the facet vertices along the tolerant edge lie in the plane of the planar face. If <CODE>
+vertices_on_planar</CODE>
+ is not used, the facet vertices may lie on either side of the edge. </P>
+<P>
+<A NAME="50422188_pgfId-343024"></A><A NAME="50422188_marker-343020"></A><A HREF="fd_chap.108.html#50422188_13699"><EM>
+Figure 107-14</EM></A> demonstrates the effect of this option. In the example, a face attached to a spherical (i.e. non-planar) surface and a face attached to a planar surface share a tolerant edge. After faceting, the facet vertices lie either on the SP-curve attached to the non-planar face (the default result), or on the SP-curve attached to the planar face (using <CODE>
+vertices_on_planar</CODE>
+), leading to a visible difference in the resulting facet mesh. </P>
+<P>
+<A NAME="50422188_pgfId-936326"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1206.gif">
+
+<P>
+<A NAME="50422188_pgfId-343605"></A>Figure 107-14 <A NAME="50422188_13699"></A>Forcing facet vertices on tolerant edges to lie on planar faces</P>
+<P>
+<A NAME="50422188_pgfId-343612"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-343611"></A>Note: If both faces adjacent to a tolerant edge are planar, Parasolid cannot force the facet vertices to be on a particular face using <CODE>
+vertices_on_planar</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422188_pgfId-343614"></A>	107.2.20 	<A NAME="50422188_51772"></A>Facet topology at singularities </H3>
+<P>
+<A NAME="50422188_pgfId-343615"></A>You can control the topology of the facets created for any singularities in a body using the <CODE>
+sing_topol</CODE>
+ option, which takes the following values:</P>
+<P>
+<A NAME="50422188_pgfId-343629"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343618"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343620"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343622"></A><A HREF=../headers/pk_facet_sing_topol_t.html>PK_facet_sing_topol_default_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343624"></A>The default setting for this option treats the singularity as a single vertex. Facets are created around that vertex such that all the facets share the vertex at the singularity.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343626"></A><A HREF=../headers/pk_facet_sing_topol_t.html>PK_facet_sing_topol_degen_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-343628"></A>This setting treats the singularity as a surface boundary. Each facet that has an apex at the singularity has its own vertex at the singularity. Pairs of visually adjacent facets that meet at the singularity are actually separated by a degenerate (zero-width) triangular facet.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-343633"></A>The effect of this option on a cone is illustrated in <A HREF="fd_chap.108.html#50422188_63118"><EM>
+Figure 107-15</EM></A>.</P>
+<P>
+<A NAME="50422188_pgfId-938242"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1207.gif">
+
+<P>
+<A NAME="50422188_pgfId-343818"></A>Figure 107-15 <A NAME="50422188_63118"></A>Controlling the topology of a faceted cone at the singularity</P>
+<P>
+<A NAME="50422188_pgfId-947483"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-947482"></A>Note: One advantage of setting <CODE>
+facet_sing</CODE>
+ to <A HREF=../headers/pk_facet_sing_topol_t.html>PK_facet_sing_topol_degen_c</A> is that it enables the facets created around a singularity to be output as a single facet strip, if you wish. This is not possible by default. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422188_pgfId-947484"></A>	107.2.21 	<A NAME="50422188_24627"></A>Facet generation on offset faces </H3>
+<P>
+<A NAME="50422188_pgfId-947485"></A>You can control faceting on faces that are offsets of one another using the <CODE>
+respect_offset</CODE>
+ option in <A HREF=../headers/pk_topol_facet_mesh_2_o_t.html>PK_TOPOL_facet_mesh_2_o_t</A> or <A HREF=../headers/pk_topol_facet_mesh_o_t.html>PK_TOPOL_facet_mesh_o_t</A>. It takes the following values:</P>
+<P>
+<A NAME="50422188_pgfId-952458"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-952447"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-952449"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-952451"></A><A HREF=../headers/pk_facet_respect_t.html>PK_facet_respect_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-952453"></A>Take faces that are offsets of one another into account when creating facets. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-952455"></A><A HREF=../headers/pk_facet_respect_t.html>PK_facet_respect_no_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-952457"></A>Do not take faces that are offsets of one another into account when creating facets. This is the default.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-952466"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-952725"></A>Note: If set to <A HREF=../headers/pk_facet_respect_t.html>PK_facet_respect_yes_c</A>, faceting will attempt to reduce the likelihood that facets on these faces clash. This may result in the creation of more facets.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-957534"></A>The following conditions apply when <CODE>
+respect_offset</CODE>
+ is <A HREF=../headers/pk_facet_respect_t.html>PK_facet_respect_yes_c</A>:</P>
+<P>
+<A NAME="50422188_pgfId-1365139"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957541"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957543"></A>Must be set to:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957545"></A>Further information</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422188_pgfId-957547"></A>density</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957549"></A><A HREF=../headers/pk_facet_density_t.html>PK_facet_density_no_view_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957554"></A><A HREF="fd_chap.108.html#50422188_34332">Section 107.2.3</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957556"></A><CODE>
+incremental_facetting</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957558"></A><A HREF=../headers/pk_facet_incr_t.html>PK_facet_incr_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957563"></A><A HREF="fd_chap.108.html#50422188_89301">Section 107.2.16</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957565"></A><CODE>
+cull</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957567"></A><A HREF=../headers/pk_facet_cull_t.html>PK_facet_cull_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-957572"></A><A HREF="fd_chap.108.html#50422188_31807">Section 107.2.4</A></P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422188_pgfId-1365121"></A>	107.2.22 	<A NAME="50422188_72921"></A>Facet generation on bodies created at different scales</H3>
+<P>
+<A NAME="50422188_pgfId-1365777"></A>You can enlarge facets generated from bodies created at different scales using the <CODE>
+bodies_with_scales</CODE>
+ and <CODE>
+scale_factors</CODE>
+ options. An array of bodies whose facets you want to enlarge are supplied via <CODE>
+bodies_with_scales</CODE>
+. The scale to which the supplied facets are to be enlarged is supplied via <CODE>
+scale_factors</CODE>
+ option which has the following values:</P>
+<P>
+<A NAME="50422188_pgfId-1365909"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1365323"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1365325"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1365327"></A><A HREF=../headers/pk_scale_factor_t.html>PK_scale_factor_1x_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1365329"></A>A scaling factor of 1 is used.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1365331"></A><A HREF=../headers/pk_scale_factor_t.html>PK_scale_factor_10x_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1365333"></A>A scaling factor of 10 is used.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1366466"></A><A HREF=../headers/pk_scale_factor_t.html>PK_scale_factor_100x_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1366468"></A>A scaling factor of 100 is used.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1368482"></A><A HREF=../headers/pk_scale_factor_t.html>PK_scale_factor_1000x_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422188_pgfId-1368484"></A>A scaling factor of 1000 is used</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-1379740"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1365927"></A>Note: If <CODE>
+topols_transfs</CODE>
+ are supplied any translation component of the transform will be applied to the facets after they have been scaled.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422188_pgfId-1365917"></A>	107.2.23 	<A NAME="50422188_91361"></A>Using viewports to limit the number of facets returned </H3>
+<P>
+<A NAME="50422188_pgfId-1379807"></A>The <CODE>
+n_viewports</CODE>
+ and <CODE>
+viewports</CODE>
+ options allow you to return only those facets that lie on faces which overlap with at least one supplied viewport.</P>
+<P>
+<A NAME="50422188_pgfId-1380367"></A>If <CODE>
+n_viewports</CODE>
+ is set to 0, all facets will be returned.</P>
+<P>
+<A NAME="50422188_pgfId-1380040"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422188_pgfId-1380051"></A>Note: If <CODE>
+incremental_facetting</CODE>
+ is set to anything other than <A HREF=../headers/pk_facet_incr_t.html>PK_facet_incr_no_c</A>, <CODE>
+n_viewports</CODE>
+ must be set to 0.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422188_pgfId-1365271"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.107.html">Display Tolerances</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.109.html">Faceting Output Via GO </A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

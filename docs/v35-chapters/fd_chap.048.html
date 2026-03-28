@@ -1,0 +1,706 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Mid-Surface Generation</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Mid-Surface Generation</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.047.html">Sewing and Knitting</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.049.html">Extending Sheets And Surfaces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-358669">47.1	Introduction </A>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-358696">47.2	Creating neutral sheets </A>
+<UL>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-358842">47.2.1	Testing the suitability of faces </A>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-397073">47.2.2	Supplying construction methods to create neutral sheets </A>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-358937">47.2.3	Extending gaps and filling holes </A>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-358987">47.2.4	Supplying tolerance information for the offset between face sets </A>
+</UL>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-358997">47.3	Trimming neutral sheets </A>
+<UL>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-359033">47.3.1	Ignoring small faces when trimming neutral sheets </A>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-359045">47.3.2	Controlling overlapping faces when trimming neutral sheets </A>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-359122">47.3.3	Controlling the method used to trim neutral sheets </A>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-359166">47.3.4	Extending gaps and filling holes </A>
+</UL>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-359176">47.4	Tracking information </A>
+<LI> <A HREF="fd_chap.048.html#50422120_pgfId-362796">47.5	 Update control </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422120_pgfId-358669"></A>47.1	<A NAME="50422120_40285"></A><A NAME="50422120_marker-358668"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422120_pgfId-358673"></A>In Parasolid, the term <STRONG>
+mid-surface generation</STRONG> refers to the creation of neutral sheets from faces of a solid body, or faces from sheet bodies and the subsequent trimming of them so as to create a sheet body representation of the original .</P>
+<P>
+<A NAME="50422120_pgfId-597671"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\MidSurface</CODE>
+ <CODE>
+Generation\Midsurface</CODE>
+ <CODE>
+From</CODE>
+ <CODE>
+Body</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422120_pgfId-358674"></A>Neutral sheets are generally used to perform finite element analysis of thin-walled parts. They allow you to represent a solid model containing thin sections as a collection of sheet bodies which can then be discretized and analysed. </P>
+<P>
+<A NAME="50422120_pgfId-432594"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422120_pgfId-432600"></A>Note: This functionality does not support facet bodies. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422120_pgfId-358675"></A>You can think of creating neutral sheets from a solid body as the opposite process to creating a solid body by thickening a series of sheets. </P>
+<P>
+<A NAME="50422120_pgfId-358676"></A>There are two stages involved in creating neutral sheets:</P>
+<UL>
+<LI>
+<A NAME="50422120_pgfId-358678"></A>Create the neutral sheets (sheet bodies), either by using <A NAME="50422120_marker-358677"></A><A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> or other methods described in <A HREF="fd_chap.048.html#50422120_52283">Section 47.2, “Creating neutral sheets”</A>, for more information.</LI>
+<LI>
+<A NAME="50422120_pgfId-358683"></A>Trim the resulting sheet bodies, using <A NAME="50422120_marker-358682"></A><A HREF=../headers/pk_body_trim_neutral_sheets_2.html>PK_BODY_trim_neutral_sheets_2</A>, to ensure that the neutral sheets are the correct size and shape and that there are edges on each sheet where two (or more) sheets meet. See <A HREF="fd_chap.048.html#50422120_41538">Section 47.3, “Trimming neutral sheets”</A>, for more information.</LI>
+</UL>
+<P>
+<A NAME="50422120_pgfId-358690"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422120_pgfId-358689"></A>Note: The combination of <A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> and <A HREF=../headers/pk_body_trim_neutral_sheets_2.html>PK_BODY_trim_neutral_sheets_2</A> does not provide a complete solution for generating mid-surfaces. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422120_pgfId-358696"></A>47.2	<A NAME="50422120_marker-358691"></A><A NAME="50422120_marker-358692"></A><A NAME="50422120_marker-358693"></A><A NAME="50422120_marker-358694"></A><A NAME="50422120_52283"></A>Creating neutral sheets 
+
+
+</H1>
+<P>
+<A NAME="50422120_pgfId-358698"></A><A NAME="50422120_marker-358697"></A><A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> is one of several tools that you can use to create a set of neutral sheets for a solid body or for sheet bodies. Other methods include:</P>
+<UL>
+<LI>
+<A NAME="50422120_pgfId-358699"></A>Use <A HREF=../headers/pk_face_offset_2.html>PK_FACE_offset_2</A> to offset faces.</LI>
+<LI>
+<A NAME="50422120_pgfId-358700"></A>Create a “rough” offsetting algorithm in your application code that offsets points on the model and creates a surface through them using <A HREF=../headers/pk_bsurf_create_constrained.html>PK_BSURF_create_constrained</A>.</LI>
+</UL>
+<P>
+<A NAME="50422120_pgfId-358701"></A><A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> creates a neutral sheet between two arrays of faces, <CODE>
+left_faces</CODE>
+ and <CODE>
+right_faces</CODE>
+. The surfaces of the <CODE>
+left_faces</CODE>
+ may or may not be offsets (to within the specified tolerance) of the corresponding surfaces of the <CODE>
+right_faces</CODE>
+, (see <A HREF="fd_chap.048.html#50422120_87650">“Supplying construction methods to create neutral sheets”</A>, for more information). The faceset pairs should be selected such that the resulting neutral sheet is not disjoint. </P>
+<P>
+<A NAME="50422120_pgfId-358705"></A>In addition to the faces themselves, you need to provide a <CODE>
+placement</CODE>
+ parameter that describes the exact position of the resulting neutral sheets between the <CODE>
+left_faces</CODE>
+ and <CODE>
+right_faces</CODE>
+. The surfaces of the face arrays are then used to create other surfaces (the neutral surfaces) that lie between them at the position defined by the supplied <CODE>
+placement</CODE>
+. For example, if <CODE>
+placement</CODE>
+ is 0, then the resulting neutral surfaces are halfway between the surfaces on the given face arrays. The neutral surfaces are then attached to a sheet which is then returned.</P>
+<P>
+<A NAME="50422120_pgfId-358712"></A><A NAME="50422120_marker-358706"></A><A NAME="50422120_marker-358707"></A><A NAME="50422120_marker-358708"></A><A HREF="fd_chap.048.html#50422120_36129"><EM>
+Figure 47-1</EM></A> shows a trivial example in which a neutral sheet is created mid-way between two cylindrical surfaces. Since <CODE>
+placement</CODE>
+ is 0, the resulting neutral sheet is halfway between the inside and outside of the cylindrical block. </P>
+<P>
+<A NAME="50422120_pgfId-358746"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-460.gif">
+
+<P>
+<A NAME="50422120_pgfId-358748"></A>Figure 47-1 <A NAME="50422120_36129"></A>Simple single face example</P>
+<P>
+<A NAME="50422120_pgfId-358752"></A><A HREF="fd_chap.048.html#50422120_73619"><EM>
+Figure 47-2</EM></A> shows a slightly more complex example in which a single neutral sheet is created from <CODE>
+left_faces</CODE>
+ and <CODE>
+right_faces</CODE>
+ arrays that both contain two faces. In particular, note that by using <A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A>, a single neutral sheet is created from four faces. This avoids overlap in the trimming result. </P>
+<P>
+<A NAME="50422120_pgfId-358756"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-461.gif">
+
+<P>
+<A NAME="50422120_pgfId-358758"></A>Figure 47-2 <A NAME="50422120_73619"></A>Creating a neutral sheet from two arrays of faces</P>
+<P>
+<A NAME="50422120_pgfId-358759"></A>If the left and right faces do not all share the same surface, then a neutral sheet that contains multiple faces may be created. <A HREF="fd_chap.048.html#50422120_82514"><EM>
+Figure 47-3</EM></A> shows a simple example that demonstrates this.</P>
+<P>
+<A NAME="50422120_pgfId-358766"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-462.gif">
+
+<P>
+<A NAME="50422120_pgfId-358768"></A>Figure 47-3 <A NAME="50422120_82514"></A>Creating a multiple face neutral sheet from two arrays of faces</P>
+<P>
+<A NAME="50422120_pgfId-358769"></A>In practice, however, you will want to create neutral sheets for an entire body or for sheet bodies, rather than just some of it. To do this, you need to make multiple calls to Parasolid functions, and the techniques you use will depend on the nature of the bodies involved. For the body shown in <A HREF="fd_chap.048.html#50422120_82514"><EM>
+Figure 47-3</EM></A>, because all pairings of <CODE>
+left_faces</CODE>
+ and <CODE>
+right_faces</CODE>
+ are offsets of each other, you can use <A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> to create neutral sheets for the entire body. <A HREF="fd_chap.048.html#50422120_76860"><EM>
+Figure 47-4</EM></A> illustrates how to do this.</P>
+<P>
+<A NAME="50422120_pgfId-358779"></A>A total of two calls to <A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> are required, with <CODE>
+left_faces</CODE>
+ and <CODE>
+right_faces</CODE>
+ specified as follows:</P>
+<P>
+<A NAME="50422120_pgfId-358793"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422120_pgfId-358782"></A><STRONG>left_faces</STRONG> </PRE>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422120_pgfId-358784"></A><STRONG>right_faces</STRONG> </PRE>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422120_pgfId-358786"></A>[ E, F, G ]</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422120_pgfId-358788"></A>[ A, B, C, D ]</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422120_pgfId-358790"></A>[ L, M ]</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422120_pgfId-358792"></A>[ N, O ]</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422120_pgfId-358794"></A>Notice that face F only needs to be specified in the <CODE>
+left_faces</CODE>
+ array once, even though there are two faces in the <CODE>
+right_faces</CODE>
+ array (B and C) that are associated with it. </P>
+<P>
+<A NAME="50422120_pgfId-358831"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-463.gif">
+
+<P>
+<A NAME="50422120_pgfId-358833"></A>Figure 47-4 <A NAME="50422120_76860"></A>Creating neutral sheets for a body </P>
+<P>
+<A NAME="50422120_pgfId-358837"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422120_pgfId-358836"></A>Note: Neither the order of the calls to <A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A>, nor which faces are <CODE>
+left_faces</CODE>
+ and which faces are <CODE>
+right_faces</CODE>
+ is important in order to create these neutral sheets.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422120_pgfId-358838"></A>The neutral sheets created by <A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> may be untrimmed. You need to use <A HREF=../headers/pk_body_trim_neutral_sheets_2.html>PK_BODY_trim_neutral_sheets_2</A> to perform this task; see <A HREF="fd_chap.048.html#50422120_41538">Section 47.3, “Trimming neutral sheets”</A>.</P>
+
+<H3>
+<A NAME="50422120_pgfId-358842"></A>	47.2.1 	<A NAME="50422120_53597"></A>Testing the suitability of faces </H3>
+<P>
+<A NAME="50422120_pgfId-358843"></A>The<CODE>
+ make_sheet</CODE>
+ option enables you to test the suitability of the supplied pairs of faces for the operation before a sheet is generated. If PK_LOGICAL_true, a neutral sheet is created. If PK_LOGICAL_false, no neutral sheet is created but the construction data is still reported in the Parasolid Report.</P>
+<P>
+<A NAME="50422120_pgfId-397097"></A>The <CODE>
+overlap</CODE>
+ option enables you to control the face pair detection stage of the neutral sheet creation algorithm. It allows you to specify whether the test is based on the extent of the underlying surface of the faces, or on the extent of the faces themselves. It takes the following values:</P>
+<P>
+<A NAME="50422120_pgfId-395814"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-395803"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-395805"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-395807"></A><A HREF=../headers/pk_neutral_face_overlap_t.html>PK_neutral_face_overlap_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-395809"></A>Face overlaps are not considered. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-395811"></A><A HREF=../headers/pk_neutral_face_overlap_t.html>PK_neutral_face_overlap_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-395813"></A>Face overlaps will be considered. If the faces sets do not overlap then neutral sheets are not created.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422120_pgfId-394973"></A><A HREF="fd_chap.048.html#50422120_92253"><EM>
+Figure 47-5</EM></A> illustrates this option using a model split with a rib. The upper faces (marked A and B in the image) on each side of the rib share a common planar surface, and the lower faces (marked C and D) on each side of the rib also share a common planar surface. </P>
+<P>
+<A NAME="50422120_pgfId-396887"></A>With the default behaviour, specifying faces A and C would be detected as a pair and if <CODE>
+make_sheet</CODE>
+ is set to PK_LOGICAL_true, a neutral sheet is created. With the option set to <A HREF=../headers/pk_neutral_face_overlap_t.html>PK_neutral_face_overlap_yes_c</A> these faces would be rejected as a pair since they do not overlap and therefore a neutral sheet is not created.</P>
+<P>
+<A NAME="50422120_pgfId-384225"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-464.gif">
+
+<P>
+<A NAME="50422120_pgfId-638282"></A>Figure 47-5 <A NAME="50422120_92253"></A>Detecting overlapping faces</P>
+<P>
+<A NAME="50422120_pgfId-628566"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422120_pgfId-638285"></A>Note: If you are supplying <CODE>
+left_faces</CODE>
+ and <CODE>
+right_faces</CODE>
+ from sheet bodies, Parasolid will attempt to determine the correct orientation for both face sets. If the correct orientation for a face set cannot be determined, a Parasolid Report of type <A HREF=../headers/pk_report_record_1_t.html>PK_REPORT_record_1_t</A> will be returned with a status <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_fa_unoriented_c</A> indicating which faces Parasolid could not determine an orientation for. In this case Parasolid will attempt to create a neutral sheet using the reported face sets in the orientation they were provided in. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for <A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> for more information on the local statuses returned. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422120_pgfId-397073"></A>	47.2.2 	<A NAME="50422120_87650"></A>Supplying construction methods to create neutral sheets </H3>
+<P>
+<A NAME="50422120_pgfId-358849"></A>You can optionally choose to construct neutral sheets using the <CODE>
+n_methods and methods</CODE>
+ options. The following table provides a brief description of these options.</P>
+<P>
+<A NAME="50422120_pgfId-358869"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-358852"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-358854"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-358856"></A><CODE>
+n_methods</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-358858"></A>The number of construction methods that can be used. If the value is set to 0, then the default <A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_mid_offset_c</A> construction method is used.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-358860"></A><CODE>
+methods</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-358862"></A>The array of construction methods that are used to construct neutral sheets. This can be one of:</P>
+<UL>
+<LI>
+<A NAME="50422120_pgfId-358863"></A><A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_mid_offset_c</A>: verifies that the <CODE>
+right_faces</CODE>
+ are offsets of the <CODE>
+left_faces</CODE>
+ and creates a neutral sheet between them. This sheet is an offset of one of the facesets, This method will fail if the facesets are not offsets of each other.</LI>
+<LI>
+<A NAME="50422120_pgfId-410374"></A><A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_offset_left_c</A>: finds the maximum distance by which the left faces can be offset before it intersects with the right faces and uses this value to create a neutral sheet in the direction of the normal that is offset to the left faces only.</LI>
+<LI>
+<A NAME="50422120_pgfId-407620"></A><A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_medial_c</A>: creates a neutral sheet that is an “average” mid-surface between the <CODE>
+left_faces</CODE>
+ and <CODE>
+right_faces</CODE>
+. This method does not require that <CODE>
+right_faces</CODE>
+ are offsets of <CODE>
+left_faces</CODE>
+ and does not create neutral sheets that are offsets of the <CODE>
+left_faces</CODE>
+. </LI>
+</UL>
+<P>
+<A NAME="50422120_pgfId-358868"></A><A HREF="fd_chap.048.html#50422120_61522"><EM>
+Figure 47-6</EM></A> illustrates these methods.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422120_pgfId-358904"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-465.gif">
+
+<P>
+<A NAME="50422120_pgfId-358906"></A>Figure 47-6 <A NAME="50422120_61522"></A>Construction methods for generating neutral sheets</P>
+<P>
+<A NAME="50422120_pgfId-416448"></A>The thickness, placement, tolerance and offset values determined by <A HREF=../headers/pk_face_make_neutral_sheet_2.html><A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A></A> are returned in the Parasolid Report with the value <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_3_c</A>. See <A HREF=../headers/pk_face_make_neutral_sheet_2.html><A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A></A> for more information.</P>
+
+
+<H3>
+<A NAME="50422120_pgfId-358937"></A>	47.2.3 	Extending gaps and filling holes </H3>
+<P>
+<A NAME="50422120_pgfId-358938"></A>By default, <A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> fills any holes and extends gaps in the resulting neutral sheets to make them large enough for trimming purposes. However, you can turn this behaviour off using the <CODE>
+extend_and_fill_holes</CODE>
+ option. Using the same example as <A HREF="fd_chap.048.html#50422120_76860"><EM>
+Figure 47-4</EM></A>, <A HREF="fd_chap.048.html#50422120_60533"><EM>
+Figure 47-7</EM></A> shows the differences in the results created when changing this option. </P>
+<P>
+<A NAME="50422120_pgfId-358984"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-466.gif">
+
+<P>
+<A NAME="50422120_pgfId-358986"></A>Figure 47-7 <A NAME="50422120_60533"></A>Choosing whether to extend and fill holes when creating neutral sheets</P>
+
+
+<H3>
+<A NAME="50422120_pgfId-358987"></A>	47.2.4 	<A NAME="50422120_96599"></A>Supplying tolerance information for the offset between face sets </H3>
+<P>
+<A NAME="50422120_pgfId-358988"></A>The <CODE>
+have_tolerance</CODE>
+ and <CODE>
+tolerance</CODE>
+ options can be used to pass in a tolerance value to the left and right faces. If <CODE>
+have_tolerance</CODE>
+ is PK_LOGICAL_true, then <CODE>
+tolerance</CODE>
+ can be used to specify a tolerance value. If <CODE>
+have_tolerance</CODE>
+ is PK_LOGICAL_false, then <CODE>
+tolerance</CODE>
+ is ignored and faces will only be considered offsets of each other if their surfaces are offsets to within Parasolid precision. The <CODE>
+have_tolerance</CODE>
+ option should be used whenever you supply a <CODE>
+tolerance</CODE>
+.</P>
+<P>
+<A NAME="50422120_pgfId-358992"></A>A tolerant offset should be considered to mean two faces that are offsets of each other to typical modeling tolerances. You should not use this functionality to attempt to create a neutral sheet from two distinctly different faces.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422120_pgfId-358997"></A>47.3	<A NAME="50422120_marker-358993"></A><A NAME="50422120_marker-358994"></A><A NAME="50422120_marker-358995"></A><A NAME="50422120_41538"></A>Trimming neutral sheets 
+
+
+</H1>
+<P>
+<A NAME="50422120_pgfId-358998"></A>Trimming is performed using <A HREF=../headers/pk_body_trim_neutral_sheets_2.html>PK_BODY_trim_neutral_sheets_2</A>. This takes the original solid body, together with the corresponding neutral sheets you created, and uses the information encoded in the face set pairs to trim the neutral sheets, and scribe edges onto them where required. These edges define either the limits of the neutral sheet or where two neutral sheets meet each other. Once all the edges have been created, any unwanted faces on the sheet are deleted.</P>
+<P>
+<A NAME="50422120_pgfId-358999"></A>An edge can be created on a neutral sheet for one of three reasons:</P>
+<UL>
+<LI>
+<A NAME="50422120_pgfId-359000"></A>Where two (or more) neutral sheets meet, an edge is created on each sheet along the common curve of intersection.</LI>
+<LI>
+<A NAME="50422120_pgfId-359001"></A>An edge is created at the exterior boundary of the neutral sheet, either because the neutral sheet intersects the surface of a side face or because it meets another neutral sheet.</LI>
+<LI>
+<A NAME="50422120_pgfId-359002"></A>An edge is created if the target body changes thickness abruptly. This occurs where there is an unclassified face. The edge next to the unclassified face is projected along the normal to the neutral surface onto the neutral sheet.</LI>
+</UL>
+<P>
+<A NAME="50422120_pgfId-359006"></A><A HREF="fd_chap.048.html#50422120_33303"><EM>
+Figure 47-8</EM></A> (a) shows a simple swept profile. There are 3 face set pairs in this example, and the corresponding untrimmed neutral sheets are shown, together with the neutral sheets after trimming.</P>
+<P>
+<A NAME="50422120_pgfId-359010"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-467.gif">
+
+<P>
+<A NAME="50422120_pgfId-359012"></A>Figure 47-8 <A NAME="50422120_33303"></A>A simple swept body</P>
+<P>
+<A NAME="50422120_pgfId-359016"></A><A HREF="fd_chap.048.html#50422120_41991"><EM>
+Figure 47-9</EM></A> shows another swept body, this time with a boss added. There are two face set pairs in this example, one for the horizontal plate with the boss and one for the upright. The resulting trimmed neutral sheets are shown in (b). Notice that, in the resulting trimmed sheets, the edge around the boss has been projected onto the corresponding neutral sheet.</P>
+<P>
+<A NAME="50422120_pgfId-359020"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-468.gif">
+
+<P>
+<A NAME="50422120_pgfId-359022"></A>Figure 47-9 <A NAME="50422120_41991"></A>Swept body with a boss added</P>
+<P>
+<A NAME="50422120_pgfId-359026"></A>A final example is shown in <A HREF="fd_chap.048.html#50422120_20109"><EM>
+Figure 47-10</EM></A> in which there are two face set pairs, one for the base plate and one for the tab. Notice that the neutral sheet of the base plate has an edge in the middle where two sheets meet.</P>
+<P>
+<A NAME="50422120_pgfId-359030"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-469.gif">
+
+<P>
+<A NAME="50422120_pgfId-359032"></A>Figure 47-10 <A NAME="50422120_20109"></A>Neutral sheets for a solid plate with a tab</P>
+
+<H3>
+<A NAME="50422120_pgfId-359033"></A>	47.3.1 	Ignoring small faces when trimming neutral sheets </H3>
+<P>
+<A NAME="50422120_pgfId-359034"></A>By default, <A HREF=../headers/pk_body_trim_neutral_sheets_2.html>PK_BODY_trim_neutral_sheets_2</A> ignores small faces that do not come from face set pairs, such as blend faces and sliver faces. The supplied neutral sheets are trimmed so as to maintain the original connectivity of the solid body. In the majority of cases, this produces the result that you are interested in. However, you can use the <CODE>
+ignore</CODE>
+ option to specify that the neutral sheets are trimmed to exactly the limits of the original face set pairs. This ensures that the trimmed neutral sheets are no larger than the face set pairs from which they are derived, but may not maintain the connectivity of the original body. </P>
+<P>
+<A NAME="50422120_pgfId-359038"></A><A HREF="fd_chap.048.html#50422120_86030"><EM>
+Figure 47-11</EM></A> shows an example that contains several blend faces. By default, these blend faces are ignored, and the neutral sheets are trimmed so as to form a closed sheet body as shown. However, if <CODE>
+ignore</CODE>
+ is set to <A HREF=../headers/pk_neutral_ignore_fa_t.html>PK_neutral_ignore_fa_no_c</A>, then the resulting trimmed neutral sheets do not form a closed body. This result might be useful if, for example, you wanted to create a closed body by adding face-face blends between each trimmed sheet. </P>
+<P>
+<A NAME="50422120_pgfId-359042"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-470.gif">
+
+<P>
+<A NAME="50422120_pgfId-359044"></A>Figure 47-11 <A NAME="50422120_86030"></A>Ignoring small faces when trimming neutral sheets</P>
+<P>
+<A NAME="50422120_pgfId-412623"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Midsurface Generation\Ignore</CODE>
+ <CODE>
+Small</CODE>
+ <CODE>
+Faces</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+
+<H3>
+<A NAME="50422120_pgfId-359045"></A>	47.3.2 	Controlling overlapping faces when trimming neutral sheets </H3>
+<P>
+<A NAME="50422120_pgfId-359046"></A>Sometimes, creating neutral sheets results in faces that overlap each other in the resulting trimmed sheets. This is particularly true if you are creating neutral sheets from models that do not have a uniform thickness. You can use the <CODE>
+overlap</CODE>
+ option in <A HREF=../headers/pk_body_trim_neutral_sheets_2.html>PK_BODY_trim_neutral_sheets_2</A> to control how to deal with these overlapping faces to achieve the best result. This option takes the following values:</P>
+<P>
+<A NAME="50422120_pgfId-359070"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-359049"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-359051"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-359053"></A><A HREF=../headers/pk_neutral_overlap_t.html>PK_neutral_overlap_no_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-359055"></A>Overlapping faces are ignored in the result body. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-359057"></A><A HREF=../headers/pk_neutral_overlap_t.html>PK_neutral_overlap_report_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-359059"></A>Detect whether faces in the trimmed sheets are overlapping and create a <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_fa_overlap_c</A> record in the Parasolid report for each set of overlapping faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-359064"></A><A HREF=../headers/pk_neutral_overlap_t.html>PK_neutral_overlap_repair_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422120_pgfId-359066"></A>Repair overlapping faces by retaining one connected set of overlapping faces and deleting the other. The overlapping faces that remain are noted with a <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_fa_overlap_c</A> record in the Parasolid report for each set of faces.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422120_pgfId-359074"></A><A HREF="fd_chap.048.html#50422120_50607"><EM>
+Figure 47-12</EM></A> shows a simple example that shows the effect on the final trimmed sheets of repairing overlapping faces. </P>
+<P>
+<A NAME="50422120_pgfId-359119"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-471.gif">
+
+<P>
+<A NAME="50422120_pgfId-359121"></A>Figure 47-12 <A NAME="50422120_50607"></A>Repairing overlapping faces when trimming neutral sheets</P>
+
+
+<H3>
+<A NAME="50422120_pgfId-359122"></A>	47.3.3 	Controlling the method used to trim neutral sheets </H3>
+<P>
+<A NAME="50422120_pgfId-359123"></A>By default, when trimming neutral sheets that contain more than one surface, faces are only trimmed against other neutral sheets. However, in some configurations, this means that the resulting neutral sheets are bigger than they should be, extending beyond the faces of the original body. In these cases, you can use the <CODE>
+trim_method</CODE>
+ option to trim to the side faces in the original body as well. </P>
+<P>
+<A NAME="50422120_pgfId-359127"></A><A HREF="fd_chap.048.html#50422120_73641"><EM>
+Figure 47-13</EM></A> shows a simple example in which the default result from <A HREF=../headers/pk_body_trim_neutral_sheets_2.html>PK_BODY_trim_neutral_sheets_2</A> extends past the original body. By setting <CODE>
+trim_method</CODE>
+ to <A HREF=../headers/pk_neutral_trim_method_t.html>PK_neutral_trim_method_sides_c</A>, the neutral sheets are trimmed to the side faces of the original body as well, thereby eliminating the unwanted extension. </P>
+<P>
+<A NAME="50422120_pgfId-359161"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-472.gif">
+
+<P>
+<A NAME="50422120_pgfId-359163"></A>Figure 47-13 <A NAME="50422120_73641"></A>Controlling how to trim neutral sheets with more than one surface</P>
+
+
+<H3>
+<A NAME="50422120_pgfId-359166"></A>	47.3.4 	<A NAME="50422120_marker-359164"></A><A NAME="50422120_marker-359165"></A>Extending gaps and filling holes </H3>
+<P>
+<A NAME="50422120_pgfId-359167"></A>Like <A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A>, you can use the <CODE>
+extend_and_fill_holes</CODE>
+ option to choose whether or not to extend sheets and fill holes when trimming neutral sheets. See <A HREF="fd_chap.048.html#50422120_52283">Section 47.2, “Creating neutral sheets”</A>, for more information on this option. </P>
+<P>
+<A NAME="50422120_pgfId-359174"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422120_pgfId-359173"></A>Note: To preserve behaviour in older models, the default setting for this option is PK_LOGICAL_false. This is not the same as the default setting for the option in PK_FACE_make_neutral_sheets_2. However, we recommend that you set this option to PK_LOGICAL_true when dealing with new models. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422120_pgfId-359176"></A>47.4	<A NAME="50422120_marker-359175"></A>Tracking information 
+
+
+</H1>
+<P>
+<A NAME="50422120_pgfId-359178"></A><A NAME="50422120_marker-359177"></A>Each face on a neutral sheet has usually arisen from the projection of two faces on the target body (one on each side). For example, in <A HREF="fd_chap.048.html#50422120_41991"><EM>
+Figure 47-9</EM></A> the top side of the circular face is the projection of the whole of the circular face on the top of the boss, the underside is part of the projection of the rectangular face on the underside of the target body. Similarly, the surrounding face is part of the projection of the rectangular face around the boss and the face on the underside.</P>
+<P>
+<A NAME="50422120_pgfId-387911"></A>Currently, the trimming function gathers and returns this information. For each side of every face on each neutral sheet it returns a list of faces on the target which project onto this face on the neutral sheet. There is usually one target face for each side. However, sometimes there may be 2 on one side, or there may be none.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422120_pgfId-362796"></A>47.5	<A NAME="50422120_52300"></A> Update control 
+
+
+</H1>
+<P>
+<A NAME="50422120_pgfId-387944"></A><A HREF=../headers/pk_face_make_neutral_sheet_2.html>PK_FACE_make_neutral_sheet_2</A> and <A HREF=../headers/pk_body_trim_neutral_sheets_2.html>PK_BODY_trim_neutral_sheets_2</A> contain an <CODE>
+update</CODE>
+ option to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information.</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.047.html">Sewing and Knitting</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.049.html">Extending Sheets And Surfaces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

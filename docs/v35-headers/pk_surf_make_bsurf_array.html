@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SURF_make_bsurf_array</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SURF_make_bsurf_array</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_SURF_make_bsurf_array
+(
+<I>--- received arguments ---
+</I>int                                 n_surfs,      --- number of surfaces
+<A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                           surfs[],      --- surfaces
+<A HREF=../headers/pk_uvbox_t.html>PK_UVBOX_t</A>                          uvboxes[],    --- required parameter bounds
+                                                  --- of surfaces
+const <A HREF=../headers/pk_surf_make_bsurf_array_o_t.html>PK_SURF_make_bsurf_array_o_t</A> *options,      --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_surf_make_bsurf_res_t.html>PK_SURF_make_bsurf_res_t</A>            results[],    --- results
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>                 *const all_succeeded --- whether succeeded for
+                                                  --- all surfaces
+)
+</B>
+<A NAME="description"></A>
+<I>Given an array of surfaces and uvboxes this function will return created
+B-surfaces that satisfy the <B>'options'</B> specified.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_tolerance          <B>'tolerance'</B> is less than session precision
+                                    (MILD)
+    PK_ERROR_bad_combination        the options specified are not permitted
+                                    (MILD)
+
+<A NAME="documentation"></A>
+Each created B-surface will be exactly coincident with the given surface if
+possible.  Where this is not possible, the maximum distance between surface and
+returned B-surface will be limited by <B>'tolerance'</B>. The function will usually
+achieve this condition but this is not guaranteed.
+
+Representations of planes and the rational forms of cylinders, cones, spheres
+and tori are exact. For an input B-surface, if the requested representation
+is different, the output B-surface will in general only be exact when the order
+is not decreased and when a rational B-surface is not represented as a
+non-rational B-surface.
+
+<B>'results'</B> is an array of <A HREF=../headers/pk_surf_make_bsurf_res_t.html>PK_SURF_make_bsurf_res_t</A> of length <B>'n_surfs'</B>. Each
+<A HREF=../headers/pk_surf_make_bsurf_res_t.html>PK_SURF_make_bsurf_res_t</A> structure contains a status indicating the degree of
+success or reason for failure, the created B-surface if succeessful, and the
+achieved tolerance and continuity. <B>'all_succeeded'</B> will be set to
+PK_LOGICAL_true if the function succeeded in creating b-surfaces for all
+input surfaces.
+
+Please refer to documentation of <A HREF=../headers/pk_surf_make_bsurf_array_o_t.html>PK_SURF_make_bsurf_array_o_t</A> and
+<A HREF=../headers/pk_surf_make_bsurf_res_t.html>PK_SURF_make_bsurf_res_t</A> for more details.
+
+Click <A HREF="../chapters/fd_chap.019.html#50434376_pgfId-298221">here</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

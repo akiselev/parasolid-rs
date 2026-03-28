@@ -1,0 +1,2470 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Identifying And Simplifying Model Details</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Identifying And Simplifying Model Details</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.064.html">Deleting Entities </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.066.html">Replacing The Surfaces Of Faces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-294766">64.1	Introduction </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-294805">64.2	Simplifying geometry </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-294855">64.3	Finding facesets </A>
+<UL>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-294928">64.3.1	Choosing which facesets to return </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-295084">64.3.2	Returning alternating facesets </A>
+</UL>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-295192">64.4	Identifying model details </A>
+<UL>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-295235">64.4.1	Finding and returning detail types </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-295384">64.4.2	Constraining the radius of a cylindrical hole </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-295393">64.4.3	Finding holes with blends </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-295589">64.4.4	Finding drillable holes </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-295703">64.4.5	Finding holes with constant-radius components </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-295788">64.4.6	Finding perforated holes </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-295911">64.4.7	Finding open holes </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-682802">64.4.8	Update control</A>
+</UL>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296028">64.5	Identifying blends </A>
+<UL>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296037">64.5.1	Calling PK_FACE_identify_blends </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296157">64.5.2	Choosing how to identify blends </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296276">64.5.3	Propagating across sharp edges </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296285">64.5.4	Identifying blends based on radius </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296298">64.5.5	Identifying blends based on convexity </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296321">64.5.6	Identifying blends based on span </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-399230">64.5.7	Identifying blend faces with non-adjacent underlying faces </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-436493">64.5.8	Reporting identified blend faces </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-423654">64.5.9	Returned information </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-436979">64.5.10	Optimising identified blend chains for subsequent operations </A>
+</UL>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296359">64.6	Identifying the faces underlying a blend </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296432">64.7	Constraining identification of details </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296896">64.8	Classifying model details </A>
+<UL>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296942">64.8.1	Options for classifying details </A>
+<LI> <A HREF="fd_chap.065.html#50422140_pgfId-296999">64.8.2	Classification details returned </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422140_pgfId-294766"></A>64.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422140_pgfId-356003"></A>Parasolid includes the following support for simplifying models:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-356008"></A>Simplifying geometry. See <A HREF="fd_chap.065.html#50422140_52751">Section 64.2</A>.</LI>
+<LI>
+<A NAME="50422140_pgfId-356012"></A>Finding facesets bounded by specified edges in a body. See <A HREF="fd_chap.065.html#50422140_24781">Section 64.3</A>.</LI>
+<LI>
+<A NAME="50422140_pgfId-294778"></A>Identifying specific details in a body. See <A HREF="fd_chap.065.html#50422140_48639">Section 64.4</A>.</LI>
+<LI>
+<A NAME="50422140_pgfId-294782"></A>Identifying blends in a body. See <A HREF="fd_chap.065.html#50422140_52112">Section 64.5</A>.</LI>
+<LI>
+<A NAME="50422140_pgfId-294786"></A>Constraining the identification of details in a body. See <A HREF="fd_chap.065.html#50422140_41047">Section 64.7</A>.</LI>
+<LI>
+<A NAME="50422140_pgfId-294790"></A>Deleting facesets from a body. See <A HREF="fd_chap.065.html#50422140_47260">Section 64.8</A>.</LI>
+<LI>
+<A NAME="50422140_pgfId-294794"></A>Classifying details in a body. <A HREF="fd_chap.065.html#50422140_65738">Section 64.8</A>.</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-460195"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-294797"></A>Note: You can also use <A HREF=../headers/pk_body_identify_general.html>PK_BODY_identify_general</A> to identify the characteristics of a body that cause it to be general. See <A HREF="fd_chap.016.html#50422085_49511">Section 15.10, “Identifying general characteristics of a body”</A>, for more information. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-460328"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-459710"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-459594"></A><A HREF="fd_chap.064.html#50422139_85200">Chapter 63, “Deleting Entities”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422140_pgfId-294805"></A>64.2	<A NAME="50422140_52751"></A><A NAME="50422140_marker-294803"></A><A NAME="50422140_marker-294804"></A>Simplifying geometry 
+
+
+</H1>
+<P>
+<A NAME="50422140_pgfId-294809"></A>Parasolid provides two functions that you can use to simplify the geometry in a body:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-294810"></A><A HREF=../headers/pk_body_simplify_geom.html>PK_BODY_simplify_geom</A> simplifies the geometry of a body.</LI>
+<LI>
+<A NAME="50422140_pgfId-294811"></A><A HREF=../headers/pk_face_simplify_geom.html>PK_FACE_simplify_geom</A> simplifies the geometry of supplied faces in a body.</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-477770"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-477792"></A>Note: This functionality supports models with a mixture of classic and facet geometry. However the geometry will only be simplified if it is classic.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-294812"></A>These functions attempt the following simplifications for the geometry shown:</P>
+<P>
+<A NAME="50422140_pgfId-294844"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294815"></A>Geometry</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294817"></A>Original form</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294819"></A>Simplified form</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294821"></A>Curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294823"></A>Rational B-curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294825"></A>Non-rational B-curve</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294829"></A>B-curve</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294831"></A>Line or circle</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294833"></A>Surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294835"></A>Rational B-surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294837"></A>Non-rational B-surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294841"></A>B-surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294843"></A>Plane, cylinder, cone, sphere, or torus</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-294845"></A>These functions are particularly useful for simplifying all or part of a body after importing it into Parasolid. See <A HREF="fd_chap.091.html#50422169_38621">Chapter 90, “Importing Data”</A>, for more information.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422140_pgfId-294855"></A>64.3	<A NAME="50422140_24781"></A><A NAME="50422140_marker-294853"></A><A NAME="50422140_marker-294854"></A>Finding facesets 
+
+
+</H1>
+<P>
+<A NAME="50422140_pgfId-435253"></A>You can use <A HREF=../headers/pk_body_find_facesets.html>PK_BODY_find_facesets</A> to find distinct sets of faces bounded by a given set of edges in a body. These facesets can then be deleted from the body, if desired, as described in <A HREF="fd_chap.065.html#50422140_47260">Section 64.8, “Classifying model details”</A>.</P>
+<P>
+<A NAME="50422140_pgfId-435330"></A><A HREF=../headers/pk_body_find_facesets.html>PK_BODY_find_facesets</A> receives and returns the following arguments:</P>
+<P>
+<A NAME="50422140_pgfId-294888"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294863"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294865"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-294867"></A>body</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294869"></A>The body in which to find facesets.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-294871"></A>n_edges</PRE>
+<PRE><A NAME="50422140_pgfId-294872"></A>edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294874"></A>The number of edges bounding the facesets, together with the array of edges bounding the facesets.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-294876"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294878"></A>A set of options.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-427608"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-427623"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-427625"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-427627"></A><CODE>
+results</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-427629"></A>A structure containing the identified facesets, together with, optionally, the sets of edges that bound each faceset.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-294889"></A>The options that you can specify are as follows:</P>
+<P>
+<A NAME="50422140_pgfId-294923"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294892"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294894"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-294896"></A>selector</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294898"></A>Specifies which facesets to return if one or more <CODE>
+selecting_topol</CODE>
+ are specified. See <A HREF="fd_chap.065.html#50422140_53813">Section 64.3.1, “Choosing which facesets to return”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-294903"></A>alternate</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294905"></A>Whether or not to return alternating facesets, starting with the supplied <CODE>
+selecting_topol</CODE>
+. (Default: PK_LOGICAL_false)</P>
+<P>
+<A NAME="50422140_pgfId-294909"></A>See <A HREF="fd_chap.065.html#50422140_19831">Section 64.3.2, “Returning alternating facesets”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-294911"></A>n_selecting_topol</PRE>
+<PRE><A NAME="50422140_pgfId-294912"></A>selecting_topol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294914"></A>An array of topologies that are used to select which facesets are returned, together with the number of elements in the array. The precise facesets that are returned depends on the value of <CODE>
+selector</CODE>
+: see <A HREF="fd_chap.065.html#50422140_53813">Section 64.3.1, “Choosing which facesets to return”</A>, for more information.</P>
+<P>
+<A NAME="50422140_pgfId-294918"></A>If <CODE>
+selecting_topol</CODE>
+ is empty (default), then all found facesets are returned. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-294920"></A>want_bounds</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294922"></A>Whether to return the bounding edges of each faceset. (Default: PK_LOGICAL_false)</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422140_pgfId-294928"></A>	64.3.1 	<A NAME="50422140_53813"></A><A NAME="50422140_marker-294925"></A><A NAME="50422140_marker-294926"></A><A NAME="50422140_marker-294927"></A>Choosing which facesets to return </H3>
+<P>
+<A NAME="50422140_pgfId-294929"></A>You can use the <CODE>
+selector</CODE>
+ and <CODE>
+selecting_topol</CODE>
+ options to choose exactly which facesets are returned by <A HREF=../headers/pk_body_find_facesets.html>PK_BODY_find_facesets</A>.</P>
+<P>
+<A NAME="50422140_pgfId-294930"></A>The <CODE>
+selector</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422140_pgfId-294948"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294933"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294935"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294937"></A>PK_boolean_off_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294939"></A>Return all facesets defined by the supplied edges, regardless of the value of <CODE>
+selecting_topol</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294941"></A>PK_boolean_include_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294943"></A>Return only those facesets that include one or more of the topologies in <CODE>
+selecting_topol</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294945"></A>PK_boolean_exclude_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-294947"></A>Return only those facesets that do not include any of the topologies in <CODE>
+selecting_topol</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-294952"></A>This is illustrated in <A HREF="fd_chap.065.html#50422140_73636"><EM>
+Figure 64-1</EM></A>.</P>
+<P>
+<A NAME="50422140_pgfId-332406"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-725.gif">
+
+<P>
+<A NAME="50422140_pgfId-295071"></A>Figure 64-1 <A NAME="50422140_73636"></A>Choosing which facesets to return</P>
+<P>
+<A NAME="50422140_pgfId-295072"></A>If a given topology in <CODE>
+selecting_topol</CODE>
+ belongs to several facesets, then they are all selected or not selected, depending on the value of <CODE>
+selector</CODE>
+.</P>
+<P>
+<A NAME="50422140_pgfId-295079"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-295075"></A>Note: The above description applies only if <CODE>
+alternate</CODE>
+ is PK_LOGICAL_false (the default). <A HREF="fd_chap.065.html#50422140_19831">Section 64.3.2, “Returning alternating facesets”</A>, describes the behaviour of <CODE>
+selector</CODE>
+ and <CODE>
+selecting_topol</CODE>
+ when alternate is PK_LOGICAL_true.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422140_pgfId-295084"></A>	64.3.2 	<A NAME="50422140_19831"></A><A NAME="50422140_marker-295081"></A><A NAME="50422140_marker-295082"></A><A NAME="50422140_marker-295083"></A>Returning alternating facesets </H3>
+<P>
+<A NAME="50422140_pgfId-295085"></A>If the <CODE>
+alternate</CODE>
+ option is PK_LOGICAL_true, you can return alternate facesets in a body. The behaviour of this option depends on the value of <CODE>
+selector</CODE>
+, and requires that <CODE>
+selecting_topol</CODE>
+ contains a single topological entity, which is used to identify the “root” faceset in a body from which alternating facesets are calculated.</P>
+<P>
+<A NAME="50422140_pgfId-295089"></A>Consider the body shown in <A HREF="fd_chap.065.html#50422140_71586"><EM>
+Figure 64-2</EM></A>. The “root” faceset is the innermost faceset that contains the selecting topology. </P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-295090"></A>If <CODE>
+selector</CODE>
+ is PK_boolean_include_c, the “root” faceset is returned, the next outermost faceset is not returned, the next outermost faceset is returned, and so on.</LI>
+<LI>
+<A NAME="50422140_pgfId-295091"></A>If <CODE>
+selector</CODE>
+ is PK_boolean_exclude_c, the “root” faceset is <STRONG>
+not</STRONG> returned, the next outermost faceset <STRONG>
+is</STRONG> returned, the next outermost faceset is not returned, and so on.</LI>
+<LI>
+<A NAME="50422140_pgfId-295092"></A>If <CODE>
+selector</CODE>
+ is PK_boolean_off_c, all facesets are returned, regardless of the value of <CODE>
+alternate</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-342031"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-726.gif">
+
+<P>
+<A NAME="50422140_pgfId-295187"></A>Figure 64-2 <A NAME="50422140_71586"></A>Returning alternating facesets</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422140_pgfId-295192"></A>64.4	<A NAME="50422140_48639"></A><A NAME="50422140_marker-295189"></A><A NAME="50422140_marker-295190"></A><A NAME="50422140_marker-295191"></A>Identifying model details 
+
+
+</H1>
+<P>
+<A NAME="50422140_pgfId-295193"></A>You can use the function <A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A> to identify specific types of details in a body. The function returns each detail of a specified type as a faceset, which you might then delete from the model as described in <A HREF="fd_chap.065.html#50422140_47260">Section 64.8</A>.</P>
+<P>
+<A NAME="50422140_pgfId-477889"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-477914"></A>Note: This functionality supports models with a mixture of classic and facet geometry. However it will only identify details which are either classic holes or rubber faces.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-295197"></A><A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A> receives and returns the following arguments:</P>
+<P>
+<A NAME="50422140_pgfId-295225"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295200"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295202"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-295204"></A>body</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295206"></A>The body in which to identify details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-295208"></A>details</PRE>
+<PRE><A NAME="50422140_pgfId-295209"></A>n_details</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295211"></A>The types of detail you want to identify, together with the number of types of detail.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-295213"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295215"></A>A set of options</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-432314"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-432376"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-432378"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-432380"></A><CODE>
+results</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-432444"></A>The facesets identified, together with their detail types.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-295226"></A>You should delete any redundant topology before calling this function, using <A HREF=../headers/pk_topol_delete_redundant_2.html>PK_TOPOL_delete_redundant_2</A>. See <A HREF="fd_chap.034.html#50422104_40083">Section 33.1, “Introduction”</A>, for more information.</P>
+<P>
+<A NAME="50422140_pgfId-508300"></A>A code example illustrating feature recognition functionality can be found in the <CODE>
+C++\Code Examples\Inquiries\Model Analysis\Feature Recognition</CODE>
+ folder, located in the <CODE>
+example_applications</CODE>
+ folder in your Parasolid installation folder. </P>
+
+<H3>
+<A NAME="50422140_pgfId-295235"></A>	64.4.1 	<A NAME="50422140_27135"></A><A NAME="50422140_marker-508973"></A><A NAME="50422140_marker-508974"></A><A NAME="50422140_marker-508975"></A><A NAME="50422140_marker-508976"></A>Finding and returning detail types </H3>
+<P>
+<A NAME="50422140_pgfId-295236"></A>The types of detail that you can identify are shown in the table. <A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A> returns a <A HREF=../headers/pk_identify_details_r_t.html>PK_identify_details_r_t</A> structure that includes an array of identified <CODE>
+facesets</CODE>
+, together with an array of <CODE>
+details</CODE>
+. Each detail in the <CODE>
+details</CODE>
+ array describes the type of detail represented by the corresponding faceset in the <CODE>
+facesets</CODE>
+ array. The returned detail values may be any of the following:</P>
+<P>
+<A NAME="50422140_pgfId-295266"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295239"></A>Detail</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295241"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295243"></A><A HREF=../headers/pk_detail_t.html>PK_detail_any_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295245"></A>Detail is unspecified.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295247"></A><A HREF=../headers/pk_detail_t.html>PK_detail_rubber_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295249"></A>One or more connected rubber faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295251"></A><A HREF=../headers/pk_detail_t.html>PK_detail_hole_cyl_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295253"></A>Any cylindrical hole.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295255"></A><A HREF=../headers/pk_detail_t.html>PK_detail_hole_cyl_through_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295257"></A>A cylindrical hole with two open ends.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295259"></A><A HREF=../headers/pk_detail_t.html>PK_detail_hole_cyl_blind_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295261"></A>A cylindrical hole with one open end and one closed end.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295263"></A><A HREF=../headers/pk_detail_t.html>PK_detail_hole_cyl_closed_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295265"></A>A cylindrical hole with two closed ends (i.e. enclosing a cavity).</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-295267"></A>A cylindrical hole contains at least one face with the following restrictions:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-295268"></A>The face has a spun, ruled surface. </LI>
+<LI>
+<A NAME="50422140_pgfId-295269"></A>The face normal points inwards.</LI>
+<LI>
+<A NAME="50422140_pgfId-295270"></A>Either:</LI>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-295271"></A>the face has two loops of type PK_LOOP_type_winding_c, or </LI>
+<LI>
+<A NAME="50422140_pgfId-295272"></A>the face has one loop of type PK_LOOP_type_inner_sing_c and one loop of type PK_LOOP_type_outer_c. </LI>
+</UL>
+<LI>
+<A NAME="50422140_pgfId-295276"></A>The face may optionally be constrained to have a constant radius. See <A HREF="fd_chap.065.html#50422140_87488">Section 64.4.5</A></LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-295277"></A>A cylindrical hole may also have additional components, so long as each component consists of an additional face with two loops and a ruled surface. Additional components make it possible to identify cylindrical holes that contain countersinks and counterbores. </P>
+<P>
+<A NAME="50422140_pgfId-295278"></A>Hole components are only considered to belong to the same hole if their axes are co-axial. You can use two options in <A HREF=../headers/pk_body_identify_details_o_t.html>PK_BODY_identify_details_o_t</A> to control whether Parasolid considers hole components to be co-axial. Two components are considered to be co-axial:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-295282"></A>If their axes are separated by no more than <CODE>
+tolerance</CODE>
+.</LI>
+<LI>
+<A NAME="50422140_pgfId-295283"></A>If their axes are parallel to within <CODE>
+angle_tolerance</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-295287"></A>This is illustrated in <A HREF="fd_chap.065.html#50422140_52473"><EM>
+Figure 64-3</EM></A>.</P>
+<P>
+<A NAME="50422140_pgfId-333671"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-727.gif">
+
+<P>
+<A NAME="50422140_pgfId-295378"></A>Figure 64-3 <A NAME="50422140_52473"></A>Identifying co-axial hole components (viewed in cross-section)</P>
+<P>
+<A NAME="50422140_pgfId-295379"></A>Cylindrical holes can be closed by any face that has a ruled surface, in particular a plane or cone. They may also be closed by a blend face, such as a face with a spherical surface. </P>
+
+
+<H3>
+<A NAME="50422140_pgfId-295384"></A>	64.4.2 	<A NAME="50422140_16525"></A><A NAME="50422140_marker-295381"></A><A NAME="50422140_marker-295382"></A><A NAME="50422140_marker-295383"></A>Constraining the radius of a cylindrical hole </H3>
+<P>
+<A NAME="50422140_pgfId-295385"></A>You can use the <CODE>
+hole_cyl_radius</CODE>
+ option in <A HREF=../headers/pk_body_identify_details_o_t.html>PK_BODY_identify_details_o_t</A> to constrain <A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A> to only return cylindrical holes based on the size of the radius. See <A HREF="fd_chap.065.html#50422140_41047">Section 64.7, “Constraining identification of details”</A> for more information.</P>
+
+
+<H3>
+<A NAME="50422140_pgfId-295393"></A>	64.4.3 	<A NAME="50422140_12793"></A><A NAME="50422140_marker-295390"></A><A NAME="50422140_marker-295391"></A><A NAME="50422140_marker-295392"></A>Finding holes with blends </H3>
+<P>
+<A NAME="50422140_pgfId-295394"></A>You can use the <CODE>
+hole_blended</CODE>
+ and <CODE>
+hole_blend_radius</CODE>
+ options in <A HREF=../headers/pk_body_identify_details_o_t.html>PK_BODY_identify_details_o_t</A> to identify holes that include blend details. These options let you specify whether <A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A> should find holes that include blend faces, and to set constraints on the size of the blends in any holes that are identified.</P>
+<P>
+<A NAME="50422140_pgfId-295416"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295397"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295399"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-295401"></A>hole_blended</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295403"></A>Whether to include blend faces when identifying hole details. This can take the following values:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-295404"></A><A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_no_c</A> - do not include blend faces. This is the default.</LI>
+<LI>
+<A NAME="50422140_pgfId-295405"></A><A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_in_c</A> - only include blend faces whose overall radius (described below) satisfies the constraint specified by <CODE>
+hole_cyl_radius</CODE>
+.</LI>
+<LI>
+<A NAME="50422140_pgfId-295406"></A><A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_out_c</A> - include all blend faces, even if their overall radius (described below) does not satisfy the constraint specified by <CODE>
+hole_cyl_radius</CODE>
+.</LI>
+<LI>
+<A NAME="50422140_pgfId-295407"></A><A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_trimmed_in_c</A> - as for <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_in_c</A>, but also include trimmed blends.</LI>
+<LI>
+<A NAME="50422140_pgfId-295408"></A><A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_trimmed_out_c</A> - <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_out_c</A>, but also include trimmed blends.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-295410"></A>hole_blend_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295412"></A>A constraint further restricting which blend faces can be included when identifying holes. You must set this constraint if you want to identify holes that contain blends. See <A HREF="fd_chap.065.html#50422140_41047">Section 64.7, “Constraining identification of details”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-295417"></A>You should use the <CODE>
+hole_blended</CODE>
+ option to specify whether to include or exclude blends in holes from any cylindrical radius constraint you might have specified. For example, <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_in_c</A> lets you identify all holes of a certain radius, together with any blends that might form part of the hole, regardless of the size of the blend itself.</P>
+<P>
+<A NAME="50422140_pgfId-295421"></A>In <A HREF="fd_chap.065.html#50422140_26351"><EM>
+Figure 64-4</EM></A>, if <CODE>
+hole_blended</CODE>
+ is <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_in_c</A>, then:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-295422"></A>The blend faces are included in the hole if you specify a <CODE>
+hole_cyl_radius</CODE>
+ based on R (because R is the sum of the hole radius and the blend radius).</LI>
+<LI>
+<A NAME="50422140_pgfId-295423"></A>The blend faces are not included in the hole if you specify a <CODE>
+hole_cyl_radius</CODE>
+ based on r.</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-295424"></A>If <CODE>
+hole_blended</CODE>
+ is <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_out_c</A>, then the blend faces are included in the identified hole in either case.</P>
+<P>
+<A NAME="50422140_pgfId-334213"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-728.gif">
+
+<P>
+<A NAME="50422140_pgfId-295466"></A>Figure 64-4 <A NAME="50422140_26351"></A>Including blends in hole radius constraints</P>
+<P>
+<A NAME="50422140_pgfId-295467"></A>You can find holes containing trimmed blends in addition to other blend faces by setting <CODE>
+hole_blended</CODE>
+ to either <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_trimmed_in_c</A> or <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_trimmed_out_c</A>, as appropriate. A blend is considered to be trimmed when it does not meet at least one of its adjacent faces smoothly,. <A HREF="fd_chap.065.html#50422140_38869"><EM>
+Figure 64-5</EM></A> shows a hole that includes trimmed blend components.</P>
+<P>
+<A NAME="50422140_pgfId-334708"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-729.gif">
+
+<P>
+<A NAME="50422140_pgfId-295510"></A>Figure 64-5 <A NAME="50422140_38869"></A>Identifying holes that include trimmed blend components</P>
+<P>
+<A NAME="50422140_pgfId-295517"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-295516"></A>Note: As shown in <A HREF="fd_chap.065.html#50422140_38869"><EM>
+Figure 64-5</EM></A>, you can use <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_trimmed_in_c</A> or <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_trimmed_out_c</A> to identify blind holes with hemispherical end faces. However, such end faces do need to meet the other components of the hole smoothly. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-379457"></A>In cases where a hole does not enter a face at right angles, the blend spines of any associated blends are used when calculating whether the blends should be identified as part of the hole. This is shown in <A HREF="fd_chap.065.html#50422140_75261"><EM>
+Figure 64-6</EM></A>, where, if <CODE>
+hole_blended</CODE>
+ is <A HREF=../headers/pk_hole_blended_t.html>PK_hole_blended_in_c</A>, <CODE>
+hole_cyle_radius</CODE>
+ must be based on D/2.</P>
+<P>
+<A NAME="50422140_pgfId-379525"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-730.gif">
+
+<P>
+<A NAME="50422140_pgfId-379527"></A>Figure 64-6 <A NAME="50422140_75261"></A>Including blends based on the blend spine</P>
+
+
+<H3>
+<A NAME="50422140_pgfId-295589"></A>	64.4.4 	<A NAME="50422140_marker-295585"></A><A NAME="50422140_marker-295586"></A><A NAME="50422140_marker-295587"></A><A NAME="50422140_76396"></A>Finding drillable holes </H3>
+<P>
+<A NAME="50422140_pgfId-379673"></A>You can use the <CODE>
+hole_ortho</CODE>
+ option to find only holes that can be drilled. A drillable hole is defined as a hole containing components that are either spun about the axis of the hole, or orthogonal to the hole, as shown in <A HREF="fd_chap.065.html#50422140_51065"><EM>
+Figure 64-7</EM></A>. </P>
+<P>
+<A NAME="50422140_pgfId-379754"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-731.gif">
+
+<P>
+<A NAME="50422140_pgfId-379756"></A>Figure 64-7 <A NAME="50422140_51065"></A>Identifying drillable holes (viewed in cross-section)</P>
+<P>
+<A NAME="50422140_pgfId-295683"></A>The <CODE>
+hole_ortho</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422140_pgfId-295697"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295686"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295688"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295690"></A><A HREF=../headers/pk_hole_ortho_t.html>PK_hole_ortho_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295692"></A>Find both drillable and non-drillable holes. (Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295694"></A><A HREF=../headers/pk_hole_ortho_t.html>PK_hole_ortho_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295696"></A>Find only drillable holes. Holes that contain non-spun components that are not orthogonal to the axis are not returned.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-295698"></A>You can use the <CODE>
+angle_tolerance</CODE>
+ option to set tolerance information to control what is considered orthogonal.</P>
+
+
+<H3>
+<A NAME="50422140_pgfId-295703"></A>	64.4.5 	<A NAME="50422140_87488"></A><A NAME="50422140_marker-295700"></A><A NAME="50422140_marker-295701"></A><A NAME="50422140_marker-295702"></A>Finding holes with constant-radius components </H3>
+<P>
+<A NAME="50422140_pgfId-295704"></A>You can use the <CODE>
+hole_const_rad</CODE>
+ option to find only holes that contain a constant-radius component, as shown in <A HREF="fd_chap.065.html#50422140_28404"><EM>
+Figure 64-8</EM></A>.</P>
+<P>
+<A NAME="50422140_pgfId-336055"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-732.gif">
+
+<P>
+<A NAME="50422140_pgfId-295770"></A>Figure 64-8 <A NAME="50422140_28404"></A>Identifying holes with constant-radius components</P>
+<P>
+<A NAME="50422140_pgfId-295771"></A>The <CODE>
+hole_const_rad</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422140_pgfId-295785"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295774"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295776"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295778"></A><A HREF=../headers/pk_hole_const_rad_t.html>PK_hole_const_rad_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295780"></A>Find both holes that contain constant-radius components, and those that do not. (Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295782"></A><A HREF=../headers/pk_hole_const_rad_t.html>PK_hole_const_rad_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295784"></A>Find only holes containing at least one constant-radius component. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-295786"></A>You can use the <CODE>
+tolerance</CODE>
+ option to set tolerance information to control what is considered constant radius: the radii at each end of a hole component must differ by less than this value to be considered a constant-radius component.</P>
+
+
+<H3>
+<A NAME="50422140_pgfId-295788"></A>	64.4.6 	<A NAME="50422140_17289"></A>Finding perforated holes </H3>
+<P>
+<A NAME="50422140_pgfId-713582"></A>You can use the <CODE>
+hole_perforated</CODE>
+ option to also identify holes that contain perforations. A perforated hole is one which can contain inner boundaries of convex edges. Holes with perforations can be successfully identified, even if they contain redundant internal edges. <A HREF="fd_chap.065.html#50422140_44535"><EM>
+Figure 64-9</EM></A> illustrates the type of perforated holes that <A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A> can recognise.</P>
+<P>
+<A NAME="50422140_pgfId-725668"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-733.gif">
+
+<P>
+<A NAME="50422140_pgfId-728951"></A>Figure 64-9 <A NAME="50422140_44535"></A>Examples of holes with perforations that can be identified</P>
+<P>
+<A NAME="50422140_pgfId-683468"></A>The <CODE>
+hole_perforated</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422140_pgfId-295902"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295891"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295893"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295895"></A><A HREF=../headers/pk_detail_perforated_t.html>PK_detail_perforated_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295897"></A>Only identify holes with no perforations. (Default) </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295899"></A><A HREF=../headers/pk_detail_perforated_t.html>PK_detail_perforated_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295901"></A>Identify holes that contain perforations. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-683473"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-295905"></A>Note: If you set <CODE>
+hole_perforated</CODE>
+ to a non-default value, then <CODE>
+hole_ortho</CODE>
+ must be <A HREF=../headers/pk_hole_ortho_t.html>PK_hole_ortho_yes_c</A>. See <A HREF="fd_chap.065.html#50422140_76396">Section 64.4.4</A> for details.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422140_pgfId-295911"></A>	64.4.7 	<A NAME="50422140_16737"></A>Finding open holes </H3>
+<P>
+<A NAME="50422140_pgfId-683478"></A>You can use the <CODE>
+hole_open</CODE>
+ option to also identify holes that contain open components. A hole with an open component is one where the spun faces of the hole (ignoring the end face of a blind hole) do not form a closed ring. <A HREF="fd_chap.065.html#50422140_62606"><EM>
+Figure 64-10</EM></A> illustrates the type of open holes that <A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A> can recognise.</P>
+<P>
+<A NAME="50422140_pgfId-729104"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-734.gif">
+
+<P>
+<A NAME="50422140_pgfId-729133"></A>Figure 64-10 <A NAME="50422140_62606"></A>Examples of open holes that can be identified</P>
+<P>
+<A NAME="50422140_pgfId-295972"></A>As shown in the last example in <A HREF="fd_chap.065.html#50422140_62606"><EM>
+Figure 64-10</EM></A>, blends can be connected to any component of an open hole, and do not need to be spun. </P>
+<P>
+<A NAME="50422140_pgfId-295973"></A>The <CODE>
+hole_open</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422140_pgfId-295987"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295976"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295978"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295980"></A><A HREF=../headers/pk_detail_open_t.html>PK_detail_open_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295982"></A>Only identify holes that are not open. (Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295984"></A><A HREF=../headers/pk_detail_open_t.html>PK_detail_open_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-295986"></A>Identify open holes. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-692724"></A><A NAME="50422140_78235"></A><A NAME="50422140_marker-640264"></A><A NAME="50422140_marker-640265"></A><A NAME="50422140_marker-640266"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-295990"></A>Note: If you set <CODE>
+hole_open</CODE>
+ to a non-default value, then <CODE>
+hole_perforated</CODE>
+ must be <A HREF=../headers/pk_detail_perforated_t.html>PK_detail_perforated_yes_c</A>. See <A HREF="fd_chap.065.html#50422140_17289">Section 64.4.6</A> for details.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422140_pgfId-682802"></A>	64.4.8 	Update control</H3>
+<P>
+<A NAME="50422140_pgfId-446144"></A>If your application relies on reproducing behaviour when updating models created using earlier versions of Parasolid, you should use the <CODE>
+update</CODE>
+ option to preserve old behaviour and help eliminate differences in rebuild results. This option lets you disable some hole identification enhancements that have been added at different Parasolid versions. Doing this ensures that hole identification gives the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_hole_update_t.html>PK_hole_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<P>
+<A NAME="50422140_pgfId-447070"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-447076"></A>Note: The default value is <A HREF=../headers/pk_hole_update_t.html>PK_hole_update_default_c</A> which uses all appropriate hole identification enhancements. Setting to a non-default value disables all appropriate hole identification enhancements.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422140_pgfId-296028"></A>64.5	<A NAME="50422140_52112"></A><A NAME="50422140_marker-296025"></A><A NAME="50422140_marker-296026"></A><A NAME="50422140_marker-296027"></A>Identifying blends 
+
+
+</H1>
+<P>
+<A NAME="50422140_pgfId-296029"></A>You can use <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> to identify blends within a body. This function lets you specify a number of constraints to control the characteristics of the blend faces that are returned.</P>
+<P>
+<A NAME="50422140_pgfId-489069"></A><A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> identifies blend faces with manifold topology. The faces can be:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-489396"></A>Constant-radius blends with a rolling-ball cross-sectional plane. </LI>
+<LI>
+<A NAME="50422140_pgfId-493375"></A>‘Blend-like’ faces which represent a constant-radius rolling-ball blend within a specified tolerance. For example, B-surfaces, or even variable-radius rolling-ball blends whose radius only varies along the extent of the blend within a specified tolerance.</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-489310"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-489309"></A>Note: This functionality partially supports the identification of mesh blends.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-296033"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-472699"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-472680"></A><A HREF="fd_chap.064.html#50422139_50380">Section 63.6, “Deleting blend faces”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422140_pgfId-296037"></A>	64.5.1 	<A NAME="50422140_marker-296034"></A><A NAME="50422140_marker-296035"></A><A NAME="50422140_marker-296036"></A>Calling <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> </H3>
+<P>
+<A NAME="50422140_pgfId-420743"></A><A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> receives and returns the following arguments:</P>
+<P>
+<A NAME="50422140_pgfId-420777"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-420746"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-420748"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-420750"></A>n_faces</PRE>
+<PRE><A NAME="50422140_pgfId-420751"></A>faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-420753"></A>The number of faces from which to search for blends, and the faces themselves.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-420755"></A>ident_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-420759"></A>How to identify blends from the supplied <CODE>
+faces</CODE>
+. See <A HREF="fd_chap.065.html#50422140_92080">Section 64.5.2, “Choosing how to identify blends”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-420762"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-420764"></A>A set of options. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-420778"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-420795"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-420797"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-420799"></A>results</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-420801"></A>A return structure containing details about the blend facesets identified from the supplied <CODE>
+faces</CODE>
+. This may include information about the radii and convexity of the blends. See <A HREF="fd_chap.065.html#50422140_45192">Section 64.5.9, “Returned information”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-420785"></A>The <A HREF=../headers/pk_face_identify_blends_o_t.html>PK_FACE_identify_blends_o_t</A> options structure contains the following fields:</P>
+<P>
+<A NAME="50422140_pgfId-296152"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296076"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296078"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296080"></A>limit_radii</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296084"></A>Control which blends are returned based on their radii. See <A HREF="fd_chap.065.html#50422140_71735">Section 64.5.4, “Identifying blends based on radius”</A> for information. Default: Return all identified blends, regardless of size.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296087"></A>convexity</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296091"></A>Control which blends are returned based on their convexity. See <A HREF="fd_chap.065.html#50422140_81346">Section 64.5.5, “Identifying blends based on convexity”</A> for information. Default: Return all identified blends, regardless of convexity.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296094"></A>allow_pi</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296099"></A>Control whether to identify blends that span pi radians. See <A HREF="fd_chap.065.html#50422140_53812">Section 64.5.6, “Identifying blends based on span”</A>, for information. Default: identify blends that span pi radians.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296102"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296104"></A>A tolerance. This is used when checking the constraints specified by <CODE>
+limit_radii</CODE>
+, and when classifying supplied faces as blends. Default: 1.0e-6.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296106"></A>want_radii</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296110"></A>Whether to return the radius of each identified chain of blends. See <A HREF="fd_chap.065.html#50422140_45192">Section 64.5.9, “Returned information”</A> for information. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296113"></A>want_convexities</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296115"></A>Whether to return the convexity of each identified chain of blends. See <A HREF="fd_chap.065.html#50422140_45192">Section 64.5.9, “Returned information”</A> for information. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296120"></A>follow_branch</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296122"></A>Whether to limit propagation of blend chains at branch faces to the supplied faces. See <A HREF="fd_chap.065.html#50422140_92080">Section 64.5.2, “Choosing how to identify blends”</A>, for information. Default: <A HREF=../headers/pk_blend_follow_branch_t.html>PK_blend_follow_branch_yes_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296127"></A>propagation_angle</PRE>
+<PRE><A NAME="50422140_pgfId-296128"></A>have_propagation_angle</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296132"></A>Whether to propagate blend chains across sharp edges. See <A HREF="fd_chap.065.html#50422140_48818">Section 64.5.3, “Propagating across sharp edges”</A>, for information. Default: propagate across all sharp edges.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296135"></A>optimise_chains</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296139"></A>Whether the blend chains are to be post-processed. See <A HREF="fd_chap.065.html#50422140_11298">Section 64.5.10, “Optimising identified blend chains for subsequent operations”</A>, for information. Default: <A HREF=../headers/pk_chain_optimise_t.html>PK_chain_optimise_none_c</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296142"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296144"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422140_pgfId-296151"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-421141"></A>report_blends</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-421143"></A>Whether to generate a Parasolid Report for blend faces that have been identified. See <A HREF="fd_chap.065.html#50422140_38242">Section 64.5.8, “Reporting identified blend faces”</A>, for more information. </P>
+<P>
+<A NAME="50422140_pgfId-421329"></A>Default: <A HREF=../headers/pk_blend_report_blends_t.html>PK_blend_report_blends_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-421167"></A>distant_unders</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-421169"></A>Whether to identify blend faces with non-adjacent underlying faces. See <A HREF="fd_chap.065.html#50422140_60128">Section 64.5.7, “Identifying blend faces with non-adjacent underlying faces”</A>, for more information. </P>
+<P>
+<A NAME="50422140_pgfId-421471"></A>Default: <A HREF=../headers/pk_blend_distant_unders_t.html>PK_blend_distant_unders_no_c</A>.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422140_pgfId-296157"></A>	64.5.2 	<A NAME="50422140_92080"></A><A NAME="50422140_marker-296154"></A><A NAME="50422140_marker-296155"></A><A NAME="50422140_marker-296156"></A>Choosing how to identify blends </H3>
+<P>
+<A NAME="50422140_pgfId-296158"></A><A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> works by identifying and returning chains of connected blend faces. For each blend face in the supplied <CODE>
+faces</CODE>
+, <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> can find other blend faces that are connected to it (whether or not they are in <CODE>
+faces</CODE>
+). </P>
+<P>
+<A NAME="50422140_pgfId-296159"></A>In a chain of blends, a <STRONG>
+branch face</STRONG> is a blend face that splits the chain into two or more branches.</P>
+<P>
+<A NAME="50422140_pgfId-296160"></A>You use the <CODE>
+ident_type</CODE>
+ argument of <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> to control how chains of blends are returned, with respect to the branch faces in the chain and the supplied <CODE>
+faces</CODE>
+. This can take one of the following values:</P>
+<P>
+<A NAME="50422140_pgfId-296187"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296163"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296165"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296167"></A><A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_within_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296169"></A>Only return chains of blends that are contained in the supplied <CODE>
+faces</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296171"></A><A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_exc_chain_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296173"></A>Return a minimal chain of connected blends, excluding branch faces. This option looks for chains of blends starting from the supplied faces. If a branch face is identified outside the specified <CODE>
+faces</CODE>
+, the chain stops, and the branch face itself is not included in the returned blends.</P>
+<P>
+<A NAME="50422140_pgfId-296174"></A>Branch faces that lie in the supplied <CODE>
+faces</CODE>
+ are returned.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296176"></A><A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_inc_chain_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296178"></A>This is the same as <A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_exc_chain_c</A>, except that branch faces outside the specified faces are also included in the returned blends.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296180"></A><A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_max_chain_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296182"></A>Return a maximal chain of blends. This option makes the chains as long as possible. If a branch face is identified, it is included in the returned blend faces, and the function continues the chain of blends along each branch.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296184"></A><A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_dependent_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296186"></A>Return chains of blends that are not within the supplied <CODE>
+faces</CODE>
+, but are dependent on one or more of them. Dependent blends are identified recursively, so for instance blends that are dependent on blends that are dependent on the supplied <CODE>
+faces</CODE>
+ are returned.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-296191"></A>The difference between these values is illustrated in <A HREF="fd_chap.065.html#50422140_91313"><EM>
+Figure 64-11</EM></A>. Note in particular the difference between <A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_inc_chain_c</A>, which returns branch faces that are not in the supplied <CODE>
+faces</CODE>
+, and <A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_exc_chain_c</A>, which only returns branch faces if they are in the supplied <CODE>
+faces</CODE>
+.</P>
+<P>
+<A NAME="50422140_pgfId-296227"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-735.gif">
+
+<P>
+<A NAME="50422140_pgfId-296229"></A>Figure 64-11 <A NAME="50422140_91313"></A>Choosing how to identify blends in the supplied set of faces</P>
+<P>
+<A NAME="50422140_pgfId-296230"></A>If you are returning a minimal chain of connected blends using either <A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_inc_chain_c</A> or <A HREF=../headers/pk_blend_identify_t.html>PK_blend_identify_exc_chain_c</A>, you can control the results returned even further using the <CODE>
+follow_branch</CODE>
+ option. This option lets you control how the chain of blends propagates from branch faces, depending on whether or not you have supplied faces adjacent to those branch faces in the call to <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A>. <A HREF="fd_chap.065.html#50422140_64162"><EM>
+Figure 64-12</EM></A> illustrates the behaviour of this option:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-296234"></A>By default, chains are propagated at branch faces to include blend faces that are not supplied in the call to <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A>.</LI>
+<LI>
+<A NAME="50422140_pgfId-296235"></A>By setting <CODE>
+follow_branch</CODE>
+ to <A HREF=../headers/pk_blend_follow_branch_t.html>PK_blend_follow_branch_no_c</A>, chains are only propagated at branch faces if no faces adjacent to those branches have been supplied. If an adjacent face has been supplied (as in <A HREF="fd_chap.065.html#50422140_64162"><EM>
+Figure 64-12</EM></A>), then propagation at the branch face is limited to the faces supplied to <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A>.</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-296272"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-736.gif">
+
+<P>
+<A NAME="50422140_pgfId-296274"></A>Figure 64-12 <A NAME="50422140_64162"></A>Choosing whether to follow branches when returning a minimal chain of connected blends</P>
+
+
+<H3>
+<A NAME="50422140_pgfId-296276"></A>	64.5.3 	<A NAME="50422140_48818"></A>Propagating across sharp edges </H3>
+<P>
+<A NAME="50422140_pgfId-296277"></A>By default, blend chains propagate across any sharp edges. You can control this, either by prohibiting propagation across sharp edges entirely, or by limiting the angle at which an edge is considered to be sharp. To do this, set <CODE>
+have_propagation_angle</CODE>
+ to PK_LOGICAL_true and specify the largest angle across which you want propagation to flow using the <CODE>
+propagation_angle</CODE>
+ option. </P>
+<P>
+<A NAME="50422140_pgfId-296281"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-296280"></A>Note: To prohibit propagation across sharp edges entirely, set <CODE>
+propagation_angle</CODE>
+ to 0 and <CODE>
+have_propagation_angle</CODE>
+ to PK_LOGICAL_true.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422140_pgfId-296285"></A>	64.5.4 	<A NAME="50422140_71735"></A><A NAME="50422140_marker-296283"></A><A NAME="50422140_marker-296284"></A>Identifying blends based on radius </H3>
+<P>
+<A NAME="50422140_pgfId-296286"></A><A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> lets you control whether or not a given chain of blends is returned based on its radius. These controls are available in the <CODE>
+limit_radii</CODE>
+ field of <A HREF=../headers/pk_face_identify_blends_o_t.html>PK_FACE_identify_blends_o_t</A>. See <A HREF="fd_chap.065.html#50422140_41047">Section 64.7, “Constraining identification of details”</A>, for more details. </P>
+<P>
+<A NAME="50422140_pgfId-296293"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-296292"></A>Note: <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> only finds blends with a constant radius. It cannot be used to identify any blend whose radius varies by more than the <CODE>
+tolerance</CODE>
+ specified in the options structure.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422140_pgfId-296298"></A>	64.5.5 	<A NAME="50422140_81346"></A><A NAME="50422140_marker-296295"></A><A NAME="50422140_marker-296296"></A><A NAME="50422140_marker-296297"></A>Identifying blends based on convexity </H3>
+<P>
+<A NAME="50422140_pgfId-296299"></A>You can use the <CODE>
+convexity</CODE>
+ field in <A HREF=../headers/pk_face_identify_blends_o_t.html>PK_FACE_identify_blends_o_t</A> to ensure that only chains of blends with a particular convexity are returned. This can take the following values:</P>
+<P>
+<A NAME="50422140_pgfId-296317"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296302"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296304"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296306"></A><A HREF=../headers/pk_blend_convexity_t.html>PK_blend_convexity_any_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296308"></A>Any convexity</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296310"></A><A HREF=../headers/pk_blend_convexity_t.html>PK_blend_convexity_concave_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296312"></A>Concave</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296314"></A><A HREF=../headers/pk_blend_convexity_t.html>PK_blend_convexity_convex_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296316"></A>Convex</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-296318"></A>A concave blend is a blend in which the normals of the adjacent faces point in towards each other.</LI>
+<LI>
+<A NAME="50422140_pgfId-296319"></A>A convex blend is a blend in which the normals of the adjacent faces point away from each other. </LI>
+</UL>
+
+
+<H3>
+<A NAME="50422140_pgfId-296321"></A>	64.5.6 	<A NAME="50422140_53812"></A>Identifying blends based on span </H3>
+<P>
+<A NAME="50422140_pgfId-296322"></A>By default, <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> returns faces that are blend-like and span pi radians. You can use the <CODE>
+allow_pi</CODE>
+ option in <A HREF=../headers/pk_face_identify_blends_o_t.html>PK_FACE_identify_blends_o_t</A> to switch off this behaviour. In <A HREF="fd_chap.065.html#50422140_73029"><EM>
+Figure 64-13</EM></A>, the blend-like faces shown in red are returned by default, but are not returned if <CODE>
+allow_pi</CODE>
+ is set to PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422140_pgfId-296329"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-737.gif">
+
+<P>
+<A NAME="50422140_pgfId-395142"></A>Figure 64-13 <A NAME="50422140_73029"></A>Controlling the identification of blend-like faces that span pi radians</P>
+
+
+<H3>
+<A NAME="50422140_pgfId-399230"></A>	64.5.7 	<A NAME="50422140_60128"></A>Identifying blend faces with non-adjacent underlying faces </H3>
+<P>
+<A NAME="50422140_pgfId-399231"></A>You can identify blend faces with non-adjacent underlying faces using the <CODE>
+distant_unders</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422140_pgfId-395634"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-395623"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-395625"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-395627"></A><A HREF=../headers/pk_blend_distant_unders_t.html>PK_blend_distant_unders_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-395629"></A>Identify blend faces with non-adjacent underlying faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-395631"></A><A HREF=../headers/pk_blend_distant_unders_t.html>PK_blend_distant_unders_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-395633"></A>Do not identify blend faces with non-adjacent underlying faces (Default).</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-427257"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-427270"></A>Note: Blend faces with non-adjacent underlying faces will only be correctly identified if there is also at least one adjacent underlying face.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-424200"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-738.gif">
+
+<P>
+<A NAME="50422140_pgfId-423645"></A>Figure 64-14 Identifying blend faces with non-adjacent underlying faces </P>
+
+
+<H3>
+<A NAME="50422140_pgfId-436493"></A>	64.5.8 	<A NAME="50422140_38242"></A>Reporting identified blend faces </H3>
+<P>
+<A NAME="50422140_pgfId-436497"></A>You can use the <CODE>
+report_blends</CODE>
+ option to control whether to generate a Parasolid Report for blend faces that have been identified, even if it they do not have underlying faces. It takes the following values:</P>
+<P>
+<A NAME="50422140_pgfId-436517"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-436500"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-436502"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-436504"></A><A HREF=../headers/pk_blend_report_blends_t.html>PK_blend_report_blends_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-436509"></A>A Parasolid Report of type <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_3_c</A> is generated indicating which blend faces have been identified and their underlying faces if present.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-436511"></A><A HREF=../headers/pk_blend_report_blends_t.html>PK_blend_report_blends_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-436516"></A>A Parasolid Report will not be generated. (Default)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-437056"></A>This report contains additional information for blend faces to that returned in the <A HREF=../headers/pk_face_identify_blends_r_t.html>PK_FACE_identify_blends_r_t</A> return structure. See <A HREF="fd_chap.065.html#50422140_45192">Section 64.5.9, “Returned information”</A>, for more information. </P>
+<P>
+<A NAME="50422140_pgfId-437034"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid Report mechanism.</P>
+
+
+<H3>
+<A NAME="50422140_pgfId-423654"></A>	64.5.9 	<A NAME="50422140_45192"></A><A NAME="50422140_marker-423651"></A><A NAME="50422140_marker-423652"></A><A NAME="50422140_marker-423653"></A>Returned information </H3>
+<P>
+<A NAME="50422140_pgfId-296337"></A>You can control the information that <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> returns using the <CODE>
+want_radii</CODE>
+ and <CODE>
+want_convexities</CODE>
+ fields in <A HREF=../headers/pk_face_identify_blends_o_t.html>PK_FACE_identify_blends_o_t</A>. </P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-296338"></A>If <CODE>
+want_radii</CODE>
+ is PK_LOGICAL_true, then the radius of each blend returned by <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> is returned. </LI>
+<LI>
+<A NAME="50422140_pgfId-296339"></A>If <CODE>
+want_convexities</CODE>
+ is PK_LOGICAL_true, then the convexity of each blend returned by <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> is returned</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-436944"></A>In each case, the information is returned in the <A HREF=../headers/pk_face_identify_blends_r_t.html>PK_FACE_identify_blends_r_t</A> return structure as an array parallel to the <CODE>
+blend_facesets</CODE>
+ array. </P>
+
+
+<H3>
+<A NAME="50422140_pgfId-436979"></A>	64.5.10 	<A NAME="50422140_11298"></A>Optimising identified blend chains for subsequent operations </H3>
+<P>
+<A NAME="50422140_pgfId-296343"></A>You can control whether blend chains are post-processed using the <CODE>
+optimise_chains</CODE>
+ option. This has the following values:</P>
+<P>
+<A NAME="50422140_pgfId-296357"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296346"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296348"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296350"></A><A HREF=../headers/pk_chain_optimise_t.html>PK_chain_optimise_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296352"></A>No post-processing. Default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296354"></A><A HREF=../headers/pk_chain_optimise_t.html>PK_chain_optimise_for_reblend_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296356"></A>Blend chains identified and processed to support reblending operations. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422140_pgfId-296359"></A>64.6	<A NAME="50422140_85923"></A>Identifying the faces underlying a blend 
+
+
+</H1>
+<P>
+<A NAME="50422140_pgfId-296360"></A>You can use <A HREF=../headers/pk_face_find_blend_unders.html>PK_FACE_find_blend_unders</A> to identify the faces underlying a given constant radius blend face. This function receives a blend face (as identified by <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A>) and, optionally, a tolerance, and returns the array of faces that underlie the blend. </P>
+<P>
+<A NAME="50422140_pgfId-478161"></A>&nbsp;</P>
+<P>
+<A NAME="50422140_pgfId-296364"></A><A HREF="fd_chap.065.html#50422140_95411"><EM>
+Figure 64-15</EM></A> shows several blends (shown in red), together with the underlying faces that are returned by <A HREF=../headers/pk_face_find_blend_unders.html>PK_FACE_find_blend_unders</A> (shown in blue).</P>
+<P>
+<A NAME="50422140_pgfId-350521"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-739.gif">
+
+<P>
+<A NAME="50422140_pgfId-296404"></A>Figure 64-15 <A NAME="50422140_95411"></A>Finding the faces that underlie a blend</P>
+<P>
+<A NAME="50422140_pgfId-296405"></A><A HREF=../headers/pk_face_find_blend_unders.html>PK_FACE_find_blend_unders</A> takes the following options:</P>
+<P>
+<A NAME="50422140_pgfId-296426"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296408"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296410"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296412"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296414"></A>The tolerance used to identify the received <CODE>
+face</CODE>
+ as a blend. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296416"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296418"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422140_pgfId-296425"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422140_pgfId-296432"></A>64.7	<A NAME="50422140_41047"></A><A NAME="50422140_marker-296428"></A><A NAME="50422140_marker-296429"></A><A NAME="50422140_marker-296430"></A><A NAME="50422140_marker-296431"></A>Constraining identification of details 
+
+
+</H1>
+<P>
+<A NAME="50422140_pgfId-296433"></A><A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A> and <A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A> contain powerful options to let you control whether or not a given detail is returned based on its radius. These controls are available in the following options:</P>
+<P>
+<A NAME="50422140_pgfId-296459"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296436"></A>Structure</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296438"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296440"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296442"></A><A HREF=../headers/pk_face_identify_blends_o_t.html>PK_FACE_identify_blends_o_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296444"></A>limit_radii</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296446"></A>Return blends with constrained radius.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296448"></A><A HREF=../headers/pk_body_identify_details_o_t.html>PK_BODY_identify_details_o_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296450"></A>hole_cyl_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296452"></A>Return holes with constrained radius.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296454"></A><A HREF=../headers/pk_body_identify_details_o_t.html>PK_BODY_identify_details_o_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296456"></A>hole_blend_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296458"></A>Return blends in holes with a constrained blend radius.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-296460"></A>Each of these options is a <A HREF=../headers/pk_double_constraint_t.html>PK_double_constraint_t</A> structure that contains two elements:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-296461"></A>An <CODE>
+interval</CODE>
+ containing a low and a high value.</LI>
+<LI>
+<A NAME="50422140_pgfId-296462"></A>A comparison operator that describes how an identified detail may be accepted or rejected based on comparing a value derived from that detail and the given <CODE>
+interval</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-296463"></A>When the function finds a detail (for example, a hole), the radius of that detail is tested using the supplied <CODE>
+interval</CODE>
+ and <CODE>
+comparison</CODE>
+. If the result of this comparison is true, then the function returns the detail. If the result is false, then the detail is not returned.</P>
+<P>
+<A NAME="50422140_pgfId-296464"></A>The comparison operations available are as follows:</P>
+<P>
+<A NAME="50422140_pgfId-296498"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296467"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296469"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296471"></A><A HREF=../headers/pk_comparison_t.html>PK_comparison_always_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296473"></A>Always return the detail, regardless of its radius.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296475"></A><A HREF=../headers/pk_comparison_t.html>PK_comparison_less_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296477"></A>Return the detail if its radius is less than or equal to the low value. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296479"></A><A HREF=../headers/pk_comparison_t.html>PK_comparison_equal_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296481"></A>Return the detail if its radius is equal to the low value. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296483"></A><A HREF=../headers/pk_comparison_t.html>PK_comparison_greater_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296485"></A>Return the detail if its radius is greater than or equal to the high value.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296487"></A><A HREF=../headers/pk_comparison_t.html>PK_comparison_between_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296489"></A>Return the detail if its radius is between or equal to the low value and the high value. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296491"></A><A HREF=../headers/pk_comparison_t.html>PK_comparison_outside_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296493"></A>Return the detail if its radius is outside the specified range, i.e. it is greater than or equal to the high value, or less than or equal to the low value. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296495"></A><A HREF=../headers/pk_comparison_t.html>PK_comparison_never_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296497"></A>Never return the detail, regardless of its radius.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-478287"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-296501"></A>Note: If the <CODE>
+details</CODE>
+ supplied to <A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A> includes <A HREF=../headers/pk_detail_t.html>PK_detail_hole_cyl_c</A>, then you must change the default setting for <CODE>
+hole_cyl_radius</CODE>
+ in order to identify any cylindrical holes. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-296502"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-478313"></A>Note: This functionality does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422140_pgfId-296896"></A>64.8	<A NAME="50422140_47260"></A><A NAME="50422140_marker-296504"></A><A NAME="50422140_marker-296505"></A><A NAME="50422140_65738"></A><A NAME="50422140_marker-296893"></A><A NAME="50422140_marker-296894"></A><A NAME="50422140_marker-296895"></A>Classifying model details 
+
+
+</H1>
+<P>
+<A NAME="50422140_pgfId-296897"></A>You can use <A HREF=../headers/pk_face_classify_details.html>PK_FACE_classify_details</A> to classify facesets according to the type of detail they represent. This function receives and returns the following arguments:</P>
+<P>
+<A NAME="50422140_pgfId-478385"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296900"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296902"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296904"></A>n_facesets</PRE>
+<PRE><A NAME="50422140_pgfId-296905"></A>facesets</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296907"></A>An array of facesets that you want to classify in terms of detail types.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296909"></A>details</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296911"></A>An array of detail types by which to classify the given facesets. There should be one detail for each faceset provided. You can choose to classify the following detail types:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-296912"></A>Through-holes only </LI>
+<LI>
+<A NAME="50422140_pgfId-296913"></A>Blind holes only </LI>
+<LI>
+<A NAME="50422140_pgfId-296914"></A>Both through-holes and blind holes</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296916"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296921"></A>An options structure. See <A HREF="fd_chap.065.html#50422140_83405">Section 64.8.1</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296924"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296926"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296928"></A>results</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296930"></A>A structure containing an array of detail definitions that contain the following information:</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-296931"></A>A <CODE>
+detail_type</CODE>
+ describing a classified detail</LI>
+<LI>
+<A NAME="50422140_pgfId-296932"></A>The faces belonging to that <CODE>
+detail_type</CODE>
+</LI>
+<LI>
+<A NAME="50422140_pgfId-296933"></A>A structure providing classification data for the <CODE>
+detail_type</CODE>
+</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-296937"></A>See <A HREF="fd_chap.065.html#50422140_59057">Section 64.8.2</A>. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-296938"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422140_pgfId-478401"></A>Note: This functionality does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422140_pgfId-296942"></A>	64.8.1 	<A NAME="50422140_83405"></A><A NAME="50422140_marker-296940"></A><A NAME="50422140_marker-296941"></A>Options for classifying details </H3>
+<P>
+<A NAME="50422140_pgfId-296943"></A>The <A HREF=../headers/pk_face_classify_details_o_t.html>PK_FACE_classify_details_o_t</A> options structure contains a <CODE>
+hole</CODE>
+ sub-structure that contains options to control how holes are classified. The <CODE>
+hole</CODE>
+ sub-structure contains the following options:</P>
+<P>
+<A NAME="50422140_pgfId-296993"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296946"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296948"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296950"></A>up</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296952"></A>For through-holes, this option specifies a vector that determines at which end of the through-hole to place the hole’s <CODE>
+origin</CODE>
+. Default: (0 0 1), which means that the origin of a through-hole is placed at the end whose position has the largest Z component. For horizontal though holes (i.e. those with a 0 Z component), the end that the origin is placed is arbitrary, unless you specify a non-default value for <CODE>
+up</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296954"></A>include_zero_depth</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296956"></A>Whether to include zero-depth components (i.e. components that are orthogonal to the hole’s axis) in hole components. This setting has no effect on the <CODE>
+faces</CODE>
+ returned (in <CODE>
+detail_defs</CODE>
+), but if PK_LOGICAL_false, zero-depth components are not returned in the <CODE>
+components</CODE>
+ array of <CODE>
+detail_defs</CODE>
+. Default: PK_LOGICAL_true.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296958"></A>want_profiles</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296960"></A>Whether to return a profile for each hole component in the <CODE>
+profile</CODE>
+ return sub-structure.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296962"></A>simplify_geom</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296964"></A>Whether to return original geometry or simplified geometry in the <CODE>
+components</CODE>
+ return array.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296966"></A>cb</PRE>
+<PRE><A NAME="50422140_pgfId-296967"></A>cb_context</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296969"></A><A HREF=../headers/pk_face_classify_details.html>PK_FACE_classify_details</A> provides support for callback functions so that you can return arbitrary information for each detail classified. This support is provided via the <CODE>
+cb</CODE>
+ and <CODE>
+cb_context</CODE>
+ options, and the <CODE>
+cb_result</CODE>
+ field of the return structure.</P>
+<UL>
+<LI>
+<A NAME="50422140_pgfId-296970"></A><CODE>
+cb</CODE>
+ contains a function definition that is called for each hole recognised. The function should return an integer result, which Parasolid places in the <CODE>
+cb_result</CODE>
+ field of the return structure.</LI>
+<LI>
+<A NAME="50422140_pgfId-296974"></A><CODE>
+cb_context</CODE>
+ contains any contextual information from your application to be used in the call to the function defined in <CODE>
+cb</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422140_pgfId-296975"></A>You can use this callback functionality for any purpose you wish. A typical use would be to implement a system to automatically classify holes into the different types defined by your application, based on the components they contain.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-296977"></A>face_tracking</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-296979"></A>Whether to track the faces that comprise hole components, in addition to surfaces.</P>
+<P>
+<A NAME="50422140_pgfId-296983"></A>By default, Parasolid only returns information about the surface that forms a hole component. This surface is returned by <A HREF=../headers/pk_face_classify_details.html>PK_FACE_classify_details</A> in the <CODE>
+entity</CODE>
+ field of the <CODE>
+components</CODE>
+ sub-structure that forms part of the results returned by the function (see <A HREF="fd_chap.065.html#50422140_59057">Section 64.8.2, “Classification details returned”</A>). </P>
+<P>
+<A NAME="50422140_pgfId-296987"></A>If <CODE>
+face_tracking</CODE>
+ is PK_LOGICAL_true, <CODE>
+entity</CODE>
+ contains groups instead of surfaces. Each group contains a surface, together with all the faces that make up that hole component. See <A HREF="fd_chap.099.html#50422178_36760">Chapter 98, “Groups”</A>, for details.</P>
+<UL>
+<ADDRESS>
+<A NAME="50422140_pgfId-296991"></A>Performance issue: In order to conserve memory, your application must delete these groups when the returned information is no longer needed. Existing groups are not reused if you call <A HREF=../headers/pk_face_classify_details.html>PK_FACE_classify_details</A> again before deleting the groups that have already been created. </ADDRESS><BR>
+</UL>
+<P>
+<A NAME="50422140_pgfId-296992"></A>The default is PK_LOGICAL_false.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422140_pgfId-296999"></A>	64.8.2 	<A NAME="50422140_59057"></A><A NAME="50422140_marker-296995"></A><A NAME="50422140_marker-296996"></A><A NAME="50422140_marker-296997"></A><A NAME="50422140_marker-296998"></A>Classification details returned </H3>
+<P>
+<A NAME="50422140_pgfId-297000"></A><A HREF=../headers/pk_face_classify_details.html>PK_FACE_classify_details</A> returns a <CODE>
+detail_defs</CODE>
+ structure that maps each <CODE>
+detail_type</CODE>
+ found to the <CODE>
+faces</CODE>
+ that comprise that detail, and a sub-structure that contains data about each detail. </P>
+<P>
+<A NAME="50422140_pgfId-297001"></A>The <CODE>
+hole</CODE>
+ sub-structure is used to return data about each hole detail classified, and includes the following information:</P>
+<P>
+<A NAME="50422140_pgfId-368332"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-368300"></A>Detail</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-368302"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-368304"></A>origin</PRE>
+<PRE><A NAME="50422140_pgfId-368305"></A>total_depth</PRE>
+<PRE><A NAME="50422140_pgfId-368306"></A>smallest_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-368308"></A>The origin (i.e. the position and orientation) of the hole detail described as an AXIS2 standard form, together with the total depth of all components in the hole, and the smallest radius of any of its components. The smallest radius is intended to represent the smallest drill size required for the hole: it therefore ignores the face that closes a hole, and it ignores any bottom blend in a closed hole. See <A HREF="fd_chap.065.html#50422140_23392"><EM>
+Figure 64-16</EM></A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-368313"></A>profile</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-368315"></A>If <CODE>
+want_profiles</CODE>
+ is PK_LOGICAL_true, this contains a profile for the hole. This consists of a wire body that, when spun about the hole’s <CODE>
+axis</CODE>
+, produces the shape of the hole. See <A HREF="fd_chap.065.html#50422140_23392"><EM>
+Figure 64-16</EM></A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-368320"></A>cb_result</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-368322"></A>The integer return value of any callback function specified in <CODE>
+cb</CODE>
+. You might use this value, for example, to classify a hole detail in terms of a classification system used by your application.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422140_pgfId-368324"></A>n_components</PRE>
+<PRE><A NAME="50422140_pgfId-368325"></A>components</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422140_pgfId-368327"></A>The number of components in the hole detail, together with a structure that describes each component in terms of its type, depth, and a data parameter and entity associated with the component. See the documentation for <A HREF=../headers/pk_hole_comp_t.html>PK_hole_comp_t</A> for details about the data parameter and entity associated with each type of hole component.</P>
+<P>
+<A NAME="50422140_pgfId-368331"></A><A HREF="fd_chap.065.html#50422140_23392"><EM>
+Figure 64-16</EM></A> shows an imaginary hole that illustrates all the hole component types that can be classified.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422140_pgfId-368584"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-740.gif">
+
+<P>
+<A NAME="50422140_pgfId-297333"></A>Figure 64-16 <A NAME="50422140_23392"></A>Classifications of hole components</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.064.html">Deleting Entities </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.066.html">Replacing The Surfaces Of Faces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

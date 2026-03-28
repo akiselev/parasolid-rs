@@ -1,0 +1,827 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Signal Handling</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Signal Handling</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.121.html">Error Handling </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.123.html">System Attribute Definitions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-318697">121.1	Introduction </A>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-294740">121.2	Parasolid concepts relating to signals </A>
+<UL>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-294742">121.2.1	State of the code in execution </A>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-294762">121.2.2	Parasolid functions used for signal handling </A>
+</UL>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-294820">121.3	Designing and registering signal handlers </A>
+<UL>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-294822">121.3.1	Registering signal handlers </A>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-294860">121.3.2	Run-time errors </A>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-294901">121.3.3	User interrupts </A>
+</UL>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-318046">121.4	How Parasolid deals with signals </A>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-295034">121.5	Summary of signal handling </A>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-295289">121.6	Re-entrant function calls </A>
+<UL>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-295345">121.6.1	Run-time errors </A>
+<LI> <A HREF="fd_chap.122.html#50422204_pgfId-295347">121.6.2	User interrupts </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422204_pgfId-318697"></A>121.1	<A NAME="50422204_14836"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422204_pgfId-294725"></A>This chapter describes how to handle signals that are caught by the operating system: specifically run-time errors (e.g., access violations, floating-point errors or illegal instructions) and user interrupts. For example, the application might encounter a division-by-zero, or the user may press Ctrl+C while the application is running. You may elect to ignore these if you wish, in which case they will be handled by the operating system. This can lead to the immediate termination of your application, however.</P>
+<P>
+<A NAME="50422204_pgfId-294732"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-294728"></A>Note: In the case of floating-point errors, you can choose whether a signal should be sent to the operating system; that is, you can decide if they should be signified as errors or ignored. For more information and recommendations for use with Parasolid, please see the <EM>
+<A HREF=../in_index.html>Installation Notes</A></EM>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-294733"></A>You can handle each type of signal by writing and registering an associated signal handler with the operating system. (It is also common to register a single function to handle both types of signal.) You can also use timer functions to raise an alarm signal, in order to avoid long delays while waiting for user interrupts to be processed.</P>
+<P>
+<A NAME="50422204_pgfId-418047"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-418073"></A>Note: If you are using Microsoft Visual Studio on a Windows platform, you need to use non-default settings to allow your application to handle signals from the operating system. We recommend that you consult the Microsoft documentation on this topic.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-332195"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-294736"></A>Note: This chapter does not cover application-defined user interrupts (such as enabling the Escape key), which are caught by the application rather than the operating system.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422204_pgfId-294740"></A>121.2	Parasolid concepts relating to signals 
+
+
+</H1>
+<P>
+<A NAME="50422204_pgfId-318002"></A>Parasolid provides some functions for you to use when writing a signal handler. First and foremost, you need to know whether Parasolid was actually running at the time of the signal. Just as important, however, is knowing the state of the (Parasolid) code that was running when the signal occurred, since any action taken depends on it. Also, you need to make the appropriate abort call to Parasolid, telling it the type of signal that has occurred.</P>
+
+<H3>
+<A NAME="50422204_pgfId-294742"></A>	121.2.1 	<A NAME="50422204_70940"></A>State of the code in execution </H3>
+<P>
+<A NAME="50422204_pgfId-294743"></A>All PK functions can be categorized as either lightweight or heavyweight:</P>
+<UL>
+<LI>
+<A NAME="50422204_pgfId-294746"></A>A <STRONG>
+lightweight</STRONG><A NAME="50422204_marker-294744"></A><A NAME="50422204_marker-294745"></A> function is a “read-only” call to the PK, such as <A HREF=../headers/pk_bsurf_ask.html>PK_BSURF_ask</A>.</LI>
+<LI>
+<A NAME="50422204_pgfId-294747"></A>A <STRONG>
+heavyweight</STRONG> function is any operation that can make changes to the model or allocate memory, such as <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>.</LI>
+</UL>
+<P>
+<A NAME="50422204_pgfId-294748"></A>Lightweight functions are highly optimised; therefore they have no protection mechanism to fall back on in the event of an error, since this would slow them down. Heavyweight functions do have some protection from errors, and can be divided into protected and unprotected sections of code:</P>
+<UL>
+<LI>
+<A NAME="50422204_pgfId-294749"></A>A <STRONG>
+protected</STRONG> section is the “writing” part of the function, which may change the model.</LI>
+<LI>
+<A NAME="50422204_pgfId-294750"></A>An <STRONG>
+unprotected</STRONG> section is the “read-only” part of the function.</LI>
+</UL>
+<P>
+<A NAME="50422204_pgfId-294751"></A>You can establish whether the code that was running is protected or unprotected by calling <A HREF=../headers/pk_session_is_in_kernel_2.html>PK_SESSION_is_in_kernel_2</A>, as explained in <A HREF="fd_chap.122.html#50422204_70926">Section 121.2.2, “Parasolid functions used for signal handling”</A>.</P>
+
+
+<H3>
+<A NAME="50422204_pgfId-294762"></A>	121.2.2 	<A NAME="50422204_marker-294755"></A><A NAME="50422204_marker-294756"></A><A NAME="50422204_70926"></A><A NAME="50422204_marker-294758"></A>Parasolid functions used for signal handling </H3>
+<P>
+<A NAME="50422204_pgfId-294766"></A>The following Parasolid functions are useful when writing signal handlers.</P>
+<P>
+<A NAME="50422204_pgfId-294813"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294769"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294771"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294774"></A><A NAME="50422204_marker-294773"></A><A HREF=../headers/pk_session_is_in_kernel_2.html>PK_SESSION_is_in_kernel_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294776"></A>This function determines whether the code currently in execution has been called from a PK function and, if so, whether the code is protected or unprotected.</P>
+<UL>
+<LI>
+<A NAME="50422204_pgfId-294777"></A><CODE>
+is_in_kernel</CODE>
+ determines whether the code has been called from Parasolid</LI>
+<LI>
+<A NAME="50422204_pgfId-319171"></A><CODE>
+is_protected</CODE>
+ determines whether the code is protected</LI>
+<LI>
+<A NAME="50422204_pgfId-294779"></A><CODE>
+is_subthread</CODE>
+ determines whether the code has been called from an internal thread</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294782"></A><A NAME="50422204_marker-294781"></A><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294784"></A>This function instructs Parasolid to abort the current session because of a run-time error or user interrupt.</P>
+<UL>
+<LI>
+<A NAME="50422204_pgfId-294785"></A>For user interrupts, <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A> sets a flag inside the Parasolid kernel to register the abort request and returns to the calling function. If <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A> is called from an application thread outside Parasolid, it will attempt to abort all application threads inside Parasolid, It will only attempt to abort its own thread if called from an application thread inside Parasolid (i.e from within callback or Frustrum code), leaving any other threads inside Parasolid alone.</LI>
+<LI>
+<A NAME="50422204_pgfId-294798"></A>For run-time errors, it <EM>
+does not return</EM> to the caller, but jumps straight to the PK function in execution and carries out the abort operation immediately.<A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A> will not succeed if called from an application thread outside Parasolid. It will cause its own thread to longjump back inside Parasolid, leaving any other threads alone.</LI>
+</UL>
+<P>
+<A NAME="50422204_pgfId-294805"></A>Some PK functions cannot be safely interrupted; for details, see the <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A> documentation. If user interrupt occurs in one of these functions, <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A> returns PK_ERROR_cant_be_aborted.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294807"></A><A HREF=../headers/pk_debug_try_error_handler.html>PK_DEBUG_try_error_handler</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294809"></A>This function is provided to help you develop signal handlers. It allows you to call functions of your own within an executing Parasolid. These functions should generate run-time errors, allowing you to test your signal handlers. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-294817"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-294816"></A>Warning: <A HREF=../headers/pk_session_is_in_kernel_2.html>PK_SESSION_is_in_kernel_2</A> and <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A> are the <EM>
+only</EM> PK functions that should be called from a signal handler.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422204_pgfId-294820"></A>121.3	<A NAME="50422204_47674"></A><A NAME="50422204_marker-294819"></A>Designing and registering signal handlers 
+
+
+</H1>
+<P>
+<A NAME="50422204_pgfId-294821"></A>This section describes handling run-time errors and user interrupts, and also raising alarm signals in conjunction with user interrupts. Having received any of these signals, the operating system immediately switches control to the registered handler for the signal. If the handler subsequently returns, execution will continue in the interrupted routine at the next point after the signal occurred.</P>
+
+<H3>
+<A NAME="50422204_pgfId-294822"></A>	121.3.1 	Registering signal handlers </H3>
+<P>
+<A NAME="50422204_pgfId-294826"></A><A HREF="fd_chap.122.html#50422204_39953"><EM>
+Figure 121-1</EM></A> shows an example of how to register (or re-register) signal handlers in C++. Note that this is not the only possibility; you can also register a single function to handle several types of signal.</P>
+<P>
+<A NAME="50422204_pgfId-294843"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422204_pgfId-294830"></A>	// <EM>register signal handlers with the operating system</EM><A NAME="50422204_marker-294829"></A></PRE>
+<PRE><A NAME="50422204_pgfId-294833"></A>	// <EM>user interrupts</EM><A NAME="50422204_marker-294831"></A><A NAME="50422204_marker-294832"></A></PRE>
+<PRE><A NAME="50422204_pgfId-294835"></A>	<STRONG>signal</STRONG><A NAME="50422204_marker-294834"></A>( sig_user_interrupt, &amp;myApp::handleUserInterrupt );</PRE>
+<PRE><A NAME="50422204_pgfId-294838"></A>	// <EM>run-time errors</EM><A NAME="50422204_marker-294836"></A><A NAME="50422204_marker-294837"></A></PRE>
+<PRE><A NAME="50422204_pgfId-294839"></A>	<STRONG>signal</STRONG>( sig_run_time_error, &amp;myApp::handleRunTimeError );</PRE>
+<PRE><A NAME="50422204_pgfId-294841"></A>	// <EM>alarms</EM><A NAME="50422204_marker-294840"></A></PRE>
+<PRE><A NAME="50422204_pgfId-294842"></A>	<STRONG>signal</STRONG>( sig_alarm, &amp;myApp::handleAlarm );</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-294846"></A>Figure 121-1 <A NAME="50422204_39953"></A><A NAME="50422204_marker-294845"></A>Example code showing the registration of various signal handlers</P>
+<P>
+<A NAME="50422204_pgfId-294859"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-294849"></A>Note: Once a given signal occurs, the operating system first restores the default signal-handling mechanism for that signal (i.e., as if no signal handler had been registered). The previously registered signal handler is then called. In order for your registered signal handler to be called for any future instance of that signal, you must <EM>
+re-register</EM> it somewhere in your code. This should be in a place that is certain to be executed; for example, at the beginning of the function itself, as shown in <A HREF="fd_chap.122.html#50422204_55608"><EM>
+Figure 121-2</EM></A>, <A HREF="fd_chap.122.html#50422204_93604"><EM>
+Figure 121-3</EM></A> and <A HREF="fd_chap.122.html#50422204_36845"><EM>
+Figure 121-4</EM></A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422204_pgfId-294860"></A>	121.3.2 	Run-time errors </H3>
+<P>
+<A NAME="50422204_pgfId-294864"></A><A HREF="fd_chap.122.html#50422204_55608"><EM>
+Figure 121-2</EM></A> shows an example of a signal handler for run-time errors. It first determines whether Parasolid was running when the error occurred; if not, it is the application’s responsibility to handle the signal as it sees fit. If Parasolid was running, the signal handler calls <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A> indicating a run-time error from within a PK function or a registered function called from Parasolid, such as a frustrum function. <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A> <EM>
+does not return</EM> to the signal handler, but instead passes control back to the PK function that was running when the error occurred, requesting the immediate termination of that function.</P>
+<P>
+<A NAME="50422204_pgfId-294865"></A>For details of how Parasolid deals with the run-time error once it regains control, see <A HREF="fd_chap.122.html#50422204_77083">Section 121.4, “How Parasolid deals with signals”</A>.</P>
+<P>
+<A NAME="50422204_pgfId-294873"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-294872"></A>Note: <A HREF=../headers/pk_session_is_in_kernel_2.html>PK_SESSION_is_in_kernel_2</A> returns <CODE>
+is_in_kernel</CODE>
+<A NAME="50422204_marker-294871"></A> = PK_LOGICAL_true whether Parasolid was running directly (i.e., a PK function was in execution) or indirectly (e.g., a frustrum function called from the PK was in execution). It indicates whether or not your master application is currently calling a PK function.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-294898"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422204_pgfId-294876"></A><STRONG>void</STRONG> myApp::handleRunTimeError( <STRONG>int</STRONG> sig_run_time_error )</PRE>
+<PRE><A NAME="50422204_pgfId-294877"></A>{</PRE>
+<PRE><A NAME="50422204_pgfId-294878"></A>	<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> is_in_kernel, is_protected;</PRE>
+<PRE><A NAME="50422204_pgfId-294879"></A>	// <EM>first RE-REGISTER the signal handler for run-time errors</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294880"></A>	<STRONG>signal</STRONG>( sig_run_time_error, &amp;myApp::handleRunTimeError );</PRE>
+<PRE><A NAME="50422204_pgfId-294881"></A>	</PRE>
+<PRE><A NAME="50422204_pgfId-294882"></A>	// <EM>determine whether Parasolid was running at the time</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294883"></A>	<A HREF=../headers/pk_session_is_in_kernel_2.html>PK_SESSION_is_in_kernel_2</A>( &amp;is_in_kernel, &amp;is_protected, &amp;is_subthread);</PRE>
+<PRE><A NAME="50422204_pgfId-294884"></A>	</PRE>
+<PRE><A NAME="50422204_pgfId-294885"></A>	<STRONG>if</STRONG> (is_in_kernel)</PRE>
+<PRE><A NAME="50422204_pgfId-294886"></A>	{</PRE>
+<PRE><A NAME="50422204_pgfId-294887"></A>		// <EM>tell Parasolid to abort immediately, and say whether the RTE occurred in the PK or the frustrum</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294888"></A>		<A HREF=../headers/pk_abort_reason_t.html>PK_abort_reason_t</A> reason = ( isFrustrumRunning() ) ? PK_abort_frustrum_error_c : PK_abort_runtime_error_c;</PRE>
+<PRE><A NAME="50422204_pgfId-294889"></A>		// <EM>note that this function DOES NOT RETURN</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294890"></A>		<A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A>( reason );</PRE>
+<PRE><A NAME="50422204_pgfId-294891"></A>	}</PRE>
+<PRE><A NAME="50422204_pgfId-294892"></A>	<STRONG>else</STRONG></PRE>
+<PRE><A NAME="50422204_pgfId-294893"></A>	{</PRE>
+<PRE><A NAME="50422204_pgfId-294894"></A>		// <EM>Parasolid was not running -- proceed accordingly</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294895"></A>		...</PRE>
+<PRE><A NAME="50422204_pgfId-294896"></A>	}</PRE>
+<PRE><A NAME="50422204_pgfId-294897"></A>}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-294900"></A>Figure 121-2 <A NAME="50422204_55608"></A>Example of a signal handler for run-time errors</P>
+
+
+<H3>
+<A NAME="50422204_pgfId-294901"></A>	121.3.3 	User interrupts </H3>
+<P>
+<A NAME="50422204_pgfId-294905"></A><A HREF="fd_chap.122.html#50422204_93604"><EM>
+Figure 121-3</EM></A> shows an example of a signal handler for user interrupts. It first determines whether Parasolid was running at the time of the interrupt; if so, the signal handler checks to see whether the interrupt took place in a protected section of the code.</P>
+<UL>
+<LI>
+<A NAME="50422204_pgfId-294906"></A>For <EM>
+unprotected</EM> code, the handler returns without attempting to interrupt the function, to avoid the application shutting down. Note that this check is not necessary if you register an error handler that throws an exception for the error code PK_ERROR_unhandleable_condition; see <A HREF="fd_chap.122.html#50422204_77083">Section 121.4, “How Parasolid deals with signals”</A> for more details.</LI>
+<LI>
+<A NAME="50422204_pgfId-294912"></A>For <EM>
+protected</EM><A NAME="50422204_marker-294910"></A><A NAME="50422204_marker-294911"></A> code, the handler calls a timer function (supplied by the application) to raise an alarm signal if too much time goes by before the interrupt is processed. It then calls <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A></A> to indicate a user interrupt. If the PK function (that was running at the time of the interrupt) cannot be interrupted safely, <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A></A> returns PK_ERROR_cant_be_aborted, and the signal handler cancels the alarm. (For a list of PK functions that cannot be interrupted safely, see the reference documentation for <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A></A>.) Otherwise the signal handler returns to the PK function, which resumes normal execution until a safe point is reached, when the abort request will be processed.</LI>
+</UL>
+<P>
+<A NAME="50422204_pgfId-294944"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422204_pgfId-294915"></A><STRONG>void</STRONG> myApp::handleUserInterrupt( <STRONG>int</STRONG> sig_user_interrupt )</PRE>
+<PRE><A NAME="50422204_pgfId-294916"></A>{</PRE>
+<PRE><A NAME="50422204_pgfId-294917"></A>	<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> is_in_kernel, is_protected;</PRE>
+<PRE><A NAME="50422204_pgfId-294918"></A>	// <EM>first RE-REGISTER the signal handler for user interrupts</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294919"></A>	<STRONG>signal</STRONG>( sig_user_interrupt, &amp;myApp::handleUserInterrupt );</PRE>
+<PRE><A NAME="50422204_pgfId-294920"></A>	</PRE>
+<PRE><A NAME="50422204_pgfId-294921"></A>	// <EM>determine whether Parasolid was running at the time</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294922"></A>	<A HREF=../headers/pk_session_is_in_kernel_2.html>PK_SESSION_is_in_kernel_2</A>( &amp;is_in_kernel, &amp;is_protected, &amp;is_subthread);</PRE>
+<PRE><A NAME="50422204_pgfId-294923"></A>	</PRE>
+<PRE><A NAME="50422204_pgfId-294924"></A>	<STRONG>if</STRONG> (is_in_kernel)</PRE>
+<PRE><A NAME="50422204_pgfId-294925"></A>	{</PRE>
+<PRE><A NAME="50422204_pgfId-294926"></A>		// <EM>return if code is not protected -- not necessary if you register an error handler that uses exceptions</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294927"></A>		<STRONG>if</STRONG> (!is_protected) <STRONG>return</STRONG>;</PRE>
+<PRE><A NAME="50422204_pgfId-294929"></A>		// <EM>set alarm to raise an RTE if PK is slow to abort</EM><A NAME="50422204_marker-294928"></A></PRE>
+<PRE><A NAME="50422204_pgfId-294930"></A>		setTimerForParasolid();</PRE>
+<PRE><A NAME="50422204_pgfId-294931"></A>		// <EM>tell Parasolid to abort at the next safe point</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294932"></A>		<A HREF=../headers/pk_abort_reason_t.html>PK_abort_reason_t</A> reason = PK_abort_user_interrupt_c;</PRE>
+<PRE><A NAME="50422204_pgfId-294933"></A>		</PRE>
+<PRE><A NAME="50422204_pgfId-294934"></A>		<STRONG>if</STRONG> (<A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A>( reason ) != PK_ERROR_no_errors)</PRE>
+<PRE><A NAME="50422204_pgfId-294935"></A>			// <EM>function cannot be aborted, so cancel alarm</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294936"></A>			cancelTimerForParasolid();</PRE>
+<PRE><A NAME="50422204_pgfId-294937"></A>	}</PRE>
+<PRE><A NAME="50422204_pgfId-294938"></A>	<STRONG>else</STRONG></PRE>
+<PRE><A NAME="50422204_pgfId-294939"></A>	{</PRE>
+<PRE><A NAME="50422204_pgfId-294940"></A>		// <EM>Parasolid was not running -- proceed accordingly</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294941"></A>		...</PRE>
+<PRE><A NAME="50422204_pgfId-294942"></A>	}</PRE>
+<PRE><A NAME="50422204_pgfId-294943"></A>}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-294946"></A>Figure 121-3 <A NAME="50422204_93604"></A>Example of a signal handler for user interrupts</P>
+<P>
+<A NAME="50422204_pgfId-294947"></A>An alarm signal will be raised if too much time elapses before a safe point in the code has been reached. This gets converted to a run-time error, as shown in <A HREF="fd_chap.122.html#50422204_36845"><EM>
+Figure 121-4</EM></A>, in order to ensure the immediate processing of the signal. Should the interrupt be processed before the timer expires, however, the alarm must be cancelled back in the main application, in order to avoid another (unwanted) signal being raised.</P>
+<P>
+<A NAME="50422204_pgfId-294951"></A>For details of how Parasolid deals with the user interrupt once it regains control, see <A HREF="fd_chap.122.html#50422204_77083">Section 121.4, “How Parasolid deals with signals”</A>.</P>
+<P>
+<A NAME="50422204_pgfId-294958"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-294957"></A>Note: The use of timer functions in a user-interrupt handler is entirely optional; it serves to avoid long delays when processing user interrupts, which get converted to run-time errors after a certain length of time. This can cause your application to exit (in situations where it might otherwise remain running) if you do not register an error handler that uses exceptions.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-294970"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422204_pgfId-294961"></A><STRONG>void</STRONG> myApp::handleAlarm( <STRONG>int</STRONG> sig_alarm )</PRE>
+<PRE><A NAME="50422204_pgfId-294962"></A>{</PRE>
+<PRE><A NAME="50422204_pgfId-294963"></A>	// <EM>first RE-REGISTER the signal handler for alarms</EM></PRE>
+<PRE><A NAME="50422204_pgfId-294964"></A>	<STRONG>signal</STRONG>( sig_alarm, &amp;myApp::handleAlarm );</PRE>
+<PRE><A NAME="50422204_pgfId-294965"></A>	</PRE>
+<PRE><A NAME="50422204_pgfId-294967"></A>	// <EM>now raise a run-time error</EM><A NAME="50422204_marker-294966"></A></PRE>
+<PRE><A NAME="50422204_pgfId-294968"></A>	<STRONG>raise</STRONG>( sig_run_time_error );</PRE>
+<PRE><A NAME="50422204_pgfId-294969"></A>}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-294975"></A>Figure 121-4 <A NAME="50422204_36845"></A><A NAME="50422204_marker-294972"></A><A NAME="50422204_marker-294973"></A><A NAME="50422204_marker-294974"></A>Example of a signal handler for alarms</P>
+<P>
+<A NAME="50422204_pgfId-294979"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-294978"></A>Note: If you wish to be able to interrupt your application at all costs, your signal handler should not check to see if the code is protected even when you do not have an error handler that uses exceptions. Also, it should not cancel the alarm when a PK function cannot be interrupted safely. Interrupts processed in these situations will ultimately cause the application to exit.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422204_pgfId-318046"></A>121.4	<A NAME="50422204_77083"></A><A NAME="50422204_marker-318042"></A>How Parasolid deals with signals 
+
+
+</H1>
+<P>
+<A NAME="50422204_pgfId-318047"></A>Once Parasolid has regained control from the signal handler, the handling of a given signal depends on the current state of the code that is being executed.</P>
+<P>
+<A NAME="50422204_pgfId-294984"></A>When Parasolid resumes execution following either a run-time error or a user interrupt, it ascertains the state of the code that was running (i.e., whether it was protected or unprotected), and also checks to see if an error handler has been registered. It then calls the error handler if there is one; if the error handler returns (rather than throwing an exception), or one is not registered, Parasolid returns to your application where possible.</P>
+<P>
+<A NAME="50422204_pgfId-294985"></A>The following table describes the ultimate outcomes of the action taken by Parasolid in the event of a run-time error or user interrupt, based on the example signal handlers shown in <A HREF="fd_chap.122.html#50422204_47674">Section 121.3, “Designing and registering signal handlers”</A> and depending on the state of the code and the situation regarding the error handler:</P>
+<P>
+<A NAME="50422204_pgfId-295026"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294991"></A>Error handler</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294993"></A>State of code</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294995"></A>Outcome</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294997"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-294999"></A>Protected</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295001"></A>Parasolid returns an error code to your application.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295003"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295005"></A>Unprotected</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295007"></A>User interrupts are ignored; run-time errors force the application to exit.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295009"></A>Yes (returns)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295011"></A>Protected</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295013"></A>An error is passed to your error handler for processing; the error code is then returned to your application.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295015"></A>Yes (returns)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295017"></A>Unprotected</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295019"></A>User interrupts are ignored; run-time errors force the application to exit.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295021"></A>Yes (throws an exception)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295023"></A>Any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295025"></A>An error is passed to your error handler for processing; it then throws a suitable exception to your application.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-318089"></A>When run-time errors occur during the execution of protected code, Parasolid returns the error code PK_ERROR_run_time_error or PK_ERROR_fru_error to your application if the PK function can be interrupted safely see the reference documentation for <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A>, depending on whether the error occurred in a PK function or a frustrum function. If the function cannot be interrupted safely, Parasolid returns PK_ERROR_fatal_error. For user interrupts during the execution of protected code, Parasolid returns PK_ERROR_aborted if the PK function can be interrupted safely; if not, then the function returns to your application as normal.</P>
+<P>
+<A NAME="50422204_pgfId-295031"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-295030"></A>Note: If you register an error handler that throws an exception for the error code PK_ERROR_unhandleable_condition, Parasolid can recover from run-time errors and handle user interrupts during unprotected code.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422204_pgfId-295034"></A>121.5	<A NAME="50422204_42689"></A><A NAME="50422204_marker-295033"></A>Summary of signal handling 
+
+
+</H1>
+<P>
+<A NAME="50422204_pgfId-295035"></A>The diagrams below illustrate the stages involved in processing run-time errors and user interrupts, in sequence starting from the top. The calls from a function are issued in order from left to right.</P>
+<P>
+<A NAME="50422204_pgfId-309771"></A>Following a run-time error, the signal handler calls <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A> with the value PK_abort_runtime_error_c or PK_abort_frustrum_error_c. This function then long-jumps back to the failing PK function, which calls the registered error handler if it exists, with the error code as shown in the respective diagram. If the error handler returns (see <A HREF="fd_chap.122.html#50422204_42310"><EM>
+Figure 121-6</EM></A>), or there is no error handler (see <A HREF="fd_chap.122.html#50422204_38316"><EM>
+Figure 121-5</EM></A>), the PK function will return the error to your application if the code is protected, and force the application to exit if the code is unprotected.</P>
+<P>
+<A NAME="50422204_pgfId-295094"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1260.gif">
+
+<P>
+<A NAME="50422204_pgfId-295096"></A>Figure 121-5 <A NAME="50422204_38316"></A>Flow of control during a run-time error without an error handler</P>
+<P>
+<A NAME="50422204_pgfId-295130"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1261.gif">
+
+<P>
+<A NAME="50422204_pgfId-295132"></A>Figure 121-6 <A NAME="50422204_42310"></A>Flow of control during a run-time error with an error handler that returns</P>
+<P>
+<A NAME="50422204_pgfId-295166"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1262.gif">
+
+<P>
+<A NAME="50422204_pgfId-295167"></A>Figure 121-7 Flow of control during a run-time error with an error handler that throws exceptions</P>
+<P>
+<A NAME="50422204_pgfId-295168"></A>In the case of a user interrupt, the signal handler checks the state of the code in execution. If the code is unprotected, the signal handler should not call <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A></A> unless there is an error handler that throws exceptions, to avoid forcing the application to exit. If the interrupt is to be processed, the handler can call a timer function to raise an alarm signal after a certain length of time, and then calls <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A></A> with the argument PK_abort_user_interrupt_c. The error code PK_ERROR_cant_be_aborted is returned if the PK function is one that cannot be interrupted safely (see the reference documentation for <A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A></A></A>), in which case the handler cancels the alarm.</P>
+<P>
+<A NAME="50422204_pgfId-295169"></A>If <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A> was not called, or PK_ERROR_cant_be_aborted was returned, the signal is ignored and the PK function proceeds as normal. Otherwise the PK function calls the registered error handler if it exists, with the error code as shown in the respective diagram. If the handler returns (see <A HREF="fd_chap.122.html#50422204_68297"><EM>
+Figure 121-9</EM></A>), or there is no error handler (see <A HREF="fd_chap.122.html#50422204_28397"><EM>
+Figure 121-8</EM></A>), the PK function returns the error to your application.</P>
+<P>
+<A NAME="50422204_pgfId-295176"></A>Once control has returned to your application, it should take whatever action is necessary following the error, as described in <A HREF="fd_chap.121.html#50422203_35122">Chapter 120, “Error Handling”</A>. This will almost always require rolling back to a valid state or stopping and restarting the Parasolid session.</P>
+<P>
+<A NAME="50422204_pgfId-295213"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1263.gif">
+
+<P>
+<A NAME="50422204_pgfId-295215"></A>Figure 121-8 <A NAME="50422204_28397"></A>Flow of control during a user interrupt without an error handler</P>
+<P>
+<A NAME="50422204_pgfId-295249"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1264.gif">
+
+<P>
+<A NAME="50422204_pgfId-295251"></A>Figure 121-9 <A NAME="50422204_68297"></A>Flow of control during a user interrupt with an error handler that returns</P>
+<P>
+<A NAME="50422204_pgfId-295285"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1265.gif">
+
+<P>
+<A NAME="50422204_pgfId-295286"></A>Figure 121-10 Flow of control during a user interrupt with an error handler that throws exceptions</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422204_pgfId-295289"></A>121.6	<A NAME="50422204_26137"></A><A NAME="50422204_marker-295288"></A>Re-entrant function calls 
+
+
+</H1>
+<P>
+<A NAME="50422204_pgfId-295290"></A>A <STRONG>
+re-entrant </STRONG>function call takes place when a PK function is called from an application call-back function (that has been registered with Parasolid) that has itself been called from a heavyweight PK function. For example, a call to <A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> might lead to a call to the registered function GOSGMT, which in turn might call <A HREF=../headers/pk_entity_ask_attribs.html><A HREF=../headers/pk_entity_ask_attribs.html>PK_ENTITY_ask_attribs</A></A>: the call to <A HREF=../headers/pk_entity_ask_attribs.html><A HREF=../headers/pk_entity_ask_attribs.html>PK_ENTITY_ask_attribs</A></A> is then described as <EM>
+re-entrant</EM>. Thus Parasolid is indirectly calling itself, as show in <A HREF="fd_chap.122.html#50422204_36288"><EM>
+Figure 121-11</EM></A>.</P>
+<P>
+<A NAME="50422204_pgfId-295299"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-295298"></A>Note: Outer-level PK functions are always <EM>
+protected</EM><A NAME="50422204_marker-295296"></A><A NAME="50422204_marker-295297"></A>, since Parasolid does not call registered functions from unprotected sections of code. Only one level of re-entrance is permitted: an inner-level function cannot call a non-PK function.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-295333"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1266.gif">
+
+<P>
+<A NAME="50422204_pgfId-295336"></A>Figure 121-11 <A NAME="50422204_36288"></A><A NAME="50422204_marker-295335"></A>Example of a re-entrant function call</P>
+<P>
+<A NAME="50422204_pgfId-295340"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-295339"></A>Warning: If <A HREF=../headers/pk_session_is_in_kernel_2.html>PK_SESSION_is_in_kernel_2</A> is called after a re-entrant call to Parasolid, it reports the status of the <EM>
+outer</EM> PK function, which should always be protected. It is therefore <EM>
+not possible</EM> to determine the status of the inner-level PK code.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-295341"></A>When handling signals from Parasolid after a re-entrant function call, the procedures outlined in <A HREF="fd_chap.122.html#50422204_42689">Section 121.5, “Summary of signal handling”</A> still apply, subject to the alterations described below. Note that, in each case, the signal handler is called from the <EM>
+inner</EM> PK function.</P>
+
+<H3>
+<A NAME="50422204_pgfId-295345"></A>	121.6.1 	Run-time errors </H3>
+<P>
+<A NAME="50422204_pgfId-295346"></A>For run-time errors, the signal handler calls <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A>, which long-jumps back to the <EM>
+outer</EM> PK function; this then calls the error handler (or returns), as for normal (non re-entrant) calls. If the error handler throws exceptions, however, they must be thrown back to a point outside of any PK function calls, and not to registered functions.</P>
+
+
+<H3>
+<A NAME="50422204_pgfId-295347"></A>	121.6.2 	User interrupts </H3>
+<P>
+<A NAME="50422204_pgfId-295348"></A>For user interrupts, the signal handler returns to the <EM>
+inner</EM> PK function (unlike non re-entrant calls). Assuming that this function can be interrupted safely (see the reference documentation for <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A>), the outcome then depends on whether the inner-level PK code is protected or unprotected, and the situation regarding the error handler, as shown in the following table:</P>
+<P>
+<A NAME="50422204_pgfId-295386"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295351"></A>Error handler</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295353"></A>State of code</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295355"></A>Outcome</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295357"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295359"></A>Protected</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295361"></A>The inner PK function returns an error with code PK_ERROR_aborted to your registered function (<EM>
+not </EM>your master application).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295363"></A>No</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295365"></A>Unprotected</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295367"></A>Parasolid forces the application to exit.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295369"></A>Yes (returns)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295371"></A>Protected</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295373"></A>An error with code PK_ERROR_aborted is passed to your error handler for processing, and is then returned to your registered function (<EM>
+not </EM>your master application).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295375"></A>Yes (returns)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295377"></A>Unprotected</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295379"></A>Parasolid forces the application to exit.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295381"></A>Yes (throws an exception)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295383"></A>Any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422204_pgfId-295385"></A>An error is passed to your error handler, which throws an exception back to your master application.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-295387"></A>If you do not use an error handler that throws exceptions, you must decide how your registered function should process the error information sent from the (protected) PK code. You may want to by-pass the outer-level PK function, and throw an exception back to your application code; if so, you must call <A HREF=../headers/pk_session_tidy.html>PK_SESSION_tidy</A> before making another PK call. Alternatively, you can call <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A> again, from the registered function, in order for the interrupt to filter up to the outer-level of Parasolid code, where it can be processed.</P>
+<P>
+<A NAME="50422204_pgfId-295388"></A>Note that some registered functions have the facility to report PK errors back to the outer-level PK function, and hence back to the master application. For example, several of the GO functions (that are registered with <A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A>) have an <CODE>
+ifail</CODE>
+<A NAME="50422204_marker-295389"></A> argument that can be used to send back the error code from the inner PK function. Others, such as B-curve evaluator functions registered via <A HREF=../headers/pk_bcurve_create_by_fitting.html>PK_BCURVE_create_by_fitting</A>, do not have this facility.</P>
+<P>
+<A NAME="50422204_pgfId-295397"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422204_pgfId-295392"></A>Warning: If the inner-level PK code is unprotected, your application will exit unless you have an error handler that throws exceptions, even if you use the signal handler model shown in <A HREF="fd_chap.122.html#50422204_93604"><EM>
+Figure 121-3</EM></A>. This is because the state of the inner PK function cannot be determined, as <CODE>
+is_protected</CODE>
+<A NAME="50422204_marker-295396"></A> is always set to true for re-entrant function calls.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422204_pgfId-275053"></A>&nbsp;</P>
+
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.121.html">Error Handling </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.123.html">System Attribute Definitions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,577 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Sheet Modeling</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Sheet Modeling</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.045.html">Wire Modeling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.047.html">Sewing and Knitting</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.046.html#50422118_pgfId-294727">45.1	Introduction </A>
+<LI> <A HREF="fd_chap.046.html#50422118_pgfId-294776">45.2	Creating sheet bodies </A>
+<LI> <A HREF="fd_chap.046.html#50422118_pgfId-296712">45.3	Trimming </A>
+<LI> <A HREF="fd_chap.046.html#50422118_pgfId-297914">45.4	Blending sheet bodies </A>
+<UL>
+<LI> <A HREF="fd_chap.046.html#50422118_pgfId-298943">45.4.1	Blending vertices on sheet bodies </A>
+<UL>
+<LI> <A HREF="fd_chap.046.html#50422118_pgfId-298954">45.4.1.1	Limitations and restrictions </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.046.html#50422118_pgfId-299203">45.5	Thickening a sheet body </A>
+<LI> <A HREF="fd_chap.046.html#50422118_pgfId-299213">45.6	Other modeling operations on sheet bodies </A>
+<UL>
+<LI> <A HREF="fd_chap.046.html#50422118_pgfId-299223">45.6.1	Replacing the surface of a sheet body </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422118_pgfId-294727"></A>45.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422118_pgfId-294729"></A>Parasolid provides specific functionality for some sheet modeling operations, and techniques that allow solid modeling functions to be used for sheet modeling. This chapter covers:</P>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-294733"></A>Creating sheet bodies - see <A HREF="fd_chap.046.html#50422118_95606">Section 45.2</A>.</LI>
+<LI>
+<A NAME="50422118_pgfId-294741"></A>Trimming sheet bodies - see <A HREF="fd_chap.046.html#50422118_10699">Section 45.3</A>.</LI>
+<LI>
+<A NAME="50422118_pgfId-294745"></A>Blending sheet bodies - see <A HREF="fd_chap.046.html#50422118_29060">Section 45.4</A>.</LI>
+<LI>
+<A NAME="50422118_pgfId-294749"></A>Thickening a sheet body to create a solid body - see <A HREF="fd_chap.046.html#50422118_29839">Section 45.5</A>.</LI>
+<LI>
+<A NAME="50422118_pgfId-294753"></A>Replacing the surface of a sheet body - see <A HREF="fd_chap.046.html#50422118_60552">Section 45.6.1</A>.</LI>
+</UL>
+<P>
+<A NAME="50422118_pgfId-294756"></A>The boolean operation of sewing sheet bodies together is explained in <A HREF="fd_chap.047.html#50422119_25517">Chapter 46, “Sewing and Knitting”</A>.</P>
+<P>
+<A NAME="50422118_pgfId-294760"></A>Trimming operations are often performed using booleans (see <A HREF="fd_chap.053.html#50422126_20143" CLASS="XRef">Chapter 52, “Manifold Booleans”</A>). However, there are circumstances where it can be more efficient to trim a multi-faced sheet body by first imprinting an entity (curves, faces or a plane) on to the body, and then trimming to the edges on the sheet body that were the result of the imprinting process. This is explained in <A HREF="fd_chap.046.html#50422118_68678">Section 45.3</A> and <A HREF="fd_chap.046.html#50422118_10699">Section 45.3</A>.</P>
+<P>
+<A NAME="50422118_pgfId-294768"></A>Information on modeling operations which can be applied to wire bodies is contained in <A HREF="fd_chap.045.html#50422117_30749">Chapter 44, “Wire Modeling”</A>.</P>
+<P>
+<A NAME="50422118_pgfId-401814"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-401683"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-401687"></A><A HREF="fd_chap.038.html#50422109_">Chapter 37, “Creating Extruded Bodies”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-401691"></A><A HREF="fd_chap.039.html#50422110_">Chapter 38, “Sweeping”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-401695"></A><A HREF="fd_chap.041.html#50422112_13353">Chapter 40, “Lofting”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-401699"></A><A HREF="fd_chap.043.html#50422114_">Chapter 42, “Creating Emboss Features”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-401703"></A><A HREF="fd_chap.047.html#50422119_Sheet Sewing">Chapter 46, “Sewing and Knitting”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-401707"></A><A HREF="fd_chap.049.html#50422121_">Chapter 48, “Extending Sheets And Surfaces”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422118_pgfId-294776"></A>45.2	<A NAME="50422118_95606"></A><A NAME="50422118_marker-294773"></A><A NAME="50422118_marker-294774"></A><A NAME="50422118_marker-294775"></A>Creating sheet bodies 
+
+
+</H1>
+<P>
+<A NAME="50422118_pgfId-294777"></A>You can use <A HREF=../headers/pk_face_make_sheet_bodies.html>PK_FACE_make_sheet_bodies</A> to create one or more sheet bodies from a collection of faces. This function contains the following options:</P>
+<P>
+<A NAME="50422118_pgfId-294799"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-294780"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-294782"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422118_pgfId-294784"></A>allow_disjoint</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-294786"></A>Return disjoint components as either a single disjoint body or several bodies. </P>
+<P>
+<A NAME="50422118_pgfId-467461"></A>Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422118_pgfId-466991"></A>make_from</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-466993"></A>Whether to make a sheet body (or bodies) from copies of the input faces, as illustrated in <A HREF="fd_chap.046.html#50422118_70579"><EM>
+Figure 45-1</EM></A>, or from the original input faces themselves,as illustrated in <A HREF="fd_chap.046.html#50422118_70707"><EM>
+Figure 45-2</EM></A>.</P>
+<P>
+<A NAME="50422118_pgfId-467470"></A>Default: PK_BODY_make_from_copy_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422118_pgfId-294788"></A>transfer_attribs</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-294790"></A>Whether the sheet bodies inherit attributes from the topology used to create the sheet bodies.</P>
+<P>
+<A NAME="50422118_pgfId-467491"></A>Default: PK_LOGICAL_true</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422118_pgfId-466987"></A>transfer_groups</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-466989"></A>Whether to transfer or copy specified groups to the new sheet body (or bodies). </P>
+<P>
+<A NAME="50422118_pgfId-467530"></A>Default: PK_GROUP_transfer_owning_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422118_pgfId-294792"></A>track_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-294794"></A>Whether to return edges from the resulting sheet bodies in the tracking data.</P>
+<P>
+<A NAME="50422118_pgfId-467541"></A>Default: <A HREF=../headers/pk_track_edges_t.html>PK_track_edges_no_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422118_pgfId-294796"></A>track_vertices</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-294798"></A>Whether to return vertices from the resulting sheet bodies in the tracking data. Default: <A HREF=../headers/pk_track_vertices_t.html>PK_track_vertices_no_c</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422118_pgfId-467601"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422118_pgfId-294802"></A>Note: If you supply faces from different bodies to this function, you should ensure that they do not intersect. If the supplied faces intersect, <A HREF=../headers/pk_face_make_sheet_bodies.html>PK_FACE_make_sheet_bodies</A> may create an invalid body.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422118_pgfId-472328"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-429.gif">
+
+<P>
+<A NAME="50422118_pgfId-472200"></A>Figure 45-1 <A NAME="50422118_70579"></A>Creating a sheet body from copies of the input faces</P>
+<P>
+<A NAME="50422118_pgfId-472241"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-430.gif">
+
+<P>
+<A NAME="50422118_pgfId-476644"></A>Figure 45-2 <A NAME="50422118_70707"></A>Creating a sheet body from the original input faces.<A NAME="50422118_66437"></A></P>
+<P>
+<A NAME="50422118_pgfId-467319"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-467294"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-467298"></A><A HREF="fd_chap.038.html#50422109_">Chapter 37, “Creating Extruded Bodies”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-467302"></A><A HREF="fd_chap.039.html#50422110_">Chapter 38, “Sweeping”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-467306"></A><A HREF="fd_chap.041.html#50422112_13353">Chapter 40, “Lofting”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-467310"></A><A HREF="fd_chap.043.html#50422114_">Chapter 42, “Creating Emboss Features”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-467314"></A><A HREF="fd_chap.047.html#50422119_Sheet Sewing">Chapter 46, “Sewing and Knitting”</A></LI>
+<LI>
+<A NAME="50422118_pgfId-467318"></A><A HREF="fd_chap.049.html#50422121_">Chapter 48, “Extending Sheets And Surfaces”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422118_pgfId-296712"></A>45.3	<A NAME="50422118_68678"></A><A NAME="50422118_marker-294805"></A><A NAME="50422118_marker-294806"></A><A NAME="50422118_marker-294807"></A><A NAME="50422118_marker-296708"></A><A NAME="50422118_marker-296709"></A><A NAME="50422118_marker-296710"></A><A NAME="50422118_10699"></A>Trimming 
+
+
+</H1>
+<P>
+<A NAME="50422118_pgfId-296714"></A>Trimming is performed using <A NAME="50422118_marker-296713"></A><A HREF=../headers/pk_body_trim.html><A HREF=../headers/pk_body_trim.html>PK_BODY_trim</A></A>. To be successful, this must divide the body into at least two sets of faces. <A HREF=../headers/pk_body_trim.html><A HREF=../headers/pk_body_trim.html>PK_BODY_trim</A></A> takes the following arguments:</P>
+<P>
+<A NAME="50422118_pgfId-296738"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296717"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296719"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296721"></A><CODE>
+body</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296723"></A>The sheet body to be trimmed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296725"></A><CODE>
+n_edges</CODE>
+</P>
+<P>
+<A NAME="50422118_pgfId-401265"></A><CODE>
+edges</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296727"></A>A list of edges defining the regions (face sets) on the sheet body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296729"></A><CODE>
+n_faces</CODE>
+</P>
+<P>
+<A NAME="50422118_pgfId-401277"></A><CODE>
+faces</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296731"></A>A list of faces indicating the regions to be kept or discarded by the trimming operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296733"></A><CODE>
+keep</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422118_pgfId-296735"></A>A boolean indicating which part of the body to keep and which part to discard. </P>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-296736"></A>PK_LOGICAL_true: keep any face sets which have a face in the <CODE>
+faces</CODE>
+ list, and delete all other face sets.</LI>
+<LI>
+<A NAME="50422118_pgfId-296737"></A>PK_LOGICAL_false: delete any face sets which have a face in the <CODE>
+faces</CODE>
+ list, and keep all other face sets.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422118_pgfId-296739"></A>The supplied <CODE>
+edges</CODE>
+ and <CODE>
+faces</CODE>
+ must all belong to the supplied <CODE>
+body</CODE>
+.</P>
+<P>
+<A NAME="50422118_pgfId-349081"></A>Should the trim operation fail, <A NAME="50422118_marker-349080"></A><A HREF=../headers/pk_body_trim_gap_analysis.html>PK_BODY_trim_gap_analysis</A> can be used to determine where the gaps of size less than the supplied tolerance exist, and the vertices bordering on these gaps are returned to enable corrective actions to be taken.</P>
+
+<H4>
+<A NAME="50422118_pgfId-349082"></A>Example 1:</H4>
+<P>
+<A NAME="50422118_pgfId-375598"></A>In this first example, a sheet body - created from a B-surface - is trimmed to an area resulting from the projection of two B-curves in a specified direction.</P>
+<P>
+<A NAME="50422118_pgfId-376065"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-431.gif">
+
+<P>
+<A NAME="50422118_pgfId-297209"></A>Figure 45-3 Trimming a sheet body to curves projected in a given direction</P>
+
+
+<H4>
+<A NAME="50422118_pgfId-297210"></A>Example 2:</H4>
+<P>
+<A NAME="50422118_pgfId-379921"></A>In this following example, a sheet body (created from a part of a cylinder) is trimmed to an area resulting from the projection of the circle down the face normal of the sheet body. This resulting face on the sheet body is selected <EM>
+not</EM> to survive the trim operation, effectively doing a pierce operation on the sheet body:</P>
+<P>
+<A NAME="50422118_pgfId-380305"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-432.gif">
+
+<P>
+<A NAME="50422118_pgfId-380306"></A>Figure 45-4 Trimming a sheet body using a circle projected down the face normal of the sheet body</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422118_pgfId-297914"></A>45.4	<A NAME="50422118_29060"></A><A NAME="50422118_marker-297911"></A><A NAME="50422118_marker-297912"></A><A NAME="50422118_marker-297913"></A>Blending sheet bodies 
+
+
+</H1>
+<P>
+<A NAME="50422118_pgfId-297916"></A><A NAME="50422118_marker-297915"></A>By using the solid modeling blend functions for applying, fixing, enquiring and checking blends it is possible to blend edges of sheet bodies which meet at the boundary of the sheet body. Parasolid constructs appropriate edge geometry at the ends of the blend. The blend type can be rolling-ball, variable-radius or chamfer.</P>
+<P>
+<A NAME="50422118_pgfId-365436"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-433.gif">
+
+<P>
+<A NAME="50422118_pgfId-298879"></A>Figure 45-5 Sheet edge blend</P>
+<P>
+<A NAME="50422118_pgfId-298880"></A>Parasolid’s face-face blending functionality can be used to blend between disjoint and overlapping faces. In the following example face-face blends are applied sequentially to a set of sheet bodies, that have faces with taper angles, to form a single sheet body as follows:</P>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-298920"></A>two face-face blends are applied to join pairs of sheets;</LI>
+</UL>
+<P>
+<A NAME="50422118_pgfId-298924"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-434.gif">
+
+<P>
+<A NAME="50422118_pgfId-298926"></A>Figure 45-6 Joining pairs of sheets</P>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-298927"></A>a third face-face blend is then applied to produce the single sheet body.</LI>
+</UL>
+<P>
+<A NAME="50422118_pgfId-298931"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-435.gif">
+
+<P>
+<A NAME="50422118_pgfId-298933"></A>Figure 45-7 Using a third face-face blend to create the single sheet body</P>
+<P>
+<A NAME="50422118_pgfId-298937"></A>For further information on Face-Face blending, see <A HREF="fd_chap.078.html#50422154_61851">Chapter 77, “Face-Face Blending”</A>.</P>
+
+<H3>
+<A NAME="50422118_pgfId-298943"></A>	45.4.1 	<A NAME="50422118_26695"></A><A NAME="50422118_marker-298939"></A><A NAME="50422118_marker-298940"></A><A NAME="50422118_marker-298941"></A><A NAME="50422118_marker-298942"></A>Blending vertices on sheet bodies </H3>
+<P>
+<A NAME="50422118_pgfId-298946"></A><A NAME="50422118_marker-298944"></A>To blend vertices on sheet bodies use <A NAME="50422118_marker-298945"></A><A HREF=../headers/pk_vertex_make_blend.html>PK_VERTEX_make_blend</A>.</P>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-298947"></A>The vertices to be blended must have two edges meeting at them:</LI>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-298948"></A>these two edges must share a common plane</LI>
+<LI>
+<A NAME="50422118_pgfId-298949"></A>if the face between the two edges has a surface then that surface must be planar</LI>
+</UL>
+</UL>
+
+<H4>
+<A NAME="50422118_pgfId-298954"></A>45.4.1.1 <A NAME="50422118_marker-298950"></A><A NAME="50422118_marker-298951"></A><A NAME="50422118_marker-298952"></A><A NAME="50422118_marker-298953"></A>Limitations and restrictions </H4>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-298955"></A>The positions calculated for each vertex are checked to make sure that none of the blends overlap with each other.</LI>
+<LI>
+<A NAME="50422118_pgfId-298956"></A>The validity of the resulting body is checked before the topology is changed or the new geometry is attached, to ensure that none of the edges intersect illegally.</LI>
+</UL>
+<P>
+<A NAME="50422118_pgfId-299024"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-436.gif">
+
+<P>
+<A NAME="50422118_pgfId-299025"></A>Figure 45-8 The proposed blend would create an invalid body, so the blend is not created</P>
+<P>
+<A NAME="50422118_pgfId-341545"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-437.gif">
+
+<P>
+<A NAME="50422118_pgfId-299099"></A>Figure 45-9 By selecting both vertices the final body is valid and the blends can be created</P>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-299100"></A>If the radius is too large for any one of the vertices then none of the blending is implemented. Likewise if any one of the checks fail, then none of the blending is implemented.</LI>
+</UL>
+<P>
+<A NAME="50422118_pgfId-299101"></A>It is permissible for two blends to be sufficiently large that they meet and exclude one of the original edges providing that the blends do not overlap. For example, it is possible to make a circle by blending the four vertices of a square.</P>
+<P>
+<A NAME="50422118_pgfId-366386"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-438.gif">
+
+<P>
+<A NAME="50422118_pgfId-299157"></A>Figure 45-10 Blending four vertices of a square to create a circle</P>
+<UL>
+<LI>
+<A NAME="50422118_pgfId-299158"></A>It is also possible to blend a vertex with a radius which is equal to the distance to the next vertex. For example, if a vertex of a square sheet is blended with a radius equal to the length of the edges of the square, then two edges of the square are replaced by the blend.</LI>
+</UL>
+<P>
+<A NAME="50422118_pgfId-358477"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-439.gif">
+
+<P>
+<A NAME="50422118_pgfId-299196"></A>Figure 45-11 Blending a vertex with a radius that is equal to the distance to the next vertex</P>
+<P>
+<A NAME="50422118_pgfId-299197"></A>If the local checking option is ON the body is checked after the blending has been carried out. In the case of a planar body the altered body is valid, but for a non-planar body local checking may return that the altered body is invalid.</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422118_pgfId-299203"></A>45.5	<A NAME="50422118_29839"></A><A NAME="50422118_marker-299199"></A><A NAME="50422118_marker-299200"></A><A NAME="50422118_marker-299201"></A><A NAME="50422118_marker-299202"></A>Thickening a sheet body 
+
+
+</H1>
+<P>
+<A NAME="50422118_pgfId-299205"></A>A sheet body can be thickened to form a solid body using <A NAME="50422118_marker-299204"></A><A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A>. For a complete description of this functionality, see <A HREF="fd_chap.061.html#50422135_34338">Chapter 60, “Thickening”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422118_pgfId-299213"></A>45.6	<A NAME="50422118_marker-299209"></A><A NAME="50422118_marker-299210"></A><A NAME="50422118_marker-299211"></A><A NAME="50422118_marker-299212"></A>Other modeling operations on sheet bodies 
+
+
+</H1>
+<P>
+<A NAME="50422118_pgfId-299217"></A><A NAME="50422118_marker-299214"></A><A NAME="50422118_marker-299215"></A><A NAME="50422118_marker-299216"></A>Providing that the relevant face of a sheet body has a surface attached to it, then the following operations can be carried out on it:</P>
+
+<H3>
+<A NAME="50422118_pgfId-299223"></A>	45.6.1 	<A NAME="50422118_60552"></A><A NAME="50422118_marker-299219"></A><A NAME="50422118_marker-299220"></A><A NAME="50422118_marker-299221"></A><A NAME="50422118_marker-299222"></A>Replacing the surface of a sheet body </H3>
+<P>
+<A NAME="50422118_pgfId-299224"></A>The surface of a sheet can be tweaked to a new surface, which must be of the same type as the original surface, using <A HREF=../headers/pk_body_embed_in_surf.html>PK_BODY_embed_in_surf</A>. During this operation the parameter space representation of the edges is maintained.</P>
+<P>
+<A NAME="50422118_pgfId-409268"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422118_pgfId-409278"></A>Note: This functionality does not offer support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422118_pgfId-299225"></A>If the edge curve is of type PK_CLASS_spcurve or a constant parameter curve of the surface of the face then it is transferred to the new surface. All other types of edge curves are converted to SP-curves before being transferred to the new surface. During this conversion, edges may need to be split at surface discontinuities.</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.045.html">Wire Modeling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.047.html">Sewing and Knitting</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,1030 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Supplying A Frustrum</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Supplying A Frustrum</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.006.html">Application Design And Architecture</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.008.html">Further Implementation Decisions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-322079">6.1	Introduction </A>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-325866">6.2	What code do you need to supply? </A>
+<UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-294771">6.2.1	Required functionality </A>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-297387">6.2.2	Optional functionality </A>
+</UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-313061">6.3	Registering the frustrum </A>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-294983">6.4	File handling </A>
+<UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-294996">6.4.1	Structuring the file system for your application </A>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295013">6.4.2	File types and file extensions </A>
+</UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295170">6.5	Memory management </A>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295203">6.6	Graphical output </A>
+<UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295215">6.6.1	Calling PK rendering functions </A>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295260">6.6.2	Supplying GO functions </A>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295302">6.6.3	Choosing which graphics libraries to use </A>
+</UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295312">6.7	Error handling </A>
+<UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295324">6.7.1	Handling failures with a non-zero error code </A>
+<UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295363">6.7.1.1	Registering an error handler </A>
+</UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295382">6.7.2	Handling failures with a zero error code </A>
+</UL>
+<LI> <A HREF="fd_chap.007.html#50422075_pgfId-295439">6.8	Starting and stopping a Parasolid session </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422075_pgfId-322079"></A>6.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422075_pgfId-322080"></A>This chapter gives you an overview of what you need to do in order to integrate Parasolid into your application. It includes the following sections: </P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-326178"></A><A HREF="fd_chap.007.html#50422075_18508">“What code do you need to supply?”</A></LI>
+<LI>
+<A NAME="50422075_pgfId-326342"></A><A HREF="fd_chap.007.html#50422075_28177">“Registering the frustrum”</A></LI>
+<LI>
+<A NAME="50422075_pgfId-326350"></A><A HREF="fd_chap.007.html#50422075_29223">“File handling”</A></LI>
+<LI>
+<A NAME="50422075_pgfId-326374"></A><A HREF="fd_chap.007.html#50422075_26868">“Memory management”</A></LI>
+<LI>
+<A NAME="50422075_pgfId-326382"></A><A HREF="fd_chap.007.html#50422075_28541">“Graphical output”</A></LI>
+<LI>
+<A NAME="50422075_pgfId-326425"></A><A HREF="fd_chap.007.html#50422075__Ref462717402">“Error handling”</A></LI>
+<LI>
+<A NAME="50422075_pgfId-326440"></A><A HREF="fd_chap.007.html#50422075_43505">“Starting and stopping a Parasolid session”</A></LI>
+</UL>
+<P>
+<A NAME="50422075_pgfId-351441"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-350736"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-429510"></A><A HREF="fd_chap.009.html#50422077_97465">Chapter 8, “Parasolid Source Code Collateral”</A></LI>
+<LI>
+<A NAME="50422075_pgfId-350751"></A><A HREF="di_chap.02.html#15965">Chapter 1, “Introduction to the Frustrum”</A> in the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual</LI>
+<LI>
+<A NAME="50422075_pgfId-350766"></A><A HREF="di_chap.05.html#42323">Chapter 4, “Graphical Output”</A> in the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual</LI>
+<LI>
+<A NAME="50422075_pgfId-350781"></A><A HREF="di_chap.06.html#15203">Chapter 5, “Registering the Frustrum”</A> in the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual</LI>
+<LI>
+<A NAME="50422075_pgfId-350798"></A><A HREF="di_chap.07.html#36151">Appendix A, “Frustrum Functions”</A> in the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual</LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422075_pgfId-325866"></A>6.2	<A NAME="50422075_marker-351173"></A><A NAME="50422075_marker-351174"></A><A NAME="50422075_marker-351175"></A><A NAME="50422075_18508"></A>What code do you need to supply? 
+
+
+</H1>
+<P>
+<A NAME="50422075_pgfId-294753"></A><A NAME="50422075_marker-294750"></A><A NAME="50422075_marker-294751"></A><A NAME="50422075_marker-294752"></A>This section outlines the frustrum functions that you need to supply in order to build a working frustrum. Some functions are optional; what you need to supply depends on the required functionality of your application.</P>
+<P>
+<A NAME="50422075_pgfId-294757"></A>The use of the frustrum functions is explained in more detail in <A HREF="fd_chap.007.html#50422075_29223" CLASS="XRef">Section 6.4, “File handling”</A>, <A HREF="fd_chap.007.html#50422075_26868">Section 6.5, “Memory management”</A>, and <A HREF="fd_chap.007.html#50422075_28541">Section 6.6, “Graphical output”</A> later on in this chapter.</P>
+<P>
+<A NAME="50422075_pgfId-294767"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422075_pgfId-294766"></A>Note: Frustrum functions are referred to throughout this guide using the field names below. You can decide on the actual function names yourself, however, since the function names you choose are mapped onto the field names when the frustrum is registered.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422075_pgfId-294771"></A>	6.2.1 	<A NAME="50422075_marker-294768"></A><A NAME="50422075_marker-294769"></A><A NAME="50422075_marker-294770"></A>Required functionality </H3>
+<P>
+<A NAME="50422075_pgfId-294772"></A>You must provide the following frustrum functions:</P>
+<P>
+<A NAME="50422075_pgfId-297384"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50422075_pgfId-297709"></A>Frustrum control</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297716"></A><STRONG>
+FSTART</STRONG><A NAME="50422075_marker-297713"></A><A NAME="50422075_marker-297714"></A><A NAME="50422075_marker-297715"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297720"></A>start the frustrum<A NAME="50422075_marker-297718"></A><A NAME="50422075_marker-297719"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297725"></A><STRONG>
+FSTOP</STRONG><A NAME="50422075_marker-297722"></A><A NAME="50422075_marker-297723"></A><A NAME="50422075_marker-297724"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297729"></A>stop the frustrum<A NAME="50422075_marker-297727"></A><A NAME="50422075_marker-297728"></A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422075_pgfId-312940"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50422075_pgfId-297306"></A>File (part data) handling (see <A HREF="fd_chap.007.html#50422075_29223">Section 6.4, “File handling”</A>)</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297313"></A><STRONG>
+FFOPRD</STRONG><A NAME="50422075_marker-399919"></A><A NAME="50422075_marker-399920"></A><A NAME="50422075_marker-399921"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297319"></A>open all guises of file (except roll-back) for reading<A NAME="50422075_marker-399924"></A><A NAME="50422075_marker-399925"></A><A NAME="50422075_marker-399926"></A><A NAME="50422075_marker-399927"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297324"></A><STRONG>
+FFOPWR</STRONG><A NAME="50422075_marker-399930"></A><A NAME="50422075_marker-399931"></A><A NAME="50422075_marker-399932"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297330"></A>open all guises of file (except roll-back) for writing<A NAME="50422075_marker-399935"></A><A NAME="50422075_marker-399936"></A><A NAME="50422075_marker-399937"></A><A NAME="50422075_marker-399938"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297335"></A><STRONG>
+FFREAD</STRONG><A NAME="50422075_marker-399941"></A><A NAME="50422075_marker-399942"></A><A NAME="50422075_marker-399943"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297339"></A>read from file<A NAME="50422075_marker-399946"></A><A NAME="50422075_marker-399947"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297344"></A><STRONG>
+FFWRIT</STRONG><A NAME="50422075_marker-399950"></A><A NAME="50422075_marker-399951"></A><A NAME="50422075_marker-399952"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297348"></A>write to file<A NAME="50422075_marker-399955"></A><A NAME="50422075_marker-399956"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297353"></A><STRONG>
+FFCLOS</STRONG><A NAME="50422075_marker-399959"></A><A NAME="50422075_marker-399960"></A><A NAME="50422075_marker-399961"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297357"></A>close file<A NAME="50422075_marker-399964"></A><A NAME="50422075_marker-399965"></A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422075_pgfId-312947"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50422075_pgfId-297363"></A>Memory handling (see <A HREF="fd_chap.007.html#50422075_26868">Section 6.5, “Memory management”</A>)</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297370"></A><STRONG>
+FMALLO</STRONG><A NAME="50422075_marker-297367"></A><A NAME="50422075_marker-297368"></A><A NAME="50422075_marker-297369"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297376"></A>allocate virtual memory<A NAME="50422075_marker-297372"></A><A NAME="50422075_marker-297373"></A><A NAME="50422075_marker-297374"></A><A NAME="50422075_marker-297375"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297381"></A><STRONG>
+FMFREE</STRONG><A NAME="50422075_marker-297378"></A><A NAME="50422075_marker-297379"></A><A NAME="50422075_marker-297380"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-297383"></A>free virtual memory</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422075_pgfId-297387"></A>	6.2.2 	<A NAME="50422075_marker-297385"></A><A NAME="50422075_marker-297386"></A>Optional functionality </H3>
+<P>
+<A NAME="50422075_pgfId-312997"></A>You can choose whether to implement the following frustrum functions. If you do not, they should be left as NULL. When you initialise the frustrum, all available functions are set to NULL, so you can effectively ignore any functions listed here that you don’t require.</P>
+<P>
+<A NAME="50422075_pgfId-313065"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50422075_pgfId-313000"></A>Frustrum control</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313007"></A><STRONG>
+FABORT</STRONG><A NAME="50422075_marker-313004"></A><A NAME="50422075_marker-313005"></A><A NAME="50422075_marker-313006"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313011"></A>called at the end of an aborted kernel operation<A NAME="50422075_marker-313009"></A><A NAME="50422075_marker-313010"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313016"></A><STRONG>
+FTMKEY</STRONG><A NAME="50422075_marker-313013"></A><A NAME="50422075_marker-313014"></A><A NAME="50422075_marker-313015"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313024"></A>returns sample name keys (used for testing <A NAME="50422075_marker-313018"></A><A NAME="50422075_marker-313019"></A><A NAME="50422075_marker-313020"></A>FFOPRD and <A NAME="50422075_marker-313021"></A><A NAME="50422075_marker-313022"></A><A NAME="50422075_marker-313023"></A>FFOPWR)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422075_pgfId-313068"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50422075_pgfId-313030"></A>Graphical output (see <A HREF="fd_chap.007.html#50422075_28541">Section 6.6, “Graphical output”</A>)</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313037"></A><STRONG>
+GOOPSG</STRONG><A NAME="50422075_marker-313034"></A><A NAME="50422075_marker-313035"></A><A NAME="50422075_marker-313036"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313039"></A>open hierarchical segment</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313044"></A><STRONG>
+GOSGMT</STRONG><A NAME="50422075_marker-313041"></A><A NAME="50422075_marker-313042"></A><A NAME="50422075_marker-313043"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313046"></A>output non-hierarchical segment</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313051"></A><STRONG>
+GOCLSG</STRONG><A NAME="50422075_marker-313048"></A><A NAME="50422075_marker-313049"></A><A NAME="50422075_marker-313050"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-313056"></A>close hierarchical segment<EM>
+</EM><A NAME="50422075_marker-313053"></A><A NAME="50422075_marker-313054"></A><A NAME="50422075_marker-313055"></A></P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422075_pgfId-313061"></A>6.3	<A NAME="50422075_28177"></A><A NAME="50422075_marker-313059"></A><A NAME="50422075_marker-313060"></A>Registering the frustrum 
+
+
+</H1>
+<P>
+<A NAME="50422075_pgfId-294948"></A>Before you can start the modeler and make PK calls, you need to register the frustrum functions with Parasolid. To do this, use the PK function <A NAME="50422075_marker-404763"></A><A NAME="50422075_marker-404764"></A><A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A>,which takes a list of pointers to the frustrum functions you have supplied. </P>
+<P>
+<A NAME="50422075_pgfId-405802"></A>You declare and initialise the frustrum in the same way that you set up any option structure in the PK. The following code extract shows how this might be done. For more details, refer to <A HREF="fd_chap.010.html#50422078_56226">Section 9.2, “PK functions”</A>.</P>
+<P>
+<A NAME="50422075_pgfId-405830"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-405808"></A><A HREF=../headers/pk_session_frustrum_t.html>PK_SESSION_frustrum_t</A> fru; /* <EM>Declare fru as the frustrum</EM> */</PRE>
+<PRE><A NAME="50422075_pgfId-405809"></A>PK_SESSION_frustrum_o_m( fru ); /* <EM>Initialise the frustrum functions</EM> */</PRE>
+<PRE><A NAME="50422075_pgfId-405810"></A>/* <EM>Point to each of the frustrum functions you are supplying</EM> */</PRE>
+<PRE><A NAME="50422075_pgfId-405811"></A>fru.<A NAME="50422075_marker-405812"></A><A NAME="50422075_marker-405813"></A><A NAME="50422075_marker-405814"></A>fstart = MyAppStartFrustrum;</PRE>
+<PRE><A NAME="50422075_pgfId-405815"></A>&nbsp;</PRE>
+<PRE><A NAME="50422075_pgfId-405819"></A>fru.<A NAME="50422075_marker-405816"></A><A NAME="50422075_marker-405817"></A><A NAME="50422075_marker-405818"></A>fabort = MyAppAbortFrustrum;</PRE>
+<PRE><A NAME="50422075_pgfId-405820"></A>&nbsp;</PRE>
+<PRE><A NAME="50422075_pgfId-405824"></A>fru.<A NAME="50422075_marker-405821"></A><A NAME="50422075_marker-405822"></A><A NAME="50422075_marker-405823"></A>goopsg = MyAppOpenSeg;/* <EM>Note: Many functions missing from the list above</EM> */</PRE>
+<PRE><A NAME="50422075_pgfId-405825"></A>/* <EM>Register the frustrum with Parasolid</EM> */</PRE>
+<PRE><A NAME="50422075_pgfId-405826"></A><A NAME="50422075_marker-405827"></A><A NAME="50422075_marker-405828"></A><A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A>( &amp;fru ); </PRE>
+<PRE><A NAME="50422075_pgfId-405829"></A>&nbsp;</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422075_pgfId-405831"></A>In the code above, note that MyAppStartFrustrum represents a function that you have actually supplied a definition for, and <A NAME="50422075_marker-405832"></A><A NAME="50422075_marker-405833"></A><A NAME="50422075_marker-405834"></A>fstart represents a field required by <A NAME="50422075_marker-405835"></A><A NAME="50422075_marker-405836"></A><A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A>. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422075_pgfId-294983"></A>6.4	<A NAME="50422075_29223"></A><A NAME="50422075_marker-294981"></A><A NAME="50422075_marker-294982"></A>File handling 
+
+
+</H1>
+<P>
+<A NAME="50422075_pgfId-294987"></A><A NAME="50422075_marker-294984"></A>The files that Parasolid uses for storing part data are referred to as ‘<A NAME="50422075_marker-294985"></A><A NAME="50422075_marker-294986"></A>transmit’ or ‘XT’ files. In order to transfer data through the frustrum, you need to write to and read from these files. Parasolid can also use several other file types, as described in <A HREF="fd_chap.007.html#50422075_36121">Section 6.4.2, “File types and file extensions”</A>. You need to decide the format and location of these files in order to write your frustrum functions. </P>
+<P>
+<A NAME="50422075_pgfId-338779"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+support\Downward</CODE>
+ <CODE>
+Interfaces\Frustrum</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H3>
+<A NAME="50422075_pgfId-294996"></A>	6.4.1 	<A NAME="50422075_marker-399498"></A><A NAME="50422075_marker-399499"></A><A NAME="50422075_marker-399500"></A><A NAME="50422075_marker-399501"></A><A NAME="50422075_marker-399502"></A>Structuring the file system for your application </H3>
+<P>
+<A NAME="50422075_pgfId-295000"></A>You can configure Parasolid to handle many different kinds of <A NAME="50422075_marker-294997"></A><A NAME="50422075_marker-294998"></A><A NAME="50422075_marker-294999"></A>archiving systems, such as:</P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-295001"></A><STRONG>
+A controlled directory structure</STRONG>, in which part files are saved as individual files on the host computer, or</LI>
+<LI>
+<A NAME="50422075_pgfId-295002"></A><STRONG>
+A database</STRONG> that integrates Parasolid part files with application-specific information.</LI>
+</UL>
+<P>
+<A NAME="50422075_pgfId-295003"></A>Your application should provide the following functionality for managing the files generated and required by Parasolid.</P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-295004"></A>Deleting parts from an archive.</LI>
+<LI>
+<A NAME="50422075_pgfId-295005"></A>Keeping a record of, and listing, the keys used to archive parts, in the current session and in previous sessions. </LI>
+<P>
+<A NAME="50422075_pgfId-295008"></A><A NAME="50422075_marker-295006"></A><A NAME="50422075_marker-295007"></A>The frustrum is passed a <EM>
+key</EM> (a text string) that identifies the part. This key can be used as a filename or as an index into the database, depending on the archiving system you have chosen.</P>
+</UL>
+
+
+<H3>
+<A NAME="50422075_pgfId-295013"></A>	6.4.2 	<A NAME="50422075_36121"></A><A NAME="50422075_marker-295010"></A><A NAME="50422075_marker-295011"></A><A NAME="50422075_marker-295012"></A>File types and file extensions </H3>
+<P>
+<A NAME="50422075_pgfId-295016"></A>Parasolid uses several file types, each of which can be written in one of the following formats:</P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-295017"></A>Neutral binary (recommended)</LI>
+<LI>
+<A NAME="50422075_pgfId-295018"></A>Machine-dependent binary</LI>
+<LI>
+<A NAME="50422075_pgfId-295019"></A>Text</LI>
+</UL>
+<P>
+<A NAME="50422075_pgfId-295022"></A>At a minimum, your application must support <A NAME="50422075_marker-295020"></A><A NAME="50422075_marker-295021"></A>Transmit files. Depending on its functionality, it may also need to deal with some of the other file types described here. </P>
+<P>
+<A NAME="50422075_pgfId-295023"></A>Each file type has a recommended file extension that is also dependent on the file system you are writing to or reading from, as shown in the table below. Note that file extensions ending in <CODE>
+_t</CODE>
+ or <CODE>
+_txt</CODE>
+ denote text-based formats, and extensions ending in <CODE>
+_b</CODE>
+ or <CODE>
+_bin</CODE>
+ denote binary-based formats.</P>
+<P>
+<A NAME="50422075_pgfId-295135"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295026"></A>File type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295028"></A>UNIX/NTFS extensions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295030"></A>FAT extensions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295032"></A>Comment</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295036"></A><A NAME="50422075_marker-295034"></A><A NAME="50422075_marker-295035"></A>Transmit (Part)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295038"></A>.xmt_txt</PRE>
+<PRE><A NAME="50422075_pgfId-295039"></A>.xmt_bin</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295041"></A>.X_T</PRE>
+<PRE><A NAME="50422075_pgfId-295042"></A>.X_B</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295046"></A><A NAME="50422075_marker-295044"></A><A NAME="50422075_marker-295045"></A>Transmit (or XT) files are used to store part or assembly data and are often used for transferring data between Parasolid-powered systems.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-373942"></A>Mesh</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-373944"></A>.xmm_txt</PRE>
+<PRE><A NAME="50422075_pgfId-374660"></A>.xmm_bin</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-373946"></A>.M_T</PRE>
+<PRE><A NAME="50422075_pgfId-375585"></A>.M_B</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-418588"></A>Mesh data of a facet body can either be embedded in the XT file, or stored externally in separate mesh files that have the same key as the corresponding transmit or partition file. See <A HREF="fd_chap.083.html#50422160_81520">Chapter 82, “Overview Of Convergent Modeling”</A> for more information on mesh data.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295050"></A><A NAME="50422075_marker-295048"></A><A NAME="50422075_marker-295049"></A>Schema</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295052"></A>.sch_txt</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295054"></A>.S_T</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295058"></A>Parasolid uses <A NAME="50422075_marker-295056"></A><A NAME="50422075_marker-295057"></A>schema files to read and write data from and to previous versions of Parasolid.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295062"></A><A NAME="50422075_marker-295060"></A><A NAME="50422075_marker-295061"></A>Journal</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295064"></A>.jnl_txt</PRE>
+<PRE><A NAME="50422075_pgfId-295065"></A>.jnl_bin</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295067"></A>.J_T</PRE>
+<PRE><A NAME="50422075_pgfId-295068"></A>.J_B</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295074"></A><A NAME="50422075_marker-295070"></A><A NAME="50422075_marker-295071"></A>Journal files are used to keep a <A NAME="50422075_marker-295072"></A><A NAME="50422075_marker-295073"></A>record of all of the commands issued to Parasolid within a session. <A NAME="50422075_marker-295075"></A><A NAME="50422075_marker-295076"></A>Journal files can be used for debugging.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295080"></A><A NAME="50422075_marker-295078"></A><A NAME="50422075_marker-295079"></A>Snapshot</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295082"></A>.snp_txt</PRE>
+<PRE><A NAME="50422075_pgfId-295083"></A>.snp_bin</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295085"></A>.N_T</PRE>
+<PRE><A NAME="50422075_pgfId-295086"></A>.N_B</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295090"></A>A <A NAME="50422075_marker-295088"></A><A NAME="50422075_marker-295089"></A>snapshot file is a memory dump of a Parasolid session. These files are very rarely used, but are sometimes useful for reproducing faults.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295094"></A><A NAME="50422075_marker-295092"></A><A NAME="50422075_marker-295093"></A>Partition</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295096"></A>.xmp_txt</PRE>
+<PRE><A NAME="50422075_pgfId-295097"></A>.xmp_bin</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295099"></A>.P_T</PRE>
+<PRE><A NAME="50422075_pgfId-295100"></A>.P_B</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295102"></A>Partitions enable related parts to be archived as a single item. Roll-back information allows your application to return a Parasolid session to an earlier state. If your application uses either of these mechanisms, the relevant data is written to a <A NAME="50422075_marker-295103"></A><A NAME="50422075_marker-295104"></A>partition file. See <EM>
+<A HREF="fd_chap.008.html#50422076_28881">Chapter 7, “Further Implementation Decisions”</A></EM> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295113"></A><A NAME="50422075_marker-295109"></A><A NAME="50422075_marker-295110"></A>Delta <A NAME="50422075_marker-295111"></A><A NAME="50422075_marker-295112"></A>transmit</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295115"></A>.xmd_txt</PRE>
+<PRE><A NAME="50422075_pgfId-295116"></A>.xmd_bin</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422075_pgfId-295118"></A>.D_T</PRE>
+<PRE><A NAME="50422075_pgfId-295119"></A>.D_B</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295123"></A><A NAME="50422075_marker-295121"></A><A NAME="50422075_marker-295122"></A>Delta files are used within the roll-back mechanism and are controlled by a separate suite of functions called the <EM>
+delta frustrum</EM><A NAME="50422075_marker-295124"></A><A NAME="50422075_marker-295125"></A>. <A NAME="50422075_marker-295126"></A><A NAME="50422075_marker-295127"></A>Delta <A NAME="50422075_marker-295128"></A><A NAME="50422075_marker-295129"></A>transmit files are an aggregate of all existing <A NAME="50422075_marker-295130"></A><A NAME="50422075_marker-295131"></A>delta files, and their creation is controlled by the frustrum. See <EM>
+<A HREF="fd_chap.008.html#50422076_28881">Chapter 7, “Further Implementation Decisions”</A></EM> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422075_pgfId-317121"></A>The file handling functions in your frustrum must handle all the file types that you decide to support, adding the appropriate extensions. These functions may also test whether a file resides on a DOS style FAT device or a long filename <A NAME="50422075_marker-429586"></A><A NAME="50422075_marker-429587"></A>NTFS type device before adding the extension, unless you decide to support only the FAT extensions, regardless of the filesystem. If you support both FAT and NTFS extensions, files can simply be renamed when transferring between the different systems. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422075_pgfId-295170"></A>6.5	<A NAME="50422075_26868"></A><A NAME="50422075_marker-429600"></A><A NAME="50422075_marker-429601"></A>Memory management 
+
+
+</H1>
+<P>
+<A NAME="50422075_pgfId-295171"></A>You need to supply two memory management functions in the frustrum that allow Parasolid to allocate and free memory for its use. These functions control the way that memory is allocated to and freed for use in:</P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-295172"></A>Internal calculations </LI>
+<LI>
+<A NAME="50422075_pgfId-295173"></A>Data-structure storage</LI>
+</UL>
+<P>
+<A NAME="50422075_pgfId-295182"></A>The memory management functions are <A NAME="50422075_marker-295176"></A><A NAME="50422075_marker-295177"></A><A NAME="50422075_marker-295178"></A>FMALLO (allocate virtual memory) and <A NAME="50422075_marker-295179"></A><A NAME="50422075_marker-295180"></A><A NAME="50422075_marker-295181"></A>FMFREE (free virtual memory).These functions map closely to the C functions malloc and free, and any function definitions you supply should be type-compatible with malloc and free. </P>
+<P>
+<A NAME="50422075_pgfId-295183"></A>You could consider implementing some buffering in order to improve performance compared to the standard functions. For example, with suitable definitions for <A NAME="50422075_marker-295184"></A><A NAME="50422075_marker-295185"></A><A NAME="50422075_marker-295186"></A>FMALLO and <A NAME="50422075_marker-295187"></A><A NAME="50422075_marker-295188"></A><A NAME="50422075_marker-295189"></A>FMFREE:</P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-295190"></A>Small amounts of memory (around 0.1 MBytes) could be served by a pool of memory set up by <A NAME="50422075_marker-295191"></A><A NAME="50422075_marker-295192"></A><A NAME="50422075_marker-295193"></A>FSTART and managed by your application.</LI>
+<LI>
+<A NAME="50422075_pgfId-295194"></A>Large amounts of memory (e.g. 1MB or more) could be requested from the operating system.</LI>
+</UL>
+<P>
+<A NAME="50422075_pgfId-295195"></A>The memory management functions are registered when registering the frustrum.</P>
+<P>
+<A NAME="50422075_pgfId-429344"></A>See <A HREF="fd_chap.010.html#50422078_36769">Section 9.3, “Memory management”</A>, for more information on memory management.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422075_pgfId-295203"></A>6.6	<A NAME="50422075_28541"></A><A NAME="50422075_marker-295202"></A>Graphical output 
+
+
+</H1>
+<P>
+<A NAME="50422075_pgfId-295206"></A><A NAME="50422075_marker-295204"></A><A NAME="50422075_marker-295205"></A>If your application needs to display parts - whether by rendering them on screen, or printing them to a plotter or laser printer - you need to do three things:</P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-295207"></A>Call PK rendering functions to obtain the necessary information from Parasolid. </LI>
+<LI>
+<A NAME="50422075_pgfId-295208"></A>Supply a set of functions known as the GO (Graphical Output) interface to interpret that information.</LI>
+<LI>
+<A NAME="50422075_pgfId-295209"></A>Supply a graphics library that is used to render the parts on the appropriate device.</LI>
+</UL>
+<P>
+<A NAME="50422075_pgfId-295210"></A>When a call is made to one of the PK rendering functions, the graphical data output by Parasolid is passed to the GO functions, which catch and interpret the data, filter it, and use the functionality of the graphics library to render the parts on the appropriate device.</P>
+<P>
+<A NAME="50422075_pgfId-338720"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+support\Downward</CODE>
+ <CODE>
+Interfaces\Go</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H3>
+<A NAME="50422075_pgfId-295215"></A>	6.6.1 	<A NAME="50422075_marker-295211"></A><A NAME="50422075_marker-295212"></A><A NAME="50422075_marker-295213"></A><A NAME="50422075_marker-295214"></A>Calling PK rendering functions </H3>
+<P>
+<A NAME="50422075_pgfId-295216"></A>In order to render part data, your application needs to call a PK rendering function. There are three such functions available:</P>
+<P>
+<A NAME="50422075_pgfId-295248"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295219"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295221"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295225"></A><A NAME="50422075_marker-295223"></A><A NAME="50422075_marker-295224"></A><A HREF=../headers/pk_geom_render.html>PK_GEOM_render</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295227"></A>Renders a geometric entity as a wireframe drawing that is independent of the view required.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295231"></A><A NAME="50422075_marker-295229"></A><A NAME="50422075_marker-295230"></A><A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295234"></A><A NAME="50422075_marker-295233"></A>Renders a list of topological entities as either:</P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-295236"></A><A NAME="50422075_marker-295235"></A>A view independent wireframe drawing </LI>
+<LI>
+<A NAME="50422075_pgfId-295237"></A>A view dependent wireframe drawing</LI>
+<LI>
+<A NAME="50422075_pgfId-295239"></A>A <A NAME="50422075_marker-295238"></A>hidden line drawing</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295243"></A><A NAME="50422075_marker-295241"></A><A NAME="50422075_marker-295242"></A><A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295247"></A><A NAME="50422075_marker-295245"></A><A NAME="50422075_marker-295246"></A>Generates a faceted representation of topological entities.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422075_pgfId-295249"></A>Each of these functions uses the supplied GO functions to pass graphical data to the appropriate graphics library.</P>
+<P>
+<A NAME="50422075_pgfId-295250"></A>The PK outputs graphical information in the form of <EM>
+segments</EM>. These correspond to identifiable portions of the model being rendered, and can be curves or facets (depending on the PK function used). There are two types of segments:</P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-295251"></A>Single-level segments, which contain data describing a curve or facet to be drawn.</LI>
+<LI>
+<A NAME="50422075_pgfId-295252"></A>Hierarchical segments, which usually contain other hierarchical or single-level segments.</LI>
+</UL>
+<P>
+<A NAME="50422075_pgfId-295256"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422075_pgfId-295255"></A>Note: It is possible to generate faceted information without using the GO, by using the function <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A>. This approach may be useful, for instance, if your application needs to perform many calculations on a faceted representation of the model.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422075_pgfId-295260"></A>	6.6.2 	<A NAME="50422075_marker-295257"></A><A NAME="50422075_marker-295258"></A><A NAME="50422075_marker-295259"></A>Supplying GO functions </H3>
+<P>
+<A NAME="50422075_pgfId-295261"></A>Parasolid passes segment data to the GO functions. These functions use the supplied graphics libraries and may generate, for example, screen pictures, plot files and laser print files.</P>
+<P>
+<A NAME="50422075_pgfId-295262"></A>There are three GO functions in the frustrum. They all take the same arguments, but interpret them in different ways. </P>
+<P>
+<A NAME="50422075_pgfId-295289"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295747"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295749"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295754"></A><A NAME="50422075_marker-295751"></A><A NAME="50422075_marker-295752"></A><A NAME="50422075_marker-295753"></A>GOOPSG </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295756"></A>Open a hierarchical segment.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295761"></A><A NAME="50422075_marker-295758"></A><A NAME="50422075_marker-295759"></A><A NAME="50422075_marker-295760"></A>GOSGMT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295763"></A>Output a single-level segment.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295768"></A><A NAME="50422075_marker-295765"></A><A NAME="50422075_marker-295766"></A><A NAME="50422075_marker-295767"></A>GOCLSG </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295770"></A>Close a hierarchical segment.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422075_pgfId-295293"></A>GO functions are registered together with the other frustrum functions. See the <A HREF="fd_chap.007.html#50422075_28177">Section 6.3, “Registering the frustrum”</A> for details.</P>
+
+
+<H3>
+<A NAME="50422075_pgfId-295302"></A>	6.6.3 	<A NAME="50422075_marker-295300"></A><A NAME="50422075_marker-295301"></A>Choosing which graphics libraries to use </H3>
+<P>
+<A NAME="50422075_pgfId-295303"></A>Parasolid’s graphical data output can be used in conjunction with many different graphical libraries. You must supply a graphics library for every device you want to use for rendering output. If your application renders to several different devices (for instance, it might render to the screen, and print paper copy), then you may need to supply several different libraries. You can write your own graphics libraries if you wish, or you can use third party libraries. The <A NAME="50422075_marker-295304"></A><A NAME="50422075_marker-295305"></A><A NAME="50422075_marker-295306"></A>GOSGMT function calls the appropriate libraries in order to perform the necessary rendering. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422075_pgfId-295312"></A>6.7	<A NAME="50422075__Ref462717402"></A><A NAME="50422075_marker-295308"></A><A NAME="50422075_marker-295309"></A><A NAME="50422075_marker-295310"></A><A NAME="50422075_marker-295311"></A>Error handling 
+
+
+</H1>
+<P>
+<A NAME="50422075_pgfId-295314"></A>Parasolid errors can occur in a variety of situations. For example, if your application passes incorrect data to a PK function, or a PK function fails to complete an operation, Parasolid sends a non-zero error code to your application. In other situations, more details concerning the nature of the failure can be returned. In these situations, a value of zero is returned as the error code, and the information is sent back via a status code among the output arguments of the function.</P>
+
+<H3>
+<A NAME="50422075_pgfId-295324"></A>	6.7.1 	<A NAME="50422075_marker-295323"></A>Handling failures with a non-zero error code </H3>
+<P>
+<A NAME="50422075_pgfId-295325"></A>There are two main decisions to make when deciding how to handle these errors: </P>
+<UL>
+<LI>
+<A NAME="50422075_pgfId-295326"></A>Whether your application should register an error-handling function with Parasolid</LI>
+<LI>
+<A NAME="50422075_pgfId-295327"></A>Whether your application should use exceptions</LI>
+</UL>
+<P>
+<A NAME="50422075_pgfId-295328"></A>Your application can write and register a particular function, known as an <STRONG>
+error handler</STRONG>, with Parasolid. This function will be called whenever an error occurs, to perform certain recovery tasks. Parasolid automatically invokes this error-handling function just before returning from a failing PK function, which means that the application does not have to deal with PK errors explicitly.</P>
+<P>
+<A NAME="50422075_pgfId-295329"></A>In addition, your application can choose whether to throw an exception when it encounters an error, via the <CODE>
+try/throw/catch</CODE>
+ statements in C++ (or the equivalent <CODE>
+setjmp/longjmp</CODE>
+ functions in C). This allows program execution to avoid some sections of code, and resume in a convenient place once the error has been dealt with. If your application uses a registered error handler combined with exceptions, it does not need to check the return status of each PK function before proceeding.</P>
+<P>
+<A NAME="50422075_pgfId-295330"></A>Whichever strategy you choose, the same recovery action needs to be taken at some point. This action depends on the severity of the error, as described in the following table:</P>
+<P>
+<A NAME="50422075_pgfId-295362"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295333"></A> Severity</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295335"></A>Current state</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295337"></A>Required action</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295339"></A>Mild</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295341"></A>The operation failed but the parts involved were not altered.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295343"></A>Your application can continue as normal.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295345"></A>Serious</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295347"></A>The parts involved in the operation may have been altered, and may be invalid as a result. The rest of the Parasolid session is intact.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295349"></A>Your application should roll back to a valid state of the model. If rolling back has not been implemented, it should stop and restart the Parasolid session, and re-register the frustrum and the delta frustrum.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295354"></A>Fatal</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295356"></A>The Parasolid session has been corrupted; rolling back, if implemented, will not be effective.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422075_pgfId-295361"></A>Your application should stop and restart the Parasolid session, and re-register the frustrum and the delta frustrum. Occasionally, it may be necessary for the application to exit.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422075_pgfId-295363"></A>6.7.1.1 Registering an error handler </H4>
+<P>
+<A NAME="50422075_pgfId-295364"></A>You register an error-handling function with Parasolid by calling <A HREF=../headers/pk_error_register_callbacks.html>PK_ERROR_register_callbacks</A>. Your error handler must receive a pointer to a <A HREF=../headers/pk_error_sf_t.html><A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A></A> structure and have the return type <A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>, although it need not necessarily return a value, as this is not used by Parasolid. The <A HREF=../headers/pk_error_sf_t.html><A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A></A> structure contains details of the error such as the name of the failing function, the error code, and the severity of the error.</P>
+<P>
+<A NAME="50422075_pgfId-295372"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422075_pgfId-295371"></A>Warning: Your error handler should not attempt to alter any details of the current error (by modifying the <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure, or returning a different error code). Parasolid stores this information separately, and so any such alterations would have no effect.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422075_pgfId-295382"></A>	6.7.2 	<A NAME="50422075_marker-295381"></A>Handling failures with a zero error code </H3>
+<P>
+<A NAME="50422075_pgfId-295383"></A>The documentation for each Parasolid function indicates whether it may return failure information through a status code, and if so, which variable contains the status code.</P>
+<P>
+<A NAME="50422075_pgfId-295387"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422075_pgfId-295386"></A>Warning: For functions that return fault information via their arguments, you should explicitly check the contents of these arguments in your application to establish the success or failure of the operation. A registered error handler will <EM>
+not</EM> be called in these situations.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422075_pgfId-295439"></A>6.8	<STRONG>
+</STRONG><A NAME="50422075_marker-395008"></A><A NAME="50422075_marker-395009"></A><A NAME="50422075_marker-395010"></A><A NAME="50422075_marker-395011"></A><A NAME="50422075_marker-395012"></A><A NAME="50422075_marker-395013"></A><A NAME="50422075_marker-395014"></A><A NAME="50422075_marker-395015"></A><A NAME="50422075_43505"></A>Starting and stopping a Parasolid session 
+
+
+</H1>
+<P>
+<A NAME="50422075_pgfId-295442"></A>You use the function <A NAME="50422075_marker-295440"></A><A NAME="50422075_marker-295441"></A><A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> to start the Parasolid modeler. This takes an options structure that you can use to specify session specific options, as described in <A HREF="fd_chap.008.html#50422076_11397">Section 7.5, “Session parameters”</A>.</P>
+<P>
+<A NAME="50422075_pgfId-295448"></A>You use the function <A NAME="50422075_marker-295446"></A><A NAME="50422075_marker-295447"></A><A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A> to stop the Parasolid modeler.</P>
+<P>
+<A NAME="50422075_pgfId-295452"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422075_pgfId-295451"></A>Warning: You <STRONG>
+must</STRONG> register the frustrum before attempting to start a Parasolid session.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422075_pgfId-295457"></A><EM>
+</EM><A NAME="50422075_marker-295453"></A><A NAME="50422075_marker-295454"></A><A NAME="50422075_marker-295455"></A><A NAME="50422075_marker-295456"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.006.html">Application Design And Architecture</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.008.html">Further Implementation Decisions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

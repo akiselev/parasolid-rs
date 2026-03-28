@@ -1,0 +1,156 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_apply_knit_pattern</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_apply_knit_pattern</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_BODY_apply_knit_pattern
+(
+<I>--- received arguments ---
+</I>const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                       body,         --- target body
+const <A HREF=../headers/pk_body_knit_pattern_t.html>PK_BODY_knit_pattern_t</A>         *knit_pattern, --- knitting pattern
+                                                    --- to be applied
+const <A HREF=../headers/pk_body_apply_knit_pattern_o_t.html>PK_BODY_apply_knit_pattern_o_t</A> *options,      --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_knit_result_t.html>PK_BODY_knit_result_t</A>          *const knit_result   --- status, edges not knit
+)
+</B>
+<A NAME="description"></A>
+<I>This function assembles a composite sheet or solid body by merging paired edge
+in the knit pattern
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+  PK_ERROR_corrupt_body           Corrupted target body
+  PK_ERROR_bad_type               bad type
+  PK_ERROR_wire_body              An edge in the pattern is from a wire body
+  PK_ERROR_no_eds_from_target     No edges in the pattern are from target body
+  PK_ERROR_instanced_tools        An edge is from an instanced (non-target)
+                                  body
+  PK_ERROR_duplicate_array_item   The same edge appears in both lists or twice
+                                  in one of the lists
+  PK_ERROR_not_in_same_partition  Edges are not all in the same partition
+  PK_ERROR_general_body           One of the edges is owned by a general body
+
+
+<A NAME="documentation"></A>
+  This function joins a number of faces or bodies together by fusing coincident
+  edge topology. This process is henceforth referred to simply as "knitting";
+  it should be noted that it is a purely topological operation which will NOT
+  perform any geometric checks whatsoever.
+
+  See <A HREF="../chapters/fd_chap.047.html#50434407_pgfId-692323">Knitting sheets together</A> for more information. See
+  <A HREF="../chapters/fd_chap.047.html#50434407_pgfId-297271">Applying connectivity information</A> for information specific to this
+  function.
+
+  <B>'body'</B> is the body the application wishes to hold the final result of the
+  knitting operation. All the other body topology to be joined onto <B>'body'</B> is
+  supplied indirectly in the two arrays of edges held in the knitting pattern
+  supplied in <B>'knit_pattern'</B>. <B>'body'</B> must be a  solid or sheet body, and all
+  edges in the knitting pattern must be edges of solids and/or sheets. All
+  bodies except <B>'body'</B> involved in the knit will be destroyed. The edges in
+  the <B>'edges'</B> array within the knitting pattern will survive the knit while
+  those in <B>'matches'</B> array of the same pattern will be destroyed. The outer
+  shell of <B>'body'</B> will also be the outer shell of the result.
+
+  The two edge arrays of the knitting pattern specify matching edge pairs to
+  be fused together. These must not contain duplicate entries. In addition, at
+  least one edge from the target <B>'body'</B> must appear in the pattern and any
+  edge not in that target body must not come from an instanced body.
+
+  Pairs of edges in corresponding positions in the <B>'edges'</B> and <B>'matches'</B>
+  arrays of the knitting pattern will be knitted together, provided that
+  these corresponding edges satisfy the following:
+
+      (1) they match up 1:1, i.e. every edge in <B>'edges'</B> has ONE partner in
+         <B>'matches'</B>
+      (2) they have the same number of distinct vertices.
+      (3) an edge in sheet body has only one adjacent face and a face in
+          a solid body has one adjacent face with a surface attached and
+          one without.
+
+  The 1:1 matching is done automatically by other routines in the most common
+  uses of PK_BODY_apply_knit_pattern. In Partial Booleans the pattern edge
+  lists are made up by <A HREF=../headers/pk_body_imprint_body.html>PK_BODY_imprint_body</A> and then further filtered by
+  <A HREF=../headers/pk_body_identify_facesets.html>PK_BODY_identify_facesets</A>. <A HREF=../headers/pk_body_find_knit_pattern.html>PK_BODY_find_knit_pattern</A> can also be used to
+  infer the connectivity of an assemblage of sheets. The application can, of
+  course, create a knitting pattern itself, though it then runs the risk of
+  creating an inconsistent body if geometric tolerance requirements are not
+  met.
+
+  The option field <B>'body_type'</B> enables the application to force the type
+  (PK_BODY_sewing_solid_c or PK_BODY_sewing_sheet_c) of the result body.
+  If the token PK_BODY_sewing_any_c is supplied then a solid will be
+  created if possible (i.e. if the knitting operation encloses a volume) and a
+  sheet will be created otherwise.
+
+  The option field <B>'sort_face_shells'</B> enables the application to control
+  whether PK_BODY_apply_knit_pattern attempts to sort the resulting faces
+  into their respective shells. This operation will not need to be done
+  when PK_BODY_apply_knit_pattern is used within a partial Boolean.
+
+  The returned structure <B>'knit_result'</B> holds information about the edges that
+  were not knitted together, and the level of success in applying the knitting
+  pattern.
+
+  Within <B>'knit_result'</B> the array <B>'unknit_edges'</B> contains all those edges from
+  the <B>'edges'</B> array within <B>'knit_pattern'</B> which did not knit together because
+  of a failure to meet the conditions described above.
+
+  In the cases where a solid body was required ('type' PK_BODY_sewing_solid_c)
+  the <B>'unknit_edges'</B> array will additionally contain all edges in the result
+  body which have only one adjacent face with a surface attached. The presence
+  of such edges in a  knitted solid is a consequence of the received knitting
+  pattern being incomplete (i.e. edges were omitted from the knitting pattern
+  which were necessary in order to successfully enclose a volume). The <B>'status'</B>
+  field of <B>'knit_result'</B> will be set to PK_BODY_knit_not_completed_c
+  in such cases, though all edges not in <B>'unknit_edges'</B> will still have been
+  knitted successfully.
+
+  The <B>'status'</B> field of <B>'knit_result'</B> will normally be set to
+  PK_BODY_knit_completed_c on a successful knit. Note that the error
+  PK_ERROR_corrupt_body should never be returned in normal operation,
+  and indicates either an internal failure or a corrupt input body.
+
+  This function is not supported for general bodies.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

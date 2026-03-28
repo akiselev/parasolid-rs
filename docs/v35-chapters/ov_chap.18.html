@@ -1,0 +1,307 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Multi-Processing Support</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Multi-Processing Support</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.17.html">Writing Parasolid Applications</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.20.html">Index</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.18.html#50446373_pgfId-278719">17.1	Support for multi-processing in Parasolid</A>
+<LI> <A HREF="ov_chap.18.html#50446373_pgfId-277391">17.2	Symmetric multi-processing in Parasolid</A>
+<UL>
+<LI> <A HREF="ov_chap.18.html#50446373_pgfId-277396">17.2.1	Expectations from Parasolid SMP</A>
+<LI> <A HREF="ov_chap.18.html#50446373_pgfId-277400">17.2.2	Thread locking</A>
+<LI> <A HREF="ov_chap.18.html#50446373_pgfId-277402">17.2.3	Functional areas that are SMP-enabled</A>
+</UL>
+<LI> <A HREF="ov_chap.18.html#50446373_pgfId-277414">17.3	Calling Parasolid from multiple threads</A>
+<LI> <A HREF="ov_chap.18.html#50446373_pgfId-277400">17.4	Locking partitions to threads</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446373_pgfId-278719"></A>17.1	<A NAME="50446373_marker-293418"></A><A NAME="50446373_Session support"></A><A NAME="50446373_Symmetric multi-processing"></A>Support for multi-processing in Parasolid
+
+
+</H1>
+<P>
+<A NAME="50446373_pgfId-278575"></A>Parasolid provides several separate mechanisms to help applications benefit from multiple processors on the host machine.</P>
+<UL>
+<LI>
+<A NAME="50446373_pgfId-277388"></A>Symmetric multi-processing (SMP): See <A HREF="ov_chap.18.html#50446373_11483">Section 17.2, &#8220;Symmetric multi-processing in Parasolid&#8221;</A>, for more information.</LI>
+<LI>
+<A NAME="50446373_pgfId-277389"></A>Multiple application threads: See <A HREF="ov_chap.18.html#50446373_83839">Section 17.3, &#8220;Calling Parasolid from multiple threads&#8221;</A>, for more information.</LI>
+<LI>
+<A NAME="50446373_pgfId-294080"></A>Partition locking: See <A HREF="ov_chap.18.html#50446373_63366">Section 17.4, &#8220;Locking partitions to threads&#8221;</A>, for more information.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446373_pgfId-277391"></A>17.2	<A NAME="50446373_11483"></A>Symmetric multi-processing in Parasolid
+
+
+</H1>
+<P>
+<A NAME="50446373_pgfId-277392"></A>Parasolid provides multi-processor support via its Symmetric Multi-Processing (SMP) mechanism.SMP allows key algorithms beneath the Parasolid API to make use of multiple processors if they are present on a host machine. </P>
+<P>
+<A NAME="50446373_pgfId-295450"></A>A number of functional areas within Parasolid have been adapted for SMP, making it possible to reduce the execution time of certain operations, thereby improving the performance of Parasolid when running on multi-processor systems. For example, if your application needs to calculate the mass of a model. Parasolid will perform this calculation face-by-face and if it uses SMP then calculations on the different faces may be calculated on different processors. </P>
+<P>
+<A NAME="50446373_pgfId-295852"></A>For a list of areas that are SMP-enabled, see <A HREF="ov_chap.18.html#50446373_28929">Section 17.2.3, &#8220;Functional areas that are SMP-enabled&#8221;</A>.</P>
+<P>
+<A NAME="50446373_pgfId-277394"></A>Parasolid SMP is enabled on the most widely used Parasolid platforms - Windows, Linux and MacOS.</P>
+<P>
+<A NAME="50446373_pgfId-277395"></A>Currently, Parasolid can create a maximum of 8 threads for SMP work.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446373_pgfId-277396"></A>	17.2.1 	Expectations from Parasolid SMP </H2>
+<P>
+<A NAME="50446373_pgfId-277397"></A>The SMP mechanism facilitates a shorter execution time for key Parasolid algorithms. Significant improvements in execution time can be achieved, though since the improvement depends on the nature of the operations being performed, it is not possible to quote a figure for the general performance improvement achieved by using SMP.</P>
+<P>
+<A NAME="50446373_pgfId-277398"></A>SMP is implemented beneath the API level, typically in low-level internal algorithms. These algorithms typically only form part of the code path called by a given API function and may be invoked to different degrees depending on the nature of the received arguments passed by the application to the function. The reduction in execution time is affected accordingly. For these reasons, you should not expect an automatic 50% speed up at the  function level when enabling SMP on a two processor machine.</P>
+<P>
+<A NAME="50446373_pgfId-277399"></A>Similarly, due to the nature of SMP, the scaling of performance with an increased number of processors is not expected to be linear. For example, if you see a 20% performance improvement for a particular function call on a 2 processor machine, this does not automatically mean that you would see a 40% performance improvement on a 4 processor machine.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446373_pgfId-277400"></A>	17.2.2 	Thread locking</H2>
+<P>
+<A NAME="50446373_pgfId-278270"></A>The overhead of thread locking can mean that isolated function calls on some platforms will actually run slightly slower with SMP enabled than with SMP disabled. We strive to minimise this in our implementation and work in collaboration with hardware vendors to do the same. If you do find functions that run excessively slowly, the Parasolid team is happy to investigate these on a case by case basis.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446373_pgfId-277402"></A>	17.2.3 	<A NAME="50446373_28929"></A>Functional areas that are SMP-enabled</H2>
+<P>
+<A NAME="50446373_pgfId-277403"></A>The following table shows the main functional areas and/or functions that can benefit from Parasolid SMP being enabled.   </P>
+<P>
+<A NAME="50446373_pgfId-277477"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277487"></A>Functional area</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277489"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277491"></A>Validity checking	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277493"></A>Implemented at the face level.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277495"></A>Boolean operations	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277626"></A>Implemented for face-face clashing portion of algorithm.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277499"></A>Wireframe rendering	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277501"></A>Implemented at the body occurrence level.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277503"></A>Hidden line rendering	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277505"></A>Implemented at the body level during initial processing and at an intersection level during line/line intersection.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277507"></A>Closest approach</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277509"></A>Multiple points must be supplied.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277511"></A>Faceting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277513"></A>Implemented at the body level. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277515"></A>Mass properties	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277517"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277884"></A>Spline creation	</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-277521"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-292208"></A>Isocline generation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446373_pgfId-292210"></A>&nbsp;</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446373_pgfId-277414"></A>17.3	<A NAME="50446373_83839"></A>Calling Parasolid from multiple threads
+
+
+</H1>
+<P>
+<A NAME="50446373_pgfId-277416"></A>Parasolid is <STRONG>
+thread-safe</STRONG>, in that it can be called simultaneously from multiple threads within an application safely. Threads that an application sends into Parasolid are called <STRONG>
+application threads</STRONG>. They are not the same thing as the internal <STRONG>
+worker threads</STRONG> that are created by Parasolid SMP. If Parasolid SMP is enabled, calling an SMP-enabled function in an application thread causes Parasolid to create and use worker threads.</P>
+<P>
+<A NAME="50446373_pgfId-277417"></A>The Parasolid APIs manage multiple application threads to ensure safety. Parasolid functions can behave as one or more of the following types: </P>
+<UL>
+<LI>
+<A NAME="50446373_pgfId-295497"></A>Concurrent functions can be executed simultaneously by different application threads. </LI>
+<LI>
+<A NAME="50446373_pgfId-295500"></A>Exclusive functions prevent other application threads from entering Parasolid until it has completed. </LI>
+<LI>
+<A NAME="50446373_pgfId-295503"></A>Locally exclusive functions act as concurrent functions when called from a locked partition, but behave exclusively if no partitions are locked. For more information, see <A HREF="ov_chap.18.html#50446373_63366">Section 17.4, &#8220;Locking partitions to threads&#8221;</A>. </LI>
+</UL>
+<P>
+<A NAME="50446373_pgfId-277419"></A>Parasolid can be called from multiple application threads on all available platforms.</P>
+<P>
+<A NAME="50446373_pgfId-277420"></A>Enabling internal algorithms to benefit from SMP or allowing Parasolid APIs to be called concurrently is not a substitute for general performance optimisation of our algorithms. Our philosophy is to ensure that all algorithms, are written in a performance optimal manner with minimum redundancy</P>
+<P>
+<A NAME="50446373_pgfId-277421"></A>This is an area of active development; Parasolid support for multiprocessors is continually evolving to meet the exacting requirements of a sophisticated and diverse customer-base. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446373_pgfId-277400"></A>17.4	<A NAME="50446373_63366"></A>Locking partitions to threads
+
+
+</H1>
+<P>
+<A NAME="50446373_pgfId-278270"></A>When calling Parasolid from multiple threads, it is possible to lock one or more partitions to a given thread. With this mechanism, the thread can only operate on the data in the partition(s) that it controls and no other thread can operate on the data in the locked partitions. The advantage of this is that it allows an application to execute exclusive API calls in parallel so long as each one is called on data from locked partitions.<A NAME="50446373_31971"></A></P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.17.html">Writing Parasolid Applications</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.20.html">Index</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

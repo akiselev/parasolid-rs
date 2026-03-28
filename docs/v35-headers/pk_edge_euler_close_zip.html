@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_euler_close_zip</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_euler_close_zip</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> PK_EDGE_euler_close_zip
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>       edge1,  --- Edge to zip
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>       edge2   --- Edge to delete
+)
+</B>
+<A NAME="description"></A>
+<I>This function "zips" two edges together by merging the vertices at either end.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_edge_not_manifold   <B>'edge1'</B> or <B>'edge2'</B> is not manifold (MILD)
+    PK_ERROR_edge_not_open       <B>'edge1'</B> or <B>'edge2'</B> is closed (MILD)
+    PK_ERROR_bad_vertex          <B>'edge1'</B> or <B>'edge2'</B> has a bad vertex (MILD)
+    PK_ERROR_no_common_vertex    <B>'edge1'</B> and <B>'edge2'</B> have no common
+                                 vertex (MILD)
+    PK_ERROR_bad_edge            <B>'edge1'</B> and <B>'edge2'</B> have both vertices
+                                 in common (MILD)
+
+<A NAME="documentation"></A>
+This function "zips" the two edges together into one. Both <B>'edge1'</B> and <B>'edge2'</B>
+must be open, share exactly one vertex, be adjacent around a loop and have
+valid vertices. Both edges must also be manifold although the vertices need
+not be manifold.
+
+If <B>'edge1'</B> and <B>'edge2'</B> are the only edges of their vertex, the right hand side
+of <B>'edge1'</B> will be zipped up.
+
+Both vertices of <B>'edge1'</B> will survive, the vertex of <B>'edge2'</B> at the open end of
+the zip will be deleted and <B>'edge2'</B> will be deleted.
+
+Any geometry on the deleted edge and vertex will also be deleted.
+
+Any curves attached to fins of the loop shared by the edges will be deleted.
+If <B>'edge2'</B> is tolerant, the other fin curve of <B>'edge2'</B> will be attached as a
+fin curve to <B>'edge1'</B>.
+
+The resulting body will normally be invalid.
+
+The inverse of this function is <A HREF=../headers/pk_edge_euler_open_zip.html>PK_EDGE_euler_open_zip</A>.
+
+See <A HREF="../chapters/fd_chap.033.html#50434391_pgfId-295452">here</A> for an illustration.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

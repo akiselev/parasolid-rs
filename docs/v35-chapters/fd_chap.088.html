@@ -1,0 +1,534 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Filling Holes In Facet Bodies</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Filling Holes In Facet Bodies</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.087.html">Checking and Repairing Mesh Data</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.089.html">Performing Evaluations On Meshes</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.088.html#50422165_pgfId-342984">87.1	Introduction </A>
+<LI> <A HREF="fd_chap.088.html#50422165_pgfId-342990">87.2	Overview of the API </A>
+<LI> <A HREF="fd_chap.088.html#50422165_pgfId-343011">87.3	Choosing which holes to fill </A>
+<UL>
+<LI> <A HREF="fd_chap.088.html#50422165_pgfId-343016">87.3.1	Choosing holes based on chains of mfins </A>
+<LI> <A HREF="fd_chap.088.html#50422165_pgfId-343022">87.3.2	Choosing holes based on help positions </A>
+</UL>
+<LI> <A HREF="fd_chap.088.html#50422165_pgfId-343031">87.4	Controlling the shape of the patch </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422165_pgfId-342984"></A>87.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422165_pgfId-342985"></A>Parasolid supports functionality for filling holes in a mesh, thereby providing you with the ability to effect repairs, for example after importing a mesh stored in a foreign facet format. This functionality is comparable to the topological fill hole functionality provided by <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A>, but differs in several important ways, including:</P>
+<UL>
+<LI>
+<A NAME="50422165_pgfId-342986"></A>Automatically identifying holes in the mesh based on the presence of chains of connected laminar fins.</LI>
+<LI>
+<A NAME="50422165_pgfId-342987"></A>Providing two APIs, rather than one, allowing you maximum choice when implementing workflows for your application.</LI>
+<LI>
+<A NAME="50422165_pgfId-342988"></A>Returning the repaired mesh as a new mesh, rather than making repairs by editing the original.</LI>
+</UL>
+<P>
+<A NAME="50422165_pgfId-350804"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-350857"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422165_pgfId-350844"></A><A HREF="fd_chap.070.html#50422145_51018">Chapter 69, “Filling Holes In A Body”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422165_pgfId-342990"></A>87.2	<A NAME="50422165_77216"></A>Overview of the API 
+
+
+</H1>
+<P>
+<A NAME="50422165_pgfId-342991"></A>Parasolid provides two functions dedicated to filling holes in a mesh:</P>
+<P>
+<A NAME="50422165_pgfId-343599"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343277"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343279"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343281"></A><A HREF=../headers/pk_mesh_find_laminar_mfins.html>PK_MESH_find_laminar_mfins</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343283"></A>Finds the laminar mfins in a mesh, returning them in groups of connected chains.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343285"></A><A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343287"></A>Fills holes in the given mesh, returning a new mesh with the specified holes filled.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422165_pgfId-342995"></A>Depending on the type of workflow you wish to implement, you can use <A HREF=../headers/pk_mesh_find_laminar_mfins.html>PK_MESH_find_laminar_mfins</A> to let your users identify which holes to fill, before passing this information to <A HREF=../headers/pk_mesh_fill_holes.html><A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A></A> to perform the repair itself, or you can use <A HREF=../headers/pk_mesh_fill_holes.html><A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A></A> to automatically fill all holes in a mesh that fulfill a specified set of criteria.</P>
+<P>
+<A NAME="50422165_pgfId-342997"></A>A summary of the options provided by these functions is as follows:</P>
+<P>
+<A NAME="50422165_pgfId-342999"></A><A HREF=../headers/pk_mesh_find_laminar_mfins.html>PK_MESH_find_laminar_mfins</A> finds laminar mfins in a mesh, based on the following options:</P>
+<P>
+<A NAME="50422165_pgfId-343605"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343294"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343296"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422165_pgfId-343298"></A>max_mfins</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343300"></A>The maximum number of mfins you want in any returned chain of mfins. Laminar boundaries that contain more than this number of mfins are not returned. See <A HREF="fd_chap.088.html#50422165_34672">Section 87.3.1, “Choosing holes based on chains of mfins”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422165_pgfId-343302"></A>help_positions</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343304"></A>An array of position data to help locate chains of mfins to return. See <A HREF="fd_chap.088.html#50422165_49228">Section 87.3.2, “Choosing holes based on help positions”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422165_pgfId-343306"></A>want_plines</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343308"></A>If PK_LOGICAL_true, then a polyline is created for each chain of mfins returned.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422165_pgfId-366262"></A>open_comps</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-366264"></A>Whether laminar mfins should be returned as open components if they cannot be grouped into closed components. Any laminar mfins that are returned as open components should not be used for filling mesh holes. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422165_pgfId-369050"></A>The <CODE>
+open_comps</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422165_pgfId-369338"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-368181"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-368183"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-368185"></A><A HREF=../headers/pk_mesh_open_comps_t.html>PK_MESH_open_comps_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-368187"></A>If laminar mfins cannot be grouped into closed components the function will return PK_ERROR_mesh_open_components. Default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-368189"></A><A HREF=../headers/pk_mesh_open_comps_t.html>PK_MESH_open_comps_allow_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-368191"></A>Any laminar mfins that cannot be grouped into closed components are returned as open components.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-368193"></A><A HREF=../headers/pk_mesh_open_comps_t.html>PK_MESH_open_comps_report_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-368195"></A>In addition to returning the same information as <A HREF=../headers/pk_mesh_open_comps_t.html>PK_MESH_open_comps_allow_c</A>, a Parasolid Report of type <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_3_c</A> is created with a status of <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_mesh_open_comps_c</A>. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422165_pgfId-343005"></A><A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A> fills holes in a mesh, based on the number of connected mfins in any of the mesh’s boundaries. In addition, it fills any holes you specify explicitly. It takes the following options:</P>
+<P>
+<A NAME="50422165_pgfId-346600"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343207"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343209"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422165_pgfId-343211"></A>max_n_mfins</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343213"></A>The maximum number of mfins on the boundary of any hole to be filled. Laminar boundaries that contain more than this number of mfins are not filled. See <A HREF="fd_chap.088.html#50422165_34672">Section 87.3.1, “Choosing holes based on chains of mfins”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422165_pgfId-343215"></A>input_holes</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343217"></A>A list of boundary mfins defining holes to be filled in addition to those identified by <CODE>
+max_n_mfins</CODE>
+. See <A HREF="fd_chap.088.html#50422165_49228">Section 87.3.2, “Choosing holes based on help positions”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422165_pgfId-343219"></A>fill_shape</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343221"></A>The method used to create patches for holes in the mesh. Different values for this option yield results with different numbers of facets and different appearances. See <A HREF="fd_chap.088.html#50422165_52232">Section 87.4, “Controlling the shape of the patch”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422165_pgfId-343611"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422165_pgfId-346618"></A>Note: The <CODE>
+max_n_mfins</CODE>
+ and <CODE>
+input_holes</CODE>
+ work independently of each other, within the same call to <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A>. For example, if you specify <CODE>
+max_n_mfins</CODE>
+ as 8 and also pass a 10 fin chain to <CODE>
+input_holes</CODE>
+, <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A> fills all holes with boundaries of 8 or fewer mfins, and also fills the 10 mfin hole specified. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422165_pgfId-343011"></A>87.3	Choosing which holes to fill 
+
+
+</H1>
+<P>
+<A NAME="50422165_pgfId-343012"></A>In order to fill holes in a mesh, you need to set suitable options in <A HREF=../headers/pk_mesh_find_laminar_mfins.html>PK_MESH_find_laminar_mfins</A> and <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A> so that holes can be correctly identified. There are two fundamental approaches to choosing which holes in a mesh to fill. </P>
+<UL>
+<LI>
+<A NAME="50422165_pgfId-343013"></A>Choose a range of holes to fill by specifying a maximum number of mfins which any hole must contain.</LI>
+<LI>
+<A NAME="50422165_pgfId-343014"></A>Use help positions to identify nearby holes to be filled. </LI>
+</UL>
+<P>
+<A NAME="50422165_pgfId-344091"></A>This section explains how you can implement both these approaches.</P>
+
+<H3>
+<A NAME="50422165_pgfId-343016"></A>	87.3.1 	<A NAME="50422165_34672"></A>Choosing holes based on chains of mfins </H3>
+<P>
+<A NAME="50422165_pgfId-343017"></A>You can define which holes to fill by specifying the maximum number of mfins that should be considered to represent the boundary of a hole. This allows you to exclude large chains of mfins (which might represent, for example, the boundary of an entire mesh, rather than a hole within that mesh). You can specify a maximum number of mfins using either <A HREF=../headers/pk_mesh_find_laminar_mfins.html>PK_MESH_find_laminar_mfins</A> or <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A>, as follows:</P>
+<P>
+<A NAME="50422165_pgfId-369542"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343355"></A>To identify holes using this function:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343357"></A>Do this:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343359"></A>Result</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343361"></A><A HREF=../headers/pk_mesh_find_laminar_mfins.html>PK_MESH_find_laminar_mfins</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343363"></A>Specify the maximum number of mfins using the <CODE>
+max_mfins</CODE>
+ option.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343365"></A>The function returns chains of laminar mfins with at most <CODE>
+max_mfins</CODE>
+ elements. To fill the holes these chains represent, pass the chains into <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A> using the <CODE>
+input_holes</CODE>
+ option.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343367"></A><A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343369"></A>Specify the maximum number of mfins using the <CODE>
+max_n_mfins</CODE>
+ option.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343371"></A>All chains of mfins containing fewer than <CODE>
+max_n_mfins</CODE>
+ are filled during the call to <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A>. You should use a value of at least 3 for <CODE>
+max_n_mfins</CODE>
+, since any value less than this cannot represent a hole. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422165_pgfId-343022"></A>	87.3.2 	<A NAME="50422165_49228"></A>Choosing holes based on help positions </H3>
+<P>
+<A NAME="50422165_pgfId-343023"></A>If you want to identify specific holes in to fill, you should use the <CODE>
+help_positions</CODE>
+ option in <A HREF=../headers/pk_mesh_find_laminar_mfins.html>PK_MESH_find_laminar_mfins</A>. You could use this option, for example, to implement a workflow in which your users choose which hole to fill using Parasolid’s picking functionality. See <A HREF="fd_chap.112.html#50422192_40605">Chapter 111, “Picking Topology”</A>, for more information on this functionality.</P>
+<P>
+<A NAME="50422165_pgfId-343025"></A>The <CODE>
+help_positions</CODE>
+ option takes an array of position vectors, and for each position vector specified, <A HREF=../headers/pk_mesh_find_laminar_mfins.html>PK_MESH_find_laminar_mfins</A> returns the closest chain of connected mfins. To subsequently fill the holes identified using <CODE>
+help_positions</CODE>
+, pass the returned chains to <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A> using the <CODE>
+input_holes</CODE>
+ option: holes specified using this option are filled regardless of any other options set. </P>
+<P>
+<A NAME="50422165_pgfId-344775"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1099.gif">
+
+<P>
+<A NAME="50422165_pgfId-344757"></A>Figure 87-1 Filling specific holes using help positions</P>
+<P>
+<A NAME="50422165_pgfId-367889"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422165_pgfId-343474"></A>Note: To fill <EM>
+only</EM> the holes identified using <CODE>
+help_positions</CODE>
+, leave the <CODE>
+max_n_mfins</CODE>
+ option in <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A> at the default value of 0. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422165_pgfId-343031"></A>87.4	<A NAME="50422165_52232"></A>Controlling the shape of the patch 
+
+
+</H1>
+<P>
+<A NAME="50422165_pgfId-343032"></A>You can use the <CODE>
+fill_shape</CODE>
+ option in <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A> to control the shape of the patches that are created in the resulting filled mesh. This can take the following values:</P>
+<P>
+<A NAME="50422165_pgfId-344476"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343182"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343184"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343186"></A><A HREF=../headers/pk_mesh_fill_shape_t.html>PK_MESH_fill_shape_linear_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343188"></A>Fills each hole without creating new mesh vertices in the interior of each hole. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343190"></A><A HREF=../headers/pk_mesh_fill_shape_t.html>PK_MESH_fill_shape_refined_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343192"></A>Produces a similar shape to <A HREF=../headers/pk_mesh_fill_shape_t.html>PK_MESH_fill_shape_linear_c</A>, but may introduce new mesh vertices in the interior of each hole to ensure new facets maintain approximately the same size as those nearby. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343194"></A><A HREF=../headers/pk_mesh_fill_shape_t.html>PK_MESH_fill_shape_tangent_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343196"></A>Uses a similar method to <A HREF=../headers/pk_mesh_fill_shape_t.html>PK_MESH_fill_shape_refined_c</A>, but additionally maintains tangency of the mesh around the boundary of each hole. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343198"></A><A HREF=../headers/pk_mesh_fill_shape_t.html>PK_MESH_fill_shape_curvature_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422165_pgfId-343200"></A>Uses a similar method to <A HREF=../headers/pk_mesh_fill_shape_t.html>PK_MESH_fill_shape_tangent_c</A>, but in addition adjusts the patch to maintain the general curvature of the mesh around the boundary of each hole.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422165_pgfId-344577"></A><A HREF="fd_chap.088.html#50422165_47561"><EM>
+Figure 87-2</EM></A> shows the effect of using different values of <CODE>
+fill_shape</CODE>
+ to fill a hole in a spherical mesh. </P>
+<P>
+<A NAME="50422165_pgfId-344608"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1100.gif">
+
+<P>
+<A NAME="50422165_pgfId-331908"></A>Figure 87-2 <A NAME="50422165_47561"></A>Controlling the shape of the patch</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.087.html">Checking and Repairing Mesh Data</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.089.html">Performing Evaluations On Meshes</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

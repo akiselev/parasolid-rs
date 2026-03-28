@@ -1,0 +1,436 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Interpreting Edge Blending Error Codes</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Interpreting Edge Blending Error Codes</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.079.html">Three-Face Blending</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.081.html">Interpreting Face-Face Blending Error Codes</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-294758">79.1	Introduction </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-294770">79.2	Severe errors </A>
+<UL>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-294772">79.2.1	Configuration of edges at a vertex is too complex </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-294879">79.2.2	Unspecified numerical problem with blend </A>
+</UL>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-294890">79.3	Configuration errors - general </A>
+<UL>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-294898">79.3.1	Blend requires invalid extension of B-surface </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-294907">79.3.2	Range inconsistent with adjacent blended edge </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-295086">79.3.3	Adjoining edge not blended </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-295196">79.3.4	Blend completely overlaps edge loop </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-295253">79.3.5	Unblended edge overlapped by blend </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-295350">79.3.6	Range of blend on face too large </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-295716">79.3.7	Supplied rho value too large </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-295759">79.3.8	Illegal blend on another edge prevented full check </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-469423">79.3.9	Range on chamfer blend too large </A>
+</UL>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-295949">79.4	Configuration errors - overlapping blends </A>
+<UL>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-295954">79.4.1	Overlapping blends </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-296910">79.4.2	End boundary intersects unblended edge </A>
+</UL>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-296969">79.5	The blend has produced a face-face inconsistency </A>
+<LI> <A HREF="fd_chap.080.html#50422156_pgfId-296976">79.6	The blend has produced a self-intersecting surface </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422156_pgfId-294758"></A>79.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422156_pgfId-294760"></A><A NAME="50422156_marker-294759"></A>This chapter is designed to assist with the interpretation of edge blending error codes. It is difficult to give a complete set of rules which would enable you to correctly apply blends in all circumstances. However, understanding these codes is the key to both correcting illegal blends and getting blends right the first time.</P>
+<P>
+<A NAME="50422156_pgfId-294762"></A>The error codes can be split into three groups:</P>
+<UL>
+<LI>
+<A NAME="50422156_pgfId-294763"></A>Severe errors</LI>
+<LI>
+<A NAME="50422156_pgfId-294764"></A>General configuration errors</LI>
+<LI>
+<A NAME="50422156_pgfId-294765"></A>Configuration errors caused by overlapping blends</LI>
+</UL>
+<P>
+<A NAME="50422156_pgfId-361399"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422156_pgfId-359296"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422156_pgfId-359256"></A><A HREF="fd_chap.075.html#50422151_17798">Chapter 74, “Edge Blending Overview”</A></LI>
+<LI>
+<A NAME="50422156_pgfId-359323"></A><A HREF="fd_chap.076.html#50422152_39578">Chapter 75, “Edge Blending Options”</A></LI>
+<LI>
+<A NAME="50422156_pgfId-359350"></A><A HREF="fd_chap.077.html#50422153_39578">Chapter 76, “Edge Blend Overflows”</A></LI>
+<LI>
+<A NAME="50422156_pgfId-359377"></A><A HREF="fd_chap.121.html#50422203_35122">Chapter 120, “Error Handling”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422156_pgfId-294770"></A>79.2	<A NAME="50422156_marker-294766"></A><A NAME="50422156_marker-294767"></A><A NAME="50422156_marker-294768"></A><A NAME="50422156_marker-294769"></A>Severe errors 
+
+
+</H1>
+<P>
+<A NAME="50422156_pgfId-294771"></A>Severe errors indicate that the edge(s) being checked can never be blended. Severe errors either reflect strict limitations on the blending functionality or cases where Parasolid is unable to classify an error.</P>
+
+<H3>
+<A NAME="50422156_pgfId-294772"></A>	79.2.1 	Configuration of edges at a vertex is too complex </H3>
+<P>
+<A NAME="50422156_pgfId-328279"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1051.gif">
+
+<P>
+<A NAME="50422156_pgfId-328281"></A>Figure 79-1 <A NAME="50422156_39712"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_vertex_c</A></P>
+<P>
+<A NAME="50422156_pgfId-294870"></A><A NAME="50422156_marker-294866"></A><A HREF="fd_chap.080.html#50422156_39712"><EM>
+Figure 79-1</EM></A> shows an example of a solid with a vertex (highlighted) that is too complex for the proposed blend (shown in blue). A single edge adjacent to this vertex can be blended on its own, as can all of the adjacent edges together provided that they are all non-smooth.</P>
+<P>
+<A NAME="50422156_pgfId-294871"></A>A vertex is generally regarded as too complex to be blended if it has four or more adjacent edges, at least two of which are to be blended. The exception to this is when all of the edges are blended, as mentioned above.</P>
+<P>
+<A NAME="50422156_pgfId-294877"></A>See also <A HREF="fd_chap.075.html#50422151_26238">Section 74.5, “Limitations on edge blending”</A> and <A HREF="fd_chap.075.html#50422151_26008">Section 74.6, “Edge blending rules, theories and tips”</A> for further details of limitations to edge blending.</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-294879"></A>	79.2.2 	Unspecified numerical problem with blend </H3>
+<P>
+<A NAME="50422156_pgfId-294880"></A>The <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_unknown_c</A> error implies that the blending algorithms cannot classify the error that has been detected. This usually infers that an internal numerical algorithm has unexpectedly failed. However, when this error occurs it may be possible to blend the edge being checked if the blend radius is changed.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422156_pgfId-294890"></A>79.3	<A NAME="50422156_marker-294881"></A><A NAME="50422156_marker-294882"></A><A NAME="50422156_marker-294883"></A><A NAME="50422156_marker-294884"></A><A NAME="50422156_marker-294885"></A><A NAME="50422156_marker-294886"></A><A NAME="50422156_marker-294887"></A><A NAME="50422156_marker-294888"></A><A NAME="50422156_marker-294889"></A>Configuration errors - general 
+
+
+</H1>
+<P>
+<A NAME="50422156_pgfId-294891"></A>Configuration errors report various invalid combinations of blends. It should always be possible to recover from a configuration error by:</P>
+<UL>
+<LI>
+<A NAME="50422156_pgfId-294892"></A>Changing the blend radius (possibly on several edges).</LI>
+<LI>
+<A NAME="50422156_pgfId-294893"></A>Applying appropriate blends to other edges.</LI>
+<LI>
+<A NAME="50422156_pgfId-294894"></A>Removing blends from some edges.</LI>
+</UL>
+
+<H3>
+<A NAME="50422156_pgfId-294898"></A>	79.3.1 	<A NAME="50422156_marker-294895"></A><A NAME="50422156_marker-294896"></A><A NAME="50422156_marker-294897"></A>Blend requires invalid extension of B-surface </H3>
+<P>
+<A NAME="50422156_pgfId-294899"></A>The <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_bsurf_c</A> error can occur for either of the following reasons:</P>
+<UL>
+<LI>
+<A NAME="50422156_pgfId-294900"></A>A face may need to be extended to terminate a blend, e.g. when blending one out of three edges at a vertex when the convexity of one of the edges is different from the other two. If the face being extended is on a B-surface the extension may attempt to extend the edges of the face beyond the valid regions.</LI>
+<LI>
+<A NAME="50422156_pgfId-294901"></A>Rolling-ball blend surfaces are defined by sweeping a circle along a spine curve. This spine curve is formed by the intersection of offsets (by the blend radius) of the surfaces of the two faces meeting at the edge being blended. If one of the surfaces is parametric then its offset is inherently bounded and therefore the offset surface may not intersect at all or may not produce a long enough spine curve.</LI>
+</UL>
+<P>
+<A NAME="50422156_pgfId-294902"></A>Unfortunately these restrictions are difficult both for you to spot and to provide rules of thumb for work rounds. It is sometimes possible to remove the error by reducing the blend radius.</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-294907"></A>	79.3.2 	<A NAME="50422156_marker-294903"></A><A NAME="50422156_marker-294904"></A><A NAME="50422156_marker-294905"></A><A NAME="50422156_marker-294906"></A>Range inconsistent with adjacent blended edge </H3>
+<P>
+<A NAME="50422156_pgfId-319900"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1052.gif">
+
+<P>
+<A NAME="50422156_pgfId-295078"></A>Figure 79-2 <A NAME="50422156_21330"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_range_c</A></P>
+<P>
+<A NAME="50422156_pgfId-295082"></A><A HREF="fd_chap.080.html#50422156_21330"><EM>
+Figure 79-2</EM></A> shows an example of a solid with unfixed blends of differing sizes on selected edges. This operation would produce the above error because the third edge, edge A, is tangent.</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-295086"></A>	79.3.3 	<A NAME="50422156_marker-295083"></A><A NAME="50422156_marker-295084"></A><A NAME="50422156_marker-295085"></A>Adjoining edge not blended </H3>
+<P>
+<A NAME="50422156_pgfId-316305"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1053.gif">
+
+<P>
+<A NAME="50422156_pgfId-295185"></A>Figure 79-3 <A NAME="50422156_29616"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_edge_c</A></P>
+<P>
+<A NAME="50422156_pgfId-295186"></A>This error is returned when attempting to create an illegal configuration while blending two out of three edges at a three-edge vertex. This might happen, for example, if the blends are of different convexity, and both blends have a variable-radius. <A HREF="fd_chap.080.html#50422156_29616"><EM>
+Figure 79-3</EM></A> illustrates this problem. See <A HREF="fd_chap.075.html#50422151_92370">Section 74.6.2, “Blending two edges at a three-edge vertex”</A>, for an explanation of which two edge blends you can create at a three-edge vertex.</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-295196"></A>	79.3.4 	<A NAME="50422156_marker-295193"></A><A NAME="50422156_marker-295194"></A><A NAME="50422156_marker-295195"></A>Blend completely overlaps edge loop </H3>
+<P>
+<A NAME="50422156_pgfId-320723"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1054.gif">
+
+<P>
+<A NAME="50422156_pgfId-295246"></A>Figure 79-4 <A NAME="50422156_37558"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_loop_c</A></P>
+<P>
+<A NAME="50422156_pgfId-295250"></A><A HREF="fd_chap.080.html#50422156_37558"><EM>
+Figure 79-4</EM></A> shows an example of a solid with an unfixed blend that overlaps the edge loop. It can be seen that the range of the blend is so large that the blend extends outside the solid. This blend is not allowed on this edge although it may be possible to blend the edge if the range is reduced to the point where it doesn't overlap the edge loop.</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-295253"></A>	79.3.5 	<A NAME="50422156_marker-295251"></A><A NAME="50422156_marker-295252"></A>Unblended edge overlapped by blend </H3>
+<P>
+<A NAME="50422156_pgfId-325912"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1055.gif">
+
+<P>
+<A NAME="50422156_pgfId-295340"></A>Figure 79-5 <A NAME="50422156_11781"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_overlap_edge_c</A></P>
+<P>
+<A NAME="50422156_pgfId-295344"></A><A HREF="fd_chap.080.html#50422156_11781"><EM>
+Figure 79-5</EM></A> shows an example of a solid where the unfixed blend overflows unblended edge A since face F cannot be extended to intersect the blend. Though this is not allowed, if the range of the blend was reduced sufficient to ensure that the overlap does not occur it may be possible to fix the blend.</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-295350"></A>	79.3.6 	<A NAME="50422156_37014"></A><A NAME="50422156_marker-295346"></A><A NAME="50422156_marker-295347"></A><A NAME="50422156_marker-295348"></A><A NAME="50422156_marker-295349"></A>Range of blend on face too large </H3>
+<P>
+<A NAME="50422156_pgfId-318782"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1056.gif">
+
+<P>
+<A NAME="50422156_pgfId-295637"></A>Figure 79-6 <A NAME="50422156_23823"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_face_c</A></P>
+<P>
+<A NAME="50422156_pgfId-295638"></A>This error can occur when no edge can be found to terminate the boundary curve of a blend, this is either because the radius of the blend is too large or one or more edges adjacent to the edge being checked also needs to be blended (<A HREF="fd_chap.080.html#50422156_23823"><EM>
+Figure 79-6</EM></A>). </P>
+<P>
+<A NAME="50422156_pgfId-321987"></A>The error can also occur when attempting to create a rolling-ball blend across a surface that contains a radius of curvature that is smaller than the radius of the blend. In such cases, the rolling ball gets “stuck” at the point where the radius of curvature is smaller than the blend radius.</P>
+
+<IMG SRC="../graphics/fd_chap-1057.gif">
+
+<P>
+<A NAME="50422156_pgfId-295714"></A>Figure 79-7 Error when radius of curvature is smaller than blend radius</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-295716"></A>	79.3.7 	<A NAME="50422156_45721"></A>Supplied rho value too large </H3>
+<P>
+<A NAME="50422156_pgfId-295717"></A>The error <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_rho_too_large_c</A> can occur when the rho value supplied is too large. This results in the blend cross section curvature being too flat compared to the underlying surface.</P>
+<P>
+<A NAME="50422156_pgfId-295754"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1058.gif">
+
+<P>
+<A NAME="50422156_pgfId-295755"></A>Figure 79-8 Blend superimposed on top of original body</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-295759"></A>	79.3.8 	<A NAME="50422156_marker-295756"></A><A NAME="50422156_marker-295757"></A><A NAME="50422156_marker-295758"></A>Illegal blend on another edge prevented full check </H3>
+<P>
+<A NAME="50422156_pgfId-322417"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1059.gif">
+
+<P>
+<A NAME="50422156_pgfId-295942"></A>Figure 79-9 <A NAME="50422156_24979"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_other_edge_c</A></P>
+<P>
+<A NAME="50422156_pgfId-295946"></A><A HREF="fd_chap.080.html#50422156_24979"><EM>
+Figure 79-9</EM></A> shows an example of a solid with two unfixed blends on it. Although edge A is legal, it does not check because there is another blend (edge B) on the same face which is not legal causing the checks for overlaps and illegal intersections not to be completed. It may be possible to blend edge A if the blend is removed from edge B. Alternatively it may be possible to blend edge A if edge B is made legal (in this case by blending the adjoining edges).</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-469423"></A>	79.3.9 	Range on chamfer blend too large </H3>
+<P>
+<A NAME="50422156_pgfId-469480"></A>You may see the fault <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_apex_range_c</A> if you define an apex range chamfer blend with a range large enough that the chord at the requested angle would not hit the opposite surface. Generally, the solution to fixing such blends is to either reduce the range, or turn on appropriate overflow behaviour to allow the blend to fix successfully. </P>
+<P>
+<A NAME="50422156_pgfId-470387"></A><A HREF="fd_chap.080.html#50422156_81820"><EM>
+Figure 79-10</EM></A> shows an example in which a chamfer blend has been defined on the edge shown. The range of the chamfer is such that the blend cannot hit the opposite surface, and so <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A> returns the fault <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_apex_range_c</A>..</P>
+<P>
+<A NAME="50422156_pgfId-470257"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1060.gif">
+
+<P>
+<A NAME="50422156_pgfId-470189"></A>Figure 79-10 <A NAME="50422156_81820"></A>Defining an apex range chamfer blend with a range that is too large</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422156_pgfId-295949"></A>79.4	<A NAME="50422156_marker-295947"></A><A NAME="50422156_marker-295948"></A>Configuration errors - overlapping blends 
+
+
+</H1>
+<P>
+<A NAME="50422156_pgfId-295950"></A>When an edge is blended the blend may have to interact with more than just the two faces which meet at the edge, e.g. if the blend is large it might cover part of one face and run onto a neighboring face. The blend must then be constrained to meet tangentially with this neighboring face.</P>
+
+<H3>
+<A NAME="50422156_pgfId-295954"></A>	79.4.1 	<A NAME="50422156_marker-295951"></A><A NAME="50422156_marker-295952"></A><A NAME="50422156_94720"></A>Overlapping blends </H3>
+<P>
+<A NAME="50422156_pgfId-295958"></A><A HREF="fd_chap.080.html#50422156_67905"><EM>
+Figure 79-11</EM></A> shows two examples where it is possible to blend successfully between non-adjacent faces, also referred to as overlapping blends. </P>
+<UL>
+<LI>
+<A NAME="50422156_pgfId-295962"></A>Sometimes, Parasolid can fix overlapping blends automatically in a single call to <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A>.</LI>
+<LI>
+<A NAME="50422156_pgfId-295963"></A>In other cases, setting different values for the <CODE>
+ov_order</CODE>
+, <CODE>
+ov_notch</CODE>
+, and <CODE>
+ov_smooth</CODE>
+ options in <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A> can let you fix overlapping blends in a single call. See <A HREF="fd_chap.076.html#50422152_13698">Section 75.3.22, “Fixing overlapping blends”</A>, for more information. </LI>
+<LI>
+<A NAME="50422156_pgfId-295967"></A>As a last resort, overlapping blends can be fixed by fixing the blends independently, using several calls to <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A>.</LI>
+</UL>
+<P>
+<A NAME="50422156_pgfId-295968"></A>Failure to fix overlapping blends in a single call is indicated using any of the following faults:</P>
+<UL>
+<LI>
+<A NAME="50422156_pgfId-295969"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_overlap_c</A></LI>
+<LI>
+<A NAME="50422156_pgfId-295970"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_overlap_end_c</A></LI>
+<LI>
+<A NAME="50422156_pgfId-295971"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_end_c</A></LI>
+</UL>
+<P>
+<A NAME="50422156_pgfId-295975"></A><A HREF="fd_chap.080.html#50422156_67905"><EM>
+Figure 79-11</EM></A> shows several examples over overlapping blends that it might not be possible for Parasolid to fix automatically (depending on the exact configuration and options settings used). Experimenting with options settings or fixing blends independently will allow the blends to be fixed successfully in each case. </P>
+<P>
+<A NAME="50422156_pgfId-327067"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1061.gif">
+
+<P>
+<A NAME="50422156_pgfId-296907"></A>Figure 79-11 <A NAME="50422156_67905"></A>Examples of overlapping blend failure</P>
+
+
+<H3>
+<A NAME="50422156_pgfId-296910"></A>	79.4.2 	<A NAME="50422156_marker-296908"></A><A NAME="50422156_marker-296909"></A>End boundary intersects unblended edge </H3>
+<P>
+<A NAME="50422156_pgfId-323383"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1062.gif">
+
+<P>
+<A NAME="50422156_pgfId-296960"></A>Figure 79-12 <A NAME="50422156_41688"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_edge_intsec_c</A></P>
+<P>
+<A NAME="50422156_pgfId-296964"></A>A typical example of when the above error can occur is shown in <A HREF="fd_chap.080.html#50422156_41688"><EM>
+Figure 79-12</EM></A> In this example the unfixed blend overlaps an unblended edge. Reducing the range of the blend, so that it doesn't interfere with the unblended edge, should enable the edge to be blended.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422156_pgfId-296969"></A>79.5	<A NAME="50422156_marker-296965"></A><A NAME="50422156_marker-296966"></A><A NAME="50422156_marker-296967"></A><A NAME="50422156_marker-296968"></A>The blend has produced a face-face inconsistency 
+
+
+</H1>
+<P>
+<A NAME="50422156_pgfId-296970"></A>The <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_face_face_c</A> error occurs if the blend has created a face-face inconsistency in the body. The blend is fixed to the body.</P>
+<P>
+<A NAME="50422156_pgfId-296971"></A>This error only occurs if the check for face-face inconsistencies has been specifically turned on while fixing the blend.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422156_pgfId-296976"></A>79.6	<A NAME="50422156_marker-296972"></A><A NAME="50422156_marker-296973"></A><A NAME="50422156_marker-296974"></A><A NAME="50422156_marker-296975"></A>The blend has produced a self-intersecting surface 
+
+
+</H1>
+<P>
+<A NAME="50422156_pgfId-296977"></A>The <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_self_int_c</A> error occurs if one or more of the blend surfaces are self-intersecting. The blend is fixed to the body.</P>
+<P>
+<A NAME="50422156_pgfId-296978"></A>This error only occurs if the check for self-intersecting surfaces has been specifically turned on while fixing the blend.</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.079.html">Three-Face Blending</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.081.html">Interpreting Face-Face Blending Error Codes</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

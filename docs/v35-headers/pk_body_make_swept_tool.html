@@ -1,0 +1,226 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_swept_tool</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_swept_tool</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                    PK_BODY_make_swept_tool
+(
+<I>--- received arguments ---
+</I>const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                    tool,           --- tool to sweep
+const <A HREF=../headers/pk_axis1_sf_t.html>PK_AXIS1_sf_t</A>               *tool_axis,      --- axis for tool
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                    path,           --- path of sweep
+const <A HREF=../headers/pk_body_make_swept_tool_o_t.html>PK_BODY_make_swept_tool_o_t</A> *options,        --- options on sweeping
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>          *const tracking,       --- tracking information
+<A HREF=../headers/pk_body_sweep_tool_r_t.html>PK_BODY_sweep_tool_r_t</A>      *const swept_tool      --- resulting swept tool
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a solid body by sweeping a solid tool body along a wire
+path.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_type               The tool, path, or target is of the
+                                    incorrect type. (MILD)
+
+    PK_ERROR_bad_value              A tool positioning vertex on the path is
+                                    required but not supplied or the axis
+                                    location does not lie in the plane normal
+                                    to the path at the tool positioning vertex.
+                                    (MILD)
+
+    PK_ERROR_bad_tolerance          The value of tolerance is invalid. (MILD)
+
+    PK_ERROR_bad_combination        A <B>'turn_axis'</B> is supplied when
+                                    <B>'have_lock_direction'</B> is PK_LOGICAL_false,
+                                    or the axis of <B>'turn_axis'</B> is not the same
+                                    as <B>'lock_direction'</B>. (MILD)
+
+    PK_ERROR_sweep_failed           PK_BODY_make_swept_tool suffered an
+                                    internal algorithmic failure. (SERIOUS)
+
+    PK_ERROR_boolean_failure        The Boolean of the target and swept tool
+                                    failed. (SERIOUS)
+
+    PK_ERROR_disjoint               The swept tool has split the target body.
+                                    (SERIOUS)
+
+<A NAME="documentation"></A>
+
+
+Introduction
+This function creates a solid body which represents the volume swept out by a
+solid tool body by revolving it about a specified axis and moving it along a
+specified wire path, with the axis centred on the path. The tool is revolved
+about the axis to make a spun outline, which is then swept along the path.
+The solid tool body is supplied in the <B>'tool'</B> argument, the tool axis is
+supplied in the <B>'tool_axis'</B> argument, and the wire path is supplied in the
+<B>'path'</B> argument.
+
+The user is informed of the result of the sweep operation via a returned
+results structure which contains the resultant swept body and error
+information.
+
+
+Tool Specification
+The following points need to be considered when specifying the tool body :
+
+    o The tool must be a solid body.
+
+    o The tool axis defines the axis about which to spin the tool body. It
+      must be perpendicular to the plane of the path if the path is planar,
+      or have a <B>'lock_direction'</B> supplied to specify the tool orientation.
+
+    o The cross-section of the spun body obtained by spinning the tool body
+      about the tool axis must form a single connected set of curves. This
+      means that the input tool body must not be disjoint, and must intersect
+      the axis.
+
+    o By default, it does not matter where the tool is located with respect to
+      the path. The tool will be translated such that the tool axis location is
+      positioned on the path before being swept. If this behaviour is not
+      desired, <B>'place_tool_on_path'</B> can be set to PK_LOGICAL_false to disable
+      it. In this case, the start vertex of the path must be specified using
+      <B>'tool_site'</B> and the <B>'tool_axis'</B> must intersect the plane perpendicular
+      to the sweep direction at this vertex, taking into account any lock
+      direction specified.
+
+Path Specification
+The following points need to be considered when specifying the sweep path :
+
+  o The path must be planar and lie in a plane orthogonal to the tool axis,
+    unless a <B>'lock_direction'</B> is supplied to specify the tool orientation.
+    Otherwise, a fault status of PK_sweep_tool_path_no_lock_c is returned.
+
+  o The sweep path need not be G1 continuous at vertices. At any non-G1
+    vertices the resultant swept body will be formed by spinning the tool body
+    on the axis centred at the non-G1 vertex. The sweep path must be G1
+    continuous where not at a vertex. If <B>'place_tool_on_path'</B> is
+    PK_LOGICAL_false and the tool <B>'location'</B> is not on the path, the path must
+    be G1 continuous. Otherwise, a fault status of PK_sweep_tool_path_not_g1_c
+    is returned.
+
+  o The sweep path may be closed in which case the resulting swept body
+    will close up on itself and is called a closed sweep.
+
+  o The sweep path may be self-intersecting.
+
+  o It is an error to specify a wire path that is a single ring edge with no
+    vertices.
+
+Nominal Geometry on the Swept Body
+The resultant swept body will always have nominal geometry enabled. The state
+of the nominal geometry flag on the resultant swept body can be enquired and
+set via <A HREF=../headers/pk_body_ask_curve_nmnl_state.html>PK_BODY_ask_curve_nmnl_state</A> and <A HREF=../headers/pk_body_set_curve_nmnl_state.html>PK_BODY_set_curve_nmnl_state</A>
+respectively.
+
+The nominal geometry for an edge may be acquired via the functions,
+<A HREF=../headers/pk_edge_ask_curve_nmnl.html>PK_EDGE_ask_curve_nmnl</A> and <A HREF=../headers/pk_edge_ask_geometry_nmnl.html>PK_EDGE_ask_geometry_nmnl</A>.
+
+Optional Boolean Functionality
+The <B>'options'</B> allow a <B>'target'</B> body to be supplied that can either be
+intersected with the swept tool or have the tool subtracted from it. If this is
+requested, the <B>'swept_tool'</B> returned is the <B>'target'</B> resulting from
+this operation. This functionality is useful whenever the desired sweep would
+produce an invalidity outside the region of interest defined by the <B>'target'</B>.
+
+Returned Tracking and Error Information
+The resultant swept body is returned in <B>'swept_tool'</B> as a structure that
+packages it with associated status information.
+
+The status information, in the <B>'status'</B> field of the returned structure, is
+itself a structure that contains information on any failure to create the
+swept body. The types of faults that occurred are indicated by the <B>'faults'</B>
+field. The locations of the faults are given by a list of points and list of
+entities in the <B>'fault_locations'</B> and <B>'fault_entities'</B> fields respectively.
+
+The tracking information is returned in <B>'tracking'</B>, and relates topology prior
+to the operation to topology after it. Details of the structure of this
+information are given in the documentation on <A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>.
+
+The tracking information will relate faces in the resultant body to faces and
+edges in the received tool, the path body, and optionally relate edges in the
+result to faces, edges or vertices in the received tool and path. The tracking
+records contain :
+
+    o for every face :
+
+        <B>'product_topols'</B>  is an array containing that face.
+        <B>'original_topols'</B> is the set of edges in the path and the edges or
+         faces in the tool from which it was generated. Where the face results
+         from spinning the tool about a non-G1 path vertex, or the vertex at
+         the start or end of the sweep, the path topology will be this vertex.
+
+If <B>'want_edge_tracking'</B> is set to PK_LOGICAL_true, then the tracking records
+will additionally contain:
+
+    o for each edge that is in the direction of the path :
+
+        <B>'product_topols'</B>  is an array containing that edge.
+        <B>'original_topols'</B> is the set of corresponding path edges, along with
+         the vertices or edges on the tool from which it was generated.
+
+    o for each edge that is generated from the cross-section of the spun tool :
+
+        <B>'product_topols'</B>  is an array containing that edge.
+        <B>'original_topols'</B> is the edges or faces in the tool from which it was
+         generated, along with either a corresponding path vertex or path edge.
+
+    o for each edge that is created by splitting faces during self intersection
+      repair :
+
+        <B>'product_topols'</B>  is an array containing that edge.
+        <B>'original_topols'</B> is an array containing the set that is the union of
+         the sets of <B>'original_topols'</B> of the two adjacent faces.
+
+Topologies involved in many topological operations may appear in several
+tracking records. In particular, where several product topologies arise from
+the same original topologies these products will be grouped together in a
+single track record.
+
+If a Boolean operation has been performed, the product topologies will all
+belong to the target body. Faces and edges created from the swept body will
+refer to the originating topologies for the corresponding faces and edges on
+the swept body. Edges produced from an imprint of the target and the swept
+body will refer to the relevant target face in addition to the sweep origins.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

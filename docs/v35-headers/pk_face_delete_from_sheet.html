@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_delete_from_sheet</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_delete_from_sheet</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_FACE_delete_from_sheet
+(
+<I>--- received arguments ---
+</I>int                                  n_faces, --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                      faces[], --- array of faces
+const <A HREF=../headers/pk_face_delete_from_sheet_o_t.html>PK_FACE_delete_from_sheet_o_t</A> *options, --- options structure
+
+<I>--- returned arguments ---
+</I>int                           *const n_bodies,--- number of bodies
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                    **const bodies   --- array of bodies
+)
+</B>
+<A NAME="description"></A>
+<I>This function removes the specified <B>'faces'</B> from a sheet body.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_wire          deleting face or faces would result in an
+                               invalid wire body
+    PK_ERROR_not_in_same_body  supplied faces are not from same body
+    PK_ERROR_not_sheet         body containing faces is not a sheet
+
+<A NAME="documentation"></A>
+
+Each face must be the face of a sheet body, with or without a surface attached.
+The options structure allows control over whether splitting the body is
+permissible or not.
+
+If the input body is not disjoint and the <B>'allow_disjoint'</B> option is
+PK_LOGICAL_false, the function will return an array containing multiple
+bodies if the body is split during the operation.  If set to PK_LOGICAL_true
+the function will always return a single body which may be disjoint if the
+sheet body has been split.  If the input body was originally disjoint then the
+function will always return a single body, the function will essentially behave
+as if <B>'allow_disjoint'</B> was set to PK_LOGICAL_true.
+
+If the sheet body possesses faces that are not in the deletion list, the body
+will remain a sheet body consisting only of these faces. If <B>'faces'</B> contains
+all the faces of a sheet body then when these faces are deleted any laminar
+edges of the original sheet body will be preserved as a wire body. If there
+are no laminar edges the function will fail with PK_ERROR_bad_wire.
+
+In the case that the received sheet body is disjoint, a disjoint wire body will
+only be produced if all the faces of that body are deleted.  If some of the
+faces of the body are to be preserved, the function will delete components of
+the disjoint body in any region of the body where all faces are removed.
+
+You can use this function to create a profile, which then may be swept to form
+a solid. See <A HREF="../chapters/fd_chap.016.html#50434373_pgfId-295405">Pierce</A> for more information.
+
+You can also use this function when importing data. See
+<A HREF="../chapters/fd_chap.091.html#50434457_pgfId-295787">Importing topology</A> for more information.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

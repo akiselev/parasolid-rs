@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_PARTITION_advance_pmark</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_PARTITION_advance_pmark</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_PARTITION_advance_pmark
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>                        partition, --- partition
+const <A HREF=../headers/pk_partition_advance_pmark_o_t.html>PK_PARTITION_advance_pmark_o_t</A> *options,   --- advance pmark options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_pmark_t.html>PK_PMARK_t</A>                     *const pmark      --- partition mark
+)
+</B>
+<A NAME="description"></A>
+<I>This function advances the current partition mark in the given <B>'partition'</B>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_rollback_not_started  Partitioned rollback is not active (MILD)
+    PK_ERROR_frustrum_failure      The frustrum reported a problem (MILD)
+    PK_ERROR_bad_mark              The pmark cannot be advanced (MILD)
+    PK_ERROR_mesh_not_found        Not all requested mesh data successfully
+                                   received (MILD)
+
+<A NAME="documentation"></A>
+The function will reuse the current partition mark so that it represents the
+current state of the <B>'partition'</B>. The previous state of the <B>'partition'</B>
+represented by the current <B>'pmark'</B> is lost. The <B>'partition'</B> is unchanged apart
+from now being at this <B>'pmark'</B>. If the <B>'partition'</B> was already at a <B>'pmark'</B>,
+this option has no effect.
+
+Initial pmarks, pmarks used by a mark, and pmarks with a following pmark
+cannot be advanced.
+
+This function should only be called when partitioned rollback has been started
+with <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,965 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Bulletin Board</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Bulletin Board</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.099.html">Groups</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.101.html">Archives</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-294726">99.1	Introduction </A>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-294745">99.2	Using the bulletin board </A>
+<UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-294751">99.2.1	Bulletin board events </A>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-294766">99.2.2	Bulletin board entity classes </A>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-294814">99.2.3	Events and entity class combinations </A>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-294934">99.2.4	Setting up the bulletin board </A>
+<UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-294959">99.2.4.1	Enquiries </A>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-294968">99.2.4.2	Setting the PK_BB_t argument </A>
+</UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-294974">99.2.5	Output of bulletin board information </A>
+</UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-295048">99.3	How Parasolid maintains the bulletin board </A>
+<UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-295074">99.3.1	Interaction between events </A>
+</UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-295084">99.4	The bulletin board and rollback </A>
+<UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-295088">99.4.1	Session rollback </A>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-295097">99.4.2	Partitioned rollback </A>
+</UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-295111">99.5	Rendering using the bulletin board </A>
+<UL>
+<LI> <A HREF="fd_chap.100.html#50422179_pgfId-295119">99.5.1	Incremental graphics </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422179_pgfId-294726"></A>99.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422179_pgfId-294728"></A><A NAME="50422179_marker-294727"></A>The Bulletin Board provides the means by which an application can trace how a model changes in the course of a modeling operation. The bulletin board is stored as arrays of tags of entities and associated arrays of event tokens which describe what has happened to an entity. </P>
+<P>
+<A NAME="50422179_pgfId-294733"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422179_pgfId-294731"></A>Performance issue: This information can be used to improve the performance of the application. For example, to implement incremental graphics or the incremental update of a database. As such, the decision of whether to use the bulletin board is fundamental to the architecture of the application.</ADDRESS><BR>
+</UL>
+<ADDRESS>
+<A NAME="50422179_pgfId-294732"></A>The bulletin board can be switched on and off during a session so its effects can be minimised if performance is of prime importance. In many cases the benefits of using the bulletin board far outweigh the cost in terms of performance.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422179_pgfId-320619"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422179_pgfId-294736"></A>Note: If you do not want to use the bulletin board, you can use pmark entity information to track modelling changes during a Parasolid session instead. In particular, <A HREF=../headers/pk_pmark_ask_entities.html>PK_PMARK_ask_entities</A> can tell you which entities would be created, modified, or deleted if you were to move to a given pmark, and <A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A> can roll a partition to a given pmark. These functions give you complete control over which entity information is tracked and returned. See <A HREF="fd_chap.098.html#50422177_36055">Chapter 97, “Rollback”</A>, for more information. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422179_pgfId-320682"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-320513"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-320492"></A><A HREF="fd_chap.011.html#50422079_81576">Section 10.2.6, “Bulletin board”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422179_pgfId-294745"></A>99.2	<A NAME="50422179_marker-294744"></A>Using the bulletin board 
+
+
+</H1>
+<P>
+<A NAME="50422179_pgfId-294747"></A><A NAME="50422179_marker-294746"></A>The entities and events that are recorded on the bulletin board are controlled by the application. Different information can be recorded for different entity classes.</P>
+
+<H3>
+<A NAME="50422179_pgfId-294751"></A>	99.2.1 	<A NAME="50422179_marker-294748"></A><A NAME="50422179_marker-294749"></A><A NAME="50422179_62429"></A>Bulletin board events </H3>
+<P>
+<A NAME="50422179_pgfId-294752"></A>A bulletin board event is some specified modification made to an entity (e.g. the entity is transformed or split into two) or the creation or deletion of the entity. The particular events which can be recorded on the bulletin board are the:</P>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-294753"></A>Creation of an entity</LI>
+<LI>
+<A NAME="50422179_pgfId-294754"></A>Deletion of an entity</LI>
+<LI>
+<A NAME="50422179_pgfId-294755"></A>Splitting of an entity into two entities</LI>
+<LI>
+<A NAME="50422179_pgfId-294756"></A>Merging of two entities to form a single entity</LI>
+<LI>
+<A NAME="50422179_pgfId-294757"></A>Transformation of an entity</LI>
+<LI>
+<A NAME="50422179_pgfId-294758"></A>Copying of an entity</LI>
+<LI>
+<A NAME="50422179_pgfId-294759"></A>Change to an attribute that is owned by an entity</LI>
+<LI>
+<A NAME="50422179_pgfId-294760"></A>Transfer of an entity from one entity to another entity</LI>
+<LI>
+<A NAME="50422179_pgfId-294761"></A>Changing, in some other manner, of an entity</LI>
+</UL>
+<P>
+<A NAME="50422179_pgfId-294762"></A>Each time one of the modeling changes listed above happens, Parasolid adds an entry to the bulletin board. </P>
+<P>
+<A NAME="50422179_pgfId-315231"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application Support\Session Management\BB</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+
+<H3>
+<A NAME="50422179_pgfId-294766"></A>	99.2.2 	<A NAME="50422179_marker-294763"></A><A NAME="50422179_marker-294764"></A><A NAME="50422179_marker-294765"></A>Bulletin board entity classes </H3>
+<P>
+<A NAME="50422179_pgfId-294767"></A>The entity classes that can be recorded on the bulletin board fall into the following groups:</P>
+<P>
+<A NAME="50422179_pgfId-294809"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294770"></A>Group</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294772"></A>Entity classes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294776"></A><A NAME="50422179_marker-294774"></A><A NAME="50422179_marker-294775"></A>Bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294778"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294782"></A><A NAME="50422179_marker-294780"></A><A NAME="50422179_marker-294781"></A>Topology</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294784"></A>shells faces loops edges vertices regions</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294788"></A><A NAME="50422179_marker-294786"></A><A NAME="50422179_marker-294787"></A>Groups</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294790"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294794"></A><A NAME="50422179_marker-294792"></A><A NAME="50422179_marker-294793"></A>Geometry</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294796"></A>surfaces curves points</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294800"></A><A NAME="50422179_marker-294798"></A><A NAME="50422179_marker-294799"></A>Transforms</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294802"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294806"></A><A NAME="50422179_marker-294804"></A><A NAME="50422179_marker-294805"></A>Attribute definitions</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294808"></A>&nbsp;</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422179_pgfId-294814"></A>	99.2.3 	<A NAME="50422179_marker-294810"></A><A NAME="50422179_marker-294811"></A><A NAME="50422179_marker-294812"></A><A NAME="50422179_marker-294813"></A>Events and entity class combinations </H3>
+<P>
+<A NAME="50422179_pgfId-294816"></A><A NAME="50422179_marker-294815"></A>The permissible combinations of events and entity classes are indicated by *</P>
+<P>
+<A NAME="50422179_pgfId-294918"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294819"></A>Event</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294821"></A>body</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294823"></A>topology, group</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294825"></A>geometry, transform</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294827"></A>attribute definition</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294829"></A>Create</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294831"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294833"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294835"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294837"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294839"></A>Delete (“deleet”)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294841"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294843"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294845"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294847"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294849"></A>Copy</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294851"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294853"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294855"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294857"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294859"></A>Transfer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294861"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294863"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294865"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294867"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294869"></A>Merge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294871"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294873"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294875"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294877"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294879"></A>Split</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294881"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294883"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294885"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294887"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294889"></A>Transform</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294891"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294893"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294895"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294897"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294899"></A>Change to Attribute</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294901"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294903"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294905"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294907"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294909"></A>Change</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294911"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294913"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294915"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294917"></A>&nbsp;</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422179_pgfId-294924"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422179_pgfId-294921"></A>Note: <STRONG>
+1.</STRONG> It is not possible for all bulletin board events to occur to all of the different entity classes, e.g. a point cannot be merged or split as these operations are only possible with topological entities.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422179_pgfId-294922"></A><STRONG>
+2.</STRONG> The name of the field for delete is <CODE>
+deleet</CODE>
+, because <CODE>
+delete</CODE>
+ is a reserved word in C++.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422179_pgfId-294923"></A><STRONG>
+3.</STRONG> Groups are considered as separate entities from any of their members. Bulletining of a group happens when members are added or removed from the group, i.e. groups change only when their set of members change and not just when a member of the set changes.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422179_pgfId-294931"></A>See <A HREF="fd_chap.099.html#50422178_13296">“Groups and modelling operations on a part”</A> in <A HREF="fd_chap.099.html#50422178_36760">Chapter 98, “Groups”</A>, for further information on how the members of a group can be changed.</P>
+
+
+<H3>
+<A NAME="50422179_pgfId-294934"></A>	99.2.4 	<A NAME="50422179_marker-294932"></A><A NAME="50422179_marker-294933"></A>Setting up the bulletin board </H3>
+<P>
+<A NAME="50422179_pgfId-294936"></A><A NAME="50422179_marker-294935"></A><A HREF=../headers/pk_bb_create.html>PK_BB_create</A> controls what is recorded by the bulletin board for each entity/event combination. The entity/events that are to be recorded are controlled by associating the required entity classes for each event.</P>
+<P>
+<A NAME="50422179_pgfId-294938"></A><A NAME="50422179_marker-294937"></A><A HREF=../headers/pk_bb_set_status.html>PK_BB_set_status</A> then switches the bulletin board on and off, by setting the <CODE>
+status</CODE>
+ argument to one of the following values:</P>
+<P>
+<A NAME="50422179_pgfId-294956"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294941"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294943"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294945"></A><A HREF=../headers/pk_bb_status_t.html>PK_BB_status_on_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294947"></A>Switch the bulletin board on to record entities</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294949"></A><A HREF=../headers/pk_bb_status_t.html>PK_BB_status_off_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294951"></A>Switch the bulletin board off, and clear its contents</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294953"></A><A HREF=../headers/pk_bb_status_t.html>PK_BB_status_user_field_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294955"></A>Switch the bulletin board on to record entities and user fields</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422179_pgfId-294959"></A>99.2.4.1 <A NAME="50422179_marker-323800"></A><A NAME="50422179_marker-323801"></A>Enquiries </H4>
+<P>
+<A NAME="50422179_pgfId-294961"></A><A NAME="50422179_marker-323803"></A>PK_BB_askoutputs the current set up of the bulletin board.</P>
+<P>
+<A NAME="50422179_pgfId-294963"></A><A NAME="50422179_marker-323805"></A><A HREF=../headers/pk_bb_ask_status.html>PK_BB_ask_status</A> outputs whether the bulletin board is currently recording.</P>
+<P>
+<A NAME="50422179_pgfId-294965"></A><A NAME="50422179_marker-294964"></A><A HREF=../headers/pk_bb_is.html>PK_BB_is</A> can be used to determine whether an entity is a bulletin board.</P>
+
+
+<H4>
+<A NAME="50422179_pgfId-294968"></A>99.2.4.2 <A NAME="50422179_marker-294966"></A><A NAME="50422179_marker-294967"></A>Setting the PK_BB_t argument </H4>
+<P>
+<A NAME="50422179_pgfId-294969"></A>Only one bulletin board at a time is supported, and <A HREF=../headers/pk_bb_create.html>PK_BB_create</A> always returns a PK_BB_t argument with the value one.</P>
+<P>
+<A NAME="50422179_pgfId-294970"></A>It is recommended that the PK_BB_t argument be set to one when calling the other Bulletin Board PK functions, although the value is currently ignored.</P>
+
+
+
+<H3>
+<A NAME="50422179_pgfId-294974"></A>	99.2.5 	<A NAME="50422179_marker-294971"></A><A NAME="50422179_marker-294972"></A><A NAME="50422179_marker-294973"></A><A NAME="50422179_47062"></A>Output of bulletin board information </H3>
+<P>
+<A NAME="50422179_pgfId-294976"></A><A NAME="50422179_marker-294975"></A>To find out what is on the bulletin board, and therefore what changes have taken place in the parts in the session, <A NAME="50422179_marker-294977"></A><A HREF=../headers/pk_bb_output_events.html>PK_BB_output_events</A> outputs the events that have occurred since the bulletin board was last emptied.</P>
+<P>
+<A NAME="50422179_pgfId-294979"></A><A NAME="50422179_marker-294978"></A><A HREF=../headers/pk_bb_output_events.html>PK_BB_output_events</A> takes an argument to specify whether the bulletin board is emptied after the bulletin board data is returned.</P>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-294980"></A>the bulletin board can be emptied at any time by calling <A HREF=../headers/pk_bb_output_events.html>PK_BB_output_events</A> with the empty argument set to PK_LOGICAL_true</LI>
+</UL>
+<P>
+<A NAME="50422179_pgfId-295002"></A>The data is returned in five arrays: </P>
+<P>
+<A NAME="50422179_pgfId-344565"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294983"></A>Array</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294985"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294987"></A><STRONG>
+events</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294989"></A>the event number</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294991"></A><STRONG>
+entities</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294993"></A>contains the tag of the entity involved</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294995"></A><STRONG>
+event_types</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294997"></A>from the <A HREF=../headers/pk_bb_event_t.html>PK_BB_event_t</A> range</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-294999"></A><STRONG>
+classes</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295001"></A>from the <A HREF=../headers/pk_class_t.html>PK_CLASS_t</A> range</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-341660"></A>user_fields</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-341662"></A>contains the user fields of the entity involved. The use of this array is optional and depends on whether the user field length is zero or not. </P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422179_pgfId-295003"></A>Example:</H4>
+<P>
+<A NAME="50422179_pgfId-295004"></A>The bulletin board is set up with <A HREF=../headers/pk_bb_create.html>PK_BB_create</A> - the <CODE>
+create</CODE>
+ and <CODE>
+copy</CODE>
+ arrays of <A HREF=../headers/pk_bb_sf_t.html>PK_BB_sf_t</A> contain PK_CLASS_point; <A HREF=../headers/pk_bb_set_status.html>PK_BB_set_status</A> turns the bulletin board on (for tags only).</P>
+<P>
+<A NAME="50422179_pgfId-295005"></A>If a point is created and copied, <A HREF=../headers/pk_bb_output_events.html>PK_BB_output_events</A> would return two events as follows:</P>
+<P>
+<A NAME="50422179_pgfId-295039"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295008"></A>events</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295010"></A>entities</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295012"></A>event_types</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295014"></A>classes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295016"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295018"></A>249</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295020"></A><A HREF=../headers/pk_bb_event_t.html>PK_BB_event_create_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295022"></A>PK_CLASS_point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295024"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295026"></A>250</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295028"></A><A HREF=../headers/pk_bb_event_t.html>PK_BB_event_copy_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295030"></A>PK_CLASS_point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295032"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295034"></A>249</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295036"></A><A HREF=../headers/pk_bb_event_t.html>PK_BB_event_copy_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422179_pgfId-295038"></A>PK_CLASS_point</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422179_pgfId-295045"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422179_pgfId-295042"></A>Note: <STRONG>
+1. </STRONG>Event 0 is the creation of point 249 and event 1 is the copying of point 249 to point 250 (for a copy event the new entity is returned first, then the original entity)</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422179_pgfId-295043"></A>Note: <STRONG>
+2. </STRONG>The bulletin board records what actually happened internally within Parasolid during a modeling operation, this may sometimes give unexpected entries</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422179_pgfId-295044"></A>Note: <STRONG>
+3. </STRONG>There may be multiple entries for the merge, split, copy and transfer events</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422179_pgfId-295048"></A>99.3	<A NAME="50422179_marker-295046"></A><A NAME="50422179_marker-295047"></A>How Parasolid maintains the bulletin board 
+
+
+</H1>
+<P>
+<A NAME="50422179_pgfId-295050"></A><A NAME="50422179_marker-295049"></A>The bulletin board accumulates events as entities are created, deleted or modified. Each time an event occurs to an entity, the kernel looks for another entry in the bulletin board associated with that entity. </P>
+<P>
+<A NAME="50422179_pgfId-295051"></A>If one already exists there are rules which govern what action the bulletin board takes when two consecutive events occur to an entity (these may not necessarily be consecutive events in the bulletin board). With respect to these rules the events bulletined fall into the following four classes:</P>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-295052"></A><STRONG>
+Inheritance events</STRONG> - events that have more than one entity associated with them. </LI>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-295053"></A><STRONG>
+Merge</STRONG> - the first entity is the dominant entity and remains through the operation, the other entities are those which were deleted as part of the operation.</LI>
+<LI>
+<A NAME="50422179_pgfId-295054"></A><STRONG>
+Split</STRONG> - the first entity is the entity which was originally split, the other entities are those which were created as part of the operation.</LI>
+<LI>
+<A NAME="50422179_pgfId-295055"></A><STRONG>
+Copy</STRONG> - the first entity is the new entity, the other entity is the entity it was copied from.</LI>
+<LI>
+<A NAME="50422179_pgfId-295056"></A><STRONG>
+Transfer</STRONG> - the first entity is the entity that is transferred, the other entity is the entity which was previously the owner.</LI>
+</UL>
+<LI>
+<A NAME="50422179_pgfId-295057"></A><STRONG>
+Creation and deletion</STRONG> </LI>
+<LI>
+<A NAME="50422179_pgfId-295058"></A><STRONG>
+Alterations</STRONG> - unspecified change, transformation</LI>
+<LI>
+<A NAME="50422179_pgfId-295059"></A><STRONG>
+External changes</STRONG> - change to attributes owned by the entity</LI>
+</UL>
+<P>
+<A NAME="50422179_pgfId-295060"></A>The rules which govern the action the bulletin board takes on two consecutive events, are:</P>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-295061"></A>If the new event is an inheritance event or an external change then the event is recorded.</LI>
+<LI>
+<A NAME="50422179_pgfId-295062"></A>If the previous event is an inheritance event or an external change then the event is recorded.</LI>
+<LI>
+<A NAME="50422179_pgfId-295063"></A>If the previous entry was a creation and</LI>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-295064"></A>the new event is an alteration, the new event is not recorded as the entity is still new from the last time the bulletin board was emptied.</LI>
+<LI>
+<A NAME="50422179_pgfId-295065"></A>the new event is deleted, then the create event is removed from the bulletin board and the delete event is not recorded.</LI>
+</UL>
+<LI>
+<A NAME="50422179_pgfId-295066"></A>If the previous event was an alteration and the new event is a deletion then the alteration event is removed and the entity is recorded as deleted. </LI>
+<LI>
+<A NAME="50422179_pgfId-295067"></A>If the previous event was a change and the new event is either a change or a transformation then the event remains as a change.</LI>
+<LI>
+<A NAME="50422179_pgfId-295068"></A>If the previous event was a transformation and</LI>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-295069"></A>the new event is a transformation, then the two events are combined into one transformation event.</LI>
+<LI>
+<A NAME="50422179_pgfId-295070"></A>the new event is a change event, then the two events are combined into one change event.</LI>
+</UL>
+</UL>
+
+<H3>
+<A NAME="50422179_pgfId-295074"></A>	99.3.1 	<A NAME="50422179_marker-295071"></A><A NAME="50422179_marker-295072"></A><A NAME="50422179_marker-295073"></A>Interaction between events </H3>
+<P>
+<A NAME="50422179_pgfId-295075"></A>Certain types of events can have overlapping definitions, this occurs if the bulletin board has been instructed not to record the relevant event type. Therefore depending on what events have been specified, the bulletin board may record a particular event as one or more other events. The events which exhibit this behaviour are:</P>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-295076"></A>The split event may be recorded as a change to the parent entity and the creation of the offspring entity.</LI>
+<LI>
+<A NAME="50422179_pgfId-295077"></A>The merge event may be recorded as a change to the dominant entity and the deletion of the sub-dominant entity.</LI>
+<LI>
+<A NAME="50422179_pgfId-295078"></A>The transfer event may be recorded as a change to the entity which was transferred.</LI>
+<LI>
+<A NAME="50422179_pgfId-295079"></A>The copy event may be recorded as a create event to the new entity.</LI>
+<LI>
+<A NAME="50422179_pgfId-295080"></A>The transformation event may be recorded as a change event.</LI>
+</UL>
+<P>
+<A NAME="50422179_pgfId-295081"></A>Records accumulate in this way until the bulletin board is emptied, which clears all the entries from it and starts again (unless the monitoring is turned off entirely).</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422179_pgfId-295084"></A>99.4	<A NAME="50422179_marker-295082"></A><A NAME="50422179_marker-295083"></A>The bulletin board and rollback 
+
+
+</H1>
+
+<H3>
+<A NAME="50422179_pgfId-295088"></A>	99.4.1 	<A NAME="50422179_marker-295085"></A><A NAME="50422179_marker-295086"></A><A NAME="50422179_marker-295087"></A>Session rollback </H3>
+<P>
+<A NAME="50422179_pgfId-295093"></A><A NAME="50422179_marker-295089"></A><A NAME="50422179_marker-295090"></A><A NAME="50422179_marker-295091"></A><A NAME="50422179_marker-295092"></A>When a session roll mark is set, this includes details of the bulletin board. When the session is rolled back, the bulletin board is also rolled back to the same point. That is, both the contents and the entity event associations are rolled back, so the bulletin board is consistent with the new state of the session.</P>
+
+
+<H3>
+<A NAME="50422179_pgfId-295097"></A>	99.4.2 	<A NAME="50422179_marker-295094"></A><A NAME="50422179_marker-295095"></A><A NAME="50422179_marker-295096"></A>Partitioned rollback </H3>
+<P>
+<A NAME="50422179_pgfId-295100"></A><A NAME="50422179_marker-295098"></A><A NAME="50422179_marker-295099"></A>When a partition mark is set, the bulletin board is NOT included. This is because a partition mark only refers to certain entities in the session. The bulletin board logs operations which occur on bodies in different partitions, and cannot selectively mark or roll its contents.</P>
+<P>
+<A NAME="50422179_pgfId-295104"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422179_pgfId-295103"></A>Note: Therefore, the bulletin board must be emptied before performing a partition roll - rolling back returns an error if the bulletin board is not empty.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422179_pgfId-295108"></A>See <A HREF="fd_chap.098.html#50422177_36055">Chapter 97, “Rollback”</A>, for further information on the rollback functionality.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422179_pgfId-295111"></A>99.5	<A NAME="50422179_marker-295109"></A><A NAME="50422179_marker-295110"></A>Rendering using the bulletin board 
+
+
+</H1>
+<P>
+<A NAME="50422179_pgfId-295116"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422179_pgfId-295114"></A>Performance issue: An application may want to maintain a picture of a part, which is updated automatically as the part is changed. In principle this could be done by simply redrawing the picture every time the model changes, but in practice this would be unnecessarily time-consuming.</ADDRESS><BR>
+</UL>
+<ADDRESS>
+<A NAME="50422179_pgfId-295115"></A>The bulletin board can be used to track how a part changes, so an application can just redraw only the entities that no longer look the same. This process is called <STRONG>
+incremental graphics</STRONG>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422179_pgfId-295119"></A>	99.5.1 	<A NAME="50422179_marker-295117"></A><A NAME="50422179_marker-295118"></A>Incremental graphics </H3>
+<P>
+<A NAME="50422179_pgfId-295122"></A><A NAME="50422179_marker-295120"></A><A NAME="50422179_marker-295121"></A>There are two Parasolid facilities used to perform incremental graphics: </P>
+<UL>
+<LI>
+<A NAME="50422179_pgfId-295123"></A>The <STRONG>
+bulletin board</STRONG> records the entities in the model which have been created, deleted or modified.</LI>
+<LI>
+<A NAME="50422179_pgfId-295124"></A>The <STRONG>
+rendering functions</STRONG> accept individual faces and edges, allowing less than a whole body to be drawn.</LI>
+</UL>
+<P>
+<A NAME="50422179_pgfId-295125"></A>By watching the bulletin board the application can re-draw anything that has been modified or added. To keep the picture properly up to date, deleted items, and the earlier versions of changed items, need to be removed. Note however that the kernel does not provide any specific support for this part of the task: it is up to the application to remember (usually in some sort of graphical data structure) what entities are being displayed, and to remove them from the picture when necessary.</P>
+<P>
+<A NAME="50422179_pgfId-295126"></A>Incremental graphics can be implemented using faceting and the bulletin board together. For example, a part can be faceted and the bulletin board can be used to identify faces that have changed after an operation. The changed faces can then be re-faceted, without re-faceting the whole part.</P>
+<P>
+<A NAME="50422179_pgfId-295130"></A>See <A HREF="fd_chap.108.html#50422188_89301">Section 107.2.16, “Incremental faceting”</A> for information on the functions available for drawing entities.</P>
+<P>
+<A NAME="50422179_pgfId-332064"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.099.html">Groups</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.101.html">Archives</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_ask_convexity</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_ask_convexity</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_EDGE_ask_convexity
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                        edge,
+const <A HREF=../headers/pk_edge_ask_convexity_o_t.html>PK_EDGE_ask_convexity_o_t</A> *options,
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_edge_convexity_t.html>PK_EDGE_convexity_t</A>             *convexity
+)
+</B>
+<A NAME="description"></A>
+<I>The function returns the convexity of the given edge.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_missing_geom         Edge or the adjacent faces do not have
+                                  geometry. (MILD)
+    PK_ERROR_non_manifold         Edge is non-manifold. (MILD)
+    PK_ERROR_unsuitable_topology  Edge is non suitable e.g laminar edge.(MILD)
+    PK_ERROR_partial_coi_found    Edge convexity cannot be identified due to
+                                  partial coincidence of adjacent faces.
+                                  (MILD)
+    PK_ERROR_eval_failure         The function has failed to find the
+                                  convexity, e.g. due to a failure in finding
+                                  the normals. (MILD)
+
+<A NAME="documentation"></A>
+The convexity of an edge is computed from the angle between the normals of the
+two faces that meet at the edge and the face curvatures. This requires the
+existence of two non-rubber adjacent faces of the edge.
+
+PK_EDGE_ask_convexity distinguishes the following convexities:
+   - convex            : The <B>'edge'</B> is convex.
+   - concave           : The <B>'edge'</B> is concave.
+   - smooth flat       : Convexity of the <B>'edge'</B> is smooth (the surface normals
+                         are parallel) and both faces have zero curvature.
+   - smooth convex     : Convexity of the <B>'edge'</B> is smooth, and both curvatures
+                         are positive, or one positive curvature and one zero
+                         curvature.
+   - smooth concave    : Convexity of the <B>'edge'</B> is smooth, and both curvatures
+                         are negative, or one negative curvature and one zero
+                         curvature.
+   - smooth inflection : Convexity of the <B>'edge'</B> is smooth, and the curvatures
+                         are opposite in sign.
+   - smooth variable   : Convexity of the <B>'edge'</B> is smooth, and some parts of
+                         the <B>'edge'</B> are smooth concave and other parts are
+                         smooth convex.
+   - knife convex      : The surface normals are anti-parallel and the sum of
+                         the curvatures is non-negative.
+   - knife concave     : The surface normals are anti-parallel and the sum of
+                         the curvatures is non-positive.
+   - variable          : The convexity varies along the <B>'edge'</B>.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

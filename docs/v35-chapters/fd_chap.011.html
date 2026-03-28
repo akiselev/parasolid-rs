@@ -1,0 +1,830 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Tracking And Labelling</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Tracking And Labelling</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.010.html">PK Interface Programming Concepts </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.012.html">Using Reports</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-325390">10.1	Introduction </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303627">10.2	Tools available </A>
+<UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303629">10.2.1	Returns from API functions </A>
+<UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-305550">10.2.1.1	Error diagnostics and status return codes </A>
+</UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303634">10.2.2	Reports </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303640">10.2.3	Tag persistence </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303651">10.2.4	Attributes </A>
+<UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303659">10.2.4.1	Attribute callbacks </A>
+</UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303670">10.2.5	Reporting entity changes in rollback </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303677">10.2.6	Bulletin board </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303686">10.2.7	General tracking information </A>
+<UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303687">10.2.7.1	Low-level model changes </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303689">10.2.7.2	Order of entities </A>
+</UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303693">10.2.8	Other tracking utilities </A>
+<UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303694">10.2.8.1	Topological and geometric connectivity enquiries</A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303698">10.2.8.2	Geometric positioning information </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303703">10.2.8.3	Appitems </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303707">10.2.8.4	User fields </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-303713">10.3	Persistent labelling </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-310048">10.4	Example of tracking </A>
+<UL>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-310084">10.4.1	Creating curves to form a profile </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-310135">10.4.2	Creating a wire profile </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-313760">10.4.3	Creating a sheet profile </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-317713">10.4.4	Extruding the profile to create a solid </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-310234">10.4.5	Add an edge blend </A>
+<LI> <A HREF="fd_chap.011.html#50422079_pgfId-310269">10.4.6	Add a cylindrical boss </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422079_pgfId-325390"></A>10.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422079_pgfId-303626"></A>This chapter is an introduction to the range of generic, customisable tools that Parasolid provides if you need to implement a mechanism that can accurately track the creation and manipulation of entities as you perform operations. Feature modelling applications can, for example, use these tools as fundamental components of a persistent labelling strategy. </P>
+<P>
+<A NAME="50422079_pgfId-338802"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-338444"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422079_pgfId-338431"></A><A HREF="fd_chap.003.html#50422070_21663">Section 2.4.2, “Tags”</A></LI>
+<LI>
+<A NAME="50422079_pgfId-338474"></A><A HREF="fd_chap.012.html#50422080_52366">Section 11.1.1, “Getting information from Parasolid’s report”</A></LI>
+<LI>
+<A NAME="50422079_pgfId-338489"></A><A HREF="fd_chap.027.html#50422096_37460">Chapter 26, “Enquiry And Output Functions”</A></LI>
+<LI>
+<A NAME="50422079_pgfId-338516"></A><A HREF="fd_chap.095.html#50422174_42241">Chapter 94, “Attribute Definitions”</A></LI>
+<LI>
+<A NAME="50422079_pgfId-338532"></A><A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A></LI>
+<LI>
+<A NAME="50422079_pgfId-338590"></A><A HREF="fd_chap.098.html#50422177_36055">Chapter 97, “Rollback”</A></LI>
+<LI>
+<A NAME="50422079_pgfId-338605"></A><A HREF="fd_chap.099.html#50422178_36760">Chapter 98, “Groups”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422079_pgfId-303627"></A>10.2	Tools available 
+
+
+</H1>
+<P>
+<A NAME="50422079_pgfId-303628"></A>This section provides an overview of the tools and sources of information that you can use to implement a tracking mechanism. Where applicable, references to additional dedicated material are also provided. Typically, you should consider using a number of the tools and sources described here; it is unlikely that you would be able to implement a complete tracking mechanism using only a single tool. The precise combination of tools that are best for your application depend on both the overall strategy you are following for tracking in your application, and the particular modelling operations you are using. </P>
+
+<H3>
+<A NAME="50422079_pgfId-303629"></A>	10.2.1 	Returns from API functions </H3>
+<P>
+<A NAME="50422079_pgfId-304720"></A>Most functions that change topological and geometric entities report information about those changes through their returned arguments. Those that don’t typically use the Parasolid report mechanism described in <A HREF="fd_chap.011.html#50422079_60637">Section 10.2.2, “Reports”</A>.</P>
+<P>
+<A NAME="50422079_pgfId-303632"></A>Tracking information can be returned in a number of ways, depending on the API, including:</P>
+<UL>
+<LI>
+<A NAME="50422079_pgfId-305139"></A>Using an array or set of arrays.</LI>
+<LI>
+<A NAME="50422079_pgfId-305175"></A>Using a dedicated <CODE>
+tracking</CODE>
+ returns structure. </LI>
+</UL>
+<P>
+<A NAME="50422079_pgfId-305207"></A>Tracking information always returns new entities that have been created as the result of an operation, and can also include information regarding the original or seed entities from which a new entity has been derived, thereby allowing you to track a given entity’s provenance. </P>
+
+<H4>
+<A NAME="50422079_pgfId-305550"></A>10.2.1.1 Error diagnostics and status return codes </H4>
+<P>
+<A NAME="50422079_pgfId-309281"></A>On completion, all Parasolid functions return information relating to the success or failure of the operation. This information can tell you about whether the function call failed completely (i.e. the operation did not complete), or about the status of the operation (i.e. the function completed, but may not have produced the expected outcome). </P>
+<P>
+<A NAME="50422079_pgfId-305348"></A>A Parasolid (PK) error occurs when a PK function fails and returns a non-zero error code (i.e., one that is different to PK_ERROR_no_errors). For example, calling the function <A HREF=../headers/pk_body_create_solid_cyl.html>PK_BODY_create_solid_cyl</A> with negative <CODE>
+radius</CODE>
+ or <CODE>
+height</CODE>
+ returns PK_ERROR_distance_le_0. If an error such as this is returned, the values of any returned arguments are undefined and should not be used for tracking (or any other) purposes. </P>
+<P>
+<A NAME="50422079_pgfId-305418"></A>Even if a Parasolid function returns a zero error code (PK_ERROR_no_errors), it may also return a failure status code within the return arguments of the function if it has not been able to perform its task as intended, and needs to return a more detailed diagnosis of the problem. For example, if <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A> is called and two or more blends are set to overlap, the function returns PK_ERROR_no_errors but sets its <CODE>
+fault</CODE>
+ argument to <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_overlap_c</A>. </P>
+<P>
+<A NAME="50422079_pgfId-309188"></A>The Parasolid report mechanism is also used to return diagnostic information in the form of status codes: see <A HREF="fd_chap.011.html#50422079_60637">Section 10.2.2, “Reports”</A>, for an introduction to this mechanism.</P>
+<P>
+<A NAME="50422079_pgfId-305611"></A>See <A HREF="fd_chap.121.html#50422203_35122">Chapter 120, “Error Handling”</A>, for more information on handling errors returned by Parasolid functions. </P>
+
+
+
+<H3>
+<A NAME="50422079_pgfId-303634"></A>	10.2.2 	<A NAME="50422079_60637"></A>Reports </H3>
+<P>
+<A NAME="50422079_pgfId-303635"></A>A number of API functions return additional information through the report mechanism. This information can be used in the same way as tracking information returned by the API itself. </P>
+<P>
+<A NAME="50422079_pgfId-303637"></A>Where applicable, the PK Reference documentation for relevant functions indicates that the report mechanism is used for these purposes, and explains how to interpret the information returned. For example see the documentation for the <CODE>
+receive_compound</CODE>
+ option in <A HREF=../headers/pk_part_receive_o_t.html>PK_PART_receive_o_t</A>.</P>
+<P>
+<A NAME="50422079_pgfId-305840"></A>Parasolid reports are described in detail in <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>.</P>
+
+
+<H3>
+<A NAME="50422079_pgfId-303640"></A>	10.2.3 	Tag persistence </H3>
+<P>
+<A NAME="50422079_pgfId-303641"></A>When changes are made to an entity as a result of a modelling operation, a set of rules governs how the tags of the affected entities are affected.</P>
+<P>
+<A NAME="50422079_pgfId-303643"></A>For example:</P>
+<UL>
+<LI>
+<A NAME="50422079_pgfId-303644"></A>When an entity such as a face or edge is split as part of a modelling operation, then one of the resultant entities retains the tag of the original entity.</LI>
+<LI>
+<A NAME="50422079_pgfId-305985"></A>When two or more entities are merged together to form a single entity, then the result retains the tag of one of the original entities. The tag that survives depends on the nature of the operation in question; for example when two models are united in a simple boolean operation, resulting in a single body, that result body has the same tag as the target body passed to the boolean operation.</LI>
+<LI>
+<A NAME="50422079_pgfId-303646"></A>When an entity shrinks as part of a modelling operation, it retains its original tag.</LI>
+</UL>
+<P>
+<A NAME="50422079_pgfId-303650"></A>You can make use of the rules that govern tag persistence within your application’s tracking mechanism, because they allow you to make certain assumptions in your application code when dealing with model changes resulting from modelling operations. </P>
+<P>
+<A NAME="50422079_pgfId-306132"></A>See <A HREF="fd_chap.003.html#50422070_17252">Section 2.4.2.3, “Persistence of tags”</A>, for more information about tag persistence.</P>
+
+
+<H3>
+<A NAME="50422079_pgfId-303651"></A>	10.2.4 	<A NAME="50422079_14496"></A>Attributes </H3>
+<P>
+<A NAME="50422079_pgfId-303652"></A>Attributes are entities that provide a means for your application to associate additional information with a model. They can be modified automatically when changes are made to a model. You can attach attributes to topology and to any geometry that is incorporated into a model. </P>
+<P>
+<A NAME="50422079_pgfId-303654"></A>Attributes are fully customisable in terms of the information that they contain, the entities to which they may be attached and their behaviour under modelling operations. </P>
+<P>
+<A NAME="50422079_pgfId-303656"></A>When an entity is modified, the behaviour of an attribute associated with that entity depends on both of the following:</P>
+<UL>
+<LI>
+<A NAME="50422079_pgfId-306350"></A>The nature of the modification (what operation was performed).</LI>
+<LI>
+<A NAME="50422079_pgfId-306390"></A>The class of attribute definition from which the attribute was created (the template describing what the attribute contains).</LI>
+</UL>
+<P>
+<A NAME="50422079_pgfId-306501"></A>For example if a face with an attribute attached to it is split into two, the attribute may be deleted, persist on one of the resultant faces or be propagated to both of the resulting faces. </P>
+<P>
+<A NAME="50422079_pgfId-303658"></A>There are a set of seven pre-defined attribute classes. Each of these has a set of rules which governs how attributes of that class are modified under a set of standard low-level modelling operations. </P>
+<P>
+<A NAME="50422079_pgfId-306579"></A>See <A HREF="fd_chap.095.html#50422174_42241">Chapter 94, “Attribute Definitions”</A>, for information about attribute definitions.</P>
+<P>
+<A NAME="50422079_pgfId-306656"></A>See <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A>, for information about attributes. </P>
+
+<H4>
+<A NAME="50422079_pgfId-303659"></A>10.2.4.1 Attribute callbacks </H4>
+<P>
+<A NAME="50422079_pgfId-303660"></A>You can customise the behaviour of attributes when a model is modified in a particular way by using attribute callbacks. When a model is modified, you can use attribute callbacks to let your application watch (in the case of read only callbacks) the behaviour of an attribute or (in the case of normal callbacks) have full-decision making powers as to how that attribute should behave. </P>
+<P>
+<A NAME="50422079_pgfId-303662"></A>Due to their customisable nature (both in terms of content and behaviour), attributes and attribute callbacks can be key tools in your application’s tracking and labelling strategy. </P>
+<P>
+<A NAME="50422079_pgfId-303665"></A>Attributes are used extensively within Parasolid operations to mark and track changes to entities during a model change. </P>
+<P>
+<A NAME="50422079_pgfId-307591"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422079_pgfId-307605"></A>Warning: Once an attribute definition has been created, you should not attempt to change that definition since this is likely to cause serious model compatibility problems for your application. For example, you must not extend the list of entities to which an attribute created from that definition can be attached, or extend the set of fields within the definition. Attributes created from a definition of the same name, but where the definitions themselves differ in other ways cannot co-exist in the same session. To address this, it is good practice to append your attribute name with an index that can be incremented if the attribute definition is changed.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422079_pgfId-303669"></A>See <A HREF="fd_chap.095.html#50422174_24693">Section 94.3, “Callback functions”</A>, for more information on attribute callbacks. </P>
+
+
+
+<H3>
+<A NAME="50422079_pgfId-303670"></A>	10.2.5 	Reporting entity changes in rollback </H3>
+<P>
+<A NAME="50422079_pgfId-303671"></A>If your application implements partitioned rollback (essential for a feature-based modelling application and highly recommended for all applications), you may find the information regarding entities which are new, changed or modified by the rollback (or roll-forward) operation is a useful source of tracking information. </P>
+<P>
+<A NAME="50422079_pgfId-303673"></A>This can be particularly useful in the context of changing a model feature in a feature modelling application which might involve rolling the partition back to a state immediately prior to the feature being created prior to editing. </P>
+<P>
+<A NAME="50422079_pgfId-303675"></A>See <A HREF="fd_chap.098.html#50422177_38141">Section 97.2.4, “Rolling to a partition mark”</A>, for more information.</P>
+
+
+<H3>
+<A NAME="50422079_pgfId-303677"></A>	10.2.6 	<A NAME="50422079_81576"></A>Bulletin board </H3>
+<P>
+<A NAME="50422079_pgfId-303678"></A>The bulletin board can be used to track low level changes to a class or classes of entities (e.g. faces, edges) under a modelling or other model change. The sequence of changes reported by the bulletin board can be used by the application to trace the changes to individual entities during a modelling or other operation. </P>
+<P>
+<A NAME="50422079_pgfId-308098"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422079_pgfId-308112"></A>Warning: Before performing any partition or session rollback operation, you must empty the bulletin board by switching it off. If you do not do this, the contents of the bulletin board will not relate to the state of the partition or session once rollback has been performed.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422079_pgfId-303683"></A>See <A HREF="fd_chap.100.html#50422179_26577">Chapter 99, “Bulletin Board”</A>, for more information about the bulletin board. </P>
+<P>
+<A NAME="50422079_pgfId-307799"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422079_pgfId-307805"></A>Note: Use of the bulletin board is not typically recommended for new application implementations, particularly given its incompatibility with rollback and since the functionality has been largely superseded by more recent and more flexible tools described elsewhere in this chapter. If you have a use case where you believe the bulletin board appears to be a good solution to your requirements, you are advised to contact Parasolid Support to for further advice.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422079_pgfId-303686"></A>	10.2.7 	General tracking information </H3>
+
+<H4>
+<A NAME="50422079_pgfId-303687"></A>10.2.7.1 Low-level model changes </H4>
+<P>
+<A NAME="50422079_pgfId-303688"></A>Tag persistence, the behaviour of attributes, the bulletin board and changes reported by rollback operations are all governed by low-level model changes such as split, merge, create, delete and change. These refer to binary and low-level changes to the model and therefore the changes may sometimes seem counter-intuitive when viewed purely from the perspective of the high-level modelling operation that is being performed. Often a sequence of low-level modelling operations chain together to form the changes made to the model under a particular API call.</P>
+
+
+<H4>
+<A NAME="50422079_pgfId-303689"></A>10.2.7.2 <A NAME="50422079_14473"></A>Order of entities </H4>
+<P>
+<A NAME="50422079_pgfId-303690"></A>With the exception of a very small number of APIs, the order of the returned entities is not guaranteed by Parasolid. This applies both within a particular version of Parasolid (including patch releases) and between different versions of Parasolid. Your application must not therefore rely on the order in which entities are returned from a function unless the API documentation specifically states that the order is guaranteed . </P>
+<P>
+<A NAME="50422079_pgfId-303692"></A>One example of such an exception is the order of faces returned from <A HREF=../headers/pk_body_ask_faces.html>PK_BODY_ask_faces</A> for solid primitives that have been created with the routines such as <A HREF=../headers/pk_body_create_solid_block.html>PK_BODY_create_solid_block</A>. The ordering is described in <A HREF="fd_chap.027.html#50422096_90538">Section 26.4.1.1, “The returned order of faces of primitive solid bodies”</A>.</P>
+
+
+
+<H3>
+<A NAME="50422079_pgfId-303693"></A>	10.2.8 	Other tracking utilities </H3>
+
+<H4>
+<A NAME="50422079_pgfId-303694"></A>10.2.8.1 Topological and geometric connectivity enquiries</H4>
+<P>
+<A NAME="50422079_pgfId-303695"></A>You can use enquiry functions to discover topological and geometric connectivity before or after a modelling operation. This strategy is usually used in conjunction with the other tools described in this chapter and forms a vital part of any persistent labelling strategy. APIs such as <A HREF=../headers/pk_body_ask_faces.html>PK_BODY_ask_faces</A>, <A HREF=../headers/pk_face_ask_edges.html>PK_FACE_ask_edges</A>, <A HREF=../headers/pk_body_ask_edges.html>PK_BODY_ask_edges</A>, <A HREF=../headers/pk_edge_ask_faces.html>PK_EDGE_ask_faces</A> and <A HREF=../headers/pk_curve_ask_edges.html>PK_CURVE_ask_edges</A> are just a small selection of the routines that you might want to use as part of such a strategy.</P>
+<P>
+<A NAME="50422079_pgfId-303697"></A>See <A HREF="fd_chap.027.html#50422096_37460">Chapter 26, “Enquiry And Output Functions”</A>, for more information.</P>
+
+
+<H4>
+<A NAME="50422079_pgfId-303698"></A>10.2.8.2 Geometric positioning information </H4>
+<P>
+<A NAME="50422079_pgfId-303699"></A>As part of your application’s persistent labelling strategy, you may sometimes find it useful or necessary to store a three-space point along with a face or an edge in order to uniquely identify that entity. These additional points are typically referred to as <STRONG>
+help points</STRONG> in the Parasolid interface. To create or identify suitable help points, Parasolid provides a number of enquiry functions that let you determine a point on an edge or within a face, or let you enquire whether a given point lies within a face or on an edge. </P>
+<P>
+<A NAME="50422079_pgfId-308594"></A>See <A HREF="fd_chap.027.html#50422096_37460">Chapter 26, “Enquiry And Output Functions”</A>, for more information.</P>
+
+
+<H4>
+<A NAME="50422079_pgfId-303703"></A>10.2.8.3 Appitems </H4>
+<P>
+<A NAME="50422079_pgfId-303704"></A>Appitems are a means by which you can associate a Parasolid tag with an entity in your application. </P>
+<P>
+<A NAME="50422079_pgfId-303706"></A>For more information see <A HREF="fd_chap.094.html#50422173_89302">Chapter 93, “Identifying Application Data”</A>.</P>
+
+
+<H4>
+<A NAME="50422079_pgfId-303707"></A>10.2.8.4 User fields </H4>
+<P>
+<A NAME="50422079_pgfId-303708"></A>User fields provide a means of associating a fixed-length byte array with each and every Parasolid entity. You can then store application specific information within the user-field associated with a given Parasolid entity. </P>
+<P>
+<A NAME="50422079_pgfId-308928"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422079_pgfId-308934"></A>Note: User fields are not typically recommended for new Parasolid implementations due to the rigidity of the mechanism, but may represent a sensible solution for certain application scenarios. We strongly recommend you consult with Parasolid Support before embarking on a user-field implementation within your application. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422079_pgfId-308886"></A>See <A HREF="fd_chap.116.html#50422197_22973">Section 115.6, “User fields”</A>, for more information. </P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422079_pgfId-303713"></A>10.3	Persistent labelling 
+
+
+</H1>
+<P>
+<A NAME="50422079_pgfId-303714"></A>Persistent labelling, particularly in the context of a feature modelling application, can be implemented using a number of different approaches. The Parasolid tools described in this chapter offer low-level building blocks that can be utilised as essential components of an application's persistent labelling strategy. The tools are designed to provide flexibility, so as not to dictate that a particular approach must be implemented. </P>
+<P>
+<A NAME="50422079_pgfId-303716"></A>There are a number of academic papers on the topic of persistent labelling, a small selection of which are referenced below. We do not endorse or recommend any particular strategy over another.</P>
+<UL>
+<LI>
+<A NAME="50422079_pgfId-303718"></A>Jiri Kripac 'A Mechanism for Persistently Naming Topological Entities in History-Based Parametric Solid Models (Topological ID System)'</LI>
+<LI>
+<A NAME="50422079_pgfId-303719"></A>Dago Agbodan, David Marcheix, Guy Pierra 'Persistent Naming for Parametric Models'</LI>
+<LI>
+<A NAME="50422079_pgfId-303720"></A>Vasilis Capoyleas, Xingping Chen, Christoph M. Hoffmann 'Generic Naming in Generative, Constraint-Based Design'</LI>
+<LI>
+<A NAME="50422079_pgfId-303721"></A>Duhwan Mun, Soonhung Han 'Identification of Topological Entities and Naming Mapping for Parametric CAD Model Exchanges'</LI>
+<LI>
+<A NAME="50422079_pgfId-303722"></A>David Marcheix, Guy Pierra 'A Survey of the Persistent Naming Problem'</LI>
+<LI>
+<A NAME="50422079_pgfId-303723"></A>Dago Agdoban, David Marceix, Guy Pierra, Christophe Thabaud 'A Topological Entity Matching Technique for Geometric Parametric Models' </LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422079_pgfId-310048"></A>10.4	<A NAME="50422079_29986"></A>Example of tracking 
+
+
+</H1>
+<P>
+<A NAME="50422079_pgfId-310049"></A>This section describes a very simple example that demonstrates how to use the information returned by the Parasolid API to track information so that entities can be passed between different function calls in the course of a simple modelling session. The example demonstrates how to create a solid block from primitives, add an edge blend, and then a cylindrical boss. The stages involved in the process are as follows:</P>
+<UL>
+<LI>
+<A NAME="50422079_pgfId-311296"></A>Create a set of curves that form the basis of a sheet profile.</LI>
+<LI>
+<A NAME="50422079_pgfId-311418"></A>Create the sheet profile: make a wire body from the curves, make a face, and attach a surface.</LI>
+<LI>
+<A NAME="50422079_pgfId-311516"></A>Sweep the profile to form a solid body.</LI>
+<LI>
+<A NAME="50422079_pgfId-311562"></A>Blend an edge on the body.</LI>
+<LI>
+<A NAME="50422079_pgfId-311594"></A>Add a cylindrical boss to the body. </LI>
+</UL>
+<P>
+<A NAME="50422079_pgfId-311709"></A>These stages are described in full in the rest of this section. </P>
+<P>
+<A NAME="50422079_pgfId-325130"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422079_pgfId-325129"></A>Note: This example is only a simple demonstration of some of the techniques described in this chapter. It does not demonstrate the only way that tracking can be performed in this scenario, and it also does not demonstrate best practices in this situation. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422079_pgfId-319261"></A>Throughout this example, function call diagrams illustrate the parameters that you need to provide to PK functions and the information that is returned by them. These diagrams illustrate how information is tracked throughout the modelling session, and how arguments are passed between functions. <A HREF="fd_chap.011.html#50422079_19230"><EM>
+Figure 10-1</EM></A> explains the layout of these diagrams. Each diagram contains the components listed below:</P>
+<P>
+<A NAME="50422079_pgfId-320050"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326238"></A>Component</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326240"></A>Explanation</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326245"></A>Function names</P>
+
+<IMG SRC="../graphics/fd_chap-25.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326247"></A>The function name is shown in bold in the central box of each diagram.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326249"></A>Received arguments</P>
+
+<IMG SRC="../graphics/fd_chap-26.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326251"></A>Parameters that you pass into the function are shown at the top of the diagram. The argument name shown is the same as the field name used in the relevant entry of the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326256"></A>Returned arguments</P>
+
+<IMG SRC="../graphics/fd_chap-27.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326258"></A>Information that is returned by the function is shown at the bottom of the diagram. The argument name shown is the same as the field name used in the relevant entry of the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326263"></A>Reused arguments</P>
+
+<IMG SRC="../graphics/fd_chap-28.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422079_pgfId-326265"></A>Returned arguments that are reused in a subsequent function call within the example are indicated using a dashed arrow. In addition, if the argument is reused in a field with a different name, this name is shown in the diagram. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422079_pgfId-321433"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422079_pgfId-321466"></A>Note: Function call diagrams only show received and returned arguments that are significant for information tracking during the course of the example. Many function calls will also involve other parameters (such as options structures) that are not illustrated here for the purposes of simplicity.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422079_pgfId-317529"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-29.gif">
+
+<P>
+<A NAME="50422079_pgfId-317558"></A>Figure 10-1 <A NAME="50422079_19230"></A>Template for function call diagrams</P>
+
+<H3>
+<A NAME="50422079_pgfId-310084"></A>	10.4.1 	Creating curves to form a profile </H3>
+<P>
+<A NAME="50422079_pgfId-317582"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-30.gif">
+
+<P>
+<A NAME="50422079_pgfId-317583"></A>Figure 10-2 Function call to create a curve</P>
+<P>
+<A NAME="50422079_pgfId-311195"></A>First, you need to create a series of curves that will be used to form a profile. Since you are creating a simple block, the profile consists of four lines. You create these with four calls to <A HREF=../headers/pk_line_create.html>PK_LINE_create</A>, passing in a <CODE>
+location</CODE>
+ (point) and an <CODE>
+axis</CODE>
+ (direction) to each call via the <CODE>
+line_sf</CODE>
+ standard form to create four unbounded lines that pass through the specified points in the given directions.</P>
+<P>
+<A NAME="50422079_pgfId-318024"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-31.gif">
+
+<P>
+<A NAME="50422079_pgfId-318267"></A>Figure 10-3 Creating lines to define the profile</P>
+<P>
+<A NAME="50422079_pgfId-311196"></A>The tags of the resultant curves are returned by each call to <A HREF=../headers/pk_line_create.html>PK_LINE_create</A> in the <CODE>
+line</CODE>
+ return argument. </P>
+
+
+<H3>
+<A NAME="50422079_pgfId-310135"></A>	10.4.2 	Creating a wire profile </H3>
+<P>
+<A NAME="50422079_pgfId-311830"></A>You need to use <A HREF=../headers/pk_curve_make_wire_body_2.html>PK_CURVE_make_wire_body_2</A> to create a wire body from which the sheet profile will be completed. In order to do this, you need to find the interval of each line that defines boundary of the profile. This is done using <A HREF=../headers/pk_curve_parameterise_vector.html>PK_CURVE_parameterise_vector</A>:</P>
+<P>
+<A NAME="50422079_pgfId-317609"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-32.gif">
+
+<P>
+<A NAME="50422079_pgfId-317610"></A>Figure 10-4 Function call to find a parameter on a curve</P>
+<P>
+<A NAME="50422079_pgfId-312172"></A>For each line in the profile boundary, call <A HREF=../headers/pk_curve_parameterise_vector.html>PK_CURVE_parameterise_vector</A> twice (a total of 8 calls):</P>
+<UL>
+<LI>
+<A NAME="50422079_pgfId-312308"></A>The first call receives the line (<CODE>
+curve</CODE>
+) and one of the points (<CODE>
+position</CODE>
+) that the line passes through. </LI>
+<LI>
+<A NAME="50422079_pgfId-312477"></A>The second call receives the same line and the other point that the line passes through. </LI>
+</UL>
+<P>
+<A NAME="50422079_pgfId-312583"></A>Each call returns the parameter (<CODE>
+double</CODE>
+) on the line of the given point. The interval of that line therefore comprises an array containing these two parameters. </P>
+<P>
+<A NAME="50422079_pgfId-322257"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-33.gif">
+
+<P>
+<A NAME="50422079_pgfId-322258"></A>Figure 10-5 Creating lines to define the profile</P>
+<P>
+<A NAME="50422079_pgfId-312827"></A>To make a wire body, call <A HREF=../headers/pk_curve_make_wire_body_2.html>PK_CURVE_make_wire_body_2</A>, handing in the set of <CODE>
+curves</CODE>
+ returned by each call to <A HREF=../headers/pk_line_create.html>PK_LINE_create</A>, and the set of <CODE>
+bounds</CODE>
+ created by combining pairs of returned parameters from calls to <A HREF=../headers/pk_curve_parameterise_vector.html>PK_CURVE_parameterise_vector</A>.</P>
+<P>
+<A NAME="50422079_pgfId-317645"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-34.gif">
+
+<P>
+<A NAME="50422079_pgfId-317646"></A>Figure 10-6 Function call to create a wire profile</P>
+<P>
+<A NAME="50422079_pgfId-317634"></A><A HREF=../headers/pk_curve_make_wire_body_2.html>PK_CURVE_make_wire_body_2</A> creates an edge for each curve received, and returns these in the array of <CODE>
+new_edges</CODE>
+. Because the function does not guarantee to return edges in the same order that their associated curves were received, it also returns the <CODE>
+edge_index</CODE>
+ array, which maps returned <CODE>
+new_edges</CODE>
+ to their original curves. </P>
+<P>
+<A NAME="50422079_pgfId-318403"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-35.gif">
+
+<P>
+<A NAME="50422079_pgfId-318404"></A>Figure 10-7 Creating a wire body profile</P>
+
+
+<H3>
+<A NAME="50422079_pgfId-313760"></A>	10.4.3 	Creating a sheet profile </H3>
+<P>
+<A NAME="50422079_pgfId-313510"></A>At this stage, you have a wire body which, if used as a profile in a sweep operation, would create a sheet body. Since you are creating a solid block, you first need to turn this wire body into a sheet. You do this by first adding a face, and then attaching a surface to the face.</P>
+<P>
+<A NAME="50422079_pgfId-313889"></A>To add a face to the wire profile, use <A HREF=../headers/pk_edge_make_faces_from_wire.html>PK_EDGE_make_faces_from_wire</A>, which attaches faces to closed loops in a wire body. </P>
+<P>
+<A NAME="50422079_pgfId-317669"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-36.gif">
+
+<P>
+<A NAME="50422079_pgfId-317670"></A>Figure 10-8 Function call to add a face to the wire profile</P>
+<P>
+<A NAME="50422079_pgfId-317663"></A>You need to pass this function an edge from each closed loop of the faces you want to create. In this simple case, a single edge from the <CODE>
+new_edges</CODE>
+ returned by <A HREF=../headers/pk_curve_make_wire_body_2.html>PK_CURVE_make_wire_body_2</A> should be passed in. In the more general case, you should use the <CODE>
+edge_index</CODE>
+ array to compare <CODE>
+new_edges</CODE>
+ returned by <A HREF=../headers/pk_curve_make_wire_body_2.html>PK_CURVE_make_wire_body_2</A> with the lines returned by <A HREF=../headers/pk_line_create.html>PK_LINE_create</A> to ensure that you choose a single edge from each closed loop. </P>
+<P>
+<A NAME="50422079_pgfId-318524"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-37.gif">
+
+<P>
+<A NAME="50422079_pgfId-318525"></A>Figure 10-9 Function call to attach a surface to the profile’s face</P>
+<P>
+<A NAME="50422079_pgfId-324209"></A><A HREF=../headers/pk_edge_make_faces_from_wire.html>PK_EDGE_make_faces_from_wire</A> returns the new face created for the wire profile: you can pass this face into <A HREF=../headers/pk_face_attach_surf_fitting.html>PK_FACE_attach_surf_fitting</A> to create a suitable surface and attach it to the face, thereby completing the sheet profile you require. </P>
+<P>
+<A NAME="50422079_pgfId-324213"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-38.gif">
+
+<P>
+<A NAME="50422079_pgfId-317730"></A>Figure 10-10 Creating a sheet profile from the wire body</P>
+<P>
+<A NAME="50422079_pgfId-324235"></A>In addition, pass the face to <A HREF=../headers/pk_face_ask_body.html>PK_FACE_ask_body</A> to retrieve the sheet profile body itself. You will need to pass this body into several subsequent function calls. </P>
+<P>
+<A NAME="50422079_pgfId-324267"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-39.gif">
+
+<P>
+<A NAME="50422079_pgfId-324268"></A>Figure 10-11 Function call to find the profile body</P>
+
+
+<H3>
+<A NAME="50422079_pgfId-317713"></A>	10.4.4 	Extruding the profile to create a solid </H3>
+<P>
+<A NAME="50422079_pgfId-315343"></A>To create a solid body from the sheet profile you have created, use <A HREF=../headers/pk_body_sweep.html>PK_BODY_sweep</A>. This receives the profile body you have already created, together with a vector path that defines the direction of the sweep. </P>
+<P>
+<A NAME="50422079_pgfId-317750"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-40.gif">
+
+<P>
+<A NAME="50422079_pgfId-317751"></A>Figure 10-12 Function call to sweep the profile into a solid block</P>
+<P>
+<A NAME="50422079_pgfId-315803"></A><A HREF=../headers/pk_body_sweep.html>PK_BODY_sweep</A> returns a number of laterals - new edges or faces created by the sweep operation, together with corresponding bases - the entities on the original profile from which these laterals were derived. </P>
+<P>
+<A NAME="50422079_pgfId-318660"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-41.gif">
+
+<P>
+<A NAME="50422079_pgfId-318661"></A>Figure 10-13 Sweeping the profile to form a solid</P>
+<P>
+<A NAME="50422079_pgfId-316155"></A>From this information, you can determine any entity in the swept body:</P>
+<UL>
+<LI>
+<A NAME="50422079_pgfId-329158"></A>You can find the additional face by calling <A HREF=../headers/pk_body_ask_faces.html>PK_BODY_ask_faces</A> and ensuring it is neither the original profile nor any face in laterals. </LI>
+<LI>
+<A NAME="50422079_pgfId-329159"></A>You can find the edges between faces with calls to <A HREF=../headers/pk_face_find_edges_common.html>PK_FACE_find_edges_common</A>. </LI>
+<LI>
+<A NAME="50422079_pgfId-329179"></A>You can find the edges around a given face by calling <A HREF=../headers/pk_face_ask_edges.html>PK_FACE_ask_edges</A>.</LI>
+<LI>
+<A NAME="50422079_pgfId-329160"></A>You can find the vertices between edges with calls to <A HREF=../headers/pk_edge_ask_vertices.html>PK_EDGE_ask_vertices</A>, as required.</LI>
+</UL>
+<P>
+<A NAME="50422079_pgfId-323089"></A>The next step is to use <A HREF=../headers/pk_face_ask_edges.html>PK_FACE_ask_edges</A> to identify the common edge between the 1st and 2nd lateral faces: this is the edge that you will blend. </P>
+<P>
+<A NAME="50422079_pgfId-317767"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-42.gif">
+
+<P>
+<A NAME="50422079_pgfId-317768"></A>Figure 10-14 Function call to find the edge that lies between two laterals</P>
+
+
+<H3>
+<A NAME="50422079_pgfId-310234"></A>	10.4.5 	Add an edge blend </H3>
+<P>
+<A NAME="50422079_pgfId-317033"></A>To add a blend to an edge, pass the edge to <A HREF=../headers/pk_edge_set_blend_constant.html>PK_EDGE_set_blend_constant</A> together with a blend <CODE>
+radius</CODE>
+. </P>
+<P>
+<A NAME="50422079_pgfId-317803"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-43.gif">
+
+<P>
+<A NAME="50422079_pgfId-317804"></A>Figure 10-15 Function call to set an edge blend</P>
+<P>
+<A NAME="50422079_pgfId-318840"></A>Once set, you can fix the blend by passing the block to <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A>, which returns the new blend face in <CODE>
+blends</CODE>
+. The underlying faces from the original model associated with the new blend face are returned in <CODE>
+unders</CODE>
+.</P>
+<P>
+<A NAME="50422079_pgfId-323496"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-44.gif">
+
+<P>
+<A NAME="50422079_pgfId-323497"></A>Figure 10-16 Function call to fix a blend</P>
+<P>
+<A NAME="50422079_pgfId-318868"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-45.gif">
+
+<P>
+<A NAME="50422079_pgfId-318869"></A>Figure 10-17 Creating a blend on an edge</P>
+<P>
+<A NAME="50422079_pgfId-328032"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422079_pgfId-328031"></A>Note: This simple example illustrates the blending of only a single edge. If several edges were blended, then each blended edge might have a different set of underlying faces. <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A> also provides the <CODE>
+tracking_type</CODE>
+ option to give you closer control of preceisely what tracking information is returned in <CODE>
+unders</CODE>
+. In addition, the tags of the original edges that were blended are returned in <CODE>
+topols</CODE>
+, although these tags will generally be dead after the blend has been fixed, since the original unblended edges no longer exist. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422079_pgfId-310269"></A>	10.4.6 	Add a cylindrical boss </H3>
+<P>
+<A NAME="50422079_pgfId-317041"></A>In the final stage, a cylindrical boss is added to the blended block you have already created. This is done by creating a cylinder and then performing a boolean unite between the cylinder and the blend block. </P>
+<P>
+<A NAME="50422079_pgfId-317263"></A>Use <A HREF=../headers/pk_body_create_solid_cyl.html>PK_BODY_create_solid_cyl</A> to create a cylinder of a given radius, height, and position. </P>
+<P>
+<A NAME="50422079_pgfId-317840"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-46.gif">
+
+<P>
+<A NAME="50422079_pgfId-317841"></A>Figure 10-18 Function call to create a cylinder</P>
+<P>
+<A NAME="50422079_pgfId-323638"></A>Like other PK_BODY_create_... functions, <A HREF=../headers/pk_body_create_solid_cyl.html>PK_BODY_create_solid_cyl</A> is a primitive creation function, so for the purposes of this example you can rely on the order in which <A HREF=../headers/pk_body_ask_faces.html>PK_BODY_ask_faces</A> returns faces from the cylinder to uniquely identify each of its faces. </P>
+<P>
+<A NAME="50422079_pgfId-323907"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422079_pgfId-323921"></A>Warning: In general, you should not rely on the order that entities are returned by PK functions.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422079_pgfId-317834"></A><A HREF=../headers/pk_body_create_solid_cyl.html>PK_BODY_create_solid_cyl</A> returns the cylindrical <CODE>
+body</CODE>
+, which you can use as the tool in a call to <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>, together with the blended block as the <CODE>
+target</CODE>
+. </P>
+<P>
+<A NAME="50422079_pgfId-317869"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-47.gif">
+
+<P>
+<A NAME="50422079_pgfId-317870"></A>Figure 10-19 Function call to unite the cylinder with the blended block</P>
+<P>
+<A NAME="50422079_pgfId-324639"></A>You can rely on tag persistence to discover the entities that the faces of the boss and the modified target faces were derived from. At this stage in the modelling session, all faces, edges, and vertices in the model can be uniquely identified. </P>
+<P>
+<A NAME="50422079_pgfId-327207"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422079_pgfId-327228"></A>Note: Rather than relying on tag persistence, a better implementation would use the tracking returns provided by <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> to track new edges in the final model rather than tag persistence. An even more robust implementation would use a more generic attribute labelling system (as outlined in <A HREF="fd_chap.011.html#50422079_14496">Section 10.2.4</A>), which would allow split and merge events to be accurately tracked for all topology classes. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422079_pgfId-319022"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-48.gif">
+
+<P>
+<A NAME="50422079_pgfId-319023"></A>Figure 10-20 Uniting the block and the cylinder to create a boss</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.010.html">PK Interface Programming Concepts </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.012.html">Using Reports</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

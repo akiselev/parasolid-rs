@@ -1297,6 +1297,10 @@ pub struct PK_REGION_embed_body_o_t { _private: [u8; 0] }
 #[repr(C)]
 pub struct PK_REGION_embed_body_r_t { _private: [u8; 0] }
 
+/// Local operation results.
+#[repr(C)]
+pub struct PK_TOPOL_local_r_t { _private: [u8; 0] }
+
 // =============================================================================
 // Extern function declarations
 // =============================================================================
@@ -1666,6 +1670,8 @@ unsafe extern "C" {
         operations: *const PK_FACE_change_t,
         tolerance: c_double,
         options: *const PK_FACE_change_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1761,7 +1767,7 @@ unsafe extern "C" {
         n_faces: c_int,
         faces: *const PK_FACE_t,
         heal_action: PK_FACE_heal_t,
-        loops_independent: PK_LOGICAL_t,
+        heal_loops: PK_FACE_heal_loops_t,
         local_check: PK_LOGICAL_t,
         n_bodies: *mut c_int,
         bodies: *mut *mut PK_BODY_t,

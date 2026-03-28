@@ -1,0 +1,1059 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Parasolid Concepts</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Parasolid Concepts</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.002.html"> Introduction To Parasolid</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.004.html">Overview Of This Manual</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-333181">2.1	Introduction </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299451">2.2	Parasolid class structure </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299515">2.3	PK interface functions </A>
+<UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299527">2.3.1	PK function syntax </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299560">2.3.2	Arguments to PK functions </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-354477">2.3.3	Options structure </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299591">2.3.4	Error codes returned from PK functions </A>
+</UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299627">2.4	Entity classes, tokens, tags and identifiers </A>
+<UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299691">2.4.1	Tokens </A>
+<UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299752">2.4.1.1	Using token names and values in your code </A>
+</UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299786">2.4.2	Tags </A>
+<UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299804">2.4.2.1	Lifetime of a tag </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299834">2.4.2.2	The null tag </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299852">2.4.2.3	Persistence of tags </A>
+</UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299875">2.4.3	Operations on tokens and tags </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299911">2.4.4	Identifiers </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299939">2.4.5	User fields </A>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299949">2.4.6	Copying entities </A>
+</UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-299983">2.5	Getting started with the PK interface </A>
+<UL>
+<LI> <A HREF="fd_chap.003.html#50422070_pgfId-300029">2.5.1	Prototyping Parasolid code </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422070_pgfId-333181"></A>2.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422070_pgfId-299447"></A>This chapter explains fundamental concepts that you need to understand in order to use Parasolid. The information in this chapter is vital to understanding Parasolid and you should read and understand it.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422070_pgfId-299451"></A>2.2	<A NAME="50422070_22611"></A>Parasolid class structure 
+
+
+</H1>
+<P>
+<A NAME="50422070_pgfId-299461"></A>Items of data that may be passed between Parasolid and your application are called <STRONG>
+objects</STRONG>. Each object belongs to a <STRONG>
+class </STRONG>that defines objects of a common type. Classes in Parasolid conform to a hierarchical tree structure as outlined in <A HREF="fd_chap.003.html#50422070_78731"><EM>
+Figure 2-1</EM></A>; for clarity, we have not shown every class in this diagram, and additional classes are indicated by a boxed ellipsis (...). The top-level class is called CLASS and is a superclass of all other Parasolid classes. Objects from the classes that are highlighted in the diagram all have <STRONG>
+tags </STRONG>that identify them; see <A HREF="fd_chap.003.html#50422070_21663">Section 2.4.2, “Tags”</A> for more information.</P>
+<P>
+<A NAME="50422070_pgfId-303754"></A><A HREF="fd_chap.003.html#50422070_56754"><EM>
+Figure 2-2</EM></A> and <A HREF="fd_chap.003.html#50422070_76626"><EM>
+Figure 2-3</EM></A> show the subclasses of two important classes used in Parasolid modeling: TOPOL and GEOM. These classes are described in detail in <A HREF="fd_chap.015.html#50422084_36760">Chapter 14, “Model Structure”</A>.</P>
+<P>
+<A NAME="50422070_pgfId-325509"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-7.gif">
+
+<P>
+<A NAME="50422070_pgfId-325511"></A>Figure 2-1 <A NAME="50422070_78731"></A>An outline of the Parasolid class hierarchy</P>
+<P>
+<A NAME="50422070_pgfId-326727"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-8.gif">
+
+<P>
+<A NAME="50422070_pgfId-322198"></A>Figure 2-2 <A NAME="50422070_56754"></A>The TOPOL class and its subclasses</P>
+<P>
+<A NAME="50422070_pgfId-326954"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-9.gif">
+
+<P>
+<A NAME="50422070_pgfId-299503"></A>Figure 2-3 <A NAME="50422070_76626"></A>The GEOM class and its subclasses</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422070_pgfId-299515"></A>2.3	<A NAME="50422070_18698"></A><A NAME="50422070_marker-299507"></A><A NAME="50422070_marker-299509"></A><A NAME="50422070_marker-299511"></A><A NAME="50422070_marker-299513"></A>PK interface functions 
+
+
+</H1>
+<P>
+<A NAME="50422070_pgfId-299519"></A><A NAME="50422070_marker-299517"></A>All PK interface functions belong to a class and can be used within subclasses of that class, where appropriate. The class of a function defines its purpose, as shown in the following table:</P>
+<P>
+<A NAME="50422070_pgfId-299522"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298175"></A>Class name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298177"></A>Purpose of function</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298183"></A><STRONG>
+CLASS</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298185"></A>Navigating the class hierarchy</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298191"></A><STRONG>
+SESSION</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298193"></A>Session management</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298199"></A><STRONG>
+ERROR</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298201"></A>Error handling</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298207"></A><STRONG>
+MEMORY</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298209"></A>Memory management</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298215"></A><STRONG>
+BB</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298217"></A>Bulletin board</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298223"></A><STRONG>
+ENTITY</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298225"></A>Modeling operations</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298231"></A><STRONG>
+APPITEM</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298233"></A>Associations with application data</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298239"></A><STRONG>
+PARTITION PMARK MARK</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298241"></A>Rollback mechanism</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422070_pgfId-299525"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422070_pgfId-298251"></A>Note: Partitions, pmarks and marks are items that have identifying tags but do not relate directly to model data. Entities and appitems also have tags and relate to Parasolid and application data, respectively.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422070_pgfId-299527"></A>	2.3.1 	PK function syntax </H3>
+<P>
+<A NAME="50422070_pgfId-299535"></A><A NAME="50422070_marker-299529"></A><A NAME="50422070_marker-299531"></A><A NAME="50422070_marker-299533"></A>All PK functions have names of the form PK_<EM>
+&lt;CLASS&gt;</EM>_<EM>
+&lt;text&gt;</EM>.</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299537"></A><EM>
+&lt;CLASS&gt;</EM> is an upper-case string that denotes the top-level class to which the function belongs</LI>
+<LI>
+<A NAME="50422070_pgfId-299539"></A><EM>
+&lt;text&gt;</EM> is (usually) a lower-case verb/noun combination that describes the operation</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-299541"></A>Some of the most common function names are constructed from a standard set of verbs, as shown below:</P>
+<P>
+<A NAME="50422070_pgfId-299544"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298280"></A>Verb</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298282"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298284"></A>Example Function</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298292"></A>create</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298294"></A>create an entity</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298296"></A><A HREF=../headers/pk_attrib_create_empty.html>PK_ATTRIB_create_empty</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298304"></A>make</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298306"></A>create from entity of another class</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298308"></A><A HREF=../headers/pk_cone_make_solid_body.html>PK_CONE_make_solid_body</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298316"></A>delete</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298318"></A>delete an entity</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298320"></A><A HREF=../headers/pk_entity_delete_attribs.html>PK_ENTITY_delete_attribs</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298328"></A>set</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298330"></A>store a value or values</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298332"></A><A HREF=../headers/pk_attrib_set_doubles.html>PK_ATTRIB_set_doubles</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298340"></A>ask</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298342"></A>retrieve a stored value</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298344"></A><A HREF=../headers/pk_face_ask_body.html>PK_FACE_ask_body</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298352"></A>is</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298354"></A>query condition</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298356"></A><A HREF=../headers/pk_entity_is_curve.html>PK_ENTITY_is_curve</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298364"></A>find/eval</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298366"></A>compute a value</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298368"></A><A HREF=../headers/pk_fin_find_curve_parameter.html>PK_FIN_find_curve_parameter</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422070_pgfId-299546"></A>Every function has a fixed set of arguments: some are used to supply data, and others are used to return information. Arguments must never be used for both purposes; if a pointer to the same memory space is passed as both input and output arguments, the behaviour of the function is undefined. Input arguments are never modified as a result of a PK function call.</P>
+<P>
+<A NAME="50422070_pgfId-299550"></A><A NAME="50422070_marker-299548"></A>In some functions, arrays of returned data are optional. Parasolid does not attempt to compute or return this information if the NULL pointer is passed as the pointer for the returned array.</P>
+
+
+<H3>
+<A NAME="50422070_pgfId-299560"></A>	2.3.2 	<A NAME="50422070_marker-299552"></A><A NAME="50422070_marker-299554"></A><A NAME="50422070_marker-299556"></A><A NAME="50422070_55614"></A>Arguments to PK functions </H3>
+<P>
+<A NAME="50422070_pgfId-299566"></A><A NAME="50422070_marker-299562"></A><A NAME="50422070_marker-299564"></A>Argument types are simple values, arrays, and structures built from the following list of primitive types:</P>
+<P>
+<A NAME="50422070_pgfId-299569"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298375"></A>Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298377"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298383"></A>int</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298385"></A>the usual C convention for an integer</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298391"></A>double</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298393"></A>the usual C convention for a double precision floating point number</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298399"></A>char*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298401"></A>the usual C convention for a null-terminated character string</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298409"></A><A NAME="50422070_marker-298407"></A><A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298413"></A><A NAME="50422070_marker-298411"></A>true or false, with values 1 and 0 respectively:</P>
+<PRE><A NAME="50422070_pgfId-298415"></A>#define PK_LOGICAL_true 1</PRE>
+<PRE><A NAME="50422070_pgfId-298417"></A>#define PK_LOGICAL_false 0</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298425"></A><A NAME="50422070_marker-298423"></A><A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298429"></A><A NAME="50422070_marker-298427"></A>a 3-space vector with coordinate fields (3 doubles):</P>
+<PRE><A NAME="50422070_pgfId-298431"></A>typedef struct {double coord[3];} <A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>;</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298439"></A><A NAME="50422070_marker-298437"></A><A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298441"></A>same as <A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>, but it must be a unit vector (enforced by argument checking)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298447"></A><A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298449"></A>a real interval ordered low/high (2 doubles):</P>
+<PRE><A NAME="50422070_pgfId-298451"></A>typedef struct {double value[2];} <A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>;</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298459"></A><A NAME="50422070_marker-298457"></A><A HREF=../headers/pk_box_t.html>PK_BOX_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298463"></A><A NAME="50422070_marker-298461"></A>a rectangular box aligned with the world coordinate axes, representing the minimum and maximum extremes of the box (6 doubles):</P>
+<PRE><A NAME="50422070_pgfId-298465"></A>typedef struct {double coord[6];} <A HREF=../headers/pk_box_t.html>PK_BOX_t</A>;</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298473"></A><A NAME="50422070_marker-298471"></A><A HREF=../headers/pk_uv_t.html>PK_UV_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298477"></A>a <A NAME="50422070_marker-298475"></A>surface parameter pair of u and v coordinates:</P>
+<PRE><A NAME="50422070_pgfId-298479"></A>typedef struct {double param[2];} <A HREF=../headers/pk_uv_t.html>PK_UV_t</A>;</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298487"></A><A NAME="50422070_marker-298485"></A><A HREF=../headers/pk_uvbox_t.html>PK_UVBOX_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-298491"></A>a <A NAME="50422070_marker-298489"></A>surface parameter space box:</P>
+<PRE><A NAME="50422070_pgfId-298493"></A>typedef struct {double param[4];} <A HREF=../headers/pk_uvbox_t.html>PK_UVBOX_t</A>;</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422070_pgfId-354475"></A>All input arguments must be specified, even if you only require the default behaviour. See <A HREF="fd_chap.010.html#50422078_56226">Section 9.2, “PK functions”</A> for more information. </P>
+
+
+<H3>
+<A NAME="50422070_pgfId-354477"></A>	2.3.3 	<A NAME="50422070_92743"></A>Options structure </H3>
+<P>
+<A NAME="50422070_pgfId-433562"></A>Some input arguments can be considered optional and you provide them via a separate options structure (named with an o_t suffix). Every option in the structure must be specified explicitly, even if you only require the default behaviour. To do this, your application should call the relevant macro (named with an o_m suffix) and then change the settings of individual non-default options before passing the structure to the function. For more information on using option structures, see <A HREF="fd_chap.010.html#50422078_39528">Chapter 9, “PK Interface Programming Concepts”</A>.</P>
+
+
+<H3>
+<A NAME="50422070_pgfId-299591"></A>	2.3.4 	<A NAME="50422070_marker-431574"></A><A NAME="50422070_marker-431575"></A><A NAME="50422070_marker-431576"></A><A NAME="50422070_marker-431577"></A><A NAME="50422070_marker-431578"></A>Error codes returned from PK functions </H3>
+<P>
+<A NAME="50422070_pgfId-299593"></A>Every Parasolid function returns an error code as the function value to the calling routine. This value broadly indicates whether the intended operation has succeeded (if zero) or failed (non-zero); in the case of failure, the error code describes the probable cause. In other situations, more details concerning the nature of the failure can be returned via the output arguments of the function. In these cases, a value of zero is returned as the error code, and the corresponding output arguments must also be examined.</P>
+<P>
+<A NAME="50422070_pgfId-331932"></A>To ease the handling of situations where non-zero error codes are returned, your application can register an <A NAME="50422070_marker-331933"></A>error handling function with Parasolid. This function is called automatically whenever an error with a non-zero code occurs, and can be used to perform any clean-up operations needed as a result of the error.</P>
+<P>
+<A NAME="50422070_pgfId-299609"></A>If you wish, your application can also register <A NAME="50422070_marker-299599"></A>signal handlers with the operating system to deal with <A NAME="50422070_marker-299602"></A>run-time errors and <A NAME="50422070_marker-299604"></A>user interrupts. For more information about error and signal handling, see <A HREF="fd_chap.121.html#50422203_35122">Chapter 120, “Error Handling”</A>.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422070_pgfId-299627"></A>2.4	<A NAME="50422070_18979"></A><A NAME="50422070_marker-299613"></A><A NAME="50422070_marker-299615"></A><A NAME="50422070_marker-299617"></A><A NAME="50422070_marker-299619"></A><A NAME="50422070_marker-299621"></A><A NAME="50422070_marker-299623"></A><A NAME="50422070_marker-299625"></A>Entity classes, tokens, tags and identifiers 
+
+
+</H1>
+<P>
+<A NAME="50422070_pgfId-299633"></A>Parasolid models are made up of items known as <STRONG>
+entities</STRONG> that are objects belonging to the ENTITY class. For example, a part consisting of a single cylindrical body contains (at least): </P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299635"></A>one <STRONG>
+body</STRONG></LI>
+<LI>
+<A NAME="50422070_pgfId-299637"></A>two <STRONG>
+regions</STRONG></LI>
+<LI>
+<A NAME="50422070_pgfId-299639"></A>two <STRONG>
+shells</STRONG></LI>
+<LI>
+<A NAME="50422070_pgfId-299641"></A>three <STRONG>
+faces</STRONG></LI>
+<LI>
+<A NAME="50422070_pgfId-299643"></A>four <STRONG>
+loops</STRONG></LI>
+<LI>
+<A NAME="50422070_pgfId-299645"></A>four <STRONG>
+fins</STRONG></LI>
+<LI>
+<A NAME="50422070_pgfId-299647"></A>two <STRONG>
+edges</STRONG></LI>
+<LI>
+<A NAME="50422070_pgfId-299649"></A>three <STRONG>
+surfaces</STRONG></LI>
+<LI>
+<A NAME="50422070_pgfId-299651"></A>two <STRONG>
+curves</STRONG></LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-299653"></A>It might also contain some <STRONG>
+attributes</STRONG> or <STRONG>
+groups</STRONG>, and further lattices, surfaces, curves and points that can be used as <STRONG>
+construction geometry</STRONG>.</P>
+<P>
+<A NAME="50422070_pgfId-299667"></A>Generally speaking, an entity is any identifiable component of a model. Any model can be represented as a network of entities that are linked by complex relationships. <A HREF="fd_chap.003.html#50422070_33627"><EM>
+Figure 2-4</EM></A> shows the entities available in a body, together with some of the relationships between them. The classes corresponding to the topological and geometric entities shown are given in <A HREF="fd_chap.003.html#50422070_56754"><EM>
+Figure 2-2</EM></A> and <A HREF="fd_chap.003.html#50422070_76626"><EM>
+Figure 2-3</EM></A>.</P>
+<P>
+<A NAME="50422070_pgfId-327586"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-10.gif">
+
+<P>
+<A NAME="50422070_pgfId-299677"></A>Figure 2-4 <A NAME="50422070_33627"></A>The entities of the kernel model</P>
+<P>
+<A NAME="50422070_pgfId-299683"></A>For more information about the entities available in Parasolid, and the relationships between them, see <A HREF="fd_chap.015.html#50422084_36760">Chapter 14, “Model Structure”</A>.</P>
+
+<H3>
+<A NAME="50422070_pgfId-299691"></A>	2.4.1 	<A NAME="50422070_marker-299685"></A><A NAME="50422070_marker-299687"></A><A NAME="50422070_marker-299689"></A>Tokens </H3>
+<P>
+<A NAME="50422070_pgfId-299695"></A>Every object has one or more classes<STRONG>
+ </STRONG>associated with it. Classes are specified and reported using <STRONG>
+tokens</STRONG> which are defined as constant values in the include file <CODE>
+parasolid_kernel.h</CODE>
+<A NAME="50422070_marker-299694"></A>. </P>
+<P>
+<A NAME="50422070_pgfId-299697"></A>Token names in the PK Interface are of one of the following two forms:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299699"></A>PK_<EM>
+&lt;CLASS&gt;</EM>_<EM>
+&lt;text&gt;</EM></LI>
+<LI>
+<A NAME="50422070_pgfId-299701"></A>PK_<EM>
+&lt;text&gt;</EM></LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-299703"></A>The upper-case string <EM>
+&lt;CLASS&gt;</EM> denotes the top-level class to which the token applies; the lower-case string <EM>
+&lt;text&gt;</EM> describes the meaning of the token. Tokens with names of the form PK_<EM>
+&lt;CLASS&gt;</EM>_<EM>
+&lt;text&gt;</EM> can also apply to subclasses of <EM>
+&lt;CLASS&gt;</EM> but not (in general) to classes outside this tree. If the token can apply to all classes, the word <EM>
+&lt;CLASS&gt;</EM> is omitted and the name is of the form PK_<EM>
+&lt;text&gt;</EM>.</P>
+<P>
+<A NAME="50422070_pgfId-299705"></A>For example, a conical surface object may be classified successively as belonging to:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299707"></A>GEOM (PK_CLASS_geom) - the overall class to which surfaces belong</LI>
+<LI>
+<A NAME="50422070_pgfId-299709"></A>SURF (PK_CLASS_surf) - a subclass of PK_CLASS_geom</LI>
+<LI>
+<A NAME="50422070_pgfId-299711"></A>CONE (PK_CLASS_cone) - a subclass of PK_CLASS_surf</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-299713"></A>Tokens are used in various ways:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299715"></A>Tokens are passed to the kernel to specify information; for example, the class of an entity or a class of parameter</LI>
+<LI>
+<A NAME="50422070_pgfId-299717"></A>Tokens are passed to the kernel to specify optional arguments; for example, to perform a unite boolean operation, you need to specify the token PK_boolean_unite_c in a PK function call.</LI>
+<LI>
+<A NAME="50422070_pgfId-299719"></A>The kernel returns tokens when identifying an object; for example, <A HREF=../headers/pk_body_ask_type.html>PK_BODY_ask_type</A> (which classifies a given body) might return PK_BODY_type_solid_c (to denote a solid body with finite volume)</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-299725"></A>Tokens are listed in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> (Part 2 - Interface Structures, Tokens &amp; Error Codes):</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299731"></A><A HREF="p2_chap.02.html#27224">Appendix A, “PK Tokens (Numeric)”</A></LI><LI>
+<A NAME="50422070_pgfId-299737"></A><A HREF="p2_chap.04.html#27224">Appendix B, “PK Tokens (Alphabetic)”</A></LI></UL>
+<P>
+<A NAME="50422070_pgfId-299740"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422070_pgfId-298246"></A>Note: In general, tags and geometric parameters are common to both the PK and KI interfaces. PK error codes and KI ifails occasionally differ.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422070_pgfId-299752"></A>2.4.1.1 <A NAME="50422070_marker-299742"></A><A NAME="50422070_marker-299744"></A><A NAME="50422070_marker-299746"></A><A NAME="50422070_marker-299748"></A><A NAME="50422070_marker-299750"></A>Using token names and values in your code </H4>
+<P>
+<A NAME="50422070_pgfId-299754"></A>Tokens also have numerical values. Since these values may change in future versions, you should use only token names in your code. These will continue to work even if the numerical value changes.</P>
+<P>
+<A NAME="50422070_pgfId-299756"></A>However, with the exception of error tokens (<A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A>), you cannot interrogate the PK itself for token names: PK functions only return the numerical values, which you can compare with the names published in the following places:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299766"></A><A HREF="p2_chap.02.html#27224">Appendix A, “PK Tokens (Numeric)”</A> in <EM><A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>, Part 2</LI>
+<LI>
+<A NAME="50422070_pgfId-299776"></A><A HREF="p2_chap.04.html#27224">Appendix B, “PK Tokens (Alphabetic)”</A> in <EM><A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>, Part 2</LI>
+<LI>
+<A NAME="50422070_pgfId-299778"></A>The file <CODE>
+parasolid_kernel.h</CODE>
+</LI>
+</UL>
+
+
+
+<H3>
+<A NAME="50422070_pgfId-299786"></A>	2.4.2 	<A NAME="50422070_21663"></A><A NAME="50422070_marker-299782"></A><A NAME="50422070_marker-299784"></A>Tags </H3>
+<P>
+<A NAME="50422070_pgfId-299790"></A><STRONG>
+Tags</STRONG><A NAME="50422070_marker-299788"></A> are used to identify items (<A HREF=../headers/pk_item_t.html>PK_ITEM_t</A>) within a Parasolid session. These may be entities (that Parasolid works on), appitems (that identify data in your own application), or partitions and other items that facilitate rollback.</P>
+<P>
+<A NAME="50422070_pgfId-299796"></A>Every item in a model has a tag associated with it. A tag is created by the kernel when the item is created; the kernel also uses them to return entities from a model to your application. Each tag in a session is unique, so that every item can be identified; tag numbers are never reused within a session. However, tags are not consistent across different sessions: if the same items are loaded into a different Parasolid session, they are not necessarily assigned the same tags.</P>
+<P>
+<A NAME="50422070_pgfId-299798"></A>Tags are held in integer variables that PK functions use to identify items; thus the maximum number of tags available for use within a session is limited by the size of integer variables in C on the platform in question. To find out the number of tags remaining in a session at any point, you can call <A HREF=../headers/pk_session_ask_tags_remaining.html>PK_SESSION_ask_tags_remaining</A>.</P>
+
+<H4>
+<A NAME="50422070_pgfId-299804"></A>2.4.2.1 <A NAME="50422070_marker-378229"></A><A NAME="50422070_marker-378230"></A>Lifetime of a tag </H4>
+<P>
+<A NAME="50422070_pgfId-299816"></A><A NAME="50422070_marker-378232"></A><A NAME="50422070_marker-378233"></A><A NAME="50422070_marker-378234"></A><A NAME="50422070_marker-378235"></A><A NAME="50422070_marker-378236"></A>A tag only has meaning (is <STRONG>
+alive</STRONG>) while the item to which it refers still exists in internal memory. If an item is:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299818"></A>explicitly deleted</LI>
+<LI>
+<A NAME="50422070_pgfId-299820"></A>implicitly deleted (e.g. a superfluous edge between two faces is merged away)</LI>
+<LI>
+<A NAME="50422070_pgfId-299822"></A>deleted by rolling the modeler back to a point before the entity was created</LI>
+<LI>
+<A NAME="50422070_pgfId-299824"></A>lost because the modeling session is stopped</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-299828"></A>then its tag is considered <STRONG>
+dead</STRONG>. It is your application’s responsibility to remember which tags are alive and which are dead; <A HREF=../headers/pk_appitem_is.html>PK_APPITEM_is</A>, <A HREF=../headers/pk_entity_is.html>PK_ENTITY_is</A>, <A HREF=../headers/pk_mark_is.html>PK_MARK_is</A>, <A HREF=../headers/pk_partition_is.html>PK_PARTITION_is</A>, and <A HREF=../headers/pk_pmark_is.html>PK_PMARK_is</A> can be used to determine whether a particular tag is alive or dead. If dead tags are passed to the PK then it traps them and returns the error PK_ERROR_not_an_entity (if argument checking is enabled). <A NAME="50422070_marker-378298"></A></P>
+
+
+<H4>
+<A NAME="50422070_pgfId-299834"></A>2.4.2.2 <A NAME="50422070_marker-299830"></A><A NAME="50422070_marker-299832"></A>The null tag </H4>
+<P>
+<A NAME="50422070_pgfId-299840"></A><A NAME="50422070_marker-299836"></A><A NAME="50422070_marker-299838"></A>There is a special constant tag called PK_ENTITY_null, which is defined in the include file <CODE>
+parasolid_kernel.h</CODE>
+. It is a tag to which no entity corresponds, and its principal use is that various PK functions return it when there is no appropriate entity to return.</P>
+<P>
+<A NAME="50422070_pgfId-299842"></A>For example, when requesting the tag of the surface attached to a face; if the face has no corresponding surface, the function returns PK_ENTITY_null.</P>
+
+
+<H4>
+<A NAME="50422070_pgfId-299852"></A>2.4.2.3 <A NAME="50422070_17252"></A><A NAME="50422070_marker-299846"></A><A NAME="50422070_marker-299848"></A><A NAME="50422070_marker-299850"></A>Persistence of tags </H4>
+<P>
+<A NAME="50422070_pgfId-299854"></A>Many modeling operations result in entities being created, deleted, or changed. Changes such as these have implications on what happens to the tags attached to those entities: sometimes new tags must be created, and sometimes old tags are deleted. A set of rules governs this tag persistence.</P>
+<P>
+<A NAME="50422070_pgfId-299860"></A><A NAME="50422070_marker-299856"></A><A NAME="50422070_marker-299858"></A>The general rules for face tag persistence can be summarized as follows: </P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299862"></A>If a face shrinks (truncated), then its tag persists.</LI>
+<LI>
+<A NAME="50422070_pgfId-299864"></A>If a face is split into several faces, then one of the resulting faces has the tag of the original face, and all other tags are new.</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-299866"></A>These rules apply equally to edge tag persistence.</P>
+<P>
+<A NAME="50422070_pgfId-299869"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422070_pgfId-298581"></A>Note: Tag persistence is disabled if normal attribute callbacks are registered and used. See <A HREF="fd_chap.095.html#50422174_24693">Section 94.3, “Callback functions”</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422070_pgfId-299875"></A>	2.4.3 	<A NAME="50422070_marker-299871"></A><A NAME="50422070_marker-299873"></A>Operations on tokens and tags </H3>
+<P>
+<A NAME="50422070_pgfId-299877"></A>The following operations can be performed on tokens:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299879"></A>Pass a token to a PK function in an argument that is defined to accept such a token.</LI>
+<LI>
+<A NAME="50422070_pgfId-299881"></A>Compare two tokens for equality.</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-299883"></A>Only certain operations are meaningful on tags and tag variables:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299885"></A>Tags are created only within the Parasolid kernel. Your application can acquire them only by calling particular PK functions which are defined to return tags in certain arguments. </LI>
+<LI>
+<A NAME="50422070_pgfId-299887"></A>In order to specify which entities in the model to operate on, your application passes tags to the kernel. These <EM>
+must</EM> be tags that have previously been provided by the kernel, and they must still be alive.</LI>
+<LI>
+<A NAME="50422070_pgfId-299893"></A>Tags may be freely copied and saved within your application (as integer variables). This could be used, for example, as a look-up mechanism to map between your entities and Parasolid entities.</LI>
+<LI>
+<A NAME="50422070_pgfId-299895"></A>Tags can be compared for equality using the ordinary integer operators <CODE>
+==</CODE>
+ and <CODE>
+!=</CODE>
+. </LI>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299897"></A>If two tags are numerically equal then they are associated with the same entity in the model.</LI>
+<LI>
+<A NAME="50422070_pgfId-305041"></A>If two distinct entities coincide precisely in model space (e.g. two points are the same, but are different entities), they do not have equal tags.</LI>
+<LI>
+<A NAME="50422070_pgfId-299901"></A>If the numerical value of one tag is greater than the other, it means the corresponding entity was created more recently: within a session, higher tag numbers imply newer entities.</LI>
+</UL>
+<LI>
+<A NAME="50422070_pgfId-299903"></A>It is meaningless to perform arithmetic on tags, or to construct tags in any way other than by obtaining them from the kernel.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422070_pgfId-299911"></A>	2.4.4 	<A NAME="50422070_marker-299905"></A><A NAME="50422070_marker-299907"></A><A NAME="50422070_68541"></A>Identifiers </H3>
+<P>
+<A NAME="50422070_pgfId-299917"></A><STRONG>
+Identifiers</STRONG><A NAME="50422070_marker-299913"></A><A NAME="50422070_marker-299915"></A> are integer values that are automatically attached to all entities within a part, except for fins and the part itself. All identifiers are unique within a given part (in contrast to tags, which are unique within the whole session). In addition, identifiers are saved when a part is archived (in contrast to tags, which are not), so identifiers can be stored in an external database with a part key to keep a handle on a particular entity.</P>
+<P>
+<A NAME="50422070_pgfId-299919"></A>Identifiers may have negative values, but are never zero. They are created when:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299921"></A>an entity is created within a part</LI>
+<LI>
+<A NAME="50422070_pgfId-299923"></A>an entity is moved from one part to another (and its old identifier is thrown away)</LI>
+<LI>
+<A NAME="50422070_pgfId-299925"></A>an entity which did not belong to a part is attached to one (e.g. when adding construction geometry)</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-299931"></A>To find the identifier of an entity from its tag, you can use the function <A HREF=../headers/pk_entity_ask_identifier.html>PK_ENTITY_ask_identifier</A>. For more information on identifiers, together with a more detailed comparison with tags, see <A HREF="fd_chap.101.html#50422180_13835">Section 100.2.6, “Identifiers”</A>.</P>
+
+
+<H3>
+<A NAME="50422070_pgfId-299939"></A>	2.4.5 	<A NAME="50422070_marker-299933"></A><A NAME="50422070_marker-299935"></A><A NAME="50422070_marker-299937"></A>User fields </H3>
+<P>
+<A NAME="50422070_pgfId-299945"></A>These allow your application to store a single field of information with all entities, such as a pointer into the application’s data structure. User fields are of a fixed length and are attached to every entity in a model. See <A HREF="fd_chap.116.html#50422197_22973">Section 115.6, “User fields”</A>, for more information. </P>
+
+
+<H3>
+<A NAME="50422070_pgfId-299949"></A>	2.4.6 	<A NAME="50422070_39907"></A>Copying entities </H3>
+<P>
+<A NAME="50422070_pgfId-449374"></A>You can use <A HREF=../headers/pk_entity_copy_2.html>PK_ENTITY_copy_2</A> to copy any entity in a Parasolid session.This function receives an entity, together with an options structure (see <A HREF="fd_chap.003.html#50422070_55614">Section 2.3.2, “Arguments to PK functions”</A>), containing options to let you control the behaviour of the function. It returns the copy of the entity (<CODE>
+entity_copy</CODE>
+), together with an optional structure containing tracking information that maps components in the original entity to their corresponding components in the copy of the entity.</P>
+<P>
+<A NAME="50422070_pgfId-449376"></A>The options available are as follows:</P>
+<P>
+<A NAME="50422070_pgfId-449432"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449379"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449381"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449383"></A><CODE>
+destination</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449385"></A>Allows you to specify the destination for <CODE>
+entity_copy</CODE>
+.This can be one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-449386"></A><A HREF=../headers/pk_part_t.html>PK_PART_t</A>: The destination will be a classic body, a facet body, or an assembly.</LI>
+<LI>
+<A NAME="50422070_pgfId-449387"></A><A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>: The destination will either be the same partition in which the original entity resides, or a different partition.</LI>
+<LI>
+<A NAME="50422070_pgfId-449388"></A>PK_ITEM_null: The destination is the same partition as the original entity. This is the default.</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-449389"></A>See the table in <A HREF=../headers/pk_entity_copy_o_t.html>PK_ENTITY_copy_o_t</A> for information on how the precise behaviour varies depending on the entity you are copying. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449391"></A><CODE>
+want_user_fields</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449395"></A>Whether you want to copy any user fields allocated to the entity. See <A HREF="fd_chap.116.html#50422197_22973">Section 115.6, “User fields”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449398"></A><CODE>
+want_attribs</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449402"></A>Whether you want to copy any atttributes attached to the entity. See <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449405"></A><CODE>
+want_groups</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449407"></A>Whether you want to copy information about the groups that are contained within the entity. If you use this option, then entity you are copying should be either a body (<A HREF="fd_chap.015.html#50422084_18488" CLASS="XRef">Section 14.2.1, “Body”</A>) or an assembly (<A HREF="fd_chap.015.html#50422084_15682">Section 14.2.9, “Assembly”</A>). See <A HREF="fd_chap.099.html#50422178_36760">Chapter 98, “Groups”</A>, for more information about groups. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449418"></A><CODE>
+want_tracking</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449420"></A>Whether you want to return tracking information with the copy of the entity. Tracking information maps components in the original entity with components in the copied entity. For example, if you copy a part, then you also copy all the entities that part contains, such as the faces or edges in that part. If <CODE>
+want_tracking</CODE>
+ is set to PK_LOGICAL_true, then <A HREF=../headers/pk_entity_copy_2.html>PK_ENTITY_copy_2</A> returns a <CODE>
+tracking</CODE>
+ structure that contains information mapping each copied entity back to the original entity it was copied from. </P>
+<P>
+<A NAME="50422070_pgfId-449426"></A>For more information on how structure of entities within Parasolid, see <A HREF="fd_chap.015.html#50422084_36760">Chapter 14, “Model Structure”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449429"></A><CODE>
+track_classes</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422070_pgfId-449431"></A>Which classes of entity you want to record tracking information for. By default, if <CODE>
+want_tracking</CODE>
+ is set to PK_LOGICAL_true, tracking information is recorded for all entity classes. However, if you set this option to a list of PK classes, then tracking information is only recorded for those classes. Using this option can improve performance of <A HREF=../headers/pk_entity_copy_2.html>PK_ENTITY_copy_2</A> if you are only interested in tracking a few entity classes. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422070_pgfId-449433"></A>By default, all of the <CODE>
+want_*</CODE>
+ options are set to PK_LOGICAL_false, so no extra information is copied or recorded when copying an entity. Set any of the <CODE>
+want_*</CODE>
+ options to PK_LOGICAL_true to copy or record the information relevant for that option. </P>
+<P>
+<A NAME="50422070_pgfId-449440"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422070_pgfId-449436"></A>Note: The tracking information returned by <A HREF=../headers/pk_entity_copy_2.html>PK_ENTITY_copy_2</A> is the only supported method in Parasolid for mapping entities in a copy to their equivalents in an original. You should not, for instance, use information such as the order of faces or identifiers in the original and copied entities to infer mapping information. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422070_pgfId-299975"></A>If you specifically want to copy geometric entities, you should use the function <A HREF=../headers/pk_geom_copy.html>PK_GEOM_copy</A>. This function lets you copy a collection of geometries, together with dependent geometries and attributes, in a single operation, and preserves the relationships between the entities. See <A HREF="fd_chap.015.html#50422084_11916">Section 14.3.7, “Copying geometry”</A>, for more details. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422070_pgfId-299983"></A>2.5	<A NAME="50422070_marker-299977"></A><A NAME="50422070_marker-299979"></A><A NAME="50422070_marker-299981"></A>Getting started with the PK interface 
+
+
+</H1>
+<P>
+<A NAME="50422070_pgfId-299989"></A>In order to use Parasolid, your application code must contain:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-299991"></A>Calls to PK functions as part of its modeling system</LI>
+<LI>
+<A NAME="50422070_pgfId-299993"></A>Definitions for frustrum functions that are themselves called by Parasolid</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-300005"></A>Before your application can use the modeler, you must first supply a frustrum (as described in <A HREF="fd_chap.007.html#50422075_14409">Chapter 6, “Supplying A Frustrum”</A>), and then call <A NAME="50422070_marker-300000"></A><A HREF=../headers/pk_session_start.html><A HREF=../headers/pk_session_start.html>PK_SESSION_start</A></A> to invoke the modeler. <A HREF=../headers/pk_session_start.html><A HREF=../headers/pk_session_start.html>PK_SESSION_start</A></A> has options that allow you to choose whether to create a <STRONG>
+journal file</STRONG><A NAME="50422070_marker-300002"></A>, and whether parts are saved and retrieved with <STRONG>
+user fields</STRONG><A NAME="50422070_marker-300004"></A>.</P>
+<P>
+<A NAME="50422070_pgfId-300011"></A>When your application has finished using the modeler, it is stopped using <A NAME="50422070_marker-300008"></A><A HREF=../headers/pk_session_stop.html><A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A></A>. Calls to <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> and <A HREF=../headers/pk_session_stop.html><A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A></A> mark the beginning and end of a kernel <STRONG>
+session</STRONG><A NAME="50422070_marker-300010"></A>.</P>
+<P>
+<A NAME="50422070_pgfId-300017"></A>For full details of the frustrum, see the <EM>
+<A HREF=../di_index.html>Downward Interfaces</A></EM> manual.</P>
+
+<H3>
+<A NAME="50422070_pgfId-300029"></A>	2.5.1 	<A NAME="50422070_marker-300019"></A><A NAME="50422070_marker-300021"></A><A NAME="50422070_marker-300023"></A>Prototyping Parasolid code </H3>
+<P>
+<A NAME="50422070_pgfId-300031"></A>It is easy to prototype code in order to see its performance before incorporating it into your application code:</P>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-300037"></A>If you are developing on a Windows platform, you can use the Example Application or Parasolid Workshop.Net to prototype code.</LI>
+<LI>
+<A NAME="50422070_pgfId-300039"></A>Alternatively, you can use the Kernel Interface Driver (KID) to prototype code.</LI>
+</UL>
+<P>
+<A NAME="50422070_pgfId-300061"></A>Parasolid Workshop.Net is a Windows application supplied with Parasolid that you can use to view and manipulate XT data. It is described in the <EM>
+Parasolid Workshop.Net User Guide</EM>. The Example Application is a simple Parasolid-powered application written in Visual C++ that is supplied with Parasolid in source code form. It is described in <A HREF="fd_chap.009.html#50422077_97465">Chapter 8, “Parasolid Source Code Collateral”</A>. </P>
+<P>
+<A NAME="50422070_pgfId-300071"></A>KID is a LISP-based package that is available on the Parasolid Code CD. KID should also be used to reproduce faults in the kernel for reporting to Parasolid Support. KID is documented in the <EM>
+<A HREF=../kd_index.html>KID Manual</A></EM>. </P>
+<P>
+<A NAME="50422070_pgfId-300074"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422070_pgfId-298256"></A>Note: Parasolid attempts to maintain downward compatibility between models as well as upward compatibility. Incompatible changes to the data design are not made between consecutive major versions of Parasolid; therefore PARTs and PARTITIONs from V17 can be read into V16, from V16 into V15 and so on. This is guaranteed subject to the caveats given below.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422070_pgfId-298258"></A>It is often the case that data can be read into Parasolid <EM>
+two</EM> versions earlier than the version in which it was created: for example, PARTs and PARTITIONs created in V16 can often be read into V14, from V15 into V13 and so on. This is <EM>
+not</EM> guaranteed, however.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422070_pgfId-298260"></A>Some caveats apply to the guarantee of compatibility:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422070_pgfId-298262"></A>The default method of saving data from V14 onwards is schema-neutral, which means that the model must hold the design differences between the modeler data and the V13.0 baseline schema.</LI>
+<LI>
+<A NAME="50422070_pgfId-298264"></A>If the data has been saved using &quot;Save As&quot;, older versions of Parasolid must have the appropriate schema available to them in order to read it.</LI>
+<LI>
+<A NAME="50422070_pgfId-298266"></A>Models created in newer versions of Parasolid may be too complex for the older algorithms, and hence may be deemed invalid in older versions.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422070_pgfId-300077"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422070_pgfId-298271"></A>Warning: Receiving DELTAs from one version of Parasolid into another carries no guarantee of success, although it is likely to work if the recent changes in the saved data are small.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.002.html"> Introduction To Parasolid</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.004.html">Overview Of This Manual</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,729 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Local Operations</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Local Operations</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.05.html">Booleans and Related Functionality</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.07.html">Working with Sheets and Wires</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-273992">5.1	Introduction</A>
+<UL>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-379068">5.1.1	Topological changes with local operations</A>
+</UL>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-395427">5.2	Offsetting operations</A>
+<UL>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-395434">5.2.1	Offsetting</A>
+<UL>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-395774">5.2.1.1	Removing self-intersections</A>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-396297">5.2.1.2	Step offsets</A>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-845480">5.2.1.3	Creating blends from offset edges</A>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-640252">5.2.1.4	Offsetting edges</A>
+</UL>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-396444">5.2.2	Hollowing</A>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-400440">5.2.3	Thickening</A>
+</UL>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-1398115">5.3	Tapering faces</A>
+<UL>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-408678">5.3.1	Step tapering</A>
+</UL>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-665513">5.4	Editing faces and healing wounds</A>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-1445034">5.5	Editing the geometry of faces</A>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-410133">5.6	Spinning and sweeping entities</A>
+<LI> <A HREF="ov_chap.06.html#50446369_pgfId-278912">5.7	Generic face change operations</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446369_pgfId-273992"></A>5.1	<A NAME="50446369_marker-457124"></A><A NAME="50446369_marker-457241"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446369_pgfId-279381"></A><A NAME="50446369_marker-273993"></A><A NAME="50446369_marker-273994"></A>Local operations are modelling operations that are restricted to a specific area of a body. They are usually performed on a face or set of faces within a model. Because the operations are restricted to specific areas, local operations can usually be performed on general bodies as well as manifold bodies, so long as those general bodies are <EM>
+locally manifold</EM>, that is, manifold in the area that the operation is performed in. </P>
+<P>
+<A NAME="50446369_pgfId-279375"></A>You can use local operations in your application to make fast changes to local regions of large and complex models. Local operations are essential if you are developing constraints-managed or parametrically-driven applications. </P>
+<P>
+<A NAME="50446369_pgfId-279391"></A>Parasolid provides local operations functionality for:</P>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-410165"></A>Offsetting and transforming</LI>
+<LI>
+<A NAME="50446369_pgfId-410195"></A>Tapering faces</LI>
+<LI>
+<A NAME="50446369_pgfId-410225"></A>Editing faces and healing wounds</LI>
+<LI>
+<A NAME="50446369_pgfId-410226"></A>Editing the geometry of faces</LI>
+<LI>
+<A NAME="50446369_pgfId-279398"></A>Spinning and sweeping entities</LI>
+<LI>
+<A NAME="50446369_pgfId-379462"></A>Generic face change operations</LI>
+</UL>
+<P>
+<A NAME="50446369_pgfId-1513434"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-44.gif">
+
+<P>
+<A NAME="50446369_pgfId-1513396"></A>Figure 5-1 Offset and transform local operations on general bodies</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446369_pgfId-379068"></A>	5.1.1 	<A NAME="50446369_marker-1513378"></A><A NAME="50446369_marker-1513379"></A><A NAME="50446369_marker-1513380"></A>Topological changes with local operations</H2>
+<P>
+<A NAME="50446369_pgfId-379178"></A>Engineering changes to the geometry of a model often change the model&#8217;s topology as well. Parasolid&#8217;s local operations support many of these changes, including the removal of self-intersecting or clashing areas of the model, and the addition of new edges to the model at places where a vertex is split into two as a result of an operation. </P>
+<P>
+<A NAME="50446369_pgfId-379267"></A>Because of the nature of the changes made by local operations, however, not all topological changes can be supported, and result bodies cannot always be guaranteed to be topologically consistent. It is therefore generally recommended that you check results before continuing modelling. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446369_pgfId-395427"></A>5.2	<A NAME="50446369_69192"></A><A NAME="50446369_marker-457128"></A><A NAME="50446369_marker-457249"></A>Offsetting operations
+
+
+</H1>
+<P>
+<A NAME="50446369_pgfId-395430"></A><A NAME="50446369_marker-395428"></A><A NAME="50446369_marker-395429"></A>Offsetting, hollowing and thickening are related modelling operations that are commonly used in MCAD systems to model, for example, objects for injection moulding or casting, or to model the outer skins of aerodynamic parts. Parasolid provides powerful offsetting functionality which itself forms the &#8220;parent&#8221; technology for its hollowing and thickening functionality. You can use offset operations directly, as well as capitalize on them via hollowing or thickening (which are themselves not considered local operations). For all these operations, you can choose to repair any degeneracies on the surface of the body involved in the operation. Information about these repairs is saved in the Parasolid report.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446369_pgfId-395434"></A>	5.2.1 	<A NAME="50446369_marker-457130"></A><A NAME="50446369_marker-457325"></A>Offsetting</H2>
+<P>
+<A NAME="50446369_pgfId-395437"></A><A NAME="50446369_marker-395435"></A><A NAME="50446369_marker-395436"></A>Offsetting is the process of moving specified faces in a solid or sheet body outwards or inwards.</P>
+<P>
+<A NAME="50446369_pgfId-1356356"></A>In <A HREF="ov_chap.06.html#50446369_36738"><EM>
+Figure 5-2</EM></A>, <A NAME="50446369_BG$Gnrich"></A>two faces whose underlying geometry is free-form are offset. Parasolid has extended the underlying surface(s) so that the new offset surfaces meet correctly.</P>
+<P>
+<A NAME="50446369_pgfId-1356387"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-45.gif">
+
+<P>
+<A NAME="50446369_pgfId-395772"></A>Figure 5-2 <A NAME="50446369_36738"></A>Offset surface extended</P>
+<P>
+<A NAME="50446369_pgfId-395773"></A><A NAME="50446369_marker-457591"></A>Because offsetting operations form the basis for hollowing and thickening, the functionality described here is also available to hollowing and thickening operations. </P>
+
+<H4>
+<A NAME="50446369_pgfId-395774"></A>5.2.1.1 <A NAME="50446369_marker-457132"></A><A NAME="50446369_marker-457315"></A><A NAME="50446369_marker-457303"></A><A NAME="50446369_marker-457253"></A>Removing self-intersections</H4>
+<P>
+<A NAME="50446369_pgfId-395776"></A><A NAME="50446369_marker-395775"></A>Generating offset surfaces can sometimes cause self-intersections which, if left, would cause the body to become invalid. Parasolid can remove self-intersections automatically, generating new surfaces wherever holes remain as a result of removing the self-intersection. <A HREF="ov_chap.06.html#50446369_82540"><EM>
+Figure 5-3</EM></A> shows some examples. </P>
+<P>
+<A NAME="50446369_pgfId-934260"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-46.gif">
+
+<P>
+<A NAME="50446369_pgfId-934518"></A>Figure 5-3 <A NAME="50446369_82540"></A>Removing self-intersections during offsetting operations</P>
+
+
+<H4>
+<A NAME="50446369_pgfId-396297"></A>5.2.1.2 <A NAME="50446369_marker-457134"></A><A NAME="50446369_marker-457257"></A>Step offsets</H4>
+<P>
+<A NAME="50446369_pgfId-396301"></A>If required, Parasolid can generate additional side faces during offset operations, in order to ensure the validity of the resulting body.</P>
+<P>
+<A NAME="50446369_pgfId-1019315"></A>&nbsp;</P>
+<P>
+<A NAME="50446369_pgfId-822054"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-47.gif">
+
+<P>
+<A NAME="50446369_pgfId-640249"></A>Figure 5-4 Step offset faces during offset operations</P>
+
+
+<H4>
+<A NAME="50446369_pgfId-845480"></A>5.2.1.3 Creating blends from offset edges</H4>
+<P>
+<A NAME="50446369_pgfId-845512"></A>Rather than extending adjacent offset faces to determine the new position of the edge, Parasolid can optionally round off the edges between adjacent offset faces during an offset operation. </P>
+<P>
+<A NAME="50446369_pgfId-845557"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-48.gif">
+
+<P>
+<A NAME="50446369_pgfId-845559"></A>Figure 5-5 <A NAME="50446369_99193"></A>Creating blends from offset edges</P>
+
+
+<H4>
+<A NAME="50446369_pgfId-640252"></A>5.2.1.4 Offsetting edges</H4>
+<P>
+<A NAME="50446369_pgfId-977068"></A>Parasolid can also offset any set of connected edges in a given direction within their owning body. It can offset both laminar and non-laminar edges, and the resulting offset edges are imprinted on the body. <A HREF="ov_chap.06.html#50446369_89803"><EM>
+Figure 5-6</EM></A> shows an example where a set of three edges have been offset on a sheet body that contains a hole and a sharp edge, such that the resulting set of four offset edges crosses both the sharp edge and the hole.</P>
+<P>
+<A NAME="50446369_pgfId-977077"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-49.gif">
+
+<P>
+<A NAME="50446369_pgfId-640502"></A>Figure 5-6 <A NAME="50446369_89803"></A>Offsetting edges in a body</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446369_pgfId-396444"></A>	5.2.2 	<A NAME="50446369_marker-457136"></A><A NAME="50446369_marker-457323"></A>Hollowing</H2>
+<P>
+<A NAME="50446369_pgfId-1009588"></A>Hollowing uses offsetting technology to create a void region in a solid body. In order to hollow a body, each face in the body is offset by a specified amount. Different faces may be offset by different amounts, and the hollow body can be opened up by specifying some faces as <STRONG>
+pierce faces</STRONG><A NAME="50446369_marker-1009589"></A><A NAME="50446369_marker-1009590"></A><A NAME="50446369_marker-1009591"></A><A NAME="50446369_marker-1009592"></A>.</P>
+<P>
+<A NAME="50446369_pgfId-822072"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-50.gif">
+
+<P>
+<A NAME="50446369_pgfId-400211"></A>Figure 5-7 <A NAME="50446369_21519"></A>Hollowing a body with two pierce faces</P>
+<P>
+<A NAME="50446369_pgfId-400216"></A><A NAME="50446369_marker-400212"></A>Parasolid can also identify and deal with tangent pierce faces (pierce faces that share at least one smooth edge with another non-pierce face), creating the additional side faces required to hollow bodies in such a manner, as shown in <A HREF="ov_chap.06.html#50446369_13565"><EM>
+Figure 5-8</EM></A>. </P>
+<P>
+<A NAME="50446369_pgfId-822086"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-51.gif">
+
+<P>
+<A NAME="50446369_pgfId-400438"></A>Figure 5-8 <A NAME="50446369_13565"></A>Hollowing a body using a tangent pierce face</P>
+<P>
+<A NAME="50446369_pgfId-845627"></A>Parasolid can also round off edges of the body that are offset by the hollow operation, as shown in <A HREF="ov_chap.06.html#50446369_98204"><EM>
+Figure 5-9</EM></A>. </P>
+<P>
+<A NAME="50446369_pgfId-845665"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-52.gif">
+
+<P>
+<A NAME="50446369_pgfId-845667"></A>Figure 5-9 <A NAME="50446369_98204"></A>Creating blends from offset edges during hollow operations</P>
+<P>
+<A NAME="50446369_pgfId-822091"></A>Parasolid can also perform local hollowing operations, in which only part of a body is hollowed. For example: </P>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-822100"></A>If you are designing a bath-tub with four legs, you can hollow out the tub while leaving the legs unhollowed.</LI>
+<LI>
+<A NAME="50446369_pgfId-822101"></A>If you have added a feature to a body that has already been hollowed, you can hollow out just the new feature.</LI>
+</UL>
+<P>
+<A NAME="50446369_pgfId-822203"></A><A HREF="ov_chap.06.html#50446369_80956"><EM>
+Figure 5-10</EM></A> illustrates how the bowl of a wine glass can be hollowed out while the stem of the glass remains solid.</P>
+<P>
+<A NAME="50446369_pgfId-822123"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-53.gif">
+
+<P>
+<A NAME="50446369_pgfId-822125"></A>Figure 5-10 <A NAME="50446369_80956"></A>Excluding faces from a hollow operation</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446369_pgfId-400440"></A>	5.2.3 	<A NAME="50446369_53846"></A><A NAME="50446369_marker-457138"></A><A NAME="50446369_marker-457327"></A>Thickening</H2>
+<P>
+<A NAME="50446369_pgfId-400441"></A><A NAME="50446369_marker-457631"></A><A NAME="50446369_marker-457929"></A>Thickening is the process of taking a sheet body and thickening it into a solid body by offsetting it by a fixed amount. Although not strictly a local operation (because it works on a whole body, rather than specific faces in the body), Parasolid&#8217;s thickening functionality also uses the offsetting technology used by hollowing. Like offsetting and hollowing, a thickened body may undergo a variety of topological changes, and Parasolid can remove self-intersections in either the side face that is created as the result of a thicken, or in the resulting offset face itself, automatically. Parasolid can also identify and repair degeneracies on the surface of the body to be thickened.</P>
+<P>
+<A NAME="50446369_pgfId-1225555"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-54.gif">
+
+<P>
+<A NAME="50446369_pgfId-403217"></A>Figure 5-11 Thickening sheet bodies</P>
+<P>
+<A NAME="50446369_pgfId-403218"></A>During thickening operations you can:</P>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-403219"></A><A NAME="50446369_marker-457635"></A>Specify a &#8220;punch&#8221; direction in which a sheet body is thickened. </LI>
+<LI>
+<A NAME="50446369_pgfId-403220"></A><A NAME="50446369_marker-457639"></A><A NAME="50446369_marker-457919"></A>Specify a surface to attach to side faces. </LI>
+<LI>
+<A NAME="50446369_pgfId-403221"></A><A NAME="50446369_marker-457643"></A>Round off edges that are offset by the thicken operation. </LI>
+<LI>
+<A NAME="50446369_pgfId-745842"></A>Specify pierce faces to open up the thickened body, in a similar way to hollowing.</LI>
+<LI>
+<A NAME="50446369_pgfId-950498"></A>Specify that Parasolid should generate step offset faces in cases where different faces are thickened by different amounts, in a similar way to offsetting. </LI>
+<LI>
+<A NAME="50446369_pgfId-950499"></A>&nbsp;</LI>
+</UL>
+<P>
+<A NAME="50446369_pgfId-950503"></A>Some of these options are illustrated in <A HREF="ov_chap.06.html#50446369_19259"><EM>
+Figure 5-12</EM></A>.</P>
+<P>
+<A NAME="50446369_pgfId-1426214"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-55.gif">
+
+<P>
+<A NAME="50446369_pgfId-1398506"></A>Figure 5-12 <A NAME="50446369_19259"></A>Thickening options</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446369_pgfId-1398115"></A>5.3	<A NAME="50446369_84470"></A><A NAME="50446369_marker-1398113"></A><A NAME="50446369_marker-1398114"></A>Tapering faces
+
+
+</H1>
+<P>
+<A NAME="50446369_pgfId-407726"></A>Parasolid provides sophisticated support for adding <STRONG>
+taper</STRONG> (sometimes known as <STRONG>
+draft</STRONG><A NAME="50446369_marker-457156"></A>) to models. You can add taper to either specific faces in a body, as described in this section, or to an entire body. </P>
+<P>
+<A NAME="50446369_pgfId-407727"></A>During the tapering process, specified faces in a body are modified so that they form a minimum angle with a given direction. This is commonly required when designing molds: faces that are parallel to the direction in which a part is drawn out of a mold need to be tapered inwards slightly with respect to the direction they are drawn so as to facilitate easy removal from the mold, as shown in <A HREF="ov_chap.06.html#50446369_31314"><EM>
+Figure 5-13</EM></A>. </P>
+<P>
+<A NAME="50446369_pgfId-1356728"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-56.gif">
+
+<P>
+<A NAME="50446369_pgfId-407955"></A>Figure 5-13 <A NAME="50446369_31314"></A>Tapering vertical faces to improve molded parts</P>
+<P>
+<A NAME="50446369_pgfId-407959"></A>Tapering is also very useful for improving the aesthetic appearance of a part. Parasolid&#8217;s tapering functionality lets you offer your users an unprecedented level of control, letting them design a part and then add taper to discrete areas afterwards, rather than requiring the designer to build tapered faces into the part from early on in the design process. You can apply different angles of taper to different faces in the body in a single operation. </P>
+<P>
+<A NAME="50446369_pgfId-1356782"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-57.gif">
+
+<P>
+<A NAME="50446369_pgfId-552180"></A>Figure 5-14 Tapering different faces by different angles</P>
+<P>
+<A NAME="50446369_pgfId-407963"></A>As well as providing the functionality to create tapered faces, Parasolid provides tools to help you decide where taper need be applied on a body. This is particularly useful in mold design, where a small taper may need to be added to a body at all places where the face is steeper than the required taper angle, with respect to the direction of draw. </P>
+<P>
+<A NAME="50446369_pgfId-407967"></A><A HREF="ov_chap.06.html#50446369_14149"><EM>
+Figure 5-15</EM></A> illustrates the workflow that you would typically use to analyse and add taper to a body. </P>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-407968"></A><A NAME="50446369_marker-457653"></A>First, the face to be tapered is analysed with respect to the taper angle that you want to apply. </LI>
+<LI>
+<A NAME="50446369_pgfId-407969"></A><A NAME="50446369_marker-457657"></A><A NAME="50446369_marker-457901"></A>Next, isocline curves are added to the body to divide the face into regions that are steeper than the taper angle, and regions that are not. <A NAME="50446369_marker-457661"></A><A NAME="50446369_marker-457911"></A>Only the steep regions require taper to be added.</LI>
+<LI>
+<A NAME="50446369_pgfId-407970"></A>Finally, taper is added to the body.</LI>
+</UL>
+<P>
+<A NAME="50446369_pgfId-1356830"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-58.gif">
+
+<P>
+<A NAME="50446369_pgfId-408671"></A>Figure 5-15 <A NAME="50446369_14149"></A>Dividing a face into steep and non-steep regions</P>
+<P>
+<A NAME="50446369_pgfId-408675"></A><A NAME="50446369_marker-457667"></A><A NAME="50446369_marker-457927"></A><A NAME="50446369_marker-457925"></A><A NAME="50446369_marker-457923"></A><A NAME="50446369_marker-457921"></A>Parasolid provides three methods of taper to choose between:</P>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-408676"></A>Isocline-based<STRONG>
+ </STRONG>tapering<STRONG>
+ </STRONG>is suitable for adding draft when creating molds. </LI>
+<LI>
+<A NAME="50446369_pgfId-408677"></A>Curve-based and surface-based tapering<STRONG>
+ </STRONG>are both particularly suited to aesthetic tapering.</LI>
+<LI>
+<A NAME="50446369_pgfId-665524"></A>Normal-to-surface tapering produces tapered surfaces that are not dependent on the draw direction but vary with the normal of a reference surface.</LI>
+</UL>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446369_pgfId-408678"></A>	5.3.1 	<A NAME="50446369_marker-457142"></A><A NAME="50446369_marker-457259"></A>Step tapering</H2>
+<P>
+<A NAME="50446369_pgfId-408681"></A><A NAME="50446369_marker-408679"></A><A NAME="50446369_marker-408680"></A>Sometimes, when a face to be tapered contains edges that are not on the taper plane, regular tapering produces less than ideal results. In such cases, you can perform a step taper, in which edges of the taper face that do not lie in the taper plane are not themselves tapered: instead, a step face extending from the edge to the tapered face is created. Step tapering is illustrated in <A HREF="ov_chap.06.html#50446369_30936"><EM>
+Figure 5-16</EM></A>.</P>
+<P>
+<A NAME="50446369_pgfId-1356884"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-59.gif">
+
+<P>
+<A NAME="50446369_pgfId-408832"></A>Figure 5-16 <A NAME="50446369_30936"></A>The effect of regular tapering against step tapering</P>
+<P>
+<A NAME="50446369_pgfId-408836"></A><A NAME="50446369_marker-408833"></A><A NAME="50446369_marker-408834"></A><A NAME="50446369_marker-408835"></A>There are two types of surfaces that you can use for step tapers: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-408837"></A><STRONG>
+Tapered surfaces</STRONG><A NAME="50446369_marker-457168"></A><A NAME="50446369_marker-457319"></A><A NAME="50446369_marker-457309"></A><A NAME="50446369_marker-457263"></A> are themselves tapered with respect to the taper face.</LI>
+<LI>
+<A NAME="50446369_pgfId-1370824"></A><STRONG>
+Normal surfaces</STRONG><A NAME="50446369_marker-1370820"></A><A NAME="50446369_marker-1370821"></A><A NAME="50446369_marker-1370822"></A><A NAME="50446369_marker-1370823"></A> are ruled surfaces perpendicular to the taper face. </LI>
+</UL>
+</UL>
+<P>
+<A NAME="50446369_pgfId-1370855"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-60.gif">
+
+<P>
+<A NAME="50446369_pgfId-409027"></A>Figure 5-17 <A NAME="50446369_18510"></A>Tapered and normal step faces</P>
+<P>
+<A NAME="50446369_pgfId-409031"></A><A NAME="50446369_marker-457695"></A>If you wish, you can ask Parasolid to create a normal step automatically wherever a taper face meets a non-taper face smoothly, such as the case shown in <A HREF="ov_chap.06.html#50446369_75796"><EM>
+Figure 5-18</EM></A>.</P>
+<P>
+<A NAME="50446369_pgfId-1371922"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-61.gif">
+
+<P>
+<A NAME="50446369_pgfId-409258"></A>Figure 5-18 <A NAME="50446369_75796"></A>Automatic step tapering</P>
+<P>
+<A NAME="50446369_pgfId-543431"></A>In addition, Parasolid can automatically add a step face when adjacent faces become separated as a result of tapering them by different angles, as shown in <A HREF="ov_chap.06.html#50446369_16143"><EM>
+Figure 5-19</EM></A></P>
+<P>
+<A NAME="50446369_pgfId-1357083"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-62.gif">
+
+<P>
+<A NAME="50446369_pgfId-543635"></A>Figure 5-19 <A NAME="50446369_16143"></A>Creating step faces between taper faces</P>
+<P>
+<A NAME="50446369_pgfId-1298451"></A>Rather than allowing Parasolid to generate the step face, you can provide one yourself using a parting body, as shown in <A HREF="ov_chap.06.html#50446369_77168"><EM>
+Figure 5-20</EM></A>.</P>
+<P>
+<A NAME="50446369_pgfId-1298628"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-63.gif">
+
+<P>
+<A NAME="50446369_pgfId-1298630"></A>Figure 5-20 <A NAME="50446369_77168"></A>Creating step faces from a parting sheet</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446369_pgfId-665513"></A>5.4	<A NAME="50446369_61073"></A><A NAME="50446369_marker-665509"></A><A NAME="50446369_marker-665510"></A><A NAME="50446369_marker-665511"></A><A NAME="50446369_marker-665512"></A>Editing faces and healing wounds
+
+
+</H1>
+<P>
+<A NAME="50446369_pgfId-274197"></A>Parasolid includes tools for performing simple edits to faces, such as:</P>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-607744"></A><A NAME="50446369_marker-607764"></A><A NAME="50446369_marker-607765"></A>Deleting arbitrary faces from a body</LI>
+<LI>
+<A NAME="50446369_pgfId-607746"></A><A NAME="50446369_marker-607762"></A><A NAME="50446369_marker-607763"></A>Deleting blend faces from a body</LI>
+<LI>
+<A NAME="50446369_pgfId-607747"></A><A NAME="50446369_marker-607760"></A><A NAME="50446369_marker-607761"></A>Copying specific faces and creating a new body from them</LI>
+<LI>
+<A NAME="50446369_pgfId-299537"></A><A NAME="50446369_marker-457711"></A><A NAME="50446369_marker-457899"></A><A NAME="50446369_marker-457897"></A>Removing specific faces and creating a new body from them</LI>
+<LI>
+<A NAME="50446369_pgfId-745868"></A>Removing trimmed boundary features from a body</LI>
+</UL>
+<P>
+<A NAME="50446369_pgfId-299499"></A>A major issue with all of these operations is the wound that is usually left as a result of editing faces on a body; when a face is removed, a hole usually remains. Parasolid can repair these wounds automatically, using a number of strategies that you can control to get the precise results you want. <A HREF="ov_chap.06.html#50446369_59329"><EM>
+Figure 5-22</EM></A> shows a variety of face edit operations, and illustrates some of the healing processes that Parasolid performs automatically.</P>
+<P>
+<A NAME="50446369_pgfId-1357157"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-64.gif">
+
+<P>
+<A NAME="50446369_pgfId-1401153"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-65.gif">
+
+<P>
+<A NAME="50446369_pgfId-274847"></A>Figure 5-21 <A NAME="50446369_53740"></A>Healing wounds after face edits</P>
+<P>
+<A NAME="50446369_pgfId-306897"></A>As well as removing faces from a body, Parasolid provides tools for adding faces to a body or replacing existing faces in a body. This can be used for:</P>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-279577"></A><A NAME="50446369_marker-457715"></A>Replacing missing geometry after importing data from a non-Parasolid based application</LI>
+<LI>
+<A NAME="50446369_pgfId-279578"></A><A NAME="50446369_marker-457719"></A><A NAME="50446369_marker-457913"></A>Simplifying models</LI>
+<LI>
+<A NAME="50446369_pgfId-900766"></A><A NAME="50446369_marker-900763"></A><A NAME="50446369_marker-900764"></A><A NAME="50446369_marker-900765"></A>Filling holes in a body</LI>
+</UL>
+<P>
+<A NAME="50446369_pgfId-1485220"></A>You can supply a patch yourself or, more commonly, let Parasolid generate one for you. Whichever option you choose, Parasolid fuses the patch with the original, as shown in <A HREF="ov_chap.06.html#50446369_59329"><EM>
+Figure 5-22</EM></A>. The last illustration in the image, shows how position data can be used to aid Parasolid in building patch data.</P>
+<P>
+<A NAME="50446369_pgfId-1485231"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-66.gif">
+
+<P>
+<A NAME="50446369_pgfId-1445028"></A>Figure 5-22 <A NAME="50446369_59329"></A>Patching open regions in sheet bodies</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446369_pgfId-1445034"></A>5.5	<A NAME="50446369_25644"></A><A NAME="50446369_marker-1445031"></A><A NAME="50446369_marker-1445032"></A><A NAME="50446369_marker-1445033"></A>Editing the geometry of faces
+
+
+</H1>
+<P>
+<A NAME="50446369_pgfId-306163"></A>As well as changing or creating faces in a body, Parasolid provides tools for creating and editing the geometry related to specific faces in a body: primarily the surfaces that are attached to the faces themselves. </P>
+<P>
+<A NAME="50446369_pgfId-306140"></A><A NAME="50446369_marker-457737"></A><A NAME="50446369_marker-457917"></A>If you have a model that contains rubber surfaces (that is, a face that has no geometry attached), you can create and attach a surface that fits it. Rubber surfaces can occur when scribing lines on a minimum body, for example, and this functionality provides a simple way to remove them.</P>
+<P>
+<A NAME="50446369_pgfId-275212"></A><A NAME="50446369_marker-275210"></A><A NAME="50446369_marker-275211"></A>You can also replace the surfaces attached to selected faces in a body, as shown in <A HREF="ov_chap.06.html#50446369_19772"><EM>
+Figure 5-23</EM></A></P>
+<P>
+<A NAME="50446369_pgfId-1357221"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-67.gif">
+
+<P>
+<A NAME="50446369_pgfId-275928"></A>Figure 5-23 <A NAME="50446369_19772"></A>Replacing surfaces attached to faces</P>
+<P>
+<A NAME="50446369_pgfId-316031"></A>When replacing surfaces, Parasolid lets you:</P>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-316032"></A>Choose whether adjacent faces are merged together where possible. </LI>
+<LI>
+<A NAME="50446369_pgfId-316036"></A>Choose which curves in the body are recalculated by Parasolid as a result of the operation. </LI>
+<LI>
+<A NAME="50446369_pgfId-316037"></A>Supply replacement curves in cases where the existing geometry is not considered accurate.</LI>
+</UL>
+<P>
+<A NAME="50446369_pgfId-316038"></A>These options are particularly useful when cleaning up parts that have been imported into Parasolid, for example as a second stage after fixing up some of the geometry of the part.</P>
+<P>
+<A NAME="50446369_pgfId-281331"></A><A NAME="50446369_marker-281350"></A><A NAME="50446369_marker-281351"></A>Parasolid can also transform the <A NAME="50446369_marker-457741"></A><A NAME="50446369_marker-457905"></A>geometry of sets of faces in a body. <A HREF="ov_chap.06.html#50446369_26406"><EM>
+Figure 5-24</EM></A> shows a body in which one face has been translated and two have been rotated.</P>
+<P>
+<A NAME="50446369_pgfId-1357276"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-68.gif">
+
+<P>
+<A NAME="50446369_pgfId-276168"></A>Figure 5-24 <A NAME="50446369_26406"></A>Transformations applied to a list of faces</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446369_pgfId-410133"></A>5.6	<A NAME="50446369_24500"></A><A NAME="50446369_marker-457148"></A><A NAME="50446369_marker-457261"></A><A NAME="50446369_marker-457221"></A><A NAME="50446369_marker-457255"></A>Spinning and sweeping entities
+
+
+</H1>
+<P>
+<A NAME="50446369_pgfId-410134"></A>You can spin many types of entity around an axis or sweep them in a specified direction, in order to create a new entity. For example, you can create a cylinder by sweeping a circular sheet along a path. Using spin and sweep (together with other operations) on profile bodies is a technique commonly used to create bodies from scratch. </P>
+<P>
+<A NAME="50446369_pgfId-410138"></A>Spin and sweep are described in more detail in <A HREF="ov_chap.10.html#50446338_31925">Chapter 9, &#8220;Building Bodies from Profiles&#8221;</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446369_pgfId-278912"></A>5.7	<A NAME="50446369_75776"></A><A NAME="50446369_marker-457150"></A><A NAME="50446369_marker-457237"></A><A NAME="50446369_marker-457233"></A>Generic face change operations
+
+
+</H1>
+<P>
+<A NAME="50446369_pgfId-278915"></A>Parasolid provides a generic <A NAME="50446369_marker-278913"></A><A NAME="50446369_marker-278914"></A>face change operation that lets you perform any combination of the following local operations on any set of faces in a body in a single call:</P>
+<P>
+<A NAME="50446369_pgfId-950130"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950020"></A>Operation</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950022"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950064"></A>Offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950026"></A>Offset any face by a specified distance.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950066"></A>Taper</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950030"></A>Replace the surface of any face with a taper surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950068"></A>Transform</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950034"></A>Transform the geometry of a face or set of faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950070"></A>Replace</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950038"></A>Replace the geometry of any face with a new surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950072"></A>Blend</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950042"></A>Reblend any face to remain consistent with its underlying faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950076"></A>Patch</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950050"></A>Replace faces by patching in a set of replacement faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950078"></A>Deform</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-950054"></A>Locally deform a set of target faces on a body while preserving and adjusting existing features.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-1820579"></A>Radiate</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446369_pgfId-1820581"></A>Radially displace a rotational surface of a face.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446369_pgfId-376668"></A>Providing a generic operation has two major advantages:</P>
+<UL>
+<LI>
+<A NAME="50446369_pgfId-376672"></A>You can perform modelling tasks that would not be possible if you used a series of separate local operations, because the model would become invalid in between those operations.</LI>
+<LI>
+<A NAME="50446369_pgfId-376676"></A>If you are performing a series of local operations, performing a single combined operation is often faster.</LI>
+</UL>
+<P>
+<A NAME="50446369_pgfId-1357376"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-69.gif">
+
+<P>
+<A NAME="50446369_pgfId-376663"></A>Figure 5-25 Performing operations to several faces within a single body</P>
+<P>
+<A NAME="50446369_pgfId-283013"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.05.html">Booleans and Related Functionality</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.07.html">Working with Sheets and Wires</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

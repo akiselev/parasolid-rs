@@ -1,0 +1,560 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Clash Detection Of Bodies</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Clash Detection Of Bodies</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.029.html">Calculating Minimum And Maximum Distance </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.031.html">Checking</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.030.html#50422099_pgfId-294921">29.1	Introduction </A>
+<LI> <A HREF="fd_chap.030.html#50422099_pgfId-294955">29.2	Types of clash </A>
+<UL>
+<LI> <A HREF="fd_chap.030.html#50422099_pgfId-294968">29.2.1	Clashes in entities of the same dimension </A>
+<LI> <A HREF="fd_chap.030.html#50422099_pgfId-294999">29.2.2	Clashes in bodies of different dimensions </A>
+<LI> <A HREF="fd_chap.030.html#50422099_pgfId-311893">29.2.3	Clashes in sheet bodies and wire bodies </A>
+</UL>
+<LI> <A HREF="fd_chap.030.html#50422099_pgfId-295047">29.3	Returned information </A>
+<LI> <A HREF="fd_chap.030.html#50422099_pgfId-295106">29.4	When clashes of faces can go undetected </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422099_pgfId-294921"></A>29.1	<A NAME="50422099_marker-294920"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422099_pgfId-294923"></A>You can use <A NAME="50422099_marker-294922"></A><A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A> to detect clashes between any combination of solids, sheets, and wire bodies. This function receives two sets of topologies, and returns any entities that are found to clash, together with (optionally) information about the nature of each clash.</P>
+<P>
+<A NAME="50422099_pgfId-312930"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Inquiries\Model Analysis\Clashing</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422099_pgfId-320293"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422099_pgfId-320303"></A>Note: This functionality offers partial support for facet geometry.See <A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422099_pgfId-294924"></A>Options available with this clash detection function for controlling the output are:</P>
+<P>
+<A NAME="50422099_pgfId-318853"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294927"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294929"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422099_pgfId-294931"></A>find_all</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294933"></A>If PK_LOGICAL_true, find all the clashes between the two topologies. If PK_LOGICAL_false, stop after the first clash. (Default: PK_LOGICAL_false)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422099_pgfId-294935"></A>find_intersect</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294937"></A>If PK_LOGICAL_true, classify each clash between the two topologies, and return the information in the <CODE>
+clash_types</CODE>
+ field of <A HREF=../headers/pk_topol_clash_t.html>PK_TOPOL_clash_t</A>. See <A HREF="fd_chap.030.html#50422099_57076">Section 29.2, “Types of clash”</A>, for more information. (Default: PK_LOGICAL_false)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422099_pgfId-294942"></A>mul_target_tf</PRE>
+<PRE><A NAME="50422099_pgfId-294943"></A>mul_tool_tf</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294945"></A>You can specify transforms to apply to the targets and tools supplied to <A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A> using the <CODE>
+tf1</CODE>
+ and <CODE>
+tf2</CODE>
+ arguments respectively. By default, a single transform is applied to either the targets (via <CODE>
+tf1</CODE>
+) or the tools (via <CODE>
+tf2</CODE>
+). By setting <CODE>
+mul_target_tf</CODE>
+ or <CODE>
+mul_tool_tf</CODE>
+ to PK_LOGICAL_true, you can supply an array of transforms to apply to either targets or tools, one transform for each target or tool supplied. (Default: PK_LOGICAL_false)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422099_pgfId-294947"></A>target_owner</PRE>
+<PRE><A NAME="50422099_pgfId-294948"></A>tool_owner</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294950"></A>In the case of face clashes, clash information returned by <A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A> is based on the interaction of the clashing faces. If you pass in the owning bodies of the target and tool using these options, then clash information returned is based on the interaction between these owning bodies instead. (Default: null)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422099_pgfId-317151"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-316977"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422099_pgfId-316952"></A><A HREF="fd_chap.029.html#50422098_">Chapter 28, “Calculating Minimum And Maximum Distance”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422099_pgfId-294955"></A>29.2	<A NAME="50422099_57076"></A><A NAME="50422099_marker-317087"></A><A NAME="50422099_marker-317088"></A>Types of clash 
+
+
+</H1>
+<P>
+<A NAME="50422099_pgfId-294956"></A>If <CODE>
+find_intersect</CODE>
+ is PK_LOGICAL_true, <A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A> returns information that classifies each type of clash detected. This information is returned in the <CODE>
+clash_type</CODE>
+ structure (<A HREF=../headers/pk_topol_clash_type_t.html>PK_TOPOL_clash_type_t</A>) of the <CODE>
+clashes</CODE>
+ return structure. </P>
+<P>
+<A NAME="50422099_pgfId-294957"></A>Any clash can be classified as one of three types:</P>
+<UL>
+<LI>
+<A NAME="50422099_pgfId-294958"></A><STRONG>
+Interference:</STRONG> bounding topologies of the entities cross with each other</LI>
+<LI>
+<A NAME="50422099_pgfId-294959"></A><STRONG>
+Abutment: </STRONG>bounding topologies of the entities touch each other</LI>
+<LI>
+<A NAME="50422099_pgfId-294960"></A><STRONG>
+Containment:</STRONG> one entity is entirely within the other, and their bounding topologies do not touch</LI>
+</UL>
+<P>
+<A NAME="50422099_pgfId-294961"></A>The precise meaning of each type of clash depends on the nature of the entities you are examining for clashes, as described in the rest of this section.</P>
+<P>
+<A NAME="50422099_pgfId-294965"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422099_pgfId-294964"></A>Note: When detecting clashes which involve vertices, no attempt is made to describe the type of clash.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422099_pgfId-294968"></A>	29.2.1 	<A NAME="50422099_marker-294966"></A><A NAME="50422099_marker-294967"></A>Clashes in entities of the same dimension </H3>
+<P>
+<A NAME="50422099_pgfId-294969"></A>When detecting clashes in entities of the same dimension, <CODE>
+clash_type</CODE>
+ is classified according to the behaviour of the bounding topology of the entities. </P>
+<UL>
+<LI>
+<A NAME="50422099_pgfId-294970"></A>The bounding topology of a body is its faces. </LI>
+<LI>
+<A NAME="50422099_pgfId-294971"></A>The bounding topology of a face is its edges. </LI>
+<LI>
+<A NAME="50422099_pgfId-294972"></A>The bounding topology of an edge is its vertices. </LI>
+</UL>
+<P>
+<A NAME="50422099_pgfId-294973"></A>For different types of entities, <CODE>
+clash_type</CODE>
+ is as follows:</P>
+<P>
+<A NAME="50422099_pgfId-294996"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294976"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294978"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294980"></A>PK_TOPOL_clash_interfere</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294982"></A>Two solid bodies interfere if they share a common volume.</P>
+<P>
+<A NAME="50422099_pgfId-294983"></A>Two faces interfere if they share a common area, or they intersect.</P>
+<P>
+<A NAME="50422099_pgfId-294984"></A>Two edges interfere if they share a common length, or they intersect.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294986"></A>PK_TOPOL_clash_abut_no_class</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294988"></A>Two solid bodies abut when they touch, but do not share a common volume.</P>
+<P>
+<A NAME="50422099_pgfId-294989"></A>Two faces abut when they share a common curve or point in space which lies on the bounding topology of at least one of the faces.</P>
+<P>
+<A NAME="50422099_pgfId-294990"></A>Two edges abut when they share a common point in space which lies on the bounding topology of at least one of the edges.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294992"></A>PK_TOPOL_clash_a_in_b</P>
+<P>
+<A NAME="50422099_pgfId-294993"></A>PK_TOPOL_clash_b_in_a</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-294995"></A>For solids, faces, and edges, one entity is contained when it lies entirely inside the other entity, and their bounding topologies do not touch.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422099_pgfId-294999"></A>	29.2.2 	<A NAME="50422099_marker-294997"></A><A NAME="50422099_marker-294998"></A>Clashes in bodies of different dimensions </H3>
+<P>
+<A NAME="50422099_pgfId-295000"></A>As in the case for entities of the same dimension, when detecting clashes between bodies of different dimensions, <CODE>
+clash_type</CODE>
+ is classified according to the behaviour of the bounding topology of the entities</P>
+<P>
+<A NAME="50422099_pgfId-295019"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295003"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295005"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295007"></A>PK_TOPOL_clash_interfere</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295009"></A>If there is a common point in space that lies within the bounding topology of the two bodies, then the bodies are said to interfere.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295011"></A>PK_TOPOL_clash_abut_no_class</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295013"></A>If no common point exists, but the bounding topologies of the two bodies touch, then the bodies are said to abut.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295015"></A>PK_TOPOL_clash_a_in_b</P>
+<P>
+<A NAME="50422099_pgfId-295016"></A>PK_TOPOL_clash_b_in_a</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295018"></A>If one body lies entirely within the bounding topology of the other, and the bounding topology of the two bodies do not touch then the entity is contained. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422099_pgfId-311893"></A>	29.2.3 	<A NAME="50422099_marker-311889"></A><A NAME="50422099_marker-311890"></A><A NAME="50422099_marker-311891"></A><A NAME="50422099_marker-311892"></A>Clashes in sheet bodies and wire bodies </H3>
+<P>
+<A NAME="50422099_pgfId-311894"></A>Clash detection in sheet bodies and wire bodies is treated as a special case, since it does not depend solely on the interaction of the bounding topologies of the bodies in which you are looking for clashes.</P>
+<P>
+<A NAME="50422099_pgfId-295028"></A>Two sheet bodies only interfere if they actually cross each other (as shown in <A HREF="fd_chap.030.html#50422099_37642"><EM>
+Figure 29-1</EM></A>(a)). Two sheet bodies that lie coincident within the same plane will abut (<A HREF="fd_chap.030.html#50422099_37642"><EM>
+Figure 29-1</EM></A>(b)). </P>
+<P>
+<A NAME="50422099_pgfId-295039"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422099_pgfId-295037"></A>Note: Sheet bodies behave differently to faces. For faces, <A HREF="fd_chap.030.html#50422099_37642"><EM>
+Figure 29-1</EM></A>(b) would be classed as interference, rather than abutment.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422099_pgfId-301585"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-220.gif">
+
+<P>
+<A NAME="50422099_pgfId-295043"></A>Figure 29-1 <A NAME="50422099_37642"></A>Detecting clashes in sheet bodies</P>
+<P>
+<A NAME="50422099_pgfId-295044"></A>When two wire bodies clash, they are not classified, since any classification is meaningless. Instead, the <CODE>
+clash_type</CODE>
+ is returned as PK_TOPOL_clash_exists for any wire body clashes.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422099_pgfId-295047"></A>29.3	<A NAME="50422099_marker-295045"></A><A NAME="50422099_marker-295046"></A>Returned information 
+
+
+</H1>
+<P>
+<A NAME="50422099_pgfId-295048"></A><A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A> returns any entities in the two sets of topologies that are found to clash. The types of those entities depends on both:</P>
+<UL>
+<LI>
+<A NAME="50422099_pgfId-295049"></A>The types of body in which you looking for clashes</LI>
+<LI>
+<A NAME="50422099_pgfId-295050"></A>The nature of any clashes found</LI>
+</UL>
+<P>
+<A NAME="50422099_pgfId-295051"></A>The following table shows what entities are returned if a clash exists.</P>
+<P>
+<A NAME="50422099_pgfId-295095"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295054"></A>Bodies being clashed</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295056"></A>Entity for clash</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295058"></A>Entity for containment</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295060"></A>Solid body v Solid body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295062"></A>Faces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295064"></A>Bodies</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295066"></A>Solid body v Sheet body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295068"></A>Faces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295070"></A>Bodies</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295072"></A>Solid body v Wire body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295074"></A>Edges or faces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295076"></A>Bodies</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295078"></A>Sheet body v Sheet body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295080"></A>Faces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295082"></A>Faces</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295084"></A>Sheet body v Wire body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295086"></A>Edges</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295088"></A>Bodies</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295090"></A>Wire body v Wire body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295092"></A>Edges</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422099_pgfId-295094"></A>Edges</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422099_pgfId-295096"></A>The second column shows the entities that are returned if interference or abutment is detected. The third column shows the entities that are returned if one set of topologies is entirely contained by the other. </P>
+<P>
+<A NAME="50422099_pgfId-295103"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422099_pgfId-295099"></A>Note: When looking for clashes between bodies of different topological dimensions, the entity with the lowest possible dimension is returned first. When seeking clashes between solid and wire bodies, two types of entity may be returned:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422099_pgfId-295100"></A>First, <A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A> determines whether the wire body intersects or abuts any edges on the solid body, and returns those edges. </LI>
+<LI>
+<A NAME="50422099_pgfId-295101"></A>If this is not the case, <A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A> determines whether the wire body intersects or abuts any faces on the solid body, and returns those faces.</LI>
+<LI>
+<A NAME="50422099_pgfId-295102"></A>If this is not the case, <A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A> determines whether the wire body is contained by the solid body.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422099_pgfId-295106"></A>29.4	<A NAME="50422099_marker-295104"></A><A NAME="50422099_marker-295105"></A>When clashes of faces can go undetected 
+
+
+</H1>
+<P>
+<A NAME="50422099_pgfId-295107"></A>Face clashes can go undetected in either of the following situations:</P>
+<UL>
+<LI>
+<A NAME="50422099_pgfId-295108"></A>Because it is only clashes of faces in one body with faces in the other body that are detected, it is possible that no clashes are detected when one body is completely contained within the other body;</LI>
+<LI>
+<A NAME="50422099_pgfId-295109"></A>When either body is a general body, clashes between a wire-frame edge in one body and a face or wire-frame edge in the other body are not detected.</LI>
+</UL>
+<P>
+<A NAME="50422099_pgfId-294916"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.029.html">Calculating Minimum And Maximum Distance </A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.031.html">Checking</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

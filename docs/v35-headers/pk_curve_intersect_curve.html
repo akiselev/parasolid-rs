@@ -1,0 +1,125 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_intersect_curve</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_intersect_curve</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_CURVE_intersect_curve
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                          curve_1,    --- first curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                       interval_1, --- first interval
+<A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                          curve_2,    --- second curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                       interval_2, --- second interval
+const <A HREF=../headers/pk_curve_intersect_curve_o_t.html>PK_CURVE_intersect_curve_o_t</A> *options,    --- options structure
+
+<I>--- returned arguments ---
+</I>int                          *const n_vectors,  --- number of intersections
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                 **const vectors,    --- positions of intersections
+double                      **const ts_1,       --- parameters on curve_1
+double                      **const ts_2,       --- parameters on curve_2
+<A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_t</A>       **const types       --- types of intersections
+)
+</B>
+<A NAME="description"></A>
+<I>PK_CURVE_intersect_curve finds the intersections between specified regions of
+two curves.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_parameter      (MILD)    bad parameter given
+    PK_ERROR_not_on_surface     (MILD)    curve does not lie on common surface
+    PK_ERROR_mixed_geometry     (MILD)    cannot intersect foreign curves with
+                                          polylines
+    PK_ERROR_cant_do_intersect  (SERIOUS) intersection cannot be done
+
+<A NAME="documentation"></A>
+
+PK_CURVE_intersect_curve finds the intersections between specified regions of
+two curves.
+It returns an array of intersection vectors <B>'vectors'</B>, arrays of parameters
+of the two input curves, and an array of tokens classifying the intersections.
+The intersections are ordered along the first curve, <B>'curve_1'</B>, and are
+classified according to the direction of this curve.
+
+If there are no intersections of the curves within the bounds, <B>'n_vectors'</B>
+is returned as zero.
+
+The parameters of <B>'curve_1'</B> at the intersections are returned as an array
+<B>'ts_1'</B> of length <B>'n_vectors'</B> and the parameters of <B>'curve_2'</B> in <B>'ts_2'</B>.
+
+The intersection types are returned in an array of length <B>'n_vectors'</B>.
+These can be one of:
+
+    <A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_simple_c</A>: : A simple intersection not
+                                    adjoining a region of coincidence. For
+                                    PK_CURVE_intersect_curve, this includes
+                                    tangent intersections.
+    <A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_start_c</A>:  : An intersection at the start
+                                    of a region of coincidence.
+    <A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_end_c</A>     : An intersection at the end
+                                    of a region of coincidence.
+
+<A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_tangent_c</A> is not returned by PK_CURVE_intersect_curve.
+
+Whether an intersection is at the start or end of a region of coincidence
+is determined by the direction of the first curve, <B>'curve_1'</B>.
+
+Coincident intersections are returned for all points lying at the bounds of
+regions of coincidence, including the ends of fully coincident curves
+(or regions of curves).  In the case where two closed curves are coincident,
+but the bounds of <B>'curve_1'</B> are not coincident with those of <B>'curve_2'</B>,
+the intersections returned will be at the bounds of <B>'curve_1'</B>.
+
+The regions of the curves which are to be intersected are specified
+by giving an interval for each curve. These are given in the
+arguments <B>'interval_1'</B> and <B>'interval_2'</B>.
+
+A surface may be supplied in the options structure which contains both the
+curves, the function will work without this surface but it may
+be more efficient to supply it.
+
+<B>'box'</B> describes the box that contains the area of interest.  All
+intersections inside this box will be returned, but ones outside it may
+not be.  The box may be used for efficiency. The box must be of type
+<A HREF=../headers/pk_box_t.html>PK_BOX_t</A>.
+
+Any B-curve, B-surface or offset surface must be capable of passing the full
+checks imposed by <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

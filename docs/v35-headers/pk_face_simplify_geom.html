@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_simplify_geom</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_simplify_geom</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_FACE_simplify_geom
+(
+<I>--- received arguments ---
+</I>int                                 n_faces,    --- number of faces
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                           faces[],    --- faces
+const <A HREF=../headers/pk_face_simplify_geom_o_t.html>PK_FACE_simplify_geom_o_t</A>    *options,    --- options
+
+<I>--- returned arguments ---
+</I>int                          *const n_geoms,    --- number of geoms returned
+<A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A>                   **const geoms       --- new geoms (optional)
+)
+</B>
+<A NAME="description"></A>
+<I>This function simplifies the classic geometries of the supplied faces, where
+possible.
+</I>
+<A NAME="documentation"></A>
+
+See also <A HREF="../chapters/fd_chap.065.html#50434428_pgfId-294805">Simplifying geometry</A> for more information.
+
+The function takes a list of faces and attempts to simplify their freeform,
+classic geometries.  Each face itself, and dependent edges in that face, are
+not affected; however their respective geometries may be replaced by simpler
+geometries, and the old geometries deleted.  The number of new geometric
+entities is returned in <B>'n_geoms'</B>. The new geometric entities may be returned
+in <B>'geoms'</B>.
+
+The output array <B>'geoms'</B> is optional. If the <B>'want_geoms'</B> flag in the options
+structure is set to PK_LOGICAL_true, then the <B>'geoms'</B> array will be output.
+Otherwise only <B>'n_geoms'</B> will be output.
+
+One level of simplification exists.  A B-curve or B-surface will only be
+replaced if a single curve or surface can replace the entire original.
+
+
+The following simplifications may be made on curves:
+
+        original form           simplified form
+        -------------           ---------------
+        Rational B-curve        Non-rational B_curve
+        B-curve                 line or circle
+
+
+The following simplifications may be made on surfaces:
+
+        original form           simplified form
+        -------------           ---------------
+       Rational B-surface       Non-rational B-surface
+       B-surface                plane, cylinder, cone, sphere, torus
+
+
+
+Options
+
+Option structure argument '<A HREF=../headers/pk_face_simplify_geom_o_t.html>PK_FACE_simplify_geom_o_t</A>* options' has one logical
+argument, <B>'want_geoms'</B>.  If <B>'want_geoms'</B> is set to PK_LOGICAL_true, then
+<B>'geoms'</B> will be filled in.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

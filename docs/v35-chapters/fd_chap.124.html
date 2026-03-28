@@ -1,0 +1,895 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>The Mathematical Form Of B-Geometry</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>The Mathematical Form Of B-Geometry</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.123.html">System Attribute Definitions</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.125.html">How the C# Binding is Implemented</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-306176">B.1	Introduction </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287018">B.2	B-spline curve definition </A>
+<UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287052">B.2.1	B-spline basis functions </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287059">B.2.2	Knot vectors </A>
+<UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-324676">B.2.2.1	The number of knots and vertices </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-324661">B.2.2.2	The valid range of the B-curve </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-314111">B.2.2.3	Periodic B-curves </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287081">B.2.2.4	Closed B-curves </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287086">B.2.2.5	Useful properties </A>
+</UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287142">B.2.3	Rational B-curve </A>
+<UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287165">B.2.3.1	B-surface definition </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287180">B.3	Other methods of representing curves </A>
+<UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287207">B.3.1	Polynomial coefficients </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287229">B.3.2	Hermite </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287260">B.3.3	Taylor series </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287281">B.3.4	Non-rational Bezier curves </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287368">B.3.5	Rational Bezier curves </A>
+</UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287395">B.4	B-spline surface definition </A>
+<UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287434">B.4.1	Continuity between patches </A>
+</UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287595">B.5	Other methods of representing surfaces </A>
+<UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287612">B.5.1	Polynomial coefficients </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287643">B.5.2	Hermite </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287684">B.5.3	Taylor series </A>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287704">B.5.4	Bezier surfaces </A>
+</UL>
+<LI> <A HREF="fd_chap.124.html#50422207_pgfId-287752">B.6	References </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422207_pgfId-306176"></A>B.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422207_pgfId-306183"></A><A NAME="50422207_marker-306177"></A><A NAME="50422207_marker-306178"></A><A NAME="50422207_marker-306179"></A><A NAME="50422207_marker-306180"></A><A NAME="50422207_marker-306181"></A><A NAME="50422207_marker-306182"></A>The B-curves and B-surfaces in Parasolid may be either rational or non-rational, and of any degree. Although the degree is not limited, there is some optimisation for cubics and bi-cubics and so degree three is recommended. Internally to Parasolid, the B-spline form is used exclusively for modelling with B-surfaces. This section describes B-curves and B-surfaces in mathematical terms, with particular reference to their implementation in Parasolid. For a fuller description, you are advised to consult the list of references.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422207_pgfId-287018"></A>B.2	<A NAME="50422207_12748"></A><A NAME="50422207_marker-287015"></A><A NAME="50422207_marker-287016"></A><A NAME="50422207_marker-287017"></A>B-spline curve definition 
+
+
+</H1>
+<P>
+<A NAME="50422207_pgfId-287022"></A><A NAME="50422207_marker-287019"></A><A NAME="50422207_marker-287020"></A><A NAME="50422207_marker-287021"></A>A spline is a piecewise polynomial or rational function which is defined to have continuity of position and of (<EM>
+degree -1</EM>) derivatives at the joins between segments.</P>
+<P>
+<A NAME="50422207_pgfId-287023"></A>The B-spline is one of many ways of describing a spline function as a linear sum of basis functions. Its advantages are well described in the literature.</P>
+<P>
+<A NAME="50422207_pgfId-287024"></A>Parasolid’s data structure for B-curves supports both:</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287028"></A>Non-Uniform Rational B-splines (NURBS)</LI>
+</UL>
+
+<IMG SRC="../graphics/fd_chap-1270.gif">
+
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287030"></A>simpler Non-Uniform B-splines</LI>
+</UL>
+<P>
+<A NAME="50422207_pgfId-287034"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1271.gif">
+
+<P>
+<A NAME="50422207_pgfId-287035"></A>where</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287036"></A>n is the number of vertices (<CODE>
+n_vertices</CODE>
+ in the PK standard form)</LI>
+<LI>
+<A NAME="50422207_pgfId-287040"></A></LI>
+<IMG SRC="../graphics/fd_chap-1272.gif">
+ are the B-spline vertices</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287044"></A></LI>
+<IMG SRC="../graphics/fd_chap-1273.gif">
+are the weights</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287048"></A></LI>
+<IMG SRC="../graphics/fd_chap-1274.gif">
+, for i=0 ... n-1 are the B-spline basis functions</UL>
+
+<H3>
+<A NAME="50422207_pgfId-287052"></A>	B.2.1 	<A NAME="50422207_marker-287049"></A><A NAME="50422207_marker-287050"></A><A NAME="50422207_marker-287051"></A>B-spline basis functions </H3>
+<P>
+<A NAME="50422207_pgfId-287056"></A><A NAME="50422207_marker-287053"></A><A NAME="50422207_marker-287054"></A><A NAME="50422207_marker-287055"></A>The B-spline basis functions are generated recursively. Users are advised to consult a standard text such as de Boor, 1978 or Gordon &amp; Riesenfeld, 1974 for details of how they are computed.</P>
+
+
+<H3>
+<A NAME="50422207_pgfId-287059"></A>	B.2.2 	<A NAME="50422207_marker-287057"></A><A NAME="50422207_marker-287058"></A>Knot vectors </H3>
+<P>
+<A NAME="50422207_pgfId-320701"></A><A NAME="50422207_marker-320698"></A><A NAME="50422207_marker-320699"></A><A NAME="50422207_marker-320700"></A>The parameter t above is global. The user supplies an ordered set of values of t at specific points. The points are called knots and the set of values of t is called the knot vector. Each successive value in the set must be greater than or equal to its predecessor. Where two or more such values are the same we say that the knots are coincident, or that the knot has multiplicity greater than 1. In this case it is best to think of the knot set as containing a null or zero length span. The principal use of coincident knots is to allow the curve to have less continuity at that point than is formally required for a spline. A B-spline curve is infinitely differentiable, except possibly at knot positions. At a knot of multiplicity <EM>
+m</EM> the curve is at least <IMG SRC="../graphics/fd_chap-1275.gif">
+continuous. The highest permitted multiplicity of a knot is equal to the degree of the curve, at which point the curve can have a discontinuity of first derivative and hence of tangent direction, except at the first or last knot where it can go as high as (degree+1).</P>
+<P>
+<A NAME="50422207_pgfId-306776"></A>In order to avoid problems associated, for example, with rounding errors in the knot set, Parasolid stores an array of distinct values and an array of integer multiplicities. This is reflected in the standard form used by the PK for input and output of B-curve data.</P>
+<P>
+<A NAME="50422207_pgfId-324675"></A>Most algorithms in the literature, and also the following discussion, refer to the expanded knot set in which a knot of multiplicity n appears explicitly n times. </P>
+
+<H4>
+<A NAME="50422207_pgfId-324676"></A>B.2.2.1 The number of knots and vertices </H4>
+<P>
+<A NAME="50422207_pgfId-324677"></A>The knot set determines a set of basis functions which are bell shaped, and non-zero over a span of <EM>
+(degree+1)</EM> intervals. One basis function starts at each knot, and each one finishes <EM>
+(degree+1)</EM> knots higher. The control vectors are the coefficients applied to these basis functions in a linear sum to obtain positions on the curve. Thus it can be seen that we require the number of knots n_knots = n_vertices + degree + 1</P>
+
+
+<H4>
+<A NAME="50422207_pgfId-324661"></A>B.2.2.2 <A NAME="50422207_marker-324658"></A><A NAME="50422207_marker-324659"></A><A NAME="50422207_marker-324660"></A>The valid range of the B-curve </H4>
+<P>
+<A NAME="50422207_pgfId-324666"></A>So if the knot set is numbered <IMG SRC="../graphics/fd_chap-1276.gif">
+,where nknots equals the number of knots, it can be seen then that it is only after<IMG SRC="../graphics/fd_chap-1277.gif">
+ that sufficient <EM>
+(degree+1)</EM> basis functions are present for the curve to be fully defined, and that the B-curve ceases to be fully defined after <IMG SRC="../graphics/fd_chap-1278.gif">
+The first <EM>
+degree</EM> knots and the last <EM>
+degree</EM> knots are known as the imaginary knots because their parameter values are outside the defined range of the B-curve.</P>
+
+
+<H4>
+<A NAME="50422207_pgfId-314111"></A>B.2.2.3 <A NAME="50422207_marker-314109"></A><A NAME="50422207_marker-314110"></A>Periodic B-curves </H4>
+<P>
+<A NAME="50422207_pgfId-315575"></A>When the end of a B-curve meets its start sufficiently smoothly Parasolid allows it to be defined to have periodic parameterisation. That is to say that if the valid range were from<IMG SRC="../graphics/fd_chap-1279.gif">
+</P>
+<P>
+<A NAME="50422207_pgfId-315601"></A>to <IMG SRC="../graphics/fd_chap-1280.gif">
+, where nknots equals the number of knots, then the difference between these values is called the period and the curve can continue to be evaluated with the same point reoccurring every period.</P>
+<P>
+<A NAME="50422207_pgfId-287078"></A>The minimal smoothness requirement for periodic curves in Parasolid is tangent continuity, but we strongly recommend C<EM>
+(degree-1)</EM>, or continuity in the <EM>
+(degree-1)th</EM> derivative. This in turn is best achieved by repeating the first <EM>
+degree </EM>vertices at the end, and by matching knot intervals so that counting from the start of the defined range, <IMG SRC="../graphics/fd_chap-1281.gif">
+, the first <EM>
+degree</EM> intervals between knots match the last <EM>
+degree </EM>intervals, and similarly matching the last <EM>
+degree</EM> knot intervals before the end of the defined range to the first <EM>
+degree</EM> intervals.</P>
+
+
+<H4>
+<A NAME="50422207_pgfId-287081"></A>B.2.2.4 <A NAME="50422207_marker-287079"></A><A NAME="50422207_marker-287080"></A>Closed B-curves </H4>
+<P>
+<A NAME="50422207_pgfId-287082"></A>A periodic B-curve must also be closed, but it is permitted to have a closed B-curve that is not periodic.</P>
+<P>
+<A NAME="50422207_pgfId-287083"></A>In this case the rules for continuity are relaxed so that only C0 (positional) continuity is required between the start and end. Such closed non-periodic curves are not able to be attached to topology.</P>
+
+
+<H4>
+<A NAME="50422207_pgfId-287086"></A>B.2.2.5 <A NAME="50422207_marker-287084"></A><A NAME="50422207_marker-287085"></A>Useful properties </H4>
+<P>
+<A NAME="50422207_pgfId-287087"></A>It is a property of the B-spline basis functions that, for a given value of t, only <EM>
+(degree+1)</EM> B-spline basis functions are non-zero. Also, the B-spline basis functions sum to one and are non-negative. Thus each point P(t) on the curve is defined as a weighted average of <EM>
+(degree+1)</EM> B-spline vertices, and each segment is affected by only <EM>
+(degree+1)</EM> vertices.</P>
+<P>
+<A NAME="50422207_pgfId-287088"></A>A B-spline curve lies entirely within the convex hull of its B-spline vertices. In fact the B-spline curve obeys a stronger hull property: any point P(t) on the curves is inside the convex hull of <EM>
+(degree+1) </EM>adjacent vertices. As a result, the entire curve lies in the composite hull made up of the union of the convex hulls of each set of <EM>
+(degree+1)</EM> adjacent vertices. The following example illustrates this.</P>
+<P>
+<A NAME="50422207_pgfId-302427"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1282.gif">
+
+<P>
+<A NAME="50422207_pgfId-287138"></A>Figure B-1 B-spline curve in its composite hull</P>
+<P>
+<A NAME="50422207_pgfId-287139"></A>B-spline curves satisfy the variation diminishing property: No plane (or straight line, in the case of planar curves) intersects a B-spline curve more times than it intersects the control polyline. The control polyline is the connected series of lines that connect subsequent control points.</P>
+
+
+
+<H3>
+<A NAME="50422207_pgfId-287142"></A>	B.2.3 	<A NAME="50422207_marker-287140"></A><A NAME="50422207_marker-287141"></A>Rational B-curve </H3>
+<P>
+<A NAME="50422207_pgfId-287148"></A><A NAME="50422207_marker-287143"></A><A NAME="50422207_marker-287144"></A><A NAME="50422207_marker-287145"></A><A NAME="50422207_marker-287146"></A><A NAME="50422207_marker-287147"></A>In the rational form of the curve, each vertex is associated with a weight, which increases or decreases the effect of the vertex without changing the curve hull. To ensure that the convex hull property is retained, the curve equation is divided by a denominator which makes the coefficients of the vertices sum to one.</P>
+<UL>
+<P>
+<A NAME="50422207_pgfId-287152"></A>&nbsp;</P>
+</UL>
+
+<IMG SRC="../graphics/fd_chap-1283.gif">
+
+<P>
+<A NAME="50422207_pgfId-287159"></A>where<IMG SRC="../graphics/fd_chap-1284.gif">
+ are weights.</P>
+<P>
+<A NAME="50422207_pgfId-287160"></A>Each weight may take any positive value, and the larger the value, the greater the effect of the associated vertex. However, it is the relative sizes of the weights which is important, as may be seen from the fact that in the equation given above, all the weights may be multiplied by a constant without changing the equation. </P>
+<P>
+<A NAME="50422207_pgfId-287161"></A>In Parasolid the weights are stored with the vertices by treating these as having an extra dimension. In the usual case of a curve in 3-d cartesian space this means that vertex_dim is four, the x, y, z values are multiplied through by the corresponding weight and the fourth value is the weight itself. Many algorithms operating on rational curves work in 4-space, projecting their results down onto the w=1 hyperplane.</P>
+
+<H4>
+<A NAME="50422207_pgfId-287165"></A>B.2.3.1 <A NAME="50422207_marker-287162"></A><A NAME="50422207_marker-287163"></A><A NAME="50422207_marker-287164"></A>B-surface definition </H4>
+<P>
+<A NAME="50422207_pgfId-287169"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1285.gif">
+
+<P>
+<A NAME="50422207_pgfId-287171"></A>The <A NAME="50422207_marker-287170"></A>B-surface definition is best thought of as an extension of the B-curve definition into two parameters, usually called u and v. Two knot sets are required and the number of control vertices is the product of the number that would be required for a curve using each knot vector. The rules for periodicity and closure given above for curves are extended to surfaces in an obvious way.</P>
+<P>
+<A NAME="50422207_pgfId-287172"></A>For attachment to topology a B-surface is required to have G1 continuity. That is to say that the surface normal direction must be continuous.</P>
+<P>
+<A NAME="50422207_pgfId-287176"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422207_pgfId-287175"></A>Note: Parasolid does not support modelling with surfaces that are self-intersecting or contain cusps. Although they can be created they cannot be attached to topology.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422207_pgfId-287180"></A>B.3	<A NAME="50422207_93177"></A><A NAME="50422207_marker-287178"></A><A NAME="50422207_marker-287179"></A>Other methods of representing curves 
+
+
+</H1>
+<P>
+<A NAME="50422207_pgfId-287181"></A>B-curves can be represented in any of the following forms:</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287182"></A>Polynomial coefficients</LI>
+<LI>
+<A NAME="50422207_pgfId-287183"></A>Bezier</LI>
+<LI>
+<A NAME="50422207_pgfId-287184"></A>Hermite (cubics only)</LI>
+<LI>
+<A NAME="50422207_pgfId-287185"></A>Taylor series</LI>
+<LI>
+<A NAME="50422207_pgfId-287186"></A>B-spline</LI>
+</UL>
+<P>
+<A NAME="50422207_pgfId-287190"></A>B-spline curves were discussed in <A HREF="fd_chap.124.html#50422207_12748" CLASS="XRef">Section B.2</A>. This section describes the other forms. In each case, equations are given for the rational form; the simplification to non-rational form is similar to that described for Bezier curves in Sections <A HREF="fd_chap.124.html#50422207_49730">B.3.4</A> and <A HREF="fd_chap.124.html#50422207_11525">B.3.5</A>. </P>
+<P>
+<A NAME="50422207_pgfId-287203"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422207_pgfId-287202"></A>Note: For the rational form, each coefficient is supplied to Parasolid as the (x, y, z) components of the coefficient, followed by a weight for the coefficient.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422207_pgfId-287207"></A>	B.3.1 	<A NAME="50422207_marker-287204"></A><A NAME="50422207_marker-287205"></A><A NAME="50422207_marker-287206"></A>Polynomial coefficients </H3>
+<P>
+<A NAME="50422207_pgfId-287208"></A>The curve equation is given by a (rational) polynomial of order <EM>
+(degree+1)</EM>.</P>
+<P>
+<A NAME="50422207_pgfId-287212"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1286.gif">
+
+<P>
+<A NAME="50422207_pgfId-287213"></A>where</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287214"></A>n = <EM>
+degree</EM></LI>
+<LI>
+<A NAME="50422207_pgfId-287218"></A></LI>
+<IMG SRC="../graphics/fd_chap-1287.gif">
+ = polynomial coefficient</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287225"></A></LI>
+<IMG SRC="../graphics/fd_chap-1288.gif">
+ = weight for <IMG SRC="../graphics/fd_chap-1289.gif">
+</UL>
+<P>
+<A NAME="50422207_pgfId-287226"></A>The polynomial coefficients are supplied starting with the constant term and ending with the term of the highest degree.</P>
+
+
+<H3>
+<A NAME="50422207_pgfId-287229"></A>	B.3.2 	<A NAME="50422207_marker-287227"></A><A NAME="50422207_marker-287228"></A>Hermite </H3>
+<P>
+<A NAME="50422207_pgfId-287230"></A>This method can only be used for cubics. The equation of the curve is:</P>
+<P>
+<A NAME="50422207_pgfId-287234"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1290.gif">
+
+<P>
+<A NAME="50422207_pgfId-287235"></A>where</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287239"></A></LI>
+<IMG SRC="../graphics/fd_chap-1291.gif">
+<BR>
+&nbsp;</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287243"></A></LI>
+<IMG SRC="../graphics/fd_chap-1292.gif">
+<BR>
+&nbsp;</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287247"></A></LI>
+<IMG SRC="../graphics/fd_chap-1293.gif">
+<BR>
+&nbsp;</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287251"></A></LI>
+<IMG SRC="../graphics/fd_chap-1294.gif">
+&nbsp;</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287252"></A>PO, P1 = start and end points of segment</LI>
+<LI>
+<A NAME="50422207_pgfId-287253"></A>D0, D1 = derivatives at start and end</LI>
+<LI>
+<A NAME="50422207_pgfId-287254"></A>w0, w1 = weights at end points</LI>
+<LI>
+<A NAME="50422207_pgfId-287255"></A>d0, d1 = derivatives of weights at start and end points</LI>
+</UL>
+<P>
+<A NAME="50422207_pgfId-287256"></A>The coefficients are supplied in the following order for the rational form: P0,w0,P1,w1,D0,d0,D1,d1</P>
+<P>
+<A NAME="50422207_pgfId-287257"></A>The coefficients are supplied in the following order for the non-rational form: P0,P1,D0,D1</P>
+
+
+<H3>
+<A NAME="50422207_pgfId-287260"></A>	B.3.3 	<A NAME="50422207_marker-287258"></A><A NAME="50422207_marker-287259"></A>Taylor series </H3>
+<P>
+<A NAME="50422207_pgfId-287261"></A>This method stores the derivatives evaluated at the start point of each segment, allowing the curve to be reconstructed as a Taylor series:</P>
+<P>
+<A NAME="50422207_pgfId-287265"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1295.gif">
+
+<P>
+<A NAME="50422207_pgfId-287266"></A>where</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287267"></A>n = <EM>
+degree</EM></LI>
+<LI>
+<A NAME="50422207_pgfId-287271"></A></LI>
+<IMG SRC="../graphics/fd_chap-1296.gif">
+= i’th derivative at t=0</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287275"></A></LI>
+<IMG SRC="../graphics/fd_chap-1297.gif">
+= i’th derivative of weight at t=0</UL>
+<P>
+<A NAME="50422207_pgfId-287276"></A>The point is stored first, followed by the 1st derivative and ending with the derivative of order <EM>
+degree</EM>.</P>
+
+
+<H3>
+<A NAME="50422207_pgfId-287281"></A>	B.3.4 	<A NAME="50422207_49730"></A><A NAME="50422207_marker-287278"></A><A NAME="50422207_marker-287279"></A><A NAME="50422207_marker-287280"></A>Non-rational Bezier curves </H3>
+<P>
+<A NAME="50422207_pgfId-287285"></A>The general form of Bezier curve segments used in Parasolid is rational, but it is helpful to describe the non-rational form in order to describe the rational form. The definition of a Bezier curve segment of order <EM>
+(degree+1)</EM> requires <EM>
+(degree+1)</EM> Bezier vertices. The equation of the non-rational Bezier curve segment is:</P>
+<P>
+<A NAME="50422207_pgfId-287289"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1298.gif">
+
+<P>
+<A NAME="50422207_pgfId-287290"></A>where</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287291"></A>n = <EM>
+degree</EM></LI>
+<LI>
+<A NAME="50422207_pgfId-287295"></A></LI>
+<IMG SRC="../graphics/fd_chap-1299.gif">
+ are the Bezier vertices</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287302"></A></LI>
+<IMG SRC="../graphics/fd_chap-1300.gif">
+ are the Bezier coefficients, defined by:</UL>
+
+<IMG SRC="../graphics/fd_chap-1301.gif">
+
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287303"></A>t is restricted to the interval [0, 1]</LI>
+</UL>
+<P>
+<A NAME="50422207_pgfId-287307"></A>The Bezier coefficients are derived by expanding the product<IMG SRC="../graphics/fd_chap-1302.gif">
+ as a binomial expansion in 1-t and t. It follows that they sum to 1. By inspection, they are positive over the range <IMG SRC="../graphics/fd_chap-1303.gif">
+. As a result, the Bezier curve P(t) lies inside the convex hull of the Bezier vertices, for t in the domain [0, 1]. The definition of a convex hull is the set</P>
+<P>
+<A NAME="50422207_pgfId-287314"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1304.gif">
+
+<P>
+<A NAME="50422207_pgfId-287318"></A>The Bezier vertices are supplied in the order <IMG SRC="../graphics/fd_chap-1305.gif">
+.</P>
+<P>
+<A NAME="50422207_pgfId-287319"></A>Other properties of the Bezier curve segment that follow from the definition are:</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287323"></A>P(0) = </LI>
+<IMG SRC="../graphics/fd_chap-1306.gif">
+</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287327"></A>P(1) = </LI>
+<IMG SRC="../graphics/fd_chap-1307.gif">
+</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287331"></A>P’(0) =</LI>
+<IMG SRC="../graphics/fd_chap-1308.gif">
+</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287335"></A>P’(1) =</LI>
+<IMG SRC="../graphics/fd_chap-1309.gif">
+</UL>
+<P>
+<A NAME="50422207_pgfId-287339"></A><A HREF="fd_chap.124.html#50422207_50869">Figure B-1</A> illustrates these properties.</P>
+<P>
+<A NAME="50422207_pgfId-302979"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1310.gif">
+
+<P>
+<A NAME="50422207_pgfId-287362"></A>Figure B-1 <A NAME="50422207_50869"></A>Bezier curves</P>
+<P>
+<A NAME="50422207_pgfId-287363"></A>The curve segment passes through the first and last Bezier vertices, and in general approaches each intermediate one in turn, but does not pass through it. Thus the string of Bezier vertices (the Bezier hull) can be used to control the shape of the curve segment.</P>
+
+
+<H3>
+<A NAME="50422207_pgfId-287368"></A>	B.3.5 	<A NAME="50422207_11525"></A><A NAME="50422207_marker-287365"></A><A NAME="50422207_marker-287366"></A><A NAME="50422207_marker-287367"></A>Rational Bezier curves </H3>
+<UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287369"></A>In the rational form of the curve, each vertex is associated with a weight, which increases or decreases the effect of the vertex without changing the curve hull. To ensure that the convex hull property is retained, the curve equation is divided by a denominator which makes the coefficients of the vertices sum to one.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422207_pgfId-287373"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1311.gif">
+
+<P>
+<A NAME="50422207_pgfId-287377"></A>where <IMG SRC="../graphics/fd_chap-1312.gif">
+ are weights.</P>
+<P>
+<A NAME="50422207_pgfId-287378"></A>Each weight may take any positive value, and the larger the value, the greater the effect of the associated vertex. However, it is the relative sizes of the weights which is important, as you can see in the equation above, since the weights may be multiplied by any constant without changing the equation.</P>
+<P>
+<A NAME="50422207_pgfId-287382"></A>The Bezier vertices are supplied in the order <IMG SRC="../graphics/fd_chap-1313.gif">
+.</P>
+<P>
+<A NAME="50422207_pgfId-287383"></A>The general properties of the rational curve are similar to the non-rational form. As before, the curve segment moves from the start vertex to the end vertex. However the end derivatives are affected by the weights:</P>
+<P>
+<A NAME="50422207_pgfId-287390"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1314.gif">
+
+
+<IMG SRC="../graphics/fd_chap-1315.gif">
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422207_pgfId-287395"></A>B.4	<A NAME="50422207_49798"></A><A NAME="50422207_marker-287392"></A><A NAME="50422207_marker-287393"></A><A NAME="50422207_marker-287394"></A>B-spline surface definition 
+
+
+</H1>
+<P>
+<A NAME="50422207_pgfId-287396"></A>The definition of a B-spline surface is an extension of the definition of a B-spline curve into two parameters. Two knot vectors are required, one for each parameter. For B-spline curves the knot vectors control how a curve is segmented, and for B-spline surfaces the knot vectors control how a surface is divided into patches. For any row of patches:</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287397"></A>the u-knot vector (a list of values of u) gives the parameters at the boundaries between the patches in the row</LI>
+<LI>
+<A NAME="50422207_pgfId-287398"></A>the v-knot vector (a list of values of v) gives the parameters at the boundaries between the patches in the column</LI>
+</UL>
+<P>
+<A NAME="50422207_pgfId-287399"></A>The description of B-spline curves and knots applies to surfaces as well. </P>
+<P>
+<A NAME="50422207_pgfId-287403"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422207_pgfId-287402"></A>Note: Both knot vectors must have coincident end knots for the surface to interpolate any of the B-spline vertices, and in this case the corner B-spline vertices will be the surface corners.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422207_pgfId-287404"></A>A B-spline surface is said to be G1-continuous if it has a continuous unit normal vector.</P>
+<P>
+<A NAME="50422207_pgfId-287405"></A>The equation of a non-uniform rational B-spline surface of orders <EM>
+(udegree+1)</EM>, <EM>
+(vdegree+1)</EM> is:</P>
+<P>
+<A NAME="50422207_pgfId-287409"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1316.gif">
+
+<P>
+<A NAME="50422207_pgfId-287410"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287414"></A>cols = number of columns of vertices (</LI>
+<IMG SRC="../graphics/fd_chap-1317.gif">
+)</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287418"></A>rows = number of rows of vertices (</LI>
+<IMG SRC="../graphics/fd_chap-1318.gif">
+)</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287422"></A></LI>
+<IMG SRC="../graphics/fd_chap-1319.gif">
+ are the B-spline vertices</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287426"></A></LI>
+<IMG SRC="../graphics/fd_chap-1320.gif">
+ are the weights</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287430"></A></LI>
+<IMG SRC="../graphics/fd_chap-1321.gif">
+ are the B-spline coefficients</UL>
+
+<H3>
+<A NAME="50422207_pgfId-287434"></A>	B.4.1 	<A NAME="50422207_marker-287431"></A><A NAME="50422207_marker-287432"></A><A NAME="50422207_marker-287433"></A>Continuity between patches </H3>
+<P>
+<A NAME="50422207_pgfId-287435"></A>You achieve continuity of position between adjacent patches with Bezier end conditions by using the same Bezier vertices and weights to define the common boundary on each patch. </P>
+<P>
+<A NAME="50422207_pgfId-287436"></A>Continuity of slope across the boundary is more difficult to achieve, and required two conditions. </P>
+<P>
+<A NAME="50422207_pgfId-287437"></A>First, you need to make corresponding triplets of vertices across the boundary co-linear, as shown in <A HREF="fd_chap.124.html#50422207_87822">Figure B-2</A>.</P>
+<P>
+<A NAME="50422207_pgfId-303080"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1322.gif">
+
+<P>
+<A NAME="50422207_pgfId-287502"></A>Figure B-2 <A NAME="50422207_87822"></A>Triplets of vertices (co-linear) across patch boundary</P>
+<P>
+<A NAME="50422207_pgfId-287503"></A>Second, you should ensure that the relative spacing between the vertices in the triplets is constant along the boundary, and the weights are in a constant ratio, as shown in <A HREF="fd_chap.124.html#50422207_64308">Figure B-3</A>. Although this may not always be required, it is the simplest way of ensuring continuity of slope across adjacent patches.</P>
+<P>
+<A NAME="50422207_pgfId-303178"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1323.gif">
+
+<P>
+<A NAME="50422207_pgfId-287591"></A>Figure B-3 <A NAME="50422207_64308"></A>Constant spacing between vertices in the triplet</P>
+<P>
+<A NAME="50422207_pgfId-287592"></A>For the best results, you should try to ensure that data is as exact as possible.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422207_pgfId-287595"></A>B.5	<A NAME="50422207_marker-287593"></A><A NAME="50422207_marker-287594"></A>Other methods of representing surfaces 
+
+
+</H1>
+<P>
+<A NAME="50422207_pgfId-287596"></A>Parametric surfaces can be represented in any of the following forms:</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287597"></A>Polynomial coefficients</LI>
+<LI>
+<A NAME="50422207_pgfId-287598"></A>Bezier</LI>
+<LI>
+<A NAME="50422207_pgfId-287599"></A>Hermite (bi-cubics only)</LI>
+<LI>
+<A NAME="50422207_pgfId-287600"></A>Taylor series</LI>
+<LI>
+<A NAME="50422207_pgfId-287601"></A>B-spline</LI>
+</UL>
+<P>
+<A NAME="50422207_pgfId-287605"></A>B-spline surfaces were described in <A HREF="fd_chap.124.html#50422207_49798">Section B.4</A>. This section describes the other forms. As in <A HREF="fd_chap.124.html#50422207_93177">Section B.3, “Other methods of representing curves”</A>, equations are given for the rational form; each coefficient should be supplied as the (x, y, z) components of the coefficient followed by a weight for the coefficient.</P>
+
+<H3>
+<A NAME="50422207_pgfId-287612"></A>	B.5.1 	<A NAME="50422207_marker-287609"></A><A NAME="50422207_marker-287610"></A><A NAME="50422207_marker-287611"></A>Polynomial coefficients </H3>
+<P>
+<A NAME="50422207_pgfId-287613"></A>The surface equation is given by a (rational) bipolynomial <EM>
+(udegree+1)</EM>, <EM>
+(vdegree+1)</EM>:</P>
+<P>
+<A NAME="50422207_pgfId-287617"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1324.gif">
+
+<P>
+<A NAME="50422207_pgfId-287618"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287619"></A>nu = <EM>
+udegree</EM></LI>
+<LI>
+<A NAME="50422207_pgfId-287620"></A>nv = <EM>
+vdegree</EM></LI>
+</UL>
+<P>
+<A NAME="50422207_pgfId-287624"></A>The polynomial coefficients <IMG SRC="../graphics/fd_chap-1325.gif">
+ are supplied in the order shown below</P>
+<P>
+<A NAME="50422207_pgfId-287634"></A><IMG SRC="../graphics/fd_chap-1326.gif">
+<IMG SRC="../graphics/fd_chap-1327.gif">
+<IMG SRC="../graphics/fd_chap-1328.gif">
+<IMG SRC="../graphics/fd_chap-1329.gif">
+<IMG SRC="../graphics/fd_chap-1330.gif">
+&nbsp;</P>
+<P>
+<A NAME="50422207_pgfId-287641"></A>starting with the constant term and ending with the term of highest degree.</P>
+<P>
+<A NAME="50422207_pgfId-287642"></A>For the non-rational form, the w’s are omitted.</P>
+
+
+<H3>
+<A NAME="50422207_pgfId-287643"></A>	B.5.2 	Hermite </H3>
+<P>
+<A NAME="50422207_pgfId-287644"></A>This method can only be used for bi-cubics. The hermite equation for the patch in matrix form is:</P>
+<P>
+<A NAME="50422207_pgfId-287648"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1331.gif">
+
+<P>
+<A NAME="50422207_pgfId-287658"></A>where</P>
+
+<IMG SRC="../graphics/fd_chap-1332.gif">
+
+
+<IMG SRC="../graphics/fd_chap-1333.gif">
+
+
+<IMG SRC="../graphics/fd_chap-1334.gif">
+
+<P>
+<A NAME="50422207_pgfId-287662"></A>The suffix T denotes the transpose of a matrix: for example <IMG SRC="../graphics/fd_chap-1335.gif">
+ is the transpose of M.</P>
+<P>
+<A NAME="50422207_pgfId-287675"></A>In the matrices A and W, the coefficients <IMG SRC="../graphics/fd_chap-1336.gif">
+ <IMG SRC="../graphics/fd_chap-1337.gif">
+ <IMG SRC="../graphics/fd_chap-1338.gif">
+ <IMG SRC="../graphics/fd_chap-1339.gif">
+ are the points at the corners and their derivatives. The w values are the corresponding weights and their derivatives.</P>
+<P>
+<A NAME="50422207_pgfId-287676"></A>The coefficients are supplied in the order shown below:</P>
+<P>
+<A NAME="50422207_pgfId-287680"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1340.gif">
+
+<P>
+<A NAME="50422207_pgfId-287681"></A>For the non-rational form, the w’s are omitted.</P>
+
+
+<H3>
+<A NAME="50422207_pgfId-287684"></A>	B.5.3 	<A NAME="50422207_marker-287682"></A><A NAME="50422207_marker-287683"></A>Taylor series </H3>
+<P>
+<A NAME="50422207_pgfId-287685"></A>This method stores the derivatives evaluated at the u=0, v=0 corner of each patch, allowing the surface to be reconstructed as a Taylor series:</P>
+<P>
+<A NAME="50422207_pgfId-287689"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1341.gif">
+
+<P>
+<A NAME="50422207_pgfId-287690"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287691"></A>nu = <EM>
+udegree</EM></LI>
+<LI>
+<A NAME="50422207_pgfId-287692"></A>nv = <EM>
+vdegree<BR>
+</EM></LI>
+<LI>
+<A NAME="50422207_pgfId-287696"></A></LI>
+<IMG SRC="../graphics/fd_chap-1342.gif">
+<BR>
+<BR>
+&nbsp;</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287700"></A></LI>
+<IMG SRC="../graphics/fd_chap-1343.gif">
+<BR>
+&nbsp;</UL>
+<P>
+<A NAME="50422207_pgfId-287701"></A>The point is supplied first, followed by the u derivatives in order, and ending with the derivative of order <EM>
+udegree</EM> in u, <EM>
+vdegree</EM> in v.</P>
+
+
+<H3>
+<A NAME="50422207_pgfId-287704"></A>	B.5.4 	<A NAME="50422207_marker-287702"></A><A NAME="50422207_marker-287703"></A>Bezier surfaces </H3>
+<P>
+<A NAME="50422207_pgfId-287705"></A>The definition of a single patch of a Bezier surface of order <EM>
+(udegree+1)</EM> in parameter u, <EM>
+(vdegree+1)</EM> in parameter v, requires a grid of <EM>
+(udegree+1)*(vdegree+1)</EM> vertices, with a weight associated with each vertex. The equation of the patch is:</P>
+<P>
+<A NAME="50422207_pgfId-287709"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1344.gif">
+
+<P>
+<A NAME="50422207_pgfId-287710"></A>where:</P>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287711"></A>nu = udegree</LI>
+<LI>
+<A NAME="50422207_pgfId-287712"></A>nv = vdegree</LI>
+<LI>
+<A NAME="50422207_pgfId-287716"></A></LI>
+<IMG SRC="../graphics/fd_chap-1345.gif">
+ are the Bezier vertices</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287720"></A></LI>
+<IMG SRC="../graphics/fd_chap-1346.gif">
+ are the weights</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287724"></A></LI>
+<IMG SRC="../graphics/fd_chap-1347.gif">
+ are the Bezier coefficients, defined as they were for Bezier curves</UL>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287725"></A>the parameters u and v are restricted to the unit square [0,1] X [0,1]</LI>
+</UL>
+<P>
+<A NAME="50422207_pgfId-287726"></A>For the rational form the Bezier vertices and weights are supplied as follows:</P>
+<P>
+<A NAME="50422207_pgfId-287736"></A><IMG SRC="../graphics/fd_chap-1348.gif">
+<IMG SRC="../graphics/fd_chap-1349.gif">
+<IMG SRC="../graphics/fd_chap-1350.gif">
+<IMG SRC="../graphics/fd_chap-1351.gif">
+<IMG SRC="../graphics/fd_chap-1352.gif">
+&nbsp;</P>
+<P>
+<A NAME="50422207_pgfId-287743"></A>&nbsp;</P>
+<P>
+<A NAME="50422207_pgfId-287744"></A>For the non-rational form, the w’s are omitted.</P>
+<P>
+<A NAME="50422207_pgfId-287745"></A>By setting u=0, you obtain</P>
+<P>
+<A NAME="50422207_pgfId-287749"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1353.gif">
+
+<P>
+<A NAME="50422207_pgfId-287750"></A>which is the equation for the Bezier curve segment on the weights and vertices with suffix i=0. Similar results hold for the other boundaries. Thus the surface patch is bounded by the Bezier curve segments (or indeed the interior ones), except for the corner ones.</P>
+<P>
+<A NAME="50422207_pgfId-287751"></A>The patch obeys a convex hull property: it is inside the convex hull of its Bezier vertices.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422207_pgfId-287752"></A>B.6	References 
+
+
+</H1>
+<UL>
+<LI>
+<A NAME="50422207_pgfId-287756"></A><A NAME="50422207_marker-287753"></A><A NAME="50422207_marker-287754"></A><A NAME="50422207_marker-287755"></A>de BOOR, Carl. 1978. A Practical Guide to Splines. Springer Verlag.</LI>
+<LI>
+<A NAME="50422207_pgfId-287757"></A>GORDON, William J., and RIESENFELD, Richard F. 1974. B-spline Curves and Surfaces in Computer Aided Geometric Design, ed. Robert E. Barnhill and Richard F. Riesenfeld. Academic Press.</LI>
+<LI>
+<A NAME="50422207_pgfId-287758"></A>FAUX I.D., and PRATT, M.J., 1979. Computational Geometry for Design and Manufacture. Ellis Horwood.</LI>
+<LI>
+<A NAME="50422207_pgfId-287759"></A>FARIN, Gerald, 1991. NURBS for Curve and Surface Design</LI>
+<LI>
+<A NAME="50422207_pgfId-287760"></A>FARIN, Gerald E., 1987. Geometric Modeling: Algorithms and New Trends</LI>
+</UL>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.123.html">System Attribute Definitions</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.125.html">How the C# Binding is Implemented</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,577 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Replacing The Surfaces Of Faces</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Replacing The Surfaces Of Faces</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.065.html">Identifying And Simplifying Model Details</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.067.html">Face Tapering</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-294751">65.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-294756">65.1.1	Tweaking a single face </A>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-296204">65.1.2	Tweaking a list of faces </A>
+</UL>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-296587">65.2	Merging adjacent faces </A>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-296837">65.3	Using variational surfaces to improve regeneration of smooth geometry </A>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-296905">65.4	Shared geometry after replacing surfaces </A>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-297132">65.5	Controlling edge geometry </A>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-297205">65.6	Controlling topology adjustment </A>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-297210">65.7	Why replacing surfaces can fail </A>
+<LI> <A HREF="fd_chap.066.html#50422141_pgfId-298593">65.8	Update control</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422141_pgfId-294751"></A>65.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422141_pgfId-294753"></A><A NAME="50422141_marker-294752"></A><A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> tweaks the surfaces of selected faces, by deleting and replacing the existing surfaces with a new list of surfaces which you have created. The list of faces can consist of one or more faces. This function only works on solid bodies, sheet bodies, and non-manifold bodies whose faces are locally manifold. It does not work on faces with no surface geometry. </P>
+<P>
+<A NAME="50422141_pgfId-438228"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422141_pgfId-413703"></A>Note: This functionality offers partial support for facet geometry. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for information on what options are supported.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422141_pgfId-383871"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-383694"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422141_pgfId-383672"></A><A HREF="fd_chap.073.html#50422148_">Chapter 72, “Generic Face Editing”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422141_pgfId-294756"></A>	65.1.1 	<A NAME="50422141_marker-294754"></A><A NAME="50422141_marker-294755"></A>Tweaking a single face </H3>
+<P>
+<A NAME="50422141_pgfId-294757"></A>You can use <A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> to change the diameter of a hole, as in the following example:</P>
+<P>
+<A NAME="50422141_pgfId-322922"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-742.gif">
+
+<P>
+<A NAME="50422141_pgfId-296200"></A>Figure 65-1 Tweaking a single face</P>
+
+
+<H3>
+<A NAME="50422141_pgfId-296204"></A>	65.1.2 	<A NAME="50422141_marker-296201"></A><A NAME="50422141_marker-296202"></A><A NAME="50422141_marker-296203"></A>Tweaking a list of faces </H3>
+<P>
+<A NAME="50422141_pgfId-296205"></A>You can use <A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> to change the top (planar) face of a cylinder to a sphere and change its cylindrical face to a truncated cone, in the same operation.</P>
+<P>
+<A NAME="50422141_pgfId-323774"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-743.gif">
+
+<P>
+<A NAME="50422141_pgfId-296582"></A>Figure 65-2 Tweaking a list of faces</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422141_pgfId-296587"></A>65.2	<A NAME="50422141_70995"></A><A NAME="50422141_marker-296584"></A><A NAME="50422141_marker-296585"></A><A NAME="50422141_marker-296586"></A>Merging adjacent faces 
+
+
+</H1>
+<P>
+<A NAME="50422141_pgfId-296588"></A>Sometimes, replacing the surfaces of selected faces means that adjacent faces that were previously not mergeable can now be merged. You can control whether or not such merging is performed using the <CODE>
+merge</CODE>
+ option (<A HREF=../headers/pk_replace_merge_t.html>PK_replace_merge_t</A>) in <A HREF=../headers/pk_face_replace_surfs_o_t.html>PK_FACE_replace_surfs_o_t</A>. This option can take the following values:</P>
+<P>
+<A NAME="50422141_pgfId-296612"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296591"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296593"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296595"></A><A HREF=../headers/pk_replace_merge_t.html>PK_replace_merge_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296597"></A>Do not merge any adjacent faces that become mergeable. This is the default.</P>
+<ADDRESS>
+<A NAME="50422141_pgfId-296598"></A>Note: Merging may still occur if healing is necessary to ensure integrity of the final part. </ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296600"></A><A HREF=../headers/pk_replace_merge_t.html>PK_replace_merge_in_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296602"></A>If adjacent faces become mergeable, merge them only if they were supplied in the original function call.</P>
+<P>
+<A NAME="50422141_pgfId-296603"></A>Vertices on the boundary of a merged face are merged if possible, though additional faces are not merged in order to achieve this.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296605"></A><A HREF=../headers/pk_replace_merge_t.html>PK_replace_merge_out_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296607"></A>Merge adjacent faces that become mergeable if the faces either:</P>
+<UL>
+<LI>
+<A NAME="50422141_pgfId-296608"></A>were supplied in the original function call</LI>
+<LI>
+<A NAME="50422141_pgfId-296609"></A>share a common edge with a face supplied in the original function call</LI>
+</UL>
+<P>
+<A NAME="50422141_pgfId-296610"></A>Vertices on the boundary of a merged face are merged if possible, though additional faces are not merged in order to achieve this.</P>
+<ADDRESS>
+<A NAME="50422141_pgfId-296611"></A>Note: Faces are not merged if they are not in the supplied set of faces, and share only a common vertex with a face in the supplied set of faces </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422141_pgfId-296616"></A>This is illustrated in <A HREF="fd_chap.066.html#50422141_69695"><EM>
+Figure 65-3</EM></A>.</P>
+<P>
+<A NAME="50422141_pgfId-325221"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-744.gif">
+
+<P>
+<A NAME="50422141_pgfId-296831"></A>Figure 65-3 <A NAME="50422141_69695"></A>Merging adjacent faces when replacing surfaces</P>
+<P>
+<A NAME="50422141_pgfId-296834"></A>This functionality is also available in <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. See <A HREF="fd_chap.073.html#50422148_63900">Section 72.4.4, “Replace options”</A>. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422141_pgfId-296837"></A>65.3	<A NAME="50422141_66433"></A>Using variational surfaces to improve regeneration of smooth geometry 
+
+
+</H1>
+<P>
+<A NAME="50422141_pgfId-296838"></A>If some of the replacement surfaces are variations of the original surfaces, then you can use the <CODE>
+variation_data</CODE>
+ option to perform a variational replacement operation.Typical examples of variational replacement operations include deformations and variable offsets.</P>
+<P>
+<A NAME="50422141_pgfId-296839"></A>A replacement surface is a variation of the original surface if both of the following are true:</P>
+<UL>
+<LI>
+<A NAME="50422141_pgfId-296840"></A>Each point on the original surface maps to a point at the same parameters on the replacement surface. </LI>
+<LI>
+<A NAME="50422141_pgfId-296841"></A>Any point where two variational surfaces meet smoothly maps to the same point on either face (to within the specified tolerance).</LI>
+</UL>
+<P>
+<A NAME="50422141_pgfId-296842"></A>If your replacement surfaces are variational surfaces, then you can use the <CODE>
+variation_data</CODE>
+ option to perform a variational replacement operation. Doing this improves regeneration of both nearly smooth edges and vertices, and laminar edges and vertices, in the result body. </P>
+<P>
+<A NAME="50422141_pgfId-296843"></A>The <CODE>
+variation_data</CODE>
+ option contains the following fields:</P>
+<P>
+<A NAME="50422141_pgfId-296857"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296846"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296848"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422141_pgfId-296850"></A>variation</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296852"></A>Whether or not to improve the generation of smooth geometry for variation faces. Default: <A HREF=../headers/pk_replace_variation_t.html>PK_replace_variation_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422141_pgfId-296854"></A>variation_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-296856"></A>A list of the faces whose replacements surfaces are variations of their original surfaces.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422141_pgfId-296861"></A><A HREF="fd_chap.066.html#50422141_61408"><EM>
+Figure 65-4</EM></A> shows a simple example in which both surfaces of the body have been replaced by variational offset surfaces. </P>
+<P>
+<A NAME="50422141_pgfId-296895"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-745.gif">
+
+<P>
+<A NAME="50422141_pgfId-296897"></A>Figure 65-4 <A NAME="50422141_61408"></A>Replacing surfaces with variational surfaces</P>
+<P>
+<A NAME="50422141_pgfId-296900"></A>This functionality is also available in <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. See <A HREF="fd_chap.073.html#50422148_63900">Section 72.4.4, “Replace options”</A>. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422141_pgfId-296905"></A>65.4	<A NAME="50422141_marker-495418"></A><A NAME="50422141_marker-495419"></A><A NAME="50422141_marker-495420"></A>Shared geometry after replacing surfaces 
+
+
+</H1>
+<P>
+<A NAME="50422141_pgfId-296909"></A><A HREF="fd_chap.066.html#50422141_23177"><EM>
+Figure 65-5</EM></A> shows a block with two slots where four faces share a single planar surface. Tweaking one of the four faces that share the top planar surface, independently of the others, results in that face being detached from the original shared surface and therefore given a new surface. The remaining three faces still share the original geometry. The same applies to the shared curves.</P>
+<P>
+<A NAME="50422141_pgfId-325684"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-746.gif">
+
+<P>
+<A NAME="50422141_pgfId-297126"></A>Figure 65-5 <A NAME="50422141_23177"></A>Shared surface after a <A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> operation</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422141_pgfId-297132"></A>65.5	<A NAME="50422141_44824"></A><A NAME="50422141_marker-297128"></A><A NAME="50422141_marker-297129"></A><A NAME="50422141_marker-297130"></A><A NAME="50422141_marker-297131"></A>Controlling edge geometry 
+
+
+</H1>
+<P>
+<A NAME="50422141_pgfId-297133"></A><A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> lets you control the way in which the geometry attached to edges (or fins, if an edge is tolerant) is handled when replacing surfaces. You prevent Parasolid from automatically recalculating the geometry attached to particular edges or fins in a model by supplying replacement curves for those edges. Parasolid also provides additional control over the precise conditions in which these replacement curves are used.</P>
+<P>
+<A NAME="50422141_pgfId-297140"></A>The functionality is provided using the following fields in the <CODE>
+edge_data</CODE>
+ option in <A HREF=../headers/pk_face_replace_surfs_o_t.html>PK_FACE_replace_surfs_o_t</A>:</P>
+<P>
+<A NAME="50422141_pgfId-496505"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297143"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297145"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422141_pgfId-297147"></A>edges</PRE>
+<PRE><A NAME="50422141_pgfId-383609"></A>curves</PRE>
+<PRE><A NAME="50422141_pgfId-383620"></A>tolerances</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297149"></A>An array of edges whose geometry you want to replace, together with:</P>
+<UL>
+<LI>
+<A NAME="50422141_pgfId-297150"></A>An array of curves that forms the required geometry. </LI>
+<LI>
+<A NAME="50422141_pgfId-297151"></A>An array of tolerance values. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422141_pgfId-297153"></A>replace_use</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297158"></A>Determines how Parasolid uses any supplied replacement curves, and under what conditions it attempts to create new curves when the supplied replacements are not satisfactory.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422141_pgfId-495772"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422141_pgfId-495771"></A>Note: If the supplied replacement surfaces are such that the operation will result in smooth, tolerant edges, it is recommended that you supply these edges via the <CODE>
+edge_data</CODE>
+ option. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422141_pgfId-297160"></A>The <CODE>
+edges</CODE>
+, <CODE>
+curves</CODE>
+, and <CODE>
+tolerances</CODE>
+ are complementary arrays containing, respectively, the edges whose geometry you want to control, replacement curves for those edges, and tolerance information for the curves. The three arrays should be the same length. </P>
+<P>
+<A NAME="50422141_pgfId-297161"></A>If any of the supplied <CODE>
+curves</CODE>
+ is PK_ENTITY_null, then any geometry already associated with its edge is used as the replacement curve. This means that you do not have to supply new curves for every edge whose geometry you want to control, and is particularly useful for those edges whose geometry you believe will remain accurate after the call to <A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A>.</P>
+<P>
+<A NAME="50422141_pgfId-297162"></A>The array of <CODE>
+tolerances</CODE>
+ lets you provide specific tolerance information for each replacement curve (whether it is one you have supplied, or whether it is the geometry already associated with the edge). For a replacement curve to be used, it needs to be within the corresponding tolerance of the surfaces on which it lies. If this is not the case, then either the function will fail, or Parasolid will recalculate the geometry of the edge anyway, as if no replacement curve had been specified, depending on the value of <CODE>
+replace_use</CODE>
+.</P>
+<P>
+<A NAME="50422141_pgfId-297166"></A>The <CODE>
+replace_use</CODE>
+ option provides fine control over when the replacement curves (or the original geometry) are used, and takes the following values:</P>
+<P>
+<A NAME="50422141_pgfId-494559"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297169"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297171"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297173"></A><A HREF=../headers/pk_replace_use_t.html>PK_replace_use_attempt_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297175"></A>Use the replacement curve whenever possible. If any curves cannot be used because they are not within tolerance of the replacement surfaces, Parasolid recalculates the curve and uses that.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297180"></A><A HREF=../headers/pk_replace_use_t.html>PK_replace_use_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297182"></A>Only use the replacement curves. If any curves cannot be used because they are not within tolerance of the replacement surfaces, <A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> fails.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297184"></A><A HREF=../headers/pk_replace_use_t.html>PK_replace_use_existing_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422141_pgfId-297186"></A>Provide a combination of the other values:</P>
+<UL>
+<LI>
+<A NAME="50422141_pgfId-297190"></A>If you have supplied a replacement curve, then Parasolid uses it if possible, and recalculates the curve otherwise.</LI>
+<LI>
+<A NAME="50422141_pgfId-297191"></A>If the original geometry is used as the replacement curve, <A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> fails if it cannot be used.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422141_pgfId-297193"></A>If you use PK_ENTITY_null values in the <CODE>
+curves</CODE>
+ array for every edge that you consider to be accurate, and set <CODE>
+replace_use</CODE>
+ to <A HREF=../headers/pk_replace_use_t.html>PK_replace_use_existing_c</A>, Parasolid warns you if any of these “accurate” edges are, in fact, not accurate, while still recalculating the geometry of other edges. This is particularly useful when cleaning up parts that have been imported into Parasolid, for example as a second stage after fixing up some of the geometry of the part.</P>
+<P>
+<A NAME="50422141_pgfId-464261"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422141_pgfId-492758"></A>Note: Edges supplied in <CODE>
+edge_data</CODE>
+ which will be mixed after the operation must have a minimum tolerance of at least 5 times session precision.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422141_pgfId-297205"></A>65.6	<A NAME="50422141_75017"></A><A NAME="50422141_marker-297201"></A><A NAME="50422141_marker-297202"></A><A NAME="50422141_marker-297203"></A><A NAME="50422141_marker-297204"></A>Controlling topology adjustment 
+
+
+</H1>
+<P>
+<A NAME="50422141_pgfId-297206"></A>By default, <A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> adjusts the topology of a part after replacing surfaces to ensure that the part remains locally valid. Usually, this is the behaviour you require. Occasionally, it can be useful to turn off this functionality - for example if you are replacing discrete surfaces as part of a larger clean-up procedure when importing a model from another system. You can do this using the <CODE>
+adjust</CODE>
+ option in <A HREF=../headers/pk_face_replace_surfs_o_t.html>PK_FACE_replace_surfs_o_t</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422141_pgfId-297210"></A>65.7	<A NAME="50422141_marker-297207"></A><A NAME="50422141_marker-297208"></A><A NAME="50422141_marker-297209"></A>Why replacing surfaces can fail 
+
+
+</H1>
+<P>
+<A NAME="50422141_pgfId-297211"></A><A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> allows a wide range of topology changes. However, there are a number it cannot handle. The following attempted operations, illustrated using the previous examples, fail for the reasons explained.</P>
+<P>
+<A NAME="50422141_pgfId-297215"></A>The operation shown in <A HREF="fd_chap.066.html#50422141_56923"><EM>
+Figure 65-6</EM></A> fails because the edges at the top and bottom cannot be recalculated. This is because the cylindrical surface no longer intersects the top/bottom faces.</P>
+<P>
+<A NAME="50422141_pgfId-330649"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-747.gif">
+
+<P>
+<A NAME="50422141_pgfId-298233"></A>Figure 65-6 <A NAME="50422141_56923"></A>Change in topological relationship between top face and hole</P>
+<P>
+<A NAME="50422141_pgfId-331698"></A>The operation shown in <A HREF="fd_chap.066.html#50422141_58806"><EM>
+Figure 65-7</EM></A> fails because the face of the hole has been tweaked to such an amount that it has split the planar faces, thereby creating two solids in the model.</P>
+<P>
+<A NAME="50422141_pgfId-331919"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-748.gif">
+
+<P>
+<A NAME="50422141_pgfId-298428"></A>Figure 65-7 <A NAME="50422141_58806"></A>Topological change - hole splits the planar faces</P>
+<P>
+<A NAME="50422141_pgfId-298432"></A>The operation shown in <A HREF="fd_chap.066.html#50422141_66542"><EM>
+Figure 65-8</EM></A> fails because the tweak that was applied to the cylindrical face would result in the creation of a pointed cone. The edge at the bottom of the cylinder cannot be recalculated since the new surface (cone) does not intersect the bottom (planar) face.</P>
+<P>
+<A NAME="50422141_pgfId-344490"></A>&nbsp;</P>
+<P>
+<A NAME="50422141_pgfId-344583"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-749.gif">
+
+<P>
+<A NAME="50422141_pgfId-344493"></A>Figure 65-8 <A NAME="50422141_66542"></A>Topological change - the bottom planar face has been deleted</P>
+<P>
+<A NAME="50422141_pgfId-298589"></A>To successfully complete the previous three examples you need to use boolean operations.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422141_pgfId-298593"></A>65.8	<A NAME="50422141_19560"></A><A NAME="50422141_marker-298591"></A><A NAME="50422141_marker-298592"></A>Update control
+
+
+</H1>
+<P>
+<A NAME="50422141_pgfId-298594"></A><A HREF=../headers/pk_face_replace_surfs_o_t.html>PK_FACE_replace_surfs_o_t</A> contains an <CODE>
+update</CODE>
+ option to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. <A NAME="50422141_79342"></A></P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.065.html">Identifying And Simplifying Model Details</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.067.html">Face Tapering</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

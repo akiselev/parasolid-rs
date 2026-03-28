@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SURF_make_bsurf_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SURF_make_bsurf_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_SURF_make_bsurf_2
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                   surf,         --- surface
+<A HREF=../headers/pk_uvbox_t.html>PK_UVBOX_t</A>                  uvbox,        --- required parameter bounds of surf
+<A HREF=../headers/pk_surf_make_bsurf_o_t.html>PK_SURF_make_bsurf_o_t</A>     *options,      --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_surf_make_bsurf_t.html>PK_SURF_make_bsurf_t</A> *const status,       --- status
+<A HREF=../headers/pk_bsurf_t.html>PK_BSURF_t</A>           *const bsurf,        --- created BSURF
+double               *const achieved_tol, --- achieved tolerance
+<A HREF=../headers/pk_achieved_cont_t.html>PK_achieved_cont_t</A>   *const achieved_cont --- achieved continuity
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a <B>'bsurf'</B> which is coincident with the given parametric
+<B>'uvbox'</B> of the given <B>'surf'</B>.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_cant_make_bspline      failed to create equivalent geometry
+                                    (MILD)
+    PK_ERROR_bad_uvbox              <B>'uvbox'</B> does not define valid extent
+                                    of <B>'surf'</B> (MILD)
+    PK_ERROR_tolerances_too_tight   <B>'tolerance'</B> is too tight (MILD)
+    PK_ERROR_bad_tolerance          <B>'tolerance'</B> is less than session precision
+                                    (MILD)
+
+<A NAME="documentation"></A>
+The created <B>'bsurf'</B> will be exactly coincident with the given <B>'surf'</B> if
+possible.  Where this is not possible, the maximum distance between <B>'surf'</B> and
+<B>'bsurf'</B> will be limited by <B>'tolerance'</B>.  The function will usually achieve this
+condition but this is not guaranteed.
+
+Representations of planes and the rational forms of cylinders, cones, spheres
+and tori are exact. When the representation of a bsurf is changed it will, in
+general, only be exact when the order is not decreased and when a rational
+<B>'surf'</B> is not represented as a non-rational <B>'bsurf'</B>.
+
+The returned argument <B>'status'</B> is set to PK_SURF_make_bsurf_exact_c if the
+<B>'bsurf'</B> is exact. Otherwise it will be set to PK_SURF_make_bsurf_approx_c if
+the resultant <B>'bsurf'</B> has been made within the supplied <B>'tolerance'</B>, or
+PK_SURF_make_bsurf_loose_c if the resultant <B>'bsurf'</B> deviates by more than
+<B>'tolerance'</B>. If the <B>'status'</B> is PK_SURF_make_bsurf_loose_c, then
+<B>'achieved_tol'</B> will be set to an upper bound for the maximum distance between
+<B>'surf'</B> and <B>'bsurf'</B>. Otherwise <B>'achieved_tol'</B> should be ignored.
+
+If the function is unable to approximate the <B>'surf'</B> because the <B>'tolerance'</B> is
+too small, then the function will fail with the error
+PK_ERROR_tolerances_too_tight. A looser tolerance may allow the function to
+succeed.
+
+If <B>'force_cubic'</B> is set to PK_LOGICAL_true, then the resulting <B>'bsurf'</B> is
+forced to be cubic.  If <B>'force_non_rational'</B> is set to PK_LOGICAL_true, then
+the resulting <B>'bsurf'</B> is forced to be non-rational.
+
+The options <B>'force_continuity'</B> and <B>'continuity'</B> control the continuity and
+periodicity of the resultant <B>'bsurf'</B>:
+  o If <B>'force_continuity'</B> is set to <A HREF=../headers/pk_force_continuity_t.html>PK_force_continuity_no_c</A>, then no
+    restrictions are placed on the continuity of the resultant <B>'bsurf'</B>.
+  o If <B>'force_continuity'</B> is set to <A HREF=../headers/pk_force_continuity_t.html>PK_force_continuity_prefer_c</A>, the resultant
+    <B>'bsurf'</B> will have the level of continuity specified by <B>'continuity'</B> if
+    possible. Otherwise, the function may return a surface with a lower level
+    of continuity.
+  o If <B>'force_continuity'</B> is set to <A HREF=../headers/pk_force_continuity_t.html>PK_force_continuity_yes_c</A>, the resultant
+    <B>'bsurf'</B> will have the level of continuity specified by <B>'continuity'</B>. If
+    this is not possible, the function will fail.
+
+If <B>'force_continuity'</B> is set to <A HREF=../headers/pk_force_continuity_t.html>PK_force_continuity_prefer_c</A>, then the
+returned argument <B>'achieved_cont'</B> will indicate whether the preferred
+continuity has been achieved. For other values of <B>'force_continuity'</B>,
+<B>'achieved_cont'</B> will always be set to <A HREF=../headers/pk_achieved_cont_t.html>PK_achieved_cont_yes_c</A>.
+
+Click <A HREF="../chapters/fd_chap.019.html#50434376_pgfId-298221">here</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

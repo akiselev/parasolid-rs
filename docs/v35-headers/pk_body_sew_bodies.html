@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_sew_bodies</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_sew_bodies</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_BODY_sew_bodies
+(
+<I>--- received arguments ---
+</I>int                              n_bodies,        --- number of bodies to sew
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                  bodies[],        --- bodies to sew
+double                           gap_width_bound, --- upper bound on gap width
+const <A HREF=../headers/pk_body_sew_bodies_o_t.html>PK_BODY_sew_bodies_o_t</A>    *options,         --- options on sewing [PF]
+
+<I>--- returned arguments ---
+</I>int                       *const n_sewn_bodies,   --- number of sewn bodies
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                **const sewn_bodies,     --- bodies produced by sewing
+int                       *const n_unsewn_bodies, --- number of input bodies
+                                                  --- not sewn
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                **const unsewn_bodies,   --- input bodies not sewn
+int                       *const n_problem_groups,--- number of problem
+                                                  --- edge groups
+<A HREF=../headers/pk_body_problem_group_t.html>PK_BODY_problem_group_t</A>  **const problem_groups   --- problem edge groups
+)
+</B>
+<A NAME="description"></A>
+<I>This function attempts to sew the received bodies together where they have
+edges common to within a given tolerance upper bound.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_value              No bodies provided for sewing. (MILD)
+
+    PK_ERROR_bodies_dont_knit       No coincident edges could be found. (MILD)
+
+    PK_ERROR_duplicate_array_item   One of the bodies supplied is duplicated.
+                                    (MILD)
+
+    PK_ERROR_sewing_failed          The sewing algorithm produced an internal
+                                    error that forced early termination of the
+                                    operation. (SERIOUS)
+
+    PK_ERROR_instanced_body         One of the input bodies is instanced
+                                    by a Parasolid Assembly. (MILD)
+
+    PK_ERROR_unsuitable_topology    One of the bodies supplied is unsuitable.
+                                    (MILD)
+
+    PK_ERROR_bad_edge               One of the bodies supplied has an invalid
+                                    laminar edge. (MILD)
+
+
+<A NAME="documentation"></A>
+For more details on sheet sewing, see <A HREF="../chapters/fd_chap.047.html#50434407_pgfId-294727">here</A>.
+
+PK_BODY_sew_bodies sews a collection of sheet bodies presented in the array
+<B>'bodies'</B>. The sheets are sewn together by glueing them where their edges
+'meet'. The notion of 'meeting' is governed by the received parameter
+<B>'gap_width_bound'</B>.  This parameter sets an upper limit on the admissible
+deviation between edges of sheets, where they overlap, such that
+PK_BODY_sew_bodies will attempt to sew. If these deviations exceed
+<B>'gap_width_bound'</B>, there will be no attempt to sew the sheets together at
+those edges.
+
+Sewing proceeds by picking the first body in the <B>'bodies'</B> array and finding all
+other sheet bodies that can be glued, either directly or indirectly, onto it.
+This collection of bodies is merged into a single connected result body. The
+connectivity is achieved through fusing together all pairs of edges that were
+found to be close enough to each other. Subject to options ( discussed below ),
+this process will be repeated on another target picked from those bodies not
+involved in the sewing so far. Sewing will complete once no more bodies are
+available to be selected as a target.
+
+Sewing by default makes a single attempt to sew sheets as described in the
+previous paragraph. During this attempt it uses the specified value of
+<B>'gap_width_bound'</B> to determine which edges are close and which are not.
+
+It is possible to request that sewing make repeated attempts to sew the sheets
+together. This is achieved by setting the option field <B>'number_of_iterations'</B>
+to a value greater than 1.  Each iteration will be performed on all the sheets,
+sewn or not, returned by the previous sewing attempt.
+
+When iterating, an array of gap width bounds may be supplied in the option
+field <B>'iteration_bounds'</B> where it is desired that sewing iterate over specific
+values for the gap width bound. If <B>'iteration_bounds'</B> are supplied, the value
+set for the <B>'gap_width_bound'</B> argument is ignored. The array is expected to
+hold one value of gap width bound for each iteration. Sewing will be attempted
+using the bounds in the order in which they are provided. Alternatively the
+<B>'iteration_bounds'</B> field may be set to NULL. PK_BODY_sew_bodies will in this
+case generate an ascending sequence of gap width bounds to iterate over,
+terminating in the value given in the argument <B>'gap_width_bound'</B>. Where the
+bounds are to be automatically selected, then the value of <B>'gap_width_bound'</B>
+must exceed 1.0e-7 to give the iteration some room for maneouvre. If the value
+offered is too small, then sewing will return the error
+PK_ERROR_bad_iteration_bound. For more information on incremental sewing using
+different gap-width-bound values, see <A HREF="../chapters/fd_chap.047.html#50434407_pgfId-296314">here</A>.
+
+The return arguments of the procedure hold the results of the sewing operation
+and some information on what could not be sewn and why. The successful element
+of the sewing operation is reflected in the array <B>'sewn_bodies'</B>. This array
+holds all of the bodies produced by sewing at least two of the received sheets
+together.
+
+Any of the <B>'bodies'</B> that have not had another received sheet body sewn onto
+them will be returned in <B>'unsewn_bodies'</B>, despite not having been sewn to
+another body these bodies may still have been modified. The <B>'problem_groups'</B> is
+an array of structures of type <A HREF=../headers/pk_body_problem_group_t.html>PK_BODY_problem_group_t</A> which contains an array
+of edges associated with a single problem found during sewing, and a token of
+type <A HREF=../headers/pk_body_sewing_problem_t.html>PK_BODY_sewing_problem_t</A> indicating the type of problem. Note that
+PK_BODY_sewing_non_manifold_c and PK_BODY_sewing_non_oriented_c are only
+returned where the options set are inconsistent with a result possessing either
+property. See <A HREF="../chapters/fd_chap.047.html#50434407_pgfId-418988">here</A> for more information.
+
+An input body that has no laminar boundary will have its body type changed to
+satisfy the preference specified in the <B>'preferred_body_type'</B> option where
+this is appropriate and will be returned in <B>'sewn_bodies'</B>.
+
+The content of the returned arguments, and some potential properties of the
+returned sewn bodies are limited by the options available in the received
+options structure. Documentation of these options is available in that provided
+on <A HREF=../headers/pk_body_sew_bodies_o_t.html>PK_BODY_sew_bodies_o_t</A>.
+
+Note that face-face checks are not performed on the resultant sewn body for
+performance reasons, so it is possible that even if this function returns
+success, a sewn body may have PK_FACE_state_bad_face_face_c check faults.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

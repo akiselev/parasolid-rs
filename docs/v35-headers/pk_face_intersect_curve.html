@@ -1,0 +1,204 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_intersect_curve</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_intersect_curve</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>           PK_FACE_intersect_curve
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                 face,           --- face
+<A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                curve,          --- curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>             bounds,         --- bounds of curve
+
+<I>--- returned arguments ---
+</I>int                *const n_vectors,      --- number of intersections
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>       **const vectors,        --- positions of intersections
+<A HREF=../headers/pk_uv_t.html>PK_UV_t</A>           **const uvs,            --- parameters on face's surface
+double            **const ts,             --- parameters on curve
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>        **const topols,         --- topological entities intersected
+<A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_t</A> **const types           --- types of intersections
+)
+</B>
+<A NAME="description"></A>
+<I>PK_FACE_intersect_curve finds the intersections between a face and the
+specified region of a curve.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_missing_geom              missing geometry
+    PK_ERROR_invalid_geometry          invalid geometry
+    PK_ERROR_not_on_curve              given parameters not on curves
+    PK_ERROR_bad_end_points            bad end points
+    PK_ERROR_bad_parameter             bad parameter given
+    PK_ERROR_cant_do_intersect         intersection cannot be done
+
+<A NAME="documentation"></A>
+
+
+
+PK_FACE_intersect_curve finds the intersections between a bounded curve
+and a face. It returns an array of intersection vectors <B>'vectors'</B>,
+an array of the face's surface parameters <B>'uvs'</B> and an array of curve
+parameters <B>'ts'</B>, it also returns an array of intersection types <B>'types'</B>.
+If the bounded curve passes through an edge or vertex of the
+face the tag of the appropriate entity is also returned in <B>'topols'</B>.
+If the bounded curve does not intersect the face, no tag information is
+returned, but is deemed to be a successful operation.
+
+The intersections are ordered along the bounded curve, and are classified
+according to the direction of the curve.
+
+The part of the curve to be intersected with the face is specified by
+giving the parametric interval in <B>'bounds'</B>.
+
+
+
+The intersection coordinates are returned in an array <B>'vectors'</B>; if
+there are no intersections of the curve and face within the interval of
+the curve bounded by <B>'interval'</B>, a null array is returned.
+If 'n_vectors' intersections are found the list <B>'ts'</B> contains <B>'n_vectors'</B>
+corresponding curve parameters and 'uvs' contains the corresponding
+u,v pairs of surface parameters. The curve and surface parametrisations are
+defined in the documentation of <A HREF=../headers/pk_curve_ask_param.html>PK_CURVE_ask_param</A> and <A HREF=../headers/pk_surf_ask_params.html>PK_SURF_ask_params</A>.
+
+Any edges or vertices intersected by the curve are returned in an array
+(<B>'topols'</B>) of length <B>'n_vectors'</B>.
+
+The intersection types are returned in an array (<B>'types'</B>) of length
+<B>'n_vectors'</B>. There are two codes for points of intersection when
+the curve and the surface of the face intersect in a single point
+and eleven codes for intersections where all or part of the
+curve lies in the surface.
+
+
+
+
+
+    Single point intersections between bounded curve and surface of face:
+
+  Type                     |  Possible entry   | Description
+                           |  in <B>'topols'</B>      |
+ __________________________|___________________|___________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_simple_c</A>  | Edge or Vertex    | The curve passes through
+                           | or PK_ENTITY_null | the surface of the face
+ __________________________|___________________|___________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_tangent_c</A> | Edge or Vertex    | The curve touches the
+                           | or PK_ENTITY_null | surface of the face
+                           |                   | but does not pass through
+                           |                   | the surface.
+
+
+
+
+    Intersections with the bounded curve lying in the surface of the face:
+
+  Type                         |  Possible entry  | Description
+                               |  in <B>'topols'</B>     |
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_out_in_c</A>      | Edge or Vertex   | The curve passes from
+                               |                  | being outside the face
+                               |                  | to being in its interior.
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_in_out_c</A>      | Edge or Vertex   | The curve passes from
+                               |                  | being in the interior
+                               |                  | of the face to being
+                               |                  | outside the face.
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_out_coi_c</A>     | Vertex           | The curve passes from
+                               |                  | being outside the face
+                               |                  | to a region of coincidence
+                               |                  | with its boundary
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_coi_out_c</A>     | Vertex           | The curve passes from
+                               |                  | a region of coincidence
+                               |                  | with the boundary of the
+                               |                  | face to being outside
+                               |                  | the face.
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_coi_in_c</A>      | Vertex           | The curve passes from a
+                               |                  | region of coincidence with
+                               |                  | the boundary of the face
+                               |                  | to being in the interior
+                               |                  |  of the face.
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_in_coi_c</A>      | Vertex           | The curve passes from
+                               |                  | being in the interior
+                               |                  | of the face to a region
+                               |                  | of coincidence with
+                               |                  | the boundary of the face.
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_in_tangent_c</A>  | Edge or Vertex   | The curve is tangent to
+                               |                  | the inside of an
+                               |                  | edge or passes through
+                               |                  | a vertex but remains
+                               |                  | inside the face.
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_out_tangent_c</A> | Edge or Vertex   | The curve is tangent to
+                               |                  | the outside of an
+                               |                  | edge or passes through
+                               |                  | a vertex but remains
+                               |                  | outside the face.
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_in_c</A>          | Edge or Vertex   | The start or end of
+                               | or PK_ENTITY_null| the curve is inside
+                               |                  | the face or lies on
+                               |                  | its boundary.
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_start_c</A>       | Edge or Vertex   | The curve enters the
+                               | or PK_ENTITY_null| face at the start of a
+                               |                  | region of coincidence
+                               |                  | with the surface.
+ ______________________________|__________________|____________________________
+ <A HREF=../headers/pk_intersect_fc_t.html>PK_intersect_fc_end_c</A>         | Edge or Vertex   | The curve leaves the
+                               | or PK_ENTITY_null| face at the end of a
+                               |                  | region of coincidence
+                               |                  | with the surface.
+
+
+
+Whether the curve enters or leaves the face is determined by the direction
+of the curve, <B>'curve'</B>.
+
+
+
+Any B-curve must be capable of passing the full checks imposed by
+<A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

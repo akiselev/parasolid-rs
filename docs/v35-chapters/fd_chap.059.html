@@ -1,0 +1,1216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Offsetting</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Offsetting</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.058.html">Introduction To Offsetting Operations</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.060.html">Hollowing</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-294719">58.1	Introduction </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-294781">58.2	Basic usage of offsetting functionality </A>
+<UL>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-294888">58.2.1	Deciding which offset function to use </A>
+</UL>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-294907">58.3	Removing self-intersections </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-295331">58.4	Dealing with degenerate faces </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-295386">58.5	Creating offset steps </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-516440">58.6	Controlling trimming during offset operations </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-295747">58.7	Tracking the deletion of partially tight-curved faces </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-295759">58.8	Creating blends from offset edges </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-295855">58.9	Controlling the growth of overflowing faces </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-295902">58.10	Constraining edge and vertex tolerance when offsetting </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-295941">58.11	Changes to topology and geometry </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-324131">58.12	Offsetting edges on a body </A>
+<UL>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-624939">58.12.1	Filling the gaps between offset edges </A>
+<LI> <A HREF="fd_chap.059.html#50422133_pgfId-380718">58.12.2	Update control </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-294719"></A>58.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-294720"></A>Offsetting, hollowing and thickening are related modeling operations in common use in CAD/CAM systems. </P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-294721"></A>Offsetting is the process of creating new faces from existing faces, where new faces are offset from the originals by a specific distance at every point.</LI>
+<LI>
+<A NAME="50422133_pgfId-294722"></A>Hollowing is the process of offsetting all (or most of) the faces in a body, and creating solid and void regions appropriately so as to create a hollowed version of the original body.</LI>
+<LI>
+<A NAME="50422133_pgfId-294723"></A>Thickening is the process of offsetting all the faces in a sheet body in order to create a solid body of a specified thickness. </LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-294724"></A>These operations are used to model, for example, objects for injection molding or casting, or thin walled aerodynamic parts.</P>
+<P>
+<A NAME="50422133_pgfId-294728"></A>Parasolid provides interfaces that let you hollow and thicken bodies in one function call; Parasolid offsets all the required faces by the specified distance automatically, rather than requiring you to specify each offset face individually. However, in addition, you have direct access to the offsetting functionality that is fundamental to hollowing and thickening operations, for your own purposes. <A HREF="fd_chap.059.html#50422133_66214"><EM>
+Figure 58-1</EM></A> shows a simple example in which a chain of faces have been offset in a body in order to create a new set of faces. </P>
+<P>
+<A NAME="50422133_pgfId-294768"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-636.gif">
+
+<P>
+<A NAME="50422133_pgfId-294770"></A>Figure 58-1 <A NAME="50422133_66214"></A>Offsetting faces in a body</P>
+<P>
+<A NAME="50422133_pgfId-294773"></A>This chapter describes the offsetting functionality that is available. </P>
+<P>
+<A NAME="50422133_pgfId-417079"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422133_pgfId-417092"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-413899"></A>For examples of these functionalities, see the code examples in the <CODE>
+C++\Code Examples\Modelling\LOP\Hollow</CODE>
+ <CODE>
+Offset</CODE>
+ <CODE>
+Thicken</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422133_pgfId-405646"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-405171"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-405156"></A><A HREF="fd_chap.060.html#50422134_22949">Chapter 59, “Hollowing”</A></LI>
+<LI>
+<A NAME="50422133_pgfId-405226"></A><A HREF="fd_chap.061.html#50422135_34338">Chapter 60, “Thickening”</A></LI>
+<LI>
+<A NAME="50422133_pgfId-405249"></A><A HREF="fd_chap.073.html#50422148_">Chapter 72, “Generic Face Editing”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-294781"></A>58.2	Basic usage of offsetting functionality 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-294783"></A>You can offset all of the faces in a body by using <A NAME="50422133_marker-294782"></A><A HREF=../headers/pk_body_offset_2.html>PK_BODY_offset_2</A>. This function receives a <CODE>
+body</CODE>
+ and offsets all the faces in that body by the specified <CODE>
+offset</CODE>
+. The offset distance can be positive or negative:</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-294784"></A>A positive distance offsets in the direction of the face normal, creating a slightly larger body.</LI>
+<LI>
+<A NAME="50422133_pgfId-294785"></A>A negative distance offsets in the opposite direction to the face normal, creating a slightly smaller body.</LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-294786"></A>You can optionally choose to offset a subset of those faces by different distances (including zero) by specifying the <CODE>
+offset_faces</CODE>
+ and <CODE>
+offset_values</CODE>
+ options. </P>
+<P>
+<A NAME="50422133_pgfId-294788"></A>Alternatively, you can offset a specific set of faces in a body using <A NAME="50422133_marker-294787"></A><A HREF=../headers/pk_face_offset_2.html>PK_FACE_offset_2</A>. This function receives a set of <CODE>
+faces</CODE>
+, together with a set of <CODE>
+offsets</CODE>
+, and offsets each face by the corresponding offset. </P>
+<P>
+<A NAME="50422133_pgfId-294789"></A>Both functions allow you to further control the resulting offset body using the following options:</P>
+<P>
+<A NAME="50422133_pgfId-294793"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422133_pgfId-294792"></A>Note: Most of these options are also available for hollowing and/or thickening operations. This is indicated throughout the rest of this chapter as appropriate.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-294887"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294796"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294798"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294800"></A>allow_disjoint</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294802"></A>Whether to allow the creation of disjoint bodies as part of the operation. Setting this to PK_LOGICAL_true can sometimes produce results that might otherwise fail or give an undesired result. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294804"></A>check_fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294806"></A>Whether to check for face-face inconsistencies. Also available in all hollowing and thickening operations. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294808"></A>offset_method</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294810"></A>Which method to use when removing self-intersections in the resulting body. See <A HREF="fd_chap.059.html#50422133_69049">Section 58.3, “Removing self-intersections”</A>. Also available in all hollowing and thickening operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294815"></A>report_sx</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294822"></A>Whether to report such self-intersections in the Parasolid report. See <A HREF="fd_chap.059.html#50422133_69049">Section 58.3, “Removing self-intersections”</A>. Also available in all hollowing and thickening operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294825"></A>offset_step</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294829"></A>Whether to create side faces, or <STRONG>
+step faces</STRONG>, in the resulting body. See <A HREF="fd_chap.059.html#50422133_31188">Section 58.5, “Creating offset steps”</A>. Also available in all hollowing and thickening operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294832"></A>ortho_vx_split</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294836"></A>How to split laminar vertices when offsetting. See <A HREF="fd_chap.059.html#50422133_47848">Section n, “<A HREF=../headers/pk_face_offset_o_t.html>PK_FACE_offset_o_t</A>”</A>. Also available in thickening operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294839"></A>track_del</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294841"></A>Whether to track partially tightly-curved faces that are deleted when offsetting. See <A HREF="fd_chap.059.html#50422133_65483">Section 58.7, “Tracking the deletion of partially tight-curved faces”</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294846"></A><CODE>fix_degens</CODE>
+</PRE>
+<PRE><A NAME="50422133_pgfId-294847"></A><CODE>report_fix_degens</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294849"></A>Whether to fix degeneracies in the input body prior to offsetting. Whether to report such degeneracies in the Parasolid report. See <A HREF="fd_chap.059.html#50422133_56624">Section 58.4, “Dealing with degenerate faces”</A>. Also available in all hollowing and thickening operations.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294854"></A>blend_edges</PRE>
+<PRE><A NAME="50422133_pgfId-294855"></A>blend_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294857"></A>Whether to create blend faces from edges that are offset, and the radius to use for those blend faces. See <A HREF="fd_chap.059.html#50422133_41359">Section 58.8, “Creating blends from offset edges”</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294862"></A>grow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294864"></A>How to heal models when features of different convexity overflow each other. See <A HREF="fd_chap.059.html#50422133_25126">Section 58.9, “Controlling the growth of overflowing faces”</A>. Also available in all hollowing and thickening operations. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294869"></A>vertex_limit</PRE>
+<PRE><A NAME="50422133_pgfId-294870"></A>edge_limit</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294872"></A>How to constrain the maximum tolerance used by each vertex or edge, as appropriate. See <A HREF="fd_chap.059.html#50422133_55498">Section 58.10, “Constraining edge and vertex tolerance when offsetting”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-294877"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-294879"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422133_pgfId-294886"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422133_pgfId-294888"></A>	58.2.1 	Deciding which offset function to use </H3>
+<P>
+<A NAME="50422133_pgfId-294892"></A>Parasolid provides two offset functions, one that operates on an entire body, and one that operates on specific faces within a body. Both functions provide identical options, including the ability to offset different faces by different amounts, or to choose not to offset a given face at all. So which function should you choose? </P>
+<P>
+<A NAME="50422133_pgfId-294896"></A>These two functions use the same underlying functionality. Both are provided by Parasolid to provide the flexibilty to customise your usage of these in your application as much as possible. For example there are situations where it might be advantageous to use one or the other in your application code. </P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-294897"></A>If you are offsetting most of the faces in a body with a single offset, it is easier to use <A HREF=../headers/pk_body_offset_2.html>PK_BODY_offset_2</A>.</LI>
+<LI>
+<A NAME="50422133_pgfId-294898"></A>If you are offsetting a few faces in a body, or using many different offsets, it is easier to use <A HREF=../headers/pk_face_offset_2.html>PK_FACE_offset_2</A>. </LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-294902"></A>Ultimately, there is no preferred method. Both functions are provided by Parasolid to ensure that you have as much choice as possible.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-294907"></A>58.3	<A NAME="50422133_69049"></A><A NAME="50422133_marker-294904"></A><A NAME="50422133_marker-294905"></A><A NAME="50422133_marker-294906"></A>Removing self-intersections 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-294908"></A>Creating accurate offset surfaces can sometimes introduce self-intersections which can cause problems with the associated offset, hollow, or thicken operation. Parasolid can remove such self-intersections, and heal any resulting holes. If <CODE>
+report_sx</CODE>
+ is set to PK_LOGICAL_true, information regarding the faces that have been repaired to remove self-intersections is saved in the Parasolid report. See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid report mechanism.</P>
+<P>
+<A NAME="50422133_pgfId-294921"></A>Faces whose offsets are completely self-intersecting are healed by intersecting neighboring surfaces. </P>
+<P>
+<A NAME="50422133_pgfId-294922"></A>Faces whose offsets are partially self-intersecting are healed using one of the following methods:</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-294923"></A><STRONG>
+Trim:</STRONG> Self-intersections are removed by trimming the offset surface.</LI>
+<LI>
+<A NAME="50422133_pgfId-294924"></A><STRONG>
+Repair:</STRONG> Any remaining self-intersections are healed by constructing a B-surface patch which covers the hole around the region of self-intersection. </LI>
+<LI>
+<A NAME="50422133_pgfId-294925"></A><STRONG>
+Extend:</STRONG> Any remaining holes are healed by extending and intersecting neighboring surfaces</LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-294929"></A>These solutions are illustrated in <A HREF="fd_chap.059.html#50422133_82540"><EM>
+Figure 58-2</EM></A>. </P>
+<P>
+<A NAME="50422133_pgfId-295296"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-637.gif">
+
+<P>
+<A NAME="50422133_pgfId-295298"></A>Figure 58-2 <A NAME="50422133_82540"></A>Removing self-intersections during offsetting operations</P>
+<P>
+<A NAME="50422133_pgfId-295299"></A>You can control which method is used to remove self-intersections using the <CODE>
+offset_method</CODE>
+ option, which can take the following values:</P>
+<P>
+<A NAME="50422133_pgfId-295317"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295302"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295304"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295306"></A>PK_offset_method_sx_trim_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295308"></A>Self-intersections are removed using the trim and extend methods described.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295310"></A>PK_offset_method_sx_repair_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295312"></A>Self-intersections are removed using the trim, repair, and extend methods described.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295314"></A>PK_offset_method_sx_repair_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295316"></A>Self-intersections are removed using methods similar to PK_offset_method_sx_repair_1_c, but with an extended procedure for patching B-surfaces.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-295323"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422133_pgfId-295320"></A>Note: We recommend you use PK_offset_method_sx_repair_2_c in all hollowing, offsetting, and thickening operations. As well as providing a wider range of possible outcomes, it also offers superior detection of self-intersections.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422133_pgfId-295321"></A>There may be some specific circumstances in which using PK_offset_method_sx_repair_1_c is preferable.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422133_pgfId-295322"></A>PK_offset_method_sx_trim_c should be used when required to retain consistency for legacy data.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-295324"></A>The <CODE>
+offset_method</CODE>
+ field is available in the following options structures:</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-295325"></A><A HREF=../headers/pk_body_hollow_o_t.html>PK_BODY_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295326"></A><A HREF=../headers/pk_body_offset_o_t.html>PK_BODY_offset_o_t</A> </LI>
+<LI>
+<A NAME="50422133_pgfId-295327"></A><A HREF=../headers/pk_body_thicken_o_t.html>PK_BODY_thicken_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295328"></A><A HREF=../headers/pk_face_hollow_o_t.html>PK_FACE_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295329"></A><A HREF=../headers/pk_face_offset_o_t.html>PK_FACE_offset_o_t</A></LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-515981"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422133_pgfId-520421"></A>Note: For offsetting and hollowing facet geometry the method for repairing self-intersections is ignored, because self-intersections are automatically repaired or removed.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-295331"></A>58.4	<A NAME="50422133_56624"></A>Dealing with degenerate faces 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-526124"></A>When you offset a body, you can optionally choose to repair any degeneracies on the surfaces </P>
+<P>
+<A NAME="50422133_pgfId-295332"></A>of the body, using the <CODE>
+fix_degens</CODE>
+ option. This takes the following values:</P>
+<P>
+<A NAME="50422133_pgfId-526129"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295335"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295337"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295339"></A><A HREF=../headers/pk_fix_degens_t.html>PK_fix_degens_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295341"></A>Do not repair any degeneracies in the input body prior to offsetting. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295343"></A><A HREF=../headers/pk_fix_degens_t.html>PK_fix_degens_offset_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295345"></A>Repair degeneracies only on those faces which are offset as part of the operation. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295347"></A><A HREF=../headers/pk_fix_degens_t.html>PK_fix_degens_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295349"></A>Repair degeneracies on faces which are offset as part of the operation and their non-offset pairs. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-516220"></A>In addition, if <CODE>
+report_fix_degens</CODE>
+ is set to PK_LOGICAL_true, then information about any repairs that have been carried out is saved in the Parasolid report. Each individual repair is saved as a record of <CODE>
+type</CODE>
+ <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_1_c</A>, and contains the following information:</P>
+<P>
+<A NAME="50422133_pgfId-295372"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295357"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295359"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-295361"></A>status</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295363"></A>This has the value <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_fa_fix_degens_c</A> if degeneracies have been fixed. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-295365"></A>old_items</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295367"></A>Original faces that were repaired, followed by the original surface. In the case where the original surface was an offset surface, this is followed by the underlying B-surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422133_pgfId-295369"></A>new_items</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295371"></A>The repaired B-surface, followed by the corresponding offset surfaces, followed by the corresponding faces on the resultant offset body.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-295373"></A>No reports of this type are returned if <CODE>
+fix_degens</CODE>
+ is left at its default value, or if no surfaces were repaired during the operation. </P>
+<P>
+<A NAME="50422133_pgfId-295374"></A>The default value of <CODE>
+report_fix_degens</CODE>
+ is PK_LOGICAL_false. </P>
+<P>
+<A NAME="50422133_pgfId-295381"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid report mechanism. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-295386"></A>58.5	<A NAME="50422133_marker-295382"></A><A NAME="50422133_marker-295383"></A><A NAME="50422133_marker-295384"></A><A NAME="50422133_31188"></A>Creating offset steps 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-295387"></A>In some cases, offsetting faces in a body requires the creation of additional side faces perpendicular to the faces being offset, as shown in <A HREF="fd_chap.059.html#50422133_43559"><EM>
+Figure 58-3</EM></A>. This may be necessary either to improve the appearance of the final model, or to successfully offset the faces at all. </P>
+<P>
+<A NAME="50422133_pgfId-295424"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-638.gif">
+
+<P>
+<A NAME="50422133_pgfId-295567"></A>Figure 58-3 <A NAME="50422133_43559"></A>Creating step faces during offsetting</P>
+<P>
+<A NAME="50422133_pgfId-295568"></A>Such side faces are known as offset steps, and they can be created whenever the boundary edge (i.e. the edge between a face being offset and a face that is not offset) is smooth, as shown in <A HREF="fd_chap.059.html#50422133_24163"><EM>
+Figure 58-4</EM></A>. </P>
+<P>
+<A NAME="50422133_pgfId-352704"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-639.gif">
+
+<P>
+<A NAME="50422133_pgfId-295640"></A>Figure 58-4 <A NAME="50422133_24163"></A>Cross-section of body <STRONG>
+(a)</STRONG> before and <STRONG>
+(b)</STRONG> after offsetting using an offset step face</P>
+<P>
+<A NAME="50422133_pgfId-295641"></A>You can create offset steps using the <CODE>
+offset_step</CODE>
+ option, which takes the following values:</P>
+<P>
+<A NAME="50422133_pgfId-295662"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295644"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295646"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295648"></A>PK_offset_step_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295650"></A>Do not create a side face along any smooth boundary edges. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295652"></A>PK_offset_step_all_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295654"></A>Create a side face along any smooth boundary edges. Using this option has no effect on the result if there are no smooth boundary edges. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-479264"></A>PK_offset_step_site_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-479266"></A>Only create side faces along smooth boundary edges if it cannot be done by growing the faces on either end of the boundary edges. Site faces that contain facet geometry will not be grown.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295656"></A>PK_offset_step_pierce_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295658"></A>Only create side faces on smooth boundaries between faces that are being offset and faces that are not. You should use this value if you need to support legacy behaviour that was available in Parasolid v18.0 and earlier. This value has the same effect as PK_offset_step_no_c if all faces are being offset by a non-zero distance. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-295666"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422133_pgfId-295665"></A>Note: Creating step faces at smooth edges splits the end vertices of those edges. You can supply a maximum of two different offset distances (including zero) for the faces that share that vertex. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-481944"></A>The <CODE>
+offset_step</CODE>
+ option offers similar behaviour to the <CODE>
+transform_step</CODE>
+ option in <A HREF=../headers/pk_face_change.html>PK_FACE_change</A>. See <A HREF="fd_chap.073.html#50422148_70554">Section 72.4.3.2, “Creating step faces when performing rotations or translations”</A>, for more information.</P>
+<P>
+<A NAME="50422133_pgfId-295667"></A>Offset steps can be created in all hollowing and thickening operations. The <CODE>
+offset_step</CODE>
+ field is available in the following options structures:</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-295668"></A><A HREF=../headers/pk_body_hollow_o_t.html>PK_BODY_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295669"></A><A HREF=../headers/pk_body_offset_o_t.html>PK_BODY_offset_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295670"></A><A HREF=../headers/pk_body_thicken_o_t.html>PK_BODY_thicken_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295671"></A><A HREF=../headers/pk_face_hollow_o_t.html>PK_FACE_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-516225"></A><A HREF=../headers/pk_face_offset_o_t.html>PK_FACE_offset_o_t</A><A NAME="50422133_47848"></A></LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-516440"></A>58.6	Controlling trimming during offset operations 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-295675"></A>If a laminar vertex needs to be split during an offset operation, you can control whether the split vertex is trimmed back to the laminar edge, or whether the vertex is split orthogonally to the face of the other laminar edge. This can lead to different results in the offset body, as shown in <A HREF="fd_chap.059.html#50422133_45844"><EM>
+Figure 58-5</EM></A>. </P>
+<P>
+<A NAME="50422133_pgfId-295679"></A>To split appropriate vertices orthogonally to the surrounding geometry, set the <CODE>
+ortho_vx_split</CODE>
+ option to PK_LOGICAL_true. </P>
+<P>
+<A NAME="50422133_pgfId-368116"></A>&nbsp;</P>
+<P>
+<A NAME="50422133_pgfId-368124"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-640.gif">
+
+<P>
+<A NAME="50422133_pgfId-295738"></A>Figure 58-5 <A NAME="50422133_45844"></A>Controlling how offset faces are trimmed</P>
+<P>
+<A NAME="50422133_pgfId-295739"></A>As well as offsetting, you can control trimming during thicken operations. The <CODE>
+ortho_vx_split</CODE>
+ option is available for the following functions:</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-295740"></A><A HREF=../headers/pk_body_offset_2.html>PK_BODY_offset_2</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295741"></A><A HREF=../headers/pk_face_offset_2.html>PK_FACE_offset_2</A></LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-295745"></A>See <A HREF="fd_chap.061.html#50422135_99530">Section 60.8, “Controlling triangular side faces”</A>, for details on using this functionality with thickening operations.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-295747"></A>58.7	<A NAME="50422133_65483"></A>Tracking the deletion of partially tight-curved faces 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-295748"></A>When you offset tightly curved faces in a body , they are liable to be deleted: for instance, if you offset a blend face by a distance greater than the blend radius, it will be deleted from the resulting body. For faces that are entirely tightly curved, users of your application will probably expect this behaviour. However, the same behaviour is true of faces that are only partially tightly-curved, and your users may not expect this. </P>
+<P>
+<A NAME="50422133_pgfId-295749"></A>To help mitigate against any undesired results you can choose to track any partially tightly-curved faces that are deleted during offset operations. Doing this makes it easy for your application to identify partially tightly-curved faces when rolling back after an offset operation. </P>
+<P>
+<A NAME="50422133_pgfId-295750"></A>To track partially tightly-curved faces, set <CODE>
+track_del</CODE>
+ to PK_offset_track_del_sx_repair_c. Any faces that are removed from the offset body because they contain tightly-curved regions have a record in the <CODE>
+track_records</CODE>
+ returned by the offset operation, and the <CODE>
+track</CODE>
+ field of that record is set to PK_TOPOL_track_delete_c. </P>
+<P>
+<A NAME="50422133_pgfId-295754"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422133_pgfId-295753"></A>Note: Faces that are removed from the offset body because they are entirely tightly-curved do not have corresponding track records, even when <CODE>
+track_del</CODE>
+ is PK_offset_track_del_sx_repair_c. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-295755"></A>The <CODE>
+track_del</CODE>
+ option is available in the following options structures:</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-295756"></A><A HREF=../headers/pk_body_offset_o_t.html>PK_BODY_offset_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295757"></A><A HREF=../headers/pk_face_offset_o_t.html>PK_FACE_offset_o_t</A></LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-295759"></A>58.8	<A NAME="50422133_41359"></A>Creating blends from offset edges 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-295760"></A>When you offset faces in a body, you can optionally choose to round off the edges between adjacent offset faces during the offset operation. </P>
+<P>
+<A NAME="50422133_pgfId-295761"></A>To do this, offsetting operations provide the <CODE>
+blend_edges</CODE>
+ and <CODE>
+blend_radius</CODE>
+ options to let you replace edges between adjacent offset faces in a body with constant-radius rolling-ball blends. To use this functionality, set <CODE>
+blend_edges</CODE>
+ to PK_EDGE_offset_blend_convex_c and specify a suitable <CODE>
+blend_radius</CODE>
+ value.</P>
+<P>
+<A NAME="50422133_pgfId-295762"></A>When you perform an offset, edges are replaced by blends of the specified radius, subject to the following constraints:</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-295763"></A>The original edge lies between two non-rubber faces.</LI>
+<LI>
+<A NAME="50422133_pgfId-295764"></A>The offset positions of the adjacent faces both lie on the same side of the original sheet (in terms of the face normals). </LI>
+<LI>
+<A NAME="50422133_pgfId-295765"></A>The original edge is convex, when viewed from the side of the adjacent faces on which the offset faces lie. </LI>
+<LI>
+<A NAME="50422133_pgfId-295766"></A>The offset distance of both adjacent faces is the same as the specified <CODE>
+blend_radius</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-295767"></A>Any offset edges in the body that do not satisfy these constraints are offset as normal, and no blend is created. </P>
+<P>
+<A NAME="50422133_pgfId-295771"></A><A HREF="fd_chap.059.html#50422133_93441"><EM>
+Figure 58-6</EM></A> illustrates the second and third of these constraints.</P>
+<P>
+<A NAME="50422133_pgfId-295805"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-641.gif">
+
+<P>
+<A NAME="50422133_pgfId-295807"></A>Figure 58-6 <A NAME="50422133_93441"></A>Constraints for replacing offset edges with blends</P>
+<P>
+<A NAME="50422133_pgfId-295811"></A>An example of this functionality is shown in <A HREF="fd_chap.059.html#50422133_99193"><EM>
+Figure 58-7</EM></A>. </P>
+<P>
+<A NAME="50422133_pgfId-295845"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-642.gif">
+
+<P>
+<A NAME="50422133_pgfId-295847"></A>Figure 58-7 <A NAME="50422133_99193"></A>Creating blends from offset edges</P>
+<P>
+<A NAME="50422133_pgfId-295848"></A>Blends can be created from offset edges in all hollowing and thickening operations. The <CODE>
+blend_edges</CODE>
+ and <CODE>
+blend_radius</CODE>
+ options are available in the following options structures:</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-295849"></A><A HREF=../headers/pk_body_hollow_o_t.html>PK_BODY_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295850"></A><A HREF=../headers/pk_body_offset_o_t.html>PK_BODY_offset_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295851"></A><A HREF=../headers/pk_body_thicken_o_t.html>PK_BODY_thicken_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295852"></A><A HREF=../headers/pk_face_hollow_o_t.html>PK_FACE_hollow_o_t</A></LI>
+<LI>
+<A NAME="50422133_pgfId-295853"></A><A HREF=../headers/pk_face_offset_o_t.html>PK_FACE_offset_o_t</A></LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-582806"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422133_pgfId-582873"></A>Note: The <CODE>
+blend_edges</CODE>
+ value PK_EDGE_offset_blend_convex_c is not supported for mixed edges.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-295855"></A>58.9	<A NAME="50422133_25126"></A>Controlling the growth of overflowing faces 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-295856"></A>When features with different convexities overflow each other as a result of offsetting, you can control which of the clashing features is grown to heal the model using the <CODE>
+grow</CODE>
+ option. </P>
+<P>
+<A NAME="50422133_pgfId-295860"></A><A HREF="fd_chap.059.html#50422133_28250"><EM>
+Figure 58-8</EM></A> shows a simple example of the effects that you can achieve using this functionality. </P>
+<P>
+<A NAME="50422133_pgfId-295894"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-643.gif">
+
+<P>
+<A NAME="50422133_pgfId-295896"></A>Figure 58-8 <A NAME="50422133_28250"></A>Controlling the growth of overflowing features with different convexity</P>
+<P>
+<A NAME="50422133_pgfId-295897"></A>This option is available in a range of different functional areas, including local operations, hollowing, and thickening. For a full description, see <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-295902"></A>58.10	<A NAME="50422133_55498"></A>Constraining edge and vertex tolerance when offsetting 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-295903"></A>Offsetting operations can sometimes produce large tolerances on vertices or edges that exceed both the tolerance specified for the operation and the original model tolerances. You can use the <CODE>
+vertex_limit</CODE>
+ and <CODE>
+edge_limit</CODE>
+ options to control whether or not to allow these large tolerances. </P>
+<P>
+<A NAME="50422133_pgfId-295904"></A>These options take values as shown in the table below. Note that <CODE>
+vertex_limit</CODE>
+ takes values of the form PK_VERTEX_limit and <CODE>
+edge_limit</CODE>
+ takes values of the form PK_EDGE_limit, though the meanings are similar for each option.</P>
+<P>
+<A NAME="50422133_pgfId-295939"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295907"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295909"></A>Description </P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295911"></A>PK_VERTEX_limit_no_c </P>
+<P>
+<A NAME="50422133_pgfId-295912"></A>PK_EDGE_limit_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295914"></A>Do not limit the tolerance applied to vertices or edges during offset operations. This is the default, but may sometimes result in undesirably large tolerances in the result. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295916"></A>PK_VERTEX_limit_report_c </P>
+<P>
+<A NAME="50422133_pgfId-295917"></A>PK_EDGE_limit_report_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295919"></A>Allow any tolerance to be applied to vertices or edges. </P>
+<P>
+<A NAME="50422133_pgfId-295920"></A>In addition, record any vertices or edges for which a large tolerance has been set via the reporting mechanism, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-295921"></A>If a large vertex tolerance has been used, set a status of <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_vx_large_tol_c</A> in the record for that vertex.</LI>
+<LI>
+<A NAME="50422133_pgfId-295922"></A>If a large edge tolerance has been used, set a status of <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_ed_large_tol_c</A> in the record for that edge. </LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-295929"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid reporting mechanism. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295931"></A>PK_VERTEX_limit_yes_c </P>
+<P>
+<A NAME="50422133_pgfId-295932"></A>PK_EDGE_limit_yes_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-295937"></A>Limit the vertex or edge tolerances set by Parasolid and fail the offset operation if these limits are not satisfied. </P>
+<ADDRESS>
+<A NAME="50422133_pgfId-295938"></A>Note: In cases where both PK_EDGE_limit_yes_c and PK_VERTEX_limit_yes_c are set, if the operation fails, then the local status returned is <A HREF=../headers/pk_local_status_t.html>PK_local_status_ed_large_tol_c</A>, even if the operation has also failed due to a vertex tolerance that does not satisfy the limits. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-295941"></A>58.11	<A NAME="50422133_18987"></A>Changes to topology and geometry 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-295945"></A>Parasolid does not allow total freedom of topology changes during offsetting operations, but does support a wide spectrum of permissible changes. These were discussed in <A HREF="fd_chap.063.html#50422138_20330">Section 62.4, “Topology changes”</A>.</P>
+<P>
+<A NAME="50422133_pgfId-295949"></A>When the faces to be offset are from a sheet body, it is possible that a tolerant body is produced from the original exact body, because some edge geometry at the boundary has to be approximated by SP-curves in order to generate the boundary curve. To solve this case, Parasolid approximates the bounding edges with SP-curves to a tolerance that is less than or equal to the tolerance supplied by your application.</P>
+<P>
+<A NAME="50422133_pgfId-295956"></A><A HREF="fd_chap.059.html#50422133_20762"><EM>
+Figure 58-9</EM></A> illustrates a case of offsetting two faces whose underlying geometry is free-form. In this example Parasolid created new edge geometry where the offset surfaces intersected. For outward offsets (positive) this can mean extending the underlying surface(s) so that the offset surfaces meet, as shown.</P>
+<P>
+<A NAME="50422133_pgfId-354130"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-644.gif">
+
+<P>
+<A NAME="50422133_pgfId-296286"></A>Figure 58-9 <A NAME="50422133_20762"></A>Offset surfaces extended</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422133_pgfId-324131"></A>58.12	<A NAME="50422133_48683"></A>Offsetting edges on a body 
+
+
+</H1>
+<P>
+<A NAME="50422133_pgfId-324132"></A>You can use <A HREF=../headers/pk_edge_offset_on_body.html>PK_EDGE_offset_on_body</A> to offset any set of connected edges in a given direction within their owning body. Edges can either be on a manifold body or on a general body so long as the edge to be offset lies in a locally manifold part of the body. <A HREF="fd_chap.059.html#50422133_11115"><EM>
+Figure 58-10</EM></A> shows an example of this. </P>
+<P>
+<A NAME="50422133_pgfId-397081"></A>If the offset operation encounters a non-manifold edge or vertex, the operation will fail with a status of PK_offset_on_body_general_c which lists the non-manifold edges or vertices blocking the operation. </P>
+<P>
+<A NAME="50422133_pgfId-376657"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-645.gif">
+
+<P>
+<A NAME="50422133_pgfId-388097"></A>Figure 58-10 <A NAME="50422133_11115"></A>Offsetting an edge on a locally manifold general body</P>
+<P>
+<A NAME="50422133_pgfId-388270"></A>You can offset both laminar and non-laminar edges, and the resulting offset edges are imprinted on the body. If edges are offset so that they all lie beyond any of the faces in the body, then no edges are imprinted, and a suitable status value is returned. Laminar edges cannot be offset away from the body.</P>
+<P>
+<A NAME="50422133_pgfId-324134"></A>Each point on an edge is offset within its normal plane, and the offset distance is measured by arc-length along the intersection between the body’s faces and this normal plane. The offset can cross sharp edges on the body, and can cope with properties such as holes on the owning body. <A HREF="fd_chap.059.html#50422133_89803"><EM>
+Figure 58-11</EM></A> shows an example where a set of three edges have been offset on a sheet body that contains a hole and a sharp edge, such that the resulting set of four offset edges crosses both the sharp edge and the hole. </P>
+<P>
+<A NAME="50422133_pgfId-324279"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-646.gif">
+
+<P>
+<A NAME="50422133_pgfId-324281"></A>Figure 58-11 <A NAME="50422133_89803"></A>Offsetting edges in a body</P>
+<P>
+<A NAME="50422133_pgfId-541299"></A>For examples of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Offset</CODE>
+ <CODE>
+Surface</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H3>
+<A NAME="50422133_pgfId-624939"></A>	58.12.1 	Filling the gaps between offset edges </H3>
+<P>
+<A NAME="50422133_pgfId-542181"></A>If the offset operation results in gaps between the resultant edges, you can use either the <CODE>
+gap_fill</CODE>
+ option or the <CODE>
+constrained_gap_fill</CODE>
+ option to fill these gaps. Both these options share the following values:</P>
+<P>
+<A NAME="50422133_pgfId-550599"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-542702"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-542704"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-614122"></A>PK_VERTEX_gap_fill_round_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-614116"></A>Fill the gap between the offset curves with a round arc.This is illustrated in <A HREF="fd_chap.059.html#50422133_30671"><EM>
+Figure 58-12</EM></A>. The offset edges are shown in red and the round arcs filling the gap are shown in black.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-620450"></A>PK_VERTEX_gap_fill_linear_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-620452"></A>Fill the gap between the offset curves with a tangent extension. This is illustrated in <A HREF="fd_chap.059.html#50422133_30671"><EM>
+Figure 58-12</EM></A>. The offset edges are shown in red and the tangent extension edges are shown in black.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-620494"></A>PK_VERTEX_gap_fill_natural_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422133_pgfId-620496"></A>Fill the gap between the offset curves with a natural curve extension as illustrated in <A HREF="fd_chap.059.html#50422133_64231"><EM>
+Figure 58-13</EM></A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-550689"></A>You control which of these options to use with the <CODE>
+gap_fill_angle</CODE>
+ option. This option takes a double constraint that defines an angular interval in radians</P>
+<UL>
+<LI>
+<A NAME="50422133_pgfId-551365"></A>If the <A NAME="50422133_50565623_pgfId-294975"></A>angle between the edges to be offset satisfies this constraint, then the <EM>
+constrained_gap_fill</EM> option is used. </LI>
+<LI>
+<A NAME="50422133_pgfId-546367"></A><A NAME="50422133_50565623_pgfId-294976"></A>If the angle between the edges to be offset does not satisfy this constraint, then the <CODE>
+gap_fill</CODE>
+ option is used. </LI>
+</UL>
+<P>
+<A NAME="50422133_pgfId-617258"></A><A NAME="50422133_71670"></A>&nbsp;</P>
+<P>
+<A NAME="50422133_pgfId-617273"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-647.gif">
+
+<P>
+<A NAME="50422133_pgfId-610136"></A>Figure 58-12 <A NAME="50422133_30671"></A>Offsetting non-g1 edges and filling the gaps between the resultant edges using the PK_VERTEX_gap_fill_round_c and PK_VERTEX_gap_fill_linear_c values of the <CODE>
+gap_fill</CODE>
+ option </P>
+<P>
+<A NAME="50422133_pgfId-620844"></A><A NAME="50422133_38748"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-648.gif">
+
+<P>
+<A NAME="50422133_pgfId-620856"></A>Figure 58-13 <A NAME="50422133_64231"></A>Offsetting non-g1 edges and filling the gaps between the resultant edges with the <CODE>
+gap_fill</CODE>
+ option set to PK_VERTEX_gap_fill_natural_c.</P>
+
+
+<H3>
+<A NAME="50422133_pgfId-380718"></A>	58.12.2 	<A NAME="50422133_23503"></A>Update control </H3>
+<P>
+<A NAME="50422133_pgfId-381571"></A>If your application relies on reproducing behaviour when updating models built using earlier versions of Parasolid, you should use the <CODE>
+update</CODE>
+ option in <A HREF=../headers/pk_edge_offset_on_body.html>PK_EDGE_offset_on_body</A> to preserve old behaviour and help eliminate differences in rebuild results. This option lets you disable some offsetting enhancements that have been added at different Parasolid versions. Doing this ensures that offsetting gives the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<P>
+<A NAME="50422133_pgfId-381587"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422133_pgfId-381586"></A>Note: The default value is <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A> which uses all appropriate offsetting enhancements. Setting to a non-default value disables all appropriate offsetting enhancements. See <A HREF="fd_chap.119.html#50422200_54445">Chapter 118, “Update Switches”</A>, for more information on update switches.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422133_pgfId-381561"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.058.html">Introduction To Offsetting Operations</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.060.html">Hollowing</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

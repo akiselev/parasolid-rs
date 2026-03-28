@@ -1,0 +1,111 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_embed_in_surf_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_embed_in_surf_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                   PK_CURVE_embed_in_surf_2
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                        curve,        --- curve
+<A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                         surf,         --- surface
+const <A HREF=../headers/pk_curve_embed_in_surf_o_t.html>PK_CURVE_embed_in_surf_o_t</A> *options,      --- options
+
+<I>--- returned arguments ---
+</I>int                        *const n_spcurves,   --- no. spcurves returned
+<A HREF=../headers/pk_spcurve_t.html>PK_SPCURVE_t</A>              **const spcurves      --- spcurves
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates one or more spcurves by embedding a b-spline
+representation of a specified section of a curve in parameter space
+(or the Z=0 plane) into the parameter space of a given surface.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity  <B>'curve'</B> is not a 2D b-curve or is not a
+                                 3D b-curve or analytic curve lying in Z=0
+                                 plane (MILD)
+    PK_ERROR_bad_combination    <B>'curve'</B> is a line but no 'curve_interval' has
+                                 been specified in the options (MILD).
+    PK_ERROR_bad_interval       <B>'curve_interval'</B> has been specified but the
+                                <B>'curve'</B> cannot be trimmed using it (MILD).
+    PK_ERROR_invalid_geometry   <B>'curve'</B> does not make valid spcurves when
+                                 embedded in <B>'surf'</B> (SERIOUS)
+    PK_ERROR_illegal_degeneracy <B>'curve'</B> has a degeneracy which prevents it
+                                 from being embedded in <B>'surf'</B> to create valid
+                                 spcurves (MILD)
+    PK_ERROR_cant_extend         <B>'curve'</B> lies outside of <B>'surf'</B> in parameter
+                                 space, and the surface cannot be extended far
+                                 enough to include the curve or the curve
+                                 cannot be adjusted to lie within the surface
+                                 (SERIOUS)
+
+<A NAME="documentation"></A>
+The <B>'curve'</B> must be one of:
+
+    1:  a 2D b-curve; that is it must either be a rational b-curve
+        with a vertex dimensionality of 3, or a non-rational b-curve
+        with a vertex dimensionality of 2. 2D b-curves that are not
+        orphans or are not in the same partition as the surface into
+        which it is to be embedded will be copied.
+
+    2:  a 3D b-curve, line, circle or ellipse lying in the Z=0 plane
+        These curves will be converted to a curve satisfying condition
+        1 by contructing the exact 2D b-spline representation of the path
+        followed by their (x,y) components in the Z=0 plane.
+
+The <B>'options'</B> structure may be used to specify a parametric sub-interval of
+the whole curve to embed in the surface. The 'have_curve_interval' field of
+the options structure should be set to PK_LOGICAL_true to indicate that the
+embedding is to be confined to the parametric interval specified in the field
+<B>'curve_interval'</B>. If `have_curve_interval` is set to PK_LOGICAL_false the
+whole of the given <B>'curve'</B> will be embedded in the parameter space of the
+given <B>'surf'</B>.
+
+Note that the supplied <B>'surf'</B> may be extended so that it includes the entire
+area onto which the spcurves reach. In order to avoid modifying the <B>'surf'</B> in
+this way, you must ensure that any spcurve created does not leave the base
+range of the <B>'surf'</B> or specify an appropriate value in the <B>'geom_adjust'</B>
+option.
+
+Each of the resulting curves will satisfy the degeneracy and continuity
+conditions for an spcurve.  See documentation of <A HREF=../headers/pk_spcurve_sf_t.html>PK_SPCURVE_sf_t</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

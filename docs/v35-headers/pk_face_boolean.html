@@ -1,0 +1,218 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_boolean</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_boolean</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>             PK_FACE_boolean
+(
+<I>--- received arguments ---
+</I>int                         n_targets,  --- number of target faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>             targets[],  --- target faces
+int                         n_tools,    --- number of tool faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>             tools[],    --- tool faces
+const <A HREF=../headers/pk_face_boolean_o_t.html>PK_FACE_boolean_o_t</A>  *options,    --- boolean options
+
+<I>--- returned arguments ---
+</I>int                  *const n_bodies,   --- number of resultant bodies
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>           **const bodies      --- resultant bodies
+)
+</B>
+<A NAME="description"></A>
+<I>This function performs a boolean operation between the list of faces
+of a target body and the list of faces of a tool body.
+
+NOTE: This function is deprecated and has been superseded by <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_contradictory_request      Bad combination of options or data for
+                                        type of boolean
+    PK_ERROR_same_tool_and_target       Tool body is also target body
+    PK_ERROR_missing_geom               Target or tool has incomplete
+                                        geometry
+    PK_ERROR_duplicate_tools            Duplication in list of tool faces
+    PK_ERROR_duplicate_targets          Duplication in list of target faces
+    PK_ERROR_instanced_tools            Instanced tool bodies
+    PK_ERROR_targ_faces_many_bodies     Target faces are from more than
+                                        one body
+    PK_ERROR_tool_faces_many_bodies     Tool faces are from more than one body
+    PK_ERROR_unsuitable_topology        A region selector is from boundary,
+                                        wrong body or ambiguous
+    PK_ERROR_cant_unite_solid_sheet     Attempt to unite solid and sheet
+    PK_ERROR_opposed_sheets             Attempt to unite opposed sheets
+    PK_ERROR_cant_intsc_solid_sheet     Cant intersect solid target with
+                                        sheet tool bodies
+    PK_ERROR_t_sheet                    Operation would result in a T-sheet
+    PK_ERROR_non_manifold               Non-manifold result
+    PK_ERROR_boolean_failure            Inconsistent arguments, or
+                                        internal error
+    PK_ERROR_partial_no_intersect       No imprinting in face boolean
+    PK_ERROR_general_body               Target or tool is general body
+    PK_ERROR_invalid_match_region       Invalid matched topology data
+
+
+
+<A NAME="documentation"></A>
+
+
+Introduction
+
+A boolean operation between the target faces and the tool faces is
+performed. The bodies associated with the given faces are actually
+booleaned, the faces are provided as a means to <B>'localising'</B> the
+boolean operation. The target body is modified and the tool body
+is deleted. The resulting body or bodies replace the target, and
+are returned in an array.
+
+A boolean based on faces is faster than a boolean based on bodies as
+it involves the comparison of only the face pairs given in <B>'targets'</B>
+and <B>'tools'</B>. The drawback being that topological consistency in
+the result cannot be guaranteed.
+
+This function operates similarly to the <A HREF=../headers/pk_body_boolean.html>PK_BODY_boolean</A> function,
+especially with regard to the phases of the boolean algorithm,
+rules concerning tag persistence, optimisation issues and error
+reporting.
+
+The effect of the <B>'fence'</B> option is identical to the <B>'fence'</B> option
+used by the <A HREF=../headers/pk_body_boolean.html><A HREF=../headers/pk_body_boolean.html>PK_BODY_boolean</A></A> function. Refer to the <A HREF=../headers/pk_body_boolean.html><A HREF=../headers/pk_body_boolean.html>PK_BODY_boolean</A></A>
+documentation for information about these subjects.
+
+
+Face Booleans
+
+In a <B>'face'</B> boolean, only the edges of intersection of the given faces are
+imprinted, unless the <B>'extend_face_list'</B> or <B>'stop_self_intersection'</B>
+options are set. The loops of imprinted edges divide the boundary of
+both bodies into facesets.
+
+For a <B>'body'</B> boolean all the facesets of the tool bodies lie
+completely inside or outside the target body. However, this is not
+necessarily the case for a <B>'face'</B> boolean, as not all faces of
+both bodies are used to compute the imprinted edges. For a <B>'face'</B> boolean,
+boundary facesets of the tool body are classified inside if they are
+locally inside the target body near a loop of imprinted edges, and
+outside if they are locally outside near the loop of imprinted edges.
+
+o The <B>'extend_face_list'</B> option may be set to ensure that the imprinted
+  loops are complete.
+
+o The <B>'stop_self_intersection'</B> option may be set to eliminate the
+  possibility of self intersecting results.
+
+In a <B>'face'</B> boolean unite, boundary facesets of the tool body which are
+outside the target body are glued to the target. Whilst for subtract and
+intersect operations, only boundary facesets of the tool body
+inside the target body are used.
+
+
+    Select Regions
+    
+    It is also possible for a <B>'face'</B> boolean to use a subset of these
+    boundary facesets in computing the result. The subset of tool faces
+    is specified within the <B>'select_region'</B> options of the boolean
+    options. These faces can be excluded or included by setting the
+    value of the <B>'select_type'</B> option to the appropriate value.
+    
+    The following restrictions are imposed :
+    
+    o All the selected regions are either excluded or included. It is
+      not possible to exclude some faces and include other faces.
+    
+    o The selected regions must be from the tool body.
+    
+    o Each faceset must be unambiguously identified by a face, edge or
+      vertex which is interior to the faceset.
+    
+
+    Help points
+    
+    It may not always be possible to unambiguously specify a faceset
+    with a select region based on a face. This situation may be
+    avoided by being able to specify a point and a face. The point
+    specifying the region of interest within a given face.
+    
+    The help points are passed to this function via the <B>'help_points'</B>
+    array within the <B>'select_region'</B> option structure.
+    
+    The following restrictions apply to help points :
+    
+    o A help point can only be associated with a face.
+    
+    o The help point must lie on the face.
+    
+    o The face/help point combination must uniquely identify a faceset
+      otherwise a PK_ERROR_unsuitable_topology error will be returned.
+    
+
+
+Boolean Restrictions
+
+The following restrictions apply to <B>'face'</B> boolean operations :
+
+o The <B>'targets'</B> argument must contain one or more faces from a single body,
+  and <B>'tools'</B> must contain one or more faces from another body.
+
+o <B>'Face'</B> boolean operations can only be performed with generalised
+  topology disabled.
+
+o There must be at least one intersection between the given topology of
+  the target and tool (i.e. at least 1 face pair must clash). If this
+  is not the case the boolean will not be performed and the error
+  PK_ERROR_partial_no_intersect will be returned.
+
+
+Option Restrictions
+
+The following options within the input <B>'options'</B> are
+ignored by this function :
+    o <B>'check_fa'</B>
+    o <B>'default_tol'</B>
+    o <B>'max_tol'</B>
+
+The following options within <B>'configuration'</B> options are
+ignored by this function :
+
+    o <B>'identical_intersect'</B>
+    o <B>'one_in_all_in'</B>
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

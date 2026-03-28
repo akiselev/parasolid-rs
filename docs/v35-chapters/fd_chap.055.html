@@ -1,0 +1,1507 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Instancing And Patterning </TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Instancing And Patterning </B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.054.html">General Booleans</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.056.html">Sectioning</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-294742">54.1	Introduction </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-294752">54.2	Instancing </A>
+<UL>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-294821">54.2.1	Summary of options </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-295061">54.2.2	Improving the performance of instancing operations </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-298335">54.2.3	Specifying the body type of target and tool </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-298392">54.2.4	Tracking information </A>
+<UL>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-298394">54.2.4.1	PK_FACE_instance_bodies </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-298421">54.2.4.2	PK_FACE_instance_tools </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-298432">54.3	Patterning </A>
+<UL>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-299047">54.3.1	Ensuring new instances are contained within a face </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-299883">54.3.2	Ensuring new instances do not intersect other faces </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-300124">54.3.3	Returning errors when collisions occur </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-300130">54.3.4	Improving performance when new instances lie in the same faces as the original feature </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-300280">54.3.5	General patterning </A>
+<UL>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-300873">54.3.5.1	Instances all lie in the faces of the original feature </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-300881">54.3.5.2	Instances lie in different faces and boundary loops are coincident with their destination faces </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-301022">54.3.5.3	Instances lie in different faces and boundary loops are not coincident with their destination faces </A>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-301946">54.3.5.4	Summary </A>
+</UL>
+<LI> <A HREF="fd_chap.055.html#50422128_pgfId-301971">54.3.6	Recreating blends around patterned instances </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422128_pgfId-294742"></A>54.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422128_pgfId-294743"></A>This chapter explains how you combine a pattern of entities using instancing or patterning (or both) to produce the models you require.</P>
+<P>
+<A NAME="50422128_pgfId-294744"></A>Instancing and patterning are special cases of boolean operations; it is assumed that you are familiar with the behaviour and concepts of booleans as explained in <A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A>.</P>
+<P>
+<A NAME="50422128_pgfId-512191"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-511682"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-511657"></A><A HREF="fd_chap.022.html#50422091_39132">Chapter 21, “Transformations”</A></LI>
+<LI>
+<A NAME="50422128_pgfId-511765"></A><A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422128_pgfId-294752"></A>54.2	<A NAME="50422128_marker-294748"></A><A NAME="50422128_marker-294749"></A><A NAME="50422128_marker-294750"></A><A NAME="50422128_66113"></A>Instancing 
+
+
+</H1>
+<P>
+<A NAME="50422128_pgfId-294755"></A><STRONG>
+Instancing</STRONG><A NAME="50422128_marker-294753"></A><A NAME="50422128_marker-294754"></A> refers to the process of performing a number of boolean operations involving a number of (often) identical tool bodies, e.g. when drilling several holes into a plate. Because of the repetitive nature of each boolean -- only a single boolean function is used, and many of the</P>
+<P>
+<A NAME="50422128_pgfId-679770"></A>tools are identical -- using a dedicated instancing operation often provides better performance than using a series of boolean operations.</P>
+<P>
+<A NAME="50422128_pgfId-680299"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422128_pgfId-679860"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-679828"></A>Parasolid provides the following dedicated functions for performing instancing operations:</P>
+<P>
+<A NAME="50422128_pgfId-294777"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294762"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294764"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294766"></A><A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294768"></A>Create instances of a single tool on a single target body. The tool and target bodies must be solid. </P>
+<P>
+<A NAME="50422128_pgfId-294769"></A>This function takes faces from a single target body, faces from a single tool body, and an array of transforms (either translations or rotations). Each transform determines the position of one instance that is the result of a boolean between the target body and a transformed copy of the given tool. </P>
+<P>
+<A NAME="50422128_pgfId-294770"></A>When using boolean subtraction, the target body must not be fragmented by the operation, and no target face may be split. </P>
+<ADDRESS>
+<A NAME="50422128_pgfId-294771"></A>Note: If the conditions stated are not met by the supplied data, then <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A> may create an invalid body without returning an error status.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294773"></A><A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294775"></A>Create instances of multiple tools on a single target body. None of the instanced tool bodies can intersect with each other. </P>
+<P>
+<A NAME="50422128_pgfId-294776"></A>This function takes a list of faces from a single target body, an array of tool bodies, and a list of transform arrays (either translations, rotations, or scales). Each transform array determines the positions of the instances of the corresponding tool body that is used within the boolean. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-294778"></A>When the configuration of target and instances allows, these functions are able to perform the boolean operation more quickly by:</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-294779"></A>First performing a single boolean for the first instance; and then</LI>
+<LI>
+<A NAME="50422128_pgfId-294780"></A>Avoiding the work of performing a boolean for subsequent instances by copying and transforming the new faces, edges, etc. of the first instance.</LI>
+</UL>
+<P>
+<A NAME="50422128_pgfId-294781"></A>Both functions can take a range of options, many of which are available in both functions. The rest of this section describes the options that are available. </P>
+<P>
+<A NAME="50422128_pgfId-294815"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-602.gif">
+
+<P>
+<A NAME="50422128_pgfId-294816"></A>Figure 54-1 Creating instances on solid and sheet bodies using single and multiple tools</P>
+<P>
+<A NAME="50422128_pgfId-294820"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422128_pgfId-294819"></A>Note: <A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A> and <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A> do not support general bodies; the target and tool bodies used in these functions must be manifold. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422128_pgfId-294821"></A>	54.2.1 	Summary of options </H3>
+<P>
+<A NAME="50422128_pgfId-294822"></A>The following table provides a summary of the options available in both instancing functions provided by Parasolid. The <STRONG>
+Availability</STRONG> column indicates whether the option is available in only PK_FACE_instance_<STRONG>
+tools</STRONG>, PK_FACE_instance_<STRONG>
+bodies</STRONG>, or <STRONG>
+both</STRONG> functions. Many of the instancing options available are identical to existing boolean options. Where this is the case, the table below references the appropriate boolean documentation in <A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A>, for further information.</P>
+<P>
+<A NAME="50422128_pgfId-295053"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294831"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294833"></A>Availability</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294835"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294837"></A>function</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294839"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294841"></A>The boolean operation to perform: unite, subtract, or intersect. Default: PK_boolean_unite_c. </P>
+<P>
+<A NAME="50422128_pgfId-294844"></A>See <A HREF="fd_chap.052.html#50422125_38618">Section 51.2, “The three basic boolean operations”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294847"></A>configuration</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294849"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294851"></A>Lets you improve the performance of the instancing operation in cases where you know the configuration of the target and tool meet certain criteria. Default: NULL.</P>
+<P>
+<A NAME="50422128_pgfId-294854"></A>See <A HREF="fd_chap.055.html#50422128_51471">Section 54.2.2, “Improving the performance of instancing operations”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-499834"></A>select_region</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-499836"></A>Tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-499838"></A>Identifies regions of the tool and/or target to be included or excluded in the boolean result. </P>
+<P>
+<A NAME="50422128_pgfId-499992"></A>See <A HREF="fd_chap.052.html#50422125_56451">Section 51.4.2, “Selecting regions in local booleans”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294857"></A>matched_region</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294859"></A>Tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294861"></A>Whether to match regions in the target with regions in the tool. Default: NULL.</P>
+<P>
+<A NAME="50422128_pgfId-294864"></A>See <A HREF="fd_chap.052.html#50422125_34853">Section 51.4.5, “Matched topology in local and global boolean operations”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294867"></A>extend_face_list</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294869"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294871"></A>Whether to “overflow” instances onto adjacent faces (not passed to the instancing function) if the boolean imprinting phase results in incomplete loops. Default: <A HREF=../headers/pk_imprint_face_list_t.html>PK_imprint_face_list_no_c</A>. </P>
+<P>
+<A NAME="50422128_pgfId-294874"></A>See <A HREF="fd_chap.052.html#50422125_88410">Section 51.4.9, “Extending face lists during local booleans”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294877"></A>stop_self_intersection</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294879"></A>Tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294881"></A>Whether to prevent self-intersections in the result. After imprinting, tool faces that survive the boolean are compared with all faces of the target body. Default: PK_LOGICAL_false. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294883"></A>tracking</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294885"></A>Tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294887"></A>Whether to return tracking information. Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422128_pgfId-294891"></A>See <A HREF="fd_chap.055.html#50422128_33016">Section 54.2.4, “Tracking information”</A> for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294893"></A>merge_imprinted</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294895"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294897"></A>Whether to merge imprinted edges where possible. The behaviour of this option differs slightly between <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A> and <A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A>. </P>
+<P>
+<A NAME="50422128_pgfId-294900"></A>For <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A>, see <A HREF="fd_chap.052.html#50422125_98716">Section 51.4.13, “Imprint completion”</A>, for more information. Default: PK_LOGICAL_false </P>
+<P>
+<A NAME="50422128_pgfId-294902"></A>For <A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A>, this option is a combination of the <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A> options <CODE>
+merge_imprinted</CODE>
+ and <CODE>
+selective_merge</CODE>
+. It can take the following values:</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-294903"></A>PK_instance_merge_new_c (default). This is the same as setting both <CODE>
+merge_imprinted</CODE>
+ and <CODE>
+selective_merge</CODE>
+ to PK_LOGICAL_true in <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A>.</LI>
+<LI>
+<A NAME="50422128_pgfId-294904"></A>PK_instance_merge_no_c (default). This is the same as setting both <CODE>
+merge_imprinted</CODE>
+ and <CODE>
+selective_merge</CODE>
+ to PK_LOGICAL_false in <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A>.</LI>
+</UL>
+<P>
+<A NAME="50422128_pgfId-294907"></A>See <A HREF="fd_chap.052.html#50422125_98716">Section 51.4.13, “Imprint completion”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294910"></A>selective_merge</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294912"></A>Tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294914"></A>Whether to preserve mergeable edges that existed on the target before the instancing operation. Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422128_pgfId-294917"></A>See <A HREF="fd_chap.052.html#50422125_98716">Section 51.4.13, “Imprint completion”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294920"></A>allow_disjoint</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294922"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294924"></A>Whether to allow disjoint bodies in the result. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294926"></A>check_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294928"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294930"></A>Whether to check faces involved in the instancing operation - only faces which are adjacent to imprinted edges are checked. Default: <A HREF=../headers/pk_boolean_check_fa_t.html>PK_boolean_check_fa_yes_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294932"></A>repair_fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294934"></A>Bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294936"></A>Whether to check and repair face self-intersections. Default: PK_instance_repair_fa_fa_yes_c.</P>
+<P>
+<A NAME="50422128_pgfId-294937"></A>If PK_instance_repair_fa_fa_yes_c, tool faces that survive the operation are compared against faces on the target and addition imprints and booleans performed if necessary. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294939"></A>default_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294941"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294943"></A>The default tolerance used by the instancing operation when creating entities or looking for coincidence between entities. Default: 1.0e-5.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294945"></A>max_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294947"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294949"></A>The maximum tolerance that may be applied to any entity involved in the instancing operation. Default: 0.0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294951"></A>merge_attributes</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294953"></A>Tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294955"></A>Whether to merge attributes on faces that are combined. Default: PK_LOGICAL_false.</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-294956"></A>If PK_LOGICAL_true, when two coincident faces are combined in the result body, this situation is treated as a merge event from the point of view of attributes and attribute callbacks.</LI>
+<LI>
+<A NAME="50422128_pgfId-294957"></A>If PK_LOGICAL_false, this situation is treated as a deletion event, </LI>
+</UL>
+<P>
+<A NAME="50422128_pgfId-294958"></A>If <CODE>
+function</CODE>
+ is PK_boolean_subtract_c, then merge events can never occur. </P>
+<P>
+<A NAME="50422128_pgfId-294961"></A>See <A HREF="fd_chap.096.html#50422175_19204">Section 95.4, “Events and how they affect attributes”</A>, for more information about attribute events. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294964"></A>keep_target_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294966"></A>Tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294968"></A>Specify the edge that survives when a target edge and tool edge coincide during an instancing operation. This can be one of:</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-294969"></A>PK_LOGICAL_false: The older edge (with the smallest tag) survives. This is the default.</LI>
+<LI>
+<A NAME="50422128_pgfId-294970"></A>PK_LOGICAL_true: The target edge survives, unless both (a) the target edge is a new edge imprinted during the boolean, and (b) the tool edge was already present; in which case the tool edge survives.</LI>
+</UL>
+<P>
+<A NAME="50422128_pgfId-294971"></A>If both faces adjacent to the tool edge survive, then the tool edge survives, regardless of the value of this option. If generalized topology is on, the target edge always survives.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294973"></A>imprint_complete_targ</PRE>
+<PRE><A NAME="50422128_pgfId-294974"></A>imprint_complete_tool</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294976"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294978"></A>Whether to perform imprint completion on the target or tool, respectively. Default: <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_no_c</A>.</P>
+<P>
+<A NAME="50422128_pgfId-294982"></A>See <A HREF="fd_chap.052.html#50422125_98716">Section 51.4.13, “Imprint completion”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294984"></A>fence</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294986"></A>Tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294988"></A>Fencing options for when performing trim or punch operations. Default: <A HREF=../headers/pk_boolean_fence_t.html>PK_boolean_fence_none_c</A>.</P>
+<P>
+<A NAME="50422128_pgfId-294991"></A>See <A HREF="fd_chap.052.html#50422125_73248">Section 51.4.12, “Effect of the fence option on solid and sheet operations”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-294994"></A>target_material_side</PRE>
+<PRE><A NAME="50422128_pgfId-294995"></A>tool_material_side</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294997"></A>Bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-294999"></A>Set material-side options for the target and tool respectively. Default: <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_default_c</A>.</P>
+<P>
+<A NAME="50422128_pgfId-295002"></A>See <A HREF="fd_chap.055.html#50422128_19911">Section 54.2.3, “Specifying the body type of target and tool”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-295005"></A>resulting_body_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295007"></A>Bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295009"></A>The preferred type of the resulting body. Default: <A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_original_c</A>.</P>
+<P>
+<A NAME="50422128_pgfId-295012"></A>See <A HREF="fd_chap.052.html#50422125_27105">Section 51.4.17, “Specifying the body type of the result”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-295015"></A>limit_target_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295017"></A>Bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295019"></A>Limit the faces that can be deleted to include only those within the boundary of the target faces specified. Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422128_pgfId-295022"></A>See <A HREF="fd_chap.052.html#50422125_14703">Section 51.4.14, “Specifying the body type of tool and target”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-295025"></A>flag_no_effect</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295027"></A>Tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295029"></A>Warn if the instancing operation would produce no effect on the body. This can be one of:</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-295030"></A><A HREF=../headers/pk_boolean_no_effect_t.html>PK_boolean_no_effect_basic_c</A>: return <A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_no_effect_c</A> rather than <A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_success_c</A> if the operation would have no effect.</LI>
+<LI>
+<A NAME="50422128_pgfId-295031"></A><A HREF=../headers/pk_boolean_no_effect_t.html>PK_boolean_no_effect_advanced_c</A>: return <A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_no_effect_c</A> rather than <A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_imprint_c</A>.</LI>
+</UL>
+<P>
+<A NAME="50422128_pgfId-295032"></A>Default: <A HREF=../headers/pk_boolean_no_effect_t.html>PK_boolean_no_effect_basic_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-295034"></A>tracking_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295036"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295038"></A>Specify the amount of tracking information that is returned. Default: <A HREF=../headers/pk_boolean_track_type_t.html>PK_boolean_track_type_basic_c</A> (<A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A>) or PK_instance_track_type_both_c (<A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A>).</P>
+<P>
+<A NAME="50422128_pgfId-295042"></A>See <A HREF="fd_chap.055.html#50422128_33016">Section 54.2.4, “Tracking information”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-295044"></A>track_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295046"></A>Bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295048"></A>Specify the amount of edge tracking that is returned if tracking is requested via the tracking_type option. Default: PK_instance_track_edges_new_c.</P>
+<P>
+<A NAME="50422128_pgfId-295052"></A>See <A HREF="fd_chap.055.html#50422128_33016">Section 54.2.4, “Tracking information”</A> for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-416987"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-416989"></A>Both</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-417316"></A>If your application uses models created using earlier versions of Parasolid, you can use the <CODE>
+update</CODE>
+ option to eliminate differences in rebuild results. Default: <A HREF=../headers/pk_boolean_update_t.html>PK_boolean_update_default_c</A>.</P>
+<P>
+<A NAME="50422128_pgfId-417190"></A>See <A HREF="fd_chap.053.html#50422126_11534">Section 52.4, “Specialised boolean operations”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-295059"></A><A NAME="50422128_marker-295054"></A><A NAME="50422128_marker-295055"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422128_pgfId-295058"></A>Note: Although the options are visible in the <A HREF=../headers/pk_face_boolean_o_t.html>PK_FACE_boolean_o_t</A> option structure, you cannot use the <CODE>
+resulting_body_type</CODE>
+, <CODE>
+tool_material_side</CODE>
+, or <CODE>
+target_material_side</CODE>
+ options with <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422128_pgfId-295061"></A>	54.2.2 	<A NAME="50422128_51471"></A>Improving the performance of instancing operations </H3>
+<P>
+<A NAME="50422128_pgfId-295062"></A>The performance of the instancing operation can be improved by using the instancing options in the <CODE>
+configuration</CODE>
+ option sub-structure. If you know that the tools and target received by either <A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A> or <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A> conform to a certain configuration, then you can set the fields in this structure to match that configuration. Doing this turns off relevant checks within the instancing operation, resulting in a corresponding performance improvement. For example, if you know that none of your tool bodies intersect each other, you can set the appropriate field, and the instancing operation will not check whether the supplied tools intersect before creating instances.</P>
+<P>
+<A NAME="50422128_pgfId-295066"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422128_pgfId-295065"></A>Warning: When setting fields in the <CODE>
+configuration</CODE>
+ structure, it is vital that the values you set correspond to the actual configuration of your tools and target. Setting any values incorrectly will result in failure of the instancing operation and corrupt bodies. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-295067"></A>The options available are as follows:</P>
+<P>
+<A NAME="50422128_pgfId-295077"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295070"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295072"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-295074"></A>no_tool_intersect</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-295076"></A>This option can be set when the set of tool bodies are known not to intersect each other, though they are allowed to clash with existing edges on the target (including the periphery edge). For optimal performance in <A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A>, this option should be PK_LOGICAL_true, and any tools supplied must not intersect with each other, or their implied transformed copies.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-297682"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-603.gif">
+
+<P>
+<A NAME="50422128_pgfId-297683"></A>Figure 54-2 Tool bodies that do not intersect each other but intersect edges on the target</P>
+<P>
+<A NAME="50422128_pgfId-297693"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-297686"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-297688"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-297690"></A>no_loop_intersect</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-297692"></A>This option can be set when there is no interference between any instances and the existing edges of the target, though, in the case of <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A>, the tools can clash with each other</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-297975"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-604.gif">
+
+<P>
+<A NAME="50422128_pgfId-297976"></A>Figure 54-3 Tool bodies that have intersected each other but not the edges on the target</P>
+<P>
+<A NAME="50422128_pgfId-297986"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-297979"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-297981"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-297983"></A>identical_intersect</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-297985"></A>This option can be set when the intersection loops of each instance of the tool body with the target body are identical with all other instances of the tool body in the target body, and the resulting intersection loops are identically positioned on the instance of the tool body.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-298322"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-605.gif">
+
+<P>
+<A NAME="50422128_pgfId-298323"></A>Figure 54-4 Identically positioned intersection loops on the instance tool body (cylinder) when it is united with an inclined planar face</P>
+<P>
+<A NAME="50422128_pgfId-298333"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298326"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298328"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-298330"></A>one_in_all_in</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298332"></A>when one tool intersects a target face then all tool faces intersect that same target face.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422128_pgfId-298335"></A>	54.2.3 	<A NAME="50422128_19911"></A>Specifying the body type of target and tool </H3>
+<P>
+<A NAME="50422128_pgfId-298336"></A>As with boolean operations, you can use the <CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ options in <A HREF=../headers/pk_face_instance_bodies_o_t.html>PK_FACE_instance_bodies_o_t</A> to control how the tools and target specified are interpreted with regard to their body type. This is particularly useful, for instance, in the case of sheet bodies, since it allows you to treat a sheet body as if it was a solid, with material on a specific side of the sheet.</P>
+<P>
+<A NAME="50422128_pgfId-298337"></A>For instance, given suitable configurations of target and tool, you can use the material-side options to perform boolean punch and fence operations when creating instances. <A HREF="fd_chap.055.html#50422128_43222"><EM>
+Figure 54-5</EM></A> shows an example in which several instances are created on a sheet body using a punch operation and a solid tool body. </P>
+<P>
+<A NAME="50422128_pgfId-298378"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-606.gif">
+
+<P>
+<A NAME="50422128_pgfId-298380"></A>Figure 54-5 <A NAME="50422128_43222"></A>Punching blind holes in a sheet using <CODE>
+target_material_side</CODE>
+</P>
+<P>
+<A NAME="50422128_pgfId-298384"></A>See <A HREF="fd_chap.052.html#50422125_14703">Section 51.4.14, “Specifying the body type of tool and target”</A>, for more information on the behaviour of the <CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ options, and the effects that can be achieved using them.</P>
+<P>
+<A NAME="50422128_pgfId-298390"></A><A NAME="50422128_marker-298385"></A><A NAME="50422128_marker-298386"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422128_pgfId-298389"></A>Note: Although the options are visible in the <A HREF=../headers/pk_face_boolean_o_t.html>PK_FACE_boolean_o_t</A> option structure, you cannot use the <CODE>
+tool_material_side</CODE>
+ or <CODE>
+target_material_side</CODE>
+ options with <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422128_pgfId-298392"></A>	54.2.4 	<A NAME="50422128_33016"></A>Tracking information </H3>
+<P>
+<A NAME="50422128_pgfId-298393"></A>Tracking behaviour is different for <A HREF=../headers/pk_face_instance_bodies.html><A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A></A> and <A HREF=../headers/pk_face_instance_tools.html><A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A></A>. In <A HREF=../headers/pk_face_instance_bodies.html><A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A></A>, you can control the amount of tracking information that is returned. By contrast, <A HREF=../headers/pk_face_instance_tools.html><A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A></A> just lets you turn tracking on or off. </P>
+
+<H4>
+<A NAME="50422128_pgfId-298394"></A>54.2.4.1 <A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A> </H4>
+<P>
+<A NAME="50422128_pgfId-298395"></A>In <A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A>, tracking is controlled using the following options:</P>
+<P>
+<A NAME="50422128_pgfId-298420"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298398"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298400"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-298402"></A>tracking_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298404"></A>Controls the amount of tracking information that is returned. One of the following values:</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-298405"></A>PK_instance_track_type_none_c: do not return any tracking information.</LI>
+<LI>
+<A NAME="50422128_pgfId-298406"></A>PK_instance_track_type_inst_c: new topology in the result body is tracked to its originating instance. This information is returned in the <CODE>
+instance_tracking</CODE>
+ return structure. </LI>
+<LI>
+<A NAME="50422128_pgfId-298407"></A>PK_instance_track_type_topol_c: new topology in the result body arising from a tool is tracked to the underlying topology in the tool that was used to create it. </LI>
+<LI>
+<A NAME="50422128_pgfId-298408"></A>PK_instance_track_type_both_c (default): Returns both instance and topology tracking information, in the <CODE>
+instance_tracking</CODE>
+ and <CODE>
+tracking</CODE>
+ return structures, respectively. </LI>
+</UL>
+<P>
+<A NAME="50422128_pgfId-298409"></A>For more information, see the documentation for <A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-298414"></A>track_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298416"></A>Controls the amount of edge tracking that is returned in the <CODE>
+tracking</CODE>
+ return structure. One of the following values:</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-298417"></A>PK_instance_track_edges_no_c: do not return edge tracking information.</LI>
+<LI>
+<A NAME="50422128_pgfId-298418"></A>PK_instance_track_edges_laminar_c: laminar edges that are created in the result body as a result of the instancing operation are tracked to the underlying topology in the tool. </LI>
+<LI>
+<A NAME="50422128_pgfId-298419"></A>PK_instance_track_edges_new_c: all new edges that are created in the result body as a result of the instancing operation are tracked to the underlying topology in the tool. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422128_pgfId-298421"></A>54.2.4.2 <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A> </H4>
+<P>
+<A NAME="50422128_pgfId-298422"></A>In <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A>, tracking is controlled using the <CODE>
+tracking</CODE>
+ option. If this field is PK_LOGICAL_true, <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A> returns tracking information. This tracking information includes:</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-298423"></A>data to identify which of the instanced tools appear in the final body (subject to the flags in the configuration structure it is legal if an instance misses the target body);</LI>
+<LI>
+<A NAME="50422128_pgfId-298424"></A>the number of faces in the tool body which are instanced at least once in the final body; </LI>
+<LI>
+<A NAME="50422128_pgfId-298425"></A>an array of data structures for each face in the tool body which is instanced at least once in the resultant body, this information includes:</LI>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-298426"></A>the original face in the tool body;</LI>
+<LI>
+<A NAME="50422128_pgfId-298427"></A>total number of times instanced copies of the original face appear in the resultant body; and</LI>
+<LI>
+<A NAME="50422128_pgfId-298428"></A>the instanced faces of the original face, each accompanied by an index to indicate in which instance it appears.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422128_pgfId-298429"></A>You can also control the level of information that is returned for imprint completion using the <CODE>
+tracking_type</CODE>
+ option. Note that this does not provide the same behaviour as the <CODE>
+tracking_type</CODE>
+ option in <A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A>: see the documentation for <A HREF=../headers/pk_boolean_track_type_t.html>PK_boolean_track_type_t</A> for details.</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422128_pgfId-298432"></A>54.3	<A NAME="50422128_marker-298430"></A><A NAME="50422128_72920"></A>Patterning 
+
+
+</H1>
+<P>
+<A NAME="50422128_pgfId-298433"></A><STRONG>
+Patterning</STRONG> is very similar to the instancing operation, although it is not actually a boolean operation as it only operates on a single body.</P>
+<P>
+<A NAME="50422128_pgfId-522895"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422128_pgfId-522905"></A>Note: This functionality does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-298435"></A>The patterning function, <A NAME="50422128_marker-604096"></A><A HREF=../headers/pk_face_pattern.html><A HREF=../headers/pk_face_pattern.html>PK_FACE_pattern</A></A>, takes a set of faces that define a feature and an array of transforms. Each transform is to be applied to a copy of the faces that comprise the feature to create a new instance of the feature. In general, <A HREF=../headers/pk_face_pattern.html><A HREF=../headers/pk_face_pattern.html>PK_FACE_pattern</A></A> assumes that the faces are transformed far enough apart that they do not clash. However, diagnostics are optionally available to help applications identify unexpected clashes between instances. These options are discussed further on in this section.</P>
+<P>
+<A NAME="50422128_pgfId-298439"></A><A HREF="fd_chap.055.html#50422128_26902"><EM>
+Figure 54-6</EM></A> shows a simple patterning example. The feature given to <A HREF=../headers/pk_face_pattern.html>PK_FACE_pattern</A> consists of the faces in both the pocket and the boss. There is only one transform applied and the result is shown on the right. Notice that this particular example could not be executed by a single boolean instancing operation, as that would imply an operation which would unite and subtract simultaneously.</P>
+<P>
+<A NAME="50422128_pgfId-408405"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-607.gif">
+
+<P>
+<A NAME="50422128_pgfId-298702"></A>Figure 54-6 <A NAME="50422128_26902"></A>Patterning example of one transform of both a pocket and a boss</P>
+<P>
+<A NAME="50422128_pgfId-298703"></A>There are restrictions on the kinds of feature that may be patterned; these restrictions are similar to those imposed for instancing. The patterning function is only able to copy the set of faces it is given and may only bring about a restricted set of topological changes. The patterning operation may split destination faces and edges on the target (underlying) body to enable successful completion. For a more detailed explanation of the restriction on changes of topology, please refer to the <A HREF=../headers/pk_face_pattern.html>PK_FACE_pattern</A> API documentation.</P>
+<P>
+<A NAME="50422128_pgfId-403202"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-608.gif">
+
+<P>
+<A NAME="50422128_pgfId-298975"></A>Figure 54-7 Patterning example that involves constant topology and geometry over the patterning operation</P>
+<P>
+<A NAME="50422128_pgfId-298976"></A>Apart from these restrictions, the form of the feature is relatively free: it may be disconnected, it may be closed or open (or a mixture of closed and open components), and it may be from a solid, sheet or general body. It may lie in one or more faces of the target body.</P>
+<P>
+<A NAME="50422128_pgfId-298977"></A><A HREF=../headers/pk_face_pattern.html>PK_FACE_pattern</A> contains the following options in <A HREF=../headers/pk_face_pattern_o_t.html>PK_FACE_pattern_o_t</A>:</P>
+<P>
+<A NAME="50422128_pgfId-299033"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298980"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298982"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-298984"></A>check_loops</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298986"></A>Ensures that the boundary loops of any new instance of the feature are contained within a face. See <A HREF="fd_chap.055.html#50422128_66959">Section 54.3.1, “Ensuring new instances are contained within a face”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-298991"></A>check_fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-298993"></A>Ensures that the new instances of the feature do not clash with other faces in the body. See <A HREF="fd_chap.055.html#50422128_84183">Section 54.3.2, “Ensuring new instances do not intersect other faces”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-298998"></A>same_face</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-299000"></A>Improves performance when the new instances lie in the same faces as those of the original feature. See <A HREF="fd_chap.055.html#50422128_13676">Section 54.3.4, “Improving performance when new instances lie in the same faces as the original feature”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-299005"></A>coi_face</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-299007"></A>Asserts whether the boundary loops of the transformed feature are known to lie wholly within their respective destination faces. See <A HREF="fd_chap.055.html#50422128_67894">Section 54.3.5, “General patterning”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-299012"></A>reblend</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-299016"></A>Specifies whether blend faces in new instances should be recreated. See <A HREF="fd_chap.055.html#50422128_12689">Section 54.3.6, “Recreating blends around patterned instances”</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-299019"></A>face_maps</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-299021"></A>Specifies the destination faces for each new instance, for cases where the boundary loops of the transformed feature are not known to lie within their respective destination faces. See <A HREF="fd_chap.055.html#50422128_67894">Section 54.3.5, “General patterning”</A>.</P>
+<P>
+<A NAME="50422128_pgfId-299025"></A>This option should not be used unless <CODE>
+same_face</CODE>
+ is set to <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_no_c</A> and <CODE>
+coi_face</CODE>
+ to <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A>; it will be ignored otherwise.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-299027"></A>collision</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-299029"></A>Whether to return errors that arise when instances collide with each other, or with features. See <A HREF="fd_chap.055.html#50422128_77869">Section 54.3.3, “Returning errors when collisions occur”</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-299037"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422128_pgfId-299036"></A>Warning: When setting values in the <CODE>
+check_loops</CODE>
+, <CODE>
+same_face</CODE>
+, and <CODE>
+coi_face</CODE>
+ options, it is vital that the values you set correspond to the actual configuration of your tools and target. Setting any values incorrectly will result in failure of the patterning operation and corrupt bodies. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-299038"></A>The returned data from the patterning function contains:</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-299039"></A>Status codes indicating the nature of any failure.</LI>
+<LI>
+<A NAME="50422128_pgfId-299040"></A>The new faces corresponding to the original faces.</LI>
+<LI>
+<A NAME="50422128_pgfId-299041"></A>In the event of a problem, a status code to indicate the nature of the problem and, sometimes, some topological information to help locate the failure.</LI>
+</UL>
+
+<H3>
+<A NAME="50422128_pgfId-299047"></A>	54.3.1 	<A NAME="50422128_66959"></A><A NAME="50422128_marker-299043"></A><A NAME="50422128_marker-299044"></A><A NAME="50422128_marker-299045"></A><A NAME="50422128_marker-299046"></A>Ensuring new instances are contained within a face </H3>
+<P>
+<A NAME="50422128_pgfId-299048"></A>By default, <CODE>
+check_loops</CODE>
+ is set to <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_no_c</A>; this means that Parasolid creates new instances of a feature even if they do not fit into any of the faces in the target body. Depending on the configuration of the model, this could lead to undesirable results or invalidities.</P>
+<P>
+<A NAME="50422128_pgfId-299049"></A>If <CODE>
+check_loops</CODE>
+ is <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_yes_c</A>, <A HREF=../headers/pk_face_pattern.html>PK_FACE_pattern</A> performs a two-stage check. This check ensures that each boundary loop (i.e., those loops of the feature that lie on the target body) of each new instance of the feature is wholly contained within a face of the body. </P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-299053"></A>Before copying a face of the feature, Parasolid first checks to see if the transformed boundary loop lies completely outside any face in the body. If so, this face is not copied.</LI>
+<LI>
+<A NAME="50422128_pgfId-299054"></A>The second stage takes place after the face has been copied and transformed. The edges of the new boundary loop are checked for intersections with the edges of the destination face. If an intersection is found (that is, the new loop does not lie wholly within the destination face), the new faces corresponding to the transform are subsequently deleted.</LI>
+</UL>
+<P>
+<A NAME="50422128_pgfId-299055"></A>Alternatively, <CODE>
+check_loops</CODE>
+ may be set to <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_outside_c</A>. This tells <A HREF=../headers/pk_face_pattern.html>PK_FACE_pattern</A> to perform the first stage of the checking (mentioned above) but not the second. Consequently, instances that would lie completely outside any face in the body are not created, but those that may intersect a bounding edge of a face are allowed to remain. If faces are not copied (or copied and subsequently deleted), the returned information indicates this.</P>
+<P>
+<A NAME="50422128_pgfId-299062"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422128_pgfId-299058"></A>Note: If <CODE>
+check_loops</CODE>
+ is <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_outside_c</A> and you also set <CODE>
+coi_face</CODE>
+ to <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A>, then it is still possible for the boundary loop (when transformed by the input transform) to be outside any face in the target body, but the patterning operation may still succeed. The <CODE>
+coi_face</CODE>
+ option is described in <A HREF="fd_chap.055.html#50422128_67894">Section 54.3.5, “General patterning”</A>. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-299063"></A>An example showing the differences between these three values of <CODE>
+check_loops</CODE>
+ is given in <A HREF="fd_chap.055.html#50422128_42676"><EM>
+Figure 54-8</EM></A>. Note that the body returned using <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_no_c</A> is invalid; those returned by using <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_yes_c</A> and <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_outside_c</A> are valid, however.</P>
+<P>
+<A NAME="50422128_pgfId-403585"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-609.gif">
+
+<P>
+<A NAME="50422128_pgfId-299879"></A>Figure 54-8 <A NAME="50422128_42676"></A>The effect of the check_loops option</P>
+
+
+<H3>
+<A NAME="50422128_pgfId-299883"></A>	54.3.2 	<A NAME="50422128_84183"></A><A NAME="50422128_marker-299881"></A><A NAME="50422128_marker-299882"></A>Ensuring new instances do not intersect other faces </H3>
+<P>
+<A NAME="50422128_pgfId-299884"></A>The <CODE>
+check_fa_fa</CODE>
+ option intersects the faces of the new instances with existing faces of the body in order to detect any clashes that may have occurred. <A HREF="fd_chap.055.html#50422128_26501"><EM>
+Figure 54-9</EM></A> illustrates how this might happen. </P>
+<P>
+<A NAME="50422128_pgfId-592954"></A>Unlike the case for <CODE>
+check_loops</CODE>
+, if <CODE>
+check_fa_fa</CODE>
+ detects clashes between instances and existing faces they are not removed, so the result body will be invalid due to the clashing faces. The returned information contains the tags of the clashing faces, so you can easily identify the location of the problem.</P>
+<P>
+<A NAME="50422128_pgfId-410056"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-610.gif">
+
+<P>
+<A NAME="50422128_pgfId-300122"></A>Figure 54-9 <A NAME="50422128_26501"></A>The effect of the <CODE>
+check_fa_fa</CODE>
+ option</P>
+
+
+<H3>
+<A NAME="50422128_pgfId-300124"></A>	54.3.3 	<A NAME="50422128_77869"></A>Returning errors when collisions occur </H3>
+<P>
+<A NAME="50422128_pgfId-300125"></A><A HREF=../headers/pk_face_pattern.html>PK_FACE_pattern</A> can detect when collisions occur, either between different instances in the resulting body, or between an instance and a pattern feature. You can use the <CODE>
+collision</CODE>
+ option to choose whether or not to report these errors. By default, collision errors are not reported (<A HREF=../headers/pk_pattern_collision_t.html>PK_pattern_collision_no_c</A>). Any collisions detected are not removed therefore the body will be invalid.</P>
+<P>
+<A NAME="50422128_pgfId-300126"></A>If this option is switched on, then you can find any collision errors in the relevant <A HREF=../headers/pk_pattern_status_t.html>PK_pattern_status_t</A> datatype for the colliding instance (found in <CODE>
+pattern_results.patterns.status</CODE>
+). In the case of a collision, <CODE>
+status</CODE>
+ has the value <A HREF=../headers/pk_pattern_status_t.html>PK_pattern_status_colliding_c</A>. </P>
+
+
+<H3>
+<A NAME="50422128_pgfId-300130"></A>	54.3.4 	<A NAME="50422128_13676"></A><A NAME="50422128_marker-593895"></A><A NAME="50422128_marker-593896"></A>Improving performance when new instances lie in the same faces as the original feature </H3>
+<P>
+<A NAME="50422128_pgfId-300131"></A>You can use the <CODE>
+same_face</CODE>
+ option to improve performance when all of the boundary loops of the new instances of the feature lie in the faces containing the original feature.</P>
+<P>
+<A NAME="50422128_pgfId-300132"></A>If <CODE>
+same_face</CODE>
+ is <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_yes_c</A> (the default), performance of the patterning operation is improved provided that the boundary loops of the new instances remain in the faces containing the feature. An example of this is shown in <A HREF="fd_chap.055.html#50422128_30190"><EM>
+Figure 54-10</EM></A>. Should they fall outside of these faces, the results depend on the value of <CODE>
+check_loops</CODE>
+: if set to <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_yes_c</A>, <A HREF=../headers/pk_face_pattern.html>PK_FACE_pattern</A> returns a valid body with only those instances that lie in the same faces; if set to <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_no_c</A>, it returns an invalid body with all the requested instances. In such cases you should consider setting <CODE>
+same_face</CODE>
+ to <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_no_c</A> as described in <A HREF="fd_chap.055.html#50422128_67894">Section 54.3.5, “General patterning”</A>.</P>
+<P>
+<A NAME="50422128_pgfId-405007"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-611.gif">
+
+<P>
+<A NAME="50422128_pgfId-300276"></A>Figure 54-10 <A NAME="50422128_30190"></A>New instances lie in the same faces as the original feature</P>
+
+
+<H3>
+<A NAME="50422128_pgfId-300280"></A>	54.3.5 	<A NAME="50422128_67894"></A><A NAME="50422128_marker-300278"></A><A NAME="50422128_marker-300279"></A>General patterning </H3>
+<P>
+<A NAME="50422128_pgfId-300281"></A>In general, the transformed versions of the feature may be altered during the patterning operation when creating new instances. These instances may or may not lie in the faces containing the original feature. <A HREF="fd_chap.055.html#50422128_62124"><EM>
+Figure 54-11</EM></A> illustrates a case where the transformed features must be altered in order to create instances that remain in contact with the destination faces (without passing through them).</P>
+<P>
+<A NAME="50422128_pgfId-300285"></A>If the transformed versions of the feature do not need to be altered before creating new instances, the boundary loops of the transformed features will be <EM>
+coincident</EM> with their respective destination faces; that is, they will lie wholly within the destination faces. In such cases, the <CODE>
+coi_face</CODE>
+ option should be set to <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_yes_c</A> for optimal performance. If any alterations must be made to a transformed feature before creating the corresponding instance, one or more of its boundary loops will not be coincident with their respective destination faces. Here, the <CODE>
+coi_face</CODE>
+ option should be set to <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A>.</P>
+<P>
+<A NAME="50422128_pgfId-494124"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-612.gif">
+
+<P>
+<A NAME="50422128_pgfId-300871"></A>Figure 54-11 <A NAME="50422128_62124"></A>Transformed boundary loops are not coincident with their destination faces</P>
+<P>
+<A NAME="50422128_pgfId-300872"></A>Depending on whether the new instances all lie in the faces containing the original feature, and also whether transformed boundary loops are coincident with destination faces, different combinations of options should be specified as described below.</P>
+
+<H4>
+<A NAME="50422128_pgfId-300873"></A>54.3.5.1 Instances all lie in the faces of the original feature </H4>
+<P>
+<A NAME="50422128_pgfId-300874"></A>In this case, you should set <CODE>
+same_face</CODE>
+ to <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_yes_c</A>. If the transformed boundary loops are known to be coincident with the destination faces, you should set <CODE>
+coi_face</CODE>
+ to <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_yes_c</A>; this is the case for the model shown in <A HREF="fd_chap.055.html#50422128_30190"><EM>
+Figure 54-10</EM></A>. If not, <CODE>
+coi_face</CODE>
+ should be <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A>; this case is illustrated in <A HREF="fd_chap.055.html#50422128_62124"><EM>
+Figure 54-11</EM></A>. The <CODE>
+face_maps</CODE>
+ array should be set to NULL.</P>
+
+
+<H4>
+<A NAME="50422128_pgfId-300881"></A>54.3.5.2 Instances lie in different faces and boundary loops are coincident with their destination faces </H4>
+<P>
+<A NAME="50422128_pgfId-300882"></A>In this case, you should set <CODE>
+same_face</CODE>
+ to <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_no_c</A> and <CODE>
+coi_face</CODE>
+ to <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_yes_c</A>. An example of this is shown in <A HREF="fd_chap.055.html#50422128_68991"><EM>
+Figure 54-12</EM></A>. The <CODE>
+face_maps</CODE>
+ array should be set to NULL.</P>
+<P>
+<A NAME="50422128_pgfId-405885"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-613.gif">
+
+<P>
+<A NAME="50422128_pgfId-301020"></A>Figure 54-12 <A NAME="50422128_68991"></A>New instances lie in different faces than the original feature and transformed boundary loops are coincident with their destination faces</P>
+
+
+<H4>
+<A NAME="50422128_pgfId-301022"></A>54.3.5.3 <A NAME="50422128_51087"></A>Instances lie in different faces and boundary loops are not coincident with their destination faces </H4>
+<P>
+<A NAME="50422128_pgfId-301023"></A>In this case, you should set <CODE>
+same_face</CODE>
+ to <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_no_c</A> and <CODE>
+coi_face</CODE>
+ to <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A>. If the destination faces of each new instance of the feature are known beforehand, the <CODE>
+face_maps</CODE>
+ array should be used to specify them; this helps Parasolid maintain optimal performance. Each element of the array contains the mapping information for one instance. The fields in each element of the <CODE>
+face_maps</CODE>
+ array are as follows:</P>
+<P>
+<A NAME="50422128_pgfId-301041"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301026"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301028"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-301030"></A>n_loops</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301032"></A>The number of boundary loops contained in the feature. (Default 0.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-301034"></A>base_loops</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301036"></A>The boundary loops of the feature. (Default NULL.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422128_pgfId-301038"></A>target_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301040"></A>The destination face of each boundary loop. (Default NULL.)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422128_pgfId-301042"></A>If the transformed boundary loops cross existing edges, however, or the destination faces are not known beforehand, you should set the <CODE>
+face_maps</CODE>
+ array to NULL and <CODE>
+check_loops</CODE>
+ to <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_outside_c</A>. Parasolid will then calculate the destination faces during the operation, at some additional cost to performance.</P>
+<P>
+<A NAME="50422128_pgfId-301046"></A>For the example given in <A HREF="fd_chap.055.html#50422128_13946"><EM>
+Figure 54-13</EM></A>, the <CODE>
+face_maps</CODE>
+ array consists of a single element containing the boundary loop and destination face shown in the diagram. The corresponding new instance is shown on the right-hand side. </P>
+<P>
+<A NAME="50422128_pgfId-395811"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-614.gif">
+
+<P>
+<A NAME="50422128_pgfId-301184"></A>Figure 54-13 <A NAME="50422128_13946"></A>The new instance lies in a different face than the original feature and the transformed boundary loop is not coincident with its destination face</P>
+<P>
+<A NAME="50422128_pgfId-301188"></A>For the example given in <A HREF="fd_chap.055.html#50422128_30148"><EM>
+Figure 54-14</EM></A>, the feature is a hollow cylinder through the solid, with boundary loops on two faces as shown in the diagram. The <CODE>
+face_maps</CODE>
+ array consists of two elements, each containing two boundary loops and two destination faces as shown. The corresponding new instances are shown on the right-hand side. </P>
+<P>
+<A NAME="50422128_pgfId-406951"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-615.gif">
+
+<P>
+<A NAME="50422128_pgfId-301532"></A>Figure 54-14 <A NAME="50422128_30148"></A>New instances lie in different faces than the original feature and transformed boundary loops are not coincident with their destination faces</P>
+<P>
+<A NAME="50422128_pgfId-301536"></A>For the sheet bodies shown in <A HREF="fd_chap.055.html#50422128_56332"><EM>
+Figure 54-15</EM></A>, the new instances of the feature cross the boundaries of existing faces; therefore you should set <CODE>
+face_maps</CODE>
+ to NULL and <CODE>
+check_loops</CODE>
+ to <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_outside_c</A>. In <A HREF="fd_chap.055.html#50422128_56332"><EM>
+Figure 54-15</EM></A> (a), the new feature straddles two adjacent faces; in <A HREF="fd_chap.055.html#50422128_56332"><EM>
+Figure 54-15</EM></A> (b), it hangs off the end of an existing face. In both cases, the transformed boundary loops do not lie within a single destination face.</P>
+<P>
+<A NAME="50422128_pgfId-411424"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-616.gif">
+
+<P>
+<A NAME="50422128_pgfId-301945"></A>Figure 54-15 <A NAME="50422128_56332"></A>Examples of where new instances cross existing edges: <CODE>
+face_maps</CODE>
+ should not be specified</P>
+
+
+<H4>
+<A NAME="50422128_pgfId-301946"></A>54.3.5.4 Summary </H4>
+<P>
+<A NAME="50422128_pgfId-301947"></A>The following table summarizes the possibilities for general patterning:</P>
+<P>
+<A NAME="50422128_pgfId-301969"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301950"></A>Case</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301952"></A>Recommended values for options</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301954"></A>New instances lie in the faces of the original feature and have coincident boundary loops.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301956"></A><CODE>
+same_face</CODE>
+: <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_yes_c</A><BR>
+<CODE>
+coi_face</CODE>
+: <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_yes_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301958"></A>New instances lie in the faces of the original feature and have non-coincident boundary loops.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301960"></A><CODE>
+same_face</CODE>
+: <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_yes_c</A><BR>
+<CODE>
+coi_face</CODE>
+: <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301962"></A>New instances lie in different faces and have coincident boundary loops.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301964"></A><CODE>
+same_face</CODE>
+: <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_no_c</A><BR>
+<CODE>
+coi_face</CODE>
+: <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_yes_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301966"></A>New instances lie in different faces and have non-coincident boundary loops.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422128_pgfId-301968"></A><CODE>
+same_face</CODE>
+: <A HREF=../headers/pk_pattern_same_face_t.html>PK_pattern_same_face_no_c</A><BR>
+<CODE>
+coi_face</CODE>
+: <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A><BR>
+<BR>
+If the destination faces are known, they should be specified in the <CODE>
+face_maps</CODE>
+ array; otherwise this should be set to NULL and <CODE>
+check_loops</CODE>
+ to <A HREF=../headers/pk_pattern_check_loops_t.html>PK_pattern_check_loops_outside_c</A>.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422128_pgfId-301971"></A>	54.3.6 	<A NAME="50422128_12689"></A>Recreating blends around patterned instances </H3>
+<P>
+<A NAME="50422128_pgfId-301972"></A>If the boundary of the feature (to be copied) contains a face that has been blended, and the boundary loops of the transformed features may not be coincident with their respective destination faces (i.e., <CODE>
+coi_face</CODE>
+ is <A HREF=../headers/pk_pattern_coi_face_t.html>PK_pattern_coi_face_unknown_c</A>), you should recreate the blends during the patterning operation. This is done using the <CODE>
+reblend</CODE>
+ option.</P>
+<UL>
+<LI>
+<A NAME="50422128_pgfId-301976"></A>If <CODE>
+reblend</CODE>
+ is <A HREF=../headers/pk_pattern_reblend_t.html>PK_pattern_reblend_no_c</A> (the default), Parasolid does not attempt to recreate any blends when creating new instances. This may result in the failure of the operation if blend faces are present in the feature.</LI>
+<LI>
+<A NAME="50422128_pgfId-301980"></A>If <CODE>
+reblend</CODE>
+ is <A HREF=../headers/pk_pattern_reblend_t.html>PK_pattern_reblend_yes_c</A>, Parasolid recreates the blend on any resulting patterned faces, as shown in <A HREF="fd_chap.055.html#50422128_54649"><EM>
+Figure 54-16</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50422128_pgfId-407760"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-617.gif">
+
+<P>
+<A NAME="50422128_pgfId-302153"></A>Figure 54-16 <A NAME="50422128_54649"></A>Recreating blends on features with non-coincident boundary loops</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.054.html">General Booleans</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.056.html">Sectioning</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

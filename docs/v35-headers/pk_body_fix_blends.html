@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_fix_blends</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_fix_blends</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>               PK_BODY_fix_blends
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                     body,         --- edge to have blends fixed
+const <A HREF=../headers/pk_body_fix_blends_o_t.html>PK_BODY_fix_blends_o_t</A> *options,      --- options structure [PF]
+
+<I>--- returned arguments ---
+</I>int                    *const n_blends,     --- number of blend faces
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>             **const blends,       --- created blend faces
+<A HREF=../headers/pk_face_array_t.html>PK_FACE_array_t</A>       **const unders,       --- underlying topology/geometry
+int                   **const topols,       --- topols that have been replaced
+<A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_t</A>       *const fault,        --- status
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>              *const fault_edge,   --- first edge for which blend
+                                            --- can't be fixed
+                                            --- (may be PK_ENTITY_null)
+<A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A>            *const fault_topol   --- topology associated with
+                                            --- fault (may be PK_ENTITY_null)
+)
+</B>
+<A NAME="description"></A>
+<I>This function changes any edges of the given body which have had blends set on
+them by the PK_EDGE_set_blend_ functions, into faces with the appropriate
+surface geometry.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_cant_fix_blends        can't fix blends in body (SERIOUS)
+    PK_ERROR_general_body           general body (MILD)
+    PK_ERROR_not_implemented        user options not implemented (MILD)
+    PK_ERROR_bad_partition          user supplied partition is invalid (MILD)
+    PK_ERROR_bad_combination        user supplied options are incompatible
+                                    (MILD)
+    PK_ERROR_clashing_limits        user supplied edge limit definitions
+                                    clash or are ambiguous (MILD)
+    PK_ERROR_not_in_same_body       topology has been supplied in an option
+                                    which does not belong to <B>'body'</B> (MILD)
+    PK_ERROR_not_in_same_partition  sheet body supplied to cap the blend is
+                                    in a different partition to <B>'body'</B> (MILD)
+
+<A NAME="documentation"></A>
+Any edges of the body which have blend attributes are changed into full faces
+with the appropriate blending surface geometry.
+
+The <A HREF=../headers/pk_body_fix_blends_o_t.html>PK_BODY_fix_blends_o_t</A> structure contains user control options. See its
+documentation for detail.
+
+PK_BODY_fix_blends returns the number of created blend faces,
+and three arrays:
+
+ <B>'blends'</B> will contain <B>'n_blends'</B> faces, which are the created blend faces.
+
+ <B>'unders'</B> The contents of <B>'unders'</B> will depend on the <B>'tracking_type'</B> option.
+          If the <B>'tracking_type'</B> option is set to <A HREF=../headers/pk_blend_track_type_t.html>PK_blend_track_type_unders_c</A>
+          then <B>'unders'</B> will contain an array of <B>'n_blends'</B> arrays of
+          integers. Each array will contain the ( possibly dead ) tags of the
+          originating topology or geometry used to determine the equivalent
+          blend face in <B>'blends'</B>. In general these will be the tags of the two
+          underlying faces of the blend, along with any other data that
+          determined the geometry of the blend face, such as a cliff edge.
+
+          For faces derived from a limit point the array will instead contain
+          a negative integer refering to -1 times the index of the
+          appropriate point in the user-supplied <B>'limit_points'</B> array.
+
+          For faces derived from a limit vertex the array will instead contain
+          the tag of the original vertex associated with the limit.
+
+          For faces derived from a user-supplied capping sheet body the array
+          will contain the tag of the appropriate face in the user-supplied
+          capping sheet body.
+
+          For faces derived from a user-supplied capping surface the array
+          will contain the tag of the original surface.
+
+          For faces derived from a user-supplied limit face or limit fin the
+          array will contain the tag of the original limit face or limit fin.
+
+          For faces derived from patching the region of a limit the array
+          will contain the tag(s) of the original user-supplied limit face(s)
+          or limit fin(s). It will also contain the (possibly dead) underlying
+          faces defining the patch. In the situation where the face is
+          derived from a limit face and that limit face is also an underlying
+          face of the patch then that face may appear twice in the array.
+
+
+          If the <B>'tracking_type'</B> option is set to <A HREF=../headers/pk_blend_track_type_t.html>PK_blend_track_type_basic_c</A>
+          then <B>'unders'</B> will contain the underlying faces associated with the
+          blends. The underlying faces of a blend are the faces whose geometry
+          determines the blend surface geometry. Some of the face tags may be
+          null. This occurs if there is no face in the final body with the
+          appropriate surface geometry, which can be the case if a face has
+          been entirely blended away, or for the cliff side of a cliffedge
+          blend. However, if the 'output_sheet' option is used and a blend
+          sheet body created the face tags will not be null. When blend faces
+          have arisen from the face/faces of a user-supplied capping sheet
+          body, the face tags will always be null, as such a blend face is
+          deemed to have no direct association with the faces of the body
+          being blended.
+
+ <B>'topols'</B> will contain <B>'n_blends'</B> integers. These integers are usually the
+          tags of the edges which were blended to produce this set of blends.
+          The tags will in general be dead unless the <B>'output_sheet'</B> option
+          is chosen and a blend sheet body created. The same value may occur
+          several times in this list if, for example, a blend has overflowed,
+          since all the corresponding faces in <B>'blends'</B> were caused by the
+          same blend attribute. Where blend faces have arisen from the
+          face/faces of a user-supplied capping sheet body, the corresponding
+          integer in this list will be the tag of the appropriate original
+          face, upon the relevant user-supplied capping sheet body.
+
+If this function returns PK_ERROR_no_errors, the result of the operation
+will be indicated by the value of <B>'fault'</B>. When this value is not
+<A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_no_fault_c</A> or <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_repaired_c</A>, it indicates an
+operation failure. An edge that was selected to be blended associated with the
+error may be returned in <B>'fault_edge'</B>. Topology associated with the error may
+also be returned in <B>'fault_topol'</B>. See the documentation for <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_t</A>
+for details. This error information can be used to locate the reason for the
+failure to fix the blend. Note that only the first error will be returned.
+
+Note that blends created with the property <B>'draw_fix'</B> set to PK_LOGICAL_false
+will not be fixed.
+
+Blends can be created on general bodies, so long as the portion of the body in
+the neighbourhood of the blend is locally manifold.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Indexed I/O Functions</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Indexed I/O Functions</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.11.html">Application I/O Functions</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.13.html">Attribute Callback Functions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+
+<P ALIGN=CENTER>
+   <A HREF="#indx_A">A</A>
+ | <A HREF="#indx_C">C</A>
+ | <A HREF="#indx_D">D</A>
+ | <A HREF="#indx_E">E</A>
+ | <A HREF="#indx_F">F</A>
+ | <A HREF="#indx_G">G</A>
+ | <A HREF="#indx_I">I</A>
+ | <A HREF="#indx_K">K</A>
+ | <A HREF="#indx_L">L</A>
+ | <A HREF="#indx_M">M</A>
+ | <A HREF="#indx_O">O</A>
+ | <A HREF="#indx_P">P</A>
+ | <A HREF="#indx_R">R</A>
+ | <A HREF="#indx_S">S</A>
+ | <A HREF="#indx_T">T</A>
+ | <A HREF="#indx_V">V</A>
+ | <A HREF="#indx_W">W</A>
+
+</P>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548808_pgfId-274044"></A>F.1	Introduction
+
+
+</H1>
+<P>
+<A NAME="50548808_pgfId-274045"></A>This appendix contains the specifications of the indexed I/O (indexio) functions which can be implemented to replace or extend the normal part file handling functions in the frustrum in order to create an indexed frustrum. These functions are used during input and output of transmit files with ‘indexed i/o’ format, to allow specific faces in a part to be received into a Parasolid session, rather than requiring an entire part to be loaded.</P>
+<P>
+<A NAME="50548808_pgfId-274046"></A>There is further information on the use of the indexed i/o functions in <A HREF="di_chap.03.html#50548799_20081">Section 2.3.3, “Indexed I/O”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548808_pgfId-274057"></A>F.2	<A NAME="50548808_marker-274056"></A><A NAME="50548808_53582"></A>Registering the indexed I/O functions
+
+
+</H1>
+<P>
+<A NAME="50548808_pgfId-274058"></A>The indexed I/O functions must be registered with Parasolid by calling the PK function <A HREF=../headers/pk_session_register_indexio.html>PK_SESSION_register_indexio</A>. This function receives a <A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A> structure that contains pointers to the functions you want to register. </P>
+<P>
+<A NAME="50548808_pgfId-281627"></A>You can also call <A HREF=../headers/pk_session_ask_indexio.html>PK_SESSION_ask_indexio</A> to return a structure that contains pointers to the functions currently registered. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548808_pgfId-273605"></A>F.3	Indexed I/O functions that can be registered
+
+
+</H1>
+<P>
+<A NAME="50548808_pgfId-281732"></A>This section lists the indexed I/O functions that you can register during a Parasolid session.</P>
+<P>
+<A NAME="50548808_pgfId-290236"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548808_pgfId-282793"></A>Note: In the following list, the function names given are purely nominal, as the functions are registered by the call to <A HREF=../headers/pk_session_register_indexio.html>PK_SESSION_register_indexio</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548808_pgfId-282794"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290239"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290241"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290243"></A>For more information</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290245"></A><CODE>
+ffoprd</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290247"></A>Opens the FFBNRY specified file for reading and stores any required information. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290249"></A><A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290251"></A><CODE>
+ffopwr</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290253"></A>Opens a specified file for writing, and stores any required information.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290255"></A><A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290257"></A><CODE>
+ucoprd</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290259"></A>Opens the specified FFBNRY file for reading in Unicode mode, and stores any required information. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290261"></A><A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290263"></A><CODE>
+ucopwr</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290265"></A>Opens a specified file for writing in Unicode format, and stores any required information. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290267"></A><A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290269"></A><CODE>
+ffread</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290271"></A>Reads from the open file starting at the current position of the file pointer.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290273"></A><A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290275"></A><CODE>
+ffwrit</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290277"></A>Writes the given bytes to an open file, starting at the current file position. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290279"></A><A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290281"></A><CODE>
+ffseek</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290283"></A>Reset file pointer. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290285"></A><A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290287"></A><CODE>
+ffclos</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290289"></A>Closes a file which has been opened with a call to <CODE>
+ffoprd</CODE>
+ or <CODE>
+ucoprd</CODE>
+. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548808_pgfId-290291"></A><A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548808_pgfId-289434"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.11.html">Application I/O Functions</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.13.html">Attribute Callback Functions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

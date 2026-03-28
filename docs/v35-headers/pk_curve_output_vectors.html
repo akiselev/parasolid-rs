@@ -1,0 +1,95 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_output_vectors</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_output_vectors</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_CURVE_output_vectors
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>          curve,           --- curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>       interval,        --- parametric curve bounds
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>        want_ts,         --- whether curve parameters required
+double              curve_chord_tol, --- maximum chordal error
+double              curve_chord_ang, --- maximum angular error
+double              curve_chord_max, --- maximum step length
+
+<I>--- returned arguments ---
+</I>int          *const n_vectors,       --- number of position vectors
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A> **const vectors,         --- position vectors
+double      **const ts               --- corresponding curve parameters
+)
+</B>
+<A NAME="description"></A>
+<I>This function outputs position vectors along a curve.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_ctol_too_small        invalid <B>'curve_chord_tol'</B>
+    PK_ERROR_atol_too_small        invalid <B>'curve_chord_ang'</B>
+    PK_ERROR_stol_too_small        invalid <B>'curve_chord_max'</B>
+    PK_ERROR_tolerances_too_tight  failed to meet tolerances
+
+<A NAME="documentation"></A>
+The required part of the curve is bounded by the given <B>'interval'</B>.  The spacing
+of position vectors is controlled by 'curve_chord_tol', 'curve_chord_ang' and
+<B>'curve_chord_max'</B>.  If these are set zero or negative then suitable defaults
+will be used.  A chord is the straight line between two adjacent position
+vectors.
+
+  curve_chord_tol: maximum distance between a chord and the curve.
+
+  curve_chord_ang: the maximum value of the sum of the angles between the
+                   chord and the curve tangents at either end of the chord,
+                   for all curve types except polylines. If the curve is a
+                   polyline, this is the maximum allowable angle between a
+                   chord and the polyline segments it spans. A segment that
+                   doubles back on the chord is taken to have an angle in
+                   excess of pi/2 radians.
+
+  curve_chord_max: maximum chord length.
+
+<B>'curve_chord_tol'</B>, <B>'curve_chord_ang'</B> and <B>'curve_chord_max'</B> are independent
+means of controlling the output of vectors.  There will be no chord for which
+a given control value is exceeded.  There is no guarantee that any given
+maximum will actually be attained.
+
+As well as position vectors, the function may also output the curve parameter
+values corresponding to each position vector.  Whether or not this is
+required is set by the <B>'want_ts'</B> argument.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

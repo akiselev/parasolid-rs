@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_find_deviation</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_find_deviation</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_EDGE_find_deviation
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>           edge1,             --- edge from which to find distances
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>           edge2,             --- edge to which to find distance
+int                 how_many,          --- how many distances to find
+
+<I>--- returned arguments ---
+</I>int          *const n_distances,       --- number of distances returned
+double      **const distances,         --- distances
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A> **const edge1_vecs,        --- points on edge1
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A> **const edge2_vecs         --- corresponding points on edge2
+)
+</B>
+<A NAME="description"></A>
+<I>This function computes distances from edge1 to edge2.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_edge_find_deviation_2.html>PK_EDGE_find_deviation_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+PK_ERROR_bad_value          Either one of the edges was null or they're both
+                            the same
+
+PK_ERROR_missing_geom       One of the edges has no curve geometry on it
+
+PK_ERROR_no_overlap         The edges had no overlap
+
+PK_ERROR_distancing_failed  Determination of the distances not completed
+                            because of algorithmic failure
+
+<A NAME="documentation"></A>
+
+
+PK_EDGE_find_deviation will provide distance samples between two edges received
+in 'edge1' and 'edge2'. These distance samples are returned in three arrays
+( 'distances', 'edge1_vecs', and 'edge2_vecs' ) whose corresponding entries
+give a position on each edge and the measured distance between them.
+
+One of the edges is selected as being apparently the more complicated one, and
+regions on it where it 'overlaps' the other are determined. There may be zero,
+one or two regions, and each region maybe extended or point-like. Within each
+point-like overlap a single location on the preferred mroe complex edge is
+chosen. For each extended region a number of locations on the more complicated
+edge is chosen according to the value of the received argmument 'how_many'.
+Once the locations are chosen on the more complex edge, distances are
+determined from each of them to the closest points on the other edge. The value
+of the 'how_many' produces three different kinds of sampling behaviour as
+indicated below:
+
+    ------------------------------------------------------------------------
+    |  Value   |                                                           |
+    |    of    |                    Behaviour                              |
+    |'how_many'|                                                           |
+    ------------------------------------------------------------------------
+    |     0    | PK_EDGE_find_deviation chooses what it feels is the       |
+    |          | appropriate set of points in each region ( both in number |
+    |          | and position. )  Distances are measured and returned at   |
+    |          | all these points.                                         |
+    ------------------------------------------------------------------------
+    |     1    | PK_EDGE_find_deviation chooses the same set of points as  |
+    |          | for the case 'how_many' == 0.  However in this case only  |
+    |          | the pair of points producing the greatest distance is     |
+    |          | returned.                                                 |
+    ------------------------------------------------------------------------
+    |   N &gt; 1  | For point-like regions a single location is chosen. The   |
+    |          | number of samples in each extended region is determined   |
+    |          | by dividing N by the number of such regions ( giving M    |
+    |          | samples per region say ). PK_EDGE_find_deviation then     |
+    |          | places M locations evenly in parameter space in each      |
+    |          | region on the more complex curve. Distances are then      |
+    |          | determined and returned from all chosen points.           |
+    ------------------------------------------------------------------------
+
+The function assumes the two edges to present a reasonably parallel pairing
+of curve geometries. Edges which differ significantly in direction can
+produce non-intuitive results. Understanding these cases can be aided by
+bearing in mind that the function seeks a collection of minimising, rather than
+stationary, distances from ( 'fixed' ) points on one edge to the other.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

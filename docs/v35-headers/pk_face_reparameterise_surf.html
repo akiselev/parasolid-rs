@@ -1,0 +1,108 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_reparameterise_surf</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_reparameterise_surf</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                        PK_FACE_reparameterise_surf
+(
+<I>--- received arguments ---
+</I>int                                    n_faces,       --- number of faces
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                              faces[],       --- faces
+const <A HREF=../headers/pk_face_reparameterise_surf_o_t.html>PK_FACE_reparameterise_surf_o_t</A> *options,       --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_face_reparameterise_surf_r_t.html>PK_FACE_reparameterise_surf_r_t</A> *const results        --- results
+)
+</B>
+<A NAME="description"></A>
+<I>This function reparameterises the surfaces attached to the given <B>'faces'</B>.
+Any sp-curves and intersection curves that are dependent on the surfaces are
+modified. Surfaces remain geometrically unaltered.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_wrong_entity_in_array (MILD)    given faces are not from same
+                                             body
+    PK_ERROR_duplicate_array_item  (MILD)    duplication in faces array
+    PK_ERROR_missing_geom          (MILD)    face does not have a geometry
+    PK_ERROR_unsuitable_entity     (MILD)    geometry unsuitable for the
+                                             requested reparameterisation
+    PK_ERROR_reparam_failed        (SERIOUS) reparameterisation failed
+
+
+<A NAME="documentation"></A>
+
+Permitted surface types are PK_CLASS_bsurf, PK_CLASS_offset, PK_CLASS_swept and
+PK_CLASS_spun. For surfaces of type PK_CLASS_swept and PK_CLASS_spun,
+underlying curve must be of type PK_CLASS_bcurve.
+
+By appropriate specifications in the options structure, this function allows
+the U,V directions to be transposed, reversed or rescaled. If more than one
+reparameterisation option is specified, then the transforms are applied in the
+following order:
+
+    (1) Transpose the U and V directions,
+    (2) Reverse the U and/or V directions,
+    (3) Rescale the U and/or V directions (using a new parameter interval).
+
+Care should be taken when combining reparameterisation options, since the
+reverse and rescale transforms will be applied to the transposed U,V
+directions.
+
+Supported reparameterisations for different surface types are:
+
+Surface Type     | Transpose | Reverse U | Reverse V | Rescale U| Rescale V
+---------------------------------------------------------------------------
+PK_CLASS_bsurf   |    Yes    |   Yes     |    Yes    |   Yes    |  Yes
+PK_CLASS_swept   |    No     |   Yes     |    No     |   Yes    |  No
+PK_CLASS_spun    |    No     |   Yes     |    No     |   Yes    |  No
+
+For surface of type PK_CLASS_offset, underlying surface type determines
+permitted reparameterisations.
+
+Alternatively application may set all reparameterisation  options to
+PK_LOGICAL_false, and Parasolid will chose whether to rescale the U/V
+intervals to improve surface quality.
+
+If <B>'geom_sharing'</B> option is set to PK_geom_sharing_keep_fail_c, user must pass
+in all construction geometry that is dependent on the surfaces of the faces
+passed in.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

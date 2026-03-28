@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_PART_transmit_b</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_PART_transmit_b</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>             PK_PART_transmit_b
+(
+<I>--- received arguments ---
+</I>int                         n_parts,     --- number of parts
+const <A HREF=../headers/pk_part_t.html>PK_PART_t</A>            *parts,       --- parts
+const <A HREF=../headers/pk_part_transmit_o_t.html>PK_PART_transmit_o_t</A> *options,     --- transmit options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_memory_block_t.html>PK_MEMORY_block_t</A>    *const block        --- chain of XT data
+)
+</B>
+<A NAME="description"></A>
+<I>This function transmits the given parts into application memory.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_file_format       Format applio not allowed (MILD)
+    PK_ERROR_duplicate_parts       Parts are not distinct, or share common
+                                      sub-parts (MILD)
+    PK_ERROR_schema_access_error   Error opening, closing, or writing the
+                                      schema file (MILD)
+    PK_ERROR_wrong_version         Cannot transmit as given version (MILD)
+    PK_ERROR_write_memory_full     Error allocating space for XT data (MILD)
+    PK_ERROR_bad_text_conversion   Some part data could not be written
+                                     (only relevant if options-&gt;transmit_format
+                                      is <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_text_c</A>) (MILD)
+    PK_ERROR_bad_field_conversion  Part contains data not convertible to
+                                      saved format (only relevant if
+                                      options-&gt;transmit_version is non-zero)
+                                     (MILD)
+    PK_ERROR_child_body            One or more of the parts is a child body
+                                     (MILD)
+    PK_ERROR_facet_geometry        A part contains facet geometry but facet
+                                   geometry is not enabled in the session
+                                     (MILD)
+    PK_ERROR_mesh_not_found        Not all requested mesh data
+                                      successfully received (MILD)
+
+<A NAME="documentation"></A>
+If any of the parts being transmitted are assemblies, then all their
+sub-parts will be transmitted with them.
+
+The parts must be distinct, and must not have any common sub-parts.
+
+Option <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_applio_c</A> is not allowed.
+
+After use, the chain of XT data can be freed by <A HREF=../headers/pk_memory_block_f.html>PK_MEMORY_block_f</A>.
+
+If the part contains delayed-load model data that has not been loaded, it
+will be loaded as part of the transmit operation.
+
+See <A HREF="../chapters/fd_chap.101.html#50434468_pgfId-313825">Transmitting a part</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

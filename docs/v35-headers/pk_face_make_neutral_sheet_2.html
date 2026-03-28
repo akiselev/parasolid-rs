@@ -1,0 +1,229 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_make_neutral_sheet_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_make_neutral_sheet_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_FACE_make_neutral_sheet_2
+(
+<I>--- received arguments ---
+</I>int                                   n_left_faces,   --- number of left faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                       left_faces[],   --- left faces
+int                                   n_right_faces,  --- number of right faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                       right_faces[],  --- right faces
+double                                placement,      --- placement parameter
+const <A HREF=../headers/pk_face_make_neutral_sheet_o_t.html>PK_FACE_make_neutral_sheet_o_t</A> *options,        --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>             *const tracking        --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates the neutral sheet defined by the surfaces on the
+faces and returns it as a sheet body.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_inconsistent_offset  (MILD)    surfaces are not offsets
+    PK_ERROR_su_not_coincident    (MILD)    surfaces are not coincident
+    PK_ERROR_bad_tolerance        (MILD)    tolerance value is invalid
+    PK_ERROR_cant_extend          (SERIOUS) failed to extend the sheet
+    PK_ERROR_cant_fill_hole       (SERIOUS) failed to patch hole
+    PK_ERROR_cant_offset          (SERIOUS) failed to create offset sheet
+    PK_ERROR_invalid_methods      (MILD)    method data invalid
+    PK_ERROR_cant_find_thickness  (MILD)    thickness cannot be calculated
+    PK_ERROR_zero_thickness       (MILD)    thickness is zero
+    PK_ERROR_disjoint             (MILD)    neutral sheet would be disjoint
+    PK_ERROR_cant_get_surf        (MILD)    failed to fit a medial surface to
+                                            the faces
+    PK_ERROR_cant_cover           (MILD)    failed to cover face set
+    PK_ERROR_su_self_intersect    (MILD)    medial surface would be
+                                            self-intersecting
+    PK_ERROR_not_smooth           (MILD)    failed to cover across edge that
+                                            is not smooth
+
+<A NAME="documentation"></A>
+Introduction
+This function receives two sets of faces and constructs a neutral sheet between
+them. The construction method of the neutral sheet can be modified via controls
+in the option structure.
+
+If the function is successful then the tracking will have one record containing
+the created body as product topol and all input faces as original topols. If
+the created body has more than one face then, in addition to the tracking
+record containing the created body, a record is returned for each face in the
+created body, containing the face or faces it is derived from.
+
+If the option <B>'extend_and_fill_holes'</B> is set to PK_LOGICAL_true then the sheet
+will be made large enough to trim against other neutral sheets or side faces,
+by extending and filling holes. If it is set to PK_LOGICAL_false then the
+sheet will not be modified and will just be the offset of one set of faces.
+
+If the neutral surface cannot be created, then an appropriate PK_ERROR_t will
+be returned.
+
+Construction Methods
+The function has three alternative construction methods. The default
+construction method is <A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_mid_offset_c</A>.
+
+Mid-Offset Construction (<A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_mid_offset_c</A>)
+    Summary: Using this method, a neutral surface will only be created if the
+    surfaces of the given faces are genuine non-zero offsets of each other. The
+    function will calculate the thickness by identifying the current offset
+    value of the received faces, and then output an offset of either
+    <B>'left_faces'</B> or <B>'right_faces'</B> at the appropriate distance.
+
+    The function will calculate the thickness by identifying an offset value
+    such that each face in <B>'left_faces'</B> is an offset at this value of a face
+    in <B>'right_faces'</B> and similarly each face in <B>'right_faces'</B> is an offset of
+    a face in <B>'left_faces'</B>.
+
+    The thickness calculation is done exactly if <B>'have_tolerance'</B> is
+    PK_LOGICAL_false, or to the specified <B>'tolerance'</B> if <B>'have_tolerance'</B> is
+    PK_LOGICAL_true. In this case an offset value will be found such that the
+    offset value for all faces lies within this <B>'tolerance'</B>.
+
+    The value of <B>'placement'</B> will then be used to create a neutral surface
+    whose points satisfy the following expression:
+
+                    (1 - p) D1 = (1 + p) D2
+
+    where p is the value of <B>'placement'</B>, D1 is the distance to the surface of
+    <B>'left_faces'</B> and D2 is the distance to the surface of <B>'right_faces'</B>. If
+    p = 0, the neutral surface is equidistant from the given surfaces. The
+    function chooses whether the resulting neutral sheet will be offset from
+    <B>'left_faces'</B> or <B>'right_faces'</B>.
+
+Offset-Left Construction (<A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_offset_left_c</A>)
+    Summary: Using this method, a neutral surface will be created if a non-zero
+    thickness can be calculated. The function will identify a thickness and
+    offset <B>'left_faces'</B> at the appropriate distance.
+
+    The function will calculate the thickness by identifying the maximum
+    distance that <B>'left_faces'</B> can be offset before they intersect
+    <B>'right_faces'</B>.
+
+    The value of <B>'placement'</B> will then be used to create a neutral sheet body
+    that is an offset of the <B>'left_faces'</B> at a distance
+
+                    thickness * (1 + p) / 2.
+
+    If p = 1, the neutral sheet will placed so that it touches <B>'right_faces'</B>.
+
+    If no offset of <B>'left_faces'</B> will intersect <B>'right_faces'</B>, or the
+    thickness is calculated to be zero, the function will fail with the
+    appropriate error.
+
+Medial Construction (<A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_medial_c</A>)
+    Summary: Using this method allows the creation of true neutral sheets for
+    face sets that are not tolerant offsets of each other. A neutral sheet
+    will be created such that each point on it satisfies the following
+    expression:
+
+                    (1 - p) D1 = (1 + p) D2
+
+    where p is the value of <B>'placement'</B>, D1 is the distance to the surfaces of
+    <B>'left_faces'</B> and D2 is the distance to the surfaces of <B>'right_faces'</B>. If
+    p = 0, the neutral sheet is equidistant from the given sets of faces.
+    If this method is used then <B>'have_tolerance'</B> must be set to PK_LOGICAL_true
+    and a <B>'tolerance'</B> specified. This tolerance will be used to build the
+    medial surfaces - i.e. the medial surfaces will be within that tolerance of
+    the theoretical medial surfaces. If a disjoint face set defined on more
+    than one surface is too complex or turns through too big an angle then the
+    function will fail with the error PK_ERROR_cant_cover. If the medial
+    surface would be self-intersecting because it lies more than the radius of
+    curvature away from either face set then the function will fail with the
+    error PK_ERROR_su_self_intersect. If creating the medial surface fails
+    because it cannot create a single surface across an edge which is not
+    smooth in either face set then the function will fail with the error
+    PK_ERROR_not_smooth. The function chooses whether the resulting neutral
+    sheet will inherit its topology from <B>'left_faces'</B> or <B>'right_faces'</B>.
+
+Function Reporting
+The function groups the faces as follows.
+ - If <A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_mid_offset_c</A> is set: each group has an offset value
+   such that each face from <B>'left_faces'</B> in the group is an offset of some face
+   from <B>'right_faces'</B> in the group at the given offset value. If <B>'tolerance'</B> is
+   set, the offset values are within <B>'tolerance'</B> of each other.
+ - If <A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_offset_left_c</A> or PK_neutral_method_medial is set,
+   all faces belong to the same group.
+
+The function will provide a report record of type <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_t</A> with status
+<A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_neutral_face_data_c</A> for each group identified by the function.
+
+Each report record will contain:
+ - the method <A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_t</A> used by the group;
+ - an integer indicating whether <B>'left_faces'</B> or <B>'right_faces'</B> were offset to
+   make the neutral sheet. The value will be zero if <B>'left_faces'</B> were offset,
+   or one if <B>'right_faces'</B> were offset. If no neutral sheet was created, the
+   value will be zero;
+ - faces from <B>'left_faces'</B> that are part of this group;
+ - faces from <B>'right_faces'</B> that are part of this group;
+ - the value by which <B>'left_faces'</B> or <B>'right_faces'</B> were offset to make the
+   neutral sheet - this will be zero if no neutral sheet was created. It will
+   also be zero if <A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_medial_c</A> is set as in this case the
+   offset is not constant;
+ - the placement parameter received by the function;
+ - the minimum thickness calculated by the function for this group of faces;
+   and
+ - the maximum thickness calculated by the function - this will be the same as
+   the minimum thickness unless method <A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_mid_offset_c</A> or
+   <A HREF=../headers/pk_neutral_method_t.html>PK_neutral_method_medial_c</A> is used and a <B>'tolerance'</B> is provided.
+ - the tolerance used by the function. This is usually the same as <B>'tolerance'</B>
+   but may have been reduced if the value is too large with respect to the
+   minimum thickness. If <B>'tolerance'</B> is unset, the value will be zero.
+
+The exact structure of the report is provided in the <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_t</A>
+documentation.
+
+Faces that are not part of any group will be reported in a <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_t</A> with
+status <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_fa_not_offset_c</A>, and the function will fail with error
+PK_ERROR_inconsistent_offset.
+
+If Parasolid was unable to determine how to orient one or both face sets,
+the faces responsible in <B>'left_faces'</B> and <B>'right_faces'</B> will be reported in a
+report of type <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_t</A> with status <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_fa_unoriented_c</A>.
+
+In certain circumstances - if both face sets are defined on a single surface
+each, and these surfaces are exact offsets - success may be returned even if
+the faces do not overlap. For certain applications this may be undesirable.
+This may be avoided by using the <B>'overlap'</B> option to perform extra checks and
+only succeed if faces are overlapping.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

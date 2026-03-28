@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_manifold_bodies</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_manifold_bodies</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_BODY_make_manifold_bodies
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>         body,         --- body to decompose
+
+<I>--- returned arguments ---
+</I>int        *const n_components, --- number of manifold bodies
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A> **const components    --- array of manifold bodies
+)
+</B>
+<A NAME="description"></A>
+<I>This function breaks a body into manifold pieces.
+</I>
+<A NAME="documentation"></A>
+If the given body is general, an array of manifold bodies is returned.  The
+given body is decomposed such that:
+
+(1) Each solid region becomes a solid body.
+
+(2) Any face with the same solid region on both sides is deleted.
+
+(3) Using any faces which are not on the boundary of a solid region, each
+maximal connected subset of them which is manifold (i.e. each edge is adjacent
+to no more than 2 faces) will be returned as a sheet body.
+
+(4) Each maximal connected set of wireframe edges which is manifold (i.e. each
+vertex is adjacent to no more than 2 edges) will be returned as a wire body.
+
+(5) Any acorn vertices are deleted unless the body consists solely of acorn
+vertices in which case a minumum or acorn body will be returned depending
+upon whether the number of vertices was one or greater than one.
+
+If the <B>'body'</B> is of type PK_BODY_type_empty_c then <B>'n_components'</B> will be
+returned as zero and the body will be deleted.
+
+This function has no effect on bodies which are not general, and the single
+component returned will be the original body.
+
+Although all the bodies returned will have valid manifold topology, they may
+not be valid for geometrical reasons.  This is because there may be a face,
+edge, or vertex in the original body which must be split to produce a manifold
+result.  Any edge with more than 2 faces incident with it will be split into
+several edges, one for each incident face.  If only 2 two of these remain in
+the same body they will be rejoined to avoid coincident edges, but if more than
+2 remain they will not be rejoined.  Coincident vertices are treated similarly
+to edges.
+
+When a sheet body is returned, all its face normals are made to be compatible
+in order to satisfy the conditions for a manifold sheet body.  The direction of
+these face normals is not defined (they could all be reversed without
+invalidating the sheet) and, in particular, is not guaranteed to remain the
+same between versions.
+
+It is possible for a sheet body to be non-orientable.  In this case some edges
+will be disjoined in order to satisfy the conditions for a manifold sheet body,
+and this will result in coincident geometry.  It is not defined which edges
+will be disjoined if a sheet is not orientable.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

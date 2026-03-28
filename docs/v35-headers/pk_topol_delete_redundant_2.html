@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TOPOL_delete_redundant_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TOPOL_delete_redundant_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                        PK_TOPOL_delete_redundant_2
+(
+<I>--- received arguments ---
+</I>int                                    n_topols, --- number of topols
+const <A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                       topols[], --- array of topols
+const <A HREF=../headers/pk_topol_delete_redundant_2_o_t.html>PK_TOPOL_delete_redundant_2_o_t</A> *options,  --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>              *const tracking  --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function removes redundant topology or sub-topology from the given list
+of topologies.
+</I>
+<A NAME="documentation"></A>
+Redundant topologies are removed from the given array of topols, which may be
+a single body, list of faces, list of edges or list of vertices.
+
+A topology may be identified as redundant if it forms the boundary between two
+topologies which have geometry on their interior that is either shared or
+equivalent and smooth across that entire boundary topology.
+
+A redundant topology can be an edge or a vertex.
+
+A vertex will normally be redundant if it is attached to a split ring edge, or
+if it is attached to only two edges, with the same curve geometry.
+
+An edge will normally be redundant if it is a wire edge (including
+parametric seam lines), or if the faces on either side have the same or
+equivalent surface geometry.
+
+For models with facet geometry, the criterion used to decide which pieces of
+topology are redundant is determined by the <B>'facet_geom_continuity'</B> and
+<B>'vertex_angle'</B> fields in the function option structure.
+
+Topologies will be combined if they share a redundant boundary. When merging
+two faces with meshes attached, the two original meshes are destroyed, and a
+new mesh is attached to the resulting face. In particular, mtopols which
+reference either of the original meshes will not necessarily remain valid. The
+situation is the same when merging edges with polylines attached; the original
+geometry is destroyed, and a new composite polyline is attached to the
+surviving edge.
+
+Track records will be returned, with delete records for redundant topologies
+that have been removed, and merge records for topologies that have been
+combined as a result.
+
+The behaviour of the function is controlled by option structure
+<A HREF=../headers/pk_topol_delete_redundant_2_o_t.html>PK_TOPOL_delete_redundant_2_o_t</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

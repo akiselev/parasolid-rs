@@ -1,0 +1,288 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Further Implementation Decisions</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Further Implementation Decisions</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.007.html">Supplying A Frustrum</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.009.html">Parasolid Source Code Collateral</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.008.html#50422076_pgfId-342255">7.1	Introduction</A>
+<LI> <A HREF="fd_chap.008.html#50422076_pgfId-336848">7.2	Handling of run-time errors and user interrupts </A>
+<LI> <A HREF="fd_chap.008.html#50422076_pgfId-326984">7.3	Roll-back </A>
+<LI> <A HREF="fd_chap.008.html#50422076_pgfId-327015">7.4	Tracking entities </A>
+<LI> <A HREF="fd_chap.008.html#50422076_pgfId-327051">7.5	Session parameters </A>
+<LI> <A HREF="fd_chap.008.html#50422076_pgfId-359731">7.6	Upgrading your version of Parasolid </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422076_pgfId-342255"></A>7.1	Introduction
+
+
+</H1>
+<P>
+<A NAME="50422076_pgfId-336843"></A>This chapter discusses other functionality that you may want to consider using when integrating your application with Parasolid. None of the issues discussed here are essential in order to get a working frustrum. </P>
+<P>
+<A NAME="50422076_pgfId-341828"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-341690"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422076_pgfId-341694"></A><A HREF="fd_chap.011.html#50422079_49464">Chapter 10, “Tracking And Labelling”</A></LI>
+<LI>
+<A NAME="50422076_pgfId-341698"></A><A HREF="fd_chap.098.html#50422177_36055">Chapter 97, “Rollback”</A></LI>
+<LI>
+<A NAME="50422076_pgfId-341702"></A><A HREF="fd_chap.122.html#50422204_35122">Chapter 121, “Signal Handling”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422076_pgfId-336848"></A>7.2	<A NAME="50422076_marker-342655"></A><A NAME="50422076_marker-342656"></A><A NAME="50422076_marker-342657"></A><A NAME="50422076_marker-342658"></A>Handling of run-time errors and user interrupts 
+
+
+</H1>
+<P>
+<A NAME="50422076_pgfId-326982"></A><A NAME="50422076_marker-326978"></A><A NAME="50422076_marker-326979"></A><A NAME="50422076_marker-326980"></A><A NAME="50422076_marker-326981"></A>You can register signal handlers with the operating system to recover from run-time errors and user interrupts. If you don’t have a signal handler in these situations, your application will most likely abort. For more information, see Volume <A HREF="fd_chap.119.html#50422201_82414" CLASS="XRef"></A><A HREF="fd_chap.119.html#50422201_82414">17</A>, <A HREF="fd_chap.119.html#50422201_43301">Error Handling</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422076_pgfId-326984"></A>7.3	<A NAME="50422076_marker-326983"></A><A NAME="50422076_63745"></A>Roll-back 
+
+
+</H1>
+<P>
+<A NAME="50422076_pgfId-326987"></A>Parasolid has two types of roll-back, both of which are available through the same mechanism. </P>
+<UL>
+<LI>
+<A NAME="50422076_pgfId-326988"></A>Session-level roll-back allows your application to roll back the contents of the entire session.</LI>
+<LI>
+<A NAME="50422076_pgfId-326993"></A><A NAME="50422076_marker-326989"></A><A NAME="50422076_marker-326990"></A>Partition-level roll-back allows your application to roll back an individual <A NAME="50422076_marker-326991"></A><A NAME="50422076_marker-326992"></A>partition independently of other partitions. </LI>
+</UL>
+<P>
+<A NAME="50422076_pgfId-326994"></A>If implemented, you can use roll-back in your application in several ways. For example:</P>
+<UL>
+<LI>
+<A NAME="50422076_pgfId-326997"></A><A NAME="50422076_marker-326995"></A><A NAME="50422076_marker-326996"></A>To revert to a known state after a failed operation (i.e. as an undo facility).</LI>
+<LI>
+<A NAME="50422076_pgfId-326999"></A><A NAME="50422076_marker-326998"></A>To mark the major milestones in the design history of a part within a feature modeling environment.</LI>
+</UL>
+<P>
+<A NAME="50422076_pgfId-327004"></A>You could implement <A NAME="50422076_marker-327000"></A><A NAME="50422076_marker-327001"></A>partition-level roll-back so that each <A NAME="50422076_marker-327002"></A><A NAME="50422076_marker-327003"></A>partition has only one part, users could make changes to individual parts and roll them back without affecting other parts in the session. </P>
+<P>
+<A NAME="50422076_pgfId-327009"></A>Roll-back is enabled by registering a <A NAME="50422076_marker-327005"></A><A NAME="50422076_marker-327006"></A>delta frustrum before the session is started. The <A NAME="50422076_marker-327007"></A><A NAME="50422076_marker-327008"></A>delta frustrum performs a similar function to the standard frustrum, and specifies how roll-back (<A NAME="50422076_marker-327010"></A><A NAME="50422076_marker-327011"></A>delta) information is written and read. </P>
+<P>
+<A NAME="50422076_pgfId-327292"></A>See <A HREF="fd_chap.098.html#50422177_36055">Chapter 97, “Rollback”</A>, for more information.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422076_pgfId-327015"></A>7.4	<A NAME="50422076_marker-327012"></A><A NAME="50422076_marker-327013"></A><A NAME="50422076_marker-327014"></A>Tracking entities 
+
+
+</H1>
+<P>
+<A NAME="50422076_pgfId-327016"></A>Your application may need to track various entities within any Parasolid session. For example, tracking is required in order to:</P>
+<UL>
+<LI>
+<A NAME="50422076_pgfId-327017"></A>Update graphical display information </LI>
+<LI>
+<A NAME="50422076_pgfId-327018"></A>Track entities in a feature-based system</LI>
+</UL>
+<P>
+<A NAME="50422076_pgfId-327019"></A>There are several ways of tracking entities in Parasolid, and you need to decide which approach you want to take. The most straightforward ways of tracking entities are:</P>
+<UL>
+<LI>
+<A NAME="50422076_pgfId-327020"></A>Using tracking information returned in PK function calls. This is the recommended method. See <A HREF="fd_chap.011.html#50422079_49464">Chapter 10, “Tracking And Labelling”</A>, for more information</LI>
+<LI>
+<A NAME="50422076_pgfId-327024"></A>Using attribute information attached to entities. See <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A>, for more information.</LI>
+<LI>
+<A NAME="50422076_pgfId-327028"></A>Setting up a bulletin board to record certain events within a Parasolid session. See <A HREF="fd_chap.100.html#50422179_26577">Chapter 99, “Bulletin Board”</A>, for more information.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422076_pgfId-327051"></A>7.5	<A NAME="50422076_11397"></A><A NAME="50422076_marker-327050"></A>Session parameters 
+
+
+</H1>
+<P>
+<A NAME="50422076_pgfId-327053"></A><A NAME="50422076_marker-327052"></A>There are a number of session-level parameters that you can set up to alter the behaviour for the whole session. Examples of session-wide parameters include:</P>
+<P>
+<A NAME="50422076_pgfId-327085"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327056"></A>Parameter</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327058"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327060"></A>Continuity and self intersection checking:</P>
+<P>
+<A NAME="50422076_pgfId-327435"></A><A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A></P>
+<P>
+<A NAME="50422076_pgfId-327463"></A><A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327064"></A><A NAME="50422076_marker-327062"></A><A NAME="50422076_marker-327063"></A>These settings affect the level of checking performed by various checking functions, and also control whether G1-discontinuous or self-intersecting geometry can be attached to topology.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327067"></A><A NAME="50422076_marker-327066"></A>General topology:</P>
+<P>
+<A NAME="50422076_pgfId-327511"></A><A HREF=../headers/pk_session_set_general_topology.html>PK_SESSION_set_general_topology</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327069"></A>This setting allows general bodies - such as non-manifold or disconnected bodies - to be created from Boolean operations. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327071"></A>Roll forward:</P>
+<P>
+<A NAME="50422076_pgfId-327545"></A><A HREF=../headers/pk_session_set_roll_forward.html>PK_SESSION_set_roll_forward</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327073"></A>This option defines whether a session can be rolled forward at any stage. The setting of this option has an affect on the roll-back management strategy your application needs to use. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327076"></A><A NAME="50422076_marker-327075"></A>SMP (Symmetric Multi Processing):</P>
+<P>
+<A NAME="50422076_pgfId-327576"></A><A HREF=../headers/pk_session_set_smp.html>PK_SESSION_set_smp</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422076_pgfId-327078"></A>This option enables Parasolid to make best use of machines that have more than one processor.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422076_pgfId-327086"></A>Session-level parameters are set to their default values when the Parasolid session is started. If you wish to change these values, you should do so after the session has started and when appropriate in your application workflow.For a list of all the session-wide parameters initialised at the start of a Parasolid session, see <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422076_pgfId-359731"></A>7.6	Upgrading your version of Parasolid 
+
+
+</H1>
+<P>
+<A NAME="50422076_pgfId-356188"></A>There are many benefits to upgrading your Parasolid version, including accessing new API functions, new options within an existing API function, and bug fixes. At times it may be necessary to upgrade your Parasolid version with minimal disruption to your application. For example, if you are close to a release deadline and require a bug fix in a newer version of Parasolid. </P>
+<P>
+<A NAME="50422076_pgfId-358733"></A>A plug-and-play mechanism exists within Parasolid that enables you to use a newer version of Parasolid (as a dynamically linked library) without the need to rebuild your application. The mechanism performs a mapping between older and newer options structures so that the new build of Parasolid correctly interprets the options set in your existing application code. </P>
+<P>
+<A NAME="50422076_pgfId-358964"></A>To access all available functional enhancements when upgrading to a newer Parasolid version, you will need to rebuild your application code.</P>
+<P>
+<A NAME="50422076_pgfId-357151"></A>For more information on the plug-and-play mechanism see <A HREF="fd_chap.010.html#50422078_87303">Section 9.8, “Compatibility between Parasolid versions”</A>.</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.007.html">Supplying A Frustrum</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.009.html">Parasolid Source Code Collateral</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

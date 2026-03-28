@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_MFACET_find_perimeters</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MFACET_find_perimeters</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_MFACET_find_perimeters
+(
+<I>--- received arguments ---
+</I>int                                  n_mfacets,  --- the number of mfacets
+const <A HREF=../headers/pk_mfacet_t.html>PK_MFACET_t</A>                    mfacets[],  --- the mfacets
+const <A HREF=../headers/pk_mfacet_find_perimeters_o_t.html>PK_MFACET_find_perimeters_o_t</A> *options,    --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_mfacet_find_perimeters_r_t.html>PK_MFACET_find_perimeters_r_t</A> *const results     --- results structure
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns the perimeter mfins around a set of given mfacets.
+Optionally, the set of mfacets can be expanded by a callback function that uses
+the given mtopols as seeds to propagate out from.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_mtopols_not_same_mesh (MILD) <B>'mfacets'</B> not all from same mesh.
+    PK_ERROR_not_implemented       (MILD) <B>'track_type'</B> option is not
+                                          <A HREF=../headers/pk_mtopol_track_t.html>PK_MTOPOL_track_none_c</A>
+    PK_ERROR_callback_failed       (MILD) the callback function failed.
+    PK_ERROR_bad_value             (MILD) the value of <B>'min_n_mfacets'</B> is
+                                          negative
+
+<A NAME="documentation"></A>
+A perimeter is defined as the set of mfins forming the boundary of a set of
+mfin-connected mfacets. If the user does not supply a callback function
+based on an mfin topology criterion, this boundary comprises every mfin of the
+set of mfin-connected mfacets that does not have an adjacent mfin whose mfacet
+is also in the set. Therefore, it includes the mfins of any inner loops or
+holes within the mfin-connected set. Sets of mfacets connected only at
+mvertices lie within distinct perimeters.
+
+If the user supplies a callback function <B>'select_cb'</B> based on mfin topology,
+the perimeter boundary will comprise all the mfins at which the callback
+function stopped the selection propagation by returning <B>'select'</B> equal to
+PK_logical_false. Therefore, the perimeter may include internal wire mfins.
+
+This function returns the perimeters of the set of input mfacets as one or
+more mloops. An mloop is a connected set of mfins ordered into a loop in the
+direction of the mfins. Each mloop consists of at least two mfins. An mloop
+cannot contain the same mfin more than once but more than one mfin in the
+mloop may point to the same mvertex. See <A HREF="../chapters/fd_chap.089.html#50434454_pgfId-367275">here</A> for more information.
+
+At most one perimeter bounds each set of mfin-connected mfacets. An
+mfin-connected set of the received mfacets may form a closed set, for
+example, all the mfacets of a topological sphere, and in that case that
+set of mfacets will have no perimeter (and therefore no mloops).
+
+The <A HREF=../headers/pk_mfacet_find_perimeters_o_t.html>PK_MFACET_find_perimeters_o_t</A> structure contains application control
+options.
+
+The mloops are returned in a <A HREF=../headers/pk_mfacet_find_perimeters_r_t.html>PK_MFACET_find_perimeters_r_t</A> structure.
+
+The option <B>'select_cb'</B> allows the application to pass a callback function
+to control an mfacet propagation algorithm. This algorithm will propagate
+outwards from the mfacets given as input in the argument `mfacets[]', which
+now act as seeds of the propagation. The criterion for propagation must be
+implemented in the callback function and this can either be formulated in
+terms of adjacent mfacets or mfins.
+
+An mfin is considered to be a wire mfin if both it and its adjacent mfin lie
+on the perimeter of the mfacetset. This can only happen when a <B>'select_cb'</B> is
+supplied that has its <B>'select_mtopol_class'</B> as PK_CLASS_mfin.  If such a
+<B>'select_cb'</B> does not select an mfacet when given a particular mfin but that
+mfacet is subsequently selected by propagating across one of its other mfins,
+then the first mfin will be considered to be a wire mfin.  If the option
+<B>'select_wire_mfins'</B> is set to <A HREF=../headers/pk_selector_type_t.html>PK_selector_type_include_c</A>, these wire mfins and
+their adjacent mfins will be included in the perimeter of the mfacetset.
+Note that <B>'select_cb'</B> should behave symmetrically: it should return the same
+selection result for an mfin and its adjacent mfin. Otherwise,
+PK_mfacet_find_perimeters will return PK_ERROR_callback_failed.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

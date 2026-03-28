@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_replace_surfs_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_replace_surfs_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_FACE_replace_surfs_2
+(
+<I>--- received arguments ---
+</I>int                              n_faces,        --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                  faces[],        --- faces
+const <A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                  surfs[],        --- replacement surfaces
+const <A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>               senses[],       --- surface orientation
+double                           tolerance,      --- tolerance for operation
+const <A HREF=../headers/pk_face_replace_surfs_o_t.html>PK_FACE_replace_surfs_o_t</A> *options,        --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>        *const tracking,       --- tracking information
+<A HREF=../headers/pk_face_replace_surfs_r_t.html>PK_FACE_replace_surfs_r_t</A> *const results         --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function replaces the geometry of the given faces with the
+supplied surfaces.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_tool_faces_many_bodies   faces do not belong to a single body
+    PK_ERROR_not_in_same_partition    faces and replacement orphan geometry
+                                      not in same partition
+    PK_ERROR_not_implemented          user options not implemented
+
+<A NAME="documentation"></A>
+
+Introduction
+All geometry of the given faces is replaced by the given geometry
+in <B>'surfs'</B>. The surface orientation with respect to the face is
+specified by the logical value in <B>'senses'</B>.
+
+The number of surfaces and sense flags passed to the function, via the
+<B>'surfs'</B> and <B>'senses'</B> arguments, must be identical to the number faces
+in the <B>'faces'</B> array.
+
+The geometry of the edges and vertices connected to the modified faces
+will be deleted and recalculated. Where edges are adjacent to faces whose
+geometry is being replaced, the edge curves are re-computed as the
+intersection of the face surfaces.
+
+Where edges or faces (sharing a vertex or edge at the boundary of the
+faces to be modified) have geometry which is inextendable, it may not
+be possible to recalculate vertices or edges. This is because the curve
+or surface do not intersect the new surface. If such edges have a user
+defined tolerance, this is likely to occur since SP-curves are
+inextendable.
+
+If the given faces are on a sheet body, they must not share an edge with
+any rubber faces.
+
+Surface Sense Parameter
+
+The sense flag for a particular face/surface combination is interpreted as
+follows :
+
+ o PK_LOGICAL_true
+   When the new surface is attached to the face, the face normal must be
+   in the same direction as the natural surface normal (as calculated by
+   the function <A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A>).
+
+ o PK_LOGICAL_false
+   When the new surface is attached to the face, the face normal must be
+   in the opposite direction to the natural surface normal (as calculated by
+   the function <A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A>).
+
+
+Checking options
+The extent to which checking is applied to the body is specified by
+the <B>'check_fa_fa'</B> field of the option structure. At present
+<B>'check_fa_fa'</B> field can only be used to turn on or off face-face
+checking, by setting it to <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_yes_c</A> or <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_no_c</A>
+respectively.  If face-face checking is turned on, then face-face
+checks are done on the body in addition to default checks.  For most
+applications face-face checking will be tuned off, which will give an
+adequate level of checking.
+
+Tracking Information
+The function returns tracking information relating to which topology
+was split, deleted and created. For more information regarding
+these structures, please refer to the PK documentation for the
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A> structure.
+
+Returned Status and Error Information
+If this function returns a value of PK_ERROR_no_errors, the result of
+the "replace surface" operation will be indicated by the value of the
+<B>'status'</B> field within the <B>'results'</B> structure.
+
+There are two values for the <B>'status'</B> field which can indicate a
+successful operation :
+
+ o <A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A>      : Indicates that the operation was successful
+                               and the modified body is valid.
+
+ o <A HREF=../headers/pk_local_status_t.html>PK_local_status_nocheck_c</A> : Indicates that the operation was successful,
+                               but the <B>'check_fa_fa'</B> field in the option
+                               structure was set to <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_no_c</A>.
+
+The remaining `PK_local_status_...' codes indicate some failure. The failure
+code is normally accompanied by an array of entities which indicate where
+the failure or problem occurs. For more information regarding these failure
+codes and the returned error entities, please refer to the PK documentation
+for the <A HREF=../headers/pk_face_replace_surfs_r_t.html>PK_FACE_replace_surfs_r_t</A> structure.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

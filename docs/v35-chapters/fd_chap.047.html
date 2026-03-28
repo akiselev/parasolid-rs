@@ -1,0 +1,1526 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Sewing and Knitting</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Sewing and Knitting</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.046.html">Sheet Modeling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.048.html">Mid-Surface Generation</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-309872">46.1	Introduction </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-294727">46.2	Sheet sewing </A>
+<UL>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-295186">46.2.1	Control options in sheet sewing </A>
+<UL>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-295191">46.2.1.1	Allow_disjoint_result </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-295199">46.2.1.2	Treat_as_manifold </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-389656">46.2.1.3	Prefered_body_type </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-295216">46.2.1.4	Duplicate_removal </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-426918">46.2.1.5	Sew_up_inner_loops </A>
+</UL>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-578308">46.2.2	Reduce_edge_tolerance </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-418988">46.2.3	How successful was the boolean? </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-295383">46.2.4	Getting the best from sheet booleans </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-296314">46.2.5	Incremental sewing using different gap-width bound values </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-404904">46.2.6	Getting the best from sheet sewing </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-296407">46.2.7	Sewing piece parts in an assembly </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-360889">46.2.8	Sewing locally manifold sheets </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-296575">46.2.9	What to do if sheets are not sewn together </A>
+</UL>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-382223">46.3	Knitting </A>
+<UL>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-634808">46.3.1	Types of knitting</A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-692323">46.3.2	Knitting with a knit pattern </A>
+<UL>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-297104">46.3.2.1	Setting model tolerance </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-297201">46.3.2.2	Finding connectivity information </A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-626610">46.3.2.3	Supplying the knit pattern (optional)</A>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-297271">46.3.2.4	Applying connectivity information </A>
+</UL>
+<LI> <A HREF="fd_chap.047.html#50422119_pgfId-370285">46.3.3	Knitting with supplied topologies </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422119_pgfId-309872"></A>46.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422119_pgfId-294723"></A>A collection of sheet bodies can be sewn together by gluing them where their edges meet, resulting in a single connected body. Parasolid sews together all pairs of edges which are less than a specified distance apart. Parasolid also supports knitting operations, which are similar to sewing but can be used if you want to fuse combinations of bodies together. This chapter discusses the operations as follows:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-654047"></A>Sheet sewing is a technique to fuse separate bodies together to form a minimum number of sheet, solid or general bodies. See <A HREF="fd_chap.047.html#50422119_11276">Section 46.2, “Sheet sewing”</A>.</LI>
+<LI>
+<A NAME="50422119_pgfId-691695"></A>Knitting is a technique to edit the target body by fusing other (implicitly supplied) bodies onto the target body. See <A HREF="fd_chap.047.html#50422119_68170">Section 46.3, “Knitting”</A></LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-449921"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-449791"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-449776"></A><A HREF="fd_chap.091.html#50422169_38621">Chapter 90, “Importing Data”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422119_pgfId-294727"></A>46.2	<A NAME="50422119_11276"></A><A NAME="50422119_marker-594927"></A><A NAME="50422119_marker-594928"></A>Sheet sewing 
+
+
+</H1>
+<P>
+<A NAME="50422119_pgfId-346780"></A><A NAME="50422119_marker-346777"></A><A NAME="50422119_33036"></A>Sheet sewing is performed using <A NAME="50422119_marker-346779"></A><A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A>, which receives the array of sheets that are required to be sewn together, and a lower bound on the width of gaps that are allowed to remain in the result(s). The first sheet in the array is the target sheet. On completion of the sewing operation the target sheet is enlarged by having all or some of the given sheets sewn to it, and information is provided on which sheets were not sewn to the target.</P>
+<P>
+<A NAME="50422119_pgfId-346781"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-441.gif">
+
+<P>
+<A NAME="50422119_pgfId-294960"></A>Figure 46-1 <A NAME="50422119_30092"></A>Sheet sewing input and output data</P>
+<P>
+<A NAME="50422119_pgfId-294961"></A>Parasolid sewing avoids, where possible, sewing a new sheet onto the target by an edge match less than the stated gap width bound. The reason for doing this is, that doing so may lead to mistakenly inverting the sheet about to be attached. This arises where the match forms a short boundary to an overlap of the target and candidate sheet. Parasolid sewing takes the reasonable view that there should be some match somewhere that is longer than the gap width bound, i.e. it expects to find edges that are larger than the gaps it has been warned about. When such longer edges are found, the sheet is included into the target and sewing then proceeds on the previously ignored edges.</P>
+<P>
+<A NAME="50422119_pgfId-294962"></A>Parasolid sewing checks to see if all edges are shorter than the gap width bound. If this is the case, then it sews along the first encountered match even if it is short.</P>
+<P>
+<A NAME="50422119_pgfId-294963"></A>Where possible during the sewing operation, Parasolid attempts to remove short edges that become degenerate when tolerances are applied while fusing sheet boundaries together. Examples of this are:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-294964"></A>short edges in the original sheets are permitted to degenerate to vertices thereby allowing them to be engulfed, see <A HREF="fd_chap.047.html#50422119_25514"><EM>
+Figure 46-2</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-347943"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-442.gif">
+
+<P>
+<A NAME="50422119_pgfId-295070"></A>Figure 46-2 <A NAME="50422119_25514"></A>Short edges degenerating to vertices</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295071"></A>short edges that are created by the algorithm when it is matching edges end to end are also allowed to be engulfed, see <A HREF="fd_chap.047.html#50422119_36679"><EM>
+Figure 46-3</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-348451"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-443.gif">
+
+<P>
+<A NAME="50422119_pgfId-295177"></A>Figure 46-3 <A NAME="50422119_36679"></A>Short edges created by the algorithm degenerating to vertices</P>
+<P>
+<A NAME="50422119_pgfId-595133"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-295180"></A>Note: <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> does not perform any body checking on the resultant body. You are advised to perform a subsequent check in your application code after the sewing operation has completed. In addition, it is your application’s responsibility to resolve any face-face inconsistencies that may result from the sewing operation.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-594939"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-467115"></A>Note: This function offers partial support facet geometry. See <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422119_pgfId-295186"></A>	46.2.1 	<A NAME="50422119_marker-295182"></A><A NAME="50422119_marker-295183"></A><A NAME="50422119_marker-295184"></A><A NAME="50422119_marker-295185"></A>Control options in sheet sewing </H3>
+<P>
+<A NAME="50422119_pgfId-295187"></A>Several options are available to influence the outcome of using <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> on a collection of sheet bodies. Each is listed below together with a brief explanation of the manner in which the result is affected by its use.</P>
+
+<H4>
+<A NAME="50422119_pgfId-295191"></A>46.2.1.1 <A NAME="50422119_marker-295188"></A><A NAME="50422119_marker-295189"></A><A NAME="50422119_marker-295190"></A>Allow_disjoint_result </H4>
+<P>
+<A NAME="50422119_pgfId-295192"></A>If set to PK_LOGICAL_true this option enables <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> to return several disjoint composite sheets in cases where the sheets that can be sewn together do not form a single cohesive composite sheet. Basically everything that can be sewn together, is. All of the products of this activity are returned in the <CODE>
+sewn_bodies</CODE>
+ return argument.</P>
+<P>
+<A NAME="50422119_pgfId-295193"></A>When set to PK_LOGICAL_false the only sewing operations that are carried out are those that lead to sheets being sewn, directly or indirectly, onto the first sheet presented in the argument 'bodies'. Only the single composite sheet which includes the target are returned.</P>
+<P>
+<A NAME="50422119_pgfId-295194"></A>Default: PK_LOGICAL_false.</P>
+
+
+<H4>
+<A NAME="50422119_pgfId-295199"></A>46.2.1.2 <A NAME="50422119_marker-295195"></A><A NAME="50422119_marker-295196"></A><A NAME="50422119_marker-295197"></A><A NAME="50422119_marker-295198"></A><A NAME="50422119_82412"></A>Treat_as_manifold </H4>
+<P>
+<A NAME="50422119_pgfId-295200"></A>If set to PK_LOGICAL_true, <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> assumes that the input data is intended to produce a manifold result. This allows the algorithm to assume that, if more than two edges are within <CODE>
+gap_width_bound</CODE>
+ of each other, then only the two closest are intended to be matched together. Sewing of this closest pair is only carried out if this won't lead to an edge that tolerantly clashes with the eliminated candidates. Where the group doesn’t have a pairing distinct from the remainder, the entire group is collected together and reported as a non-manifold problem (see below).</P>
+<P>
+<A NAME="50422119_pgfId-295201"></A>When set to PK_LOGICAL_false, <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> makes no attempt to separate out a pair of edges from a larger group, but instead immediately reports the whole group as non-manifold.</P>
+<P>
+<A NAME="50422119_pgfId-427475"></A>Default: PK_LOGICAL_true.</P>
+
+
+<H4>
+<A NAME="50422119_pgfId-389656"></A>46.2.1.3 <A NAME="50422119_marker-295202"></A><A NAME="50422119_marker-295203"></A><A NAME="50422119_marker-295204"></A><A NAME="50422119_marker-295205"></A>Prefered_body_type </H4>
+<P>
+<A NAME="50422119_pgfId-295207"></A>This option permits the application to state a preference for the body type of the results that are produced by the sewing operation. It was envisioned as a means by which applications could prefer composite sheets having no laminar boundary edges to be returned as closed sheets rather than solid bodies. However the options permit the application to state a preference for:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295208"></A>PK_BODY_sewing_solid_c - any result is returned as a solid body if and only if it has no laminar boundary or non-manifold edges. Where the result is not returned as a solid body it is returned as a sheet unless it has a non-manifold edge (in which case it is returned as a general body).</LI>
+<LI>
+<A NAME="50422119_pgfId-295209"></A>PK_BODY_sewing_sheet_c - any result is returned as a sheet body unless it has a non-manifold edge (in which case it is returned as a general body).</LI>
+<LI>
+<A NAME="50422119_pgfId-295210"></A>PK_BODY_sewing_general_c - all results are returned as general bodies.</LI>
+<LI>
+<A NAME="50422119_pgfId-295211"></A>PK_BODY_sewing_any_c - The application is stating no preference, however <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> picks the most specific body type it can. It effectively behaves as if this option were set to PK_BODY_sewing_solid_c.</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-694481"></A>Default: PK_BODY_sewing_any_c.</P>
+<P>
+<A NAME="50422119_pgfId-693066"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-694484"></A>Note: When an input body has no laminar boundary, this option permits <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> to change the result body type, where appropriate, to match the specified preference.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422119_pgfId-295216"></A>46.2.1.4 <A NAME="50422119_marker-295212"></A><A NAME="50422119_marker-295213"></A><A NAME="50422119_marker-295214"></A><A NAME="50422119_marker-295215"></A><A NAME="50422119_78965"></A>Duplicate_removal </H4>
+<P>
+<A NAME="50422119_pgfId-295217"></A>In Parasolid, the sewing functionality can attempt to remove duplications of sheets. If duplicate sheets are present then the result of the sewing operation is likely to include a large number of reported non-manifold problems. The sewn bodies additionally have a high probability of incorporating pairs of (duplicated) faces sewn together back-to-back. Such bodies are corrupt, and therefore almost useless in later modeling operations.</P>
+<P>
+<A NAME="50422119_pgfId-295218"></A>When you suspect your data contains duplicated sheets then you should use the <CODE>
+duplicate_removal</CODE>
+ option, which can take the following values:</P>
+<P>
+<A NAME="50422119_pgfId-295239"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-295221"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-295223"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-295225"></A>PK_BODY_sewing_remove_none_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-295227"></A>Do not attempt to remove duplicate sheets. (Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-295229"></A>PK_BODY_sewing_remove_poss_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-295234"></A>Identify and remove possible duplicates to within Parasolid precision.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-295236"></A>PK_BODY_sewing_remove_cert_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-295238"></A>Identify and remove duplicates to within the tolerance specified by the <CODE>
+gap_width_bound</CODE>
+ argument to <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-295240"></A>PK_BODY_sewing_remove_cert_c is more successful at identifying duplicates than PK_BODY_sewing_remove_poss_c, but is also slower. </P>
+<P>
+<A NAME="50422119_pgfId-295241"></A>The strategy for removing possible duplicate sheets reliably, and without expensive coincidence checking is:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295242"></A>Group the input data into equivalence classes of bodies indistinguishable by the following checks:</LI>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295243"></A>same number of faces on each body;</LI>
+<LI>
+<A NAME="50422119_pgfId-295244"></A>same number of edges on each body;</LI>
+<LI>
+<A NAME="50422119_pgfId-295245"></A>same number of vertices on each body, with corresponding entries returned by <A HREF=../headers/pk_body_ask_vertices.html>PK_BODY_ask_vertices</A> occupying the same place;</LI>
+<LI>
+<A NAME="50422119_pgfId-295246"></A>corresponding entries returned by <A HREF=../headers/pk_body_ask_faces.html>PK_BODY_ask_faces</A> have the same type of surface;</LI>
+<LI>
+<A NAME="50422119_pgfId-295247"></A>boxes are equal.</LI>
+</UL>
+<LI>
+<A NAME="50422119_pgfId-295248"></A>Take on representative of each class and sew these together.</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-295249"></A>The unused members of the classes are returned in the array of unsewn bodies.</P>
+<P>
+<A NAME="50422119_pgfId-419069"></A>Parasolid sewing does not handle examples of duplicated candidates where not all of the sheet boundaries are shared. Parasolid is in no position to judge the relative merits of two equally plausible candidates.</P>
+
+
+<H4>
+<A NAME="50422119_pgfId-426918"></A>46.2.1.5 <A NAME="50422119_10264"></A>Sew_up_inner_loops </H4>
+<P>
+<A NAME="50422119_pgfId-432103"></A>This option controls the sewing of edges whose fins belong to the same loop. It only has an effect if this loop is an inner loop of a face. If <CODE>
+sew_up_inner_loops</CODE>
+ is PK_LOOP_sew_up_loop_c, and the edges are less than gap width apart, the edges are sewn together. It is possible that this will close the loop.</P>
+<P>
+<A NAME="50422119_pgfId-432104"></A>If set to PK_LOOP_sew_up_no_c, such edges will not be sewn together even if they are less than gap width apart.</P>
+<P>
+<A NAME="50422119_pgfId-427215"></A>Default: PK_LOOP_sew_up_loop_c. </P>
+<P>
+<A NAME="50422119_pgfId-423803"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-444.gif">
+
+<P>
+<A NAME="50422119_pgfId-423804"></A>Figure 46-4 Sewing within the inner loops of a face</P>
+
+
+
+<H3>
+<A NAME="50422119_pgfId-578308"></A>	46.2.2 	<A NAME="50422119_24550"></A>Reduce_edge_tolerance </H3>
+<P>
+<A NAME="50422119_pgfId-578360"></A>You can control the tolerance set on sewn edges using the <CODE>
+reduce_edge_tolerance</CODE>
+ option as follows: </P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-579345"></A>When set to PK_EDGE_reduce_tol_no_c, no attempt is made to reduce edge tolerance. This is the default.</LI>
+<LI>
+<A NAME="50422119_pgfId-580208"></A>When set to PK_EDGE_reduce_tol_yes_c, extra checks are performed and the tolerance is reduced where possible. If it cannot be reduced, a Parasolid Report of type <A HREF=../headers/pk_report_record_1_t.html>PK_REPORT_record_1_t</A> is generated with a status of <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_ed_large_tol_c</A> indicating the original edges. See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid Report mechanism.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422119_pgfId-418988"></A>	46.2.3 	<A NAME="50422119_marker-418983"></A><A NAME="50422119_marker-418984"></A><A NAME="50422119_marker-418985"></A><A NAME="50422119_marker-418986"></A><A NAME="50422119_marker-418987"></A>How successful was the boolean? </H3>
+<P>
+<A NAME="50422119_pgfId-295257"></A>The level of success of the sewing operation is determined by the information returned in the arrays <CODE>
+unsewn_bodies</CODE>
+ and <CODE>
+problem_groups</CODE>
+ together with an evaluation, by the application, of the laminar boundary loops present on each result returned in the array <CODE>
+sewn_bodies</CODE>
+:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295258"></A><CODE>
+unsewn_bodies</CODE>
+ returns those bodies that had no other presented sheet body sewn onto it</LI>
+<LI>
+<A NAME="50422119_pgfId-295259"></A><CODE>
+problem_groups</CODE>
+ return, in groups, those edges that are associated with a single problem found during sewing</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-295260"></A>The <CODE>
+unsewn_bodies</CODE>
+ array is fairly self explanatory. However it should be noted that the appearance of a sheet in this array does not imply that it has remained unmodified by the sewing operation. The unsewn sheet may have had some of its edges considered as unsuccessful candidates for sewing. In such cases the edges may have been split to fit the region of the match, but they were subsequently rejected in favour of better nearby pairings. Some edges of the unsewn sheet may also have been deleted in a similar process. For example consider the following three sheets:</P>
+<P>
+<A NAME="50422119_pgfId-349004"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-445.gif">
+
+<P>
+<A NAME="50422119_pgfId-295370"></A>Figure 46-5 How the tolerance bound works</P>
+<P>
+<A NAME="50422119_pgfId-295371"></A>Given that sheet A is the target (by being handed in at the head of the array), the result of handing A, B and C to <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> with default options is that sheets A and B are sewn together. Sheet C is returned as unsewn, but the edge on it nearest sheet A has been split at X while considering matching options in the shaded region. Incidentally the neighboring edges on sheets A and B are also split at Y during the same process of examining the shaded area.</P>
+<P>
+<A NAME="50422119_pgfId-295372"></A>The problem group array holds structures, each of which is an array of edges with an accompanying token indicating the type of problem encountered while dealing with these edges. These tokens, together with their standard interpretations are:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295373"></A>PK_BODY_sewing_non_manifold_c - A group of edges marked with this problem type indicates a region where three or more sheets meet to within the specified gap width bound, and no distinct pair of edges can be picked to fuse together. Such problems require the application either to remove, or trim back all but two of the sheets so that <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> can select the appropriate distinct edge pair. Note that the option <CODE>
+treat_as_manifold</CODE>
+ affects the reporting of such problems (see above).</LI>
+<LI>
+<A NAME="50422119_pgfId-295374"></A>PK_BODY_sewing_non_oriented_c - This token usually marks a group of just two edges. It indicates a pair of edges where either a single sheet, or single composite result sheet meets itself after twisting through a half turn. Sewing the two edges together would lead to a non-manifold result since the outward normal of the sheet would reverse direction across the edge.</LI>
+<LI>
+<A NAME="50422119_pgfId-295375"></A>PK_BODY_sewing_unspecified_c - This problem type marks an algorithmic failure encountered while trying to process this group of matched edges. While this occurs internally to Parasolid, it should ultimately lead to <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> returning the error code PK_ERROR_sewing_failed. An application wouldn’t, in practice, see this type of problem group.</LI>
+<LI>
+<A NAME="50422119_pgfId-295376"></A>PK_BODY_sewing_overlapping_c - At present, problem groups of this type are not returned. Groups of this type are intended to mark edges that are not sewn because the owning sheets overlap too far. The current implementation of <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> doesn't search for this condition. Applications must detect this through inference from the presence of unexpected laminar edges in the results.</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-295377"></A>Immediate problems aside, the application has to check that the results have the boundaries that were expected to arise from the sewing operation. Despite limited opportunities to make some judgements on the boundaries of a result (e.g. the result of a call that stated a preference for a solid body might be presumed to have no laminar boundary edges), <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> makes no attempt to do this. However some support for the application to examine sheet boundaries is provided through <A NAME="50422119_marker-295378"></A><A HREF=../headers/pk_body_find_laminar_edges.html>PK_BODY_find_laminar_edges</A> which presents easy access to this information.</P>
+
+
+<H3>
+<A NAME="50422119_pgfId-295383"></A>	46.2.4 	<A NAME="50422119_marker-295379"></A><A NAME="50422119_marker-295380"></A><A NAME="50422119_marker-295381"></A><A NAME="50422119_marker-295382"></A>Getting the best from sheet booleans </H3>
+<P>
+<A NAME="50422119_pgfId-295384"></A>While <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> does its best to deal with the sheet geometries passed to it, it obviously does have limitations. In order to achieve a high success rate when using this function, it is advisable to bear these limitations in mind when preparing the sheets to sew together.</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295385"></A><A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> only joins sheets along existing edge geometries. No attempt is made by the function to trim back overlapping sheets to a curve of mutual intersection so that sewing may occur there. In some situations it is possible to produce suitable edge-edge contacts between overlapping sheets by using boolean subtractions.</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-349548"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-446.gif">
+
+<P>
+<A NAME="50422119_pgfId-295589"></A>Figure 46-6 Boolean B-surface sheets together</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295590"></A>The edge matching method employed by <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> relies on the presence of vertices to bound the extent of edge-edge matches. Regions along which two edges are intended to be sewn must be bounded (to within the applied sewing tolerance bound) at both ends by vertices appearing on at least one of the participating sheets (except where both the edges are rings). Loops bounding sheets such as those shown in <A HREF="fd_chap.047.html#50422119_32739"><EM>
+Figure 46-7</EM></A> (a) are valid, but do not successfully sew into a composite sheet for this very reason. This requirement can be complied with either by; supplying one bounding curve per intended edge in the result (e.g. four bounding curves for a rectangular sheet), or splitting the edges, where necessary, using <A HREF=../headers/pk_edge_imprint_point.html>PK_EDGE_imprint_point</A>.</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-351773"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-447.gif">
+
+<P>
+<A NAME="50422119_pgfId-352068"></A>Figure 46-7 <A NAME="50422119_32739"></A>Examples of vertices (not) bounding edge-edge matches</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295889"></A>Sewing is carried out by fusing edge topologies together and applying a tolerance that engulfs the geometries of the edges that were so combined (one of which is arbitrarily chosen to lie on the primary fin). In choosing this tolerance <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> does not select one smaller than any tolerance previously present on the fused edges.</LI>
+<P>
+<A NAME="50422119_pgfId-295890"></A>The sewing algorithm has a greater chance of success if it can select the smallest appropriate tolerance for the edges that it fuses together. To facilitate this, it is better that the laminar boundary edges of the sheet bodies handed to <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> have as small a tolerance as possible. Of course no edge tolerance at all would be preferable.</P>
+<P>
+<A NAME="50422119_pgfId-295891"></A>Vertex tolerances are less of a problem since sewing adjusts these to be as small as possible without violating model consistency. In summary sheets are preferred in descending order left to right in the following diagram:</P>
+</UL>
+<P>
+<A NAME="50422119_pgfId-356930"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-448.gif">
+
+<P>
+<A NAME="50422119_pgfId-295990"></A>Figure 46-8 The preferred presentation when sewing sheets</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-295991"></A>In imported data trimmed by polylines, the boundaries, when rendered with tolerant vertex bubbles, can resemble a necklace of pearls. These composite edges are often lethal to any attempt to sew the sheet that owns them.</LI>
+<P>
+<A NAME="50422119_pgfId-295992"></A>In the course of finding and grouping bundles of candidate matches to an edge, the edge is split at many points. These points are projections on to the edge of neighboring boundary vertices lying within the gap width bound of it. The average number of split points rises roughly as the square of the gap width bound (assuming a uniform distribution of vertices on a locally 2-D problem). Short edges near wide gaps may be induced by neighboring vertices on smaller scale edges associated with correspondingly smaller gaps.</P>
+</UL>
+<P>
+<A NAME="50422119_pgfId-352547"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-449.gif">
+
+<P>
+<A NAME="50422119_pgfId-296307"></A>Figure 46-9 Showing why short edges are hard to sew</P>
+<UL>
+<P>
+<A NAME="50422119_pgfId-296308"></A>‘Necklaces’ of many small-scale edges can provide an overabundance of vertices. Avoid these where possible, perhaps rebounding the surfaces with a single curve that approximates a composite curve constructed from the geometries of the edges in the necklace.</P>
+<P>
+<A NAME="50422119_pgfId-296309"></A>Where they are unavoidable (perhaps on a seriously non-G1 surface) there is always the chance that sewing sheets with necklace edges using a gap width bound relatively significantly smaller than the edges in the necklace may work. Doing this as an initial phase of the sewing operation may help the larger problem.</P>
+<LI>
+<A NAME="50422119_pgfId-296310"></A>It is possible for ‘thin sliver sheets’ to be present in data as extremely thin fillers for gaps in the surface data. With typical maximum widths of around 1 micron, these are not very viable and sometimes they can’t have tolerances successfully applied to them due to their interactions with neighboring boundary vertices. Even when it is possible to apply tolerances to them, their presence impairs the reliability of later modeling operations.</LI>
+<P>
+<A NAME="50422119_pgfId-296311"></A>Parasolid sewing has some limited ability to ignore 2 and 3 edged examples of these thin sliver sheets.</P>
+</UL>
+
+
+<H3>
+<A NAME="50422119_pgfId-296314"></A>	46.2.5 	<A NAME="50422119_marker-296312"></A><A NAME="50422119_marker-296313"></A><A NAME="50422119_20199"></A>Incremental sewing using different gap-width bound values </H3>
+<P>
+<A NAME="50422119_pgfId-296315"></A>If the collection of sheet bodies to be sewn contains a wide range of gap-widths, then the most effective method of sewing them together is to perform several passes of the sewing operation. This technique is known as <EM>
+incremental sewing</EM><A NAME="50422119_marker-296316"></A><A NAME="50422119_marker-296317"></A>.</P>
+<P>
+<A NAME="50422119_pgfId-404881"></A>The <CODE>
+number_of_iterations</CODE>
+ and <CODE>
+iteration_bounds</CODE>
+ options to <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> are used to control incremental sewing, as follows:</P>
+<P>
+<A NAME="50422119_pgfId-404899"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-404884"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-404886"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-404888"></A><CODE>
+number_of_iterations</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-404890"></A>The number of iterations of the sewing operation to perform. Default is 1 - that is, incremental sewing is not performed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-404892"></A><CODE>
+iteration_bounds</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-404894"></A>An array of different gap-width bounds used when <CODE>
+number_of_iterations</CODE>
+ &gt; 1.</P>
+<P>
+<A NAME="50422119_pgfId-600442"></A>If this array is NULL (default) then Parasolid generates an increasing range of gap-width bounds, the largest of which is the <CODE>
+gap_width_bound</CODE>
+ supplied to <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A>.</P>
+<P>
+<A NAME="50422119_pgfId-610009"></A>If the <CODE>
+iteration_bounds</CODE>
+ is not NULL then the <CODE>
+gap_width_bound</CODE>
+ is ignored. In these circumstances, you should ensure that <CODE>
+iteration_bounds</CODE>
+ are provided in the correct order from smallest to greatest.</P>
+<ADDRESS>
+<A NAME="50422119_pgfId-417237"></A>Note: You should avoid using tolerances which are either significantly larger than the gaps expected to remain or are large with respect to the sheets being sewn. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-404923"></A>Where Parasolid generates a range of gap-width bounds for use in incremental sewing, sheets are first sewn using the smallest gap-width bound. The resulting bodies are then sewn using a larger gap-width bound. This is repeated until all the sheets are sewn together or the user-supplied gap-width bound is reached. Sheets that are closer together are sewn together in earlier passes, when the gap-width bound is small, and sheets that are further apart are not sewn together until later passes (if it all). </P>
+<P>
+<A NAME="50422119_pgfId-416412"></A>In cases where you provide your own <CODE>
+iteration_bounds</CODE>
+, sheets are sewn using gap-width bounds in the order in which they are provided.</P>
+
+
+<H3>
+<A NAME="50422119_pgfId-404904"></A>	46.2.6 	<A NAME="50422119_marker-404900"></A><A NAME="50422119_marker-404901"></A><A NAME="50422119_marker-404902"></A><A NAME="50422119_marker-404903"></A>Getting the best from sheet sewing </H3>
+<P>
+<A NAME="50422119_pgfId-373289"></A>Sometimes the sheet bodies you want to sew together may contain a wide range of gap-width bounds that cannot be easily predicted. If you are attempting to sew a number of sheets together in these conditions, you can increase the success rate of sewing operations by using incremental sewing, rather than specifying a gap-width bound that is large enough to pull all the sheets together in one pass. </P>
+<P>
+<A NAME="50422119_pgfId-296340"></A>Since regions where sheets are close together may be disconnected (creating “islands” of sheets that are close together), we recommend you use the <CODE>
+allow_disjoint_result</CODE>
+ option whenever incremental sewing is performed if you want to retain the detail contained in those regions. </P>
+<P>
+<A NAME="50422119_pgfId-296341"></A>Using <CODE>
+allow_disjoint_result</CODE>
+ together with incremental sewing ensures that all sheets that are sewn benefit from the greater accuracy of smaller gap-width bounds, rather than just those that are in the same “island” as the target, as shown in <A HREF="fd_chap.047.html#50422119_12607"><EM>
+Figure 46-10</EM></A>. </P>
+<P>
+<A NAME="50422119_pgfId-353264"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-450.gif">
+
+<P>
+<A NAME="50422119_pgfId-296405"></A>Figure 46-10 <A NAME="50422119_12607"></A>Sewing “islands” of disconnected sheets using <CODE>
+allow_disjoint_result</CODE>
+</P>
+
+
+<H3>
+<A NAME="50422119_pgfId-296407"></A>	46.2.7 	<A NAME="50422119_26685"></A>Sewing piece parts in an assembly </H3>
+<P>
+<A NAME="50422119_pgfId-296408"></A>When sewing together faces that may come from an assembly, you can use the <CODE>
+assembly_sewing</CODE>
+ option in <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> to improve the results and execution speed.</P>
+<P>
+<A NAME="50422119_pgfId-296409"></A>By default, when more than two candidate edges would clash in the output and none can be discarded without throwing away a sheet body of significant size, <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> cannot choose which two edges are the correct ones to sew. However, if you know that the data come from a valid assembly, Parasolid can make assumptions about the relative configurations of the faces owning those edges. It may then be possible to determine which of several edges can be sewn together. The <CODE>
+assembly_sewing</CODE>
+ option lets you choose between two different methods:</P>
+<P>
+<A NAME="50422119_pgfId-296427"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-296415"></A>Method</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-296417"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-296419"></A>Face orientation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-296421"></A>If <CODE>
+assembly_sewing</CODE>
+ is PK_BODY_sewing_assy_orient_c, then the orientation of the owning faces is examined to determine which pairs of faces come from the same piece part in an assembly, and sews the two edges whose owning faces come from the same piece part. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-296423"></A>Shared laminar edges</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-296425"></A>If face orientation is not enough to determine a unique solution, then you can set <CODE>
+assembly_sewing</CODE>
+ to PK_BODY_sewing_assy_extend_c. This option also looks at the number of shared laminar edges in the owning faces, and sews the edge pair whose connected laminar edge groups have the greatest number of coincidences. </P>
+<ADDRESS>
+<A NAME="50422119_pgfId-296426"></A>Note: In this context, a “connected laminar edge group” bounds the component that the laminar edge lies in. This could be found by calling <A HREF=../headers/pk_body_find_laminar_edges.html>PK_BODY_find_laminar_edges</A> on the edge’s body at that stage in the sewing operation. The connected laminar edge groups of a given edge pair may change at different points of the sewing operation. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-296428"></A>By default, <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> assumes that the received bodies come from a single valid piece part.</P>
+<P>
+<A NAME="50422119_pgfId-296432"></A><A HREF="fd_chap.047.html#50422119_13260"><EM>
+Figure 46-11</EM></A> shows a simple example where three faces, shown in cross-section, can potentially be sewn together at the end points indicated. If <CODE>
+assembly_sewing</CODE>
+ is set to PK_BODY_sewing_assy_orient_c, then <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A> assumes the data comes from a valid assembly, and examines the orientation of each face. From this information, it deduces that the red and blue faces are part of the same component of the assembly, and sews the edges appropriately. </P>
+<P>
+<A NAME="50422119_pgfId-316278"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-451.gif">
+
+<P>
+<A NAME="50422119_pgfId-316280"></A>Figure 46-11 <A NAME="50422119_13260"></A>Sewing together assemblies based on face normal information</P>
+<P>
+<A NAME="50422119_pgfId-296472"></A><A HREF="fd_chap.047.html#50422119_14656"><EM>
+Figure 46-12</EM></A> shows a more complex example that PK_BODY_sewing_assy_orient_c could not solve, because the orientation of the faces is not consistent. If <CODE>
+assembly_sewing</CODE>
+ is set to PK_BODY_sewing_assy_extend_c, the number of shared boundary edges is also examined. In this case, face B shares more boundary edges with face A than face C does, and so face B and face A are assumed to be part of the same component of the assembly and are sewn together, correcting the orientation of face B at the same time. </P>
+<P>
+<A NAME="50422119_pgfId-296506"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-452.gif">
+
+<P>
+<A NAME="50422119_pgfId-296508"></A>Figure 46-12 <A NAME="50422119_14656"></A>Sewing assemblies based on shared laminar boundaries</P>
+<P>
+<A NAME="50422119_pgfId-296512"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-361113"></A>Note: The <CODE>
+assembly_sewing</CODE>
+ option works best for data that comes from valid assemblies. In particular, components in the assembly are assumed not to clash with each other (other than by abutting). </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-360886"></A>The following conditions apply when <CODE>
+assembly_sewing</CODE>
+ is enabled:</P>
+<P>
+<A NAME="50422119_pgfId-360887"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-360904"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-360906"></A>Must be set to:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-360908"></A>Further information</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-360910"></A><CODE>
+treat_as_manifold</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-360912"></A>PK_LOGICAL_true</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-360914"></A><A HREF="fd_chap.047.html#50422119_82412">Section 46.2.1.2</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-360916"></A><CODE>
+duplicate_removal</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-360918"></A>PK_BODY_sewing_remove_none_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-360920"></A><A HREF="fd_chap.047.html#50422119_78965">Section 46.2.1.4</A></P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422119_pgfId-360889"></A>	46.2.8 	<A NAME="50422119_42633"></A>Sewing locally manifold sheets </H3>
+<P>
+<A NAME="50422119_pgfId-296518"></A>If general topology is enabled in a Parasolid session, you can use the <CODE>
+general_sewing</CODE>
+ option in <A HREF=../headers/pk_body_sew_bodies_o_t.html>PK_BODY_sew_bodies_o_t</A> to sew general input bodies together. It takes the following values:</P>
+<P>
+<A NAME="50422119_pgfId-438910"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-438923"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-438925"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-438927"></A>PK_BODY_sewing_gen_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-438929"></A>If the input bodies contain general topology, the sewing operation fails with PK_ERROR_unsuitable_topology. (Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-438931"></A>PK_BODY_sewing_gen_loc_manf_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-438933"></A>If general topology is enabled, general bodies are sewn wherever their laminar boundaries meet in a locally manifold configuration. <A HREF="fd_chap.047.html#50422119_11259"><EM>
+Figure 46-13</EM></A> illustrates this.</P>
+<P>
+<A NAME="50422119_pgfId-439633"></A>If general topology is disabled, all manifold bodies are converted into sheets and all non-manifold bodies are returned as unsewn bodies. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-296524"></A><A HREF="fd_chap.047.html#50422119_11259"><EM>
+Figure 46-13</EM></A> shows two examples in which general inputs are sewn together successfully to create single general bodies. In the first example, two T-sheets are sewn together to create a single general body containing six faces. The second example shows how you can form a Moebius strip by sewing two faces together to produce a single general body with two faces. </P>
+<P>
+<A NAME="50422119_pgfId-296558"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-453.gif">
+
+<P>
+<A NAME="50422119_pgfId-296560"></A>Figure 46-13 <A NAME="50422119_11259"></A>Sewing locally manifold general bodies when general topology is enabled</P>
+<P>
+<A NAME="50422119_pgfId-296564"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-296563"></A>Note: If you use this option, then <CODE>
+assembly_sewing</CODE>
+ must be left at its default setting. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-296568"></A>See <A HREF="fd_chap.016.html#50422085_33276">Section 15.7, “General bodies”</A>, for more information on enabling and using general topology in Parasolid.</P>
+
+
+<H3>
+<A NAME="50422119_pgfId-296575"></A>	46.2.9 	<A NAME="50422119_marker-296572"></A><A NAME="50422119_marker-296573"></A><A NAME="50422119_marker-296574"></A>What to do if sheets are not sewn together </H3>
+<P>
+<A NAME="50422119_pgfId-296576"></A>Where sheet boundaries have not been sewn as expected, or when some measurement of actual gap size is required in advance of using <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A>, use <A NAME="50422119_marker-296577"></A><A HREF=../headers/pk_edge_find_deviation_2.html>PK_EDGE_find_deviation_2</A>. This function calculates either the maximal distance between a pair of matching edges, or multiple distance samples between those edges, as shown in <A HREF="fd_chap.047.html#50422119_39190"><EM>
+Figure 46-14</EM></A>.</P>
+<P>
+<A NAME="50422119_pgfId-354282"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-454.gif">
+
+<P>
+<A NAME="50422119_pgfId-354493"></A>Figure 46-14 <A NAME="50422119_39190"></A>Determining distances and points on unsewn edges</P>
+<P>
+<A NAME="50422119_pgfId-297000"></A>The distance that <A HREF=../headers/pk_edge_find_deviation_2.html>PK_EDGE_find_deviation_2</A> measures is the distance between the two edge geometries. To find a corresponding gap-width, subtract the sum of the two edge precisions from the returned distance. </P>
+<P>
+<A NAME="50422119_pgfId-367192"></A>Measurements taken using <A HREF=../headers/pk_edge_find_deviation_2.html>PK_EDGE_find_deviation_2</A> are only a guide to predicting the result of applying <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A>. In practice, matching and splitting edges, together with progressive application of local precisions, occasionally results in a marginally different assessment of distance during sewing.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422119_pgfId-382223"></A>46.3	<A NAME="50422119_68170"></A>Knitting 
+
+
+</H1>
+<P>
+<A NAME="50422119_pgfId-639418"></A>Sewing and knitting are used to fuse bodies together, but the two methods give different results as described below:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-649598"></A>Sheet sewing is a technique to fuse separate bodies together to form a minimum number of sheet, solid or general bodies. See <A HREF="fd_chap.047.html#50422119_11276">Section 46.2, “Sheet sewing”</A>.</LI>
+<LI>
+<A NAME="50422119_pgfId-639265"></A>Knitting is a technique to edit the target body by fusing other (implicitly supplied) bodies onto the target body. The two types of knitting, knit with knit pattern and knit with supplied topologies are described in <A HREF="fd_chap.047.html#50422119_36670">Section 46.3.2</A> and <A HREF="fd_chap.047.html#50422119_91370">Section 46.3.3</A>.</LI>
+</UL>
+
+<H3>
+<A NAME="50422119_pgfId-634808"></A>	46.3.1 	<A NAME="50422119_47736"></A>Types of knitting</H3>
+<P>
+<A NAME="50422119_pgfId-691726"></A>The different types of knitting are:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-382381"></A>Knitting with a knit pattern. Sheets and solid bodies can be fused together using the process described in <A HREF="fd_chap.047.html#50422119_36670">Section 46.3.2</A>.</LI>
+<LI>
+<A NAME="50422119_pgfId-370207"></A>Knitting with supplied topologies. Edges (manifold or non-manifold) or vertices from an array of topologies can be fused together to create a single result body using the process described in <A HREF="fd_chap.047.html#50422119_91370">Section 46.3.3</A>.</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-627714"></A>A guide for using the types of knitting is shown below: </P>
+<P>
+<A NAME="50422119_pgfId-634894"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644023"></A>Knitting type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644025"></A>PK function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644027"></A>Knitting inputs</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644029"></A>Facet enabled </P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644031"></A>Knitting with a knit pattern</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644033"></A><A HREF=../headers/pk_body_find_knit_pattern.html>PK_BODY_find_knit_pattern</A></P>
+<P>
+<A NAME="50422119_pgfId-644034"></A><A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644036"></A>Edges from sheets and solid bodies </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644041"></A>No</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644043"></A>Knitting with supplied topologies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644045"></A><A HREF=../headers/pk_body_knit.html>PK_BODY_knit</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644047"></A>Matched pairs of edges or vertices from wire, sheet, solid and general bodies.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644052"></A>Yes</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-673592"></A>The differences between the two knitting types (PK_BODY_{find/apply}_knit_pattern and <A HREF=../headers/pk_body_knit.html>PK_BODY_knit</A>) are in the inputs and the allowed knitting operations using wire, sheet solid and general bodies.</P>
+<UL>
+<P>
+<A NAME="50422119_pgfId-673594"></A>For the knit pattern the inputs are sheets and solid bodies (except in circumstances where a knit pattern is directly supplied by the user). The functionality that is exclusive to the knit pattern type is: </P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-673803"></A>Edges will be split with new vertices as required</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-673709"></A>For the supplied topologies the inputs are wire, sheet, solid and general bodies. With this knitting type you can knit solids with no requirement for knitted edges on solids to have two faces, one with a surface and one rubber. 	The functionality that is exclusive to the supplied topologies includes:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-673599"></A>Facet enabled</LI>
+<LI>
+<A NAME="50422119_pgfId-673600"></A>	General bodies allowed in input</LI>
+<LI>
+<A NAME="50422119_pgfId-673601"></A>	General bodies allowed in result</LI>
+<LI>
+<A NAME="50422119_pgfId-673602"></A>		Wire bodies allowed</LI>
+<LI>
+<A NAME="50422119_pgfId-673443"></A>	Option to specify result body type</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422119_pgfId-691746"></A>See <A HREF="fd_chap.047.html#50422119_94823"><EM>
+Figure 46-15</EM></A> Knitting two solid bodies and four sheets into a single body.</P>
+
+
+<H3>
+<A NAME="50422119_pgfId-692323"></A>	46.3.2 	<A NAME="50422119_marker-650766"></A><A NAME="50422119_marker-650767"></A><A NAME="50422119_marker-650768"></A><A NAME="50422119_36670"></A>Knitting with a knit pattern </H3>
+<P>
+<A NAME="50422119_pgfId-395717"></A>The recommended process for knitting sheet and solid bodies together using a knit pattern, is to set a suitable tolerance on edges and vertices to be knitted, identify connectivity information and then apply the connectivity information. </P>
+<P>
+<A NAME="50422119_pgfId-648002"></A>The process is described in the following table: </P>
+<P>
+<A NAME="50422119_pgfId-643913"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644181"></A>Process</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644183"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644185"></A>Setting model tolerance</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644187"></A>Use <A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A> and <A HREF=../headers/pk_vertex_set_precision.html>PK_VERTEX_set_precision</A> to set edge and vertex tolerance in the sheets to knit together.</P>
+<P>
+<A NAME="50422119_pgfId-646522"></A>For details, see <A HREF="fd_chap.047.html#50422119_96289">Section 46.3.2.1</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644189"></A>Finding connectivity information</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-674864"></A>Use <A NAME="50422119_marker-674863"></A><A HREF=../headers/pk_body_find_knit_pattern.html>PK_BODY_find_knit_pattern</A> to infer the connectivity between a collection of sheets created with <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>, using the geometry of the edges.</P>
+<P>
+<A NAME="50422119_pgfId-674847"></A>For details, see <A HREF="fd_chap.047.html#50422119_27603">Section 46.3.2.2</A>.</P>
+<P>
+<A NAME="50422119_pgfId-676997"></A>There may be circumstances where you can supply your own knit pattern. If the knit pattern is known, this information can be supplied from the application using <A HREF=../headers/pk_body_knit_pattern_t.html>PK_BODY_knit_pattern_t</A> structure. </P>
+<P>
+<A NAME="50422119_pgfId-679250"></A>In such circumstances and for performance optimisation we recommend that you omit this part of the process and use <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A> to supply this information directly. (Optional)</P>
+<P>
+<A NAME="50422119_pgfId-664164"></A>For details, see <A HREF="fd_chap.047.html#50422119_85958">Section 46.3.2.3</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644339"></A>Applying connectivity information</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-644341"></A>Use <A NAME="50422119_marker-645077"></A><A HREF=../headers/pk_body_knit_pattern_t.html>PK_BODY_knit_pattern_t</A> structure to supply the connectivity information to <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A>.</P>
+<P>
+<A NAME="50422119_pgfId-677532"></A>For details, see <A HREF="fd_chap.047.html#50422119_65599">Section 46.3.2.4</A>.</P>
+<P>
+<A NAME="50422119_pgfId-675475"></A>If you have supplied your own knit pattern you can use <A HREF=../headers/pk_body_knit_pattern_t.html>PK_BODY_knit_pattern_t</A> structure to supply the connectivity information to <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A>. (Optional)</P>
+<P>
+<A NAME="50422119_pgfId-646630"></A>For details, see <A HREF="fd_chap.047.html#50422119_65599">Section 46.3.2.4</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<P>
+<A NAME="50422119_pgfId-691768"></A>&nbsp;</P>
+</UL>
+<P>
+<A NAME="50422119_pgfId-637093"></A>An example of knitting sheets and solid bodies together is shown in <A HREF="fd_chap.047.html#50422119_94823"><EM>
+Figure 46-15</EM></A>.</P>
+<P>
+<A NAME="50422119_pgfId-354741"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-455.gif">
+
+<P>
+<A NAME="50422119_pgfId-365804"></A>Figure 46-15 <A NAME="50422119_94823"></A>Knitting two solid bodies and four sheets into a single body.</P>
+<P>
+<A NAME="50422119_pgfId-637691"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-637685"></A>Note: When knitting solid bodies, all edges which are intended to appear in the knitting pattern must have one adjacent face with a surface attached and one without.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422119_pgfId-297104"></A>46.3.2.1 <A NAME="50422119_marker-297100"></A><A NAME="50422119_marker-297101"></A><A NAME="50422119_marker-297102"></A><A NAME="50422119_marker-297103"></A><A NAME="50422119_96289"></A>Setting model tolerance </H4>
+<P>
+<A NAME="50422119_pgfId-297105"></A>The first step when knitting bodies is to set a suitable model tolerance. You can do this using <A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A> and <A HREF=../headers/pk_vertex_set_precision.html>PK_VERTEX_set_precision</A>, which are described in more detail in <A HREF="fd_chap.017.html#50422086_38513">Chapter 16, “Session And Local Precision”</A>.</P>
+<P>
+<A NAME="50422119_pgfId-297109"></A>The tolerance you set is used by <A HREF=../headers/pk_body_find_knit_pattern.html>PK_BODY_find_knit_pattern</A> to determine which edges in the supplied bodies need to match in order to successfully knit the bodies. To ensure that two edges match correctly, the curve attached to at least one of the edges must lie precisely within the tolerance tube of the other edge, as shown in <A HREF="fd_chap.047.html#50422119_52930"><EM>
+Figure 46-16</EM></A>. You should set an appropriate tolerance, if you need to, for the data you want to knit together.</P>
+<P>
+<A NAME="50422119_pgfId-355223"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-456.gif">
+
+<P>
+<A NAME="50422119_pgfId-297189"></A>Figure 46-16 <A NAME="50422119_52930"></A>Setting tolerance to ensure that edges match correctly.</P>
+<P>
+<A NAME="50422119_pgfId-297197"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-297192"></A>Note: You can use <A NAME="50422119_marker-625994"></A><A HREF=../headers/pk_edge_imprint_point.html>PK_EDGE_imprint_point</A>, if you need to imprint bounding vertices along some of the edges you want to knit together<A NAME="50422119_marker-297193"></A>. </ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422119_pgfId-625948"></A><A HREF=../headers/pk_body_find_knit_pattern.html>PK_BODY_find_knit_pattern</A> has the same limitations in locating subsets of edges to compare as <A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A>, and so bounding vertices must be supplied as shown in <A HREF="fd_chap.047.html#50422119_32739"><EM>
+Figure 46-7</EM></A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422119_pgfId-297201"></A>46.3.2.2 <A NAME="50422119_marker-297198"></A><A NAME="50422119_marker-297199"></A><A NAME="50422119_marker-297200"></A><A NAME="50422119_27603"></A>Finding connectivity information </H4>
+<P>
+<A NAME="50422119_pgfId-297202"></A><A HREF=../headers/pk_body_find_knit_pattern.html>PK_BODY_find_knit_pattern</A> infers the connectivity of a set of sheet or solid bodies that you want to knit together. It returns this connectivity information in the form of a knit pattern that can be passed to <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A>.</P>
+<P>
+<A NAME="50422119_pgfId-297203"></A><A HREF=../headers/pk_body_find_knit_pattern.html>PK_BODY_find_knit_pattern</A> receives the following arguments:</P>
+<P>
+<A NAME="50422119_pgfId-595828"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297206"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297208"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297210"></A><CODE>n_bodies</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297212"></A>The number of bodies for which to find a knitting pattern.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297214"></A><CODE>bodies</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297216"></A>An array of bodies for which to find a knitting pattern. Faces in the body that you expect to survive the knitting operation should have geometry attached (i.e. should not be rubber). Faces that you do not expect to survive the operation may be rubber, as shown in <A HREF="fd_chap.047.html#50422119_94823"><EM>
+Figure 46-15</EM></A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-595482"></A><A HREF=../headers/pk_body_find_knit_pattern.html>PK_BODY_find_knit_pattern</A> returns the following arguments:</P>
+<P>
+<A NAME="50422119_pgfId-297236"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-595506"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-595508"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-595510"></A><CODE>
+knit_pattern</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-595605"></A>The connectivity information of those bodies in bodies that could be connected.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-595514"></A><CODE>
+n_absent_bodies</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-595516"></A>The number of bodies that could not be connected together.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-595646"></A><CODE>
+absent_bodies</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-595648"></A>An array of bodies that could not be connected together.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-297240"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-297239"></A>Warning: To create a knit pattern that can be successfully applied using <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A>, there must be no interference between the supplied bodies other than along the common edge geometry, and no more than two bodies sharing common boundaries.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422119_pgfId-626610"></A>46.3.2.3 <A NAME="50422119_85958"></A>Supplying the knit pattern (optional)</H4>
+<P>
+<A NAME="50422119_pgfId-297241"></A>If your application already knows the connectivity information of the bodies to be knitted, then you can supply your own knit pattern. This can be supplied using the <A HREF=../headers/pk_body_knit_pattern_t.html>PK_BODY_knit_pattern_t</A> structure, and has the following fields:</P>
+<P>
+<A NAME="50422119_pgfId-297267"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297244"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297246"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297248"></A>n_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297250"></A>The number of pairs of matching edges. The <CODE>
+edges</CODE>
+ and <CODE>
+matches</CODE>
+ arrays should both be this length.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297252"></A>edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297254"></A>An array of edges that can be matched wholly with the list of matching edges supplied in <CODE>
+matches</CODE>
+. Each item in this array matches wholly with the corresponding item in <CODE>
+matches</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297256"></A>matches</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297258"></A>An array of matching edges for the supplied <CODE>
+edges</CODE>
+. Each item in this array matches wholly with the corresponding item in <CODE>
+edges</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297260"></A>n_reversals</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297262"></A>The number of owning bodies of edges in either <CODE>
+edges</CODE>
+ or <CODE>
+matches</CODE>
+ that need to be reversed for knitting to succeed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297264"></A>reversals</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297266"></A>An array containing the owning bodies of any edges in either <CODE>
+edges</CODE>
+ or <CODE>
+matches</CODE>
+ that need to be reversed in order to knit the bodies together successfully.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422119_pgfId-297271"></A>46.3.2.4 <A NAME="50422119_marker-297268"></A><A NAME="50422119_marker-297269"></A><A NAME="50422119_marker-297270"></A><A NAME="50422119_65599"></A>Applying connectivity information </H4>
+<P>
+<A NAME="50422119_pgfId-297272"></A>Use <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A> to fuse together the edges specified in the knitting pattern. The edges specified in the matches array of the knitting pattern are deleted after knitting has completed.</P>
+<P>
+<A NAME="50422119_pgfId-297273"></A><A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A> receives the following arguments:</P>
+<P>
+<A NAME="50422119_pgfId-595868"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297276"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297278"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297280"></A><CODE>body</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297282"></A>The target body into which the result of the knit operation is placed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297284"></A><CODE>knit_pattern</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297286"></A>The knit pattern used to fuse a series of edges into body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-297288"></A><CODE>options</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-297290"></A>Options controlling the final form of body. The following options are available:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-297291"></A><CODE>
+body_type</CODE>
+: the type of result body you want to create</LI>
+<LI>
+<A NAME="50422119_pgfId-297292"></A><CODE>
+sort_face_shells</CODE>
+: whether to sort the resulting faces into their respective shells</LI>
+<LI>
+<A NAME="50422119_pgfId-297293"></A><CODE>
+close_marginal_gaps</CODE>
+: whether to attempt to close gaps in the input bodies that are not addressed by the pairs of edges in <CODE>
+knit_pattern</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422119_pgfId-297294"></A>See the documentation for <A HREF=../headers/pk_body_apply_knit_pattern_o_t.html>PK_BODY_apply_knit_pattern_o_t</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-594094"></A>and returns the following:</P>
+<P>
+<A NAME="50422119_pgfId-297303"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-594100"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-594102"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-594104"></A><CODE>
+knit_result</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-594106"></A>Information about the result of the knit operation. This structure contains any edges that could not be knitted together, as well as status information about the operation.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-297307"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-297306"></A>Note: <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A> does not perform any body checking on the resultant body. You are advised to perform a subsequent check in your application code after the knitting operation has completed.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422119_pgfId-370285"></A>	46.3.3 	<A NAME="50422119_91370"></A>Knitting with supplied topologies </H3>
+<P>
+<A NAME="50422119_pgfId-370337"></A>Bodies can be joined together using <A HREF=../headers/pk_body_knit.html>PK_BODY_knit</A>. This function takes an array of topologies which you want to fuse together to create a single result body. The supplied topologies must be edges (manifold or non-manifold) or vertices. It receives and returns the following arguments:</P>
+<P>
+<A NAME="50422119_pgfId-370371"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-370340"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-370342"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-370344"></A><CODE>body</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-370346"></A>The target body into which the result of the knit operation is placed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-370348"></A><CODE>n_topols</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-370350"></A>The number of <CODE>
+topols</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-370352"></A><CODE>topols</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-370354"></A>An array of input topology. This array can contain duplicates; however, it cannot contain elements from the <CODE>
+matches</CODE>
+ array.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-370356"></A>matches</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-370358"></A>An array of topology that matches <CODE>
+topols</CODE>
+. This array cannot contain duplicates.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-370360"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-594269"></A>The options available for controlling the preferred <CODE>
+body_type</CODE>
+ of the result body are:</P>
+<UL>
+<LI>
+<A NAME="50422119_pgfId-629731"></A>PK_BODY_type_prefer_solid_c</LI>
+<LI>
+<A NAME="50422119_pgfId-629396"></A>PK_BODY_type_prefer_sheet_c</LI>
+<LI>
+<A NAME="50422119_pgfId-629454"></A>PK_BODY_type_prefer_general_c</LI>
+<LI>
+<A NAME="50422119_pgfId-629499"></A>PK_BODY_type_prefer_original</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-410916"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-410926"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-410928"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422119_pgfId-410954"></A><CODE>tracking</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422119_pgfId-410956"></A>Tracking information</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-404507"></A><A HREF=../headers/pk_body_knit.html>PK_BODY_knit</A> joins a number of bodies together using 1:1 matching where one topology from the <CODE>
+topols</CODE>
+ array is knitted to the topology in the <CODE>
+matches</CODE>
+ array with the same index. Topology listed in the <CODE>
+topols</CODE>
+ array survives the operation, whereas topology in the <CODE>
+matches</CODE>
+ array is removed. The original edge tags from the input edges are preserved during this operation.</P>
+<P>
+<A NAME="50422119_pgfId-418669"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422119_pgfId-418668"></A>Note: If general topology is enabled for the session, non-manifold bodies are supported. For mixed geometry the result must be locally manifold, if the supplied <CODE>
+topols</CODE>
+ and <CODE>
+matches</CODE>
+ are edges.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422119_pgfId-371429"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-457.gif">
+
+<P>
+<A NAME="50422119_pgfId-411072"></A>Figure 46-17 <A NAME="50422119_27485"></A>Knitting bodies together by matching vertex topologies.</P>
+<P>
+<A NAME="50422119_pgfId-664550"></A>For classic bodies, the supplied <CODE>
+topols</CODE>
+ and their corresponding entity in <CODE>
+matches</CODE>
+ must be coincident, allowing for any tolerances applied to those entities.</P>
+<P>
+<A NAME="50422119_pgfId-411076"></A>If the geometry attached to an entity in <CODE>
+matches</CODE>
+ is not the same as that attached to its corresponding entity in <CODE>
+topols</CODE>
+, a Parasolid Report of type <A HREF=../headers/pk_report_record_1_t.html>PK_REPORT_record_1_inconsistent_geom_c</A> is generated.</P>
+<P>
+<A NAME="50422119_pgfId-417666"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid Report mechanism.</P>
+<P>
+<A NAME="50422119_pgfId-640535"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-458.gif">
+
+<P>
+<A NAME="50422119_pgfId-633624"></A>Figure 46-18 Knitting matched edges</P>
+<P>
+<A NAME="50422119_pgfId-674380"></A>For facet matches, unlike classic matches, input meshes may be adjusted to ensure they meet accurately at the matched topologies.</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.046.html">Sheet Modeling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.048.html">Mid-Surface Generation</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

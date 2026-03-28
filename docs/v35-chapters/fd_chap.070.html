@@ -1,0 +1,2198 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Filling Holes In A Body</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Filling Holes In A Body</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.069.html">Patching</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.071.html">Moving Faces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-412663">69.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-294920">69.1.1	Received arguments </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-294960">69.1.2	Summary of options </A>
+</UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295075">69.2	Methods for patching </A>
+<UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295093">69.2.1	Creating a patch </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295147">69.2.2	Supplying a fill sheet </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295270">69.2.3	Growing neighboring faces </A>
+</UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295314">69.3	Controlling the appearance of the result </A>
+<UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295364">69.3.1	Controlling the topology of the patch </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295388">69.3.2	Specifying whether boundary edges are smooth </A>
+<UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-337351">69.3.2.1	Controlling the smoothness of boundary edges </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-337094">69.3.2.2	Specifying exceptions for smooth boundary edges </A>
+</UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-351835">69.3.3	Controlling behaviour of non-smooth edges </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295555">69.3.4	Specifying smoothness of internal edges </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295656">69.3.5	Attaching the sheet to the result body </A>
+<UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-661195">69.3.5.1	Tracking the edges of unattached patches </A>
+</UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-363173">69.3.6	Using point (position) data to control the shape of the patch </A>
+</UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295712">69.4	Using supporting bodies to control the shape of a patch </A>
+<UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295905">69.4.1	Imprinting edges from supporting bodies </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-295967">69.4.2	Applying clamps to acorn supporting bodies </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296102">69.4.3	Tracking edges imprinted from supporting bodies </A>
+</UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296108">69.5	Using tolerances </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296181">69.6	Tracking and fault status </A>
+<UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296202">69.6.1	Tracking faces in patches </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296207">69.6.2	Tracking imprinted edges </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296229">69.6.3	Tracking the edges of unattached patches </A>
+</UL>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296231">69.7	Optimising the fill hole operation </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296254">69.8	Controlling the type of the resulting body </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296275">69.9	Checking face-face inconsistencies </A>
+<LI> <A HREF="fd_chap.070.html#50422145_pgfId-296295">69.10	Update control </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-412663"></A>69.1	<A NAME="50422145_21711"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-294739"></A>Parasolid provides a comprehensive tool for filling holes in sheet and solid bodies with the function <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A>. As its name implies, this function can be used to fill holes in a body, but it also can be used to perform modelling operations in a wide variety of situations. </P>
+<P>
+<A NAME="50422145_pgfId-294789"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294742"></A>Usage </P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294744"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294746"></A>Filling holes in a sheet, solid, or general body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294748"></A><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> can fill holes that may be present in solid and sheet bodies, such as those shown in <A HREF="fd_chap.070.html#50422145_36204"><EM>
+Figure 69-1</EM></A>. These may arise for a variety of reasons, such as:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-294752"></A>Gaps between faces that are created when importing data from another modeling system. </LI>
+<LI>
+<A NAME="50422145_pgfId-294753"></A>Simplifying models.</LI>
+<LI>
+<A NAME="50422145_pgfId-385670"></A>Holes that are created as a result of straightforward development of a part, for instance by explicit deletion of faces, using either <A HREF=../headers/pk_edge_delete.html>PK_EDGE_delete</A> or <A HREF=../headers/pk_loop_delete_from_sheet_body.html>PK_LOOP_delete_from_sheet_body</A>, as described in <A HREF="fd_chap.064.html#50422139_34722">Section 63.4.1, “Deleting holes in a sheet body”</A>.</LI>
+</UL>
+<P>
+<A NAME="50422145_pgfId-385254"></A><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> can also fill holes on general bodies if the boundary surrounding the hole is locally manifold.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294759"></A>Filling gaps between touching bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294761"></A><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> can fill any gaps that are formed between two touching bodies, as shown in <A HREF="fd_chap.070.html#50422145_40846"><EM>
+Figure 69-2</EM></A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294766"></A>Adding faces using additional wires</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294768"></A>By adding wire bodies to a sheet body such that, when combined with the laminar edges of the sheet, a closed loop is formed, you can use <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> to fill the “hole” formed by the wire bodies and the laminar edges, effectively extending the sheet to a new boundary by adding a new face. This is shown in <A HREF="fd_chap.070.html#50422145_58704"><EM>
+Figure 69-3</EM></A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294773"></A>Filling wire bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294775"></A><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> can be used to fill a closed wire body, and in conjunction with Parasolid’s lofting and profiling functionality, this can form the basis of a powerful model creation toolkit. This is shown in <A HREF="fd_chap.070.html#50422145_58704"><EM>
+Figure 69-3</EM></A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294783"></A>Bridging gaps between bodies that do not touch</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294785"></A>In specific circumstances, <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> can even be used to bridge the gaps between different sheet bodies. See <A HREF="fd_chap.070.html#50422145_48207">Section 69.2.2, “Supplying a fill sheet”</A>, for more information. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-294790"></A><A HREF=../headers/pk_body_fill_hole.html><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A></A> can be used to fill holes in bodies in all of these situations, either by asking Parasolid to generate a sheet for you, or by supplying a sheet to fill the hole yourself. This chapter explains how to use <A HREF=../headers/pk_body_fill_hole.html><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A></A> to perform these operations and provides complete details of the range of options and functionality available.</P>
+<P>
+<A NAME="50422145_pgfId-434416"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422145_pgfId-434429"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-393519"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\LOP\Fill</CODE>
+ <CODE>
+Hole</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422145_pgfId-294833"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-801.gif">
+
+<P>
+<A NAME="50422145_pgfId-294835"></A>Figure 69-1 <A NAME="50422145_36204"></A>Filling holes in bodies</P>
+<P>
+<A NAME="50422145_pgfId-294873"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-802.gif">
+
+<P>
+<A NAME="50422145_pgfId-294875"></A>Figure 69-2 <A NAME="50422145_40846"></A>Filling gaps between touching bodies</P>
+<P>
+<A NAME="50422145_pgfId-294917"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-803.gif">
+
+<P>
+<A NAME="50422145_pgfId-294919"></A>Figure 69-3 <A NAME="50422145_58704"></A>Using wires to add and create faces</P>
+<P>
+<A NAME="50422145_pgfId-412493"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-412189"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-412176"></A><A HREF="fd_chap.069.html#50422144_22949">Chapter 68, “Patching”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422145_pgfId-294920"></A>	69.1.1 	<A NAME="50422145_81718"></A>Received arguments </H3>
+<P>
+<A NAME="50422145_pgfId-294921"></A><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> receives the following arguments:</P>
+<P>
+<A NAME="50422145_pgfId-294954"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294924"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294926"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-294928"></A>target</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294930"></A>The target body containing the hole to be filled. This body is modified by the operation. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-294932"></A>n_edges</PRE>
+<PRE><A NAME="50422145_pgfId-294933"></A>edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294935"></A>An array describing the edges of the hole to be filled. See <A HREF="fd_chap.070.html#50422145_21711">Section 69.1, “Introduction”</A> for more information on the description of holes/boundaries which can be filled.</P>
+<P>
+<A NAME="50422145_pgfId-399943"></A>At least one of the edges should be an edge of the target body. The bodies from which edges are taken must not intersect or have edges that meet anywhere except at vertices in the hole boundary. If you are supplying edges from a wire body, all the edges of the wire body must form part of the hole boundary.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-294941"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294946"></A>A specified tolerance for the operation. See <A HREF="fd_chap.070.html#50422145_95494">Section 69.5, “Using tolerances”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-294948"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294952"></A>A set of options to control the results of the fill hole operation. See <A HREF="fd_chap.070.html#50422145_80175">Section 69.1.2, “Summary of options”</A>, for an introduction to these options. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-294955"></A>A number of arguments are returned by the function to record tracking information and fault status. See <A HREF="fd_chap.070.html#50422145_43854">Section 69.6, “Tracking and fault status”</A>, for more information. </P>
+
+
+<H3>
+<A NAME="50422145_pgfId-294960"></A>	69.1.2 	<A NAME="50422145_80175"></A>Summary of options </H3>
+<P>
+<A NAME="50422145_pgfId-294961"></A><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> contains a wide variety of options to let you control the result of the operation. The following table summarizes the options that are available, full details of which are given in the rest of this chapter. </P>
+<P>
+<A NAME="50422145_pgfId-295073"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294964"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294966"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-294968"></A>method</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294970"></A>The method used to fill the hole. Different methods may produce different result bodies. See <A HREF="fd_chap.070.html#50422145_60743">Section 69.2, “Methods for patching”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-294975"></A>fill_sheet</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294979"></A>The sheet body that is used to fill the hole. See <A HREF="fd_chap.070.html#50422145_60743">Section 69.2, “Methods for patching”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-294982"></A>patch_topology</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294984"></A>Control of the number of faces in the patch, in cases where you let Parasolid generate the patch automatically. See <A HREF="fd_chap.070.html#50422145_55892">Section 69.3.1, “Controlling the topology of the patch”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-294992"></A>fill_preference</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-294996"></A>Control of the smoothness of edges at the hole boundary. See <A HREF="fd_chap.070.html#50422145_30922">Section 69.3.2, “Specifying whether boundary edges are smooth”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-337132"></A>non_smooth_edges</PRE>
+<PRE><A NAME="50422145_pgfId-334760"></A>non_g2_smooth_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295001"></A>Arrays of edges for which the boundary smoothness controls are relaxed. See <A HREF="fd_chap.070.html#50422145_30922">Section 69.3.2, “Specifying whether boundary edges are smooth”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-347329"></A>non_g1_behaviour</PRE>
+<PRE><A NAME="50422145_pgfId-622317"></A>non_g2_behaviour</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-347331"></A>Controls behaviour when the hole boundary is not sufficiently G1 or G2 smooth and <CODE>
+smoothness</CODE>
+ is set to <A HREF=../headers/pk_continuity_t.html>PK_continuity_g1_c</A> or <A HREF=../headers/pk_continuity_t.html>PK_continuity_g2_c</A>. See <A HREF="fd_chap.070.html#50422145_97210">Section 69.3.3, “Controlling behaviour of non-smooth edges”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-348109"></A>smoothness</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-348111"></A>Controls whether the smoothness of boundary edges should be G1 or G2 smooth. See <A HREF="fd_chap.070.html#50422145_41970">Section 69.3.2.1, “Controlling the smoothness of boundary edges”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295006"></A>internal_smoothness</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295008"></A>Control of smoothness of internal edges in generated patches. See <A HREF="fd_chap.070.html#50422145_94524">Section 69.3.4, “Specifying smoothness of internal edges”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295013"></A>attach_sheet</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295015"></A>Whether to attach the fill sheet to the body. Default: PK_LOGICAL_true. See <A HREF="fd_chap.070.html#50422145_81979">Section 69.3.5, “Attaching the sheet to the result body”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295020"></A>supporting_bodies</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295022"></A>Wire bodies or an acorn vertex that you can use to guide the shape of the generated patch. See <A HREF="fd_chap.070.html#50422145_19325">Section 69.4, “Using supporting bodies to control the shape of a patch”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295027"></A>imprint_supporting_bodies</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295029"></A>Control over whether to imprint supporting bodies onto the result. See <A HREF="fd_chap.070.html#50422145_43430">Section 69.4.1, “Imprinting edges from supporting bodies”</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295034"></A>n_clamps</PRE>
+<PRE><A NAME="50422145_pgfId-295035"></A>clamps</PRE>
+<PRE><A NAME="50422145_pgfId-295036"></A>clamp_indices</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295040"></A>Specification for clamps to be applied to supporting bodies. See <A HREF="fd_chap.070.html#50422145_72090">Section 69.4.2, “Applying clamps to acorn supporting bodies”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295043"></A>optimise</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295045"></A>Control over whether to optimise the fill hole operation for performance, or for quality of the result. See <A HREF="fd_chap.070.html#50422145_61009">Section 69.7, “Optimising the fill hole operation”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295050"></A>body_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295054"></A>The preferred type of the resulting body. See <A HREF="fd_chap.070.html#50422145_38240">Section 69.8, “Controlling the type of the resulting body”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295057"></A>check_fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295059"></A>Whether to check for face-face inconsistencies during the operation. See <A HREF="fd_chap.070.html#50422145_99288">Section 69.9, “Checking face-face inconsistencies”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295064"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295066"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.070.html#50422145_25661">Section 69.10, “Update control”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-631966"></A>tracking_control</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-631968"></A>Control over whether to return additional edge tracking information when outputting an unattached patch. See <A HREF="fd_chap.070.html#50422145_40314">Section 69.3.5.1, “Tracking the edges of unattached patches”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-295075"></A>69.2	<A NAME="50422145_60743"></A>Methods for patching 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-295076"></A>You can fill a hole in a body using a number of different basic methods, all of which are controlled using the <CODE>
+method</CODE>
+ option. These methods can be summarized as follows:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-295083"></A>Let Parasolid create a suitable patch to fill a hole. See <A HREF="fd_chap.070.html#50422145_28556">Section 69.2.1</A>. </LI>
+<LI>
+<A NAME="50422145_pgfId-295087"></A>Fill a hole using a suitable sheet body that you supply yourself. See <A HREF="fd_chap.070.html#50422145_48207">Section 69.2.2</A>.</LI>
+<LI>
+<A NAME="50422145_pgfId-295091"></A>Fill a hole by extending adjacent faces until the hole is covered. See <A HREF="fd_chap.070.html#50422145_95381">Section 69.2.3</A>. </LI>
+</UL>
+
+<H3>
+<A NAME="50422145_pgfId-295093"></A>	69.2.1 	<A NAME="50422145_28556"></A>Creating a patch </H3>
+<P>
+<A NAME="50422145_pgfId-295097"></A>If you set <CODE>
+method</CODE>
+ to PK_fill_hole_create_patch_c, Parasolid generates a suitable sheet body to match the boundary of the hole. This is the most common way of filling holes in a body.</P>
+<P>
+<A NAME="50422145_pgfId-295133"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-804.gif">
+
+<P>
+<A NAME="50422145_pgfId-295137"></A>Figure 69-4 Letting Parasolid generate a patch to fill a hole</P>
+<P>
+<A NAME="50422145_pgfId-295141"></A>When you ask Parasolid to generate a patch in this way, the boundary of the hole is maintained, and the patch meets the faces that surround the hole smoothly wherever possible. The boundary edges of the hole must form a single closed loop. If filling a gap, rather than a rubber face, you can use additional wire edges to ensure that this is the case. </P>
+<P>
+<A NAME="50422145_pgfId-295142"></A>You can further control the characteristics of the patch using the options described in <A HREF="fd_chap.070.html#50422145_93004">Section 69.3, “Controlling the appearance of the result”</A>. </P>
+
+
+<H3>
+<A NAME="50422145_pgfId-295147"></A>	69.2.2 	<A NAME="50422145_48207"></A>Supplying a fill sheet </H3>
+<P>
+<A NAME="50422145_pgfId-295151"></A>Rather than allowing Parasolid to generate a patch for you, you can supply one yourself by setting <CODE>
+method</CODE>
+ to an appropriate value and supplying a suitable sheet body using the <CODE>
+fill_sheet</CODE>
+ option. </P>
+<P>
+<A NAME="50422145_pgfId-295152"></A>The <CODE>
+fill_sheet</CODE>
+ must be:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-295153"></A>Large enough to cover the hole.</LI>
+<LI>
+<A NAME="50422145_pgfId-295154"></A>Have only one boundary.</LI>
+<LI>
+<A NAME="50422145_pgfId-295155"></A>Have no holes.</LI>
+</UL>
+<P>
+<A NAME="50422145_pgfId-295156"></A>The supplied <CODE>
+fill_sheet</CODE>
+ is not destroyed after the call to <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A>: you should delete the <CODE>
+fill_sheet</CODE>
+ yourself if it is no longer required for other purposes. </P>
+<P>
+<A NAME="50422145_pgfId-295157"></A>Different results are possible, depending on the value of <CODE>
+method</CODE>
+:</P>
+<P>
+<A NAME="50422145_pgfId-295173"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295160"></A>Value of method</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295162"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295164"></A>PK_fill_hole_trim_to_hole_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295166"></A>Trim the supplied <CODE>
+fill_sheet</CODE>
+ to the boundary of the hole that requires filling. </P>
+<P>
+<A NAME="50422145_pgfId-295167"></A>If you use this value, the boundary edges of the hole must form a single closed loop. If necessary, you can add wire edges to ensure that this is the case. All the boundaries of the hole must lie within the supplied <CODE>
+tolerance</CODE>
+ of <CODE>
+fill_sheet</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295169"></A>PK_fill_hole_trim_to_sheet_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295171"></A>Trim the target bodies to the laminar edges of the supplied <CODE>
+fill_sheet</CODE>
+.</P>
+<P>
+<A NAME="50422145_pgfId-295172"></A>When trimming to the sheet, the laminar edges of <CODE>
+fill_sheet</CODE>
+ must lie within <CODE>
+tolerance</CODE>
+ of the body they are to be joined to, and all the bodies specified in <CODE>
+edges</CODE>
+ must have at least one laminar edge of <CODE>
+fill_sheet</CODE>
+ within tolerance of them. When using this method, you cannot use additional wire edges in <CODE>
+edges</CODE>
+.</P>
+<ADDRESS>
+<A NAME="50422145_pgfId-386468"></A>Note: This value cannot be set when a general body is supplied.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-295177"></A><A HREF="fd_chap.070.html#50422145_19787"><EM>
+Figure 69-5</EM></A> illustrates the differences between these two methods. </P>
+<P>
+<A NAME="50422145_pgfId-295217"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-805.gif">
+
+<P>
+<A NAME="50422145_pgfId-295219"></A>Figure 69-5 <A NAME="50422145_19787"></A>Filling a hole using a supplied fill sheet</P>
+<P>
+<A NAME="50422145_pgfId-295220"></A>If <CODE>
+method</CODE>
+ is PK_fill_hole_trim_to_sheet_c, you can also use <A HREF=../headers/pk_body_fill_hole.html><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A></A> to fill the gap between two separate sheet bodies. In order to use <A HREF=../headers/pk_body_fill_hole.html><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A></A> in this way, you must ensure that the supplied sheet is at least big enough to cover the entire gap between the received <CODE>
+edges</CODE>
+. </P>
+<P>
+<A NAME="50422145_pgfId-295224"></A><A HREF="fd_chap.070.html#50422145_77308"><EM>
+Figure 69-6</EM></A> shows an example where the gap between two target bodies is bridged using a fill sheet that is not as wide as the targets themselves. In order to achieve this, vertices were imprinted on the targets so as to create additional edges, such that each edge is no wider than the fill sheet. These edges are then received by <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> (one from each target body) in order to successfully bridge the gap. </P>
+<P>
+<A NAME="50422145_pgfId-295266"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-806.gif">
+
+<P>
+<A NAME="50422145_pgfId-295268"></A>Figure 69-6 <A NAME="50422145_77308"></A>Bridging the gap between two sheet bodies. </P>
+
+
+<H3>
+<A NAME="50422145_pgfId-295270"></A>	69.2.3 	<A NAME="50422145_95381"></A>Growing neighboring faces </H3>
+<P>
+<A NAME="50422145_pgfId-295271"></A>A final method of filling a hole is to extend neighboring faces so that they cover the hole. You can do this by setting <CODE>
+method</CODE>
+ to PK_fill_hole_extend_adjacent_c.</P>
+<P>
+<A NAME="50422145_pgfId-295272"></A>The advantage of this method is that you do not need to supply a <CODE>
+fill_sheet</CODE>
+, and Parasolid does not need to generate a patch face. However, it can only be used in cases where the configuration is such that the hole can be filled simply by extending the existing faces. In addition, since no new faces are created, there is no way of identifying the patched area once the fill hole operation has succeeded. </P>
+<P>
+<A NAME="50422145_pgfId-295311"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-807.gif">
+
+<P>
+<A NAME="50422145_pgfId-295312"></A>Figure 69-7 Filling a hole by extending neighboring faces</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-295314"></A>69.3	<A NAME="50422145_93004"></A>Controlling the appearance of the result 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-295318"></A>If you let Parasolid generate a patch to fill a hole, there are several options that let you control the appearance of the result body. These options give you control over the topology of the patch itself, the smoothness of any edges involved, and whether the patch should be attached to the target. The following table summarizes the options available:</P>
+<P>
+<A NAME="50422145_pgfId-295355"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295321"></A>To control ...</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295323"></A>See ...</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295328"></A>the number of faces in a patch generated by Parasolid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295332"></A><A HREF="fd_chap.070.html#50422145_55892">Section 69.3.1, “Controlling the topology of the patch”</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295335"></A>the smoothness of edges that form the boundary between the original model and the generated patch.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295339"></A><A HREF="fd_chap.070.html#50422145_30922">Section 69.3.2, “Specifying whether boundary edges are smooth”</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295342"></A>the smoothness of any internal edges in the patch, if a single face solution is not requested or possible. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295346"></A><A HREF="fd_chap.070.html#50422145_94524">Section 69.3.4, “Specifying smoothness of internal edges”</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295349"></A>whether or not to attach the patch face to the result body. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295353"></A><A HREF="fd_chap.070.html#50422145_81979">Section 69.3.5, “Attaching the sheet to the result body”</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-363103"></A>the shape of the patch using an array of point (position) data.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-363105"></A><A HREF="fd_chap.070.html#50422145_99923">Section 69.3.6, “Using point (position) data to control the shape of the patch”</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-295362"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422145_pgfId-295358"></A>Note: All of the options described in this section require that <CODE>
+method</CODE>
+ is set to PK_fill_hole_create_patch_c. See <A HREF="fd_chap.070.html#50422145_28556">Section 69.2.1, “Creating a patch”</A>, for details. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422145_pgfId-295364"></A>	69.3.1 	<A NAME="50422145_55892"></A>Controlling the topology of the patch </H3>
+<P>
+<A NAME="50422145_pgfId-295365"></A>You can use the <CODE>
+patch_topology</CODE>
+ option to control the number of faces in any patches generated by <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A>. This option takes the following values:</P>
+<P>
+<A NAME="50422145_pgfId-295386"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295368"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295370"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295372"></A><A HREF=../headers/pk_fill_hole_topol_t.html>PK_fill_hole_topol_multiple_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295374"></A>Always create a patch if a solution is possible, even if that patch contains multiple faces. This is the recommended value, because Parasolid creates a suitable number of faces to ensure that the performance and reliability of the model is optimal in downstream operations; in particular, a single face solution is created whenever possible. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295379"></A><A HREF=../headers/pk_fill_hole_topol_t.html>PK_fill_hole_topol_single_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295381"></A>Only produce a patch in cases where a single face patch is possible. If a single face solution is not possible, then the call to <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> fails. If you only ever want to use single face patches, then using this value can sometimes result in performance improvements. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295383"></A><A HREF=../headers/pk_fill_hole_topol_t.html>PK_fill_hole_topol_minimal_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295385"></A>Attempt to minimise the number of faces in the patch. Using this value does not, in general, produce a solution that contains a single face, though in the case of multiple face patches, it can sometimes produce a solution with fewer faces. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422145_pgfId-295388"></A>	69.3.2 	<A NAME="50422145_30922"></A>Specifying whether boundary edges are smooth </H3>
+<P>
+<A NAME="50422145_pgfId-295389"></A>You can choose the preferred method of filling the hole using the <CODE>
+fill_preference</CODE>
+ option. You can use this option to choose whether to fill the hole with a sheet that is smooth at the hole boundary, or one that is not.</P>
+<P>
+<A NAME="50422145_pgfId-295390"></A>Possible values are:</P>
+<P>
+<A NAME="50422145_pgfId-295412"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295393"></A>Value </P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295395"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295397"></A>PK_fill_hole_smooth_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295399"></A>The hole is filled with a sheet that is smooth at the boundary. The sheet is analytic if possible. You must use this option if <CODE>
+non_smooth_edges</CODE>
+ is not empty. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295401"></A><A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295403"></A>The hole is filled while ignoring all smoothness requirements at the boundary of the hole, using an analytic solution where possible. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295405"></A>PK_fill_hole_plane_only_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295407"></A>The hole is filled with a planar sheet if possible. If this is not possible, the call to <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> fails. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295409"></A>PK_fill_hole_prefer_plane_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295411"></A>The hole is filled with a planar sheet if possible. If this is not possible, a smooth sheet is used. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-295416"></A><A HREF="fd_chap.070.html#50422145_39043"><EM>
+Figure 69-8</EM></A> shows a simple example that illustrates the different results that can be produced by specifying either PK_fill_hole_smooth_c or <A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_c</A>. </P>
+<P>
+<A NAME="50422145_pgfId-295454"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-808.gif">
+
+<P>
+<A NAME="50422145_pgfId-295456"></A>Figure 69-8 <A NAME="50422145_39043"></A>Generating patches with smooth and non-smooth boundary edges</P>
+<P>
+<A NAME="50422145_pgfId-295457"></A>The resulting patch that is generated depends very much on the configuration of the initial hole, and in particular whether a planar solution is possible. <A HREF="fd_chap.070.html#50422145_97495"><EM>
+Figure 69-9</EM></A> shows an example in which such a planar solution is possible. In this case, all values of <CODE>
+fill_preference</CODE>
+ except for PK_fill_hole_smooth_c produce this planar solution, as shown. </P>
+<P>
+<A NAME="50422145_pgfId-295498"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-809.gif">
+
+<P>
+<A NAME="50422145_pgfId-295500"></A>Figure 69-9 <A NAME="50422145_97495"></A>Filling planar holes with faces that have smooth and non-smooth boundaries</P>
+<P>
+<A NAME="50422145_pgfId-295504"></A><A HREF="fd_chap.070.html#50422145_88365"><EM>
+Figure 69-10</EM></A> shows a similar configuration, with the exception that a planar solution is not possible. In this case, only <A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_c</A> produces a result that can be considered similar to the planar solution of <A HREF="fd_chap.070.html#50422145_97495"><EM>
+Figure 69-9</EM></A>. Both PK_fill_hole_smooth_c and PK_fill_hole_prefer_plane_c produce a smooth solution and PK_fill_hole_plane_only_c fails completely. </P>
+<P>
+<A NAME="50422145_pgfId-295545"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-810.gif">
+
+<P>
+<A NAME="50422145_pgfId-337052"></A>Figure 69-10 <A NAME="50422145_88365"></A>Filling non-planar holes with faces that have smooth and non-smooth boundaries</P>
+
+<H4>
+<A NAME="50422145_pgfId-337351"></A>69.3.2.1 <A NAME="50422145_41970"></A>Controlling the smoothness of boundary edges </H4>
+<P>
+<A NAME="50422145_pgfId-337053"></A>If you have requested a smooth result (that is, <CODE>
+fill_preference</CODE>
+ is PK_fill_hole_smooth_c or PK_fill_hole_prefer_plane_c), you can control whether that result is G1 or G2 smooth using the <CODE>
+smoothness</CODE>
+ option. By default, all smooth fill sheets are G1 smooth. You can request G2 smoothness (<CODE>
+smoothness</CODE>
+ is <A HREF=../headers/pk_continuity_t.html>PK_continuity_g2_c</A>) if the following are also true:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-337057"></A><CODE>
+method</CODE>
+ is PK_fill_hole_create_patch_c. See <A HREF="fd_chap.070.html#50422145_28556">Section 69.2.1</A>.</LI>
+<LI>
+<A NAME="50422145_pgfId-337061"></A><CODE>
+optimise</CODE>
+ is <A HREF=../headers/pk_fill_hole_opt_t.html>PK_fill_hole_opt_quality_c</A>. See <A HREF="fd_chap.070.html#50422145_61009">Section 69.7</A>.</LI>
+</UL>
+<P>
+<A NAME="50422145_pgfId-340557"></A>For a successful G2 smooth result, G2 smoothness conditions must also be met by the boundary faces, boundary edges, and any supporting bodies, unless <CODE>
+non_g2_behaviour</CODE>
+ is set to <A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_allow_c</A> (see <A HREF="fd_chap.070.html#50422145_97210">Section 69.3.3</A> for more information). If these conditions are not met, a Parasolid Report of type <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_fill_hole_non_g2_c</A> is generated. </P>
+<P>
+<A NAME="50422145_pgfId-340898"></A>See the reference documentation for <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> for more information. </P>
+<P>
+<A NAME="50422145_pgfId-340908"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid Report mechanism.</P>
+
+
+<H4>
+<A NAME="50422145_pgfId-337094"></A>69.3.2.2 Specifying exceptions for smooth boundary edges </H4>
+<P>
+<A NAME="50422145_pgfId-337428"></A>The <CODE>
+non_smooth_edges</CODE>
+ and <CODE>
+non_g2_smooth_edges</CODE>
+ arrays contain edges on the hole boundary for which the smoothness requirements are relaxed: </P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-337095"></A><CODE>
+non_smooth_edges</CODE>
+ is an array of boundary edges that do not have to be G1 smooth.</LI>
+<LI>
+<A NAME="50422145_pgfId-337096"></A><CODE>
+non_g2_smooth_edges</CODE>
+ is an array of boundary edges that do not have to be G2 smooth.</LI>
+</UL>
+<P>
+<A NAME="50422145_pgfId-334920"></A>Edges specified in either of these arrays must form part of the hole boundary, and must therefore be present in the <CODE>
+edges</CODE>
+ array passed to <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A>. </P>
+<P>
+<A NAME="50422145_pgfId-295553"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422145_pgfId-337156"></A>Note: If you specify any <CODE>
+non_smooth_edges</CODE>
+, then:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-337161"></A><CODE>
+fill_preference</CODE>
+ must be PK_fill_hole_smooth_c</LI>
+<LI>
+<A NAME="50422145_pgfId-337179"></A><CODE>
+method</CODE>
+ must be PK_fill_hole_create_patch_c</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422145_pgfId-337180"></A>If you specify any <CODE>
+non_g2_smooth_edges</CODE>
+, then:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-337181"></A><CODE>
+fill_preference</CODE>
+ must be PK_fill_hole_smooth_c</LI>
+<LI>
+<A NAME="50422145_pgfId-337182"></A><CODE>
+smoothness</CODE>
+ must be <A HREF=../headers/pk_continuity_t.html>PK_continuity_g2_c</A></LI>
+<LI>
+<A NAME="50422145_pgfId-337183"></A><CODE>
+method</CODE>
+ must be PK_fill_hole_create_patch_c</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422145_pgfId-335390"></A>An edge cannot be supplied in both <CODE>
+non_smooth_edges</CODE>
+ and <CODE>
+non_g2_smooth_edges</CODE>
+. </ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422145_pgfId-295552"></A>Providing all the edges of the hole boundary as <CODE>
+non_smooth_edges</CODE>
+ produces the same result as setting <CODE>
+fill_preference</CODE>
+ to <A HREF=../headers/pk_fill_hole_non_smooth_t.html><A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_c</A></A>. Setting <A HREF=../headers/pk_fill_hole_non_smooth_t.html><A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_c</A></A> is recommended because it is more straightforward. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422145_pgfId-351835"></A>	69.3.3 	<A NAME="50422145_97210"></A>Controlling behaviour of non-smooth edges </H3>
+<P>
+<A NAME="50422145_pgfId-617437"></A>Where smoothness is set to either <A HREF=../headers/pk_continuity_t.html>PK_continuity_g1_c</A>, or <A HREF=../headers/pk_continuity_t.html>PK_continuity_g2_c</A>, there could be cases where the boundary faces, edges, and supporting bodies are not sufficiently G1 or G2 smooth to allow this.</P>
+<P>
+<A NAME="50422145_pgfId-617572"></A>In these circumstances, you can control how to proceed filling the hole using either the <CODE>
+non_g1_behaviour</CODE>
+ or the <CODE>
+non_g2_behaviour</CODE>
+ option respectively. These options take the following values:</P>
+<P>
+<A NAME="50422145_pgfId-352004"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-351993"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-351995"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-351997"></A><A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_fail_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-351999"></A>The hole is not filled and a status of PK_fill_hole_too_complex_c is returned. This is the default for both options.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-352001"></A><A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_allow_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-352003"></A>The hole is filled.</P>
+<P>
+<A NAME="50422145_pgfId-617209"></A>When using the:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-615678"></A><CODE>
+non_g1_behaviour</CODE>
+: The resultant sheet may not be G1 smooth to adjacent faces in areas near G1 discontinuities.</LI>
+<LI>
+<A NAME="50422145_pgfId-615660"></A><CODE>
+non_g2_behaviour</CODE>
+: The resultant sheet may not be G2 smooth to adjacent faces in areas near G2 discontinuities.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-605302"></A>In both cases, a Parasolid Report is produced indicating where the boundary edges do not meet the smoothness requirements. The types of report produced are as follows:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-616752"></A><A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_fill_hole_non_g1_c</A> (does not meet the G1 smoothness requirements)</LI>
+<LI>
+<A NAME="50422145_pgfId-616765"></A><A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_fill_hole_non_g2_c</A> (does not meet the G2 smoothness requirements)</LI>
+</UL>
+<P>
+<A NAME="50422145_pgfId-349748"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid Report mechanism.</P>
+
+
+<H3>
+<A NAME="50422145_pgfId-295555"></A>	69.3.4 	<A NAME="50422145_94524"></A>Specifying smoothness of internal edges </H3>
+<P>
+<A NAME="50422145_pgfId-295556"></A>You can choose whether or not any internal edges in a generated patch are smooth using the <CODE>
+internal_smoothness</CODE>
+ option. This takes the following values:</P>
+<P>
+<A NAME="50422145_pgfId-295570"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295559"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295561"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295563"></A><A HREF=../headers/pk_fill_hole_patch_eds_t.html>PK_fill_hole_patch_eds_sharp_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295565"></A>Internal edges in the generated patch do not need to be smooth. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295567"></A><A HREF=../headers/pk_fill_hole_patch_eds_t.html>PK_fill_hole_patch_eds_smooth_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295569"></A>Internal edges in the generated patch must be smooth. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-295574"></A><A HREF="fd_chap.070.html#50422145_96603"><EM>
+Figure 69-11</EM></A> shows an example in which a patch can only be generated if <CODE>
+internal_smoothness</CODE>
+ is set to its default value. </P>
+<P>
+<A NAME="50422145_pgfId-295610"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-811.gif">
+
+<P>
+<A NAME="50422145_pgfId-295612"></A>Figure 69-11 <A NAME="50422145_96603"></A>Sharp internal edges in a patch</P>
+<P>
+<A NAME="50422145_pgfId-295616"></A>Conversely, <A HREF="fd_chap.070.html#50422145_97738"><EM>
+Figure 69-12</EM></A> illustrates an example that can only be successfully filled when <CODE>
+internal_smoothness</CODE>
+ is <A HREF=../headers/pk_fill_hole_patch_eds_t.html>PK_fill_hole_patch_eds_smooth_c</A>. </P>
+<P>
+<A NAME="50422145_pgfId-295652"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-812.gif">
+
+<P>
+<A NAME="50422145_pgfId-295654"></A>Figure 69-12 <A NAME="50422145_97738"></A>Smooth internal edges in a patch</P>
+
+
+<H3>
+<A NAME="50422145_pgfId-295656"></A>	69.3.5 	<A NAME="50422145_81979"></A>Attaching the sheet to the result body </H3>
+<P>
+<A NAME="50422145_pgfId-295657"></A>You can use the <CODE>
+attach_sheet</CODE>
+ option to choose whether or not to attach the fill sheet to the body or not. The default value for this option is PK_LOGICAL_true, and this is the setting you should use in the majority of situations. However, if you have asked Parasolid to create a patch for you (as described in <A HREF="fd_chap.070.html#50422145_28556">Section 69.2.1, “Creating a patch”</A>), then you can set <CODE>
+attach_sheet</CODE>
+ to PK_LOGICAL_false if you want to return the patch created by Parasolid as a separate body. You could use this option, for instance, to generate a patch that is then used as an explicit <CODE>
+fill_sheet</CODE>
+ in a subsequent call to <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A>.</P>
+<P>
+<A NAME="50422145_pgfId-295667"></A>You can use the tracking information returned from <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> to find the patch body. See <A HREF="fd_chap.070.html#50422145_43854">Section 69.6, “Tracking and fault status”</A>, for details. </P>
+<P>
+<A NAME="50422145_pgfId-295705"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-813.gif">
+
+<P>
+<A NAME="50422145_pgfId-295706"></A>Figure 69-13 Choosing whether to attach a patch to the result body</P>
+<P>
+<A NAME="50422145_pgfId-642884"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422145_pgfId-295709"></A>Note: If <CODE>
+attach_sheet</CODE>
+ is PK_LOGICAL_false, <CODE>
+method</CODE>
+ must be PK_fill_hole_create_patch_c.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422145_pgfId-661195"></A>69.3.5.1 <A NAME="50422145_40314"></A>Tracking the edges of unattached patches </H4>
+<P>
+<A NAME="50422145_pgfId-648031"></A>When returning the patch created by Parasolid as a separate body, you can use the <CODE>
+tracking_control</CODE>
+ option to output additional tracking information for the boundary of the patch. This takes the following values:</P>
+<P>
+<A NAME="50422145_pgfId-643214"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-643198"></A>Values </P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-643200"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-643202"></A><A HREF=../headers/pk_fill_hole_track_t.html>PK_fill_hole_track_default_c</A></PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-643204"></A>This value returns:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-643205"></A>A track record containing all the faces of the patch.</LI>
+<LI>
+<A NAME="50422145_pgfId-643206"></A>A track record for each edge of a supporting body that is imprinted on the patch, if one or more <CODE>
+supporting_bodies</CODE>
+ have been supplied. </LI>
+</UL>
+<P>
+<A NAME="50422145_pgfId-643207"></A>This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-643209"></A><A HREF=../headers/pk_fill_hole_track_t.html>PK_fill_hole_track_bdry_edges_c</A></PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-643211"></A>This value supplements the default tracking with: </P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-643212"></A>Track records for mapping supplied boundary edges to corresponding topologies on an unattached patch.</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422145_pgfId-643213"></A>Note: For this value <CODE>
+attach_sheet </CODE>
+must be set to PK_LOGICAL_false and <CODE>
+method</CODE>
+ must be set to PK_fill_hole_create_patch_c.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-645482"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-645528"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-645449"></A><A HREF="fd_chap.070.html#50422145_28556">Section 69.2.1, “Creating a patch”</A></LI>
+<LI>
+<A NAME="50422145_pgfId-645591"></A><A HREF="fd_chap.070.html#50422145_81979">Section 69.3.5, “Attaching the sheet to the result body”</A></LI>
+<LI>
+<A NAME="50422145_pgfId-650229"></A><A HREF="fd_chap.070.html#50422145_">Section 69.6.3, “Tracking the edges of unattached patches”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422145_pgfId-363173"></A>	69.3.6 	<A NAME="50422145_99923"></A>Using point (position) data to control the shape of the patch </H3>
+<P>
+<A NAME="50422145_pgfId-376193"></A>You can use the <CODE>
+supporting_point_sets</CODE>
+ option to control the shape of a patch using a supplied array of point data. The patch created will pass close to the supplied point data, to within tolerances supplied for each set. These tolerance must be greater than or equal to the tolerance supplied to <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A>. You can optionally supply normals within the point set data. Default: No point data set is supplied. </P>
+<P>
+<A NAME="50422145_pgfId-376222"></A><A HREF="fd_chap.070.html#50422145_62641"><EM>
+Figure 69-14</EM></A> shows how the shape of a patch is controlled using an array of point data.</P>
+<P>
+<A NAME="50422145_pgfId-364664"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-814.gif">
+
+<P>
+<A NAME="50422145_pgfId-364727"></A>Figure 69-14 <A NAME="50422145_62641"></A>Controlling the shape of a patch with point data</P>
+<P>
+<A NAME="50422145_pgfId-363734"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422145_pgfId-363933"></A>Note: This option can only be used when <CODE>
+method</CODE>
+ is set to PK_fill_hole_create_patch_c. See <A HREF="fd_chap.070.html#50422145_28556">Section 69.2.1, “Creating a patch”</A>, for details.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-295712"></A>69.4	<A NAME="50422145_19325"></A>Using supporting bodies to control the shape of a patch 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-295713"></A>The <CODE>
+supporting_bodies</CODE>
+ option allows you to specify one or more bodies which are used to give fine control over the final appearance of a filled hole. These bodies act as guides for the operation, resulting in a patch that follows the shape described by those guides.This option takes one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-295714"></A>An array of wire bodies.</LI>
+<LI>
+<A NAME="50422145_pgfId-295715"></A>A single acorn vertex, used as a point through which the resulting patch must pass.</LI>
+<LI>
+<A NAME="50422145_pgfId-295716"></A>A single general wire body.</LI>
+</UL>
+<P>
+<A NAME="50422145_pgfId-295723"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422145_pgfId-295719"></A>Note: Any wire <CODE>
+supporting_bodies</CODE>
+ used to control the appearance of the patch are distinct from any wire bodies that might be used as edges for the <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> operation, such as those shown in <A HREF="fd_chap.070.html#50422145_58704"><EM>
+Figure 69-3</EM></A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-295727"></A><A HREF="fd_chap.070.html#50422145_79617"><EM>
+Figure 69-15</EM></A> shows an example that illustrates how two wire bodies can be used to control the shape of one of the faces created by a fill operation: without the additional control provided by the supplied <CODE>
+supporting_bodies</CODE>
+, the example shown would fail.</P>
+<P>
+<A NAME="50422145_pgfId-295766"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-815.gif">
+
+<P>
+<A NAME="50422145_pgfId-295768"></A>Figure 69-15 <A NAME="50422145_79617"></A>Using an array of wire bodies to guide the shape of the patch</P>
+<P>
+<A NAME="50422145_pgfId-295772"></A><A HREF="fd_chap.070.html#50422145_76064"><EM>
+Figure 69-16</EM></A> shows an example where the final shape of the patch is controlled by a grid defined using a single general wire body. </P>
+<P>
+<A NAME="50422145_pgfId-295814"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-816.gif">
+
+<P>
+<A NAME="50422145_pgfId-295816"></A>Figure 69-16 <A NAME="50422145_76064"></A>Using a single general wire body to define a support grid </P>
+<P>
+<A NAME="50422145_pgfId-295817"></A>When using this functionality, the following constraints apply, depending on the type of <CODE>
+supporting_bodies</CODE>
+ supplied: </P>
+<P>
+<A NAME="50422145_pgfId-295858"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295820"></A>Type of body</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295822"></A>Constraints</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295824"></A>All supporting bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295826"></A>The <CODE>
+method</CODE>
+ supplied must be PK_fill_hole_create_patch_c (see <A HREF="fd_chap.070.html#50422145_28556">Section 69.2.1</A>).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295831"></A>Array of wire bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295833"></A>The supplied <CODE>
+supporting_bodies</CODE>
+:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-295834"></A>Cannot contain non-smooth vertices.</LI>
+<LI>
+<A NAME="50422145_pgfId-295835"></A>Must not be disjoint.</LI>
+<LI>
+<A NAME="50422145_pgfId-295836"></A>Must not intersect. </LI>
+<LI>
+<A NAME="50422145_pgfId-295837"></A>Must have end vertices that are coincident (to within tolerance) of a vertex on the boundary of the hole. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295839"></A>Acorn body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295843"></A>A clamp may also be supplied (see <A HREF="fd_chap.070.html#50422145_72090">Section 69.4.2, “Applying clamps to acorn supporting bodies”</A>).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295846"></A>Single general wire body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295848"></A>The wire body must:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-295849"></A>Not be disjoint.</LI>
+<LI>
+<A NAME="50422145_pgfId-295850"></A>Contain a vertex within tolerance of the hole boundary.</LI>
+</UL>
+<P>
+<A NAME="50422145_pgfId-295851"></A>The wire body and the hole boundary together describe a “grid” defining the shape of the patch. Each vertex of this grid must meet the following smoothness constraints:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-295852"></A>For each vertex with two edges, the tangents of those edges must be collinear.</LI>
+<LI>
+<A NAME="50422145_pgfId-295853"></A>For each vertex with more than two edges, the tangents of those edges must be coplanar.</LI>
+<LI>
+<A NAME="50422145_pgfId-295854"></A>For each vertex on a laminar edge at the boundary, that edge must either be supplied in <CODE>
+non_smooth_edges</CODE>
+ (to give a non-smooth patch: see <A HREF="fd_chap.070.html#50422145_30922">Section 69.3.2</A>), or the tangents of all the edges that meet at that vertex must lie in the tangent plane of the face at that vertex (to give a smooth result). Alternatively, for a completely non-smooth solution, <CODE>
+fill_preference</CODE>
+ can be set to <A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_c</A>.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-295862"></A><A HREF="fd_chap.070.html#50422145_44362"><EM>
+Figure 69-17</EM></A> illustrates the use of <CODE>
+non_smooth_edges</CODE>
+ in conjunction with a single general wire supporting body in order to produce a non-smooth result. </P>
+<P>
+<A NAME="50422145_pgfId-295900"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-817.gif">
+
+<P>
+<A NAME="50422145_pgfId-295902"></A>Figure 69-17 <A NAME="50422145_44362"></A>Using a support grid in conjunction with non-smooth edges</P>
+<P>
+<A NAME="50422145_pgfId-295903"></A>The supplied <CODE>
+supporting_bodies</CODE>
+ remain unchanged after the operation.</P>
+
+<H3>
+<A NAME="50422145_pgfId-295905"></A>	69.4.1 	<A NAME="50422145_43430"></A>Imprinting edges from supporting bodies </H3>
+<P>
+<A NAME="50422145_pgfId-295906"></A>You can use the <CODE>
+imprint_supporting_bodies</CODE>
+ option to control which edges are imprinted onto the patch when <CODE>
+supporting_bodies</CODE>
+ are supplied. This takes the following values:</P>
+<P>
+<A NAME="50422145_pgfId-295920"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295909"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295911"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295913"></A><A HREF=../headers/pk_fill_hole_imprint_t.html>PK_fill_hole_imprint_sharp_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295915"></A>Imprint edges from the supplied <CODE>
+supporting_bodies</CODE>
+ onto the patch faces only when internal edges are required because the resulting patch is not smooth. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295917"></A><A HREF=../headers/pk_fill_hole_imprint_t.html>PK_fill_hole_imprint_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295919"></A>Always imprint edges from the supplied <CODE>
+supporting_bodies</CODE>
+. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-295924"></A><A HREF="fd_chap.070.html#50422145_82307"><EM>
+Figure 69-18</EM></A> shows an example that illustrates how you might use this option to preserve the design intent of a model while at the same time modifying the original body. A hole is filled in a face, but a supporting body is also specified to guide the shape of the resulting patch. By default, that supporting body is not imprinted onto the patch, because the resulting internal edge is smooth. However, the original body did have an edge imprinted, and so you can optionally use the <CODE>
+imprint_supporting_bodies</CODE>
+ option, to force imprinting of the supporting body, as shown. </P>
+<P>
+<A NAME="50422145_pgfId-295963"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-818.gif">
+
+<P>
+<A NAME="50422145_pgfId-295965"></A>Figure 69-18 <A NAME="50422145_82307"></A>Controlling imprinted edges from supporting bodies.</P>
+
+
+<H3>
+<A NAME="50422145_pgfId-295967"></A>	69.4.2 	<A NAME="50422145_72090"></A>Applying clamps to acorn supporting bodies </H3>
+<P>
+<A NAME="50422145_pgfId-295968"></A>If you supply an acorn vertex as a supporting body, you can also supply the specification for a clamp to apply at that point. The specified clamp constrains the tangency of the surface patch at the location of the supporting body, providing you with extra control over the shape of the patch. </P>
+<P>
+<A NAME="50422145_pgfId-295969"></A>You use the following options to specify clamp information:</P>
+<P>
+<A NAME="50422145_pgfId-295984"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295972"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295974"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295976"></A>n_clamps</PRE>
+<PRE><A NAME="50422145_pgfId-295977"></A>clamps</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295979"></A>An array of one or more clamps to apply to the specified <CODE>
+supporting_bodies</CODE>
+. The <CODE>
+n_clamps</CODE>
+ option gives the length of the <CODE>
+clamps</CODE>
+ array. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-295981"></A>clamp_indices</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-295983"></A>An array of length <CODE>
+n_clamps</CODE>
+ indicating which of the supplied <CODE>
+supporting_bodies</CODE>
+ should be associated with each clamp in <CODE>
+clamps</CODE>
+. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-295988"></A><A HREF="fd_chap.070.html#50422145_19660"><EM>
+Figure 69-19</EM></A> shows how the <CODE>
+clamps</CODE>
+ you specify map onto supplied <CODE>
+supporting_bodies</CODE>
+ using the <CODE>
+clamp_indices</CODE>
+ array. In this example, three <CODE>
+clamps</CODE>
+ are supplied, and these are used with three of the four supplied <CODE>
+supporting_bodies</CODE>
+: the third supporting body is not clamped in any way. </P>
+<P>
+<A NAME="50422145_pgfId-295992"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422145_pgfId-295991"></A>Note: You must use a separate clamp for each supporting body that you want to clamp: different supporting bodies cannot share a single clamp. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-296026"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-819.gif">
+
+<P>
+<A NAME="50422145_pgfId-296028"></A>Figure 69-19 <A NAME="50422145_19660"></A>Specifying clamps for different supporting bodies</P>
+<P>
+<A NAME="50422145_pgfId-296029"></A>The information required for each clamp is specified in the <CODE>
+clamps</CODE>
+ structure, which takes the following fields:</P>
+<P>
+<A NAME="50422145_pgfId-296045"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296032"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296034"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-296036"></A>type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296038"></A>The type of clamp to apply to the supporting body. This can be one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-296039"></A><A HREF=../headers/pk_fill_hole_clamp_t.html>PK_fill_hole_clamp_no_c</A>: no clamp</LI>
+<LI>
+<A NAME="50422145_pgfId-296040"></A><A HREF=../headers/pk_fill_hole_clamp_planar_t.html>PK_fill_hole_clamp_planar_c</A>: planar clamp</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-296042"></A>planar_clamp</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296044"></A>If <CODE>
+type</CODE>
+ is <A HREF=../headers/pk_fill_hole_clamp_planar_t.html>PK_fill_hole_clamp_planar_c</A>, this structure can contain a <CODE>
+normal</CODE>
+ that specifies a planar clamp. If no <CODE>
+normal</CODE>
+ is specified (i.e. if <CODE>
+planar_clamp.have_normal</CODE>
+ is PK_LOGICAL_false), then <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> calculates an appropriate normal. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-296049"></A><A HREF="fd_chap.070.html#50422145_24563"><EM>
+Figure 69-20</EM></A> illustrates the different effects that you can achieve by specifying different clamps. </P>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-296050"></A>By default, no clamp is supplied. This produces a patch that contains a sharp point at the position of the supporting body. </LI>
+<LI>
+<A NAME="50422145_pgfId-296051"></A>If you set <CODE>
+type</CODE>
+ to <A HREF=../headers/pk_fill_hole_clamp_planar_t.html>PK_fill_hole_clamp_planar_c</A> (and do not supply <CODE>
+planar_clamp</CODE>
+), the result is a smooth patch. </LI>
+<LI>
+<A NAME="50422145_pgfId-296052"></A>If you also supply a <CODE>
+planar_clamp</CODE>
+ with a <CODE>
+normal</CODE>
+, the shape can be further modified as shown. </LI>
+</UL>
+<P>
+<A NAME="50422145_pgfId-296092"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-820.gif">
+
+<P>
+<A NAME="50422145_pgfId-296094"></A>Figure 69-20 <A NAME="50422145_24563"></A>Different clamps possible with an acorn supporting body</P>
+<P>
+<A NAME="50422145_pgfId-296101"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422145_pgfId-296097"></A>Note: Currently, if you supply an acorn vertex as a supporting body, it must be the only supporting body. Consequently, you should only supply a single clamp. as follows: </ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422145_pgfId-296098"></A><CODE>
+n_clamps</CODE>
+ must be 1.</LI>
+<LI>
+<A NAME="50422145_pgfId-296099"></A><CODE>
+clamps</CODE>
+ and <CODE>
+clamp_indices</CODE>
+ must be arrays with just one element. </LI>
+</UL>
+<ADDRESS>
+<A NAME="50422145_pgfId-296100"></A>The API described above is provided to allow for possible future expansion in this functionality. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422145_pgfId-296102"></A>	69.4.3 	Tracking edges imprinted from supporting bodies </H3>
+<P>
+<A NAME="50422145_pgfId-296103"></A>When <CODE>
+supporting_bodies</CODE>
+ are supplied, <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> tracks any edges that are imprinted as a result of the option. See <A HREF="fd_chap.070.html#50422145_43854">Section 69.6, “Tracking and fault status”</A>, for more information. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-296108"></A>69.5	<A NAME="50422145_95494"></A>Using tolerances 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-296109"></A><A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> needs to be supplied with a <CODE>
+tolerance</CODE>
+ argument that is used to determine the tolerance to which the fill hole operation is performed. This argument can affect a number of different aspects of the functionality, so you need to bear this in mind when deciding the type of results you want to achieve. In general, looser tolerances (i.e. larger <CODE>
+tolerance</CODE>
+ values), produce simpler, but less accurate, result bodies. Tighter tolerances (i.e. smaller <CODE>
+tolerance</CODE>
+ values) lead to more accurate results. </P>
+<P>
+<A NAME="50422145_pgfId-296110"></A>The following table provides more details about the areas that are affected by your choice of tolerance:</P>
+<P>
+<A NAME="50422145_pgfId-296136"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296113"></A>Affected area</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296115"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296117"></A>The type of surface produced.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296119"></A>If you use a looser tolerance, a simple analytic surface may suitably fill the hole. Tighter tolerances are more likely to produce a more complex solution, usually resulting in a B-surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296121"></A>The number of faces produced.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296123"></A>In multi-face solutions, tightening the tolerance may produce a patch solution with more faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296125"></A>The complexity of the surface. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296127"></A>In situations where a B-surface is produced, tightening the tolerance may produce a more complex surface with a higher  number of vertices. This will have an affect on down-stream performance.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296129"></A>The performance of the fill hole operation. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296131"></A>Tightening the tolerance may increase the time taken and memory usage of <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296133"></A>Tolerance of entities within the result body.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296135"></A>The resultant edge and vertex tolerances on the boundary and in the interior of the hole are affected by the tolerance you supply: a looser supplied <CODE>
+tolerance</CODE>
+ results in larger tolerances on the corresponding edges and vertices of the result body. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-296140"></A><A HREF="fd_chap.070.html#50422145_59661"><EM>
+Figure 69-21</EM></A> illustrates a case where a wire body that is nearly, but not quite, planar has been filled using different tolerances. Using a tight tolerance, an accurate result is produced, but the resulting surface is a B-surface that is not planar. By increasing the tolerance, an analytic result that uses a planar surface is produced. However, the boundary edge of the resulting surface has an associated tolerance that was not in the original unfilled body. </P>
+<P>
+<A NAME="50422145_pgfId-296177"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-821.gif">
+
+<P>
+<A NAME="50422145_pgfId-296179"></A>Figure 69-21 <A NAME="50422145_59661"></A>Using tolerance information to affect fill hole results</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-296181"></A>69.6	<A NAME="50422145_43854"></A>Tracking and fault status 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-296182"></A>In order to track changes to entities and record fault status, <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> returns the following arguments. </P>
+<P>
+<A NAME="50422145_pgfId-296201"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296185"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296187"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-296189"></A>tracking</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296191"></A>Topology tracking information for the operation. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-296193"></A>fault</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296195"></A>Status information for the operation. In cases where the results of the fill hole operation are not as desired, this datatype can help diagnose what has gone wrong. See <A HREF=../headers/pk_fill_hole_fault_t.html>PK_fill_hole_fault_t</A> for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-296197"></A>n_fault_topols</PRE>
+<PRE><A NAME="50422145_pgfId-296198"></A>fault_topols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296200"></A>For some values of <CODE>
+fault</CODE>
+, topological entities are also returned. These entities are returned in the <CODE>
+fault_topols</CODE>
+ array, and <CODE>
+n_fault_topols</CODE>
+ indicates the number of such entities. See <A HREF=../headers/pk_fill_hole_fault_t.html>PK_fill_hole_fault_t</A> for more information. </P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422145_pgfId-296202"></A>	69.6.1 	Tracking faces in patches </H3>
+<P>
+<A NAME="50422145_pgfId-296203"></A>If <CODE>
+method</CODE>
+ is PK_fill_hole_create_patch_c, each face created for the patch is recorded in a track record with its <CODE>
+track</CODE>
+ field set to PK_TOPOL_track_create_c. If you have chosen to return the patch as a separate body, rather than attaching it to the target (see <A HREF="fd_chap.070.html#50422145_81979">Section 69.3.5</A>), then you can find that body by passing any of these faces to <A HREF=../headers/pk_face_ask_body.html>PK_FACE_ask_body</A>. </P>
+
+
+<H3>
+<A NAME="50422145_pgfId-296207"></A>	69.6.2 	Tracking imprinted edges </H3>
+<P>
+<A NAME="50422145_pgfId-296210"></A>If <CODE>
+supporting_bodies</CODE>
+ are supplied in the the call to <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> (see <A HREF="fd_chap.070.html#50422145_19325">Section 69.4, “Using supporting bodies to control the shape of a patch”</A>), then edges imprinted onto a patch from these <CODE>
+supporting_bodies</CODE>
+ are tracked. For each imprinted edge, there is a track record with the following fields set:</P>
+<P>
+<A NAME="50422145_pgfId-632767"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296214"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296216"></A>Contents</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-296218"></A>track</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296220"></A>This is set to PK_TOPOL_track_create_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-296222"></A>product_topols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296224"></A>This contains the imprinted edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-296226"></A>original_topols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296228"></A>This contains the corresponding edge from the supplied <CODE>
+supporting_bodies</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422145_pgfId-296229"></A>	69.6.3 	<A NAME="50422145_"></A>Tracking the edges of unattached patches </H3>
+<P>
+<A NAME="50422145_pgfId-648904"></A>If the <CODE>
+tracking_control</CODE>
+ option is set to <A HREF=../headers/pk_fill_hole_track_t.html>PK_fill_hole_track_bdry_edges_c</A> (see <A HREF="fd_chap.070.html#50422145_40314">Section 69.3.5.1, “Tracking the edges of unattached patches”</A>), track records will be output to map the supplied boundary edges to boundary topologies on the patch. Each track record contains the following fields:</P>
+<P>
+<A NAME="50422145_pgfId-638404"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-638389"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-638391"></A>Contents</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-638393"></A>track</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-638395"></A>This is set to PK_TOPOL_track_create_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-638397"></A>product_topols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-638399"></A>This contains one or more topologies (edges or vertices) from the laminar boundary of the patch.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422145_pgfId-638401"></A>original_topols</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-638403"></A>This contains the corresponding input boundary edge(s).</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-296231"></A>69.7	<A NAME="50422145_61009"></A>Optimising the fill hole operation 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-296232"></A>Because there are often potentially several different results possible when filling a hole in a body, depending on the configuration and the options chosen, Parasolid provides the <CODE>
+optimise</CODE>
+ option to let you choose whether Parasolid should produce a solution with the best quality, or whether an emphasis should be placed on performance. The <CODE>
+optimise</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422145_pgfId-296252"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296241"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296243"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296245"></A><A HREF=../headers/pk_fill_hole_opt_t.html>PK_fill_hole_opt_quality_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296247"></A>Produce the best quality solution possible. <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> attempts to produce a solution with a single face, and with minimal surface curvature. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296249"></A><A HREF=../headers/pk_fill_hole_opt_t.html>PK_fill_hole_opt_performance_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296251"></A>Produce a solution as quickly as possible. <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> produces a solution that is optimised for performance. The resulting patch may contain several faces, and curvatures on the resulting surfaces may not be optimal. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-296254"></A>69.8	<A NAME="50422145_38240"></A>Controlling the type of the resulting body 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-296255"></A>You can use the <CODE>
+body_type</CODE>
+ option to choose whether the resulting body is a sheet or a solid. This option takes the following values:</P>
+<P>
+<A NAME="50422145_pgfId-296273"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296258"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296260"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296262"></A><A HREF=../headers/pk_fill_hole_body_type_t.html>PK_fill_hole_body_type_orig_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296264"></A>Return a body of the same type as the original supplied body. If the original body is a wire, then the result is a sheet. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296266"></A><A HREF=../headers/pk_fill_hole_body_type_t.html>PK_fill_hole_body_type_sheet_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296268"></A>Return a sheet body if possible.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296270"></A><A HREF=../headers/pk_fill_hole_body_type_t.html>PK_fill_hole_body_type_solid_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296272"></A>Return a solid body if possible. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-296275"></A>69.9	<A NAME="50422145_99288"></A>Checking face-face inconsistencies 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-296279"></A>You can use the <CODE>
+check_fa_fa</CODE>
+ option to control whether Parasolid checks for face-face inconsistencies in the result body. This can take the following values:</P>
+<P>
+<A NAME="50422145_pgfId-296293"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296282"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296284"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296286"></A><A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296288"></A>Perform face-face checking. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296290"></A><A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422145_pgfId-296292"></A>Do not perform face-face checking. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422145_pgfId-296295"></A>69.10	<A NAME="50422145_25661"></A>Update control 
+
+
+</H1>
+<P>
+<A NAME="50422145_pgfId-384806"></A>If your application relies on reproducing behaviour when updating models built using earlier versions of Parasolid, you should use the <CODE>
+update</CODE>
+ option to preserve old behaviour and help eliminate differences in rebuild results. This option lets you disable some fill hole enhancements that have been added at different Parasolid versions. Doing this ensures that <A HREF=../headers/pk_body_fill_hole.html>PK_BODY_fill_hole</A> gives the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_fill_hole_update_t.html>PK_fill_hole_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<P>
+<A NAME="50422145_pgfId-357672"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422145_pgfId-357697"></A>Note: The default value is <A HREF=../headers/pk_fill_hole_update_t.html>PK_fill_hole_update_default_c</A> which uses all appropriate fill hole enhancements. Setting to a non-default value disables all appropriate fill hole enhancements.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422145_pgfId-651741"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.069.html">Patching</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.071.html">Moving Faces</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

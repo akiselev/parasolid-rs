@@ -1,0 +1,718 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Implementing Version Control In Applications</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Implementing Version Control In Applications</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.117.html">Version Controls</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.119.html">Update Switches</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-413001">117.1	Introduction</A>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-377956">117.2	Applications with no need to maintain legacy behaviour</A>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-377957">117.3	Applications with legacy data created in applications that only use the consolidated system</A>
+<UL>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-382569">117.3.1	Creating new features</A>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-382575">117.3.2	Updating features</A>
+</UL>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-377960">117.4	Applications with legacy data created in applications that implement both the consolidated and the original systems</A>
+<UL>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-382622">117.4.1	Creating new features</A>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-382634">117.4.2	Updating features created since implementing the consolidated system</A>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-382648">117.4.3	Updating features created before implementing the consolidated system</A>
+</UL>
+<LI> <A HREF="fd_chap.118.html#50422199_pgfId-387042">117.5	A detailed example of the consolidated system</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422199_pgfId-413001"></A>117.1	Introduction
+
+
+</H1>
+<P>
+<A NAME="50422199_pgfId-383104"></A>This chapter provides advice on how best to implement version control in your application, using a combination of the consolidated system and the original system, depending on your needs.</P>
+<UL>
+<LI>
+<A NAME="50422199_pgfId-383212"></A><A HREF="fd_chap.118.html#50422199_63729">Section 117.2</A> describes what you should do if you never have to deal with legacy data.</LI>
+<LI>
+<A NAME="50422199_pgfId-383285"></A><A HREF="fd_chap.118.html#50422199_20731">Section 117.3</A> describes what you should do if you only have to deal with legacy data created in an application that implements the consolidated system.</LI>
+<LI>
+<A NAME="50422199_pgfId-383413"></A><A HREF="fd_chap.118.html#50422199_55324">Section 117.4</A> describes what you should do if you have to deal with legacy data created in an application that implements both the consolidated and original systems.</LI>
+<LI>
+<A NAME="50422199_pgfId-413215"></A><A HREF="fd_chap.118.html#50422199_72370">Section 117.5</A> provides a complete worked example of how you can use the consolidated system to maintain legacy behaviour to minimise the possibility of regressions during version updates. </LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422199_pgfId-377956"></A>117.2	<A NAME="50422199_63729"></A>Applications with no need to maintain legacy behaviour
+
+
+</H1>
+<P>
+<A NAME="50422199_pgfId-383526"></A>The most straightforward situation is if your application never needs to emulate the behaviour of an older version of Parasolid. In this case, you can just instruct Parasolid to always use the latest behaviour. Do this as follows:</P>
+<P>
+<A NAME="50422199_pgfId-387354"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387360"></A>Step</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387362"></A>Details</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387364"></A>Call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> once during your session start routines</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387414"></A>For <CODE>
+behaviour_requested</CODE>
+ set:</P>
+<UL>
+<LI>
+<A NAME="50422199_pgfId-387433"></A><CODE>
+behaviour_type</CODE>
+=<A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_latest_c</A> </LI>
+<LI>
+<A NAME="50422199_pgfId-387439"></A><CODE>
+behaviour_value</CODE>
+=0</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422199_pgfId-382544"></A>This ensures that for the remainder of the session, the latest behaviour will be accessed at all times.</P>
+<P>
+<A NAME="50422199_pgfId-388373"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422199_pgfId-388403"></A>Note:  We strongly advise that you call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> as described above, even when you have no legacy data to contend with, since it ensures that all improvements to behaviour are available at each patch release. Failing to do this causes no problems with the behaviour of any APIs, but means that you will have to wait until the next FCS release to take advantage of many improvements to behaviour.  </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422199_pgfId-377957"></A>117.3	<A NAME="50422199_20731"></A>Applications with legacy data created in applications that only use the consolidated system
+
+
+</H1>
+<P>
+<A NAME="50422199_pgfId-384239"></A>If you need to maintain legacy behaviour in features created in applications that only implement the consolidated system, you should use <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> to set behaviour appropriately when creating new features and when updating existing features.</P>
+
+<H3>
+<A NAME="50422199_pgfId-382569"></A>	117.3.1 	<A NAME="50422199_53528"></A>Creating new features</H3>
+<P>
+<A NAME="50422199_pgfId-382570"></A>When creating new features in your application, you need to ensure that you always use the latest behaviour offered by Parasolid. In addition, you need to store details about the version of Parasolid that new features are created in. Do this by performing the following workflow for each new feature that you create: </P>
+<P>
+<A NAME="50422199_pgfId-387445"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387451"></A>Step</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387453"></A>Details</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387455"></A>Call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> as part of session start-up routines</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387506"></A>For <CODE>
+behaviour_requested</CODE>
+ set:</P>
+<UL>
+<LI>
+<A NAME="50422199_pgfId-387572"></A><CODE>
+behaviour_type</CODE>
+=<A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_latest_c</A> </LI>
+<LI>
+<A NAME="50422199_pgfId-387578"></A><CODE>
+behaviour_value</CODE>
+=0</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387528"></A>Record the value returned by <CODE>
+behaviour_value</CODE>
+ in the <CODE>
+behaviour_set</CODE>
+ structure.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387550"></A>Store this <CODE>
+behaviour_value</CODE>
+ in the feature data of new features created in this session.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422199_pgfId-382575"></A>	117.3.2 	Updating features</H3>
+<P>
+<A NAME="50422199_pgfId-382576"></A>When updating existing features, you need to check which version of Parasolid the feature was originally created in, and then emulate that version of Parasolid. Do this as follows:</P>
+<P>
+<A NAME="50422199_pgfId-387656"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387643"></A>Step</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387645"></A>Details</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387677"></A>Call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387699"></A>For <CODE>
+behaviour_requested</CODE>
+, set:</P>
+<UL>
+<LI>
+<A NAME="50422199_pgfId-387798"></A><CODE>
+behaviour_type</CODE>
+=<A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_value_c</A> </LI>
+<LI>
+<A NAME="50422199_pgfId-387804"></A><CODE>
+behaviour_value</CODE>
+ to the value recorded in the feature data as described in <A HREF="fd_chap.118.html#50422199_53528">Section 117.3.1</A>.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50422199_pgfId-387724"></A>Make other relevant Parasolid calls to update the feature.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387753"></A>Instruct Parasolid to use the latest behaviour. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387775"></A>Call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>. For <CODE>
+behaviour_requested</CODE>
+ set:</P>
+<UL>
+<LI>
+<A NAME="50422199_pgfId-387819"></A><CODE>
+behaviour_type</CODE>
+=<A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_latest_c</A> </LI>
+<LI>
+<A NAME="50422199_pgfId-387825"></A><CODE>
+behaviour_value</CODE>
+=0</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422199_pgfId-377959"></A>This last step ensures that as you continue to create new features, old behaviours do not remain set and Parasolid does not access legacy behaviour by mistake.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422199_pgfId-377960"></A>117.4	<A NAME="50422199_55324"></A>Applications with legacy data created in applications that implement both the consolidated and the original systems
+
+
+</H1>
+<P>
+<A NAME="50422199_pgfId-384928"></A>The most complex situation is when you need to maintain legacy behaviour in features created in applications that implement both the consolidated and original systems, since behaviour may need to be preserved using either session behaviours or a combination of session switches and update switches. To minimise the code changes you are required to make in this situation, the general approach is to consider the original system as your “default” system, and activate the consolidated system only when creating new features or updating more recently created features. </P>
+<P>
+<A NAME="50422199_pgfId-377827"></A>The key to implementing this system is to return the session behaviour to its initial value of <A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_unset_c</A> to ensure that older features can continue to be updated successfully using the original system.</P>
+<P>
+<A NAME="50422199_pgfId-386310"></A>This section explains how to implement such a system.</P>
+
+<H3>
+<A NAME="50422199_pgfId-382622"></A>	117.4.1 	Creating new features</H3>
+<P>
+<A NAME="50422199_pgfId-385413"></A>You should create all new features using the consolidated system. Do this as follows:</P>
+<P>
+<A NAME="50422199_pgfId-387857"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387832"></A>Step</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387834"></A>Details</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387836"></A>Call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387884"></A>For <CODE>
+behaviour_requested</CODE>
+ set:</P>
+<UL>
+<LI>
+<A NAME="50422199_pgfId-388106"></A><CODE>
+behaviour_type</CODE>
+=<A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_latest_c</A></LI>
+<LI>
+<A NAME="50422199_pgfId-388109"></A><CODE>
+behaviour_value</CODE>
+=0</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387915"></A>Record the value returned by <CODE>
+behaviour_value</CODE>
+ in the <CODE>
+behaviour_set</CODE>
+ structure.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-387941"></A>Store this <CODE>
+behaviour_value</CODE>
+ in the feature data of new features created in this session.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50422199_pgfId-387973"></A>Make calls to Parasolid APIs to create any new features.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-388005"></A>Instruct Parasolid to use the old system of session switches and update switches. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-388005"></A>Call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>. For <CODE>
+behaviour_requested</CODE>
+, set:</P>
+<UL>
+<LI>
+<A NAME="50422199_pgfId-388074"></A><CODE>
+behaviour_type</CODE>
+=<A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_unset_c</A></LI>
+<LI>
+<A NAME="50422199_pgfId-388083"></A><CODE>
+behaviour_value</CODE>
+=0</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422199_pgfId-382631"></A>This last step ensures that the new mechanism is not active when you update features built in the original system. This is necessary to ensure that these features continue to update correctly, without you needing to make changes to your application code.</P>
+<P>
+<A NAME="50422199_pgfId-382632"></A>You can start using the consolidated system in any release of Parasolid from V28.1 onwards. Session switches and update switches will continue to be supported so that you can make the transition at any later version. </P>
+<P>
+<A NAME="50422199_pgfId-382633"></A>If you cannot adopt the consolidated system  immediately, continue to use the original system for creation and update of features, and store the same information as before in the feature data. </P>
+
+
+<H3>
+<A NAME="50422199_pgfId-382634"></A>	117.4.2 	Updating features created since implementing the consolidated system</H3>
+<P>
+<A NAME="50422199_pgfId-382635"></A>To update existing features created since you implemented the consolidated system, you need to use the consolidated system to emulate the relevant Parasolid release, and then return the Parasolid session to using session switches and update switches. Do this as follows:</P>
+<P>
+<A NAME="50422199_pgfId-388165"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-388139"></A>Step</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-388141"></A>Details</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-388207"></A>Call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-388229"></A>For <CODE>
+behaviour_requested</CODE>
+, set:</P>
+<UL>
+<LI>
+<A NAME="50422199_pgfId-388325"></A><CODE>
+behaviour_type</CODE>
+=<A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_value_c</A></LI>
+<LI>
+<A NAME="50422199_pgfId-388329"></A><CODE>
+behaviour_value</CODE>
+ to the value recorded in the feature data as described in <A HREF="fd_chap.118.html#50422199_53528">Section 117.3.1</A>.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="2">
+<P>
+<A NAME="50422199_pgfId-388183"></A>Make other relevant Parasolid calls to update the feature.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-388282"></A>Instruct Parasolid to use the old system of session switches and update switches. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-388282"></A>Call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>. For <CODE>
+behaviour_requested</CODE>
+, set:</P>
+<UL>
+<LI>
+<A NAME="50422199_pgfId-388340"></A><CODE>
+behaviour_type</CODE>
+=<A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_unset_c</A> </LI>
+<LI>
+<A NAME="50422199_pgfId-388343"></A><CODE>
+behaviour_value</CODE>
+=0</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422199_pgfId-382648"></A>	117.4.3 	Updating features created before implementing the consolidated system</H3>
+<P>
+<A NAME="50422199_pgfId-382649"></A>To update existing features created before you implemented the consolidated system, set session switches and update switches to the appropriate values based on the feature data already stored. This requires no changes to your existing version control architecture for updating features that were built when the original system was the only version control implementation.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422199_pgfId-387042"></A>117.5	<A NAME="50422199_72370"></A>A detailed example of the consolidated system
+
+
+</H1>
+<P>
+<A NAME="50422199_pgfId-413783"></A>Unless your application has absolutely no requirements to maintain legacy behaviour, you are recommended to always rebuild features using the same behaviour as was available in the Parasolid version you used when you created the feature. Doing this ensures that downstream operations are never adversely affected by improvements in Parasolid's behaviour. This section describes a straightforward example that shows why you should do this and how you achieve it using the consolidated version control system.</P>
+<P>
+<A NAME="50422199_pgfId-413784"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422199_pgfId-413861"></A>Note: Some of the modelling behaviour shown in this example is not representative of actual behaviour in Parasolid, and is used only for the purpose of illustration. In particular, Parasolid does not create redundant vertices in the manner suggested here. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422199_pgfId-413787"></A><A HREF="fd_chap.118.html#50422199_71310"><EM>
+Figure 117-1</EM></A> shows some of the stages in the creation of a sheet metal part. </P>
+<P>
+<A NAME="50422199_pgfId-413904"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1252.gif">
+
+<P>
+<A NAME="50422199_pgfId-413788"></A>Figure 117-1 <A NAME="50422199_71310"></A>Creating features in an application without version control</P>
+<P>
+<A NAME="50422199_pgfId-413789"></A>Part A shows the result of extruding a profile into a solid. Notice how, in this example, Parasolid has created a redundant vertex when drawing the circles in the profile. This has then been extruded and created a redundant edge. </P>
+<P>
+<A NAME="50422199_pgfId-413791"></A>Part B shows the part after further modelling has been performed. Blends and other small features have been added and the part has been hollowed so as to produce a thin sheet. </P>
+<P>
+<A NAME="50422199_pgfId-413793"></A>Part C shows the result of sectioning this sheet. Note that the user has decided to use the redundant edge created in Part A as the basis for the tool body used in the section operation. </P>
+<P>
+<A NAME="50422199_pgfId-413795"></A>Now suppose that a later Parasolid release improves behaviour such that the redundant vertex seen in Part A of <A HREF="fd_chap.118.html#50422199_71310"><EM>
+Figure 117-1</EM></A> is no longer created. <A HREF="fd_chap.118.html#50422199_89110"><EM>
+Figure 117-2</EM></A> shows what happens if the part is rebuilt using an application that does not support the consolidated version control mechanism - that is, the application always takes advantage of Parasolid's improved behaviour. </P>
+<P>
+<A NAME="50422199_pgfId-413977"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1253.gif">
+
+<P>
+<A NAME="50422199_pgfId-413796"></A>Figure 117-2 <A NAME="50422199_89110"></A>Failing to rebuild features after improvements to behaviour</P>
+<P>
+<A NAME="50422199_pgfId-413797"></A>Part A shows the same extruded profile, but, as expected, no redundant topology is present because the part has been rebuilt in a version of Parasolid that uses the improved behaviour. </P>
+<P>
+<A NAME="50422199_pgfId-413799"></A>Part B shows the hollowed, blended model, again without any redundant topology. </P>
+<P>
+<A NAME="50422199_pgfId-413801"></A>At some point after this, the rebuild fails. The application attempts to create the tool body for the section operation, but because the redundant edge no longer exists in the part, it cannot complete the operation. </P>
+<P>
+<A NAME="50422199_pgfId-413803"></A>In order to protect against this type of situation, you need to use the consolidated version control mechanism to record the build in which a feature was created, and then ensure the same behaviour is used whenever the feature is rebuilt. You do this as shown below. </P>
+<P>
+<A NAME="50422199_pgfId-414093"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1254.gif">
+
+<P>
+<A NAME="50422199_pgfId-413804"></A>Figure 117-3 <A NAME="50422199_53692"></A>Creating features in an application with version control</P>
+<P>
+<A NAME="50422199_pgfId-413805"></A><A HREF="fd_chap.118.html#50422199_53692"><EM>
+Figure 117-3</EM></A> shows the same modelling steps as <A HREF="fd_chap.118.html#50422199_71310"><EM>
+Figure 117-1</EM></A>. However, this time the modeller makes a call to <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> before starting to model the feature, with the following arguments:</P>
+<P>
+<A NAME="50422199_pgfId-413806"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414153"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414155"></A>Value</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422199_pgfId-414157"></A>behaviour_requested.behaviour_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414159"></A><A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_latest_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422199_pgfId-414161"></A>behaviour_requested.behaviour_value</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414163"></A>0</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422199_pgfId-414871"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414173"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414175"></A>Value</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422199_pgfId-414177"></A>behaviour_set.behaviour_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414179"></A><A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_latest_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422199_pgfId-414181"></A>behaviour_set.behaviour_value</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414183"></A>Store returned valued in a variable (e.g. <CODE>
+BuiltWithVersion</CODE>
+)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422199_pgfId-413810"></A>This ensures that you have a record of the version of Parasolid that was used to create the feature.</P>
+<P>
+<A NAME="50422199_pgfId-413815"></A>Next, <A HREF="fd_chap.118.html#50422199_87164"><EM>
+Figure 117-4</EM></A> shows what you need to do in order to replicate this behaviour when rebuilding the part in the later Parasolid release that no longer creates the redundant vertex. </P>
+<P>
+<A NAME="50422199_pgfId-413817"></A>Before rebuilding the part, call <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> with the following arguments:</P>
+<P>
+<A NAME="50422199_pgfId-413818"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414345"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414347"></A>Value</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422199_pgfId-414349"></A>behaviour_requested.behaviour_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414351"></A><A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_value_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422199_pgfId-414353"></A>behaviour_requested.behaviour_value</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414355"></A>Value of variable stored at feature creation (e.g. <CODE>
+BuiltWithVersion</CODE>
+)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422199_pgfId-413823"></A>This will ensure that the part is rebuilt using the behaviour offered by the Parasolid version originally used to build the part, and in particular ensures that the redundant vertex is present in the initial profile (Part A). Modelling can continue as shown in Part B, and the section operation shown in Part C succeeds. </P>
+<P>
+<A NAME="50422199_pgfId-413825"></A>Once the feature has been rebuilt successfully, you should &quot;reset&quot; your Parasolid session to use the latest behaviour again, by calling <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> one last time with the following values:</P>
+<P>
+<A NAME="50422199_pgfId-413826"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414369"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414371"></A>Value</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422199_pgfId-414373"></A>behaviour_requested.behaviour_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414375"></A><A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_latest_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422199_pgfId-414377"></A>behaviour_requested.behaviour_value</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422199_pgfId-414379"></A>0</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422199_pgfId-414202"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1255.gif">
+
+<P>
+<A NAME="50422199_pgfId-413816"></A>Figure 117-4 <A NAME="50422199_87164"></A>Successful rebuild of features after improvements to behaviour</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.117.html">Version Controls</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.119.html">Update Switches</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

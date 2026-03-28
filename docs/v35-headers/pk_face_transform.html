@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_transform</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_transform</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>         PK_FACE_transform
+(
+<I>--- received arguments ---
+</I>int                     n_faces,       --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>         faces[],       --- faces
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>       transfs[],     --- face transformations
+double                  tolerance,     --- tolerance for replacement geometry
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>            local_check,   --- whether to perform local check
+
+<I>--- returned arguments ---
+</I>int              *const n_replaces,    --- number of replaced geometry
+<A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A>       **const replaces,      --- replaced geometry (optional)
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>    **const exact,         --- whether replaced geometry is exact
+                                       --- (optional)
+<A HREF=../headers/pk_local_check_t.html>PK_local_check_t</A> *const check_result   --- result of local check
+)
+</B>
+<A NAME="description"></A>
+<I>This function transforms the given faces by the given transformations.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_face_transform_2.html>PK_FACE_transform_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_tool_faces_many_bodies   faces do not belong to a single body
+
+<A NAME="documentation"></A>
+
+All geometry of the given faces is replaced by geometry which is
+derived from the original geometry by transforming it through the
+given transformation.
+
+Replacement surfaces for the faces will satisfy the first possible
+of the following list of criteria :
+
+ 1 - be of the same class as the original geometry,
+ 2 - be exactly coincident with the transformation of the original
+     geometry,
+ 3 - not deviate by more than the given <B>'tolerance'</B> from the
+     transformation of the original geometry.
+
+Replacement curves for edges will satisfy the same criteria in order
+of precedence unless the curve lies on an edge which is at the junction
+of faces, of which at least one of the attached surfaces has been
+approximated (criterion 3), in which case, the edge curve will be
+re-computed as the intersection of the face surfaces.
+
+The original geometry of topological entities that acquire new
+geometry as a result of this operation will be deleted.
+
+
+
+Returned Geometry
+
+All of the new surfaces of faces may be returned in <B>'replaces'</B>. Each
+element in the <B>'exact'</B> array indicate whether the surface is an exact
+transformation (criterion 1 or 2), or an approximation (criterion 3).
+
+<B>'replaces'</B> is optional. If it is set to NULL then only the number of
+new surfaces will be returned (in <B>'n_replaces'</B>).
+
+<B>'exact'</B> is optional.  It may only be non-NULL if <B>'replaces'</B> is non_NULL.
+
+
+Returned Check Status
+
+If local checking is on, consistency checks will be made on newly
+created topological and geometrical entities, and the result of
+the local check on the body returned via <B>'check_result'</B> :
+
+ o <A HREF=../headers/pk_local_check_t.html>PK_local_check_ok_c</A>       indicates the body is valid.
+
+ o <A HREF=../headers/pk_local_check_t.html>PK_local_check_no_c</A>       indicates that local checking is
+                             switched off.
+
+ o <A HREF=../headers/pk_local_check_t.html>PK_local_check_failed_c</A>   indicates the body is invalid and
+                             further modelling operations on it
+                             may fail. It is the responsibility
+                             of the calling routine to make any
+                             necessary reparation.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

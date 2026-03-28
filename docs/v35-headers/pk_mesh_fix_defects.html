@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_MESH_fix_defects</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MESH_fix_defects</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_MESH_fix_defects
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_mesh_t.html>PK_MESH_t</A>                      mesh,                --- mesh in which to fix
+                                                    --- defects
+const <A HREF=../headers/pk_mesh_fix_defects_o_t.html>PK_MESH_fix_defects_o_t</A> *options,             --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_mesh_fix_result_t.html>PK_MESH_fix_result_t</A>    *const result,              --- function result
+int                     *const n_resultant_meshes,  --- number of resultant
+                                                    --- meshes
+<A HREF=../headers/pk_mesh_t.html>PK_MESH_t</A>              **const resultant_meshes,    --- resultant meshes
+<A HREF=../headers/pk_mesh_defect_array_t.html>PK_MESH_defect_array_t</A> **const defect_array         --- defect array for each
+                                                    --- resultant mesh
+)
+</B>
+<A NAME="description"></A>
+<I>This function fixes defects on a mesh.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_angle             max_foldover_angle is either &lt; 0 or &gt; pi/2
+                                   (MILD)
+    PK_ERROR_is_attached           the mesh is attached to a face (MILD)
+    PK_ERROR_tolerance_too_loose   too many degenerate and flat mfacets are
+                                   found on the mesh using the current linear
+                                   tolerance (MILD)
+
+<A NAME="documentation"></A>
+This function performs the same series of checks on a mesh as
+<A HREF=../headers/pk_mesh_find_defects.html>PK_MESH_find_defects</A>, and fixes the defects found, if any. This function may
+introduce new defects into the fixed mesh.
+
+The function returns the resultant meshes in the array <B>'resultant_meshes'</B>, of
+length <B>'n_resultant_meshes'</B>.
+
+For each resultant mesh, the function returns information about remaining and
+introduced defects in the array <B>'defect_array'</B>, where each entry in the
+<B>'defect_array'</B> refers to the item with the same index in the array
+<B>'resultant_meshes'</B>. Remaining defects are those specified by the input options,
+but which could not be resolved, and introduced defects are defects which were
+introduced during the fixing process. The array may not include all defects in
+the mesh.
+
+If all options are left at their default value then all defects found and fixed
+are invalidities corresponding to faults returnable by <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>. This
+function is not implemented for meshes attached to faces.
+
+See <A HREF="../chapters/fd_chap.087.html#50434452_pgfId-339908">here</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

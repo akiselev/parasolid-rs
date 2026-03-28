@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_check_blends</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_check_blends</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_EDGE_check_blends
+(
+<I>--- received arguments ---
+</I>int                 n_edges,        --- number of edges
+const <A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>     edges[],        --- edges to have blends checked
+<A HREF=../headers/pk_blend_check_t.html>PK_blend_check_t</A>    level,          --- level of checking required
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_t</A>    faults[],       --- result of check
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>          fault_topols[]  --- topology associated with fault
+)
+</B>
+<A NAME="description"></A>
+<I>This function checks the unfixed blends on the given edges.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_general_body         edge is from general body
+
+<A NAME="documentation"></A>
+This is a diagnostic function, used to determine why <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A>
+failed, or whether an alteration in an unfixed blend has removed a problem.
+
+
+edges
+For each edge in <B>'edges'</B> that has a blend attribute attached, the associated
+blending surface and parameters are checked for consistency with geometry and
+blend attributes attached to neighbouring entities. Edges in <B>'edges'</B> that have
+no blend attribute attached are ignored.
+
+level
+If <B>'level'</B> is <A HREF=../headers/pk_blend_check_t.html>PK_blend_check_vertex_c</A>, the blending surface parameters
+are checked for consistency at the vertices.
+If <B>'level'</B> is <A HREF=../headers/pk_blend_check_t.html>PK_blend_check_full_c</A>, additional checks are made to ensure
+that the blend boundaries are legal. Even if PK_EDGE_check_blends
+finds no inconsistencies, the blends are not guaranteed to fix; some problems
+can only be detected by <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A> making up the new faces.
+
+faults, fault_topols
+If an edge does not have an unfixed blend then <B>'faults'</B> is returned as
+<A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_no_blend_c</A>. If the function finds no problem then <B>'fault'</B>
+is returned as <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_no_fault_c</A>. Otherwise a particular fault is
+returned as documented under <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_t</A> and <B>'fault_topols'</B> returns
+an entity as documented there. Some failure codes have no associated topology:
+in these cases the entry in <B>'fault_topols'</B> will be set to PK_ENTITY_null.
+
+This function is not supported for edges on general bodies.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

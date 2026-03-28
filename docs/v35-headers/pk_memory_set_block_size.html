@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_MEMORY_set_block_size</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MEMORY_set_block_size</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> PK_MEMORY_set_block_size
+(
+<I>--- received arguments ---
+</I>size_t          size  --- required default block size
+)
+</B>
+<A NAME="description"></A>
+<I>This function sets the size of the smallest block of memory that Parasolid
+will request from FMALLO (<A HREF=../headers/pk_fmallo_f_t.html>PK_FMALLO_f_t</A>) for modelling data.
+</I>
+<A NAME="documentation"></A>
+See also <A HREF="../chapters/fd_chap.116.html#50434485_pgfId-294958">Controlling memory allocation</A> for more information.
+
+The allowed sizes are approximately in the range of one eighth of a MByte to 16
+MByte but the precise allowed values are platform dependent.  The default block
+size is the minimum allowed block size for the platform.
+
+If the requested <B>'size'</B> is set to less than the minimum size for the platform,
+then the smallest allowed block size for the platform will be used.  In
+particular, giving an argument of zero will always re-instate the default.
+
+If the requested <B>'size'</B> is set to greater than the maximum size for the
+platform then the maximum size for the platform will be used.
+
+Moreover, for alignment reasons, not all sizes between the allowed minimum and
+maximum are allowed.  Parasolid will set the block size to the largest allowed
+block size that is less than or equal to the requested block size.
+
+The actual smallest block size in effect at any time may be enquired by calling
+<A HREF=../headers/pk_memory_ask_block_size.html>PK_MEMORY_ask_block_size</A>.
+
+Any blocks already allocated when this function is called are unaffected by the
+call.
+
+SESSION considerations:
+
+  - the function may be called at any time, whether or not the modeller is
+    started.
+
+  - starting the modeller causes Parasolid to allocate several blocks of
+    memory, so if all blocks are to be of a required minimum size then the
+    call to PK_MEMORY_set_block_size must precede the call to
+    <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A>.
+
+  - Parasolid can not be started unless 6 blocks of the current block size can
+    be allocated.
+
+  - stopping the modeller (<A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>) reinstates the default block
+    size which is the smallest allowed block size for the platform.
+
+  - some modelling operations require extra separate memory blocks so it is
+    recommended that the requested block size be kept well below an eighth
+    of the maximum space available.
+
+  - the block size set with this function is applied session-wide. There is
+    no facility to set a thread-specific block size.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

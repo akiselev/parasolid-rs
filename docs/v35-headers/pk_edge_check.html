@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_check</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_check</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>              PK_EDGE_check
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                    edge,         --- edge to be checked
+const <A HREF=../headers/pk_edge_check_o_t.html>PK_EDGE_check_o_t</A>     *options,      --- options structure
+
+<I>--- returned arguments ---
+</I>int                   *const n_faults,     --- number of faults
+<A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A>     **const faults        --- faults
+)
+</B>
+<A NAME="description"></A>
+<I>This function checks the given edge.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_check_error        a fault has been found when max_faults = 0
+                                (MILD)
+    PK_ERROR_check_failure      checker failure (MILD)
+    PK_ERROR_bad_option_data    max_faults &lt; 0 (MILD)
+    PK_ERROR_wrong_entity       wrong entity given (MILD)
+    PK_ERROR_facet_geometry     <B>'edge'</B>s body has facet geometry but facet
+                                geometry is not enabled in session (MILD)
+
+<A NAME="documentation"></A>
+
+This function performs a series of checks on an edge, and returns information
+about the faults found, if any.
+
+
+option structure
+------ ---------
+The option structure allows the caller to control which checks are performed;
+if no options are supplied, all checks appropriate to the edge will be made.
+
+The option structure allows the following to be set:
+
+    <B>'max_faults'</B>
+        maximum number of faults to be returned and whether to force checking
+        to raise a PK error instead of returning check faults.
+
+    <B>'geom'</B>
+        what general geometry checking is to be performed
+
+    <B>'bgeom'</B>
+        whether specific B-geometry checking is to be performed
+
+    <B>'top_geo'</B>
+        whether checks for consistency of topology and geometry are to be
+        performed
+
+    <B>'size_box'</B>
+        whether checks for size box violation are to be performed
+
+    <B>'nmnl_geom'</B>
+        whether nominal geometry checking is to be performed
+
+    <B>'returns'</B>
+        what version of check fault information is to be returned
+
+    <B>'attribs'</B>
+        whether checks on validity of attached system attributes are to be
+        performed
+
+These options and the check faults they may give rise to are described  in
+the documentation of <A HREF=../headers/pk_body_check.html>PK_BODY_check</A>.
+
+Faults are returned in an array of <A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A> structures.
+If there are no faults found, then <B>'n_faults'</B> is returned as zero.
+
+If there is more than one fault then the function does not
+guarantee to return all the faults.
+
+When some types of check are omitted, a body which would fail them may
+produce misleading results or checker failures when other checks are applied.
+
+If the checking process itself suffers an internal failure then the function
+will return the error PK_ERROR_check_failure and the entity that gave problems
+will be returned in the <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure.  In such a case it has proved
+impossible for Parasolid to demonstrate the theoretical correctness or
+otherwise of the edge.  However it is likely that Parasolid will have
+difficulties in performing subsequent operations on the body which has this
+edge.
+
+For more details on fault types and how they may arise, see the chapter on
+'Checking' in the Functional Description.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_MESH_make_surf_trimmed</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MESH_make_surf_trimmed</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_MESH_make_surf_trimmed
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_mesh_t.html>PK_MESH_t</A>                            mesh,      --- mesh
+const <A HREF=../headers/pk_mesh_make_surf_trimmed_o_t.html>PK_MESH_make_surf_trimmed_o_t</A> *options,   --- option structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                     *const surf,      --- surface
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>                  *const sense,     --- which side of surface
+<A HREF=../headers/pk_surf_trim_data_t.html>PK_SURF_trim_data_t</A>           *const trim_data  --- trim data
+)
+</B>
+<A NAME="description"></A>
+<I>This function makes a trimmed surface from the given <B>'mesh'</B>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+   PK_ERROR_cant_get_surf          (SERIOUS) Failed to fit a surface to
+                                             a mesh. This may mean that
+                                             the mesh is too  complex
+                                             for the function to handle
+                                             with the given tolerances.
+   PK_ERROR_cant_parameterise_mesh (MILD)    A continuous
+                                             parameterisation for the
+                                             input <B>'mesh'</B> cannot be
+                                             computed.
+   PK_ERROR_bad_mvx_normals        (MILD)    The mesh has non-unique
+                                             normals at one or more
+                                             mvertices.
+
+<A NAME="documentation"></A>
+This function creates a trimmed surface which conforms to the provided
+<B>'mesh'</B> within the specified tolerances.
+
+Options are provided to control the fitting tolerance and whether
+or not to use the mesh vertex normals as constraints in the fitting.
+
+The output of this function is a single trimmed surface.
+A description of a single trimmed surface is comprised of a
+<A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>, a <A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> representing the sense of the surface,
+and trimming information held in a <A HREF=../headers/pk_surf_trim_data_t.html>PK_SURF_trim_data_t</A> structure.
+
+The surface that is fitted to the mesh is returned in <B>'surf'</B>.
+
+The <B>'sense'</B> argument indicates whether <B>'surf'</B>s normal points in the same
+direction (PK_LOGICAL_true) or opposite to (PK_LOGICAL_false) the <B>'mesh'</B>
+normal.
+
+<B>'trim_data'</B> returns the trimming information.  The <B>'spcurves'</B> field of
+<B>'trim_data'</B> is described here.  For further information on <B>'trim_data'</B> see
+documentation for <A HREF=../headers/pk_surf_trim_data_t.html>PK_SURF_trim_data_t</A>.
+
+<B>'spcurves'</B> consists of an array of SP-curves which describe the boundary
+           loops of the trimmed surface. Where it is
+           appropriate to do so Parasolid will place the outer boundary
+           loop of the trimmed surface at the head of the list of loops.
+           An example of where this is not appropriate is a trimmed
+           surface on a sphere, in this case it is sometimes hard
+           to distinguish between outer boundaries and holes.
+
+           Each returned component of a trimming loop is
+           g1-continuous in 3-space.
+
+           Where an SP-curve is to represent a 3-space curve
+           identified as a line of constant surface parameter the
+           SP-curve description of it will be in the form of a
+           linear B-spline.
+
+Note: if <B>'n_spcurves'</B>&gt;0 then `trim_set[n_spcurves-1]' says how many trim sets
+there are.
+
+Note: the function does not support creating periodic B-surfaces.
+
+If the output from PK_MESH_make_surf_trimmed is to be passed into
+<A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> in order to create a sheet whose orientation
+agrees with the input <B>'mesh'</B> then the application should pass <B>'surf'</B> and
+<B>'trim_data'</B> directly to <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> and if the value of
+<B>'sense'</B> is PK_LOGICAL_false, <A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A> must be
+applied to the result.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

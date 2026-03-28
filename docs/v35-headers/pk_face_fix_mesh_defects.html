@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_fix_mesh_defects</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_fix_mesh_defects</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_FACE_fix_mesh_defects
+(
+<I>--- received arguments ---
+</I>int                                 n_faces,     --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                     faces[],     --- array of faces to process
+const <A HREF=../headers/pk_face_fix_mesh_defects_o_t.html>PK_FACE_fix_mesh_defects_o_t</A> *options,     --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_entity_track_r_t.html>PK_ENTITY_track_r_t</A>          *const tracking,    --- tracking
+<A HREF=../headers/pk_face_fix_mesh_defects_r_t.html>PK_FACE_fix_mesh_defects_r_t</A> *const results      --- results
+)
+</B>
+<A NAME="description"></A>
+<I>This function attempts to repair meshes attached to the given faces.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity      Some of the faces in <B>'faces'</B> don't have
+                                    facet geometry.
+                                    (MILD)
+    PK_ERROR_wrong_entity           Some of the faces in <B>'faces'</B> are rubber.
+                                    (MILD)
+    PK_ERROR_non_manifold           Some of the faces in <B>'faces'</B> are connected
+                                    by a non-manifold edge.
+                                    (MILD)
+    PK_ERROR_wrong_entity_in_array  The input faces are not from same body.
+                                    (MILD)
+    PK_ERROR_not_connected          The input faces do not form a single edge-
+                                    connected set.
+                                    (MILD)
+    PK_ERROR_missing_geom           Either an edge or a vertex is rubber.
+                                    (MILD)
+    PK_ERROR_cant_fix_defects       Failed to fix face set.
+                                    (SERIOUS)
+
+
+<A NAME="documentation"></A>
+This function fixes defects on meshes of the supplied faces, keeping the
+body watertight as necessary.
+
+The <B>'faces'</B> must all have facet geometries, form a single edge-connected
+set, and be connected by manifold edges.
+
+Note that faces adjacent to <B>'faces'</B> may be affected.
+
+Degenerate and flat facets, as well as slits at laminar edges, and
+foldovers in the interior of the faces are repaired. These repairs are
+performed to session precision, or to <B>'max_deviation'</B> if supplied. Self-
+intersections are repaired, unless they cross or touch an edge.
+No attempts are made to resolve invalidities of type
+PK_FACE_state_bad_face_face_c.
+
+
+Tracking information
+The <B>'tracking'</B> structure contains track records of operations performed on
+the topologies.
+
+For any face whose mesh was repaired, there is a tracking record of type
+PK_ENTITY_track_derive_c where the original entities are the face and the
+original mesh, and the product entity is the repaired mesh.
+
+For any face which was deleted, there is a tracking record of type
+PK_ENTITY_track_delete_c where the original entity is that face.
+
+For any edge that resulted from gluing two edges, there is a tracking
+record of type PK_ENTITY_track_derive_c where the original entities are
+the two edges involved, and the product entity is the resulting edge.
+
+For any edge that was split from an existing edge, there is a tracking
+record of type PK_ENTITY_track_derive_c where the original entity is the
+original edge, and the product entity is the new edge.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

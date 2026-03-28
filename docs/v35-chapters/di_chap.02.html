@@ -1,0 +1,753 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Introduction to the Frustrum</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Introduction to the Frustrum</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.03.html">File Handling</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273840">1.1	Introduction</A>
+<UL>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273859">1.1.1	Dummy frustrum</A>
+</UL>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273865">1.2	Summary of functions</A>
+<UL>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273953">1.2.1	Initialisation</A>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273961">1.2.2	Memory management</A>
+</UL>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273966">1.3	Abort recovery</A>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273975">1.4	Frustrum errors</A>
+<UL>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273979">1.4.1	Prediction errors</A>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273985">1.4.2	Exception errors</A>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-273992">1.4.3	Illegal call errors</A>
+</UL>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-274000">1.5	Validation tests</A>
+<UL>
+<LI> <A HREF="di_chap.02.html#50548798_pgfId-274008">1.5.1	TESTFR - invokes the verification tests for the frustrum</A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548798_pgfId-273840"></A>1.1	Introduction
+
+
+</H1>
+<P>
+<A NAME="50548798_pgfId-273841"></A>The Frustrum is a set of functions which must be written by the application programmer. They are called by Parasolid to perform the following tasks:</P>
+<UL>
+<LI>
+<A NAME="50548798_pgfId-273842"></A>Frustrum control</LI>
+<LI>
+<A NAME="50548798_pgfId-273843"></A>File (part data) handling</LI>
+<LI>
+<A NAME="50548798_pgfId-273844"></A>Memory handling</LI>
+<LI>
+<A NAME="50548798_pgfId-273845"></A>Graphical output</LI>
+<LI>
+<A NAME="50548798_pgfId-281778"></A>Foreign Geometry support (if required)</LI>
+</UL>
+<P>
+<A NAME="50548798_pgfId-281781"></A>Detailed information on the Frustrum’s file handling functionality is in <A HREF="di_chap.03.html#50548799_21045">Chapter 2, “File Handling”</A>.</P>
+<P>
+<A NAME="50548798_pgfId-273851"></A>The standard format of file headers which the Frustrum should read and write is described in <A HREF="di_chap.04.html#50548800_24726">Chapter 3, “File Header Structure”</A>.</P>
+<P>
+<A NAME="50548798_pgfId-273855"></A>This chapter introduces the Frustrum functions; their interfaces are defined in <A HREF="di_chap.07.html#50548803_36151">Appendix A, “Frustrum Functions”</A>.</P>
+<P>
+<A NAME="50548798_pgfId-282489"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548798_pgfId-282509"></A>Note: You are strongly advised to look at the following chapters in the Parasolid <EM>
+<A HREF=../fd_index.html>Functional Description</A></EM> before looking at the information in this manual.</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50548798_pgfId-287697"></A><A HREF="fd_chap.006.html#32151">Chapter 5, “Application Design And Architecture”</A></LI><LI>
+<A NAME="50548798_pgfId-287702"></A><A HREF="fd_chap.007.html#14409">Chapter 6, “Supplying A Frustrum”</A></LI></UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50548798_pgfId-273859"></A>	1.1.1 	Dummy frustrum</H3>
+<P>
+<A NAME="50548798_pgfId-273860"></A>The code for a dummy frustrum is supplied with the release in the file <CODE>
+frustrum.c</CODE>
+. This example gives a feel for how a Frustrum might be implemented, although the complexity of a Frustrum is dependent on its application. The example Frustrum has three purposes:</P>
+<UL>
+<LI>
+<A NAME="50548798_pgfId-273861"></A>To build and run the Parasolid installation acceptance test program.</LI>
+<LI>
+<A NAME="50548798_pgfId-273862"></A>To let you build and run simple prototype applications without having first to write a complete Frustrum.</LI>
+<LI>
+<A NAME="50548798_pgfId-273863"></A>To help you write you own frustrum.</LI>
+</UL>
+<P>
+<A NAME="50548798_pgfId-280911"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548798_pgfId-280939"></A>Note: This frustrum contains the bare minimum required to be used, in order for it to remain clear and platform independent. Normally a Frustrum is written with a particular application in mind, and may make use of system calls rather than the C run-time library for enhanced performance.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548798_pgfId-282338"></A>To further help you write your own frustrum, the Parasolid Example Application also contains source code for a frustrum implementation on Windows NT. See the <A HREF="fd_chap.007.html#14409">Chapter 6, “Supplying A Frustrum”</A> in the Parasolid <EM><A HREF=../fd_index.html>Functional Description</A></EM> for more details.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548798_pgfId-273865"></A>1.2	Summary of functions
+
+
+</H1>
+<P>
+<A NAME="50548798_pgfId-273866"></A>This table summarizes the frustrum functions which you must provide.</P>
+<P>
+<A NAME="50548798_pgfId-273950"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="3">
+<P>
+<A NAME="50548798_pgfId-282606"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282612"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282614"></A>FSTART</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282616"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282618"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282620"></A>Initialise the frustrum</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="11" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282622"></A>these functions require the Frustrum to be initialised:</P>
+<P>
+<A NAME="50548798_pgfId-282623"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282625"></A>FMALLO</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282627"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282629"></A>Allocate a contiguous region of virtual memory</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282633"></A>FMFREE</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282635"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282637"></A>Free a region of virtual memory (from FMALLO)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282641"></A>FFOPRD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282643"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282645"></A>Open most guises of frustrum file for reading</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282649"></A>FFOPWR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282651"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282653"></A>Open most guises of frustrum file for writing</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282657"></A>UCOPRD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282659"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282661"></A>Open most guises of frustrum file for reading. The file has a Unicode filename.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282714"></A>UCOPWR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282716"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282825"></A>Open most guises of frustrum file for writing. The file has a Unicode filename.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="3" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282665"></A>these functions require the file to be opened:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282668"></A>FFREAD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282670"></A>Read from a file where permitted</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282676"></A>FFWRIT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282678"></A>Write to a file where permitted</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282684"></A>FFCLOS</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282686"></A>Close a Frustrum file</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282690"></A>FABORT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282692"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282694"></A>Tidy up/longjump following aborted operation</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282698"></A>FTMKEY</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282700"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282702"></A>Key name server required by TESTFR</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282704"></A>FSTOP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282706"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282708"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-282710"></A>Close down the frustrum</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548798_pgfId-282735"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548798_pgfId-282741"></A>Note: If your application supports 16-bit Unicode filenames, then you must provide UCOPRD and UCOPWR functions in your frustrum in addition to FFOPRD and FFOPWR (which are still required for schemas and journals). If your application does not support Unicode filenames, then you must provide FFOPRD and FFOPWR functions. See <A HREF="di_chap.03.html#50548799_65159">Section 2.2, “Unicode filenames”</A>, for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50548798_pgfId-273953"></A>	1.2.1 	<A NAME="50548798_marker-273951"></A><A NAME="50548798_marker-273952"></A>Initialisation</H3>
+<P>
+<A NAME="50548798_pgfId-273954"></A>The Frustrum is initialised by calling FSTART and is closed down by FSTOP.</P>
+<P>
+<A NAME="50548798_pgfId-273955"></A>The former is called by <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> and the latter by <A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>. Parasolid does not call any other Frustrum functions before the Frustrum has been initialised nor after it has been closed.</P>
+<P>
+<A NAME="50548798_pgfId-280980"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548798_pgfId-281000"></A>Note: The calls made by Parasolid to the start and stop functions can be nested within each other (e.g. FSTART, FSTART, FMALLO, FMFREE, FSTOP, FSTOP). Only the outermost calls are significant; the innermost calls must be ignored.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50548798_pgfId-281001"></A>FSTART and FSTOP are assumed never to fail.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50548798_pgfId-273961"></A>	1.2.2 	<A NAME="50548798_marker-273958"></A><A NAME="50548798_marker-273959"></A><A NAME="50548798_34077"></A>Memory management</H3>
+<P>
+<A NAME="50548798_pgfId-273962"></A>Parasolid needs to be able to allocate and free virtual memory into which to put its model data. The Frustrum interface to this facility is provided by the FMALLO and FMFREE functions, and is similar to the C library functions <CODE>
+malloc</CODE>
+ and <CODE>
+free</CODE>
+.</P>
+<P>
+<A NAME="50548798_pgfId-273963"></A>The amount of virtual memory that Parasolid requests depends on the complexity of the modelling operation. By default, the minimum is about 1/8 Mbyte. You can set and enquire the current value of this minimum block of memory using the functions <A HREF=../headers/pk_memory_set_block_size.html>PK_MEMORY_set_block_size</A> and <A HREF=../headers/pk_memory_ask_block_size.html>PK_MEMORY_ask_block_size</A>, respectively. For complex cases, or those which require a lot of data storage, Parasolid may request more.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548798_pgfId-273966"></A>1.3	<A NAME="50548798_marker-273964"></A><A NAME="50548798_marker-273965"></A>Abort recovery
+
+
+</H1>
+<P>
+<A NAME="50548798_pgfId-273967"></A>Following an interrupt, the application has the option of calling KABORT before allowing Parasolid to continue processing. This causes it to abort the operation which was in progress. The call to KABORT would be made by an interrupt handler provided by the application.</P>
+<P>
+<A NAME="50548798_pgfId-273968"></A>Following such an abort, Parasolid normally returns through the PK in the normal way, giving error PK_ERROR_aborted. Before returning, Parasolid makes a call to Frustrum function FABORT, which gives the application developer an opportunity to do any generic tidying up and/or to do a long-jump to some special recovery-point within his code.</P>
+<P>
+<A NAME="50548798_pgfId-273971"></A>For further information on abort recovery, see <A HREF="fd_chap.120.html#35122">Chapter 119, “Error Handling”</A>, of the Parasolid <A HREF=../fd_index.html>Functional Description</A> manual.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548798_pgfId-273975"></A>1.4	<A NAME="50548798_marker-273973"></A><A NAME="50548798_marker-273974"></A><A NAME="50548798_99807"></A>Frustrum errors
+
+
+</H1>
+<P>
+<A NAME="50548798_pgfId-281832"></A>If a Frustrum function detects an error, it returns an error code in its final argument (<CODE>
+ifail</CODE>
+), which otherwise is the code FR_no_errors. The error codes are divided into three categories - <STRONG>
+prediction</STRONG>, <STRONG>
+exception</STRONG> and <STRONG>
+illegal call</STRONG>.</P>
+
+<H3>
+<A NAME="50548798_pgfId-273979"></A>	1.4.1 	<A NAME="50548798_marker-273977"></A><A NAME="50548798_marker-273978"></A>Prediction errors</H3>
+<P>
+<A NAME="50548798_pgfId-273980"></A>This category contains those errors which can be expected to occur during the ordinary course of a program run. Parasolid looks for this type of error return code explicitly and takes the appropriate action.</P>
+<P>
+<A NAME="50548798_pgfId-273981"></A>For example, the implementation must always check the key name arguments which are passed to FFOPRD and FFOPWR and the file size argument which is passed to FFOPRB, in case Parasolid is being run with argument validation having been switched off by <A HREF=../headers/pk_session_set_check_arguments.html>PK_SESSION_set_check_arguments</A>. These types of errors can be said to be predictable.</P>
+<P>
+<A NAME="50548798_pgfId-273982"></A>The range of prediction error codes which can be returned from a given function are documented as end of line comments to the <CODE>
+ifail</CODE>
+ argument.</P>
+
+
+<H3>
+<A NAME="50548798_pgfId-273985"></A>	1.4.2 	<A NAME="50548798_marker-273983"></A><A NAME="50548798_marker-273984"></A>Exception errors</H3>
+<P>
+<A NAME="50548798_pgfId-273986"></A>This category contains codes for unpredictable but plausible errors.</P>
+<P>
+<A NAME="50548798_pgfId-273987"></A>Where some particular remedial action is possible, Parasolid traps these cases explicitly. If no specific course of action is appropriate, Parasolid traps and handles such cases by a default action.</P>
+<P>
+<A NAME="50548798_pgfId-273988"></A>For example, some PK functions need to take special action in the event of running out of disk space whereas others handle such cases by a catch all error trap.</P>
+<P>
+<A NAME="50548798_pgfId-273989"></A>Exception codes are also added as end of line comments to the <CODE>
+ifail</CODE>
+ argument in the documentation of each Frustrum function.</P>
+
+
+<H3>
+<A NAME="50548798_pgfId-273992"></A>	1.4.3 	<A NAME="50548798_marker-273990"></A><A NAME="50548798_marker-273991"></A>Illegal call errors</H3>
+<P>
+<A NAME="50548798_pgfId-281864"></A>This category is used to report an erroneous call being made to a Frustrum function, such as trying to write to a file <CODE>
+strid</CODE>
+ which has not been opened or to denote that an error has occurred in the Frustrum implementation.</P>
+<P>
+<A NAME="50548798_pgfId-273994"></A>The Frustrum should normally report illegal call errors by outputting a message describing what went wrong, before returning the generic code FR_unspecified.</P>
+<P>
+<A NAME="50548798_pgfId-273995"></A>This code should only be returned when an error has been detected; it should not be set in the normal course of events. For this reason, the ifail code FR_unspecified is not used in the documentation for the Frustrum functions.</P>
+<P>
+<A NAME="50548798_pgfId-273996"></A>If an error occurs which is not the result of an erroneous call being made to the Frustrum or of an internal error in the Frustrum code, the ifail should be set to one the mnemonic codes in the documentation which best describes the result.</P>
+<P>
+<A NAME="50548798_pgfId-273997"></A>Note that the code FR_unspecified is not trapped explicitly by Parasolid, so the resulting <CODE>
+ifail</CODE>
+ code returned from the KI may be misleading.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548798_pgfId-274000"></A>1.5	<A NAME="50548798_marker-273998"></A><A NAME="50548798_marker-273999"></A>Validation tests
+
+
+</H1>
+<P>
+<A NAME="50548798_pgfId-274001"></A>The test function TESTFR is supplied with Parasolid to enable the customer to check that the behaviour of his implementation of the Frustrum is consistent with the requirements of Parasolid and of file portability.</P>
+<P>
+<A NAME="50548798_pgfId-274002"></A>It is strongly recommended that TESTFR be linked and run every time the Frustrum is changed, and for every new version of Parasolid; Frustrum faults can cause obscure and serious problems in Parasolid.</P>
+<P>
+<A NAME="50548798_pgfId-274003"></A>Although the specification for TESTFR is included with the Frustrum documentation, TESTFR is not itself part of the Frustrum, and as such is not supplied by the customer, but is supplied with Parasolid.</P>
+<P>
+<A NAME="50548798_pgfId-274004"></A>However, the TESTFR function requires a key name server FTMKEY to be provided by the customer implementation, which returns sample names to be used as arguments in the test calls made to FFOPRD and FFOPWR. The key name server is not otherwise used by Parasolid.</P>
+
+<H3>
+<A NAME="50548798_pgfId-274008"></A>	1.5.1 	<A NAME="50548798_marker-274005"></A><A NAME="50548798_marker-274006"></A><A NAME="50548798_42441"></A>TESTFR - invokes the verification tests for the frustrum</H3>
+<P>
+<A NAME="50548798_pgfId-281361"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50548798_pgfId-281370"></A>void TESTFR</PRE>
+<PRE><A NAME="50548798_pgfId-283984"></A>(</PRE>
+<PRE><A NAME="50548798_pgfId-283996"></A>                            /* received arguments */</PRE>
+<PRE><A NAME="50548798_pgfId-284004"></A>int *number,       /* test number */</PRE>
+<PRE><A NAME="50548798_pgfId-284012"></A>int *level,        /* trace level */</PRE>
+<PRE><A NAME="50548798_pgfId-284020"></A>                            /* returned arguments */</PRE>
+<PRE><A NAME="50548798_pgfId-284028"></A>int *code          /* completion code */</PRE>
+<PRE><A NAME="50548798_pgfId-284036"></A>)</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548798_pgfId-281479"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281485"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281487"></A>Synopsis</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281489"></A> Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281491"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281493"></A>number</P>
+</TD>
+<TD ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281495"></A>test number</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281628"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281630"></A>run all tests</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281632"></A>n</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281634"></A>run test n (n&gt;=1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="5" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281509"></A>level</P>
+</TD>
+<TD ROWSPAN="5" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281511"></A>trace level</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281670"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281672"></A>no tracing</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281674"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281676"></A>number, purpose, result</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281678"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281680"></A>+ receive/return args</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281682"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281684"></A>+ diagnostics</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281686"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281688"></A>+ debug trace</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="6" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281549"></A>code</P>
+</TD>
+<TD ROWSPAN="6" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281551"></A>completion code</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281726"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281728"></A>setup_error</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281730"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281732"></A>test_success</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281734"></A>2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281736"></A>test_failure</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281738"></A>3</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281740"></A>test_omitted</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281742"></A>4</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281744"></A>test_exceeded</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281746"></A>5</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548798_pgfId-281748"></A>test_warning</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548798_pgfId-281451"></A>This function invokes a set of verification tests for customer implementations of the Frustrum. These are designed to confirm that the behaviour of the Frustrum (with respect to file handling and memory management) is consistent with the requirements of Parasolid and of file portability.</P>
+<P>
+<A NAME="50548798_pgfId-274153"></A>The tests are not foolproof, and in particular, cannot detect cases where the Frustrum writes/reads files in a way not compatible with the C run time library. Nonetheless, the tests can detect many Frustrum faults which might otherwise cause obscure and catastrophic problems in Parasolid. It is therefore strongly recommended that a customer runs the tests after any modification to his Frustrum, and after receiving any new version of Parasolid.</P>
+<P>
+<A NAME="50548798_pgfId-274154"></A>In order to run the tests, the customer must provide a simple driver program to call TESTFR, which he then links with TESTFR and with his Frustrum. Once a test image has been linked, the following test strategy is recommended:</P>
+<UL>
+<LI>
+<A NAME="50548798_pgfId-274155"></A>Delete any back copies of test files which have been produced by earlier runs. The names of these files have been determined by the sample key names which were returned by FTMKEY.</LI>
+<P>
+<A NAME="50548798_pgfId-274156"></A>For example, if FTMKEY is called with guise = FFCJNL, format = FFTEXT and test index 20, it might return the string “TESTFR_20.jnl_txt”. It would be necessary to delete any test files which matched “TESTFR_&lt;index&gt;.&lt;guise&gt;_&lt;format&gt;” (where &lt;index&gt; = 1..20)</P>
+<P>
+<A NAME="50548798_pgfId-274157"></A>Note that the test files are not necessarily created in the same directory (e.g. a Frustrum implementation might choose to write its journal file to the user’s default directory but to write its schema files to a common system directory).</P>
+<LI>
+<A NAME="50548798_pgfId-274158"></A>Call TESTFR for test 0 at trace level 0. Note the completion code.</LI>
+<LI>
+<A NAME="50548798_pgfId-274159"></A>If the completion code is zero (implying a setup error), check that all of the test files which are implied by FTMKEY have been deleted. Check that the test and trace arguments are being passed correctly to TESTFR (by address) and that the values are in range.</LI>
+<LI>
+<A NAME="50548798_pgfId-274160"></A>If the completion code is one, all of the tests have succeeded.</LI>
+<LI>
+<A NAME="50548798_pgfId-274161"></A>If the completion code is two (failure), delete any test files which have just been produced and call TESTFR for test 0 at trace level 1.</LI>
+<P>
+<A NAME="50548798_pgfId-274162"></A>Note the test number which has failed as N.</P>
+<P>
+<A NAME="50548798_pgfId-274163"></A>Delete any test files which have just been produced and call TESTFR for test N at trace level 2 (or 3). This traces the function arguments which were used (with diagnostics).</P>
+<P>
+<A NAME="50548798_pgfId-274164"></A>Correct the Frustrum implementation, making use of the trace messages (and diagnostics), then return to the first step and start the process again.</P>
+<LI>
+<A NAME="50548798_pgfId-274165"></A>If the completion code is three, this implies that no tests in TESTFR are associated with the given test number; it should be incremented (this is to allow particular tests to be commented out later on).</LI>
+<LI>
+<A NAME="50548798_pgfId-274166"></A>If the completion code is four, this implies that the given number exceeds the number of tests which have been defined for TESTFR. If running with the test number as zero, this message shows up at the end of the level one trace, all the tests have been tried.</LI>
+<LI>
+<A NAME="50548798_pgfId-274167"></A>If the completion code is five, all of the tests have succeeded but a warning has been noted; delete any test files which have just been produced and call TESTFR for test 0 at trace level 3 (writing the trace output to a log file). Search the file for the word ‘Warning’. Check with Parasolid Support if the reason for the warning is not apparent from the trace messages and Frustrum documentation.</LI>
+</UL>
+<P>
+<A NAME="50548798_pgfId-274168"></A>The association between a particular check and a test number will not necessarily be maintained between releases of Parasolid and/or releases of the Frustrum interface specification.</P>
+<P>
+<A NAME="50548798_pgfId-110680"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.03.html">File Handling</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

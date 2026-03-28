@@ -1,0 +1,131 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_is_isoparam</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_is_isoparam</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                 PK_CURVE_is_isoparam
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                      curve,          --- curve to test
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                   bounds,         --- range to bound the curve
+<A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                       surf,           --- embedding surface
+const <A HREF=../headers/pk_curve_is_isoparam_o_t.html>PK_CURVE_is_isoparam_o_t</A> *options,        --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_curve_is_isoparam_t.html>PK_CURVE_is_isoparam_t</A>   *const is_isoparam,    --- whether given curve is an
+                                                --- isoparameter
+double                   *const iso_value,      --- value of the constant
+                                                --- surface parameter
+<A HREF=../headers/pk_param_direction_t.html>PK_PARAM_direction_t</A>     *const iso_direction,  --- which surface parameter
+                                                --- (u or v) is constant
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>            *const param_interval, --- interval in the surface's
+                                                --- non-constant parameter
+                                                --- covered by bounded curve
+<A HREF=../headers/pk_isoparam_alignment_t.html>PK_isoparam_alignment_t</A>  *const param_alignment --- how the the surface's non-
+                                                --- constant parameter varies
+                                                --- with respect to the curve
+                                                --- parameterisation.
+)
+</B>
+<A NAME="description"></A>
+<I>Tests whether a bounded curve lying within a surface is a constant-parameter
+curve (i.e., an isoparameter) for that surface.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_not_on_surface     Could not ascertain that <B>'curve'</B> lies
+                                entirely within <B>'surf'</B> over the given
+                                parameter <B>'bounds'</B>.
+                                (MILD)
+
+    PK_ERROR_bad_parameter      Given <B>'bounds'</B> lie outside <B>'curve'</B>'s domain
+                                of definition.
+                                (MILD)
+
+    PK_ERROR_interval_le_0      Length of <B>'bounds'</B> &lt;= 0.
+                                (MILD)
+
+    PK_ERROR_curve_too_short    Segment of <B>'curve'</B> too short for analysis.
+                                (MILD)
+
+    PK_ERROR_not_implemented    Unavailable functionality called.
+                                (MILD)
+
+<A NAME="documentation"></A>
+This function tests whether a given segment of <B>'curve'</B> with parameter interval
+<B>'bounds'</B> is an isoparameter on a surface <B>'surf'</B>. If so, it also returns which
+surface parameter is constant, and that parameter's value.
+
+In order for a curve to be identified as an isoparameter of a surface, it
+must (1) be an exact isoparameter; and (2) cover a single, well-defined range
+in the surface's parameter space (so it may not, for example, cross a seam in
+a closed but non-periodic surface).
+
+The curve's <B>'bounds'</B> should be such that the curve segment lies entirely
+within the surface. If not, the error code PK_ERROR_not_on_surface will be
+returned.
+
+<B>'is_isoparam'</B> is set to PK_CURVE_ask_isoparam_yes_c if the curve is determined
+to be an isoparameter of the surface. It is set to PK_CURVE_ask_isoparam_no_c
+otherwise.
+
+<B>'iso_value'</B> is the value of the constant parameter, if the curve is an
+isoparameter of the surface. Otherwise, it is set to zero.
+
+<B>'iso_direction'</B> indicates which of the surface's parameters is constant, and
+is one of either PK_PARAM_direction_u or PK_PARAM_direction_v, if the curve is
+an isoparameter. Otherwise, it is set to PK_PARAM_direction_u.
+
+<B>'param_interval'</B> is the interval on the surface's non-constant parameter
+occupied by the curve. It is only computed and set if the flag <B>'want_interval'</B>
+in <B>'options'</B> is set to PK_LOGICAL_true. It returns an interval [0.0, 0.0] if
+the curve is not an isoparameter.
+
+<B>'param_alignment'</B> is <A HREF=../headers/pk_isoparam_alignment_t.html>PK_isoparam_alignment_aligned_c</A> if the surface's
+non-constant parameter increases with increasing curve parameter, or
+conversely <A HREF=../headers/pk_isoparam_alignment_t.html>PK_isoparam_alignment_opposed_c</A>. It is set to
+<A HREF=../headers/pk_isoparam_alignment_t.html>PK_isoparam_alignment_unset_c</A> if the curve is not an isoparameter.
+<B>'param_alignment'</B> is only computed and set if the flag <B>'want_alignment'</B> in
+<B>'options'</B> is set to PK_LOGICAL_true.
+
+This function does not support foreign geometry. If either <B>'curve'</B> or <B>'surf'</B>
+is foreign, the error code PK_ERROR_not_implemented will be returned.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

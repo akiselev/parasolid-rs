@@ -1,0 +1,604 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Symmetric Multi-Processing In Parasolid</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Symmetric Multi-Processing In Parasolid</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.114.html">Calling Parasolid From Multiple Threads</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.116.html">Session Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-294756">114.1	What is Symmetric Multi-Processing? </A>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-314471">114.2	Setting up and using Parasolid SMP </A>
+<UL>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-294856">114.2.1	Enabling SMP within Parasolid </A>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-330498">114.2.2	Determining the maximum number of SMP threads used in a session </A>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-294906">114.2.3	Setting the stack size of SMP threads </A>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-294956">114.2.4	Memory usage with Parasolid SMP </A>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-294983">114.2.5	Order of returned entities </A>
+</UL>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-295048">114.3	Expectations from Parasolid SMP </A>
+<UL>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-295055">114.3.1	Thread locking </A>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-295061">114.3.2	Functional areas that are SMP-enabled </A>
+<LI> <A HREF="fd_chap.115.html#50422196_pgfId-295127">114.3.3	Failure to create worker threads </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422196_pgfId-294756"></A>114.1	What is Symmetric Multi-Processing? 
+
+
+</H1>
+<P>
+<A NAME="50422196_pgfId-294760"></A>Symmetric Multi-Processing (or SMP) allows algorithms beneath the Parasolid API to make use of multiple processors if they are present on a host machine. A number of functional areas within Parasolid have been adapted for SMP, making it possible to reduce the execution time of certain operations, thereby improving the performance of Parasolid when running on multi-processor systems. </P>
+<P>
+<A NAME="50422196_pgfId-294773"></A>Parasolid SMP is enabled on the most widely used Parasolid platforms. For a complete list, see <A HREF="in_chap.06.html#50680">Section 5.6, “Symmetric Multi-Processing (SMP)”</A>, in the Parasolid <EM><A HREF=../in_index.html>Installation Notes</A></EM>. Parasolid makes use of Win32 threads on Microsoft Windows platforms, and POSIX threads on UNIX and Linux platforms. </P>
+<P>
+<A NAME="50422196_pgfId-294786"></A>This chapter describes:</P>
+<UL>
+<LI>
+<A NAME="50422196_pgfId-294793"></A>How to set up, configure, and use Parasolid SMP (<A HREF="fd_chap.115.html#50422196_79160">Section 114.2</A>).</LI>
+<LI>
+<A NAME="50422196_pgfId-294800"></A>What effect you should expect from Parasolid SMP (<A HREF="fd_chap.115.html#50422196_23490">Section 114.3</A>).</LI>
+</UL>
+<P>
+<A NAME="50422196_pgfId-314457"></A>For information on how to call multiple PK functions simultaneously from different application threads, and the restrictions that apply when doing so, see <A HREF="fd_chap.114.html#50422195_73035">Chapter 113, “Calling Parasolid From Multiple Threads”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422196_pgfId-314471"></A>114.2	<A NAME="50422196_marker-314465"></A><A NAME="50422196_marker-314466"></A><A NAME="50422196_79160"></A>Setting up and using Parasolid SMP 
+
+
+</H1>
+<P>
+<A NAME="50422196_pgfId-314475"></A>This section explains how to switch SMP on in a Parasolid session, how to configure it best for your own use, and discusses issues related to your application source code that you need to consider when making use of Parasolid’s SMP. </P>
+<UL>
+<LI>
+<A NAME="50422196_pgfId-294822"></A><A HREF="fd_chap.115.html#50422196_72847">Section 114.2.1, “Enabling SMP within Parasolid”</A>, explains how to switch SMP on during a Parasolid session.</LI>
+<LI>
+<A NAME="50422196_pgfId-294829"></A><A HREF="fd_chap.115.html#50422196_47131">Section 114.2.3, “Setting the stack size of SMP threads”</A>, explains how to best configure Parasolid SMP according to the platform you are running on.</LI>
+<LI>
+<A NAME="50422196_pgfId-294836"></A><A HREF="fd_chap.115.html#50422196_48939">Section 114.2.5, “Order of returned entities”</A>, explains how the order of entities returned by PK functions may be different when Parasolid SMP is on compared to when it is not, and how to allow for this in your application code accordingly. </LI>
+</UL>
+<P>
+<A NAME="50422196_pgfId-294842"></A>For more information on many of the issues described in this section, See <A HREF="in_chap.06.html#50680">Section 5.6, “Symmetric Multi-Processing (SMP)”</A>, of the Parasolid <EM><A HREF=../in_index.html>Installation Notes</A></EM>. </P>
+
+<H3>
+<A NAME="50422196_pgfId-294856"></A>	114.2.1 	<A NAME="50422196_marker-294850"></A><A NAME="50422196_marker-294851"></A><A NAME="50422196_72847"></A>Enabling SMP within Parasolid </H3>
+<P>
+<A NAME="50422196_pgfId-294863"></A>SMP operation within Parasolid is controlled via the following functions:</P>
+<P>
+<A NAME="50422196_pgfId-314649"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-314635"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-314637"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-314639"></A><A HREF=../headers/pk_session_set_smp.html>PK_SESSION_set_smp</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-314644"></A>Enable and disable Parasolid SMP</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-314646"></A><A HREF=../headers/pk_session_ask_smp.html>PK_SESSION_ask_smp</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-314648"></A>Return the current session’s SMP parameters</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422196_pgfId-314595"></A>You use <A HREF=../headers/pk_session_set_smp.html>PK_SESSION_set_smp</A> to enable SMP in Parasolid. By default, Parasolid SMP is configured to:</P>
+<UL>
+<LI>
+<A NAME="50422196_pgfId-294864"></A>Enable 1 thread per processor core.</LI>
+<LI>
+<A NAME="50422196_pgfId-294868"></A>Disable Parasolid SMP on single processor machines.</LI>
+</UL>
+<P>
+<A NAME="50422196_pgfId-294872"></A>These are the recommended settings for Parasolid SMP and will be sufficient for most cases. <A HREF="in_chap.06.html#38070">Section 5.6.1, “Guidelines for setting the number of threads”</A> in the Parasolid <EM><A HREF=../in_index.html>Installation Notes</A></EM>, contains further information on how you can choose the optimum number of threads for your platform and application.</P>
+<P>
+<A NAME="50422196_pgfId-294888"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422196_pgfId-294887"></A>Note: Currently, Parasolid can create a maximum of 8 threads for SMP work.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422196_pgfId-313700"></A>Parasolid SMP can be enabled or disabled at any time during a session. Once SMP has been enabled in a Parasolid session, most functional areas that can benefit from SMP will do so automatically. However, some specific PK functions may also require certain options to be set within the function in addition to SMP being enabled at the session level: for example, <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A> requires you to set <CODE>
+options.choice.smp</CODE>
+ to <A HREF=../headers/pk_facet_smp_t.html>PK_facet_smp_body_c</A> (see <A HREF="fd_chap.110.html#50422190_26560">Section 109.3, “Tabular faceting and threads”</A>). For specific details on a per function basis, see the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>.</P>
+
+
+<H3>
+<A NAME="50422196_pgfId-330498"></A>	114.2.2 	Determining the maximum number of SMP threads used in a session </H3>
+<P>
+<A NAME="50422196_pgfId-330582"></A>You can use <A HREF=../headers/pk_session_ask_max_threads.html>PK_SESSION_ask_max_threads</A> to determine the maximum number of SMP threads that Parasolid can use in a current session. Knowing the number of threads that Parasolid can use in a session allows you to determine how many threads are available for your application to use.</P>
+<P>
+<A NAME="50422196_pgfId-332021"></A>The number of threads returned depends on the maximum number of SMP threads that Parasolid can work with (currently 8) and the values returned in the <CODE>
+thread_format</CODE>
+, <CODE>
+n_threads</CODE>
+, and <CODE>
+n_processors</CODE>
+ options of <A HREF=../headers/pk_session_ask_smp.html>PK_SESSION_ask_smp</A>. For more information on how this number is calculated, see the reference documentation for <A HREF=../headers/pk_session_ask_max_threads.html>PK_SESSION_ask_max_threads</A>. </P>
+<P>
+<A NAME="50422196_pgfId-332533"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422196_pgfId-332563"></A>Note: If SMP is disabled then the maximum number of threads is 1.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422196_pgfId-294906"></A>	114.2.3 	<A NAME="50422196_marker-294903"></A><A NAME="50422196_marker-294904"></A><A NAME="50422196_47131"></A>Setting the stack size of SMP threads </H3>
+<P>
+<A NAME="50422196_pgfId-294910"></A><A NAME="50422196_marker-294907"></A><A NAME="50422196_marker-294908"></A><A NAME="50422196_marker-294909"></A>Depending on the platform that your application runs on, you may need to specify the stack size of threads used by Parasolid SMP. Although the default stack size for the system is usually sufficient, this is not always the case.</P>
+<UL>
+<LI>
+<A NAME="50422196_pgfId-294914"></A>On some systems, the default stack size is too small for complex modelling, leading to runtime errors.</LI>
+<LI>
+<A NAME="50422196_pgfId-294915"></A>If your application only performs simple operations, reducing the stack size can conserve memory use.</LI>
+</UL>
+<P>
+<A NAME="50422196_pgfId-294919"></A>The following functions allow you to set and enquire the stack size of Parasolid SMP threads:</P>
+<P>
+<A NAME="50422196_pgfId-294941"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294922"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294924"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294927"></A><A NAME="50422196_marker-294926"></A><A HREF=../headers/pk_session_set_smp_stacksize.html>PK_SESSION_set_smp_stacksize</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294932"></A>Sets the size of the stack allocated to Parasolid SMP threads. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294935"></A><A NAME="50422196_marker-294934"></A><A HREF=../headers/pk_session_ask_smp_stacksize.html>PK_SESSION_ask_smp_stacksize</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294940"></A>Returns the size of the stack allocated to Parasolid SMP threads. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422196_pgfId-294942"></A>For both functions, a zero value means that the platform default stack size is used.</P>
+<P>
+<A NAME="50422196_pgfId-294943"></A>Guidelines for setting appropriate stack sizes on different supported platforms can be found in <A HREF="in_chap.06.html#68496">Section 5.5, “Stack sizes”</A>, of the <EM><A HREF=../in_index.html>Installation Notes</A></EM>.</P>
+
+
+<H3>
+<A NAME="50422196_pgfId-294956"></A>	114.2.4 	<A NAME="50422196_83739"></A><A NAME="50422196_marker-294951"></A><A NAME="50422196_marker-294952"></A>Memory usage with Parasolid SMP </H3>
+<P>
+<A NAME="50422196_pgfId-294960"></A>When using SMP in Parasolid, expect to need more memory than you would for a single-processor machine. With SMP enabled, Parasolid generally requires more temporary workspace in main memory during SMP-accelerated operations. For example, with two threads, it can require twice as much workspace. </P>
+<P>
+<A NAME="50422196_pgfId-294967"></A>If this extra space causes Parasolid’s requirements to exceed the physical memory of the machine - thus causing the operating system to start swapping data between disk and main memory - the resulting performance is normally worse than if Parasolid was running with a single thread.</P>
+<P>
+<A NAME="50422196_pgfId-294977"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422196_pgfId-294976"></A>Note: This only applies to temporary workspace used during calls to Parasolid; the memory needed to hold a given model is essentially the same for single- or multi-threaded operation.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422196_pgfId-294983"></A>	114.2.5 	<A NAME="50422196_marker-294978"></A><A NAME="50422196_marker-294979"></A><A NAME="50422196_marker-294980"></A><A NAME="50422196_marker-294981"></A><A NAME="50422196_48939"></A>Order of returned entities </H3>
+<P>
+<A NAME="50422196_pgfId-294987"></A>Whether Parasolid SMP is enabled or not, the vast majority of PK functions do not guarantee the order of returned entities. Enabling SMP in a session is likely to result in the order of returned entities being different compared to the order if SMP is not enabled. The table below describes some examples:</P>
+<P>
+<A NAME="50422196_pgfId-295032"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294990"></A>Functional area</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294992"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294994"></A>Booleans</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-294996"></A>If a boolean operation results in several distinct bodies being created, the order of the bodies returned may vary when SMP is enabled. This also applies to the tag persistence rules with respect to the value of the target body tag being applied to any one of the returned bodies.</P>
+<P>
+<A NAME="50422196_pgfId-295000"></A>For example, if Parasolid SMP is enabled and a boolean subtract operation returns more than one resultant body, Parasolid does not guarantee:</P>
+<UL>
+<LI>
+<A NAME="50422196_pgfId-295004"></A>the order of the returned bodies;</LI>
+<LI>
+<A NAME="50422196_pgfId-295005"></A>which resultant body inherits the value of the target body tag.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295007"></A>Body checking</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295009"></A>If <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> returns several errors, the order of the errors in the return structure may vary if SMP is enabled in a Parasolid session.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295014"></A>Wire-frame sketching</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295016"></A>When generating wire-frame data via the Graphical Output (GO) with SMP enabled, Parasolid does not guarantee the order of information output via the GO. More specifically:</P>
+<UL>
+<LI>
+<A NAME="50422196_pgfId-295023"></A>The state of Parasolid SMP has no effect on the sequence of calls to the GO functions GOOPSG and GOCLSG to open and close a hierarchical data segment.</LI>
+<LI>
+<A NAME="50422196_pgfId-295024"></A>The order of calls to the GO function GOSGMT to output a non-hierarchical data segment may vary depending on the state of SMP within Parasolid.</LI>
+</UL>
+<P>
+<A NAME="50422196_pgfId-295028"></A>For example, when sketching a body:</P>
+<UL>
+<LI>
+<A NAME="50422196_pgfId-295029"></A>GOOPSG is invoked to indicate the start of the segment;</LI>
+<LI>
+<A NAME="50422196_pgfId-295030"></A>GOSGMT is invoked for each line segment drawn (edges, hatching of faces and silhouettes). If SMP is enabled, the line segments of one face may be interspersed with the line segments from another face;</LI>
+<LI>
+<A NAME="50422196_pgfId-295031"></A>GOCLSG is invoked to indicate the end of the segment.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422196_pgfId-295036"></A>Regardless of whether or not you use Parasolid SMP, you should ensure that your application code is sufficiently robust to deal with changes to the order of returned entities. You can use the debug functions <A HREF=../headers/pk_debug_shuffle_start.html>PK_DEBUG_shuffle_start</A> and <A HREF=../headers/pk_debug_shuffle_stop.html>PK_DEBUG_shuffle_stop</A> to help test the robustness of your code in this area.</P>
+<P>
+<A NAME="50422196_pgfId-295040"></A>Whenever reporting faults to Parasolid Support, always specify whether or not Parasolid SMP is enabled.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422196_pgfId-295048"></A>114.3	<A NAME="50422196_23490"></A>Expectations from Parasolid SMP 
+
+
+</H1>
+<P>
+<A NAME="50422196_pgfId-295049"></A>In general, it is not possible to quote a figure for the general performance improvement achieved by using SMP, since this improvement depends on the nature of the operations you are performing. </P>
+<P>
+<A NAME="50422196_pgfId-295050"></A>SMP is implemented beneath the API level, typically in low-level internal algorithms. These algorithms typically only form part of the code path called by a given PK function and may be invoked to different degrees depending on the nature of the received arguments passed by the application to the PK function. The reduction in execution time is affected accordingly. For these reasons, you should not expect an automatic 50% speed up at the PK function level when enabling SMP on a two processor machine.</P>
+<P>
+<A NAME="50422196_pgfId-295051"></A>Similarly, due to the nature of SMP, the scaling of performance with an increased number of processors is not expected to be linear. For example, if you see a 20% performance improvement for a particular function call on a 2 processor machine, this does not automatically mean that you would see a 40% performance improvement on a 4 processor machine.</P>
+<P>
+<A NAME="50422196_pgfId-295052"></A>Finally, the entity level at which SMP has an effect varies from one functional area to another. For example: </P>
+<UL>
+<LI>
+<A NAME="50422196_pgfId-295053"></A>In validity checking, SMP is enabled at the face level: the PK function <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> can benefit from SMP when only one body is passed to the function, because several faces can be checked together. </LI>
+<LI>
+<A NAME="50422196_pgfId-295054"></A>In faceting, SMP is enabled at the body level: the PK functions <A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A> and <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A> can only benefit from SMP when more than one body is passed in a single call to those functions.</LI>
+</UL>
+
+<H3>
+<A NAME="50422196_pgfId-295055"></A>	114.3.1 	Thread locking </H3>
+<P>
+<A NAME="50422196_pgfId-295056"></A>The overhead of thread locking can mean that some functions on some platforms will actually run slightly slower with SMP enabled than with SMP disabled. We strive to minimise this in our implementation and work in collaboration with hardware vendors to do the same. If you do find functions that run excessively slowly, the Parasolid team is happy to investigate these on a case by case basis.</P>
+
+
+<H3>
+<A NAME="50422196_pgfId-295061"></A>	114.3.2 	<A NAME="50422196_49448"></A>Functional areas that are SMP-enabled </H3>
+<P>
+<A NAME="50422196_pgfId-295062"></A>The following table shows the main functional areas and/or PK functions that can benefit from Parasolid SMP being enabled. </P>
+<P>
+<A NAME="50422196_pgfId-295069"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422196_pgfId-295068"></A>Note: The presence of a PK function or functional area in this list does not guarantee a performance improvement when SMP is enabled. Conversely, the absence of a PK function or functional area does not preclude a benefit being seen from enabling SMP.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422196_pgfId-295125"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295072"></A>Functional area</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295074"></A>PK function where applicable</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295076"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295078"></A>Validity checking</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295080"></A><A HREF=../headers/pk_body_check.html>PK_BODY_check</A> and where checking is called internally as part of a PK function call.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295082"></A>Implemented at the face level.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295084"></A>Boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295086"></A>Various.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295088"></A>Implemented for face-face clashing portion of algorithm.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295090"></A>Wireframe rendering</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295092"></A><A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295094"></A>Implemented at the body occurrence level</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295096"></A>Hidden line rendering</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295098"></A><A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295100"></A>Implemented at the body level during initial processing and at an intersection level during line/line intersection. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295102"></A>Closest approach</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295104"></A><A HREF=../headers/pk_geom_range_vector_many.html>PK_GEOM_range_vector_many</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295106"></A>Multiple points must be supplied.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-323395"></A><A HREF=../headers/pk_topol_range.html>PK_TOPOL_range</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-323397"></A>Computing distance between two bodies.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295108"></A>Faceting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295110"></A><A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A>, <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295112"></A>Implemented at the body level. You must set the <CODE>
+smp</CODE>
+ option (<A HREF=../headers/pk_topol_facet_2.html>PK_TOPOL_facet_2</A>) or the <CODE>
+go_interleaved</CODE>
+ option (<A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>) to enable SMP.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295114"></A>Mass properties</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295116"></A><A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295118"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295120"></A>Spline creation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295122"></A><A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-295124"></A>Must fit at least one position to a tolerance, or set <CODE>
+have_chordal_tol</CODE>
+ to PK_LOGICAL_true.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-323644"></A>Isocline generation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-323646"></A><A HREF=../headers/pk_face_imprint_cus_isoclin.html>PK_FACE_imprint_cus_isoclin</A>, <A HREF=../headers/pk_surf_make_cus_isocline.html>PK_SURF_make_cus_isocline</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-323648"></A>Generating isocline curves.<BR>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-339400"></A>B-geometry creation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-339402"></A><A HREF=../headers/pk_curve_make_bcurve_array.html>PK_CURVE_make_bcurve_array</A><BR>
+<A HREF=../headers/pk_surf_make_bsurf_array.html>PK_SURF_make_bsurf_array</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422196_pgfId-339404"></A>&nbsp;</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422196_pgfId-295127"></A>	114.3.3 	<A NAME="50422196_62715"></A>Failure to create worker threads </H3>
+<P>
+<A NAME="50422196_pgfId-295131"></A>If at any time the operating system cannot create worker threads for Parasolid SMP, this is reported using a <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_osthread_fail_c</A> record in the Parasolid report. </P>
+<P>
+<A NAME="50422196_pgfId-295135"></A>If the operating system subsequently resumes creating worker threads, this is reported using a <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_osthread_ok_c</A> record. </P>
+<P>
+<A NAME="50422196_pgfId-295139"></A>If worker threads cannot be created, Parasolid performs the work they would have done in the thread used to call Parasolid. This is slower than using worker threads, but permits the operation to complete successfully.</P>
+<P>
+<A NAME="50422196_pgfId-295149"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for information about using the Parasolid report mechanism.</P>
+<P>
+<A NAME="50422196_pgfId-275053"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.114.html">Calling Parasolid From Multiple Threads</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.116.html">Session Support</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_repair</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_repair</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_FACE_repair
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                  face,     --- face
+const <A HREF=../headers/pk_face_repair_o_t.html>PK_FACE_repair_o_t</A>  *options,  --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>  *const tracking  --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function attempts to repair a face, i.e. make it valid. The options
+structure determines which types of repair are attempted.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_su_self_intersect      self-intersecting region lies in face
+
+<A NAME="documentation"></A>
+This function is primarily intended for use when a model is being imported into
+Parasolid via a data exchange format.
+
+Before this function is called, <A HREF=../headers/pk_edge_repair.html>PK_EDGE_repair</A> (with option <B>'ensure_on_surfs'</B>)
+must be called on all the edges of the face.
+
+At present there are two types of repair provided: splitting the face to remove
+G1 discontinuities in the surface, and splitting the face to remove areas of
+surface self-intersection which lie outside the face.
+
+Tracking information will be returned in <B>'tracking'</B>. This is only returned if
+the face is split, in which case there will be one track record recording the
+split.
+
+See <A HREF="../chapters/fd_chap.091.html#50434457_pgfId-295949">Repairing the part</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_ENTITY_delete</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_ENTITY_delete</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>    PK_ENTITY_delete
+(
+<I>--- received arguments ---
+</I>int                n_entities,      --- number of entities to be deleted
+const <A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A> *entities         --- entities to be deleted
+)
+</B>
+<A NAME="description"></A>
+<I>This function deletes the given entities.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_wrong_entity           (MILD) some entity is of a class for which
+                                    deletion is not allowed
+    PK_ERROR_still_referenced       (SERIOUS) some entity cannot be deleted
+                                    since it is still referenced by an entity
+                                    not in the given array
+
+<A NAME="documentation"></A>
+The classes of entities for which deletion is allowed are:
+
+    PK_CLASS_assembly
+    PK_CLASS_attrib
+    PK_CLASS_body
+    PK_CLASS_curve
+    PK_CLASS_group
+    PK_CLASS_instance
+    PK_CLASS_ki_list
+    PK_CLASS_lattice
+    PK_CLASS_point
+    PK_CLASS_surf
+    PK_CLASS_transf
+
+Deleting a group does not delete the entities it contains.
+
+If a body or assembly is instanced it can not be deleted unless that instance
+is included in the array.
+
+Deleting a compound body deletes all its children.
+
+If a geometric entity is used in the definition of another geometric
+entity (e.g. base surface of an offset), then it may not be deleted unless that
+other entity is included in the array.
+
+Geometric entities attached to faces, edges or vertices will be detached before
+deletion. When deleting geometric entities, their geometric dependents will
+also be deleted if they no longer have any geometric or topological owners.
+
+The error PK_ERROR_still_referenced is raised with severity PK_ERROR_mild if
+no entities have been deleted, but with a severity of PK_ERROR_serious if
+some entities have been deleted.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

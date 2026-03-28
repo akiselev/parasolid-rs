@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_THREAD_chain_start</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_THREAD_chain_start</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_THREAD_chain_start
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_thread_chain_type_t.html>PK_THREAD_chain_type_t</A>           type,
+const <A HREF=../headers/pk_thread_chain_start_o_t.html>PK_THREAD_chain_start_o_t</A> *options
+)
+</B>
+<A NAME="description"></A>
+<I>This function starts chaining Parasolid functions in the calling thread.
+The exclusivity of this function is dynamic and corresponds with the value
+of <B>'type'</B>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_not_stopped        Chaining has already been started (MILD)
+    PK_ERROR_recursion_depth    Called within an outer PK or KI function (MILD)
+
+<A NAME="documentation"></A>
+A chain is a set of multiple, contiguous Parasolid functions called from a
+single application thread, which has the same application thread protection as
+a single Parasolid function. It can improve performance at the cost of
+responsiveness.
+
+Chains can consist of a single link containing all functions or can be split
+into multiple shorter links, each containing one or more functions. This
+allows other application threads to execute any other Parasolid functions
+between links.
+
+A chain starts from when this function is entered until <A HREF=../headers/pk_thread_chain_stop.html>PK_THREAD_chain_stop</A>
+is called in this thread, with all intermediate Parasolid functions chained.
+If the option <B>'length'</B> is specified and is &gt; 0, then chains will be split so
+that at most that number of Parasolid functions will be in each link.
+
+Whilst in a thread chain, threads cannot lock or unlock partitions, and
+applications should avoid waiting for other threads that can call Parasolid.
+
+A thread with locked partitions may start a thread chain. However, if it is
+an exclusive thread chain, it will exclude all other threads, including those
+with locked partitions.
+
+Only outermost Parasolid functions are counted in a chain. PK functions that
+are never counted in a chain are:
+    <A HREF=../headers/pk_memory_alloc.html>PK_MEMORY_alloc</A>
+    <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>
+    <A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A>
+    <A HREF=../headers/pk_session_ask_function.html>PK_SESSION_ask_function</A>
+    <A HREF=../headers/pk_session_ask_kernel_version.html>PK_SESSION_ask_kernel_version</A>
+    <A HREF=../headers/pk_session_ask_schema_version.html>PK_SESSION_ask_schema_version</A>
+    <A HREF=../headers/pk_session_is_in_kernel.html>PK_SESSION_is_in_kernel</A>
+    <A HREF=../headers/pk_session_is_in_kernel_2.html>PK_SESSION_is_in_kernel_2</A>
+    <A HREF=../headers/pk_session_register.html>PK_SESSION_register</A>
+    <A HREF=../headers/pk_session_tidy.html>PK_SESSION_tidy</A>
+    <A HREF=../headers/pk_thread_ask_exclusion.html>PK_THREAD_ask_exclusion</A>
+    <A HREF=../headers/pk_thread_ask_function.html>PK_THREAD_ask_function</A>
+    <A HREF=../headers/pk_thread_ask_id.html>PK_THREAD_ask_id</A>
+    <A HREF=../headers/pk_thread_clear_exclusion.html>PK_THREAD_clear_exclusion</A>
+    <A HREF=../headers/pk_thread_is_in_chain.html>PK_THREAD_is_in_chain</A>
+    <A HREF=../headers/pk_thread_is_in_kernel.html>PK_THREAD_is_in_kernel</A>
+    <A HREF=../headers/pk_thread_tidy.html>PK_THREAD_tidy</A>
+    Any of the PK memory freeing functions ending in _f
+
+The functions listed above can be called at any time by any thread during
+chaining without being excluded.
+
+This function can only be called when the modeller is started.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

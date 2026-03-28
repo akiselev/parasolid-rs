@@ -1,0 +1,159 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_section_with_surf</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_section_with_surf</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_BODY_section_with_surf
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                  target,        --- Body to be sectioned by surface
+<A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                  surface,       --- Sectioning surface [PF]
+const <A HREF=../headers/pk_body_section_o_t.html>PK_BODY_section_o_t</A> *options,       --- Sectioning options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_section_r_t.html>PK_section_r_t</A>      *const results        --- front/back faces/bodies
+)
+</B>
+<A NAME="description"></A>
+<I>This function sections the target body with the tool surface.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_contradictory_request      Bad combination of options or
+                                        data for type of boolean
+    PK_ERROR_missing_geom               Target or tool has incomplete
+                                        geometry
+    PK_ERROR_wrong_surface              Surface not a plane or cylinder
+    PK_ERROR_wire_body                  Tool is a wire body, or target is
+                                        a wire body and general topology
+                                        is not enabled
+    PK_ERROR_partial_coi_found          Boolean failure due to to partial
+                                        coincidence
+    PK_ERROR_non_manifold               Non-manifold result
+    PK_ERROR_boolean_failure            Inconsistent arguments, or
+                                        internal error
+    PK_ERROR_general_body               Tool is a general body, or target is
+                                        a general body and general topology
+                                        is not enabled
+    PK_ERROR_bad_combination            A mixture of facet and classic geometry
+                                        has been supplied
+
+
+<A NAME="documentation"></A>
+
+Introduction
+The given target body is sectioned with the given tool surface. If the
+<B>'target'</B> has classic geometry, the tool surface may be of class
+PK_CLASS_plane or PK_CLASS_cylinder; if it has facet geometry, the tool
+surface may be of class PK_CLASS_plane or PK_CLASS_mesh.
+
+When the section surface intersects with the target body, the body will
+be split, by the section surface, into two or more parts. The resulting
+bodies are split into two lists, those in front of the section surface
+and those behind it. These bodies are returned in the <B>'front_bodies'</B> and
+<B>'back_bodies'</B> arrays of the <B>'results'</B> structure. All new faces associated
+with these bodies which lie in the sectioning surface are returned in the
+<B>'front_faces'</B> and <B>'back_faces'</B> arrays of the <B>'results'</B> structure.
+
+The front of the section surface is regarded as the side to which the
+surface normal points.
+
+Target bodies, or disjoint components of the target body, that do not
+clash with the section surface will be left unchanged. It is not defined
+whether they will be returned in the front_bodies or in the back_bodies
+array.
+
+The operation of the surface sectioning function may be controlled via
+an option structure passed to the function as an input argument.
+
+This function operates similarly to the <B>'<A HREF=../headers/pk_body_boolean.html>PK_BODY_boolean</A>'</B> function,
+especially with regard to the phases of the boolean algorithm,
+rules concerning tag persistence and error reporting. Refer to
+the <B>'<A HREF=../headers/pk_body_boolean.html>PK_BODY_boolean</A>'</B> documentation for information about these
+subjects.
+
+
+Section Options
+The function can be instructed, via the <B>'fence'</B> option, to :
+
+o Only calculate the bodies and faces in front of the section surface.
+o Only calculate the bodies and faces behind the section surface.
+o Calculate the bodies and faces in front and behind the section surface.
+
+
+Returned Arguments
+Refer to the <B>'<A HREF=../headers/pk_section_r_t.html>PK_section_r_t</A>'</B> documentation for information
+about the arrays returned in the <B>'results'</B> structure.
+
+
+Sectioning with Generalised Topology Enabled
+If generalised topology is enabled, Parasolid will perform sections on a
+general target body and will allow any resultant body or bodies to be general.
+
+When a target face is coincident with the section sheet, its behaviour
+depends on the solidity of its neighbouring regions. If one of the face's
+neighbouring regions is solid and the other is void, then the face will
+appear only on the side of the section where its solid region lies. But if
+both of its neighbouring regions have the same solidity (i.e. they are both
+solid or both void), or if the face is surrounded on both sides by the same
+region, then the face will be copied. If the normals of the target face and
+the section sheet are parallel then the original face will appear in the
+front body and the copy will appear in the back body. Otherwise (if the
+normals of the target face and the section sheet are antiparallel) then
+the copy will appear in the front body and the original face will appear
+in the back body.
+
+If a component of the target body is not sectioned by the surface,
+a <A HREF=../headers/pk_report_r_t.html>PK_REPORT_r_t</A> will be produced, with report record(s) of type
+<A HREF=../headers/pk_report_record_1_t.html>PK_REPORT_record_1_t</A>. The report status will be <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_cut_no_clash_c</A>.
+
+
+Option Restrictions
+The following options within the input <B>'options'</B> are
+ignored by this function :
+    o <B>'check_fa'</B>
+    o <B>'default_tol'</B>
+    o <B>'max_tol'</B>
+    o <B>'tracking'</B>
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

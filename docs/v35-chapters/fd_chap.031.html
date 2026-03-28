@@ -1,0 +1,3433 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Checking</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Checking</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.030.html">Clash Detection Of Bodies</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.032.html">Introduction To Manipulating Topology</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-294718">30.1	Introduction </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-294732">30.2	How checking works </A>
+<UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-295064">30.2.1	The number of faults to be returned </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-295072">30.2.2	Enhancing the faults returned </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-295138">30.2.3	Checking system attributes </A>
+<UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-295157">30.2.3.1	What checks are performed </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-295184">30.2.3.2	Checking system attributes during general checks </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-295204">30.2.3.3	Checking only system attributes </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-295247">30.2.3.4	Checking system attributes when setting specific fields </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-295254">30.3	What the return tokens mean </A>
+<UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-378560">30.3.1	Additional information for bodies with corrupt data structures </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296051">30.3.2	Faults associated with checking system attributes </A>
+</UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296116">30.4	Local checking </A>
+<UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296873">30.4.1	Face-face checks </A>
+</UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296898">30.5	When to use checking </A>
+<UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296919">30.5.1	Sweeping and spinning </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296931">30.5.2	Blending vertices on sheet and wire bodies </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296938">30.5.3	Creating curves and surfaces </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296949">30.5.4	How applications should use checking </A>
+</UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296956">30.6	Other checking options </A>
+<UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296960">30.6.1	Argument checking </A>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296970">30.6.2	Geometric self-intersection checking </A>
+<UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-296990">30.6.2.1	Geometric self-intersection checking of offset surfaces </A>
+</UL>
+<LI> <A HREF="fd_chap.031.html#50422100_pgfId-297007">30.6.3	Composite geometry checks for B-curves and B-surfaces </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422100_pgfId-294718"></A>30.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422100_pgfId-320828"></A>Parasolid assumes that any bodies you are working with are valid. Most functions do not check the bodies you pass to them, and do not work properly if you hand them an invalid body. Therefore it is necessary to have the ability to test the validity of a body, for which Parasolid uses either the appropriate checking function or <EM>
+local checking</EM> which is available via an argument that is part of specific functions. Both these methods are explained in more detail later in this chapter.</P>
+<P>
+<A NAME="50422100_pgfId-348647"></A>For an example of explicit validity-checking, see the code example in the <CODE>
+C++\Code Examples\Inquiries\Model Analysis\Validity</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422100_pgfId-294722"></A>The Parasolid checker is intended to:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-294723"></A>Assist in the debugging of application </LI>
+<LI>
+<A NAME="50422100_pgfId-294724"></A>Validate the results of modeling operations</LI>
+<LI>
+<A NAME="50422100_pgfId-294725"></A>Assist in the construction of valid models from imported data</LI>
+<LI>
+<A NAME="50422100_pgfId-294726"></A>Guide the user attempting to repair an invalid model</LI>
+</UL>
+<P>
+<A NAME="50422100_pgfId-294727"></A>Checking is a time-consuming operation and can be <STRONG>
+much</STRONG> slower than local checking. If you turn local checking OFF to save time when you are performing a sequence of local operations, or you want one of the intermediate operations to create an invalid body, you can call <A HREF=../headers/pk_body_check.html><A HREF=../headers/pk_body_check.html>PK_BODY_check</A></A> to check the final body. If <A HREF=../headers/pk_body_check.html><A HREF=../headers/pk_body_check.html>PK_BODY_check</A></A> indicates that the body is invalid then roll back to a point before the local operations, and try a different approach.</P>
+<P>
+<A NAME="50422100_pgfId-294728"></A>Local checking is a time-saving tool because, in contrast to a full body check, it only checks the features of the model that were changed by that particular operation.</P>
+<P>
+<A NAME="50422100_pgfId-358085"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-357989"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-357976"></A><A HREF="fd_chap.015.html#50422084_36760">Chapter 14, “Model Structure”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422100_pgfId-294732"></A>30.2	<A NAME="50422100_marker-294729"></A><A NAME="50422100_marker-294730"></A><A NAME="50422100_72479"></A>How checking works 
+
+
+</H1>
+<P>
+<A NAME="50422100_pgfId-294733"></A>By default, the checking functions make all the checks appropriate to the supplied entity, but the caller may control which checks are applied by supplying options to the relevant checking function. The checking functions available are listed below.</P>
+<P>
+<A NAME="50422100_pgfId-294769"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294736"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294738"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485801"></A><A HREF=../headers/pk_assembly_check.html>PK_ASSEMBLY_check</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485803"></A>check an assembly</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294741"></A><A NAME="50422100_marker-294740"></A><A HREF=../headers/pk_body_check.html>PK_BODY_check</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294743"></A>check a body</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294746"></A><A NAME="50422100_marker-294745"></A><A HREF=../headers/pk_edge_check.html>PK_EDGE_check</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294748"></A>check an edge</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294751"></A><A NAME="50422100_marker-294750"></A><A HREF=../headers/pk_face_check.html>PK_FACE_check</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294753"></A>check a face</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294756"></A><A NAME="50422100_marker-294755"></A><A HREF=../headers/pk_face_check_pair.html>PK_FACE_check_pair</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294758"></A>do face-face checks on a pair of faces</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294761"></A><A NAME="50422100_marker-294760"></A><A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294763"></A>check a point, curve, surface, or lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294766"></A><A NAME="50422100_marker-294765"></A><A HREF=../headers/pk_transf_check.html>PK_TRANSF_check</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294768"></A>check a transformation</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422100_pgfId-294770"></A>The different types of checks are performed in groups in a certain sequence, where each group of checks only proceeds if the previous checks have all passed; therefore, checks which rely on the results of previous checks are omitted if these have failed. This means that the checking functionality does not guarantee to find all the faults if there is more than one.</P>
+<P>
+<A NAME="50422100_pgfId-294771"></A>An option structure, specific to each checking function, allows you to set which checks are to be performed and how many faults are to be returned:</P>
+<P>
+<A NAME="50422100_pgfId-294842"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294774"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294776"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294778"></A>max_faults</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294782"></A>Sets an upper limit on the number of faults found. See <A HREF="fd_chap.031.html#50422100_81832">Section 30.2.1, “The number of faults to be returned”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294785"></A>geom</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294787"></A>Which if any geometry validity checks are to be performed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294789"></A>bgeom</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294791"></A>Check B-geometry continuity, yes/no.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-383769"></A>mesh</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-383771"></A>Check mesh data. See <A HREF="fd_chap.087.html#50422164_66771">Section 86.4, “Checking meshes”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294793"></A>top_geo</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294795"></A>Which if any topology geometry consistent checks are to be performed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294797"></A>size_box</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294799"></A>Check for size box violations, yes/no.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294801"></A>fa_x</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294803"></A>Check for face self-intersections, yes/no.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294805"></A>loops</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294807"></A>Check for loop consistency of faces, yes/no.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294809"></A>fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294811"></A>Check for face-face inconsistencies, yes/no.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294813"></A>sh</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294815"></A>Check for inside out or inconsistent shells, yes/no.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294817"></A>corrupt</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294819"></A>Check for corrupt data structure and identifiers, yes/no.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294821"></A>nmnl_geom</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294823"></A>Check for nominal geometry errors, yes/no.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294825"></A>returns</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294829"></A>Control the level of information returned. See <A HREF="fd_chap.031.html#50422100_42045">Section 30.2.2, “Enhancing the faults returned”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294832"></A>extra_faults</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294834"></A>Return additional information about bodies that are found to have a corrupt data structure. See <A HREF="fd_chap.031.html#50422100_42045">Section 30.2.2, “Enhancing the faults returned”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294839"></A>attribs</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294841"></A>Check for validity of system attributes.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422100_pgfId-294843"></A>The following table summarizes which options are available in which checking functions:</P>
+<P>
+<A NAME="50422100_pgfId-295055"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294846"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485852"></A>ASSEMBLY</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294848"></A>BODY</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294850"></A>EDGE</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294852"></A>FACE</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294854"></A>FACE_check_pair</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294856"></A>GEOM</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294858"></A>TRANSF</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294860"></A>max_faults</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485854"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294862"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294864"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294866"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294868"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294870"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294872"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294874"></A>geom</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485856"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294876"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294878"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294880"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294882"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294884"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294886"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294888"></A>bgeom</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485858"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294890"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294892"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294894"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294896"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294898"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294900"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-383803"></A>mesh</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485860"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-383805"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-383807"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-383809"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-383811"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-383813"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-383815"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294902"></A>top_geo</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485862"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294904"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294906"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294908"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294910"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294912"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294914"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294916"></A>size_box</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485864"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294918"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294920"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294922"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294924"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294926"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294928"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294930"></A>fa_x</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485866"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294932"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294934"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294936"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294938"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294940"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294942"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294944"></A>loops</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485868"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294946"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294948"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294950"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294952"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294954"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294956"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294958"></A>fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485870"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294960"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294962"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294964"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294966"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294968"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294970"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294972"></A>sh</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485872"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294974"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294976"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294978"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294980"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294982"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294984"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-294986"></A>corrupt</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485874"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294988"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294990"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294992"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294994"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294996"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-294998"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-295000"></A>nmnl_geom</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485876"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295002"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295004"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295006"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295008"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295010"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295012"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-295014"></A>returns</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485878"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295016"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295018"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295020"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295022"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295024"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295026"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-295028"></A>extra_faults</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485880"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295030"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295032"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295034"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295036"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295038"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295040"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-295042"></A>attribs</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-485882"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295044"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295046"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295048"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295050"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295052"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295054"></A>&nbsp;</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422100_pgfId-295056"></A>For more information on all the available options, see the documentation for <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>. </P>
+<P>
+<A NAME="50422100_pgfId-492814"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422100_pgfId-492821"></A>Note: For assemblies, geometry (including mesh) and attribute checks only apply to the assembly and its instances and not to any sub-component bodies or assemblies.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422100_pgfId-295064"></A>	30.2.1 	<A NAME="50422100_marker-295060"></A><A NAME="50422100_marker-295061"></A><A NAME="50422100_marker-295062"></A><A NAME="50422100_81832"></A>The number of faults to be returned </H3>
+<P>
+<A NAME="50422100_pgfId-295065"></A>These checking functions never return more than <CODE>
+max_faults</CODE>
+ faults. If <CODE>
+max_faults</CODE>
+ is set to zero and any fault is found, the function fails with the error PK_ERROR_check_error. The application may thereby force all check faults to cause errors. The entity in error is returned in the error standard form.</P>
+<P>
+<A NAME="50422100_pgfId-295066"></A>If <CODE>
+max_faults</CODE>
+ is set greater than zero then up to <CODE>
+max_faults</CODE>
+ check faults may be returned. <EM>
+It is not guaranteed that all faults will be found even if max_faults should be large enough.</EM> To acquire as many faults as possible, the application should set <CODE>
+max_faults</CODE>
+ to a large number, e.g. 1000.</P>
+<P>
+<A NAME="50422100_pgfId-295070"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422100_pgfId-295069"></A>Note: It is generally the case that only the most serious fault may be returned for each geometrical entity. Therefore if a surface has two or more faults (e.g., PK_GEOM_state_self_int_c and PK_BCURVE_state_close_knots_c), only one will be returned (in this case, PK_BCURVE_state_close_knots_c). For topological entities, at most one fault may be returned for each underlying geometrical entity and then an unlimited amount of faults relating to the topology itself (such as PK_EDGE_state_bad_vertex_c) provided that the total number does not exceed <CODE>
+max_faults</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422100_pgfId-295072"></A>	30.2.2 	<A NAME="50422100_42045"></A>Enhancing the faults returned </H3>
+<P>
+<A NAME="50422100_pgfId-295073"></A>You can use the <CODE>
+returns</CODE>
+ option in <A HREF=../headers/pk_body_check.html>PK_BODY_check</A>, <A HREF=../headers/pk_face_check.html>PK_FACE_check</A>, and <A HREF=../headers/pk_edge_check.html>PK_EDGE_check</A>, to enhance the fault information that is returned. This option can take the following values:</P>
+<P>
+<A NAME="50422100_pgfId-295108"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295076"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295078"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295080"></A><A HREF=../headers/pk_check_returns_t.html>PK_check_returns_latest_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295082"></A>Ensures that the information returned includes all possible enhancements. In Parasolid V30.1 and above, setting this value is the same as setting <A HREF=../headers/pk_check_returns_t.html>PK_check_returns_5_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-350055"></A><A HREF=../headers/pk_check_returns_t.html>PK_check_returns_0_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-350057"></A>Returns basic fault information. (Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-350082"></A><A HREF=../headers/pk_check_returns_t.html>PK_check_returns_1_c</A><BR>
+<A HREF=../headers/pk_check_returns_t.html>PK_check_returns_2_c</A><BR>
+<A HREF=../headers/pk_check_returns_t.html>PK_check_returns_3_c</A><BR>
+<A HREF=../headers/pk_check_returns_t.html>PK_check_returns_4_c</A><BR>
+<A HREF=../headers/pk_check_returns_t.html>PK_check_returns_5_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-350084"></A>These values return enhanced fault information in addition to the fault information for <A HREF=../headers/pk_check_returns_t.html>PK_check_returns_0_c</A>. </P>
+<P>
+<A NAME="50422100_pgfId-488784"></A>For more details on the specific information returned for each value, see <A HREF=../headers/pk_body_check_o_t.html>PK_BODY_check_o_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422100_pgfId-295109"></A>In addition, you can use the <CODE>
+extra_faults</CODE>
+ option in <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> and <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A> to return additional information about bodies that are found to have a corrupt data structure. This can take the following values:</P>
+<P>
+<A NAME="50422100_pgfId-372548"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295112"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295114"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295116"></A><A HREF=../headers/pk_check_extra_faults_t.html>PK_check_extra_faults_latest_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295118"></A>Ensures that the information returned includes all possible enhancements. In Parasolid V23.0 and above, setting this value is the same as setting <A HREF=../headers/pk_check_extra_faults_t.html>PK_check_extra_faults_1_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295123"></A><A HREF=../headers/pk_check_extra_faults_t.html>PK_check_extra_faults_1_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295125"></A>Return additional information when a corrupt data structure is detected. If this value is used, a wide range of return tokens may be used instead of PK_BODY_state_corrupt_c (<A HREF=../headers/pk_body_check.html>PK_BODY_check</A>) and PK_ENTITY_state_invalid_c (<A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>). </P>
+<P>
+<A NAME="50422100_pgfId-295128"></A>See the documentation for <A HREF=../headers/pk_body_check_o_t.html>PK_BODY_check_o_t</A> and <A HREF=../headers/pk_geom_check_o_t.html>PK_GEOM_check_o_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for complete details on the additional faults that may be returned. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295132"></A><A HREF=../headers/pk_check_extra_faults_t.html>PK_check_extra_faults_0_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-382231"></A>Do not return additional information about corrupt bodies. This is the default.</P>
+<P>
+<A NAME="50422100_pgfId-363667"></A>See the documentation for <A HREF=../headers/pk_body_check_o_t.html>PK_BODY_check_o_t</A> and <A HREF=../headers/pk_geom_check_o_t.html>PK_GEOM_check_o_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for complete details on the additional faults that may be returned.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422100_pgfId-295136"></A>See <A HREF="fd_chap.031.html#50422100_10183">Section 30.3, “What the return tokens mean”</A>, for more information on the tokens returned. </P>
+
+
+<H3>
+<A NAME="50422100_pgfId-295138"></A>	30.2.3 	<A NAME="50422100_10952"></A>Checking system attributes </H3>
+<P>
+<A NAME="50422100_pgfId-295139"></A>System attributes can be checked for validity in one of the following ways:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-295140"></A>As part of a call to one of the general checking functions</LI>
+<LI>
+<A NAME="50422100_pgfId-295141"></A>Via a specific call to <A HREF=../headers/pk_entity_check_attribs.html>PK_ENTITY_check_attribs</A></LI>
+<LI>
+<A NAME="50422100_pgfId-295142"></A>When setting a specific field in a system attribute</LI>
+</UL>
+<P>
+<A NAME="50422100_pgfId-295143"></A>This section explains what checks are performed in these situations, and describes how you can control system attribute checking to suit your needs. </P>
+<P>
+<A NAME="50422100_pgfId-295150"></A>See <A HREF="fd_chap.095.html#50422174_42241" CLASS="XRef">Chapter 94, “Attribute Definitions”</A>, and <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A>, to learn more about how to use attributes. See <A HREF="fd_chap.123.html#50422206_11003">Appendix A, “System Attribute Definitions”</A>, for a description of the standard system-wide attributes that are provided by Parasolid.</P>
+
+<H4>
+<A NAME="50422100_pgfId-295157"></A>30.2.3.1 What checks are performed </H4>
+<P>
+<A NAME="50422100_pgfId-295161"></A>When checking system attributes, the following checks can be performed. Parasolid automatically performs the relevant checks according to the information being checked. </P>
+<P>
+<A NAME="50422100_pgfId-295183"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295164"></A>Check</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295166"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295168"></A>Validity of string fields.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295170"></A>Checks that all string fields of system attributes are valid (such that they contain no characters that cannot be exported as part of a text format XT transmit file).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295172"></A>Validity of numerical values.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295174"></A>Checks that all numerical data fields of system attributes are valid, in cases where that field has a definable range of valid values. For example, this check ensures that the real numerical field of the SDL/TYSA_DENSITY attribute is not negative.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295176"></A>Validity of length of supplied data arrays.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295178"></A>Checks that the correct amount of data is supplied for each data array in a system attribute. For example:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-295179"></A>The real field of SDL/TYSA_DENSITY should have one value.</LI>
+<LI>
+<A NAME="50422100_pgfId-295180"></A>The real field of SDL/TYSA_HATCHING should have four values.</LI>
+<LI>
+<A NAME="50422100_pgfId-295181"></A>The real field of SDL/TYSA_PLANAR_HATCHING should have any multiple of seven values.</LI>
+</UL>
+<P>
+<A NAME="50422100_pgfId-295182"></A>This also checks that required fields are not empty. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422100_pgfId-295184"></A>30.2.3.2 Checking system attributes during general checks </H4>
+<P>
+<A NAME="50422100_pgfId-295185"></A>If you are performing a general check on one or more entities, using one of the functions <A HREF=../headers/pk_assembly_check.html>PK_ASSEMBLY_check</A>, <A HREF=../headers/pk_body_check.html>PK_BODY_check</A>, <A HREF=../headers/pk_edge_check.html>PK_EDGE_check</A>, <A HREF=../headers/pk_face_check.html>PK_FACE_check</A>, or <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>, you can use the <CODE>
+attribs</CODE>
+ option to check the validity of system attributes attached to those entities. This option takes the following values:</P>
+<P>
+<A NAME="50422100_pgfId-295199"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295188"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295190"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295192"></A><A HREF=../headers/pk_check_attribs_t.html>PK_check_attribs_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295194"></A>Do not check system attributes. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295196"></A><A HREF=../headers/pk_check_attribs_t.html>PK_check_attribs_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295198"></A>Perform checks on any system attributes attached to any of the entities being checked. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422100_pgfId-295203"></A>See <A HREF="fd_chap.031.html#50422100_17904">Section 30.3.2, “Faults associated with checking system attributes”</A>, for a list of the faults that may be returned when <CODE>
+attribs</CODE>
+ is <A HREF=../headers/pk_check_attribs_t.html>PK_check_attribs_yes_c</A>.</P>
+
+
+<H4>
+<A NAME="50422100_pgfId-295204"></A>30.2.3.3 Checking only system attributes </H4>
+<P>
+<A NAME="50422100_pgfId-295205"></A>You can also check the system attributes attached to a group of entities, without performing other types of checks. To do this use <A HREF=../headers/pk_entity_check_attribs.html>PK_ENTITY_check_attribs</A>. This function receives the following arguments:</P>
+<P>
+<A NAME="50422100_pgfId-295229"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295208"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295210"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-295212"></A>entity</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295214"></A>The entity whose system attributes you want to check.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-295216"></A>attdef</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295218"></A>Use this argument to check only a specific type of system attribute. </P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-295219"></A>To check all system attributes attached to the given <CODE>
+entity</CODE>
+, set this to PK_ENTITY_null. </LI>
+<LI>
+<A NAME="50422100_pgfId-295220"></A>To check a specific type of system attribute, set this to the attribute definition of the system attribute you want to check. </LI>
+</UL>
+<P>
+<A NAME="50422100_pgfId-295221"></A>Use <A HREF=../headers/pk_attdef_find.html>PK_ATTDEF_find</A> to find the attribute definition for a system attribute. All system attributes have names that start with “SDL/TY”. See <A HREF="fd_chap.123.html#50422206_11003">Appendix A, “System Attribute Definitions”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422100_pgfId-295226"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295228"></A>A set of options.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422100_pgfId-295230"></A>If the <CODE>
+check_sub</CODE>
+ option is PK_LOGICAL_true, then any sub-entities of the given entity are also checked, according to the hierarchy shown in <A HREF="fd_chap.031.html#50422100_10027"><EM>
+Figure 30-1</EM></A>. For example if <CODE>
+entity</CODE>
+ is a loop, then when <CODE>
+check_sub</CODE>
+ is PK_LOGICAL_true, Parasolid checks the loop, its fins, edges, and vertices, any curves attached to the fins or edges, and any points attached to the vertices. </P>
+<P>
+<A NAME="50422100_pgfId-295240"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-222.gif">
+
+<P>
+<A NAME="50422100_pgfId-295242"></A>Figure 30-1 <A NAME="50422100_10027"></A>Entity hierarchy used when checking system attributes on sub-entities</P>
+<P>
+<A NAME="50422100_pgfId-295243"></A>Like other checking functions, <A HREF=../headers/pk_entity_check_attribs.html>PK_ENTITY_check_attribs</A> returns a structure containing return tokens that describe any faults found. See <A HREF="fd_chap.031.html#50422100_17904">Section 30.3.2, “Faults associated with checking system attributes”</A>, for a list of the faults that may be returned .</P>
+
+
+<H4>
+<A NAME="50422100_pgfId-295247"></A>30.2.3.4 Checking system attributes when setting specific fields </H4>
+<P>
+<A NAME="50422100_pgfId-295248"></A>System attributes are automatically checked when you set the information in the attributes themselves. Checks are made when setting system attribute values using any of the following functions: <A HREF=../headers/pk_attrib_set_ints.html>PK_ATTRIB_set_ints</A>, <A HREF=../headers/pk_attrib_set_named_ints.html>PK_ATTRIB_set_named_ints</A>, <A HREF=../headers/pk_attrib_set_doubles.html>PK_ATTRIB_set_doubles</A>, <A HREF=../headers/pk_attrib_set_named_doubles.html>PK_ATTRIB_set_named_doubles</A>, <A HREF=../headers/pk_attrib_set_string.html>PK_ATTRIB_set_string</A>, <A HREF=../headers/pk_attrib_set_named_string.html>PK_ATTRIB_set_named_string</A>, <A HREF=../headers/pk_attrib_set_ustring.html>PK_ATTRIB_set_ustring</A>, <A HREF=../headers/pk_attrib_set_named_ustring.html>PK_ATTRIB_set_named_ustring</A>, <A HREF=../headers/pk_attrib_set_vectors.html>PK_ATTRIB_set_vectors</A>, <A HREF=../headers/pk_attrib_set_named_vectors.html>PK_ATTRIB_set_named_vectors</A>, <A HREF=../headers/pk_attrib_set_axes.html>PK_ATTRIB_set_axes</A>, <A HREF=../headers/pk_attrib_set_named_axes.html>PK_ATTRIB_set_named_axes</A>, <A HREF=../headers/pk_attrib_set_pointers.html>PK_ATTRIB_set_pointers</A>, <A HREF=../headers/pk_attrib_set_named_pointers.html>PK_ATTRIB_set_named_pointers</A>, </P>
+<P>
+<A NAME="50422100_pgfId-295249"></A>In these cases, only the checks relevant to the type of field being set are called. For example a call to <A HREF=../headers/pk_attrib_set_doubles.html>PK_ATTRIB_set_doubles</A> does not perform checks for the validity of string fields. </P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422100_pgfId-295254"></A>30.3	<A NAME="50422100_marker-295250"></A><A NAME="50422100_marker-295251"></A><A NAME="50422100_marker-295252"></A><A NAME="50422100_10183"></A>What the return tokens mean 
+
+
+</H1>
+<P>
+<A NAME="50422100_pgfId-295255"></A>Entities may fail the checker for a number of reasons; not all of these mean that the entity is completely corrupt and no longer suitable for modeling. This section provides additional detail on each of the fault types, except for those that get returned when the <CODE>
+expand</CODE>
+ option is used, and suggestions on what should be done in each case.</P>
+<P>
+<A NAME="50422100_pgfId-295256"></A>Most modeling operations continue to work on a body that has failed the check in a local fashion (e.g. with one invalid face, edge, or piece of geometry) so long as the offending area is not directly involved in the operation. Often the best way to salvage such a body is to remove the offending entities altogether with a local operation or boolean.</P>
+<P>
+<A NAME="50422100_pgfId-295257"></A>Similarly, many modeling operations work on a body which has failed the face-face inconsistency check (for instance, if regions interpenetrate), although the hidden-line algorithm may fail; and mass properties calculations may give misleading answers.</P>
+<P>
+<A NAME="50422100_pgfId-295267"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422100_pgfId-372416"></A>Note: As mentioned in <A HREF="fd_chap.031.html#50422100_42045">Section 30.2.2, “Enhancing the faults returned”</A>, if you set the <CODE>
+extra_faults</CODE>
+ option in <A HREF=../headers/pk_body_check.html><A HREF=../headers/pk_body_check.html>PK_BODY_check</A></A> or <A HREF=../headers/pk_geom_check.html><A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A></A> to anything other than <A HREF=../headers/pk_check_extra_faults_t.html>PK_check_extra_faults_0_c</A> (Default), then other more specific tokens may be returned instead of PK_BODY_state_corrupt_c (<A HREF=../headers/pk_body_check.html><A HREF=../headers/pk_body_check.html>PK_BODY_check</A></A>) and PK_ENTITY_state_invalid_c (<A HREF=../headers/pk_geom_check.html><A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A></A>). </ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422100_pgfId-364974"></A>See <A HREF="fd_chap.031.html#50422100_30453">Section 30.3.1, “Additional information for bodies with corrupt data structures”</A>, for details of the tokens that may be returned when using this option in <A HREF=../headers/pk_body_check.html>PK_BODY_check</A>. </ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422100_pgfId-380140"></A>See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on the tokens that may be returned when using this option in <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422100_pgfId-295610"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295270"></A>Fault state</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295272"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295277"></A><A NAME="50422100_marker-491643"></A><A NAME="50422100_marker-491644"></A><A NAME="50422100_marker-491645"></A>Corrupt data structures</P>
+<P>
+<A NAME="50422100_pgfId-295278"></A>PK_ASSEMBLY_state_corrupt_c<BR>
+PK_BB_state_corrupt_c<BR>
+PK_BODY_state_corrupt_c<BR>
+PK_GEOM_state_corrupt_c<BR>
+PK_PARTITION_state_corrupt_c<BR>
+PK_SESSION_state_corrupt_c<BR>
+PK_TRANSF_state_corrupt_c<BR>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295280"></A>The returned entity is corrupt. This can happen if the caller does not roll back after a modeling error (e.g. a boolean failure); otherwise it usually means a serious bug in Parasolid, which should be reported, although occasionally it may be caused by an invalid sequence of calls to the PK interface. The caller must roll back or restart the modeler (<A NAME="50422100_marker-491650"></A><A HREF=../headers/pk_entity_delete.html>PK_ENTITY_delete</A> sometimes fails on corrupt parts).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-492046"></A>Cyclic references</P>
+<P>
+<A NAME="50422100_pgfId-492081"></A>PK_ASSEMBLY_state_cyclic_ref_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-492048"></A>The assembly is self-referencing.This can happen if the assembly has at least one instance with a child part that is ultimately a parent, making the assembly graph cyclical. </P>
+<P>
+<A NAME="50422100_pgfId-492484"></A>If this fault occurs in assemblies created in Parasolid, it should be reported as a serious bug in Parasolid.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295287"></A><A NAME="50422100_marker-491652"></A><A NAME="50422100_marker-491653"></A><A NAME="50422100_marker-491654"></A><A NAME="50422100_marker-491655"></A>Invalid or duplicate identifiers</P>
+<P>
+<A NAME="50422100_pgfId-295288"></A>PK_BODY_state_invalid_ident_c</P>
+<P>
+<A NAME="50422100_pgfId-491989"></A>PK_ASSEMBLY_state_invalid_id_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295291"></A>This fault can be corrected by calling <A NAME="50422100_marker-491660"></A><A HREF=../headers/pk_part_rectify_identifiers.html>PK_PART_rectify_identifiers</A>.</P>
+<P>
+<A NAME="50422100_pgfId-295293"></A>If this fault occurs in bodies or assemblies created wholly in later versions of Parasolid, or after <A HREF=../headers/pk_part_rectify_identifiers.html>PK_PART_rectify_identifiers</A> has been called on any body, it should be reported as a serious bug in Parasolid. However, it should not cause problems unless the application is using identifiers and relying on their uniqueness.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295298"></A><A NAME="50422100_marker-491663"></A><A NAME="50422100_marker-491664"></A><A NAME="50422100_marker-491665"></A>Missing geometry</P>
+<P>
+<A NAME="50422100_pgfId-295299"></A>PK_TOPOL_state_no_geom_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295301"></A>This can arise naturally after local operations, or if geometry has been explicitly deleted or detached; there are several ways to remedy the situation (e.g. <A NAME="50422100_marker-491670"></A><A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A>, <A NAME="50422100_marker-491671"></A><A HREF=../headers/pk_face_attach_surf_fitting.html>PK_FACE_attach_surf_fitting</A>).</P>
+<P>
+<A NAME="50422100_pgfId-295304"></A>Bodies that are invalid because of missing geometry are identified as such by the checker. You create a body like this in the process of making a sheet by scribing lines on a wire body. When the wire is closed you have a sheet with edge geometry. <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> detects this, and the problem can be rectified using <A HREF=../headers/pk_face_attach_surf_fitting.html>PK_FACE_attach_surf_fitting</A> to create a surface for one of the faces.</P>
+<P>
+<A NAME="50422100_pgfId-295305"></A>A body with missing geometry can be manipulated by most local operations (see <A HREF="fd_chap.063.html#50422138_22949">Chapter 62, “Overview of Editing Models”</A>), provided the parts of the body which are changed have geometry attached. Boolean operations cannot be performed on bodies with missing geometry, and in general, care is needed in their manipulation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295312"></A><A NAME="50422100_marker-491678"></A><A NAME="50422100_marker-491679"></A>Invalid geometry</P>
+<P>
+<A NAME="50422100_pgfId-295313"></A>PK_ENTITY_state_invalid_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295315"></A>This can happen if geometry is constructed incorrectly with parameter checking switched off (see <A HREF=../headers/pk_session_set_check_arguments.html>PK_SESSION_set_check_arguments</A>). It is usually possible to rescue the model by deleting the offending geometry and replacing it with valid geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295320"></A><A NAME="50422100_marker-491685"></A><A NAME="50422100_marker-491686"></A><A NAME="50422100_marker-491687"></A>Self-intersecting geometry or degenerate geometry</P>
+<P>
+<A NAME="50422100_pgfId-295321"></A>PK_GEOM_state_self_int_c, PK_GEOM_state_degenerate_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295323"></A>These can happen if geometry is created with self-intersection checking switched off (see <A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>); again, it is best to replace the offending geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295328"></A><A NAME="50422100_marker-491693"></A><A NAME="50422100_marker-491694"></A><A NAME="50422100_marker-491695"></A>Geometry not G1-continuous, or fails other composite geometry checks</P>
+<P>
+<A NAME="50422100_pgfId-295329"></A>PK_TOPOL_state_not_G1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295331"></A>This can happen if the composite geometry checks are switched off (see <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A>) when the geometry is attached to topology; some modeling operations may work with the offending geometry, but it is best to replace it if possible.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295333"></A>Geometry is closed but not periodic</P>
+<P>
+<A NAME="50422100_pgfId-295334"></A>PK_TOPOL_state_bad_closed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295336"></A>Like PK_TOPOL_state_not_G1_c, this can happen if the composite geometry checks are switched off (see <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A>) when the geometry is attached to topology; some modeling operations may work with the offending geometry, but it is best to replace it if possible. It is returned only when enhanced fault reporting is switched on using the <CODE>
+returns</CODE>
+ option as described in <A HREF="fd_chap.031.html#50422100_42045">Section 30.2.2</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295341"></A>Topology’s geometry has an invalid degeneracy</P>
+<P>
+<A NAME="50422100_pgfId-295342"></A>PK_TOPOL_state_u_parm_degen_c<BR>
+PK_TOPOL_state_v_parm_degen_c<BR>
+PK_TOPOL_state_parm_degen_c<BR>
+PK_TOPOL_state_u_phys_degen_c<BR>
+PK_TOPOL_state_v_phys_degen_c<BR>
+PK_TOPOL_state_phys_degen_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295344"></A>The geometry attached to the topology contains an invalid degeneracy. Parasolid can identify both parametric and physical degeneracies, in either the u, v or both parameters, returning the appropriate token as listed above. These tokens are returned only when enhanced fault reporting is switched on using the <CODE>
+returns</CODE>
+ option as described in <A HREF="fd_chap.031.html#50422100_42045">Section 30.2.2</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295354"></A><A NAME="50422100_marker-491720"></A><A NAME="50422100_marker-491721"></A>Open or non-periodic curve attached to ring edge</P>
+<P>
+<A NAME="50422100_pgfId-295355"></A>PK_EDGE_state_open_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295357"></A>The related edge has been turned into a ring edge by the large tolerances, leaving an open curve as the geometry. This token should not arise under normal circumstances. It indicates an internal failure which could arise, for example, if the tolerances on the edge become so large as to consume features incorrectly. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295361"></A><A NAME="50422100_marker-491727"></A><A NAME="50422100_marker-491728"></A>Open or non-periodic nominal geometry attached to ring edge</P>
+<P>
+<A NAME="50422100_pgfId-295362"></A>PK_EDGE_state_open_nmnl_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295364"></A>The related edge has been turned into a ring edge by the large tolerances, leaving an open curve as the nominal geometry. This token should not arise under normal circumstances. It is similar to PK_EDGE_state_open_c, except that the problem is indicated by the nominal curve on the edge, rather than the edge itself. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295368"></A><A NAME="50422100_marker-491734"></A><A NAME="50422100_marker-491735"></A>Vertex not on curve of edge</P>
+<P>
+<A NAME="50422100_pgfId-295369"></A>PK_EDGE_state_bad_vertex_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295371"></A>This could arise as a result of a tolerance mismatch, or incorrect use of <A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A>. Resetting tolerances or re-positioning the geometry should resolve the fault.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295375"></A><A NAME="50422100_marker-491741"></A><A NAME="50422100_marker-491742"></A>Vertex not on nominal geometry</P>
+<P>
+<A NAME="50422100_pgfId-295376"></A>PK_EDGE_state_bad_vertex_nmnl_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295378"></A>This token should not arise under normal circumstances, because the functions for attaching nominal geometry perform enough checks to prevent it. It indicates an internal failure in which the tolerances on the nominal geometry have become too large, and a body exhibiting this would probably have other failures. To resolve this problem, either reset the tolerances on the nominal geometry or, failing this, detach the nominal geometry from the body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295383"></A><A NAME="50422100_marker-491748"></A><A NAME="50422100_marker-491749"></A><A NAME="50422100_marker-491750"></A>Edge reversed</P>
+<P>
+<A NAME="50422100_pgfId-295384"></A>PK_EDGE_state_reversed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295386"></A>This could arise as a result of incorrect use of <A NAME="50422100_marker-491755"></A><A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A>. Detaching the curve, negating it, and re-attaching it would solve the problem.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295393"></A><A NAME="50422100_marker-491757"></A><A NAME="50422100_marker-491758"></A><A NAME="50422100_marker-491759"></A><A NAME="50422100_marker-491760"></A>Nominal geometry in wrong direction</P>
+<P>
+<A NAME="50422100_pgfId-295394"></A>PK_EDGE_state_reversed_nmnl_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295396"></A>This token should not arise under normal circumstances, because the functions for attaching nominal geometry perform enough checks to prevent it. It indicates an internal failure in which the tolerances on the nominal geometry have become too large, and a body exhibiting this would probably have other failures. To resolve this problem, either reset the tolerances on the nominal geometry or, failing this, detach the nominal geometry from the body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295400"></A><A NAME="50422100_marker-491766"></A><A NAME="50422100_marker-491767"></A>SP-curves of edge not within tolerance</P>
+<P>
+<A NAME="50422100_pgfId-295401"></A>PK_EDGE_state_bad_spcurve_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295403"></A>This could happen as a result of invalid SP-curve data, or more likely an unsuitable tolerance value on the edge, which could be resolved using <A NAME="50422100_marker-491772"></A><A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A> or <A NAME="50422100_marker-491773"></A><A HREF=../headers/pk_vertex_attach_points.html>PK_VERTEX_attach_points</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295409"></A><A NAME="50422100_marker-491775"></A><A NAME="50422100_marker-491776"></A>SP-curves not within edge’s tolerance of nominal geometry</P>
+<P>
+<A NAME="50422100_pgfId-295410"></A>PK_EDGE_state_bad_sp_nmnl_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295412"></A>This token should not arise under normal circumstances, because the functions for attaching nominal geometry perform enough checks to prevent it. It indicates an internal failure in which the tolerances on the nominal geometry have become too large, and a body exhibiting this would probably have other failures. To resolve this problem, either reset the tolerances on the nominal geometry or, failing this, detach the nominal geometry from the body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295416"></A><A NAME="50422100_marker-491782"></A><A NAME="50422100_marker-491783"></A>Vertices of edge touch</P>
+<P>
+<A NAME="50422100_pgfId-295417"></A>PK_EDGE_state_vertices_touch_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295419"></A>Again, this could be a tolerance problem or the result of incorrect use of <A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A>. Resetting tolerances or replacing the geometry of the edge or vertices should resolve the fault.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295424"></A><A NAME="50422100_marker-491789"></A><A NAME="50422100_marker-491790"></A><A NAME="50422100_marker-491791"></A>Faces incorrectly ordered at edge</P>
+<P>
+<A NAME="50422100_pgfId-295425"></A>PK_EDGE_state_bad_face_order_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295427"></A>This can only happen on a non-manifold edge. It means that the order of the faces around an edge in the topological data structure does not agree with the order of the surfaces attached to those faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-435434"></A>Polyline not valid for edge</P>
+<P>
+<A NAME="50422100_pgfId-435469"></A>PK_EDGE_state_bad_polyline_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-435744"></A>This token is returned when the set of polylines associated with an edge is inconsistent. This could be due to the polylines not being watertight or having incompatible directions.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295431"></A><A NAME="50422100_marker-491802"></A><A NAME="50422100_marker-491803"></A>Vertex not on surface of face</P>
+<P>
+<A NAME="50422100_pgfId-295432"></A>PK_FACE_state_bad_vertex_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295434"></A>This could arise as a result of a tolerance mismatch, or incorrect use of <A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A> or <A HREF=../headers/pk_vertex_attach_points.html>PK_VERTEX_attach_points</A>. Resetting tolerances or re-positioning the geometry should resolve the fault.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295440"></A><A NAME="50422100_marker-491809"></A><A NAME="50422100_marker-491810"></A><A NAME="50422100_marker-491811"></A><A NAME="50422100_marker-491812"></A>Edge not on surface of face</P>
+<P>
+<A NAME="50422100_pgfId-295441"></A>PK_FACE_state_bad_edge_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295443"></A>This could arise as a result of a tolerance mismatch, or incorrect use of <A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A> or <A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A>. Resetting tolerances or re-positioning the geometry should resolve the fault.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295448"></A><A NAME="50422100_marker-491818"></A><A NAME="50422100_marker-491819"></A><A NAME="50422100_marker-491820"></A>Self-intersecting face (i.e. edge/edge inconsistency)</P>
+<P>
+<A NAME="50422100_pgfId-295449"></A>PK_FACE_state_self_int_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295451"></A>This could arise as a result of a local operation which produces a self-intersecting body. Further local operations to remove the self-intersection, or a subsequent modeling operation which destroys the offending face, should resolve the fault.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295456"></A><A NAME="50422100_marker-491826"></A><A NAME="50422100_marker-491827"></A><A NAME="50422100_marker-491828"></A>Edges incorrectly ordered at vertex</P>
+<P>
+<A NAME="50422100_pgfId-295457"></A>PK_FACE_state_bad_edge_order_c<BR>
+PK_EDGE_state_bad_order_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295459"></A>This could arise as a result of incorrect use of <A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A>. Re-attaching the curves so that their edges are correctly ordered around the vertex should resolve the fault.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295464"></A><A NAME="50422100_marker-491834"></A><A NAME="50422100_marker-491835"></A><A NAME="50422100_marker-491836"></A>Loops inconsistent</P>
+<P>
+<A NAME="50422100_pgfId-295465"></A>PK_FACE_state_bad_loops_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295467"></A>This could arise as a result of incorrect use of <A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A> or <A NAME="50422100_marker-491841"></A><A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>. It means either that the directions of the loops in the face are wrong, or that the number and types of loops in the face are inconsistent with the surface type.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295470"></A>Face redundant</P>
+<P>
+<A NAME="50422100_pgfId-295471"></A>PK_FACE_state_redundant_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295473"></A>The face created is redundant with respect to tolerances. This could arise as a result of incorrect use of <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>. No entities are returned with this token. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295475"></A>Direction of loop inconsistent</P>
+<P>
+<A NAME="50422100_pgfId-295476"></A>PK_CURVE_state_inconsistent_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295478"></A>The direction of the curves supplied for a loop are inconsistent. This could arise as a result of incorrect use of <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>. No entities are returned with this token. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295480"></A>Invalid loop</P>
+<P>
+<A NAME="50422100_pgfId-295481"></A>PK_LOOP_state_invalid_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295483"></A>The combination of loops formed by the curves does not form a valid face on the supplied surface. This could arise as a result of incorrect use of <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>. No entities are returned with this token. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295488"></A><A NAME="50422100_marker-491858"></A><A NAME="50422100_marker-491859"></A><A NAME="50422100_marker-491860"></A>Missing vertex at surface singularity</P>
+<P>
+<A NAME="50422100_pgfId-295489"></A>PK_FACE_state_no_vtx_at_sing_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295491"></A>This could arise as a result of incorrect use of <A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A>. The problem could be avoided by introducing the surface into the model in a different way (e.g. <A NAME="50422100_marker-491865"></A><A HREF=../headers/pk_surf_make_sheet_body.html>PK_SURF_make_sheet_body</A>).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295494"></A>Wire-frame edge/face inconsistency</P>
+<P>
+<A NAME="50422100_pgfId-295495"></A>PK_FACE_state_bad_wire_fa_ed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295497"></A>This could arise as a result of incorrect use of <A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A> or <A NAME="50422100_marker-491871"></A><A HREF=../headers/pk_face_imprint_curves_2.html>PK_FACE_imprint_curves_2</A> on a general body. It means that a wire-frame edge intersects a face other than at a vertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295500"></A>Wire-frame edge/wire-frame edge inconsistency</P>
+<P>
+<A NAME="50422100_pgfId-295501"></A>PK_EDGE_state_bad_wire_ed_ed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295503"></A>This could arise as a result of incorrect use of <A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A> or <A HREF=../headers/pk_face_imprint_curves_2.html>PK_FACE_imprint_curves_2</A> (with local checking turned off) on a wire or general body. It means that two wire-frame edges intersect other than at a vertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295505"></A>Touching edges inconsistency</P>
+<P>
+<A NAME="50422100_pgfId-295506"></A>PK_EDGE_state_touch_edge_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295508"></A>This could arise if two edges that share common vertices touch at a position other than at those vertices. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295511"></A><A NAME="50422100_marker-491883"></A>Size-box violation</P>
+<P>
+<A NAME="50422100_pgfId-295512"></A>PK_TOPOL_state_size_box_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295514"></A>This fault should be avoided, but does not mean that modeling operations will necessarily fail. Modeling with entities outside the size-box may often work, but is not recommended, as resolution problems are more likely to occur.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295518"></A><A NAME="50422100_marker-491889"></A><A NAME="50422100_marker-491890"></A>Face-face inconsistency</P>
+<P>
+<A NAME="50422100_pgfId-295519"></A>PK_FACE_state_bad_face_face_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295521"></A>This could arise as a result of a local operation which produces a self-intersecting body. Further local operations to remove the self-intersection, or a subsequent modeling operation which destroys the offending region, should resolve the fault.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295526"></A><A NAME="50422100_marker-491896"></A><A NAME="50422100_marker-491897"></A><A NAME="50422100_marker-491898"></A>Body is inside out</P>
+<P>
+<A NAME="50422100_pgfId-295527"></A>PK_BODY_state_inside_out_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295529"></A>This could arise as a result of incorrect use of <A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A>. Negating the body with <A NAME="50422100_marker-491903"></A><A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A> resolves the problem.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295532"></A>Item referenced by two partitions</P>
+<P>
+<A NAME="50422100_pgfId-295533"></A>PK_PARTITION_state_xref_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295535"></A>Two partitions reference a single item.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295540"></A><A NAME="50422100_marker-491910"></A><A NAME="50422100_marker-491911"></A><A NAME="50422100_marker-491912"></A>Shells of region are inconsistent</P>
+<P>
+<A NAME="50422100_pgfId-295541"></A><A HREF=../headers/pk_region_t.html>PK_REGION_state_bad_shells_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295543"></A>The checker returns this when a region itself is invalid. This could arise as a result of incorrect use of <A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A> (e.g. making a body with two positive shells). It is possible that the problem could be resolved with a local operation (deleting or tweaking the faces of one of the shells, for example).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295547"></A><A NAME="50422100_marker-491918"></A><A NAME="50422100_marker-491919"></A>Regions of body are inconsistent</P>
+<P>
+<A NAME="50422100_pgfId-295548"></A>PK_BODY_state_bad_regions_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295550"></A>The checker returns this when there is an inconsistency between regions. This could arise as a result of incorrect use of <A HREF=../headers/pk_face_attach_surfs.html><A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A></A>. It means that either the body contains more than one infinite region, or that the infinite region is not the first region. In some cases the problem may be solved using <A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A> or by <A HREF=../headers/pk_face_attach_surfs.html><A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A></A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295558"></A><A NAME="50422100_marker-491925"></A><A NAME="50422100_marker-491926"></A><A NAME="50422100_marker-491927"></A><A NAME="50422100_marker-491928"></A><A NAME="50422100_marker-491929"></A><A NAME="50422100_marker-491930"></A>Geometry/topology inconsistency in shell</P>
+<P>
+<A NAME="50422100_pgfId-295559"></A>PK_SHELL_state_bad_topol_geom_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295561"></A>This could arise as a result of incorrect use of <A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A>, it can only occur for general bodies. It means that a wire-frame edge or a face in a shell is not geometrically inside that shell.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295566"></A><A NAME="50422100_marker-491936"></A><A NAME="50422100_marker-491937"></A><A NAME="50422100_marker-491938"></A>Acorn shell/shell inconsistency</P>
+<P>
+<A NAME="50422100_pgfId-295567"></A>PK_SHELL_state_bad_sh_sh_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295569"></A>This could arise as incorrect use of <A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A>, it can only occur for general bodies. It means that an acorn shell is coincident with another shell.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295571"></A>Unspecified checker failure or checker failure during face-face check</P>
+<P>
+<A NAME="50422100_pgfId-295572"></A>PK_TOPOL_state_check_fail_c, PK_FACE_state_check_fail_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295574"></A>These fault types are used to distinguish cases where the checker itself has failed, due to an internal numerical problem. They should not be taken to mean that the body itself is invalid.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295576"></A>Unattached item</P>
+<P>
+<A NAME="50422100_pgfId-295577"></A><A HREF=../headers/pk_item_t.html>PK_ITEM_state_unattached_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295579"></A>The returned item is not attached to any owner. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295583"></A><A NAME="50422100_marker-491954"></A><A NAME="50422100_marker-491955"></A>Non-printing character used in name of attribute definition</P>
+<P>
+<A NAME="50422100_pgfId-295584"></A>PK_ATTDEF_state_bad_name_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295586"></A>This could arise if a non-printing character (such as a line feed or carriage return) is used in an attribute definition name. See <A HREF="fd_chap.095.html#50422174_42241">Chapter 94, “Attribute Definitions”</A> for a description of attribute definitions.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295591"></A>Non-printing character used in string field of attribute</P>
+<P>
+<A NAME="50422100_pgfId-295592"></A>PK_ATTRIB_state_bad_string_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295594"></A>The string field of the returned attribute is not capable of being transmitted in text XT format. This could arise if a non-printing character (such as a line feed or carriage return) is used in the string field of an attribute. See <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A>, for a description of attributes. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295602"></A><A NAME="50422100_marker-491972"></A><A NAME="50422100_marker-491973"></A><A NAME="50422100_94856"></A>B-geometry has knots closer than the allowed session angular precision</P>
+<P>
+<A NAME="50422100_pgfId-295603"></A>PK_BCURVE_state_close_knots_c, PK_BSURF_state_close_u_knots_c, PK_BSURF_state_close_v_knots_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-295605"></A>This happens when B-geometry has been created by <A HREF=../headers/pk_bcurve_create.html><A HREF=../headers/pk_bcurve_create.html>PK_BCURVE_create</A></A> or <A HREF=../headers/pk_bcurve_create.html><A HREF=../headers/pk_bcurve_create.html>PK_BCURVE_create</A></A> with knots that are closer than the session angular precision; see <A HREF="fd_chap.019.html#50422088_59502">Section 18.4.1, “B-spline data”</A> for more details.</P>
+<ADDRESS>
+<A NAME="50422100_pgfId-295609"></A>Note: If B-geometry has knots that are closer than the session angular precision, this will be reported in preference to any purely geometric problems (e.g., PK_GEOM_state_self_int_c) but not before any serious data-structure faults (such as PK_BODY_state_corrupt_c).</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422100_pgfId-378560"></A>	30.3.1 	<A NAME="50422100_30453"></A>Additional information for bodies with corrupt data structures </H3>
+<P>
+<A NAME="50422100_pgfId-378563"></A>Unless the <CODE>
+extra_faults</CODE>
+ option is <A HREF=../headers/pk_check_extra_faults_t.html>PK_check_extra_faults_0_c</A> (as described in <A HREF="fd_chap.031.html#50422100_42045">Section 30.2.2, “Enhancing the faults returned”</A>), the following tokens may be returned instead of PK_BODY_state_corrupt_c when using this option in <A HREF=../headers/pk_body_check.html>PK_BODY_check</A>. If <CODE>
+extra_faults</CODE>
+ is <A HREF=../headers/pk_check_extra_faults_t.html>PK_check_extra_faults_0_c</A>, then PK_BODY_state_corrupt_c is returned instead. All tokens are returned in the <CODE>
+state</CODE>
+ field, and all entities are returned in the <CODE>
+entity_1</CODE>
+ field, unless otherwise specified. </P>
+<P>
+<A NAME="50422100_pgfId-296049"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378567"></A>Fault state</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378569"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378581"></A>Body of wrong type</P>
+<P>
+<A NAME="50422100_pgfId-378582"></A>PK_BODY_state_bad_type_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378584"></A>The returned body is of the wrong type.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378586"></A>Body has no regions</P>
+<P>
+<A NAME="50422100_pgfId-378587"></A>PK_BODY_state_no_region_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378589"></A>The returned body has no regions. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378591"></A>Body has no shell</P>
+<P>
+<A NAME="50422100_pgfId-378592"></A>PK_BODY_state_no_shell_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378594"></A>The returned body has no shell. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378596"></A>Solid body has no regions</P>
+<P>
+<A NAME="50422100_pgfId-378597"></A>PK_BODY_state_no_solid_reg_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378599"></A>The returned body is solid but has no regions.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378601"></A>First region not void</P>
+<P>
+<A NAME="50422100_pgfId-378602"></A>PK_BODY_state_region_1_solid_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378604"></A>The returned body’s first region (<CODE>
+entity_2</CODE>
+) is not void. The first region of a body should always be the void region.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378606"></A>First shell returned is not first shell of solid region</P>
+<P>
+<A NAME="50422100_pgfId-378607"></A>PK_BODY_state_shell_not_first_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378609"></A>The first shell of the returned body is not the first shell of the body’s (solid) region (<CODE>
+entity_2</CODE>
+).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378611"></A>Wrong region returned</P>
+<P>
+<A NAME="50422100_pgfId-378612"></A>PK_BODY_state_wrong_ext_reg_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378614"></A>The returned manifold solid body has the wrong external region. In a valid body, the region of the first shell of a face in the first shell of the body (<CODE>
+entity_2</CODE>
+) should coincide with the first region of the body. However, this state indicates that this is not the case. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378616"></A>Body has wrong number of regions</P>
+<P>
+<A NAME="50422100_pgfId-378617"></A>PK_BODY_state_wrong_num_regs_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378619"></A>The returned body has the wrong number of regions.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378621"></A>Fault with fins on laminar edge </P>
+<P>
+<A NAME="50422100_pgfId-378622"></A>PK_EDGE_state_bad_fins_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378624"></A>The returned laminar edge contains faults on its attached fins. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378626"></A>Edge tolerance too small</P>
+<P>
+<A NAME="50422100_pgfId-378627"></A>PK_EDGE_state_bad_tol_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378629"></A>The returned edge has tolerance, but it is smaller than the working precision.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378631"></A>Rind edge has incorrect fins</P>
+<P>
+<A NAME="50422100_pgfId-378632"></A>PK_EDGE_state_fin_bad_ring_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378634"></A>The returned edge is a ring edge (i.e. has no vertex) but the returned fin (<CODE>
+entity_2</CODE>
+) has a next or previous fin of the edge which is not a fin of this ring edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378636"></A>Next edge has incorrect fin</P>
+<P>
+<A NAME="50422100_pgfId-378637"></A>PK_EDGE_state_fin_ed_next_pos_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378639"></A>The next fin of the returned edge has the same sense as the returned fin (<CODE>
+entity_2</CODE>
+).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378641"></A>Incorrect fin owner</P>
+<P>
+<A NAME="50422100_pgfId-378642"></A>PK_EDGE_state_fin_ed_not_ed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378644"></A>The returned edge has a fin (<CODE>
+entity_2</CODE>
+) whose owner is not the edge itself.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378646"></A>Incorrect sense of first fin</P>
+<P>
+<A NAME="50422100_pgfId-378647"></A>PK_EDGE_state_fin_not_pos_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378649"></A>The first fin (<CODE>
+entity_2</CODE>
+) of the returned edge does not have positive sense, which it must. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378651"></A>Incorrect vertices on fins</P>
+<P>
+<A NAME="50422100_pgfId-378652"></A>PK_EDGE_state_single_vertex_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378654"></A>The returned edge has one fin with a vertex and one fin without a vertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378656"></A>Wire edge is corrupt</P>
+<P>
+<A NAME="50422100_pgfId-378657"></A>PK_EDGE_state_wire_corrupt_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378659"></A>A wire edge must have two loops. If this fault is raised, the fins in these two loops are corrupt, leading to an invalid data structure. The returned edge indicates which fins are corrupt. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378661"></A>Entity has wrong owner</P>
+<P>
+<A NAME="50422100_pgfId-378662"></A>PK_ENTITY_state_bad_owner_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378664"></A>The returned entity has the wrong owner. It should be the returned <CODE>
+entity_2</CODE>
+. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-424381"></A>Incorrect group or attribute information for entity</P>
+<P>
+<A NAME="50422100_pgfId-424382"></A>PK_ENTITY_state_has_att_group_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-424384"></A>The returned entity has an attribute or group (<CODE>
+entity_2</CODE>
+) but is not an owner of an attribute or group.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-424541"></A>Incorrect group for entity</P>
+<P>
+<A NAME="50422100_pgfId-424542"></A>PK_ENTITY_state_in_group_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-424544"></A>The returned entity is a member of a group of which it is not allowed to be a member.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378671"></A>Entity has several owners</P>
+<P>
+<A NAME="50422100_pgfId-378672"></A>PK_ENTITY_state_shared_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378674"></A>The returned entity wrongly has more than one owner. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378676"></A>Shells in same region</P>
+<P>
+<A NAME="50422100_pgfId-378677"></A>PK_FACE_state_diff_sh_same_rg_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378679"></A>The returned face has two distinct shells which incorrectly belong to the same region. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378681"></A>Moebius face</P>
+<P>
+<A NAME="50422100_pgfId-378682"></A>PK_FACE_state_edge_moebius_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378684"></A>The returned face is a Moebius strip: the orientation of the fins of the returned edge (<CODE>
+entity_2</CODE>
+) are the same when the face meets them. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378686"></A>Badly defined sense</P>
+<P>
+<A NAME="50422100_pgfId-378687"></A>PK_FACE_state_wrong_sense_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378689"></A>The sense of the returned face is undefined.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378691"></A>Bad fin</P>
+<P>
+<A NAME="50422100_pgfId-378692"></A>PK_FIN_state_bad_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378694"></A>The returned fin does not belong to any of the following:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-378695"></A>An isolated vertex.</LI>
+<LI>
+<A NAME="50422100_pgfId-378696"></A>A ring edge.</LI>
+<LI>
+<A NAME="50422100_pgfId-378697"></A>An ordinary edge. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378699"></A>Problem with fin order</P>
+<P>
+<A NAME="50422100_pgfId-378700"></A>PK_FIN_state_bad_ed_fins_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378702"></A>Repeatedly asking for the next fin of the edge never yields the returned fin itself.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378704"></A>Corrupt fin</P>
+<P>
+<A NAME="50422100_pgfId-378705"></A>PK_FIN_state_corrupt_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378707"></A>The data structure of the returned fin is corrupt. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378709"></A>Problem with fin order</P>
+<P>
+<A NAME="50422100_pgfId-378710"></A>PK_FIN_state_ed_next_is_fin_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378712"></A>The next fin (<CODE>
+entity_2</CODE>
+) of the edge is the returned fin itself.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378714"></A>Fins have different vertices</P>
+<P>
+<A NAME="50422100_pgfId-378715"></A>PK_FIN_state_edge_diff_vertex_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378717"></A>The two returned fins have the same sense and belong to the same edge but point to different vertices. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378719"></A>Missing expected next fin of edge</P>
+<P>
+<A NAME="50422100_pgfId-378720"></A>PK_FIN_state_no_ed_next_in_sh_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378722"></A>There is no next fin of the edge, even though both fins are known to lie in the same shell. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378724"></A>Fin has identifier</P>
+<P>
+<A NAME="50422100_pgfId-378725"></A>PK_FIN_state_non_zero_ident_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378727"></A>The returned fin must not have an identifier. Fins should never have an identifier.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378729"></A>Incorrect fin order in edge</P>
+<P>
+<A NAME="50422100_pgfId-378730"></A>PK_FIN_state_not_ed_next_prev_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378732"></A>The previous fin of the next fin of the edge (<CODE>
+entity_2</CODE>
+) is not the returned fin itself. This fault can only be raised if the body is a solid or a sheet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378734"></A>Incorrect fin order in loop</P>
+<P>
+<A NAME="50422100_pgfId-378735"></A>PK_FIN_state_not_lp_next_prev_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378737"></A>The previous fin of the next fin of the loop (<CODE>
+entity_2</CODE>
+) is not the returned fin itself. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378739"></A>Fin does not point to vertex</P>
+<P>
+<A NAME="50422100_pgfId-378740"></A>PK_FIN_state_vx_not_vx_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378742"></A>The returned positive fin of edge terminating at the vertex (<CODE>
+entity_2</CODE>
+) does not point to that vertex. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378744"></A>Fin does not point to vertex</P>
+<P>
+<A NAME="50422100_pgfId-378745"></A>PK_FIN_state_wrong_vertex_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378747"></A>The returned fin should be pointing to the returned vertex (<CODE>
+entity_2</CODE>
+). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378749"></A>Geometry dependent on non-geometry</P>
+<P>
+<A NAME="50422100_pgfId-378750"></A>PK_GEOM_state_bad_dep_type_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378752"></A>The returned geometry has a dependant (<CODE>
+entity_2</CODE>
+) that is not geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378754"></A>Geometry has incorrect owner</P>
+<P>
+<A NAME="50422100_pgfId-378755"></A>PK_GEOM_state_bad_geom_owner_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378757"></A>The returned geometry has a geometric owner (<CODE>
+entity_2</CODE>
+) that is not a curve or a surface. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378759"></A>Geometry has incorrect owner</P>
+<P>
+<A NAME="50422100_pgfId-378760"></A>PK_GEOM_state_bad_owner_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378762"></A>The returned geometry has wrong owner. The required owner is returned in <CODE>
+entity_2</CODE>
+. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378764"></A>Geometry’s owner of wrong type</P>
+<P>
+<A NAME="50422100_pgfId-378765"></A>PK_GEOM_state_bad_topol_owner_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378767"></A>The returned geometry has the wrong type of topological owner (<CODE>
+entity_2</CODE>
+). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378769"></A>Geometry has duplicate owner</P>
+<P>
+<A NAME="50422100_pgfId-378770"></A>PK_GEOM_state_dup_geom_owner_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378772"></A>The returned geometry’s owner (<CODE>
+entity_2</CODE>
+) appears more than once as owner of the returned geometry. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378774"></A>Not geometric dependant of owner</P>
+<P>
+<A NAME="50422100_pgfId-378775"></A>PK_GEOM_state_not_owners_dep_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378777"></A>The returned geometry is not a geometric dependant of the returned owner (<CODE>
+entity_2</CODE>
+).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378779"></A>Geometry not owner of dependant</P>
+<P>
+<A NAME="50422100_pgfId-378780"></A>PK_GEOM_state_not_owning_dep_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378782"></A>The returned geometry is not a geometric owner of its geometric dependant (<CODE>
+entity_2</CODE>
+).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378784"></A>Bad group state</P>
+<P>
+<A NAME="50422100_pgfId-378785"></A>PK_GROUP_state_bad_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378787"></A>The returned group owns a node it should not, based on the class of that group. For example, if the entity class of the group is PK_CLASS_face, and the group owns an edge, then this fault could be returned. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378810"></A>Curve belongs to an isolated vertex</P>
+<P>
+<A NAME="50422100_pgfId-378811"></A>PK_LOOP_state_isolated_has_cu_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378813"></A>There is a curve (<CODE>
+entity_2</CODE>
+) attached to the fin of an isolated vertex loop. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378815"></A>Faulty attribute</P>
+<P>
+<A NAME="50422100_pgfId-378816"></A>PK_PART_state_bad_attrib_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378818"></A>The returned part has a faulty attribute (<CODE>
+entity_2</CODE>
+).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378820"></A>Faulty attribute list</P>
+<P>
+<A NAME="50422100_pgfId-378821"></A>PK_PART_state_bad_attrib_list_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378823"></A>The returned part has a faulty attribute list (<CODE>
+entity_2</CODE>
+).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378825"></A>Badly defined state</P>
+<P>
+<A NAME="50422100_pgfId-378826"></A>PK_PART_state_bad_state_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378828"></A>The “state” field in the XT data structure of the returned part is undefined. See the <EM>
+Parasolid </EM><EM>
+XT Format Manual</EM> for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378836"></A>Corrupt part</P>
+<P>
+<A NAME="50422100_pgfId-378837"></A>PK_PART_state_corrupt_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378839"></A>The returned part is corrupt. This fault is raised if the “state” field in the XT data structure of the returned part is set to SCH_unloaded_part but still refers to a region. See the <EM>
+Parasolid </EM><EM>
+XT Format Manual</EM> for more details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378847"></A>Part has key</P>
+<P>
+<A NAME="50422100_pgfId-378848"></A>PK_PART_state_has_key_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378850"></A>The returned part wrongly has a key.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378852"></A>Part has no key</P>
+<P>
+<A NAME="50422100_pgfId-378853"></A>PK_PART_state_no_key_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378855"></A>The returned part wrongly has no key.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378857"></A>Region has no shell</P>
+<P>
+<A NAME="50422100_pgfId-378858"></A><A HREF=../headers/pk_region_t.html>PK_REGION_state_no_shell_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378860"></A>The returned region has no shell and it is not the unique region of an infinite void body. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378862"></A>Incorrect solid region</P>
+<P>
+<A NAME="50422100_pgfId-378863"></A><A HREF=../headers/pk_region_t.html>PK_REGION_state_wrongly_solid_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378865"></A>The returned solid region is in a sheet or wire body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378867"></A>Inconsistent face in shell</P>
+<P>
+<A NAME="50422100_pgfId-378868"></A>PK_SHELL_state_bad_fa_orient_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378870"></A>The returned shell has a face whose orientation is inconsistent with the shell itself. This fault is only returned for solid bodies. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378872"></A>Shell contains entities of wrong dimension</P>
+<P>
+<A NAME="50422100_pgfId-378873"></A>PK_SHELL_state_bad_wf_acorn_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378875"></A>The returned shell of a solid or sheet body contains a wire frame edge and/or acorn vertex (one of which is returned in <CODE>
+entity_2)</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378877"></A>Wire shell contains entities of wrong dimension</P>
+<P>
+<A NAME="50422100_pgfId-378878"></A>PK_SHELL_state_bad_wf_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378880"></A>The returned shell of a wire body either contains an inconsistent face, or contains no vertex or edge. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378882"></A>Inconsistent faces in closed shell</P>
+<P>
+<A NAME="50422100_pgfId-378883"></A>PK_SHELL_state_closed_bad_fa_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378885"></A>The returned shell has invalid face fields for a closed sheet body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378887"></A>Acorn shell contains entities of wrong dimensions</P>
+<P>
+<A NAME="50422100_pgfId-378888"></A>PK_SHELL_state_ed_fa_in_acorn_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378890"></A>The returned shell contains a vertex and should be an acorn shell. However, the shell also has faces and or edges (one of which is returned in <CODE>
+entity_2</CODE>
+). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378892"></A>Fragmented edges in shell</P>
+<P>
+<A NAME="50422100_pgfId-378893"></A>PK_SHELL_state_eds_fragmented_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378895"></A>The returned shell has a wire frame edge (<CODE>
+entity_2</CODE>
+) that does not belong to the set of connected faces and wire frame edges of the shell. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378897"></A>Fragmented faces in shell</P>
+<P>
+<A NAME="50422100_pgfId-378898"></A>PK_SHELL_state_fas_fragmented_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378900"></A>The returned shell has a face (<CODE>
+entity_2</CODE>
+) that does not belong to the set of connected faces and wire frame edges of the shell. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378902"></A>Shell has no vertices, edges, or faces</P>
+<P>
+<A NAME="50422100_pgfId-378903"></A>PK_SHELL_state_no_vx_ed_fa_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378905"></A>The returned shell has no vertices, edges, or faces. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378907"></A>Bad owner in acorn shell</P>
+<P>
+<A NAME="50422100_pgfId-378908"></A>PK_SHELL_state_not_owning_vx_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378910"></A>The returned acorn shell contain a vertex (<CODE>
+entity_2</CODE>
+), but the owner of the vertex is not the shell. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378912"></A>Inconsistent faces in open shell</P>
+<P>
+<A NAME="50422100_pgfId-378913"></A>PK_SHELL_state_open_bad_fa_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378915"></A>The returned shell has invalid face fields for an open sheet body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378917"></A>Two shells in region meet at edge</P>
+<P>
+<A NAME="50422100_pgfId-378918"></A>PK_SHELL_state_reg_meet_at_ed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378920"></A>Two shells of the same region (one of which is returned in <CODE>
+entity_1</CODE>
+) meet at an edge (<CODE>
+entity_2</CODE>
+). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378922"></A>Two shells in region meet at vertex</P>
+<P>
+<A NAME="50422100_pgfId-378923"></A>PK_SHELL_state_reg_meet_at_vx_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378925"></A>Two shells of the same region (one of which is returned in <CODE>
+entity_1</CODE>
+) meet at a vertex (<CODE>
+entity_2</CODE>
+). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378927"></A>Sheet shell has no face</P>
+<P>
+<A NAME="50422100_pgfId-378928"></A>PK_SHELL_state_sheet_no_fa_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378930"></A>The returned shell belongs to a sheet body but has no face. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378932"></A>Wire shell has face</P>
+<P>
+<A NAME="50422100_pgfId-378933"></A>PK_SHELL_state_too_many_fas_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378935"></A>The returned shell belongs to a wire body but has a face. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378937"></A>Closed but non-periodic topology</P>
+<P>
+<A NAME="50422100_pgfId-378938"></A>PK_TOPOL_state_bad_box_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378940"></A>The topology has an invalid box. The box is defined using a high and a low co-ordinate. In this case, one of the high co-ordinate values is lower than its corresponding low co-ordinate. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378942"></A>Inconsistent order in shared geometry</P>
+<P>
+<A NAME="50422100_pgfId-378943"></A>PK_TOPOL_state_bad_geom_share_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378945"></A>Faces that share a surface are ordered on that surface. Similarly, edges that share a curve are ordered along that curve. If this fault is returned, then two edges or two faces (returned in <CODE>
+entity_1</CODE>
+ and <CODE>
+entity_2</CODE>
+) share the same geometry, but this order is inconsistent. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378947"></A>Owner of topology has bad type</P>
+<P>
+<A NAME="50422100_pgfId-378948"></A>PK_TOPOL_state_bad_owner_type_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378950"></A>The returned topology has an owner (<CODE>
+entity_2</CODE>
+) that has a bad type.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378952"></A>Missing shared geometry</P>
+<P>
+<A NAME="50422100_pgfId-378953"></A>PK_TOPOL_state_share_no_geom_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378955"></A>The returned edge or face has no attached geometry, but is defined as sharing geometry with at least one other edge or face (<CODE>
+entity_2</CODE>
+). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378957"></A>Inconsistent fins</P>
+<P>
+<A NAME="50422100_pgfId-378958"></A>PK_VERTEX_state_bad_fin_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378960"></A>An edge at the returned vertex has a fin (<CODE>
+entity_2</CODE>
+), that is not correctly linked. This fault is not returned for solid bodies. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378962"></A>Vertex not isolated</P>
+<P>
+<A NAME="50422100_pgfId-378963"></A>PK_VERTEX_state_bad_isolated_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378965"></A>The returned vertex, which has been declared isolated from a solid body, is not isolated.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378967"></A>Bad vertex tolerance</P>
+<P>
+<A NAME="50422100_pgfId-378968"></A>PK_VERTEX_state_bad_tol_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378970"></A>The returned vertex has tolerance that is smaller than the working tolerance.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378972"></A>Inconsistent fins entering vertex</P>
+<P>
+<A NAME="50422100_pgfId-378973"></A>PK_VERTEX_state_fin_chains_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378975"></A>Traversing the chain of fins entering the returned vertex gives inconsistent results.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378977"></A>Non-manifold vertex</P>
+<P>
+<A NAME="50422100_pgfId-378978"></A>PK_VERTEX_state_non_manifold_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378980"></A>The returned vertex is non-manifold: typically the fins at edges around the vertex are inconsistently defined. This fault is not returned for solid bodies. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378982"></A>Acorn vertex not in shell</P>
+<P>
+<A NAME="50422100_pgfId-378983"></A>PK_VERTEX_state_not_dep_of_sh_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378985"></A>The returned acorn vertex is not owned by its owning shell (<CODE>
+entity_2</CODE>
+). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378987"></A>Acorn vertex not owned by shell</P>
+<P>
+<A NAME="50422100_pgfId-378988"></A>PK_VERTEX_state_owner_not_sh_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378990"></A>The returned acorn vertex has an owner (<CODE>
+entity_2</CODE>
+) that is not a shell.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378992"></A>Corrupt data structure in sheet body vertex</P>
+<P>
+<A NAME="50422100_pgfId-378993"></A>PK_VERTEX_state_sheet_corrupt_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378995"></A>The returned vertex has a corrupt data structure. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-378997"></A>Too many edges in wire vertex</P>
+<P>
+<A NAME="50422100_pgfId-378998"></A>PK_VERTEX_state_too_many_eds_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-379000"></A>The returned vertex is from a wire body. but has more than two edges.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-379002"></A>Wireframe edge at vertex not in shell</P>
+<P>
+<A NAME="50422100_pgfId-379003"></A>PK_VERTEX_state_wf_ed_bad_sh_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-379005"></A>There is a wireframe edge at the returned vertex that should belong to the returned shell (<CODE>
+entity_2</CODE>
+). </P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422100_pgfId-296051"></A>	30.3.2 	<A NAME="50422100_17904"></A>Faults associated with checking system attributes </H3>
+<P>
+<A NAME="50422100_pgfId-296052"></A>If the <CODE>
+attribs</CODE>
+ option in <A HREF=../headers/pk_assembly_check.html>PK_ASSEMBLY_check</A>, <A HREF=../headers/pk_body_check.html>PK_BODY_check</A>, <A HREF=../headers/pk_edge_check.html>PK_EDGE_check</A>, <A HREF=../headers/pk_face_check.html>PK_FACE_check</A>, or <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A> is <A HREF=../headers/pk_check_attribs_t.html>PK_check_attribs_yes_c</A>, then the following return tokens may be returned. For all of these tokens:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-296053"></A><CODE>
+entity_1</CODE>
+ contains the attribute being checked.</LI>
+<LI>
+<A NAME="50422100_pgfId-296054"></A><CODE>
+entity_2</CODE>
+ contains the owner of that attribute.</LI>
+<LI>
+<A NAME="50422100_pgfId-296055"></A><CODE>
+position</CODE>
+ is empty.</LI>
+</UL>
+<P>
+<A NAME="50422100_pgfId-296056"></A>Use <A HREF=../headers/pk_entity_check_attribs.html>PK_ENTITY_check_attribs</A> to find further information about the faults. </P>
+<P>
+<A NAME="50422100_pgfId-296112"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296059"></A>Fault state</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296061"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296063"></A>Invalid data in field</P>
+<P>
+<A NAME="50422100_pgfId-296064"></A>PK_ATTRIB_state_bad_data_len_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296066"></A>A field of a system attribute has an invalid amount of data filled.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296068"></A>Invalid Unicode string </P>
+<P>
+<A NAME="50422100_pgfId-296069"></A>PK_ATTRIB_state_bad_ustring_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296071"></A>A Unicode string in a system attribute is invalid.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296073"></A>Byte field out of range</P>
+<P>
+<A NAME="50422100_pgfId-296074"></A>PK_ATTRIB_state_byte_oor_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296076"></A>A byte field of a system attribute is out of (valid) range.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296078"></A>Empty field</P>
+<P>
+<A NAME="50422100_pgfId-296079"></A>PK_ATTRIB_state_empty_field_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296081"></A>A required field in a system attribute has no data filled.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296083"></A>Integer field out of range</P>
+<P>
+<A NAME="50422100_pgfId-296084"></A>PK_ATTRIB_state_int_oor_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296086"></A>An integer field of a system attribute is out of (valid) range.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296088"></A>Invalid data</P>
+<P>
+<A NAME="50422100_pgfId-296089"></A>PK_ATTRIB_state_invalid_att_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296091"></A>A system attribute has invalid data .</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296093"></A>Non-unit-length vector field</P>
+<P>
+<A NAME="50422100_pgfId-296094"></A>PK_ATTRIB_state_non_unit_vec_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296096"></A>A vector field required to be of unit length is not.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296098"></A>Real field out of range</P>
+<P>
+<A NAME="50422100_pgfId-296099"></A>PK_ATTRIB_state_real_oor_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296101"></A>A real field of a system attribute is out of (valid) range.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296103"></A>Short field out of range</P>
+<P>
+<A NAME="50422100_pgfId-296104"></A>PK_ATTRIB_state_short_oor_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296106"></A>A short field of a system attribute is out of (valid) range.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296108"></A>Position vector field out of range</P>
+<P>
+<A NAME="50422100_pgfId-296109"></A>PK_ATTRIB_state_p_vector_oor_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422100_pgfId-296111"></A>A position vector field is out of range (usually outside size box).</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422100_pgfId-296116"></A>30.4	<A NAME="50422100_marker-296113"></A><A NAME="50422100_marker-296114"></A><A NAME="50422100_marker-296115"></A>Local checking 
+
+
+</H1>
+<P>
+<A NAME="50422100_pgfId-296118"></A><A NAME="50422100_marker-296117"></A>Local checking only tests whether the body has been invalidated by the operation performed. If a body is invalid before a local operation, in a region not affected by the operation, local checking is not guaranteed to identify the body as invalid.</P>
+<P>
+<A NAME="50422100_pgfId-296119"></A>Local checking is activated through an argument of the relevant function. Functions that use the local checking switch are:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-424120"></A><A HREF=../headers/pk_body_sweep.html>PK_BODY_sweep</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424121"></A><A HREF=../headers/pk_face_sweep.html>PK_FACE_sweep</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424122"></A><A HREF=../headers/pk_vertex_sweep.html>PK_VERTEX_sweep</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424123"></A><A HREF=../headers/pk_body_spin.html>PK_BODY_spin</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424124"></A><A HREF=../headers/pk_face_spin.html>PK_FACE_spin</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424125"></A><A HREF=../headers/pk_vertex_spin.html>PK_VERTEX_spin</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424126"></A><A HREF=../headers/pk_face_make_solid_bodies.html>PK_FACE_make_solid_bodies</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424127"></A><A HREF=../headers/pk_face_attach_surf_fitting.html>PK_FACE_attach_surf_fitting</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424128"></A><A HREF=../headers/pk_face_transform_2.html>PK_FACE_transform_2</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424129"></A><A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424130"></A><A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A></LI>
+</UL>
+<P>
+<A NAME="50422100_pgfId-296156"></A><A NAME="50422100_marker-296155"></A>When local checking is turned ON then the <CODE>
+state</CODE>
+ return argument of each local operation function is set to one of the following values:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-296157"></A><A HREF=../headers/pk_local_check_t.html>PK_local_check_ok_c</A> - indicates that on completion of the local operation, the resulting body in the area affected by the local operation is valid. </LI>
+<P>
+<A NAME="50422100_pgfId-296158"></A>If the body was previously invalid, in an area that isn't affected by the local operation, the body in general terms would therefore still be invalid.</P>
+<LI>
+<A NAME="50422100_pgfId-296159"></A><A HREF=../headers/pk_local_check_t.html>PK_local_check_negated_c</A> - indicates that the resulting body would have been inside out, but the function negated it so that it is now a positive, valid solid. This token is returned in the following example:</LI>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-296161"></A>When using <A NAME="50422100_marker-296160"></A><A HREF=../headers/pk_face_make_solid_bodies.html>PK_FACE_make_solid_bodies</A> to create a solid from the top face of a truncated pyramid, with the “grow from parent” option.</LI>
+<LI>
+<A NAME="50422100_pgfId-296164"></A><A NAME="50422100_marker-296162"></A><A NAME="50422100_marker-296163"></A>The face normal sense of the faces on the parent body are pointing away from the body, as for all valid solids.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422100_pgfId-330206"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-223.gif">
+
+<P>
+<A NAME="50422100_pgfId-296541"></A>Figure 30-2 Face normal senses on a valid body</P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-296542"></A><A HREF=../headers/pk_face_make_solid_bodies.html>PK_FACE_make_solid_bodies</A> copies the selected face into a new body, using the curves and surfaces of the original face to ‘grow’ over the wound, using the ‘Grow from Parent’ option.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422100_pgfId-331458"></A>Because of the direction of the face normal of the face from which the pyramid was created, the resulting face normal senses of the pyramid point into the body.</P>
+<P>
+<A NAME="50422100_pgfId-296543"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-224.gif">
+
+<P>
+<A NAME="50422100_pgfId-296856"></A>Figure 30-3 Face normal senses of a negative body</P>
+<UL>
+<UL>
+<P>
+<A NAME="50422100_pgfId-296857"></A>As this body is therefore negative and invalid, it is automatically negated by Parasolid and the token <A HREF=../headers/pk_local_check_t.html>PK_local_check_negated_c</A> is returned to advise you that this is what has happened.</P>
+</UL>
+<LI>
+<A NAME="50422100_pgfId-296858"></A><A HREF=../headers/pk_local_check_t.html>PK_local_check_failed_c</A> - means that the resulting body is invalid, usually because the body is self-intersecting. If the local operation was one which does not change topology, you can sometimes undo the operation, by performing a reverse operation instead of using rollback, to recover a valid body.</LI>
+</UL>
+<P>
+<A NAME="50422100_pgfId-296859"></A>The local operations can succeed (return PK_ERROR_no “state” argument after calling a local operation.</P>
+<P>
+<A NAME="50422100_pgfId-296860"></A>The checks that are performed by Parasolid when local checking is turned ON are completed in three stages:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-296861"></A>The initial stage does checking of individual faces to ensure that there are none that are self-intersecting within themselves.</LI>
+<P>
+<A NAME="50422100_pgfId-296862"></A>If this initial check fails, an error is returned indicating why the check failed. When this occurs you are strongly advised to roll back.</P>
+<LI>
+<A NAME="50422100_pgfId-296863"></A>The second stage checks each altered face pairwise with every other to ensure that they intersect each other correctly.</LI>
+<LI>
+<A NAME="50422100_pgfId-296864"></A>The third stage is the shell check, this determines whether the body needs to be negated or not.</LI>
+<P>
+<A NAME="50422100_pgfId-296865"></A>Checking for, and correcting, negated shells is performed whether or not local checking is 'ON'; however if local checking is OFF then a state of <A HREF=../headers/pk_local_check_t.html>PK_local_check_negated_c</A> is <STRONG>
+not</STRONG> returned even though the check has been performed.</P>
+</UL>
+<P>
+<A NAME="50422100_pgfId-296866"></A>Providing that the body passes the initial stage PK_ERROR_no_errors are returned.</P>
+<P>
+<A NAME="50422100_pgfId-296867"></A>When Parasolid performs local operations with checking OFF, only very simple checks are made on the integrity of the body after the operation and the result returned is <A HREF=../headers/pk_local_check_t.html>PK_local_check_no_c</A>. This is desirable if the resulting body is an intermediate stage which you expect to be invalid.</P>
+<P>
+<A NAME="50422100_pgfId-296869"></A><A NAME="50422100_marker-296868"></A>For general bodies the result <A HREF=../headers/pk_local_check_t.html>PK_local_check_negated_c</A> is never returned since this has no meaning for general bodies.</P>
+
+<H3>
+<A NAME="50422100_pgfId-296873"></A>	30.4.1 	<A NAME="50422100_marker-296870"></A><A NAME="50422100_marker-296871"></A><A NAME="50422100_45550"></A>Face-face checks </H3>
+<P>
+<A NAME="50422100_pgfId-296875"></A><A NAME="50422100_marker-424261"></A>Other modeling functions, though they don't have the <CODE>
+local_check</CODE>
+ option, do have an argument to activate face-face checking. They include the following:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-424298"></A><A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424299"></A><A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424300"></A><A HREF=../headers/pk_body_offset_2.html>PK_BODY_offset_2</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424301"></A><A HREF=../headers/pk_face_offset_2.html>PK_FACE_offset_2</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424302"></A><A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A></LI>
+<LI>
+<A NAME="50422100_pgfId-424303"></A><A HREF=../headers/pk_face_hollow_2.html>PK_FACE_hollow_2</A></LI>
+</UL>
+<P>
+<A NAME="50422100_pgfId-296896"></A>These functions all return further information about faults via the PK_ERROR standard form structure.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422100_pgfId-296898"></A>30.5	<A NAME="50422100_marker-296897"></A>When to use checking 
+
+
+</H1>
+<P>
+<A NAME="50422100_pgfId-296900"></A><A NAME="50422100_marker-296899"></A>Checking is a time-consuming operation. If you turn local checking OFF to save time when you are performing a sequence of local operations, or you want one of the intermediate operations to create an invalid body, you can call <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> to check the final body. If the check indicates that the body is invalid then roll back to a point before the local operation, and try a different approach.</P>
+<P>
+<A NAME="50422100_pgfId-296901"></A>Local checking only tests whether the body has been invalidated by the operation performed. If a body is invalid before a local operation, in a region not affected by the operation, local checking is not guaranteed to identify the body as invalid.</P>
+<P>
+<A NAME="50422100_pgfId-296902"></A>When Parasolid performs local operations with checking ON, each affected face is checked to ensure it is consistent with itself and a subset of nearby faces. The checking can return a number of results.</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-296903"></A>If all the affected faces of the body are consistent with themselves and with all other faces in the subset, the returned result is <A HREF=../headers/pk_local_check_t.html>PK_local_check_ok_c</A>.</LI>
+<LI>
+<A NAME="50422100_pgfId-296904"></A>If the body is negated so that its faces bound a void in an infinite solid rather than a solid in an infinite void, the returned result is <A HREF=../headers/pk_local_check_t.html>PK_local_check_negated_c</A>. Parasolid automatically inverts negated bodies and so the value of “state” indicates that the body was negated but is now valid. </LI>
+<P>
+<A NAME="50422100_pgfId-296905"></A>This check is also performed when local checking is OFF, but in this instance the returned result is <A HREF=../headers/pk_local_check_t.html>PK_local_check_no_c</A>.</P>
+<LI>
+<A NAME="50422100_pgfId-296906"></A>If an affected face is inconsistent with itself, the returned argument is undefined and a non-zero error is returned to indicate that the body is invalid even as an intermediate stage. The value of the error indicates the nature of the problem. </LI>
+<LI>
+<A NAME="50422100_pgfId-296907"></A>If an affected face is inconsistent with any other face in the body the return argument <CODE>
+check_state</CODE>
+ has the value <A HREF=../headers/pk_local_check_t.html>PK_local_check_failed_c</A>. This may be an acceptable intermediate state so a zero error is still returned and the algorithm of your application needs to specify how to proceed. </LI>
+</UL>
+<P>
+<A NAME="50422100_pgfId-296908"></A>Local operation checking is more efficient than checking the whole body especially if the local operation affects a small proportion of the body's entities. However, if Parasolid is performing a number of local operations, you may prefer to check the entire body when all the operations are complete rather than performing local checking at each operation.</P>
+<P>
+<A NAME="50422100_pgfId-296913"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422100_pgfId-296911"></A>Note: When fixing blends, local checking is performed as part of the <A NAME="50422100_marker-296912"></A><A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A> operation.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422100_pgfId-296919"></A>	30.5.1 	<A NAME="50422100_marker-296914"></A><A NAME="50422100_marker-296915"></A><A NAME="50422100_marker-296916"></A><A NAME="50422100_marker-296917"></A><A NAME="50422100_marker-296918"></A>Sweeping and spinning </H3>
+<P>
+<A NAME="50422100_pgfId-296921"></A><A NAME="50422100_marker-296920"></A>When spinning bodies you must take care with the positioning of the axis. For example you are not permitted to spin a wire body through 2pi if an internal vertex rests on the axis as this would result in a non-manifold sheet body. Also it is easy to create self-intersecting bodies by sweeping or swinging. Always make sure to check the results, either by having local checking on, or using <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> on the resulting bodies. For more information about these restrictions see the description of <A NAME="50422100_marker-296922"></A><A HREF=../headers/pk_body_spin.html>PK_BODY_spin</A>.</P>
+
+
+<H3>
+<A NAME="50422100_pgfId-296931"></A>	30.5.2 	<A NAME="50422100_marker-296923"></A><A NAME="50422100_marker-296924"></A><A NAME="50422100_marker-296925"></A><A NAME="50422100_marker-296926"></A><A NAME="50422100_marker-296927"></A><A NAME="50422100_marker-296928"></A><A NAME="50422100_marker-296929"></A><A NAME="50422100_marker-296930"></A>Blending vertices on sheet and wire bodies </H3>
+<P>
+<A NAME="50422100_pgfId-296933"></A><A NAME="50422100_marker-296932"></A>If the local checking is ON the body is checked after the blending has been carried out. In the case of a planar body the altered body is valid, but for a non-planar body local checking may return that the altered body is invalid.</P>
+
+
+<H3>
+<A NAME="50422100_pgfId-296938"></A>	30.5.3 	<A NAME="50422100_marker-296934"></A><A NAME="50422100_marker-296935"></A><A NAME="50422100_marker-296936"></A><A NAME="50422100_marker-296937"></A>Creating curves and surfaces </H3>
+<P>
+<A NAME="50422100_pgfId-296940"></A><A NAME="50422100_marker-296939"></A>When creating curves and surfaces in Parasolid there are a few restrictions placed on the resulting curves and surfaces. These restrictions are to ensure that the curve or surface does not self-intersect or have a cusp. Any function that requires a surface which has been checked performs these checks. These checks shall only be performed once, with the result being stored in the data structure.</P>
+<P>
+<A NAME="50422100_pgfId-296941"></A>The <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A> function can be used to test if the surface is acceptable to Parasolid for modeling purposes. </P>
+<P>
+<A NAME="50422100_pgfId-296944"></A>Full details of the restrictions on parametric curves and surfaces are given in <A HREF="fd_chap.019.html#50422088_13353">Chapter 18, “B-Curves And B-Surfaces”</A>.</P>
+
+
+<H3>
+<A NAME="50422100_pgfId-296949"></A>	30.5.4 	<A NAME="50422100_marker-296946"></A><A NAME="50422100_marker-296947"></A><A NAME="50422100_marker-296948"></A>How applications should use checking </H3>
+<P>
+<A NAME="50422100_pgfId-296951"></A><A NAME="50422100_marker-296950"></A>Applications should provide users with control over local checking, and should provide the option to check bodies whenever they like it: it is suggested that two levels of body checking be provided, both with and without the face-face inconsistency check. The face-face inconsistency check is by far the most time-consuming for all but the simplest models, and should only be used when self-intersection is suspected.</P>
+<P>
+<A NAME="50422100_pgfId-296952"></A>With experience you will be able to judge when to use local checking and how often to use the checking functionality in the kind of modeling you typically do. To begin with, you will want to rely on it more, but with experience you will be able to work faster by skipping checks when they are not really needed.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422100_pgfId-296956"></A>30.6	<A NAME="50422100_marker-296953"></A><A NAME="50422100_marker-296954"></A><A NAME="50422100_marker-296955"></A>Other checking options 
+
+
+</H1>
+<P>
+<A NAME="50422100_pgfId-296957"></A>The following checking options can be set by their relevant functions.</P>
+
+<H3>
+<A NAME="50422100_pgfId-296960"></A>	30.6.1 	<A NAME="50422100_marker-296958"></A><A NAME="50422100_marker-296959"></A>Argument checking </H3>
+<P>
+<A NAME="50422100_pgfId-296962"></A><A NAME="50422100_marker-296961"></A>Parasolid performs simple checking of all arguments, but much more rigorous checking can be applied through <A NAME="50422100_marker-296963"></A><A HREF=../headers/pk_session_set_check_arguments.html>PK_SESSION_set_check_arguments</A>. This additional checking is ON by default, and has performance penalties but identifies problems as soon as possible. If this optional checking is not applied, a function argument error might not become apparent until it causes an error much later in the session.</P>
+<P>
+<A NAME="50422100_pgfId-296964"></A>Argument checking can be turned ON or OFF in a session; the current setting is returned by <A NAME="50422100_marker-296965"></A><A HREF=../headers/pk_session_ask_check_arguments.html>PK_SESSION_ask_check_arguments</A>. It is expected that argument checking is switched ON in the vast majority of sessions since, in general, the improvement in error detection far outweighs the effects on performance. However, if you have tested a piece of code rigorously and performance is of prime importance, this balance may change.</P>
+
+
+<H3>
+<A NAME="50422100_pgfId-296970"></A>	30.6.2 	<A NAME="50422100_marker-296966"></A><A NAME="50422100_marker-296967"></A><A NAME="50422100_marker-296968"></A><A NAME="50422100_marker-296969"></A>Geometric self-intersection checking </H3>
+<P>
+<A NAME="50422100_pgfId-296974"></A><A NAME="50422100_marker-296971"></A><A NAME="50422100_marker-296972"></A><A NAME="50422100_marker-296973"></A>Self-intersection checking is optional and can be switched ON or OFF in a session using <A NAME="50422100_marker-296975"></A><A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>.</P>
+<P>
+<A NAME="50422100_pgfId-296976"></A>To prevent the creation of invalid bodies Parasolid requires that for a curve or surface to be attached to an edge or face it must be valid. Attaching a self-intersecting curve or surface, which is therefore invalid, to an edge or face would create an invalid body. </P>
+<P>
+<A NAME="50422100_pgfId-296977"></A>The checking of a B-curve, B-surface, or an offset of a B-surface for self-intersection is an expensive operation. This facility allows curves and surfaces to be used in modeling operations without the self-intersection check being made. It is not intended for this facility to provide a method of modeling with self-intersecting geometry but to be used when there is confidence that the geometry does not self-intersect.</P>
+<P>
+<A NAME="50422100_pgfId-296978"></A>With self-intersection checking switched OFF B-curve/surface geometry is still checked against the usual restriction on these entities, e.g. chord length, continuity, etc. The current setting is returned by <A NAME="50422100_marker-296979"></A><A HREF=../headers/pk_session_ask_check_self_int.html>PK_SESSION_ask_check_self_int</A>.</P>
+<P>
+<A NAME="50422100_pgfId-296983"></A>For further information see <A HREF="fd_chap.019.html#50422088_13353">Chapter 18, “B-Curves And B-Surfaces”</A>.</P>
+<P>
+<A NAME="50422100_pgfId-296984"></A><A HREF=../headers/pk_body_check.html>PK_BODY_check</A> only insists that the geometry does not self-intersect if the self-intersecting checking facility is switched ON.</P>
+
+<H4>
+<A NAME="50422100_pgfId-296990"></A>30.6.2.1 <A NAME="50422100_marker-296985"></A><A NAME="50422100_marker-296986"></A><A NAME="50422100_marker-296987"></A><A NAME="50422100_marker-296988"></A><A NAME="50422100_marker-296989"></A>Geometric self-intersection checking of offset surfaces </H4>
+<P>
+<A NAME="50422100_pgfId-296995"></A><A NAME="50422100_marker-296991"></A><A NAME="50422100_marker-296992"></A><A NAME="50422100_marker-296993"></A><A NAME="50422100_marker-296994"></A>Self-intersection checking of offset surfaces is approached as follows:</P>
+<UL>
+<LI>
+<A NAME="50422100_pgfId-296996"></A>For offsets of Foreign Geometry, Swept, Spun and Offset surfaces the self-intersection check is completed regardless of the setting of <A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>. </LI>
+<LI>
+<A NAME="50422100_pgfId-296997"></A>For offsets of B-surfaces it is only necessary that the offset surface passes the composite geometry check as the check for self-intersection is not made at this stage. The created offset surface may be checked for self-intersection by explicitly calling <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A> with <A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A> set.</LI>
+</UL>
+
+
+
+<H3>
+<A NAME="50422100_pgfId-297007"></A>	30.6.3 	<A NAME="50422100_marker-296998"></A><A NAME="50422100_marker-296999"></A><A NAME="50422100_marker-297000"></A><A NAME="50422100_marker-297001"></A><A NAME="50422100_marker-297002"></A><A NAME="50422100_marker-297003"></A><A NAME="50422100_marker-297004"></A><A NAME="50422100_marker-297005"></A><A NAME="50422100_marker-297006"></A>Composite geometry checks for B-curves and B-surfaces </H3>
+<P>
+<A NAME="50422100_pgfId-297012"></A><A NAME="50422100_marker-297008"></A><A NAME="50422100_marker-297009"></A><A NAME="50422100_marker-297010"></A><A NAME="50422100_marker-297011"></A>Composite geometry checks that are performed on B-curves and B-surfaces, when determining whether the geometry can be modeled as a single topological entity, can be turned ON or OFF using <A NAME="50422100_marker-297013"></A><A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A>. The current setting is returned by <A NAME="50422100_marker-297014"></A><A HREF=../headers/pk_session_ask_check_continuity.html>PK_SESSION_ask_check_continuity</A>.</P>
+
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.030.html">Clash Detection Of Bodies</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.032.html">Introduction To Manipulating Topology</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,991 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Sweeping Tool Bodies Along a Path</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Sweeping Tool Bodies Along a Path</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.039.html">Sweeping</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.041.html">Lofting</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-299844">39.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-324789">39.1.1	Received and returned arguments </A>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-325546">39.1.2	Options available when sweeping tool bodies </A>
+</UL>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-299940">39.2	Specifying a tool body </A>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-299952">39.3	Specifying a path </A>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-300093">39.4	Sweeping along 3D paths </A>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-300147">39.5	Positioning the tool on or off the path </A>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-538049">39.6	Specifying that path edges lie on a spun surface </A>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-300248">39.7	Simplifying faces of a swept tool body </A>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-353888">39.8	Specifying corner types </A>
+<LI> <A HREF="fd_chap.040.html#50422111_pgfId-300539">39.9	Performing boolean operations with solid tool bodies </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422111_pgfId-299844"></A>39.1	<A NAME="50422111_96185"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422111_pgfId-394553"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-393842"></A>Note:  Parasolid’s functionality to sweep a tool along a path is targeted specifically at CAM workflows. It is not intended for use as a general purpose 3D solid sweep algorithm.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422111_pgfId-393307"></A>With this functionality:</P>
+<UL>
+<LI>
+<A NAME="50422111_pgfId-395276"></A><A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A> takes a tool body, spins it about an axis, and then sweeps the resulting spun body along a path to create a swept body. </LI>
+<LI>
+<A NAME="50422111_pgfId-394330"></A>The resultant body is described by the envelope of the tool body as it is swept along the path. </LI>
+</UL>
+<P>
+<A NAME="50422111_pgfId-393578"></A>You can use this function to construct bodies that represent regions to be cut from a solid body using a machine tool. For example, you can create a region to be cut out using <A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A> and then subtract this region from the solid body either using a boolean operation, as shown in <A HREF="fd_chap.040.html#50422111_36446"><EM>
+Figure 39-1</EM></A>, or the <CODE>
+sweep_boolean</CODE>
+ option as described in <A HREF="fd_chap.040.html#50422111_76381">Section 39.9, “Performing boolean operations with solid tool bodies”</A>.</P>
+<P>
+<A NAME="50422111_pgfId-321439"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-364.gif">
+
+<P>
+<A NAME="50422111_pgfId-299887"></A>Figure 39-1 <A NAME="50422111_36446"></A>Creating swept bodies for use in cutting out regions from a body</P>
+<P>
+<A NAME="50422111_pgfId-307853"></A><A NAME="50422111_68913"></A>For examples of this functionality, see the code examples in the <CODE>
+C++\Code Examples\Modelling\Profiling</CODE>
+ folder in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422111_pgfId-343674"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-343694"></A>Note: This functionality does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422111_pgfId-333739"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-341387"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422111_pgfId-333806"></A><A HREF="fd_chap.039.html#50422110_45750">Chapter 38.1, “Introduction”</A></LI>
+<LI>
+<A NAME="50422111_pgfId-333753"></A><A HREF="fd_chap.052.html#50422125_">Chapter 51, “Introduction to Booleans”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422111_pgfId-324789"></A>	39.1.1 	Received and returned arguments </H3>
+<P>
+<A NAME="50422111_pgfId-299888"></A><A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A> receives and returns the following arguments:</P>
+<P>
+<A NAME="50422111_pgfId-302142"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-299891"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-299893"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-299895"></A>tool</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-299897"></A>A tool body that is spun about the <CODE>
+tool_axis</CODE>
+ to form a profile for the resulting swept body. See <A HREF="fd_chap.040.html#50422111_38757">Section 39.2, “Specifying a tool body”</A>, for details about the form this body should take.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-299902"></A>tool_axis</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-299904"></A>An axis about which the supplied <CODE>
+tool</CODE>
+ is rotated in order to form a profile for the sweep operation. See <A HREF="fd_chap.040.html#50422111_38757">Section 39.2, “Specifying a tool body”</A> for more details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-299909"></A>path</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-299913"></A>A path for the sweep operation. See <A HREF="fd_chap.040.html#50422111_84876">Section 39.3, “Specifying a path”</A>, for details about the form this path should take.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-299916"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-299920"></A>A set of options. See <A HREF="fd_chap.040.html#50422111_30747">Section 39.1.2, “Options available when sweeping tool bodies”</A>, for details about the options available. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422111_pgfId-325240"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-302168"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-302170"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-302172"></A>tracking</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-302174"></A>A structure containing tracking information that relates topology prior to the operation to the topology that is available after it. You can control the amount of tracking information returned: see <A HREF="fd_chap.040.html#50422111_30747">Section 39.1.2, “Options available when sweeping tool bodies”</A> for details. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-302176"></A>swept_tool</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-302178"></A>A structure that combines the resulting swept <CODE>
+body</CODE>
+ together with a <CODE>
+status</CODE>
+ structure that provides details about any <CODE>
+faults</CODE>
+ that occurred during the sweep operation, together with their associated <CODE>
+fault_locations</CODE>
+ and <CODE>
+fault_entities</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422111_pgfId-325546"></A>	39.1.2 	<A NAME="50422111_30747"></A>Options available when sweeping tool bodies </H3>
+<P>
+<A NAME="50422111_pgfId-325547"></A><A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A> contains an options structure that provides the following options:</P>
+<P>
+<A NAME="50422111_pgfId-325634"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325550"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325552"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325554"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325556"></A>The tolerance to which entities are approximated or assumed to be coincident. Default: 1.0e-5.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325558"></A>allow_rationals</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325560"></A>Whether or not rational B-surfaces may be used in the resulting body. Default: PK_LOGICAL_true</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325562"></A>want_edge_tracking</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325564"></A>Whether or not tracking information for edges should be returned in the <CODE>
+tracking</CODE>
+ structure. If PK_LOGICAL_false, only tracking information for faces is returned. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325580"></A>have_lock_direction</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325582"></A>Whether to use a lock direction for the sweep. If set to PK_LOGICAL_true, the sweep direction and the orientation of the tool are controlled by <CODE>
+lock_direction</CODE>
+. Default: PK_LOGICAL_false</P>
+<P>
+<A NAME="50422111_pgfId-325586"></A>See <A HREF="fd_chap.040.html#50422111_42306">Section 39.4, “Sweeping along 3D paths”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325588"></A>lock_direction</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325590"></A>The direction of the lock if <CODE>
+have_lock_direction</CODE>
+ is set to PK_LOGICAL_true. </P>
+<P>
+<A NAME="50422111_pgfId-325594"></A>See <A HREF="fd_chap.040.html#50422111_42306">Section 39.4, “Sweeping along 3D paths”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325596"></A>tool_site</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325598"></A>A positioning vertex on the path that indicates the location of <CODE>
+tool_axis</CODE>
+. </P>
+<P>
+<A NAME="50422111_pgfId-325602"></A>See <A HREF="fd_chap.040.html#50422111_68610">Section 39.5, “Positioning the tool on or off the path”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325604"></A>n_cap_faces</PRE>
+<PRE><A NAME="50422111_pgfId-325605"></A>cap_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325607"></A>An array of faces on the tool body whose precise geometry is not significant for downstream operations. </P>
+<P>
+<A NAME="50422111_pgfId-325611"></A>See <A HREF="fd_chap.040.html#50422111_49417">Section 39.7, “Simplifying faces of a swept tool body”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325613"></A>place_tool_on_path</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325615"></A>Whether the tool should be placed on the path before sweeping. Default: PK_LOGICAL_true.</P>
+<P>
+<A NAME="50422111_pgfId-325619"></A>See <A HREF="fd_chap.040.html#50422111_68610">Section 39.5, “Positioning the tool on or off the path”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325621"></A>sweep_boolean</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325623"></A>Specifies which boolean operation to apply to the sweep tool and <CODE>
+target</CODE>
+. Default: <A HREF=../headers/pk_sweep_boolean_t.html>PK_sweep_boolean_none_c</A>. See <A HREF="fd_chap.040.html#50422111_76381">Section 39.9, “Performing boolean operations with solid tool bodies”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-325628"></A>target</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-325630"></A>Specifies the target body to use when using a <CODE>
+sweep_boolean</CODE>
+ operation. See <A HREF="fd_chap.040.html#50422111_76381">Section 39.9, “Performing boolean operations with solid tool bodies”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-474363"></A><CODE>corner_type</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-474365"></A>Specifies which type of corner to produce at non-G1 discontinuities in the path. Default: <A HREF=../headers/pk_sweep_corner_type_t.html>PK_sweep_corner_type_spin_c</A>. See <A HREF="fd_chap.040.html#50422111_60375">Section 39.8, “Specifying corner types”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-537705"></A>have_turn_axis</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-537707"></A>Whether <CODE>
+turn_axis</CODE>
+ is supplied. Default: PK_LOGICAL_false </P>
+<P>
+<A NAME="50422111_pgfId-545565"></A>See <A HREF="fd_chap.040.html#50422111_60417">Section 39.6, “Specifying that path edges lie on a spun surface”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-537745"></A>turn_axis</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-537747"></A>The supplied turn axis.</P>
+<P>
+<A NAME="50422111_pgfId-544076"></A>See <A HREF="fd_chap.040.html#50422111_60417">Section 39.6, “Specifying that path edges lie on a spun surface”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-537785"></A>turn_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-537787"></A>The path edges to which the <CODE>
+turn_axis</CODE>
+ applies.</P>
+<P>
+<A NAME="50422111_pgfId-544125"></A>See <A HREF="fd_chap.040.html#50422111_60417">Section 39.6, “Specifying that path edges lie on a spun surface”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422111_pgfId-364332"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-364337"></A>If your application uses models created using earlier versions of Parasolid, you can use the <CODE>
+update</CODE>
+ option to help eliminate differences in rebuild results. This option lets you turn off some of the enhancements to sweeping, to ensure that you get the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_swept_tool_update_t.html>PK_swept_tool_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<ADDRESS>
+<A NAME="50422111_pgfId-364344"></A>Note: The default value is PK_swept_tool_update_default_c which uses all appropriate sweeping enhancements. Setting to a non-default value disables all appropriate sweeping enhancements.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422111_pgfId-299940"></A>39.2	<A NAME="50422111_38757"></A>Specifying a tool body 
+
+
+</H1>
+<P>
+<A NAME="50422111_pgfId-299941"></A>The <CODE>
+tool</CODE>
+ supplied to <A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A> has the following restrictions:</P>
+<UL>
+<LI>
+<A NAME="50422111_pgfId-299942"></A>It must be a solid body.</LI>
+<LI>
+<A NAME="50422111_pgfId-440417"></A>It must be convex.</LI>
+<LI>
+<A NAME="50422111_pgfId-299943"></A>It must not be disjoint.</LI>
+<LI>
+<A NAME="50422111_pgfId-299944"></A>It must intersect the <CODE>
+axis</CODE>
+ as defined by the <CODE>
+tool_axis</CODE>
+. This is so that when the tool body is spun about the <CODE>
+axis</CODE>
+, the resulting cross-section forms a single connected set of curves for use as a profile during the sweep operation. (In other words, the profile body has no holes.)</LI>
+</UL>
+<P>
+<A NAME="50422111_pgfId-299947"></A>It does not matter where the <CODE>
+tool</CODE>
+ is located with respect to the <CODE>
+path</CODE>
+. By default, <A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A> positions the <CODE>
+tool</CODE>
+ so that the <CODE>
+location</CODE>
+ of the <CODE>
+tool_axis</CODE>
+ is on the specified <CODE>
+path</CODE>
+ before sweeping. If you do not want to move the tool onto the <CODE>
+path</CODE>
+, you can set <CODE>
+place_tool_on_path</CODE>
+ to PK_LOGICAL_false. See <A HREF="fd_chap.040.html#50422111_68610">Section 39.5, “Positioning the tool on or off the path”</A>, for more information.</P>
+<P>
+<A NAME="50422111_pgfId-299946"></A>The <CODE>
+tool_axis</CODE>
+ defines the axis about which the tool body is spun. The tool does not need to be rotationally symmetric about the <CODE>
+tool_axis</CODE>
+. The shape of the resultant body can vary depending on the position of the <CODE>
+tool_axis</CODE>
+ as illustrated in <A HREF="fd_chap.040.html#50422111_51448"><EM>
+Figure 39-2</EM></A>.</P>
+<P>
+<A NAME="50422111_pgfId-356012"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-365.gif">
+
+<P>
+<A NAME="50422111_pgfId-355877"></A>Figure 39-2 <A NAME="50422111_51448"></A>The effect that changing the location of the tool axis has on the result body</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422111_pgfId-299952"></A>39.3	<A NAME="50422111_84876"></A>Specifying a path 
+
+
+</H1>
+<P>
+<A NAME="50422111_pgfId-299953"></A>The <CODE>
+path</CODE>
+ supplied to <A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A>:</P>
+<UL>
+<LI>
+<A NAME="50422111_pgfId-441526"></A>must be planar and lie in a plane orthogonal to the <CODE>
+tool_axis,</CODE>
+unless a <CODE>
+lock_direction</CODE>
+ controlling the orientation of the tool is supplied.</LI>
+<LI>
+<A NAME="50422111_pgfId-299954"></A>may be closed (in which case the resulting swept body is called a <STRONG>
+closed sweep</STRONG>). It may also self-intersect: self-intersections in the resulting swept body are healed automatically. </LI>
+<LI>
+<A NAME="50422111_pgfId-299955"></A>need not be G1 continuous, so long as a vertex is placed at each G1 discontinuity. The shape of the swept body at any G1-discontinuous vertex is formed by spinning the tool body on its axis centred at the G1-discontinuous vertex. <A HREF="fd_chap.040.html#50422111_71393"><EM>
+Figure 39-3</EM></A> shows a top-down view of a simple example that illustrates this. </LI>
+</UL>
+<P>
+<A NAME="50422111_pgfId-299965"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-299961"></A>Note: If you are sweeping a tool along a path and the tool is not positioned on the path; then the <CODE>
+path</CODE>
+ must be G1 continuous. See <A HREF="fd_chap.040.html#50422111_68610">Section 39.5, “Positioning the tool on or off the path”</A>, for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422111_pgfId-300001"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-366.gif">
+
+<P>
+<A NAME="50422111_pgfId-300003"></A>Figure 39-3 <A NAME="50422111_71393"></A>Forming swept bodies at G1-discontinuities on the path</P>
+<P>
+<A NAME="50422111_pgfId-300007"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-300006"></A>Warning: You must not specify a wire path that consists of a single ring edge with no vertices.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422111_pgfId-300093"></A>39.4	<A NAME="50422111_42306"></A>Sweeping along 3D paths 
+
+
+</H1>
+<P>
+<A NAME="50422111_pgfId-300094"></A>For non-planar paths or when the tool spin axis is not orthogonal to the path, you must supply a <CODE>
+lock_direction</CODE>
+ to specify the orientation of the swept tool. It must be a unit vector and is used if <CODE>
+have_lock_direction</CODE>
+ is PK_LOGICAL_true. <A HREF="fd_chap.040.html#50422111_46488"><EM>
+Figure 39-4</EM></A> shows a cylindrical tool with a set <CODE>
+lock_direction</CODE>
+ being swept along a 3D path.</P>
+<P>
+<A NAME="50422111_pgfId-300143"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-367.gif">
+
+<P>
+<A NAME="50422111_pgfId-300145"></A>Figure 39-4 <A NAME="50422111_46488"></A>Sweeping along a 3D path</P>
+<P>
+<A NAME="50422111_pgfId-442122"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-442172"></A>Note: For 3D paths, the path curve cannot be an SP-curve.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422111_pgfId-360082"></A>The <CODE>
+lock_direction</CODE>
+ does not have to be in the same direction as the <CODE>
+tool_axis</CODE>
+ and their relative directions can affect the overall shape of the result. <A HREF="fd_chap.040.html#50422111_95450"><EM>
+Figure 39-5</EM></A> (a) shows the result when the direction of the <CODE>
+lock_direction</CODE>
+ and <CODE>
+tool_axis</CODE>
+ are the same, and (b) shows the result when the direction of the <CODE>
+lock_direction</CODE>
+ is different to that of the <CODE>
+tool_axis</CODE>
+.</P>
+<P>
+<A NAME="50422111_pgfId-366979"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-366972"></A>Note:  If <CODE>
+lock_direction</CODE>
+ is not the same as the direction of <CODE>
+tool_axis</CODE>
+, <CODE>
+tool_site</CODE>
+ must be used. In addition, the edges of the path must be one of the following: an analytic curve, a C2 non-rational b-curve or a helical curve created by a Parasolid function. You cannot supply a <CODE>
+lock_direction</CODE>
+ that is parallel to the path tangent at any interior point of the path edge unless the edge is entirely parallel to the <CODE>
+lock_direction</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422111_pgfId-358357"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-368.gif">
+
+<P>
+<A NAME="50422111_pgfId-355274"></A>Figure 39-5 <A NAME="50422111_95450"></A>Difference in the shape of the result body when the direction of <CODE>
+lock_direction</CODE>
+ is the same (a) and different (b) to the direction of <CODE>
+tool_axis</CODE>
+</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422111_pgfId-300147"></A>39.5	<A NAME="50422111_68610"></A>Positioning the tool on or off the path 
+
+
+</H1>
+<P>
+<A NAME="50422111_pgfId-300198"></A>Using the <CODE>
+place_tool_on_path</CODE>
+ option, you can choose whether or not to place the tool on the path before sweeping. When set to PK_LOGICAL_false, the tool will not be moved onto the path and will be swept from its initial position if the following conditions are met:</P>
+<UL>
+<LI>
+<A NAME="50422111_pgfId-300199"></A>the <CODE>
+tool_site</CODE>
+ specifies a positioning vertex for the path which indicates the location of <CODE>
+tool_axis</CODE>
+ and enables the body to be placed on the path for sweeping.</LI>
+<LI>
+<A NAME="50422111_pgfId-300200"></A>the <CODE>
+tool_axis</CODE>
+ intersects the plane perpendicular to the sweep direction at the <CODE>
+tool_site</CODE>
+ taking any <CODE>
+lock_direction</CODE>
+ specified into account.</LI>
+<LI>
+<A NAME="50422111_pgfId-300201"></A>the <CODE>
+path</CODE>
+ is G1 continuous.</LI>
+</UL>
+<P>
+<A NAME="50422111_pgfId-300202"></A>By default, the tool will be moved onto the path before it is swept. The results of both values are illustrated in <A HREF="fd_chap.040.html#50422111_51749"><EM>
+Figure 39-6</EM></A> and <A HREF="fd_chap.040.html#50422111_49319"><EM>
+Figure 39-7</EM></A>.</P>
+<P>
+<A NAME="50422111_pgfId-300244"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-369.gif">
+
+<P>
+<A NAME="50422111_pgfId-300246"></A>Figure 39-6 Sweeping a tool that lies on the path<A NAME="50422111_51749"></A></P>
+<P>
+<A NAME="50422111_pgfId-383581"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-370.gif">
+
+<P>
+<A NAME="50422111_pgfId-382863"></A>Figure 39-7 <A NAME="50422111_49319"></A>Sweeping a tool that lies off the path</P>
+<P>
+<A NAME="50422111_pgfId-385638"></A>Any vertex on the path can be used as a positioning vertex. <A HREF="fd_chap.040.html#50422111_60451"><EM>
+Figure 39-8</EM></A> and <A HREF="fd_chap.040.html#50422111_47667"><EM>
+Figure 39-9</EM></A> show how the location of the positioning vertex on the path can affect the overall shape of the resultant swept profile. </P>
+<P>
+<A NAME="50422111_pgfId-409594"></A>&nbsp;</P>
+<P>
+<A NAME="50422111_pgfId-396103"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-371.gif">
+
+<P>
+<A NAME="50422111_pgfId-300197"></A>Figure 39-8 <A NAME="50422111_60451"></A>Sweeping along a path using a vertex at the start of the path as a positioning vertex </P>
+<P>
+<A NAME="50422111_pgfId-397222"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-372.gif">
+
+<P>
+<A NAME="50422111_pgfId-397007"></A>Figure 39-9 <A NAME="50422111_47667"></A>Sweeping along a path using a vertex in the middle of the path as a positioning vertex </P>
+<P>
+<A NAME="50422111_pgfId-542030"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-386203"></A>Note: If <CODE>
+lock_direction</CODE>
+ is not the same as the direction of <CODE>
+tool_axis</CODE>
+, <CODE>
+tool_site</CODE>
+ must be used.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422111_pgfId-538049"></A>39.6	<A NAME="50422111_60417"></A>Specifying that path edges lie on a spun surface 
+
+
+</H1>
+<P>
+<A NAME="50422111_pgfId-540286"></A>You can use the <CODE>
+have_turn_axis,</CODE>
+ <CODE>
+turn_axis</CODE>
+, and <CODE>
+turn_edges</CODE>
+ options to specify a subset of the path that is considered to turn around the <CODE>
+turn_axis</CODE>
+. Specifying these options can improve the quality of the resulting swept body, for example when simulating lathing and turning operations.</P>
+<P>
+<A NAME="50422111_pgfId-538291"></A>If <CODE>
+have_turn_axis</CODE>
+ is PK_LOGICAL_true:</P>
+<UL>
+<LI>
+<A NAME="50422111_pgfId-538615"></A>the edges of the path specified in <CODE>
+turn_edges</CODE>
+ are treated as lying on a body spun around the supplied <CODE>
+turn_axis</CODE>
+. The tool motion of the sweep corresponding to these edges will be determined using the <CODE>
+turn_axis</CODE>
+ together with the radial directions from <CODE>
+turn_axis</CODE>
+.</LI>
+<LI>
+<A NAME="50422111_pgfId-541602"></A>the <CODE>
+turn_axis</CODE>
+ must lie in the same direction as the <CODE>
+lock_direction</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422111_pgfId-539029"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-373.gif">
+
+<P>
+<A NAME="50422111_pgfId-538275"></A>Figure 39-10 <A NAME="50422111_21525"></A>Specifying the <CODE>
+turn_edges</CODE>
+ in the sweep operation</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422111_pgfId-300248"></A>39.7	<A NAME="50422111_49417"></A>Simplifying faces of a swept tool body 
+
+
+</H1>
+<P>
+<A NAME="50422111_pgfId-300249"></A>If there are faces on the tool body whose precise geometry is not significant for downstream operations, they can be supplied as <CODE>
+cap_faces</CODE>
+ to enable Parasolid to generate simpler geometry for these faces. These cap faces are often used to close off the tool volume or to represent the shaft of the tool. </P>
+<P>
+<A NAME="50422111_pgfId-300259"></A><A HREF="fd_chap.040.html#50422111_70567"><EM>
+Figure 39-11</EM></A> (a) shows a tool body sweep without <CODE>
+cap_faces</CODE>
+ supplied. <A HREF="fd_chap.040.html#50422111_70567"><EM>
+Figure 39-11</EM></A> (b) shows the same tool body sweep where the faces coloured red in the tool have been supplied as <CODE>
+cap_faces</CODE>
+. Parasolid geometrically simplifies these <CODE>
+cap_faces</CODE>
+ to a spherical face that is smoothly joined to the tool and the sweep operation proceeds with this remodelled tool. </P>
+<P>
+<A NAME="50422111_pgfId-300266"></A>Swept faces generated from <CODE>
+cap_faces</CODE>
+ are returned in a Parasolid Report of type <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_3_c</A> with a status of <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_sweep_tool_cap_c</A>. This contains a <A HREF=../headers/pk_sweep_tool_cap_t.html>PK_sweep_tool_cap_t</A> status to indicate whether the swept tool volume is either enclosed (PK_swept_tool_cap_enclose_c) or undercut (<A HREF=../headers/pk_sweep_tool_cap_t.html>PK_sweep_tool_cap_undercut_c</A>) by the simplified cap geometry.</P>
+<P>
+<A NAME="50422111_pgfId-300273"></A>See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid report mechanism.</P>
+<P>
+<A NAME="50422111_pgfId-300312"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-374.gif">
+
+<P>
+<A NAME="50422111_pgfId-300314"></A>Figure 39-11 <A NAME="50422111_70567"></A>Sweeping a tool body with and without supplying <CODE>
+cap_faces</CODE>
+ </P>
+<P>
+<A NAME="50422111_pgfId-474736"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-353919"></A>Note: Faces whose precise geometry is significant for downstream operations must not be supplied as <CODE>
+cap_faces</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422111_pgfId-353888"></A>39.8	<A NAME="50422111_60375"></A>Specifying corner types 
+
+
+</H1>
+<P>
+<A NAME="50422111_pgfId-475009"></A>When the sweep path is not G1-continuous, you can choose to produce either a rounded or mitred corner at each sharp corner on the path using the <CODE>
+corner_type</CODE>
+ option. By default, rounded corners are produced. When set to <A HREF=../headers/pk_sweep_corner_type_t.html>PK_sweep_corner_type_mitre_c</A>, each section of the sweep is linearly extended to produce mitred corners.</P>
+<P>
+<A NAME="50422111_pgfId-479129"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-479546"></A>Note: If the value is set to <A HREF=../headers/pk_sweep_corner_type_t.html>PK_sweep_corner_type_mitre_c</A>, the path must be planar and lie in a plane orthogonal to the tool axis. If you are using a lock direction for the sweep, it must be parallel to the tool axis.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422111_pgfId-477999"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-375.gif">
+
+<P>
+<A NAME="50422111_pgfId-477869"></A>Figure 39-12 Producing rounded or mitred corners when sweeping with a tool body</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422111_pgfId-300539"></A>39.9	<A NAME="50422111_76381"></A>Performing boolean operations with solid tool bodies 
+
+
+</H1>
+<P>
+<A NAME="50422111_pgfId-317260"></A>As discussed in <A HREF="fd_chap.040.html#50422111_96185">Section 39.1</A>, you can use <A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A> to construct bodies that represent regions to be cut from a solid body and then use Parasolid’s boolean operation to subtract the specified region from the solid body. See <A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A> for more information on boolean functionality.</P>
+<P>
+<A NAME="50422111_pgfId-328814"></A><A NAME="50422111_27619"></A>Alternatively, you can perform both the sweep and boolean operation in one function call, using the <CODE>
+sweep_boolean</CODE>
+ option in <A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A>. When simulating lathing operations for example, the volume of interest is often the volume remaining after removal of material from the target body. In these circumstances, setting the <CODE>
+sweep_boolean</CODE>
+ option allows the complexity of the modelling operations to be reduced.</P>
+<P>
+<A NAME="50422111_pgfId-329318"></A>To use this functionality you must specify an appropriate target body in addition to the chosen boolean operation (either subtract or intersect) using the <CODE>
+sweep_boolean</CODE>
+ option. This takes the following values:</P>
+<P>
+<A NAME="50422111_pgfId-330659"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-329321"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-329323"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-329325"></A><A HREF=../headers/pk_sweep_boolean_t.html>PK_sweep_boolean_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-329327"></A>Do not perform a boolean operation. Default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-329329"></A><A HREF=../headers/pk_sweep_boolean_t.html>PK_sweep_boolean_subtract_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-329331"></A>Subtract the swept tool from the chosen target body to create the result body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-329333"></A><A HREF=../headers/pk_sweep_boolean_t.html>PK_sweep_boolean_intersect_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422111_pgfId-329335"></A>Intersect the chosen target with the swept tool to create the result body.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422111_pgfId-300564"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422111_pgfId-300563"></A>Note: Only solid body targets are supported for this functionality</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422111_pgfId-300568"></A><A HREF="fd_chap.040.html#50422111_93247"><EM>
+Figure 39-13</EM></A> shows an example of this functionality. When <CODE>
+sweep_boolean</CODE>
+ is set to <A HREF=../headers/pk_sweep_boolean_t.html>PK_sweep_boolean_subtract_c</A> the swept tool volume is subtracted from the specified target body to create a result body. When set to <A HREF=../headers/pk_sweep_boolean_t.html>PK_sweep_boolean_intersect_c</A> the specified target volume is intersected with the swept tool to create a result body</P>
+<P>
+<A NAME="50422111_pgfId-336117"></A>With this option, the boolean operation occurs immediately after the swept tool has been swept along its path and the swept tool returned is the target body which is the result of the boolean operation between the sweep and boolean combination. </P>
+<P>
+<A NAME="50422111_pgfId-300603"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-376.gif">
+
+<P>
+<A NAME="50422111_pgfId-300605"></A>Figure 39-13 <A NAME="50422111_93247"></A>Performing boolean operations with a swept tool body<A NAME="50422111_98441"></A></P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.039.html">Sweeping</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.041.html">Lofting</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

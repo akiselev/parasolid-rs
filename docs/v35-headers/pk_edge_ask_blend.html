@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_ask_blend</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_ask_blend</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>               PK_EDGE_ask_blend
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                     edge,           --- an edge
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_blend_type_t.html>PK_blend_type_t</A>        *const type,           --- type of blend
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>              *const left_face,      --- face to left of edge
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>              *const right_face,     --- face to right of edge
+<A HREF=../headers/pk_blend_edge_shape_t.html>PK_blend_edge_shape_t</A>  *const edge_shape,     --- shape of blend
+<A HREF=../headers/pk_blend_properties_t.html>PK_blend_properties_t</A>  *const properties,     --- blend properties
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>              *const cliff_edge      --- cliff edge
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns information about the blend on a given edge if any.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_attr_not_found     Blend attribute missing from an edge that
+                                is a member of a blend set over a chain
+                                of edges. (MILD)
+
+    PK_ERROR_check_error        Encountered corrupt blend attribute(s). (MILD)
+
+<A NAME="documentation"></A>
+If the edge has no unfixed blend the <B>'type'</B> is returned as <A HREF=../headers/pk_blend_type_t.html>PK_blend_type_no_c</A>
+and all other returned arguments are undefined.
+
+The <B>'propagate'</B> flag in the <B>'properties'</B> field will always be returned as
+<A HREF=../headers/pk_blend_propagate_t.html>PK_blend_propagate_no_c</A> since this flag is only meaningful when the blend
+attributes are created.
+
+The returned arguments are as follows:
+
+    <B>'type'</B>
+        Type of blend: one of <A HREF=../headers/pk_blend_type_t.html>PK_blend_type_no_c</A>, <A HREF=../headers/pk_blend_type_t.html>PK_blend_type_ball_c</A>,
+        <A HREF=../headers/pk_blend_type_t.html>PK_blend_type_chamfer_c</A>, or <A HREF=../headers/pk_blend_type_t.html>PK_blend_type_chain_c</A>.
+        <A HREF=../headers/pk_blend_type_t.html>PK_blend_type_chain_c</A> is for blends set using <A HREF=../headers/pk_edge_set_blend_chain.html>PK_EDGE_set_blend_chain</A>.
+
+    <B>'left_face'</B>
+        The face to the left of the edge.
+
+    <B>'right_face'</B>
+        The face to the right of the edge.
+
+    <B>'edge_shape'</B>
+        A structure of type <A HREF=../headers/pk_blend_edge_shape_t.html>PK_blend_edge_shape_t</A> detailing the shape of the
+        blend on the edge. If <B>'type'</B> is <A HREF=../headers/pk_blend_type_t.html>PK_blend_type_chain_c</A>, the content of
+        this structure is undefined (see below). Otherwise, its fields
+
+        <B>'rhos'</B>
+            will be zero for rolling ball/chamfer/non-conic variable
+            radius blends.
+
+        <B>'positions'</B>
+            will be set to (0, 0, 0) for rolling ball/chamfer blends.
+
+    <B>'properties'</B>
+        A structure of type <A HREF=../headers/pk_blend_properties_t.html>PK_blend_properties_t</A> detailing the blend's
+        properties. If <B>'type'</B> is <A HREF=../headers/pk_blend_type_t.html>PK_blend_type_chain_c</A>, this structure's
+        content is only partially defined (see below).
+
+    <B>'cliff_edge'</B>
+        Blend's cliff edge, if used.
+
+In the case of a variable radius blend, this function will only return the end
+radii of the blend in <B>'edge_shape'</B>.
+
+If the blend on <B>'edge'</B> was set using <A HREF=../headers/pk_edge_set_blend_chain.html>PK_EDGE_set_blend_chain</A> (i.e., <B>'type'</B> is
+<A HREF=../headers/pk_blend_type_t.html>PK_blend_type_chain_c</A>), the following applies:
+
+ 1. The parameters defining the shape of the blend chain will be returned in a
+    record in the Parasolid report stream and NOT in <B>'edge_shape'</B>. This record
+    will be of type <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_3_c</A>, and will have a status of
+    <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_blend_chain_c</A>.
+
+ 2. The only fields of <B>'properties'</B> defined in this case are tolerance,
+    ov_smooth, ov_cliff, ov_cliff_end, and ov_notch.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_persp_outline</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_persp_outline</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                        PK_BODY_make_persp_outline
+(
+<I>--- received arguments ---
+</I>const int                              n_bodies,      --- number of bodies
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                        bodies[],      --- bodies
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>                      transfs[],     --- body transformation
+const <A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                      eye_position,  --- eye position
+const <A HREF=../headers/pk_body_make_persp_outline_o_t.html>PK_BODY_make_persp_outline_o_t</A>  *options,       --- option structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_make_persp_outline_r_t.html>PK_BODY_make_persp_outline_r_t</A>  *const result,        --- outline result
+<A HREF=../headers/pk_entity_track_r_t.html>PK_ENTITY_track_r_t</A>             *const tracking       --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function produces outlines for viewing bodies of type PK_BODY_type_solid_c
+or PK_BODY_type_sheet_c from the <B>'eye_position'</B>, to give a perspective view.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_component        (MILD)  a supplied transform contains terms
+                                          other than translation, rotation and
+                                          reflection.
+
+    PK_ERROR_unsuitable_entity    (MILD)  a supplied body is edge-on or is
+                                          neither solid body nor sheet body.
+
+    PK_ERROR_bad_position         (MILD)  the <B>'eye_position'</B> is placed outside
+                                          the size box or close to the
+                                          projection surface within the
+                                          operation tolerance.
+
+
+<A NAME="documentation"></A>
+This function produces outlines for viewing bodies of type PK_BODY_type_solid_c
+or PK_BODY_type_sheet_c from the <B>'eye_position'</B>, to give a perspective view.
+
+If the <B>'transfs'</B> argument is NULL, no transforms are applied to the bodies and
+the bodies array must not contain duplicates.
+
+If the <B>'transfs'</B> argument is not NULL, it refers to an array of <B>'n_bodies'</B>
+<A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A> entities. Each body is transformed by its corresponding entry in
+<B>'transfs'</B>. The bodies array may contain duplicates. The <B>'transfs'</B> may only
+include rigid and reflection transforms. If an instance does not need to be
+transformed, its <B>'transfs'</B> entry can be set to PK_ENTITY_null.
+
+<B>'result'</B> returns the status information and an array of outlines, each
+consisting of a set of outline curves that connect to each other when viewing
+from the <B>'eye_position'</B>.
+
+If <A HREF=../headers/pk_persp_outline_t.html>PK_persp_outline_ok_c</A> or <A HREF=../headers/pk_persp_outline_t.html>PK_persp_outline_non_manifold_c</A> or
+<A HREF=../headers/pk_persp_outline_t.html>PK_persp_outline_cant_project_c</A> is returned as the <B>'status'</B> of the <B>'result'</B>,
+<B>'tracking'</B> returns the tracking information of the edges and faces that
+generate the outline curves, one track record per outline curve.
+If the value of <B>'clipping'</B> is not <A HREF=../headers/pk_persp_clipping_t.html>PK_persp_clipping_no_c</A>, the result may
+include bound curves that are created from the boundary of the viewing range,
+which together with the outline curves define the areas inside the outline
+loops. A bound curve has a tracking record with empty <B>'original_entities'</B> and
+<B>'original_classes'</B> arrays.
+
+An edge is returned as the original entity if it coincides with an outline
+curve when viewing from the <B>'eye_position'</B>.
+
+A face is returned if its silhouette coincides with an outline curve when
+viewing from the <B>'eye_position'</B>.
+
+If <A HREF=../headers/pk_persp_outline_t.html>PK_persp_outline_non_manifold_c</A> is returned, the <B>'product_error_entities'</B>
+in the <B>'result'</B> contains the entities associated with the non-manifold
+outlines.
+
+If <A HREF=../headers/pk_persp_outline_t.html>PK_persp_outline_cant_project_c</A> is returned, the outline curves that fail
+to project will be returned as 0, and the outline curves that fail to check
+will be returned in the <B>'product_error_entities'</B> in the <B>'result'</B>. The
+entities that generate these outline curves will be returned in the
+<B>'original_error_entities'</B> in the <B>'result'</B>.
+
+If <A HREF=../headers/pk_persp_outline_t.html>PK_persp_outline_no_outline_c</A> is returned as the <B>'status'</B> of the <B>'result'</B>,
+only empty arrays will be returned in the <B>'result'</B>.
+
+For a returned <B>'status'</B> that indicates an operation failure before producing
+any outline, e.g. <A HREF=../headers/pk_persp_outline_t.html>PK_persp_outline_cant_facet_c</A>, the entities associated with
+the failure will be returned in <B>'original_error_entities'</B> in the <B>'result'</B>.
+The <B>'product_error_entities'</B> will be empty.
+
+For a returned <B>'status'</B> that indicates an operation failure after producing
+outline curves, the error curves responsible for the failure will be returned
+in <B>'product_error_entities'</B>. In cases where the value of <B>'clipping'</B> is not
+<A HREF=../headers/pk_persp_clipping_t.html>PK_persp_clipping_no_c</A>, the error curves may include some bound curves from
+the boundary of the viewing range. The original entities and transforms of
+error bound curves are returned as 0 in <B>'original_error_entities'</B> and
+<B>'original_error_transfs'</B> respectively.
+
+If applicable, the transformations associated with the entities in
+<B>'original_error_entities'</B> will be returned in <B>'original_error_transfs'</B> in the
+<B>'result'</B>. If an entity in <B>'original_error_entities'</B> does not associate with
+a transformation or the operation failure does not link to a transformation,
+its transformation tag in <B>'original_error_transfs'</B> will be returned as 0.
+
+Note: Where the function returns several outlines the order of those outlines
+is undefined.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

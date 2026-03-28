@@ -1,0 +1,534 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Transformations</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Transformations</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.021.html">Lattice Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.023.html">Assemblies And Instances</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.022.html#50422091_pgfId-294726">21.1	Introduction </A>
+<LI> <A HREF="fd_chap.022.html#50422091_pgfId-296500">21.2	Creating transformations </A>
+<LI> <A HREF="fd_chap.022.html#50422091_pgfId-396506">21.3	Applying transformations </A>
+<LI> <A HREF="fd_chap.022.html#50422091_pgfId-296525">21.4	Transforming geometry </A>
+<LI> <A HREF="fd_chap.022.html#50422091_pgfId-373788">21.5	Transforming bodies </A>
+<LI> <A HREF="fd_chap.022.html#50422091_pgfId-296575">21.6	Transforming other entities </A>
+<LI> <A HREF="fd_chap.022.html#50422091_pgfId-373814">21.7	Checking and classifying transformations </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422091_pgfId-294726"></A>21.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422091_pgfId-296496"></A><A NAME="50422091_85200"></A><A NAME="50422091_marker-396631"></A><A NAME="50422091_marker-396632"></A><A NAME="50422091_marker-396633"></A>The Parasolid PK interface supports homogenous coordinate transformations. These allow translation, scale (equal and non-uniform), rotation, shear and reflection transformations to be specified. These transformations can then be combined to give more general transformations.</P>
+<P>
+<A NAME="50422091_pgfId-296497"></A>Transformations can be applied to individual geometrical entities or to whole bodies. Transformations can also be checked for validity, and classified by class.</P>
+<P>
+<A NAME="50422091_pgfId-388892"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422091_pgfId-380906"></A>Note: Throughout this chapter, transformations are assumed to be supplied in the form of a 4x4 matrix. For more details, see <A HREF=../headers/pk_transf_sf_t.html>PK_TRANSF_sf_t</A>. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422091_pgfId-387946"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-387622"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422091_pgfId-387772"></A><A HREF="fd_chap.030.html#50422099_Clash Detection Of Bodies">Chapter 29, “Clash Detection Of Bodies”</A></LI>
+<LI>
+<A NAME="50422091_pgfId-387645"></A><A HREF="fd_chap.055.html#50422128_28642">Chapter 54, “Instancing And Patterning”</A></LI>
+<LI>
+<A NAME="50422091_pgfId-387807"></A><A HREF="fd_chap.073.html#50422148_">Chapter 72, “Generic Face Editing”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422091_pgfId-296500"></A>21.2	<A NAME="50422091_marker-389309"></A><A NAME="50422091_marker-389310"></A><A NAME="50422091_46697"></A>Creating transformations 
+
+
+</H1>
+<P>
+<A NAME="50422091_pgfId-296502"></A><A NAME="50422091_marker-296501"></A>Many of the basic transformations are available directly via:</P>
+<UL>
+<LI>
+<A NAME="50422091_pgfId-296504"></A><A NAME="50422091_marker-296503"></A><A HREF=../headers/pk_transf_create_equal_scale.html>PK_TRANSF_create_equal_scale</A></LI>
+<LI>
+<A NAME="50422091_pgfId-296506"></A><A NAME="50422091_marker-296505"></A><A HREF=../headers/pk_transf_create_reflection.html>PK_TRANSF_create_reflection</A></LI>
+<LI>
+<A NAME="50422091_pgfId-296508"></A><A NAME="50422091_marker-296507"></A><A HREF=../headers/pk_transf_create_rotation.html>PK_TRANSF_create_rotation</A></LI>
+<LI>
+<A NAME="50422091_pgfId-296510"></A><A NAME="50422091_marker-296509"></A><A HREF=../headers/pk_transf_create_translation.html>PK_TRANSF_create_translation</A></LI>
+</UL>
+<P>
+<A NAME="50422091_pgfId-296512"></A>In addition to these functions, <A NAME="50422091_marker-296511"></A><A HREF=../headers/pk_transf_create.html><A HREF=../headers/pk_transf_create.html>PK_TRANSF_create</A></A> allows you to create any transformation directly. For example, a non-uniform scaling of 2 in X, 3 in Y and 4 in Z can be generated from the <A HREF=../headers/pk_transf_create.html><A HREF=../headers/pk_transf_create.html>PK_TRANSF_create</A></A> function with matrix:</P>
+<P>
+<A NAME="50422091_pgfId-296513"></A>( 2 0 0 0 )<BR>
+( 0 3 0 0 )<BR>
+( 0 0 4 0 )<BR>
+( 0 0 0 1 )</P>
+<P>
+<A NAME="50422091_pgfId-381828"></A>as input. The documentation of the standard form, <A HREF=../headers/pk_transf_sf_t.html>PK_TRANSF_sf_t</A>, explains the mathematics underlying this matrix. Parasolid currently does not allow perspective terms in transformations used in modeling operations. This means that the first 3 elements of the 4th column of the matrix must be zero.</P>
+<P>
+<A NAME="50422091_pgfId-381832"></A>The upper left 3x3 sub-matrix of any 4x4 transformation matrix represents the component of the transformation that is a linear transformation. This is referred to as the <STRONG>
+linear transformation matrix</STRONG>. For more details, see <A HREF=../headers/pk_transf_sf_t.html>PK_TRANSF_sf_t</A>. </P>
+<P>
+<A NAME="50422091_pgfId-296516"></A>Transformations can be combined and manipulated using <A HREF=../headers/pk_transf_transform_2.html>PK_TRANSF_transform_2</A>.</P>
+<P>
+<A NAME="50422091_pgfId-411584"></A>Parasolid supports large transformations (i.e where the entity lies within the size box but can be positioned by a large transform outside the size box).This can be useful for example in factory design when deciding where to position objects (such as machinery) around the factory. Each component of the factory is “small” but the factory itself may extend to a few kilometers in size. </P>
+<P>
+<A NAME="50422091_pgfId-411586"></A>Large transformations cannot be applied to geometry or topology but they can be passed into certain Parasolid API that accept transformations as input. These include:</P>
+<UL>
+<LI>
+<A NAME="50422091_pgfId-411589"></A><A HREF=../headers/pk_body_pick_topols.html>PK_BODY_pick_topols</A></LI>
+<LI>
+<A NAME="50422091_pgfId-411587"></A><A HREF=../headers/pk_entity_range.html>PK_ENTITY_range</A></LI>
+<LI>
+<A NAME="50422091_pgfId-412020"></A><A HREF=../headers/pk_face_is_coincident.html>PK_FACE_is_coincident</A></LI>
+<LI>
+<A NAME="50422091_pgfId-411588"></A><A HREF=../headers/pk_topol_clash.html>PK_TOPOL_clash</A></LI>
+<LI>
+<A NAME="50422091_pgfId-412106"></A><A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A></LI>
+<LI>
+<A NAME="50422091_pgfId-413518"></A><A HREF=../headers/pk_topol_find_box_2.html>PK_TOPOL_find_box_2</A></LI>
+<LI>
+<A NAME="50422091_pgfId-411949"></A><A HREF=../headers/pk_topol_find_nabox.html>PK_TOPOL_find_nabox</A></LI>
+<LI>
+<A NAME="50422091_pgfId-412145"></A><A HREF=../headers/pk_topol_render_line.html>PK_TOPOL_render_line</A> (wireframe rendering)</LI>
+</UL>
+<P>
+<A NAME="50422091_pgfId-411592"></A>In order to maintain accuracy when working with large transformations, we recommend you use the specific transformation functions <A HREF=../headers/pk_transf_create_equal_scale.html>PK_TRANSF_create_equal_scale</A>, <A HREF=../headers/pk_transf_create_reflection.html>PK_TRANSF_create_reflection</A> and <A HREF=../headers/pk_transf_create_rotation.html>PK_TRANSF_create_rotation</A> to create the necessary transformations and <A HREF=../headers/pk_transf_transform_2.html>PK_TRANSF_transform_2</A> to combine them.</P>
+<P>
+<A NAME="50422091_pgfId-410635"></A>If you are interested in implementing large transformations in your application, please contact Parasolid Support for more information.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422091_pgfId-396506"></A>21.3	<A NAME="50422091_marker-296517"></A><A NAME="50422091_marker-296518"></A><A NAME="50422091_91286"></A>Applying transformations 
+
+
+</H1>
+<P>
+<A NAME="50422091_pgfId-396508"></A><A NAME="50422091_marker-396507"></A>Transformations can be applied to geometry, bodies, assemblies, instances, vectors and faces.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422091_pgfId-296525"></A>21.4	<A NAME="50422091_marker-296523"></A><A NAME="50422091_marker-296524"></A>Transforming geometry 
+
+
+</H1>
+<P>
+<A NAME="50422091_pgfId-296527"></A>You can use <A NAME="50422091_marker-408644"></A><A HREF=../headers/pk_geom_transform_2.html>PK_GEOM_transform_2</A> to transform an array of geometric entities, either by modifying the original entities, or by modifying copies of them. It receives an array of geometries, a transformation and a set of options. It can return transformed copies of the supplied geometry, together with information about whether each copy is an exact transformation of the original or not. </P>
+<P>
+<A NAME="50422091_pgfId-296528"></A><A HREF=../headers/pk_geom_transform_2.html>PK_GEOM_transform_2</A> takes options that let you control the behaviour of the function as follows:</P>
+<P>
+<A NAME="50422091_pgfId-373785"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-373753"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-373755"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-373757"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-373759"></A>If a geometric entity cannot be transformed exactly, this is the tolerance to which the new geometry matches the original. </P>
+<P>
+<A NAME="50422091_pgfId-373760"></A>Whether an exact result is possible depends on both the type of transformation and the class of the geometry. For example, for surfaces:</P>
+<UL>
+<LI>
+<A NAME="50422091_pgfId-373761"></A>Planes can always be transformed to planes.</LI>
+<LI>
+<A NAME="50422091_pgfId-373762"></A>Spheres can always be exactly transformed but may result in B-surfaces.</LI>
+<LI>
+<A NAME="50422091_pgfId-373763"></A>B-surfaces can always be exactly transformed.</LI>
+<LI>
+<A NAME="50422091_pgfId-373764"></A>Offset surfaces usually transform to approximate B-surfaces.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-373766"></A>modify</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-373768"></A>Whether to create new geometric entities, or to modify the originals.</P>
+<UL>
+<LI>
+<A NAME="50422091_pgfId-373769"></A>Modifying the originals is useful if, for instance, you want to ensure that the Parasolid tags for each entity remain unchanged. </LI>
+<LI>
+<A NAME="50422091_pgfId-373773"></A>Creating new entities means that, for example, you can transform the surfaces of faces in a body without affecting the integrity of the original body.</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422091_pgfId-373774"></A>Note: If you modify the original geometry, and you attempt a transformation that either produces a non-exact result, or changes the geometry type (e.g. a sphere becomes a B-surface), then the operation fails. </ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-373776"></A>want_out_geoms</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-373778"></A>Whether to return transformed geometry in an <CODE>
+out_geoms</CODE>
+ array. If this is PK_LOGICAL_true, then:</P>
+<UL>
+<LI>
+<A NAME="50422091_pgfId-373779"></A>If you are modifying the original geometry, then <CODE>
+out_geoms</CODE>
+ contains a list of the original geometry. </LI>
+<LI>
+<A NAME="50422091_pgfId-373780"></A>If you are transforming copies of the original geometry, then <CODE>
+out_geoms</CODE>
+ contains the resulting transformed geometry. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-373782"></A>want_exact</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-373784"></A>Whether to return information indicating whether each geometry has been transformed exactly, or to within the specified tolerance. If PK_LOGICAL_true, then <A HREF=../headers/pk_geom_transform_2.html>PK_GEOM_transform_2</A> returns an <CODE>
+exact</CODE>
+ array of <A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> tokens, one for each transformed geometry. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422091_pgfId-373788"></A>21.5	<A NAME="50422091_marker-373786"></A><A NAME="50422091_marker-373787"></A>Transforming bodies 
+
+
+</H1>
+<P>
+<A NAME="50422091_pgfId-373790"></A><A NAME="50422091_marker-373789"></A><A HREF=../headers/pk_body_transform_2.html>PK_BODY_transform_2</A> takes a sheet or solid body, a transformation and a tolerance for geometry which may have to be approximated.</P>
+<P>
+<A NAME="50422091_pgfId-296569"></A>The body is transformed. Face surfaces and edge curves may have to be approximated in order to achieve the desired result. Intersection curves are recalculated between transformed face surfaces unless the intersection and face surfaces can be transformed exactly.</P>
+<P>
+<A NAME="50422091_pgfId-296570"></A>It can happen that edges and vertices become tolerant as a result of this operation. For example, a smooth edge between faces often transforms to a tolerant smooth edge. Some topology changes, such as the elimination of edges made too short by transformation, are supported.</P>
+<P>
+<A NAME="50422091_pgfId-296574"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422091_pgfId-296573"></A>Note: The order in which transformations are applied is important, e.g. a rotation of 90 degrees about the Z axis followed by a translation of (1 0 0) is not the same as a translation of (1 0 0) followed by a rotation of 90 degrees about the Z axis.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422091_pgfId-296575"></A>21.6	Transforming other entities 
+
+
+</H1>
+<P>
+<A NAME="50422091_pgfId-296576"></A>As well as bodies and geometry, you can apply transformations to other entities using the following functions:</P>
+<UL>
+<LI>
+<A NAME="50422091_pgfId-296577"></A><A HREF=../headers/pk_assembly_transform.html>PK_ASSEMBLY_transform</A></LI>
+<LI>
+<A NAME="50422091_pgfId-296578"></A><A HREF=../headers/pk_face_transform_2.html>PK_FACE_transform_2</A></LI>
+<LI>
+<A NAME="50422091_pgfId-296579"></A><A HREF=../headers/pk_instance_transform.html>PK_INSTANCE_transform</A></LI>
+<LI>
+<A NAME="50422091_pgfId-296580"></A><A HREF=../headers/pk_transf_transform_2.html>PK_TRANSF_transform_2</A></LI>
+<LI>
+<A NAME="50422091_pgfId-403829"></A><A HREF=../headers/pk_vector_transform.html>PK_VECTOR_transform</A><A NAME="50422091_75578"></A></LI>
+<LI>
+<A NAME="50422091_pgfId-402818"></A><A HREF=../headers/pk_vector_transform_direction.html>PK_VECTOR_transform_direction</A></LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422091_pgfId-373814"></A>21.7	<A NAME="50422091_30895"></A>Checking and classifying transformations 
+
+
+</H1>
+<P>
+<A NAME="50422091_pgfId-377385"></A>You can use <A HREF=../headers/pk_transf_check.html>PK_TRANSF_check</A> to perform a simple validity check on a given transformation. This function returns limited information about any faults found in the transformation, if any. </P>
+<P>
+<A NAME="50422091_pgfId-376649"></A><A HREF=../headers/pk_transf_classify.html><A HREF=../headers/pk_transf_classify.html>PK_TRANSF_classify</A></A> is a more comprehensive API that complements the basic validity checking of <A HREF=../headers/pk_transf_check.html>PK_TRANSF_check</A>. <A HREF=../headers/pk_transf_classify.html><A HREF=../headers/pk_transf_classify.html>PK_TRANSF_classify</A></A> can tell you the class of a transformation and (optionally) provide details about how the transformation deviates from the orthonormal state for that class.</P>
+<P>
+<A NAME="50422091_pgfId-377409"></A>PK functions that receive transformations as arguments have their own requirements on the classification of transformation that they accept. Please refer to the relevant API for further information. Where a received transformation is rejected, you can use <A HREF=../headers/pk_transf_classify.html>PK_TRANSF_classify</A> to provide additional information to help you diagnose the cause.</P>
+<P>
+<A NAME="50422091_pgfId-374403"></A><A HREF=../headers/pk_transf_classify.html>PK_TRANSF_classify</A> returns the following information:</P>
+<P>
+<A NAME="50422091_pgfId-374467"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-374477"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-374479"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-374481"></A>matrix_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-374483"></A>The class of the linear transformation matrix (this is the upper left 3x3 matrix of the supplied transformation: see <A HREF="fd_chap.022.html#50422091_46697">Section 21.2</A>). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-374485"></A>determinant</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-374487"></A>The determinant of the linear transformation matrix.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-374489"></A>unit_rows_deviations</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-374491"></A>The signed deviations from 1.0 of the squared norms of the rows of the linear transformation matrix. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-374493"></A>orthog_rows_deviation</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-376301"></A>The signed deviations from 0.0 of the dot products between the rows of the linear transformation matrix. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-374497"></A>translation</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-374499"></A>The translation vector of the supplied transformation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-374501"></A>perspective</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-376016"></A>The perspective vector of the supplied transformation</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422091_pgfId-374505"></A>scale</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-374507"></A>The reciprocal of the global scale factor corresponding to the bottom right corner value of the transformation. The transformation is shrinking if this value is &lt; 1.0 and expanding if this value is &gt; 1.0,</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422091_pgfId-377266"></A>The returned <CODE>
+matrix_type</CODE>
+ is one of the following:</P>
+<P>
+<A NAME="50422091_pgfId-377292"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377269"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377271"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377273"></A><A HREF=../headers/pk_matrix_type_t.html>PK_matrix_type_identity_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377275"></A>The linear transformation is the identity matrix.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377277"></A><A HREF=../headers/pk_matrix_type_t.html>PK_matrix_type_rotation_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377279"></A>The linear transformation is a rotation matrix.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377281"></A><A HREF=../headers/pk_matrix_type_t.html>PK_matrix_type_reflection_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377283"></A>The linear transformation is an orthonormal matrix that includes a reflection (i.e. the determinant is -1).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377285"></A><A HREF=../headers/pk_matrix_type_t.html>PK_matrix_type_general_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377287"></A>The linear transformation is valid (according to <A HREF=../headers/pk_transf_check.html>PK_TRANSF_check</A>), but contains local scaling information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377289"></A><A HREF=../headers/pk_matrix_type_t.html>PK_matrix_type_unclassified_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422091_pgfId-377291"></A>The linear transformation cannot be classified.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422091_pgfId-375552"></A>By default, <A HREF=../headers/pk_transf_classify.html>PK_TRANSF_classify</A> does not return either <CODE>
+unit_rows_deviations</CODE>
+ or <CODE>
+orthog_rows_deviations</CODE>
+. These values are only returned if the <CODE>
+diagnostics</CODE>
+ option is PK_TRANSF_diagnostics_all_c. </P>
+<P>
+<A NAME="50422091_pgfId-376956"></A>See <A HREF=../headers/pk_transf_classify.html>PK_TRANSF_classify</A> for more information. </P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.021.html">Lattice Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.023.html">Assemblies And Instances</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

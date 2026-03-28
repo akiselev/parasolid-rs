@@ -1,0 +1,153 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_taper</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_taper</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>              PK_BODY_taper
+(
+<I>--- received arguments ---
+</I>const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>              body,           --- body to be tapered
+int                          n_refs_above,   --- number of reference
+                                             --- entities above parting
+                                             --- body
+const <A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A>            refs_above[],   --- reference entities
+                                             --- above parting body
+int                          n_refs_below,   --- number of reference
+                                             --- entities below parting
+                                             --- body
+const <A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A>            refs_below[],   --- reference entities
+                                             --- below parting body
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>              parting_body,   --- parting body
+<A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>                 direction,      --- draw direction
+double                       angle_above,    --- taper angle above
+double                       angle_below,    --- taper angle below
+const <A HREF=../headers/pk_body_taper_o_t.html>PK_BODY_taper_o_t</A>     *options,        --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>    *const tracking,       --- tracking information
+<A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A>    *const results         --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function applies two-sided tapering to the <B>'body'</B> parted
+by the <B>'parting_body'</B>.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_topology    only solid bodies and solid
+                                    or sheet parting bodies are
+                                    supported (MILD)
+
+    PK_ERROR_wrong_entity_in_array  given references are not from
+                                    same body or non-default tapering
+                                    method entities not given as
+                                    references (MILD)
+
+    PK_ERROR_bad_reference          invalid reference entity (MILD)
+
+    PK_ERROR_impossible_taper       taper conditions cannot be
+                                    satisfied (SERIOUS)
+
+    PK_ERROR_not_implemented        unavailable functionality is
+                                    called (MILD)
+
+    PK_ERROR_taper_failed           PK_BODY_taper suffered an
+                                    internal algorithmic failure
+                                    (SERIOUS)
+
+
+<A NAME="documentation"></A>
+For more information about this method of tapering see
+<A HREF="../chapters/fd_chap.068.html#50434431_pgfId-690982">here</A> in the Parasolid
+Functional Description.
+
+The <B>'body'</B> is divided by the <B>'parting_body'</B> into "above" and "below"
+halves with respect to the draw <B>'direction'</B>. Taper faces are then
+constructed and replace existing faces between given references on
+each half and the <B>'parting_body'</B>. See
+<A HREF="../chapters/fd_chap.068.html#50434431_pgfId-309235">here</A> for more information.
+
+Surfaces of new taper faces are defined by the <B>'direction'</B> and
+<B>'angle_above'</B> or <B>'angle_below'</B> for "above" and "below" halves
+respectively. These surfaces originate at <B>'refs_above'</B> and <B>'refs_below'</B>
+and propagate to the intersection with the <B>'parting_body'</B>.
+
+Edge references on either side can form a single chain or multiple
+chains.  If there are references on both sides and <B>'mitre_at_parting'</B>
+is set to PK_LOGICAL_true, then both sides must have the same number of
+chains. See
+<A HREF="../chapters/fd_chap.068.html#50434431_pgfId-1417325">here</A> for more
+information.
+
+Default tapering method can be defined for all references with
+<B>'default_method'</B> option field. It is possible to override the default
+method for each reference entity using <B>'methods'</B> and <B>'method_refs'</B>
+arrays of the option structure. If <B>'default_method'</B> is set to
+<A HREF=../headers/pk_taper_method_t.html>PK_taper_method_isocline_c</A>, it is recommended that the isocline reference
+edges are generated by calling <A HREF=../headers/pk_face_imprint_cus_isoclin.html>PK_FACE_imprint_cus_isoclin</A> with the value
+of <B>'isocline_split'</B> set to <A HREF=../headers/pk_isocline_split_t.html>PK_isocline_split_convexity_c</A>.
+See <A HREF="../chapters/fd_chap.068.html#50434431_pgfId-752777">here</A> for more information.
+
+
+If resulting tapered faces from two halves do not meet at the
+<B>'parting_body'</B> then  the function will do the following depending on
+<B>'miter_at_parting'</B> option field:
+
+Non-mitered solution (<B>'miter_at_parting'</B> is PK_LOGICAL_false)
+
+* Any gaps between misaligned "above" and "below" halves at the
+  <B>'parting_body'</B> will be filled using faces of the <B>'parting_body'</B>.
+
+Mitered solution (<B>'miter_at_parting'</B> is PK_LOGICAL_true)
+
+* Extra material will be added to one or both halves to make sure they
+  meet at the <B>'parting_body'</B>. Depending on the value of the <B>'miter_type'</B>
+  option, mitered faces can either be bound by the supplied reference
+  edges, or tangential to the body, or a combination of the two. This
+  results in varied taper angle for some of the new faces.
+
+The function allows for one-sided solutions as described in
+<A HREF="../chapters/fd_chap.068.html#50434431_pgfId-690982">here</A>. In this case only one
+set of references should be given. The function will construct new
+taper surfaces from the given references to the intersection with
+the <B>'parting_body'</B>.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

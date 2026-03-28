@@ -1,0 +1,115 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_facet_body</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_facet_body</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                    PK_BODY_make_facet_body
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                          body,            --- Body to facet
+<A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>                        transf,          --- Transform
+const <A HREF=../headers/pk_body_make_facet_body_o_t.html>PK_BODY_make_facet_body_o_t</A> *options,
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                   *const body_copy,       --- Faceted copy of body
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>          *const tracking,        --- Tracking information
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>          *const redundant_topol  --- Topological entities
+                                                    --- that were not copied
+                                                    --- to the new body
+)
+</B>
+<A NAME="description"></A>
+<I>This function produces a new body which is a copy of the given body with its
+geometry replaced with facet geometry generated using the supplied options.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsupported_transf    <B>'transf'</B> is not a rigid body transformation.
+                                   (MILD)
+    PK_ERROR_bad_box               The box of <B>'body'</B> does not all lie inside
+                                   the size box. (MILD)
+    PK_ERROR_failed_to_facet       <B>'partial_conversion'</B> is set to
+                                   <A HREF=../headers/pk_error_on_fail_t.html>PK_ERROR_on_fail_any_c</A> and some faces or
+                                   edges in <B>'body'</B> failed to facet. (SERIOUS)
+                                   <B>'partial_conversion'</B> is set to
+                                   <A HREF=../headers/pk_error_on_fail_t.html>PK_ERROR_on_fail_all_c</A> and all faces and
+                                   edges in <B>'body'</B> failed to facet. (SERIOUS)
+
+<A NAME="documentation"></A>
+PK_BODY_make_facet_body will return a copy of <B>'body'</B> in <B>'body_copy'</B>. Points,
+polylines and meshes will be created for the <B>'body_copy'</B> in place of the
+geometry attached to <B>'body'</B>. Options are available to specify whether groups
+and/or attributes should be copied and whether a partial conversion is
+acceptable.  If a partial conversion occurs <B>'body_copy'</B> will have some topology
+with missing geometry.
+
+If <B>'transf'</B> is not PK_ENTITY_null and it only contains translation and rotation
+components then <B>'transf'</B> will be applied to the meshes, polylines and points
+of <B>'body_copy'</B>.  Reflections, scales, shears and perspective components are not
+allowed.
+
+The options structure contains controls for generating a tessellation for the
+original body.  If the <B>'body'</B> has facet geometry and the tessellation options
+are left at their default values, the meshes, polylines and points attached to
+<B>'body_copy'</B> will be exact copies of those in <B>'body'</B>.  Otherwise, the body will
+be tessellated based on the options given, and the meshes, polylines and points
+in the copy will be derived from this tessellation.
+
+
+The function receives:
+    <B>'body'</B>               A body to facet.
+
+    <B>'transf'</B>             A rigid body transformation (translation and rotation
+                         only).
+
+    <B>'options'</B>            Tessellation options, tracking controls, whether to
+                         retain attributes and groups, and whether partial
+                         conversion is allowed.
+
+
+The function will return:
+    <B>'body_copy'</B>          A copy of the body with facet geometry.
+
+    <B>'tracking'</B>           Tracking information identifying the mapping of
+                         topology in <B>'body'</B> to topology in <B>'body_copy'</B>.
+
+    <B>'redundant_topol'</B>    Information identifying topologies from <B>'body'</B> that
+                         were not copied to <B>'body_copy'</B>.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,1582 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Deleting Entities </TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Deleting Entities </B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.063.html"> Overview of Editing Models</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.065.html">Identifying And Simplifying Model Details</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-430343">63.1	Introduction </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-300966">63.2	Deleting faces and healing wounds </A>
+<UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-300988">63.2.1	Methods for healing wounds </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-301066">63.2.2	Calling PK_FACE_delete_2 </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-301111">63.2.3	Heal actions when deleting faces </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-301489">63.2.4	Healing faces with multiple loops </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-301762">63.2.5	Allowing disjoint results </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-301874">63.2.6	Repairing face-face inconsistencies </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-698663">63.2.7	Tracking capping faces when healing wounds </A>
+</UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-698707">63.3	Deleting faces without healing wounds </A>
+<UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-302007">63.3.1	Limitations/restrictions on healing wounds </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-302065">63.3.2	Related functionality </A>
+</UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-321389">63.4	Deleting edges </A>
+<UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-321682">63.4.1	Deleting holes in a sheet body </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-321685">63.4.2	Update control </A>
+</UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-321801">63.5	Deleting face sets </A>
+<UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-321837">63.5.1	Options when deleting face sets </A>
+</UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-397707">63.6	Deleting blend faces </A>
+<UL>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-322222">63.6.1	Checking face-face consistency </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-322244">63.6.2	Simplifying adjacent blend faces </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-322276">63.6.3	Adding cap faces to heal wounds </A>
+<LI> <A HREF="fd_chap.064.html#50422139_pgfId-322430">63.6.4	Specifying underlying entities for blends to be deleted </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422139_pgfId-430343"></A>63.1	<A NAME="50422139_28956"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422139_pgfId-430402"></A>Parasolid provides a range of tools for deleting faces and healing the resulting wounds. This chapter describes the main function, <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A>, and also tells you where you can find information on related tools offered by Parasolid.</P>
+<P>
+<A NAME="50422139_pgfId-430406"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\LOP\Face</CODE>
+ <CODE>
+Delete</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422139_pgfId-430417"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-430412"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422139_pgfId-430416"></A><A HREF="fd_chap.063.html#50422138_23322">Section 62.3.1, “Identifying and deleting blends”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422139_pgfId-300966"></A>63.2	Deleting faces and healing wounds 
+
+
+</H1>
+<P>
+<A NAME="50422139_pgfId-300967"></A>A common operation during model editing is to delete one or more faces from a body. When performing this type of operation, your application must ensure that the resulting body remains valid afterwards; deleting a face from a solid body leaves a wound in the body that requires healing if validity is to be maintained. </P>
+
+<H3>
+<A NAME="50422139_pgfId-300988"></A>	63.2.1 	<A NAME="50422139_75104"></A>Methods for healing wounds </H3>
+<P>
+<A NAME="50422139_pgfId-300989"></A>A variety of methods are available for healing wounds created when editing, and in particular deleting, faces in a body. These are exposed in the <A HREF=../headers/pk_face_heal_t.html>PK_FACE_heal_t</A> structure, which is used by the following functions:</P>
+<UL>
+<LI>
+<A NAME="50422139_pgfId-300990"></A><A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A>, described in this chapter.</LI>
+<LI>
+<A NAME="50422139_pgfId-300993"></A><A HREF=../headers/pk_face_delete_facesets.html>PK_FACE_delete_facesets</A>, described in <A HREF="fd_chap.064.html#50422139_80826">Section 63.5, “Deleting face sets”</A>.</LI>
+<LI>
+<A NAME="50422139_pgfId-365903"></A><A HREF=../headers/pk_face_make_solid_bodies.html>PK_FACE_make_solid_bodies</A>, described in <A HREF="fd_chap.072.html#50422147_99978">Section 71.1.1, “Copying faces to create new bodies”</A>.</LI>
+<LI>
+<A NAME="50422139_pgfId-365908"></A><A HREF=../headers/pk_face_remove_to_solid_bodies.html>PK_FACE_remove_to_solid_bodies</A>, described in <A HREF="fd_chap.072.html#50422147_49104">Section 71.2, “Removing faces to create new bodies”</A>.</LI>
+</UL>
+<P>
+<A NAME="50422139_pgfId-301003"></A>The following table describes the various healing methods available.</P>
+<P>
+<A NAME="50422139_pgfId-301007"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-301006"></A>Note: Not all of the methods available can be used in all functions. The table below provides details. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-301061"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301010"></A>Method</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301012"></A>Value of <CODE>
+heal_action</CODE>
+</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301014"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301019"></A><A NAME="50422139_marker-301016"></A><A NAME="50422139_marker-301017"></A><A NAME="50422139_marker-301018"></A>Capping</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301021"></A>PK_FACE_heal_cap_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301023"></A>Calculates a surface that can cover a wound; this surface must therefore contain all edges of the wound</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301028"></A><A NAME="50422139_marker-301025"></A><A NAME="50422139_marker-301026"></A><A NAME="50422139_marker-301027"></A>Allow shrinkage</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301030"></A>PK_FACE_heal_shrink_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301032"></A>Allow faces adjacent to the wound to shrink or grow in order to heal the wound. </P>
+<P>
+<A NAME="50422139_pgfId-301033"></A>Not available to <A HREF=../headers/pk_face_make_solid_bodies.html>PK_FACE_make_solid_bodies</A> or <A HREF=../headers/pk_face_remove_to_solid_bodies.html>PK_FACE_remove_to_solid_bodies</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301038"></A><A NAME="50422139_marker-301035"></A><A NAME="50422139_marker-301036"></A><A NAME="50422139_marker-301037"></A>Grow from parent</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301040"></A>PK_FACE_heal_grow_from_parent_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301042"></A>Faces from the original body that are not inputs in the operation (parent face set) are grown around the hole until the hole is covered.This heal action offers a subset of the functionality of PK_FACE_heal_shrink_c, and should only be used with <A HREF=../headers/pk_face_make_solid_bodies.html>PK_FACE_make_solid_bodies</A> or <A HREF=../headers/pk_face_remove_to_solid_bodies.html>PK_FACE_remove_to_solid_bodies</A>; for all other functions, use PK_FACE_heal_shrink_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301045"></A><A NAME="50422139_marker-301044"></A>Grow from child</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301047"></A>PK_FACE_heal_grow_from_child_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301049"></A>Extends the set of input faces (child face set) around the hole until they cover the hole.</P>
+<P>
+<A NAME="50422139_pgfId-301050"></A>Not available to <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A>.</P>
+<P>
+<A NAME="50422139_pgfId-301051"></A>Only available as a <CODE>
+child_heal_action</CODE>
+ to <A HREF=../headers/pk_face_remove_to_solid_bodies.html>PK_FACE_remove_to_solid_bodies</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301056"></A><A NAME="50422139_marker-301053"></A><A NAME="50422139_marker-301054"></A><A NAME="50422139_marker-301055"></A>Leave rubber</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301058"></A>PK_FACE_heal_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301060"></A>Leave each hole as a face with no surface geometry</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-822948"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-301064"></A>Note: Where the edges bounding the wound are tolerant, you can only heal the wound by capping if the wound can be capped with a planar surface.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422139_pgfId-301066"></A>	63.2.2 	Calling <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A> </H3>
+<P>
+<A NAME="50422139_pgfId-301067"></A><A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A> receives an array of faces that you want to delete, together with an options structure that contains the following options:</P>
+<P>
+<A NAME="50422139_pgfId-301108"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301070"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301072"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-301074"></A>heal_action</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301076"></A>The method for healing the wounds caused by the operations. See <A HREF="fd_chap.064.html#50422139_17375">Section 63.2.3, “Heal actions when deleting faces”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-301081"></A>heal_loops</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301085"></A>Whether loops should be healed together or separately. See <A HREF="fd_chap.064.html#50422139_43171">Section 63.2.4, “Healing faces with multiple loops”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-301088"></A>local_check</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301090"></A>Whether you want to perform a local check on entities that are created by the operation. If this is PK_LOGICAL_true, then checking results are returned in a report of type <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_t</A>. See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-301095"></A>allow_disjoint</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301099"></A>Whether or not to allow a disjoint result. See <A HREF="fd_chap.064.html#50422139_60635">Section 63.2.5, “Allowing disjoint results”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-301102"></A><CODE>repair_fa_fa</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301104"></A>Whether to repair face-face inconsistencies found by local checking. See <A HREF="fd_chap.064.html#50422139_97623">Section 63.2.6, “Repairing face-face inconsistencies”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-610541"></A>track</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-610543"></A>Whether to track new entities resulting from a delete operation. Default: <A HREF=../headers/pk_delete_track_t.html>PK_delete_track_no_c</A>. See <A HREF="fd_chap.064.html#50422139_87423">Section 63.3, “Deleting faces without healing wounds”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-415549"></A>Provided the faces received by <A HREF=../headers/pk_face_delete_2.html><A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A></A> are locally manifold, the body that they are part of may be a general body: <A HREF=../headers/pk_face_delete_2.html><A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A></A> deletes the faces, heals the wounds as requested, and returns a general body as shown in <A HREF="fd_chap.064.html#50422139_22694"><EM>
+Figure 63-1</EM></A>.</P>
+<P>
+<A NAME="50422139_pgfId-415965"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-698.gif">
+
+<P>
+<A NAME="50422139_pgfId-415859"></A>Figure 63-1 <A NAME="50422139_22694"></A>Deleting faces and healing wounds on a general body</P>
+<P>
+<A NAME="50422139_pgfId-301109"></A>It returns a tracking structure that contains a split tracking record if the operation split the body into multiple bodies (and <CODE>
+allow_disjoint</CODE>
+ was PK_LOGICAL_false). It is empty otherwise. </P>
+
+
+<H3>
+<A NAME="50422139_pgfId-301111"></A>	63.2.3 	<A NAME="50422139_17375"></A>Heal actions when deleting faces </H3>
+<P>
+<A NAME="50422139_pgfId-301114"></A><A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A> supports a subset of the heal actions described in <A HREF="fd_chap.064.html#50422139_75104">Section 63.2.1, “Methods for healing wounds”</A> when healing wounds. This section describes the methods supported, and provides examples.</P>
+<P>
+<A NAME="50422139_pgfId-301116"></A>In practice, there are only two heal actions that you need to use when calling <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A>: </P>
+<UL>
+<LI>
+<A NAME="50422139_pgfId-301117"></A>PK_FACE_heal_cap_c </LI>
+<LI>
+<A NAME="50422139_pgfId-301118"></A>PK_FACE_heal_shrink_c</LI>
+</UL>
+<P>
+<A NAME="50422139_pgfId-301122"></A><A HREF="fd_chap.064.html#50422139_90860"><EM>
+Figure 63-2</EM></A> shows a simple example that illustrates the difference between these heal actions; the pad can be removed from the pyramid either by capping it, to create a truncated pyramid, or by extending the adjacent faces, to create a complete pyramid. </P>
+<P>
+<A NAME="50422139_pgfId-302252"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-699.gif">
+
+<P>
+<A NAME="50422139_pgfId-301317"></A>Figure 63-2 <A NAME="50422139_90860"></A>Deleting faces using “capping” and “allow shrinkage” methods</P>
+<P>
+<A NAME="50422139_pgfId-301321"></A><A HREF="fd_chap.064.html#50422139_64871"><EM>
+Figure 63-3</EM></A> shows an example where the result is the same no matter what heal action is chosen: deleting the faces that comprise the blind hole caps the resulting wound whether a capping face is created, or the adjacent face is extended.</P>
+<P>
+<A NAME="50422139_pgfId-305518"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-700.gif">
+
+<P>
+<A NAME="50422139_pgfId-305520"></A>Figure 63-3 <A NAME="50422139_64871"></A>Healing wounds by capping a hole with a surface</P>
+<P>
+<A NAME="50422139_pgfId-305474"></A><A HREF="fd_chap.064.html#50422139_41995"><EM>
+Figure 63-4</EM></A> shows an example in which the surrounding faces must be grown in order to heal the wound successfully. PK_FACE_heal_cap_c cannot be used in this case because neither a plane nor any single one of the surfaces of the surrounding faces cover the whole wound. PK_FACE_heal_shrink_c is therefore required. </P>
+<P>
+<A NAME="50422139_pgfId-302544"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-701.gif">
+
+<P>
+<A NAME="50422139_pgfId-302546"></A>Figure 63-4 <A NAME="50422139_41995"></A>Healing wounds by growing the faces around the hole: PK_FACE_heal_shrink_c</P>
+<P>
+<A NAME="50422139_pgfId-301437"></A><A HREF="fd_chap.064.html#50422139_60487"><EM>
+Figure 63-5</EM></A> shows an example where some faces surrounding the wound must be grown while others must be shrunk. Again, PK_FACE_heal_shrink_c is the correct <CODE>
+heal_action</CODE>
+ to use. </P>
+<P>
+<A NAME="50422139_pgfId-302643"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-702.gif">
+
+<P>
+<A NAME="50422139_pgfId-301473"></A>Figure 63-5 <A NAME="50422139_60487"></A>Healing wounds growing some faces around a hole while shrinking others: PK_FACE_heal_shrink_c</P>
+<P>
+<A NAME="50422139_pgfId-689556"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-301476"></A>Note: You can also supply PK_FACE_heal_grow_from_parent_c. However, this heals wounds by growing faces in exactly the same way as PK_FACE_heal_shrink_c, as shown in <A HREF="fd_chap.064.html#50422139_41995"><EM>
+Figure 63-4</EM></A>, but does not provide the shrinking behaviour shown in <A HREF="fd_chap.064.html#50422139_60487"><EM>
+Figure 63-5</EM></A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422139_pgfId-301489"></A>	63.2.4 	<A NAME="50422139_marker-301484"></A><A NAME="50422139_marker-301485"></A><A NAME="50422139_marker-301486"></A><A NAME="50422139_marker-301487"></A><A NAME="50422139_43171"></A>Healing faces with multiple loops </H3>
+<P>
+<A NAME="50422139_pgfId-301490"></A>The wound left when deleting a face is actually a hole that has one or more loops. If the hole contains more than one loop, and if you have set <CODE>
+heal_action</CODE>
+ to PK_FACE_heal_shrink_c, Parasolid needs to either deal with these loops individually in order to heal the wound, or deal with them as a single composite, reducing the total number of loops remaining in the healed body. The method used depends on the configuration of the loops in the original body; only one method will yield a valid body. You can use the <CODE>
+heal_loops</CODE>
+ option to control how the loops are treated.</P>
+<P>
+<A NAME="50422139_pgfId-558244"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-561105"></A>Note: You are strongly recommended to set the <CODE>
+heal_loops</CODE>
+ option to PK_FACE_heal_loops_auto_c. Using this value instructs Parasolid to decide on the appropriate method for healing the loops.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-301501"></A><A HREF="fd_chap.064.html#50422139_10369"><EM>
+Figure 63-6</EM></A> shows an example where there are several independent loops enclosed by the faces to be deleted. Healing these loops separately preserves them in order to produce the valid body shown. </P>
+<P>
+<A NAME="50422139_pgfId-302848"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-703.gif">
+
+<P>
+<A NAME="50422139_pgfId-301556"></A>Figure 63-6 <A NAME="50422139_10369"></A>Healing multiple loops separately when deleting faces</P>
+<P>
+<A NAME="50422139_pgfId-301563"></A><A HREF="fd_chap.064.html#50422139_51871"><EM>
+Figure 63-7</EM></A> and <A HREF="fd_chap.064.html#50422139_40575"><EM>
+Figure 63-8</EM></A>, by contrast, show examples where the loops inside the faces to be deleted are dependent on each other. These loops need to be healed together in order to produce the valid bodies shown. </P>
+<P>
+<A NAME="50422139_pgfId-302905"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-704.gif">
+
+<P>
+<A NAME="50422139_pgfId-301601"></A>Figure 63-7 <A NAME="50422139_51871"></A>Healing multiple loops together when deleting faces</P>
+<P>
+<A NAME="50422139_pgfId-302970"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-705.gif">
+
+<P>
+<A NAME="50422139_pgfId-301639"></A>Figure 63-8 <A NAME="50422139_40575"></A>Healing multiple loops together when deleting faces</P>
+<P>
+<A NAME="50422139_pgfId-301643"></A>Parasolid can heal loops in complex configurations, such as those that contain vertices with three or more edges. In <A HREF="fd_chap.064.html#50422139_35674"><EM>
+Figure 63-9</EM></A>, although the loops lie solely on the face to be deleted, they contain vertices with three attached edges.</P>
+<P>
+<A NAME="50422139_pgfId-303138"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-706.gif">
+
+<P>
+<A NAME="50422139_pgfId-303107"></A>Figure 63-9 <A NAME="50422139_35674"></A>Healing wounds with loops that contain multiple edge vertices by growing</P>
+<P>
+<A NAME="50422139_pgfId-301707"></A>Parasolid can heal wounds such as this even when faces need to shrink as well as grow. In <A HREF="fd_chap.064.html#50422139_78861"><EM>
+Figure 63-10</EM></A> the planar face can be deleted as shown. This shrinks the faces around the rectangular loop even though they have different surfaces attached, while growing the spherical surface to heal the wound.</P>
+<P>
+<A NAME="50422139_pgfId-303259"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-707.gif">
+
+<P>
+<A NAME="50422139_pgfId-301742"></A>Figure 63-10 <A NAME="50422139_78861"></A>Healing wounds with loops that contain multiple edge vertices by growing and shrinking</P>
+
+
+<H3>
+<A NAME="50422139_pgfId-301762"></A>	63.2.5 	<A NAME="50422139_60635"></A>Allowing disjoint results </H3>
+<P>
+<A NAME="50422139_pgfId-301763"></A>By default, if the healing process splits the original body into multiple components, each component results in a separate body. However, you can ensure that all components remain in a single body using the <CODE>
+allow_disjoint</CODE>
+ option. <A HREF="fd_chap.064.html#50422139_29831"><EM>
+Figure 63-11</EM></A> illustrates a simple example in which the middle face of a solid body is deleted. Depending on the setting for <CODE>
+allow_disjoint</CODE>
+, the result is either two spherical solid bodies (the default), or a single disjoint body comprising two disjoint spherical solid components.</P>
+<P>
+<A NAME="50422139_pgfId-303292"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-708.gif">
+
+<P>
+<A NAME="50422139_pgfId-301802"></A>Figure 63-11 <A NAME="50422139_29831"></A>Returning a single disjoint body when deleting faces</P>
+<P>
+<A NAME="50422139_pgfId-675869"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-301833"></A>Note: You cannot set this option to PK_LOGICAL_true if <CODE>
+heal_action</CODE>
+ is PK_FACE_heal_no_c and <CODE>
+heal_loops</CODE>
+ is PK_FACE_heal_loops_separate_c.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422139_pgfId-301874"></A>	63.2.6 	<A NAME="50422139_97623"></A>Repairing face-face inconsistencies </H3>
+<P>
+<A NAME="50422139_pgfId-301875"></A>You can use the <CODE>
+repair_fa_fa</CODE>
+ option to choose whether to repair face-face inconsistencies that remain after a successful face deletion.</P>
+<P>
+<A NAME="50422139_pgfId-301889"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301878"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301880"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301882"></A><A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301884"></A>No repairs performed.This is the default value.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301886"></A><A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301888"></A>Repairs performed.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-303451"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-709.gif">
+
+<P>
+<A NAME="50422139_pgfId-301969"></A>Figure 63-12 Repairing self-intersections that remain after a face deletion</P>
+<P>
+<A NAME="50422139_pgfId-301970"></A>If <CODE>
+repair_fa_fa</CODE>
+ is <A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_yes_c</A> and the repairs are successful, a report of type <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_t</A> is returned via the Parasolid Report which contains the following information:</P>
+<P>
+<A NAME="50422139_pgfId-301987"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301976"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301978"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301980"></A><CODE>
+status</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301982"></A>This has the value of <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_fa_fa_repair_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301984"></A><CODE>
+new_items</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-301986"></A>Edges created by intersecting the pairs of clashing faces.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-698649"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-301990"></A>Note: If <CODE>
+local_check</CODE>
+ is set to PK_LOGICAL_false and <A HREF=../headers/pk_repair_fa_fa_t.html>PK_repair_fa_fa_yes_c</A> is chosen, PK_ERROR_bad_combination is returned</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422139_pgfId-698663"></A>	63.2.7 	<A NAME="50422139_73956"></A>Tracking capping faces when healing wounds </H3>
+<P>
+<A NAME="50422139_pgfId-698664"></A>You can delete a face from a classic or facet body and heal the resultant wounds with capping faces. These capping faces can be tracked by setting the <CODE>
+track</CODE>
+ option to <A HREF=../headers/pk_delete_track_t.html>PK_delete_track_cap_c</A>. When set to this value, each capping face created generates a tracking record of type PK_TOPOL_track_create_c that contains the tags of the original faces and the new capping faces.</P>
+<P>
+<A NAME="50422139_pgfId-698701"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-710.gif">
+
+<P>
+<A NAME="50422139_pgfId-698702"></A>Figure 63-13 Deleting faces from a facet body and healing the wound with capping faces</P>
+<P>
+<A NAME="50422139_pgfId-701244"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-698705"></A>Note: The <CODE>
+track</CODE>
+ option can only be set to <A HREF=../headers/pk_delete_track_t.html>PK_delete_track_cap_c</A> if <CODE>
+heal_action</CODE>
+ is set to PK_FACE_heal_cap_c.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422139_pgfId-698707"></A>63.3	<A NAME="50422139_87423"></A>Deleting faces without healing wounds 
+
+
+</H1>
+<P>
+<A NAME="50422139_pgfId-698708"></A>You can delete a face from a body without healing the resultant wounds. This creates rubber faces (i.e a face without geometry) that can be used in later downstream operations. You can track these rubber faces by setting the <CODE>
+track</CODE>
+ option to <A HREF=../headers/pk_delete_track_t.html>PK_delete_track_rubber_c</A>. When set at this value, each rubber face created generates a tracking record of type PK_TOPOL_track_create_c that contains the tags of the original faces and the new rubber faces.</P>
+<P>
+<A NAME="50422139_pgfId-698745"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-711.gif">
+
+<P>
+<A NAME="50422139_pgfId-698746"></A>Figure 63-14 Deleting faces from a body without healing the wound</P>
+<P>
+<A NAME="50422139_pgfId-698750"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-698749"></A>Note: The option can only be set to <A HREF=../headers/pk_delete_track_t.html>PK_delete_track_rubber_c</A> if <CODE>
+heal_action</CODE>
+ is set to PK_FACE_heal_no_c.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422139_pgfId-302007"></A>	63.3.1 	<A NAME="50422139_"></A>Limitations/restrictions on healing wounds </H3>
+<P>
+<A NAME="50422139_pgfId-302008"></A>It is not possible to heal wounds in a single operation if the set of faces that need to be healed are themselves non-manifold, as shown in <A HREF="fd_chap.064.html#50422139_53034"><EM>
+Figure 63-15</EM></A>. This operation is possible if the faces are deleted using two calls to <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A>, each using the PK_FACE_heal_shrink_c option.</P>
+<P>
+<A NAME="50422139_pgfId-303504"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-712.gif">
+
+<P>
+<A NAME="50422139_pgfId-302064"></A>Figure 63-15 <A NAME="50422139_53034"></A>Non-manifold face set boundary</P>
+
+
+<H3>
+<A NAME="50422139_pgfId-302065"></A>	63.3.2 	<A NAME="50422139_14222"></A>Related functionality </H3>
+<P>
+<A NAME="50422139_pgfId-302069"></A><A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A> is not the only tool provided by Parasolid for removing faces from a body. Other tools that you can use are as follows:</P>
+<P>
+<A NAME="50422139_pgfId-302107"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302072"></A>Tool</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302074"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302076"></A><A HREF=../headers/pk_face_delete_facesets.html>PK_FACE_delete_facesets</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302078"></A>Delete a set of faces identified using PK_FACE_identify_facesets. See <A HREF="fd_chap.064.html#50422139_80826">Section 63.5, “Deleting face sets”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302083"></A><A HREF=../headers/pk_face_remove_to_solid_bodies.html>PK_FACE_remove_to_solid_bodies</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302087"></A>Remove faces from a body to create another body. See <A HREF="fd_chap.072.html#50422147_49104">Section 71.2, “Removing faces to create new bodies”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302090"></A><A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302094"></A>Remove blend faces from a body. See <A HREF="fd_chap.064.html#50422139_50380">Section 63.6, “Deleting blend faces”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302097"></A><A HREF=../headers/pk_face_delete_from_sheet.html>PK_FACE_delete_from_sheet</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302099"></A>Removes a set of faces from a sheet. No healing is required when using this function.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302101"></A><A HREF=../headers/pk_face_delete_from_gen_body.html>PK_FACE_delete_from_gen_body</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-302105"></A>Deletes faces from a general body. See <A HREF="fd_chap.016.html#50422085_22675">Section 15.9.3, “Deleting entities from general bodies”</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-302108"></A>By combining these functions with other functionality, you can implement sophisticated tools that let your users edit models interactively and intuitively. For example, you could delete a face from a solid body to leave an open sheet body by first using <A HREF=../headers/pk_region_make_void.html>PK_REGION_make_void</A> to convert the solid body to a sheet, and then using <A HREF=../headers/pk_face_delete_from_sheet.html>PK_FACE_delete_from_sheet</A> to remove the face in question. Using this strategy avoids the need to heal wounds, letting you implement editing tools that are not possible using <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A> alone. </P>
+<P>
+<A NAME="50422139_pgfId-303538"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-713.gif">
+
+<P>
+<A NAME="50422139_pgfId-302165"></A>Figure 63-16 Deleting a face from a solid to leave an open sheet</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422139_pgfId-321389"></A>63.4	<A NAME="50422139_25973"></A>Deleting edges 
+
+
+</H1>
+<P>
+<A NAME="50422139_pgfId-321390"></A>You can use <A HREF=../headers/pk_edge_delete.html><A HREF=../headers/pk_edge_delete.html>PK_EDGE_delete</A></A> to remove trimmed boundary features such as laminar and wire edges in order to simplify a model. This general purpose deleting function can heal gaps in the resulting model, making it particularly useful for simplification, and producing a model that is better suited, for example, to CAE operations. You can also use <A HREF=../headers/pk_edge_delete.html><A HREF=../headers/pk_edge_delete.html>PK_EDGE_delete</A></A> as an alternative to <A HREF=../headers/pk_topol_delete_redundant_2.html><A HREF=../headers/pk_topol_delete_redundant_2.html>PK_TOPOL_delete_redundant_2</A></A> for removing redundant or mergeable edges, in which case it also fills the gap by extending or trimming adjacent edges rather than simply removing the edge. See <A HREF="fd_chap.034.html#50422104_40083">Section 33.1, “Introduction”</A>, for more information about <A HREF=../headers/pk_topol_delete_redundant_2.html><A HREF=../headers/pk_topol_delete_redundant_2.html>PK_TOPOL_delete_redundant_2</A></A>.</P>
+<P>
+<A NAME="50422139_pgfId-812705"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-812730"></A>Note: This functionality does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-321397"></A><A HREF="fd_chap.064.html#50422139_13896"><EM>
+Figure 63-17</EM></A> shows several examples that illustrate how <A HREF=../headers/pk_edge_delete.html>PK_EDGE_delete</A> can remove edges and heal the resulting wound. In each example, the edge to be deleted is shown in red. </P>
+<P>
+<A NAME="50422139_pgfId-321398"></A><A HREF=../headers/pk_edge_delete.html><A HREF=../headers/pk_edge_delete.html>PK_EDGE_delete</A></A> can only heal wounds if the 3-space curves of the edges adjacent to the resulting wound can meet when extended and lie in the surface. If this is not the case, the <A HREF=../headers/pk_edge_delete.html><A HREF=../headers/pk_edge_delete.html>PK_EDGE_delete</A></A> returns PK_ERROR_cant_heal_wound.</P>
+<P>
+<A NAME="50422139_pgfId-321399"></A>In addition, edges that are shared between two faces can be deleted if the two faces are mergeable; otherwise PK_ERROR_not_implemented is returned.</P>
+<P>
+<A NAME="50422139_pgfId-335906"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-714.gif">
+
+<P>
+<A NAME="50422139_pgfId-321676"></A>Figure 63-17 <A NAME="50422139_13896"></A>Deleting edges and healing the resulting wound</P>
+<P>
+<A NAME="50422139_pgfId-383757"></A>You can delete edges in non-manifold bodies so long as the edge you want to delete is in a locally manifold part of the body. <A HREF="fd_chap.064.html#50422139_15919"><EM>
+Figure 63-18</EM></A> shows an example in which an edge can be successfully deleted from a non-manifold “T-sheet” body, because the only non-manifold part of the body is the area where three faces meet at a single edge. </P>
+<P>
+<A NAME="50422139_pgfId-383904"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-715.gif">
+
+<P>
+<A NAME="50422139_pgfId-383932"></A>Figure 63-18 <A NAME="50422139_15919"></A>Deleting edges in a locally manifold part of a non-manifold body</P>
+
+<H3>
+<A NAME="50422139_pgfId-321682"></A>	63.4.1 	<A NAME="50422139_34722"></A><A NAME="50422139_marker-321678"></A><A NAME="50422139_marker-321679"></A><A NAME="50422139_marker-321680"></A><A NAME="50422139_marker-321681"></A>Deleting holes in a sheet body </H3>
+<P>
+<A NAME="50422139_pgfId-780356"></A>You can remove holes from single and multi-faced sheet bodies using <A HREF=../headers/pk_edge_delete.html>PK_EDGE_delete</A>. Alternatively, providing that the hole lies completely within a single face, you can use <A NAME="50422139_marker-321684"></A><A HREF=../headers/pk_loop_delete_from_sheet_body.html>PK_LOOP_delete_from_sheet_body</A> to specify a list of interior loops to delete.</P>
+<P>
+<A NAME="50422139_pgfId-780021"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-780359"></A>Note: <A HREF=../headers/pk_edge_delete.html>PK_EDGE_delete</A> does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422139_pgfId-321685"></A>	63.4.2 	Update control </H3>
+<P>
+<A NAME="50422139_pgfId-321686"></A><A HREF=../headers/pk_edge_delete_o_t.html>PK_EDGE_delete_o_t</A> contains an <CODE>
+update</CODE>
+ option to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422139_pgfId-321801"></A>63.5	<A NAME="50422139_80826"></A>Deleting face sets 
+
+
+</H1>
+<P>
+<A NAME="50422139_pgfId-321802"></A>You can use <A HREF=../headers/pk_face_delete_facesets.html>PK_FACE_delete_facesets</A> to delete face sets from a body. These face sets could typically be those identified by calls to either <A HREF=../headers/pk_body_find_facesets.html>PK_BODY_find_facesets</A>, <A HREF=../headers/pk_body_identify_details.html>PK_BODY_identify_details</A>, or <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A>.</P>
+<P>
+<A NAME="50422139_pgfId-321803"></A><A HREF=../headers/pk_face_delete_facesets.html>PK_FACE_delete_facesets</A> receives and returns the following arguments:</P>
+<P>
+<A NAME="50422139_pgfId-812945"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321806"></A>Received</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321808"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-321810"></A>n_facesets</PRE>
+<PRE><A NAME="50422139_pgfId-321811"></A>facesets</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321813"></A>The number of face sets to delete, together with an array of those face sets. Each element in <CODE>
+facesets</CODE>
+ is itself an array of faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-321815"></A>options</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321817"></A>A set of options.</P>
+</TD>
+</TR>
+</TABLE>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321820"></A>Returned</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321822"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-321824"></A>n_bodies</PRE>
+<PRE><A NAME="50422139_pgfId-321825"></A>bodies</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321827"></A>The number of resulting bodies, together with the bodies themselves.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-321829"></A>n_failed_facesets</PRE>
+<PRE><A NAME="50422139_pgfId-321830"></A>failed_facesets_indices</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321832"></A>The number of face sets that could not be deleted, together with indices into the <CODE>
+facesets</CODE>
+ array indicating which face sets could not be deleted.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422139_pgfId-321837"></A>	63.5.1 	<A NAME="50422139_marker-321834"></A><A NAME="50422139_marker-321835"></A><A NAME="50422139_marker-321836"></A>Options when deleting face sets </H3>
+<P>
+<A NAME="50422139_pgfId-321838"></A><A HREF=../headers/pk_face_delete_facesets.html>PK_FACE_delete_facesets</A> takes a number of options, available in <A HREF=../headers/pk_face_delete_facesets_o_t.html>PK_FACE_delete_facesets_o_t</A>. The options available are as follows:</P>
+<P>
+<A NAME="50422139_pgfId-823436"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321841"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321843"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-321845"></A>allow_disjoint</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321847"></A>If PK_LOGICAL_true, <A HREF=../headers/pk_face_delete_facesets.html>PK_FACE_delete_facesets</A> returns a disjoint body if deleting face sets splits the body into two or more components. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-321849"></A>heal_action</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321851"></A>If PK_FACE_heal_yes_c, <A HREF=../headers/pk_face_delete_facesets.html>PK_FACE_delete_facesets</A> attempts to heal the body using any available method after deleting the face sets. This may split the body into two or more bodies. If PK_FACE_heal_no, wounds are not healed, and each deleted face set is replaced by a single rubber face. If any other value, only the specified <CODE>
+heal_action</CODE>
+ is attempted. See <A HREF="fd_chap.064.html#50422139_75104">Section 63.2.1, “Methods for healing wounds”</A> for details about the available values. Default: PK_FACE_heal_yes_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-321856"></A>n_details</PRE>
+<PRE><A NAME="50422139_pgfId-321857"></A>details</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321859"></A>These options are used to pass detail types to <A HREF=../headers/pk_face_delete_facesets.html>PK_FACE_delete_facesets</A> for the face sets you want to delete. If you know the detail type of each of the face sets you are passing into the function, passing this information as well can help performance.</P>
+<P>
+<A NAME="50422139_pgfId-321860"></A>The <CODE>
+details</CODE>
+ array contains an array of detail types corresponding to the array of <CODE>
+facesets</CODE>
+ passed to the function. <CODE>
+n_details</CODE>
+ represents the size of this array. The detail types may be any of the values described in <A HREF="fd_chap.065.html#50422140_27135">Section 64.4.1, “Finding and returning detail types”</A>, and in addition may include the following type:</P>
+<UL>
+<LI>
+<A NAME="50422139_pgfId-321864"></A><A HREF=../headers/pk_detail_t.html>PK_detail_blend_rb_const_r_c</A>: A rolling-ball blend with a constant radius.</LI>
+</UL>
+<P>
+<A NAME="50422139_pgfId-321865"></A>Setting <CODE>
+n_details</CODE>
+ to 0 (the default) is equivalent to setting <CODE>
+details</CODE>
+ to a single element array containing <A HREF=../headers/pk_detail_t.html>PK_detail_any_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-321867"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321869"></A>Tolerance for healing.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-321871"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-321873"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for information. </P>
+<P>
+<A NAME="50422139_pgfId-321880"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-321833"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-812959"></A>Note: This functionality does not support facet geometry unless the <CODE>
+heal_action</CODE>
+ option is set to PK_FACE_heal_no_c, or it is set to PK_FACE_heal_yes_c and the <CODE>
+details</CODE>
+ option for the faceset containing facet geometry is set to PK_.detail_blend_rb_const_r_c.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422139_pgfId-397707"></A>63.6	<A NAME="50422139_50380"></A>Deleting blend faces 
+
+
+</H1>
+<P>
+<A NAME="50422139_pgfId-397715"></A><A NAME="50422139_marker-980816"></A><A NAME="50422139_marker-980817"></A><A NAME="50422139_marker-980818"></A><A NAME="50422139_marker-980819"></A><A NAME="50422139_marker-980820"></A><A NAME="50422139_marker-980821"></A><A NAME="50422139_marker-980822"></A><A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A></A></A></A> is used to delete blend faces. In general, <A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A></A></A></A> is intended for deleting either single blend faces or complete chains of blends. The faces supplied must all come from the same body. <A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A></A></A></A> takes into account topological changes that occur during blending in order to provide a delete operation that is as close to an inverse blend as possible. Using this information, <A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html><A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A></A></A></A> can delete a higher proportion of faces than <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A>. </P>
+<P>
+<A NAME="50422139_pgfId-967183"></A>If blend faces cannot be deleted, PK_ERROR_cant_heal_wound is returned and in cases where specific blend faces can be identified as having caused the failure, a Parasolid Report of type <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_t</A> is generated with a status of <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_bad_blend_c</A> indicating which faces could not be deleted. See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for more information about the Parasolid Report mechanism.</P>
+<P>
+<A NAME="50422139_pgfId-321954"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-321950"></A>Note: Because chamfer blends do not maintain any information about the original edge, there are some configurations in which, though a rolling ball-like blend could be deleted, a chamfer blend cannot. In most cases, you can use the <CODE>
+unders_data</CODE>
+ option to handle this. See <A HREF="fd_chap.064.html#50422139_58681">Section 63.6.4, “Specifying underlying entities for blends to be deleted”</A>, for information. This operation can also be performed using <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A> instead: see <A HREF="fd_chap.064.html#50422139_28956">Section 63.1, “Introduction”</A>, for details.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-322166"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-716.gif">
+
+<P>
+<A NAME="50422139_pgfId-322167"></A>Figure 63-19 Before and after deleting the faces created by a blend operation</P>
+<P>
+<A NAME="50422139_pgfId-447130"></A>You can delete blend faces in non-manifold bodies so long as the blend you want to delete is in a locally manifold part of the body as shown in <A HREF="fd_chap.064.html#50422139_62027"><EM>
+Figure 63-20</EM></A>.</P>
+<P>
+<A NAME="50422139_pgfId-447509"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-717.gif">
+
+<P>
+<A NAME="50422139_pgfId-447452"></A>Figure 63-20 <A NAME="50422139_62027"></A>Deleting blends on locally manifold bodies</P>
+<P>
+<A NAME="50422139_pgfId-322171"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-322170"></A>Warning: <A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A> assumes that the faces specified have been created by a blend operation. It is not suitable as a tool for general face deletion.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-322172"></A>A <A HREF=../headers/pk_face_delete_blends_o_t.html>PK_FACE_delete_blends_o_t</A> options structure contains the following options that let you control blend deletion:</P>
+<P>
+<A NAME="50422139_pgfId-446807"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322175"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322177"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322179"></A>check_fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322183"></A>Check face-face consistency on the resulting body. See <A HREF="fd_chap.064.html#50422139_98889">Section 63.6.1, “Checking face-face consistency”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322186"></A>simplify</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322190"></A>Simplify the surfaces of adjacent blend faces in the model. See <A HREF="fd_chap.064.html#50422139_44646">Section 63.6.2, “Simplifying adjacent blend faces”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322193"></A>cap</PRE>
+<PRE><A NAME="50422139_pgfId-322194"></A>cap_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322198"></A>Whether to add cap faces to any resulting wounds. See <A HREF="fd_chap.064.html#50422139_93476">Section 63.6.3, “Adding cap faces to heal wounds”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322201"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322203"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid.See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A> for information. </P>
+<P>
+<A NAME="50422139_pgfId-322207"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322209"></A>unders_data</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322211"></A>Optional sub-structure to allow you to specify blends together with their underlying faces. See <A HREF="fd_chap.064.html#50422139_58681">Section 63.6.4, “Specifying underlying entities for blends to be deleted”</A>, for information.</P>
+<P>
+<A NAME="50422139_pgfId-322215"></A>Default: do not specify data for underlying faces. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-322217"></A>You can also use <A HREF=../headers/pk_face_delete_facesets.html>PK_FACE_delete_facesets</A> to delete constant-radius rolling-ball blends from a body. See <A HREF="fd_chap.064.html#50422139_80826">Section 63.5, “Deleting face sets”</A>for details.</P>
+<P>
+<A NAME="50422139_pgfId-460381"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-460404"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422139_pgfId-460391"></A><A HREF="fd_chap.065.html#50422140_52112">Section 64.5, “Identifying blends”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422139_pgfId-322222"></A>	63.6.1 	<A NAME="50422139_98889"></A><A NAME="50422139_marker-322219"></A><A NAME="50422139_marker-322220"></A><A NAME="50422139_marker-322221"></A>Checking face-face consistency </H3>
+<P>
+<A NAME="50422139_pgfId-322223"></A>You use the <CODE>
+check_fa_fa</CODE>
+ option to specify whether face-face consistency checking should be performed on the body resulting from the operation. The permitted values are:</P>
+<P>
+<A NAME="50422139_pgfId-322237"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322226"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322228"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322230"></A><A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322232"></A>Check for face-face inconsistencies (the default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322234"></A><A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322236"></A>Do not check for face-face inconsistencies</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-322238"></A>If face-face consistency checking is performed, then altered faces are checked against each other and against unaltered faces.</P>
+
+
+<H3>
+<A NAME="50422139_pgfId-322244"></A>	63.6.2 	<A NAME="50422139_44646"></A><A NAME="50422139_marker-322240"></A><A NAME="50422139_marker-322241"></A><A NAME="50422139_marker-322242"></A><A NAME="50422139_marker-322243"></A>Simplifying adjacent blend faces </H3>
+<P>
+<A NAME="50422139_pgfId-322245"></A>You use the <CODE>
+simplify</CODE>
+ option to choose whether to simplify the surfaces of blend-like faces that are adjacent to any deleted blends. You can use this option to eliminate any B-surfaces from suitable faces adjacent to those being deleted.</P>
+<P>
+<A NAME="50422139_pgfId-322246"></A>With this option switched on, healing the gaps created when deleting blends is more likely to be successful, because blend surfaces can be extended more easily than B-surfaces. Using the option simplifies the overall model, and can improve performance for downstream operations. In some cases, it can improve the chance of <A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A> succeeding.</P>
+<P>
+<A NAME="50422139_pgfId-322247"></A>Switching the <CODE>
+simplify</CODE>
+ option on does not make any significant difference to the shape of the model, since replacement surfaces are always within tolerance of the original surface.</P>
+<P>
+<A NAME="50422139_pgfId-322248"></A>This option only simplifies faces that satisfy all three of the following conditions:</P>
+<UL>
+<LI>
+<A NAME="50422139_pgfId-322249"></A>The face is vertex-adjacent to a blend to be deleted by <A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A></LI>
+<LI>
+<A NAME="50422139_pgfId-322250"></A>The face can be identified as a blend face by <A HREF=../headers/pk_face_identify_blends.html>PK_FACE_identify_blends</A></LI>
+<LI>
+<A NAME="50422139_pgfId-322251"></A>The face does not already have a blend, torus, or cylinder surface attached.</LI>
+</UL>
+<P>
+<A NAME="50422139_pgfId-322252"></A>Faces that satisfy these conditions have their surfaces replaced by either blend, torus, or cylinder surfaces as appropriate. </P>
+<P>
+<A NAME="50422139_pgfId-322253"></A>The permitted values for the option are:</P>
+<P>
+<A NAME="50422139_pgfId-322267"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322256"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322258"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322260"></A>PK_FACE_simplify_adj_blends_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322262"></A>Try to simplify blend surfaces that are vertex-adjacent to blends to be deleted.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322264"></A>PK_FACE_simplify_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322266"></A>Do not try to simplify any adjacent blend surfaces.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-322274"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-322273"></A>Note: Parasolid reapplies the surfaces of any blend faces (of class PK_CLASS_blendsf) that are dependent on faces that have been simplified to ensure that their underlying surfaces reference the new simplified geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422139_pgfId-322276"></A>	63.6.3 	<A NAME="50422139_93476"></A>Adding cap faces to heal wounds </H3>
+<P>
+<A NAME="50422139_pgfId-322277"></A>As mentioned in <A HREF="fd_chap.064.html#50422139_50380">Section 63.6, “Deleting blend faces”</A>, <A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A> is intended for deleting either single blend faces or complete chains of blends. Sometimes you might just want to delete a few blends from a longer chain; in particular, you might want to delete a number of blends in order to add a new feature to the model in the area of those blends, before reblending that area. This section describes how to delete such blends.</P>
+<P>
+<A NAME="50422139_pgfId-398563"></A>You can delete a partial chain of blends using the <CODE>
+cap</CODE>
+ option. By setting this option to <A HREF=../headers/pk_blend_delete_cap_t.html>PK_blend_delete_cap_planar_c</A>, Parasolid creates planar cap faces with which to heal the wounds left by deleting only part of a chain of blends. </P>
+<P>
+<A NAME="50422139_pgfId-322285"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422139_pgfId-322284"></A>Note: By default, any cap faces created by this option are placed approximately 10% from the end of the blend; however, this can be controlled using the <CODE>
+cap_data</CODE>
+ option.  </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-322289"></A>The effect of using this option is shown in <A HREF="fd_chap.064.html#50422139_91895"><EM>
+Figure 63-21</EM></A>. Here, the middle blend face in a chain of three blends has been deleted, with a view to editing the model in the area of the deleted blend before reblending. </P>
+<P>
+<A NAME="50422139_pgfId-322323"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-718.gif">
+
+<P>
+<A NAME="50422139_pgfId-322325"></A>Figure 63-21 <A NAME="50422139_91895"></A>Creating capping faces when deleting blends</P>
+<P>
+<A NAME="50422139_pgfId-322326"></A>In addition, you can control where blend caps are added using the <CODE>
+cap_data</CODE>
+ option. This is a structure containing the following information:</P>
+<P>
+<A NAME="50422139_pgfId-322344"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322329"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322331"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322333"></A>blends</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322335"></A>A list of blends to be partially deleted.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322337"></A>end_idents</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322339"></A>A corresponding list of entities that identifies one end of each blend specified in <CODE>
+blends</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322341"></A>keep</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322343"></A>A corresponding list of tokens that specifies whether the blend should be retained or deleted, for each blend end specified in <CODE>
+end_idents</CODE>
+. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-353971"></A>type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-353973"></A>A corresponding list of tokens that specifies the type of capping for each end blend specified in <CODE>
+end_idents</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-322348"></A><A HREF="fd_chap.064.html#50422139_16078"><EM>
+Figure 63-22</EM></A> shows an example where two blend chains have been applied to a body. Suppose that you want to delete the blend with the larger radius (which was also applied last), as indicated. You may want to do this in order to resize the blend with the smaller-radiused blend (shown in orange), for example. </P>
+<P>
+<A NAME="50422139_pgfId-322349"></A>You can remove the relevant part of this blend using the <CODE>
+cap</CODE>
+ option. However, doing this without supplying any <CODE>
+cap_data</CODE>
+ creates a very small unwanted cap face, as shown in <A HREF="fd_chap.064.html#50422139_16078"><EM>
+Figure 63-22</EM></A>. This cap face can be eliminated by supplying <CODE>
+cap_data</CODE>
+ that specifies that the blend should be kept at one end only. </P>
+<P>
+<A NAME="50422139_pgfId-322386"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-719.gif">
+
+<P>
+<A NAME="50422139_pgfId-322388"></A>Figure 63-22 <A NAME="50422139_16078"></A>Using cap controls to remove unwanted faces</P>
+<P>
+<A NAME="50422139_pgfId-322392"></A>Better still, <A HREF="fd_chap.064.html#50422139_36498"><EM>
+Figure 63-23</EM></A> shows how you can create a result in which the majority of the larger blend is retained. You can do this by specifying where you want the blend to be removed, rather than where you want it to be retained. Again, no unwanted cap face is created in the region of the blend with the smaller radius. </P>
+<P>
+<A NAME="50422139_pgfId-322426"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-720.gif">
+
+<P>
+<A NAME="50422139_pgfId-322428"></A>Figure 63-23 <A NAME="50422139_36498"></A>Using cap controls to remove minimal blend material</P>
+<P>
+<A NAME="50422139_pgfId-360457"></A>Using the <CODE>
+type</CODE>
+ field, you can choose the type of capping you want to place at the edge of a blend. This field takes the following values:</P>
+<P>
+<A NAME="50422139_pgfId-360353"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-360338"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-360340"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-360342"></A><A HREF=../headers/pk_blend_cap_type_t.html>PK_blend_cap_type_within_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-360344"></A>Delete the edge to within 10% of the end of the blend. The planar cap is placed approximately10% from the edge of the blend.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-360346"></A><A HREF=../headers/pk_blend_cap_type_t.html>PK_blend_cap_type_beyond_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-360348"></A>Delete beyond the blend. The cap will be placed beyond the blend, close to the edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-360350"></A><A HREF=../headers/pk_blend_cap_type_t.html>PK_blend_cap_type_at_edge_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-360352"></A>Delete at the edge. The blend will be capped by a surface passing through the edge, which may not be planar.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-360379"></A><A HREF="fd_chap.064.html#50422139_79275"><EM>
+Figure 63-24</EM></A> shows examples of using the <CODE>
+type</CODE>
+ field. </P>
+<P>
+<A NAME="50422139_pgfId-360359"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-721.gif">
+
+<P>
+<A NAME="50422139_pgfId-355587"></A>Figure 63-24 <A NAME="50422139_79275"></A>Using the type field to create different placements of cap faces</P>
+
+
+<H3>
+<A NAME="50422139_pgfId-322430"></A>	63.6.4 	<A NAME="50422139_58681"></A>Specifying underlying entities for blends to be deleted </H3>
+<P>
+<A NAME="50422139_pgfId-322431"></A>You can use the <CODE>
+unders_data</CODE>
+ sub-structure to specify underlying entities for some of the blends you wish to delete. Specifying underlying entities for some or all of the blends you are deleting facilitates:</P>
+<UL>
+<LI>
+<A NAME="50422139_pgfId-322432"></A>Deletion of cliff edge blends with Parasolid generating the underlying faces which are no longer present in the model as shown in <A HREF="fd_chap.064.html#50422139_25209"><EM>
+Figure 63-25</EM></A>.</LI>
+<LI>
+<A NAME="50422139_pgfId-494916"></A>Deletion of fully and partial notch edge blends as well as notched branch blends with Parasolid generating the underlying faces which are no longer present in the model as shown in <A HREF="fd_chap.064.html#50422139_79732"><EM>
+Figure 63-26</EM></A>.</LI>
+<LI>
+<A NAME="50422139_pgfId-468733"></A>Improved robustness when deleting chamfers. Because identifying the underlying entities of a chamfer can be complex, supplying underlying entities increases the likelihood that the delete operation will succeed.</LI>
+<LI>
+<A NAME="50422139_pgfId-322433"></A>Improved robustness in cases where the underlying entity of the blend is no longer adjacent to the blend.</LI>
+</UL>
+<P>
+<A NAME="50422139_pgfId-492610"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-722.gif">
+
+<P>
+<A NAME="50422139_pgfId-492571"></A>Figure 63-25 <A NAME="50422139_25209"></A>Deleting cliff blends and replacing the missing underlying faces</P>
+<P>
+<A NAME="50422139_pgfId-495349"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-723.gif">
+
+<P>
+<A NAME="50422139_pgfId-495194"></A>Figure 63-26 <A NAME="50422139_79732"></A>Deleting notch edge blends</P>
+<P>
+<A NAME="50422139_pgfId-322434"></A>The <CODE>
+unders_data</CODE>
+ sub-structure takes the following fields:</P>
+<P>
+<A NAME="50422139_pgfId-464881"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322437"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322439"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322441"></A>n_blends</PRE>
+<PRE><A NAME="50422139_pgfId-322442"></A>blends</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322444"></A>The blends for which you want to specify underlying entities. These should be faces that are also supplied in the <CODE>
+faces</CODE>
+ received argument to <A HREF=../headers/pk_face_delete_blends.html>PK_FACE_delete_blends</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422139_pgfId-322446"></A>unders</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422139_pgfId-322448"></A>An array of arrays of entities. The entities that you need to supply depend on the type of blend you are deleting. See <A HREF=../headers/pk_blend_delete_unders_data_t.html>PK_blend_delete_unders_data_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information. </P>
+<ADDRESS>
+<A NAME="50422139_pgfId-467993"></A>Note: If you are deleting cliff or notch blends the underlying entities of the blend must be supplied for the delete operation to succeed.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422139_pgfId-319753"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.063.html"> Overview of Editing Models</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.065.html">Identifying And Simplifying Model Details</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,1475 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Converting Between Facet and Classic Geometry</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Converting Between Facet and Classic Geometry</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.084.html">Facet Model Structure</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.086.html">Creating PSM Data From Foreign Facet Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-299366">84.1	Introduction </A>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-475349">84.2	Creating a mixed body from classic topology </A>
+<UL>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-479006">84.2.1	Controlling angular tolerance information </A>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-478513">84.2.2	Controlling the sizes of facets </A>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-479826">84.2.3	Storing normals </A>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-478560">84.2.4	Tracking the edges on a facet body </A>
+</UL>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-309084">84.3	Creating facet bodies directly from existing bodies </A>
+<UL>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-477938">84.3.1	Controlling the sizes of facets </A>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-477980">84.3.2	Controlling tolerance information </A>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-509983">84.3.3	Controlling the conversion to facet bodies </A>
+</UL>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-315876">84.4	Manipulating facet data </A>
+<UL>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-325103">84.4.1	Creating bodies from a mesh </A>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-336148">84.4.2	Creating meshes from mesh topology </A>
+<UL>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-391328">84.4.2.1	Creating a mesh from a small set of mfacets </A>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-425813">84.4.2.2	Creating meshes using mfacets from multiple meshes </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-408098">84.5	Creating classic geometry from a mesh </A>
+<LI> <A HREF="fd_chap.085.html#50422162_pgfId-325683">84.6	Creating a mixture of facet and classic geometry </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422162_pgfId-299366"></A>84.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422162_pgfId-379005"></A>This chapter provides an overview on the different ways you can create <STRONG>
+facet bodies</STRONG> from <STRONG>
+classic bodies</STRONG> and classic bodies from mesh data. It also describes how you can create classic geometry from a mesh. These are discussed in the following sections:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-482482"></A><A HREF="fd_chap.085.html#50422162_83293">Section 84.2, “Creating a mixed body from classic topology”</A></LI>
+<LI>
+<A NAME="50422162_pgfId-379009"></A><A HREF="fd_chap.085.html#50422162_49311">Section 84.3, “Creating facet bodies directly from existing bodies”</A></LI>
+<LI>
+<A NAME="50422162_pgfId-379013"></A><A HREF="fd_chap.085.html#50422162_58644">Section 84.4, “Manipulating facet data”</A></LI>
+<LI>
+<A NAME="50422162_pgfId-379017"></A><A HREF="fd_chap.085.html#50422162_44333">Section 84.5, “Creating classic geometry from a mesh”</A></LI>
+<LI>
+<A NAME="50422162_pgfId-470723"></A><A HREF="fd_chap.085.html#50422162_65426">Section 84.6, “Creating a mixture of facet and classic geometry”</A></LI>
+</UL>
+<P>
+<A NAME="50422162_pgfId-341931"></A>For information on creating facet bodies from foreign mesh data see <A HREF="fd_chap.086.html#50422163_93469">Chapter 85, “Creating PSM Data From Foreign Facet Data”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422162_pgfId-475349"></A>84.2	<A NAME="50422162_83293"></A>Creating a mixed body from classic topology 
+
+
+</H1>
+<P>
+<A NAME="50422162_pgfId-475352"></A>You can create a mixed body from classic topology using the <A HREF=../headers/pk_topol_make_facet_topol.html><A HREF=../headers/pk_topol_make_facet_topol.html>PK_TOPOL_make_facet_topol</A></A> function. With this function, topological entities are specified from which to create new facet geometry by replacing curves and surfaces of the original classic body with facet data. <A HREF=../headers/pk_topol_make_facet_topol.html><A HREF=../headers/pk_topol_make_facet_topol.html>PK_TOPOL_make_facet_topol</A></A> allows you to add facet geometry to existing bodies without having to convert the entire body as illustrated in <A HREF="fd_chap.085.html#50422162_88415"><EM>
+Figure 84-1</EM></A>.</P>
+<P>
+<A NAME="50422162_pgfId-482706"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1077.gif">
+
+<P>
+<A NAME="50422162_pgfId-482651"></A>Figure 84-1 <A NAME="50422162_88415"></A>Creating a mixed body with <A HREF=../headers/pk_topol_make_facet_topol.html>PK_TOPOL_make_facet_topol</A></P>
+<P>
+<A NAME="50422162_pgfId-475353"></A>It has the following options:</P>
+<P>
+<A NAME="50422162_pgfId-475432"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475356"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475358"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475360"></A><CODE>
+have_angular_tolerance<BR>
+angular_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475362"></A>Provides controls for angular tolerance.</P>
+<P>
+<A NAME="50422162_pgfId-475365"></A>See <A HREF="fd_chap.085.html#50422162_39120">Section 84.2.1, “Controlling angular tolerance information”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475376"></A><CODE>
+have_max_chord_length<BR>
+max_chord_length</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-496006"></A>Controls the maximum length of a facet edge.</P>
+<P>
+<A NAME="50422162_pgfId-475381"></A>See <A HREF="fd_chap.085.html#50422162_88800">Section 84.2.2, “Controlling the sizes of facets”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475392"></A><CODE>
+have_max_facet_width<BR>
+max_facet_width</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475394"></A>Controls the size of facets. </P>
+<P>
+<A NAME="50422162_pgfId-475397"></A>See <A HREF="fd_chap.085.html#50422162_88800">Section 84.2.2, “Controlling the sizes of facets”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475408"></A><CODE>
+store_normals</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475410"></A>Whether to store the normals of classic surfaces as mvertex normals in the meshes which replace them. Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422162_pgfId-479891"></A>See <A HREF="fd_chap.085.html#50422162_19768">Section 84.2.3, “Storing normals”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475412"></A><CODE>
+track_faces</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475414"></A>Whether to return tracking records for all topological changes made to faces as part of the operation. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475416"></A><CODE>
+track_edges</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475420"></A>Whether to return tracking records for all topological changes made to edges. See <A HREF="fd_chap.085.html#50422162_33254">Section 84.2.4, “Tracking the edges on a facet body”</A> for more information. </P>
+<P>
+<A NAME="50422162_pgfId-475422"></A>Default: <A HREF=../headers/pk_track_edges_t.html>PK_track_edges_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475424"></A><CODE>
+return_redundant</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475426"></A>Whether to return tracking records containing all topological entities that were made redundant or merged out by the operation. </P>
+<P>
+<A NAME="50422162_pgfId-475427"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475429"></A><CODE>
+return_modified</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-475431"></A>Whether to return an array of all topological entities that were modified by the operation. This includes any edges and vertices that were created. </P>
+<P>
+<A NAME="50422162_pgfId-487288"></A>Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422162_pgfId-479006"></A>	84.2.1 	<A NAME="50422162_39120"></A>Controlling angular tolerance information </H3>
+<P>
+<A NAME="50422162_pgfId-479007"></A>You can control the angular tolerance using the <CODE>
+have_angular_tolerance</CODE>
+ and the <CODE>
+angular_tolerance</CODE>
+ options.</P>
+<P>
+<A NAME="50422162_pgfId-479008"></A>If <CODE>
+have_angular_tolerance</CODE>
+ is PK_LOGICAL_true and <CODE>
+angular_tolerance</CODE>
+ is a positive value, then it is used to control the sum of the angles in radians between a facet edge and the curve or surface tangents at each end. </P>
+
+
+<H3>
+<A NAME="50422162_pgfId-478513"></A>	84.2.2 	<A NAME="50422162_88800"></A>Controlling the sizes of facets </H3>
+<P>
+<A NAME="50422162_pgfId-478514"></A>You can control the sizes of the facets using the <CODE>
+max_facet_width</CODE>
+ and <CODE>
+max_chord_length</CODE>
+ options. </P>
+<P>
+<A NAME="50422162_pgfId-479557"></A>If <CODE>
+have_max_facet_width</CODE>
+ is PK_LOGICAL_true and <CODE>
+max_facet_width</CODE>
+ is a positive value, this value will control the maximum length of any facet edge in the meshes created for any supplied faces as shown in <A HREF="fd_chap.085.html#50422162_63096"><EM>
+Figure 84-2</EM></A>.</P>
+<P>
+<A NAME="50422162_pgfId-489418"></A>If <CODE>
+has_max_chord_length</CODE>
+ is PK_LOGICAL_true and <CODE>
+max_chord_length</CODE>
+ is a positive value, this value will control the maximum length of any polyline chord.</P>
+
+
+<H3>
+<A NAME="50422162_pgfId-479826"></A>	84.2.3 	<A NAME="50422162_19768"></A>Storing normals </H3>
+<P>
+<A NAME="50422162_pgfId-493751"></A>By default, Parasolid dynamically calculates the normals of meshes created to replace the input surfaces. </P>
+<P>
+<A NAME="50422162_pgfId-490856"></A>You can choose to store normals by setting the <CODE>
+store_normals</CODE>
+ option to PK_LOGICAL_true. When set to PK_LOGICAL_true, the meshes created will have the same normals as the existing surfaces which they are replacing. See the API for more details on this option.</P>
+<P>
+<A NAME="50422162_pgfId-492469"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422162_pgfId-492313"></A>Performance issue: You should only store normal data on a mesh if you have a specific need to maintain precise values during an operation.</ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422162_pgfId-490009"></A>For more information about mesh normals, and managing mvertex normals, see <A HREF="fd_chap.089.html#50422166_38228">Section 88.3, “Mesh normals”</A>.</P>
+
+
+<H3>
+<A NAME="50422162_pgfId-478560"></A>	84.2.4 	<A NAME="50422162_33254"></A>Tracking the edges on a facet body </H3>
+<P>
+<A NAME="50422162_pgfId-478561"></A>You can choose whether to return tracking information for edges using the <CODE>
+track_edges</CODE>
+ option.This takes the following values:</P>
+<P>
+<A NAME="50422162_pgfId-478579"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-478564"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-478566"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-478568"></A><A HREF=../headers/pk_track_edges_t.html>PK_track_edges_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-478570"></A>Track all edges.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-478572"></A><A HREF=../headers/pk_track_edges_t.html>PK_track_edges_laminar_wire_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-478574"></A>Only track laminar and wire edges.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-478576"></A><A HREF=../headers/pk_track_edges_t.html>PK_track_edges_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-478578"></A>Do not track edges</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422162_pgfId-309084"></A>84.3	<A NAME="50422162_49311"></A>Creating facet bodies directly from existing bodies 
+
+
+</H1>
+<P>
+<A NAME="50422162_pgfId-318393"></A>You can create a facet body directly from an existing body using <A HREF=../headers/pk_body_make_facet_body.html>PK_BODY_make_facet_body</A>. This function takes the body you wish to convert and a translation or rotation transform and returns a copy of the body with facet geometry attached in place of existing geometry.The original body is untouched. As well as controlling the linear and angular tolerance of the resulting attached mesh, you can also control the size of facets within the mesh, whether attributes and groups should be retained, and whether partial conversion to a facet body is allowed.</P>
+<P>
+<A NAME="50422162_pgfId-483258"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1078.gif">
+
+<P>
+<A NAME="50422162_pgfId-483226"></A>Figure 84-2 <A NAME="50422162_63096"></A>Creating a facet body from a classic body</P>
+<P>
+<A NAME="50422162_pgfId-318203"></A>This function takes the following options: </P>
+<P>
+<A NAME="50422162_pgfId-477930"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316179"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316181"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316191"></A><CODE>
+is_max_facet_width</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316193"></A>Whether <CODE>
+max_facet_width</CODE>
+ is set. Default: PK_LOGICAL_false. </P>
+<P>
+<A NAME="50422162_pgfId-319076"></A>See <A HREF="fd_chap.085.html#50422162_10088">Section 84.3.1, “Controlling the sizes of facets”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316195"></A><CODE>
+max_facet_width</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316197"></A>Controls the maximum length of a facet edge.</P>
+<P>
+<A NAME="50422162_pgfId-319113"></A>See <A HREF="fd_chap.085.html#50422162_10088">Section 84.3.1, “Controlling the sizes of facets”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316199"></A><CODE>
+is_distance_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316201"></A>Whether <CODE>
+distance_tolerance</CODE>
+ is set. Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422162_pgfId-319183"></A>See <A HREF="fd_chap.085.html#50422162_28156">Section 84.3.2, “Controlling tolerance information”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316203"></A><CODE>
+distance_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316205"></A>The distance of the tolerance between model geometry and new facets. </P>
+<P>
+<A NAME="50422162_pgfId-319223"></A>See <A HREF="fd_chap.085.html#50422162_28156">Section 84.3.2, “Controlling tolerance information”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316207"></A><CODE>
+is_angular_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316209"></A>Whether <CODE>
+angular_tolerance</CODE>
+ is set. Default: PK_LOGICAL_false. </P>
+<P>
+<A NAME="50422162_pgfId-319241"></A>See <A HREF="fd_chap.085.html#50422162_28156">Section 84.3.2, “Controlling tolerance information”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316211"></A><CODE>
+angular_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316213"></A>The angular tolerance between model geometry and new facets.</P>
+<P>
+<A NAME="50422162_pgfId-319279"></A>See <A HREF="fd_chap.085.html#50422162_28156">Section 84.3.2, “Controlling tolerance information”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316215"></A><CODE>
+is_max_chord_length</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316217"></A>Whether <CODE>
+max_chord_length</CODE>
+ is set. Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422162_pgfId-319082"></A>See <A HREF="fd_chap.085.html#50422162_10088">Section 84.3.1, “Controlling the sizes of facets”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316219"></A><CODE>
+max_chord_length</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316221"></A>Controls the maximum length of a facet edge derived from the model.</P>
+<P>
+<A NAME="50422162_pgfId-319165"></A>See <A HREF="fd_chap.085.html#50422162_10088">Section 84.3.1, “Controlling the sizes of facets”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316223"></A><CODE>
+retain_attributes</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316225"></A>Whether attributes should be copied into the new facet body. Default: PK_LOGICAL_false. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316227"></A><CODE>
+retain_groups</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-316229"></A>Whether groups should be copied into the new facet body.Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-338855"></A><CODE>
+track_faces</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-338857"></A>Whether to track faces. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-338880"></A><CODE>
+track_edges</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-338882"></A>Whether to return tracking information for edges copied from the input classic body to the faceted copy of the body.  See <A HREF="fd_chap.085.html#50422162_33254">Section 84.2.4, “Tracking the edges on a facet body”</A> for more information. </P>
+<P>
+<A NAME="50422162_pgfId-339952"></A>Default: <A HREF=../headers/pk_track_edges_t.html>PK_track_edges_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-338896"></A><CODE>
+return_redundant</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-338898"></A>Whether to provide a list of topologies that have not been copied to the new body. For example, silver faces that are narrower than the <CODE>
+distance_tolerance</CODE>
+ may be zipped up in order to produce a consistent result body.</P>
+<P>
+<A NAME="50422162_pgfId-344130"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-509724"></A><CODE>
+partial_conversion</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-509726"></A>Whether to allow the partial conversion of a body to a facet body if some of the original faces or edges fail to facet. See <A HREF="fd_chap.085.html#50422162_16695">Section 84.3.3, “Controlling the conversion to facet bodies”</A> for more information.</P>
+<P>
+<A NAME="50422162_pgfId-509916"></A>Default: <A HREF=../headers/pk_error_on_fail_t.html>PK_ERROR_on_fail_any_c</A></P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422162_pgfId-477938"></A>	84.3.1 	<A NAME="50422162_10088"></A>Controlling the sizes of facets </H3>
+<P>
+<A NAME="50422162_pgfId-477939"></A>You can control the sizes of the facets using the <CODE>
+max_facet_width</CODE>
+ and <CODE>
+max_chord_length</CODE>
+ options.</P>
+<P>
+<A NAME="50422162_pgfId-477940"></A>If <CODE>
+is_max_facet_width</CODE>
+ is PK_LOGICAL_true and <CODE>
+max_facet_width</CODE>
+ is a positive value, this value will control the maximum length of any facet edge as shown in <A HREF="fd_chap.085.html#50422162_92526"><EM>
+Figure 84-3</EM></A>.</P>
+<P>
+<A NAME="50422162_pgfId-477976"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1079.gif">
+
+<P>
+<A NAME="50422162_pgfId-477977"></A>Figure 84-3 <A NAME="50422162_92526"></A>Controlling the facet sizes</P>
+<P>
+<A NAME="50422162_pgfId-477978"></A>If <CODE>
+is_max_chord_length</CODE>
+ is PK_LOGICAL_true and <CODE>
+max_chord_length</CODE>
+ is a positive value, this value will control the maximum length of any facet edge which represents part of an original edge.</P>
+
+
+<H3>
+<A NAME="50422162_pgfId-477980"></A>	84.3.2 	<A NAME="50422162_28156"></A>Controlling tolerance information </H3>
+<P>
+<A NAME="50422162_pgfId-477981"></A>You can control the distance and angular tolerance using the <CODE>
+distance_tolerance</CODE>
+ and the <CODE>
+angular_tolerance</CODE>
+ options.</P>
+<P>
+<A NAME="50422162_pgfId-477982"></A>If <CODE>
+is_distance_tolerance</CODE>
+ is PK_LOGICAL_true and <CODE>
+distance_tolerance</CODE>
+ is a positive value in model units, then this value controls the maximum chordal distance between a facet edge and its original edge and the minimum distance between the mid-plane of a facet and its original face entity.</P>
+<P>
+<A NAME="50422162_pgfId-477983"></A>If <CODE>
+is_angular_tolerance</CODE>
+ is PK_LOGICAL_true and <CODE>
+angular_tolerance</CODE>
+ is a positive value in model units this value is used to control the maximum angle in radians between a facet chord and its original edge. It also controls the maximum angle in radians allowed between the surface normals at any two positions on the surface that lie within the facet boundary.</P>
+
+
+<H3>
+<A NAME="50422162_pgfId-509983"></A>	84.3.3 	<A NAME="50422162_16695"></A>Controlling the conversion to facet bodies </H3>
+<P>
+<A NAME="50422162_pgfId-517671"></A>You can use the <CODE>
+partial_conversion</CODE>
+ option to control the behaviour if some of the faces or edges on the original body fail to convert to facet geometry.</P>
+<P>
+<A NAME="50422162_pgfId-517663"></A>It takes the following values:</P>
+<P>
+<A NAME="50422162_pgfId-516621"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-510215"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-510217"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-510219"></A><A HREF=../headers/pk_error_on_fail_t.html>PK_ERROR_on_fail_any_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-510221"></A>If <STRONG>
+any</STRONG> of the faces or edges on the original body fail to convert to facet geometry then PK_ERROR_failed_to_facet is returned and the operation fails. Default</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-510223"></A><A HREF=../headers/pk_error_on_fail_t.html>PK_ERROR_on_fail_all_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422162_pgfId-511267"></A>If <STRONG>
+all </STRONG>of the faces and edges on the original body fail to convert to facet geometry then PK_ERROR_failed_to_facet is returned.</LI>
+<LI>
+<A NAME="50422162_pgfId-511482"></A>Otherwise, any topologies whose geometry fails to convert to facet geometry are returned with no geometry attached and the original body is only partially converted to a facet body. A Parasolid report of type <A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_1_c</A> is generated with a status of <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_cant_get_geom_c</A>, indicating the faces and edges in the result body which do not have geometry attached as a result of the partial conversion. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on the local statuses returned. See <A HREF="fd_chap.012.html#50422080_44713">Chapter 11, “Using Reports”</A>, for information about the Parasolid Report mechanism.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422162_pgfId-510593"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422162_pgfId-516333"></A>Note: Topologies with no geometry in the original body are not converted during the operation and do not appear in the returned Parasolid report.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422162_pgfId-315876"></A>84.4	<A NAME="50422162_46637"></A><A NAME="50422162_22332"></A><A NAME="50422162_58644"></A><A NAME="50422162_57921"></A>Manipulating facet data 
+
+
+</H1>
+<P>
+<A NAME="50422162_pgfId-321354"></A>Parasolid has a number of functions that allow you to create or remove facet data and standard forms that can be used to create polylines and meshes. In addition, facet geometry can be attached or detached from supplied model topology to create the desired body. It is recommended that you attempt to repair any defects on a mesh before any topology is added: see <A HREF="fd_chap.087.html#50422164_70778">Chapter 86, “Checking and Repairing Mesh Data”</A>, for more information.</P>
+
+<H3>
+<A NAME="50422162_pgfId-325103"></A>	84.4.1 	<A NAME="50422162_95174"></A><A NAME="50422162_29878"></A>Creating bodies from a mesh </H3>
+<P>
+<A NAME="50422162_pgfId-325104"></A><A HREF=../headers/pk_mesh_make_bodies.html>PK_MESH_make_bodies</A> creates bodies from mesh data. It does this by analysing the mesh to find out how many disjoint components are present and to find the laminar mesh fins that are used to build edges and their respective polylines. The mesh is attached to faces on the new body or bodies, polylines are attached to edges and points to vertices.</P>
+<P>
+<A NAME="50422162_pgfId-411645"></A>If a mesh has no laminar mfins and encloses a watertight volume, the resulting body will be topologically spherical as Parasolid will not add any additional topology automatically.</P>
+<P>
+<A NAME="50422162_pgfId-412057"></A><A HREF=../headers/pk_mesh_make_bodies.html>PK_MESH_make_bodies</A> takes the following options:</P>
+<P>
+<A NAME="50422162_pgfId-351328"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-336163"></A>Options</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-336165"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-336167"></A><CODE>
+vertex_angle</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-336169"></A>Controls when vertices are created between laminar edges of the resultant facet body. A vertex is created if the angle (in radians) between two laminar mfins is greater than the value set by <CODE>
+vertex_angle</CODE>
+. Default: 4 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-336171"></A><CODE>
+allow_disjoint</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-336485"></A>Whether the result body is disjoint. </P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-337979"></A>If PK_LOGICAL_false, each separate component in the result becomes a separate body. </LI>
+<LI>
+<A NAME="50422162_pgfId-337988"></A>If PK_LOGICAL_true, the result is a single body which may contain disjoint components.</LI>
+</UL>
+<P>
+<A NAME="50422162_pgfId-336173"></A>Default: PK_LOGICAL_true</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-336175"></A><CODE>
+preferred_body_type</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-336373"></A>Indicates the preferred type of the results.</P>
+<P>
+<A NAME="50422162_pgfId-336313"></A>It takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-336341"></A>PK_BODY_type_sheet_c:(Default)</LI>
+<LI>
+<A NAME="50422162_pgfId-337750"></A>PK_BODY_type_solid_c</LI>
+</UL>
+<P>
+<A NAME="50422162_pgfId-337778"></A>See the <EM>
+PK Reference documentation</EM> for more information for these values.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422162_pgfId-336148"></A>	84.4.2 	<A NAME="50422162_23097"></A>Creating meshes from mesh topology </H3>
+<P>
+<A NAME="50422162_pgfId-351379"></A><A HREF=../headers/pk_mtopol_make_meshes.html>PK_MTOPOL_make_meshes</A> creates a mesh using a collection of mesh topologies (mtopols) either from the same mesh or from multiple meshes. You can either supply all the mtopols needed to create the mesh, or you can choose to supply a small set of mfacets from which a mesh can be created as described in the following sections:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-434133"></A><A HREF="fd_chap.085.html#50422162_90969">Section 84.4.2.1, “Creating a mesh from a small set of mfacets”</A></LI>
+<LI>
+<A NAME="50422162_pgfId-432020"></A><A HREF="fd_chap.085.html#50422162_73445">Section 84.4.2.2, “Creating meshes using mfacets from multiple meshes”</A></LI>
+</UL>
+<P>
+<A NAME="50422162_pgfId-391146"></A><A HREF=../headers/pk_mtopol_make_meshes.html>PK_MTOPOL_make_meshes</A> takes the following options:</P>
+<P>
+<A NAME="50422162_pgfId-386393"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-383954"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-383956"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-383958"></A><CODE>
+allow_disjoint</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-383960"></A>Controls whether the result mesh is disjoint. When set to:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-392116"></A>PK_LOGICAL_true, a single mesh which may contain disjoint components is returned (Default). </LI>
+<LI>
+<A NAME="50422162_pgfId-392126"></A>PK_LOGICAL_false, each component is returned as a separate mesh.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-383962"></A><CODE>
+select_cb</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-383964"></A>A callback function of type PK_MTOPOL_select_cb_t used to determine how to propagate from an initial seed mtopol. See <A HREF="fd_chap.085.html#50422162_90969">Section 84.4.2.1, “Creating a mesh from a small set of mfacets”</A> for more information.</P>
+<P>
+<A NAME="50422162_pgfId-384491"></A>Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-383966"></A><CODE>
+select_data</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-383968"></A>Context information required by <CODE>
+select_cb</CODE>
+. See <A HREF="fd_chap.085.html#50422162_90969">Section 84.4.2.1, “Creating a mesh from a small set of mfacets”</A> for more information.</P>
+<P>
+<A NAME="50422162_pgfId-384318"></A>Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-384033"></A><CODE>
+select_mtopol_class</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-384035"></A>The class type of the input mtopol used in <CODE>
+select_cb</CODE>
+. See <A HREF="fd_chap.085.html#50422162_90969">Section 84.4.2.1, “Creating a mesh from a small set of mfacets”</A> for more information.</P>
+<P>
+<A NAME="50422162_pgfId-386974"></A>Default: PK_CLASS_mfin</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-384037"></A><CODE>
+select_type</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-384039"></A>Whether to create a mesh either from the mfacets set selected by <CODE>
+select_cb</CODE>
+ or by the user, or from mfacets not selected. It takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-384917"></A><A HREF=../headers/pk_selector_type_t.html>PK_selector_type_include_c</A>: Create the mesh using the mfacets selected by <CODE>
+select_cb</CODE>
+ or by the user. This is the default.</LI>
+<LI>
+<A NAME="50422162_pgfId-384878"></A><A HREF=../headers/pk_selector_type_t.html>PK_selector_type_exclude_c</A>: Create the mesh using mfacets that were not selected by <CODE>
+select_cb</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422162_pgfId-392339"></A>See <A HREF="fd_chap.085.html#50422162_90969">Section 84.4.2.1, “Creating a mesh from a small set of mfacets”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-423326"></A><CODE>
+map_mfacets</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-423328"></A>Whether mfacets in the newly created mesh(es) should be tracked back to their respective mfacets in the input meshes. It takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-424371"></A><A HREF=../headers/pk_mfacet_map_t.html>PK_MFACET_map_no_c</A>: Do not map the supplied mfacets (Default).</LI>
+<LI>
+<A NAME="50422162_pgfId-424403"></A><A HREF=../headers/pk_mfacet_map_t.html>PK_MFACET_map_yes_c</A>: Map the supplied mfacets</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-436795"></A><CODE>
+map_mvertices</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-436797"></A>Whether mvertices in the newly created mesh(es) should be tracked back to their respective mvertices in the input meshes. It takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-437016"></A><A HREF=../headers/pk_mvertex_map_t.html>PK_MVERTEX_map_no_c</A>: Do not map the supplied mvertices (Default).</LI>
+<LI>
+<A NAME="50422162_pgfId-437100"></A><A HREF=../headers/pk_mvertex_map_t.html>PK_MVERTEX_map_yes_c</A>: Map the supplied mvertices.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-423340"></A><CODE>
+map_cb</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-423383"></A>A callback function of type <A HREF=../headers/pk_mtopol_map_cb_f_t.html>PK_MTOPOL_map_cb_f_t</A> used to return tracking information to the user. Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-423418"></A><CODE>
+map_data</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-423420"></A>Context information required by <CODE>
+map_cb</CODE>
+. Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-423432"></A><CODE>
+n_max_cb_mtopol</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-423434"></A>The maximum number of input mtopols used in <CODE>
+map_cb</CODE>
+.</P>
+<P>
+<A NAME="50422162_pgfId-423824"></A>Default: 500</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-427496"></A><CODE>
+n_faces</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-427498"></A>The number of elements in the <CODE>
+faces</CODE>
+, <CODE>
+senses</CODE>
+, and <CODE>
+contributions</CODE>
+ arrays. See <A HREF="fd_chap.085.html#50422162_73445">Section 84.4.2.2, “Creating meshes using mfacets from multiple meshes”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-427506"></A><CODE>
+faces</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-427508"></A>The faces attached to the supplied mtopols. When using this option, all faces must be from the same body. See <A HREF="fd_chap.085.html#50422162_73445">Section 84.4.2.2, “Creating meshes using mfacets from multiple meshes”</A> for more information.</P>
+<P>
+<A NAME="50422162_pgfId-428592"></A>Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-427516"></A><CODE>
+senses</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-427518"></A>Controls the sense of the resultant mesh. See <A HREF="fd_chap.085.html#50422162_73445">Section 84.4.2.2, “Creating meshes using mfacets from multiple meshes”</A> for more information.</P>
+<P>
+<A NAME="50422162_pgfId-428626"></A>Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-427526"></A><CODE>
+contributions</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-427528"></A>Indicates whether to use all the mfacets from the supplied faces. See <A HREF="fd_chap.085.html#50422162_73445">Section 84.4.2.2, “Creating meshes using mfacets from multiple meshes”</A> for more information.</P>
+<P>
+<A NAME="50422162_pgfId-428666"></A>Default: NULL</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422162_pgfId-391328"></A>84.4.2.1 <A NAME="50422162_90969"></A>Creating a mesh from a small set of mfacets </H4>
+<P>
+<A NAME="50422162_pgfId-393242"></A>Both <A HREF=../headers/pk_mtopol_make_meshes.html>PK_MTOPOL_make_meshes</A> and <A HREF=../headers/pk_mfacet_find_perimeters.html>PK_MFACET_find_perimeters</A> have options to allow you to create a mesh using a smaller set of mfacets. Using the callback function defined by <CODE>
+select_cb,</CODE>
+ this set of mfacets act as seeds that propagate outwards into the adjacent mfacets to create a mesh. Depending on the value of <CODE>
+select_mtopol_class</CODE>
+, <CODE>
+select_cb</CODE>
+ will take either an mfacet or an mfin and specifies whether to propagate to the adjacent mfacet or the mfacet of the adjacent mfin respectively as illustrated in <A HREF="fd_chap.085.html#50422162_13744"><EM>
+Figure 84-4</EM></A>. </P>
+<P>
+<A NAME="50422162_pgfId-394797"></A>As shown in <A HREF="fd_chap.085.html#50422162_13744"><EM>
+Figure 84-4</EM></A>, mfacet A is part of the selected set of mfacets and mfacet B is an adjacent mfacet that has not been selected. If <CODE>
+select_mtopol_class</CODE>
+ is set to PK_CLASS_mfin, the <CODE>
+select_cb</CODE>
+ function specifies propagation across the mfin and into its mfacet. If <CODE>
+select_cb</CODE>
+ is set to PK_CLASS_mfacet, the <CODE>
+select_cb</CODE>
+ function specifies propagation into the adjacent mfacet.</P>
+<P>
+<A NAME="50422162_pgfId-390623"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1080.gif">
+
+<P>
+<A NAME="50422162_pgfId-390600"></A>Figure 84-4 <A NAME="50422162_13744"></A>Different class types that can be passed to the callback function</P>
+<P>
+<A NAME="50422162_pgfId-395919"></A>This functionality may be useful when deploying an algorithm to infer model topology from the facet topology of the mesh, or when you require a subset of facet topology from a large mesh whose facet elements satisfy a certain criterion, such as distance from a given point.<A NAME="50422162_67368"></A></P>
+
+
+<H4>
+<A NAME="50422162_pgfId-425813"></A>84.4.2.2 <A NAME="50422162_73445"></A>Creating meshes using mfacets from multiple meshes </H4>
+<P>
+<A NAME="50422162_pgfId-430930"></A>If you are creating meshes from multiple meshes, you need to specify the following in <A HREF=../headers/pk_mtopol_make_meshes.html>PK_MTOPOL_make_meshes</A>:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-431075"></A>An array of faces that the given mtopols are attached to via the <CODE>
+faces</CODE>
+ option.</LI>
+<LI>
+<A NAME="50422162_pgfId-431084"></A>Whether to reverse the sense of each supplied face in the newly created mesh via the <CODE>
+senses</CODE>
+ option.</LI>
+<LI>
+<A NAME="50422162_pgfId-431145"></A>How the mtopol selection should be interpreted via the <CODE>
+contributions</CODE>
+ option.</LI>
+</UL>
+<P>
+<A NAME="50422162_pgfId-437313"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422162_pgfId-433724"></A>Note: If <CODE>
+select_type</CODE>
+ is <A HREF=../headers/pk_selector_type_t.html>PK_selector_type_exclude_c</A> and <CODE>
+contributions</CODE>
+ is <A HREF=../headers/pk_mtopol_selection_t.html>PK_MTOPOL_selection_all_c</A>, mtopols from the associated faces will not be used.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422162_pgfId-408098"></A>84.5	<A NAME="50422162_44333"></A>Creating classic geometry from a mesh 
+
+
+</H1>
+<P>
+<A NAME="50422162_pgfId-373628"></A>You can create classic geometry directly from a mesh using <A HREF=../headers/pk_mesh_make_surf_trimmed.html>PK_MESH_make_surf_trimmed</A>. This function converts mesh data from a single mesh into a single trimmed surface as illustrated in <A HREF="fd_chap.085.html#50422162_89934"><EM>
+Figure 84-5</EM></A>. </P>
+<P>
+<A NAME="50422162_pgfId-379828"></A>This function takes the following options:</P>
+<P>
+<A NAME="50422162_pgfId-376065"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373679"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373681"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373683"></A><CODE>
+fitting_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373685"></A>Specifies the tolerance for the surface created from the original mesh. If <CODE>
+have_bdry_tolerance</CODE>
+ is PK_LOGICAL_true, the value of <CODE>
+fitting_tolerance</CODE>
+ should be larger than that of <CODE>
+bdry_tolerance</CODE>
+.</P>
+<P>
+<A NAME="50422162_pgfId-373686"></A>Default: 1.0e-5.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373688"></A><CODE>
+have_bdry_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373690"></A>Whether a boundary tolerance is supplied. </P>
+<P>
+<A NAME="50422162_pgfId-373691"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373693"></A><CODE>
+bdry_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373695"></A>Specifies the boundary tolerance for the surface created from the original mesh. When supplied, this value should be smaller than that of <CODE>
+fitting_tolerance</CODE>
+.</P>
+<P>
+<A NAME="50422162_pgfId-373697"></A>Default: 0.0. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373699"></A><CODE>
+bdry_mvertex_angle</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-376712"></A>Controls how the laminar boundary of the input mesh is represented as trimming curves. Separate trimming curves are created on either side of an mvertex where the angle between adjacent laminar mfins is greater than <CODE>
+bdry_mvertex_angle</CODE>
+. </P>
+<P>
+<A NAME="50422162_pgfId-377008"></A>Default: 0.3.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373704"></A><CODE>
+fit_normals</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373706"></A>Whether the normals of the resultant trimmed surface match the vertex normals of the input mesh.</P>
+<P>
+<A NAME="50422162_pgfId-373707"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373709"></A><CODE>
+have_normal_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373711"></A>Whether the normal tolerance is supplied. If set to the default value, Parasolid will choose an appropriate value.</P>
+<P>
+<A NAME="50422162_pgfId-373712"></A>Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373714"></A><CODE>
+normal_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373716"></A>The angular tolerance to use to fit the trimmed surface to the mesh vertex normals when <CODE>
+have_normal_tolerance</CODE>
+ is PK_LOGICAL_true. </P>
+<P>
+<A NAME="50422162_pgfId-373717"></A>If <CODE>
+have_normal_tolerance</CODE>
+ is PK_LOGICAL_true, this option must be set to a positive value.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422162_pgfId-373668"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1081.gif">
+
+<P>
+<A NAME="50422162_pgfId-373670"></A>Figure 84-5 <A NAME="50422162_89934"></A>Creating a trimmed surface from a single mesh</P>
+<P>
+<A NAME="50422162_pgfId-377666"></A>Use <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> to create topology for the resulting trimmed surface:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-380594"></A>Pass the <CODE>
+surf </CODE>
+and <CODE>
+trim_data</CODE>
+ returned by <A HREF=../headers/pk_mesh_make_surf_trimmed.html>PK_MESH_make_surf_trimmed</A> to <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>.</LI>
+<LI>
+<A NAME="50422162_pgfId-380604"></A>If the value of <CODE>
+sense</CODE>
+ in <A HREF=../headers/pk_mesh_make_surf_trimmed.html>PK_MESH_make_surf_trimmed</A> is PK_LOGICAL_false, then pass the body returned by <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> to <A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A>.</LI>
+</UL>
+<P>
+<A NAME="50422162_pgfId-504784"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422162_pgfId-504794"></A>Note: <A HREF=../headers/pk_mesh_make_surf_trimmed.html>PK_MESH_make_surf_trimmed</A> does not support the creation of periodic B-surfaces.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422162_pgfId-373736"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-373731"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-373735"></A><A HREF="fd_chap.091.html#50422169_38621">Chapter 90, “Importing Data”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422162_pgfId-325683"></A>84.6	<A NAME="50422162_65426"></A>Creating a mixture of facet and classic geometry 
+
+
+</H1>
+<P>
+<A NAME="50422162_pgfId-457611"></A>For some modelling functions, if their input bodies contain facet geometry only, you may control whether any resulting bodies have facet geometry only, or a mixture of classic and facet geometry. These functions use the <CODE>
+keep_as_facet</CODE>
+ option described in the following table:</P>
+<P>
+<A NAME="50422162_pgfId-454610"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-454600"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-454602"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422162_pgfId-454604"></A>PK_BODY_keep_as_facet_yes_c </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-458424"></A>When this value is used:</P>
+<UL>
+<LI>
+<A NAME="50422162_pgfId-454607"></A>If the input body contains facet geometry only, then the operation will either return facet geometry or fail. It will not return a mixture of classic and facet geometry.</LI>
+<LI>
+<A NAME="50422162_pgfId-458194"></A>If the input body contains any classic geometry, then this option is ignored.</LI>
+</UL>
+<P>
+<A NAME="50422162_pgfId-458185"></A>This is the default.</P>
+<ADDRESS>
+<A NAME="50422162_pgfId-460268"></A>Note: This value maintains the legacy behaviour and preserves the facet geometry result. When using the <CODE>
+keep_as_facet</CODE>
+ option, it is recommended that the PK_BODY_keep_as_facet_no_c value is used.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422162_pgfId-455775"></A>PK_BODY_keep_as_facet_no_c </PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-455777"></A>When the input body contains facet geometry only, then the operation may return a mixture of classic and facet geometry.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422162_pgfId-453682"></A>The <CODE>
+keep_as_facet </CODE>
+option is available in the following functions:</P>
+<P>
+<A NAME="50422162_pgfId-457491"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-457498"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-457500"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-457502"></A><A HREF=../headers/pk_body_extrude.html>PK_BODY_extrude</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-457504"></A>See <A HREF="fd_chap.038.html#50422109_23943">Section 37.2.6.1, “Preventing mixed bodies”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-457571"></A><A HREF=../headers/pk_body_make_curves_outline.html>PK_BODY_make_curves_outline</A></P>
+<P>
+<A NAME="50422162_pgfId-457572"></A><A HREF=../headers/pk_body_make_spun_outline.html>PK_BODY_make_spun_outline</A></P>
+<P>
+<A NAME="50422162_pgfId-457506"></A><A HREF=../headers/pk_body_make_persp_outline.html>PK_BODY_make_persp_outline</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-457508"></A>See <A HREF="fd_chap.037.html#50422108_76463">Section 36.3.2, “Specifying options”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-461011"></A><A HREF=../headers/pk_body_section_with_surf.html>PK_BODY_section_with_surf</A></P>
+<P>
+<A NAME="50422162_pgfId-462878"></A><A HREF=../headers/pk_body_make_section.html>PK_BODY_make_section</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-460682"></A>See <A HREF="fd_chap.056.html#50421908_64079">Section 55.4, “Options for global and local sectioning”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-462910"></A><A HREF=../headers/pk_face_make_sect_with_sfs.html>PK_FACE_make_sect_with_sfs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422162_pgfId-462912"></A>See <A HREF="fd_chap.056.html#50421908_64079">Section 55.4, “Options for global and local sectioning”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422162_pgfId-446941"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.084.html">Facet Model Structure</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.086.html">Creating PSM Data From Foreign Facet Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

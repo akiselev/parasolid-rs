@@ -1,0 +1,162 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>PK_MEMORY Functions</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MEMORY Functions</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.09.html">PK_DELTA Functions</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.11.html">Application I/O Functions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="di_chap.10.html#50548806_pgfId-274045">D.1	Introduction</A>
+<UL>
+<LI> <A HREF="di_chap.10.html#50548806_pgfId-274060">D.1.1	Registering the memory management functions</A>
+<LI> <A HREF="di_chap.10.html#50548806_pgfId-284494">D.1.2	Memory management functions that can be registered</A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548806_pgfId-274045"></A>D.1	<A NAME="50548806_marker-274044"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50548806_pgfId-274046"></A>This appendix contains the specifications of the Frustrum functions required for allocating and freeing memory, used when PK functions return variable length information. These functions are called by the PK functions <A HREF=../headers/pk_memory_alloc.html>PK_MEMORY_alloc</A> and <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>.</P>
+<P>
+<A NAME="50548806_pgfId-274047"></A>The functions should be type compatible with malloc and free in the standard C run-time library.</P>
+<P>
+<A NAME="50548806_pgfId-274051"></A>The section on <A HREF="fd_chap.010.html#36769">Section 9.3, “Memory management”</A> in the Parasolid <EM><A HREF=../fd_index.html>Functional Description</A></EM> provides further information on the use of these functions.</P>
+<P>
+<A NAME="50548806_pgfId-274055"></A>The functions are allowed to long-jump out of Parasolid in case of an error, with the same restrictions and requirements as the user-registered error-handling function (see <A HREF="fd_chap.120.html#35122">Chapter 119, “Error Handling”</A>, of the Parasolid <A HREF=../fd_index.html>Functional Description</A> manual).</P>
+<H3>
+<A NAME="50548806_pgfId-274060"></A>	D.1.1 	<A NAME="50548806_marker-274059"></A>Registering the memory management functions</H3>
+<P>
+<A NAME="50548806_pgfId-274061"></A>The memory management functions must be registered with Parasolid by calling the function <A HREF=../headers/pk_memory_register_callbacks.html>PK_MEMORY_register_callbacks</A>. This function can be called before starting a Parasolid modelling session, or during a session whenever Parasolid’s internal PK memory is empty.</P>
+<P>
+<A NAME="50548806_pgfId-274062"></A>If the functions have not been registered, or either of the function pointers given to <A HREF=../headers/pk_memory_register_callbacks.html>PK_MEMORY_register_callbacks</A> is NULL, Parasolid defaults to using the appropriate function from the standard C run-time-library when the application calls <A HREF=../headers/pk_memory_alloc.html>PK_MEMORY_alloc</A> or <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>.</P>
+<P>
+<A NAME="50548806_pgfId-284493"></A>You can use <A HREF=../headers/pk_memory_ask_callbacks.html>PK_MEMORY_ask_callbacks</A> to return pointers to the memory management functions currently registered with Parasolid. </P>
+
+
+<H3>
+<A NAME="50548806_pgfId-284494"></A>	D.1.2 	Memory management functions that can be registered</H3>
+<P>
+<A NAME="50548806_pgfId-283318"></A>This section lists the memory management functions that you can register during a Parasolid session.</P>
+<P>
+<A NAME="50548806_pgfId-284503"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548806_pgfId-279634"></A>Note: In the following list, the function names given are purely nominal, as the functions are registered by the call to <A HREF=../headers/pk_memory_register_callbacks.html>PK_MEMORY_register_callbacks</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548806_pgfId-296678"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548806_pgfId-284506"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548806_pgfId-284508"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548806_pgfId-284510"></A>For more information</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548806_pgfId-284512"></A><CODE>
+alloc_fn</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548806_pgfId-284514"></A>Allocates a specified amount of memory required in bytes.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548806_pgfId-284516"></A><A HREF=../headers/pk_memory_alloc_f_t.html>PK_MEMORY_alloc_f_t</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548806_pgfId-284518"></A><CODE>
+free_fn</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548806_pgfId-284520"></A>Frees previously allocated memory.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548806_pgfId-284522"></A><A HREF=../headers/pk_memory_free_f_t.html>PK_MEMORY_free_f_t</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548806_pgfId-279626"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.09.html">PK_DELTA Functions</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.11.html">Application I/O Functions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

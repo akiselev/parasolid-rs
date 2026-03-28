@@ -4,7 +4,7 @@
 
 #![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 
-use std::os::raw::{c_double, c_int};
+use std::os::raw::{c_char, c_double, c_int};
 
 use crate::*;
 
@@ -14,8 +14,8 @@ use crate::*;
 
 // -- Body type ----------------------------------------------------------------
 
-pub const PK_BODY_type_minimum_c: PK_BODY_type_t = 3;
-pub const PK_BODY_type_mixed_c: PK_BODY_type_t = 4;
+pub const PK_BODY_type_minimum_c: PK_BODY_type_t = 6;
+pub const PK_BODY_type_mixed_c: PK_BODY_type_t = 7;
 
 // -- Fin type -----------------------------------------------------------------
 
@@ -152,17 +152,41 @@ pub struct PK_NABOX_sf_t {
 }
 
 /// Foreign curve standard form.
+///
+/// Passed to `PK_FCURVE_create`; filled by `PK_FCURVE_ask`.
+/// - `keylen`   — byte length of the evaluator key string.
+/// - `key`      — pointer to the evaluator key string (not NUL-terminated by convention).
+/// - `nspace`   — number of `double` slots available to the evaluator in its working space.
+/// - `n_kii`    — number of integers in the KI integer array.
+/// - `ki_ints`  — pointer to the KI integer array (length `n_kii`).
+/// - `n_kir`    — number of reals in the KI real array.
+/// - `ki_reals` — pointer to the KI real array (length `n_kir`).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_FCURVE_sf_t {
-    pub function_data: *mut std::os::raw::c_void,
+    pub keylen: c_int,
+    pub key: *const c_char,
+    pub nspace: c_int,
+    pub n_kii: c_int,
+    pub ki_ints: *const c_int,
+    pub n_kir: c_int,
+    pub ki_reals: *const c_double,
 }
 
 /// Foreign surface standard form.
+///
+/// Same field layout as `PK_FCURVE_sf_t`; used with `PK_FSURF_create` and
+/// `PK_FSURF_ask`.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_FSURF_sf_t {
-    pub function_data: *mut std::os::raw::c_void,
+    pub keylen: c_int,
+    pub key: *const c_char,
+    pub nspace: c_int,
+    pub n_kii: c_int,
+    pub ki_ints: *const c_int,
+    pub n_kir: c_int,
+    pub ki_reals: *const c_double,
 }
 
 // =============================================================================
@@ -444,6 +468,10 @@ pub struct PK_TOPOL_make_new_o_t { _private: [u8; 0] }
 #[repr(C)]
 pub struct PK_ENTITY_copy_o_t { _private: [u8; 0] }
 
+/// Options for `PK_BODY_ask_topology`.
+#[repr(C)]
+pub struct PK_BODY_ask_topology_o_t { _private: [u8; 0] }
+
 /// Options for `PK_ENTITY_ask_description`.
 #[repr(C)]
 pub struct PK_ENTITY_ask_description_o_t { _private: [u8; 0] }
@@ -493,9 +521,17 @@ unsafe extern "C" {
     // Geometric standard form queries
     // =========================================================================
 
-    pub fn PK_FCURVE_ask(fcurve: PK_FCURVE_t, sf: *mut PK_FCURVE_sf_t) -> PK_ERROR_code_t;
+    /// Return the standard form of a foreign curve.
+    pub fn PK_FCURVE_ask(
+        fcurve: PK_FCURVE_t,
+        fcurve_sf: *mut PK_FCURVE_sf_t,
+    ) -> PK_ERROR_code_t;
 
-    pub fn PK_FSURF_ask(fsurf: PK_FSURF_t, sf: *mut PK_FSURF_sf_t) -> PK_ERROR_code_t;
+    /// Return the standard form of a foreign surface.
+    pub fn PK_FSURF_ask(
+        fsurf: PK_FSURF_t,
+        fsurf_sf: *mut PK_FSURF_sf_t,
+    ) -> PK_ERROR_code_t;
 
     // B-curve / B-surface standard form and variants
 
@@ -529,9 +565,15 @@ unsafe extern "C" {
     // Body topology queries
     // =========================================================================
 
+    /// Returns all topological entities belonging to a body.
+    ///
+    /// NOTE: `PK_BODY_topology_t` is a convenience struct and is NOT the ABI type.
+    /// The actual ABI returns a flat `PK_TOPOL_t` array via `topols`/`n_topols`.
     pub fn PK_BODY_ask_topology(
         body: PK_BODY_t,
-        topology: *mut PK_BODY_topology_t,
+        options: *const PK_BODY_ask_topology_o_t,
+        n_topols: *mut c_int,
+        topols: *mut *mut PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_BODY_find_laminar_edges(

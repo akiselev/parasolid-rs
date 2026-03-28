@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_check_pair</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_check_pair</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_FACE_check_pair
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                      face_1,       --- face to be checked
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                      face_2,       --- face to be checked
+const <A HREF=../headers/pk_face_check_pair_o_t.html>PK_FACE_check_pair_o_t</A>  *options,      --- options structure
+
+<I>--- returned arguments ---
+</I>int                     *const n_faults,     --- number of faults
+<A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A>       **const faults        --- faults
+)
+</B>
+<A NAME="description"></A>
+<I>This function checks the given pair of faces.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_check_error        a fault has been found when max_faults = 0
+                                (MILD)
+    PK_ERROR_check_failure      checker failure (MILD)
+    PK_ERROR_bad_option_data    max_faults &lt; 0 (MILD)
+    PK_ERROR_not_in_same_body   faces are not both from the same body (MILD)
+
+<A NAME="documentation"></A>
+
+This function performs a series of checks on a pair of faces,
+and returns information about the faults found, if any.
+
+
+option structure
+------ ---------
+The option structure allows the caller to control which checks are performed;
+if no options are supplied, all checks appropriate to the face pair will be
+made.
+
+The option structure allows the following to be set:
+
+    <B>'max_faults'</B>
+        maximum number of faults to be returned and whether to force checking
+        to raise a PK error instead of returning check faults.
+
+
+The check fault associated with this check is as follows
+
+'state'                        |<B>'entity_1'</B>|<B>'entity_2'</B>|     'position'
+-------------------------------------------------------------------------------
+PK_FACE_state_bad_face_face_c  |   face   |   face   | point in region of
+                               |          |          |    inconsistency
+                               |          |          |
+
+Faults are returned in an array of <A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A> structures.
+If there are no faults found, then <B>'n_faults'</B> is returned as zero.
+
+If there is more than one fault then the function does not
+guarantee to return all the faults.
+
+For more details on fault types and how they may arise, see the chapter on
+'Checking' in the Functional Description.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

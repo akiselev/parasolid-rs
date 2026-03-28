@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_set_type</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_set_type</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>               PK_BODY_set_type
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                     body,         --- body to have its type changed
+<A HREF=../headers/pk_body_type_t.html>PK_BODY_type_t</A>                new_type,     --- type to change to (if possible)
+const <A HREF=../headers/pk_body_set_type_o_t.html>PK_BODY_set_type_o_t</A>   *options       --- options structure
+)
+</B>
+<A NAME="description"></A>
+<I>This function tries to change the type of the body (e.g. from General to
+Solid). If the change is not possible, either a mild error is returned
+and the body is unchanged, or in specific cases a serious error is returned.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_orientation        Unable to set the body type to Solid
+                                    because the faces have inconsistent
+                                    orientation. (SERIOUS)
+
+    PK_ERROR_bad_type               Either the user passed in
+                                    PK_BODY_type_unspecified_c as <B>'new_type'</B>,
+                                    or asked for a conversion that is
+                                    not supported (e.g. Sheet to Wire). (MILD)
+
+    PK_ERROR_laminar_edge           The supplied body has at least one
+                                    laminar edge and thus cannot become
+                                    a solid. (MILD)
+
+
+    PK_ERROR_unsuitable_topology    The conversion is not possible due to
+                                    topological reasons (e.g. mixed dimension
+                                    of a general body). (MILD)
+
+
+<A NAME="documentation"></A>
+
+This function tries to change the type of the body (e.g. from General to
+Solid) to the type specified by <B>'new_type'</B>. If the change is not possible,
+an error is returned and the body is not changed, except when trying to
+change a body to Solid. In that case the body may have changed during the
+conversion attempt, if it was indeed changed a serious error is returned.
+In all other cases if an error is returned it is mild.
+
+The following type conversions are supported currently (provided they
+make sense topologically):
+
+a) General -&gt; Solid/Sheet/Wire/Acorn/Minimum
+
+b) Solid/Sheet/Wire/Acorn/Minimum -&gt; General
+
+c) Solid -&gt; Sheet
+
+d) Sheet -&gt; Solid
+
+Conversion to the General type should always work.
+
+At present no attempt is made to correct any faults/peculiarities in the
+body which may prevent the type change. Notably, the orientations of faces
+are not changed by this function. This means that converting a Sheet (or
+General) body to a Solid will fail when the faces appear to form a sensible
+solid body, if one or more of them are incorrectly oriented. See
+<A HREF="../chapters/fd_chap.015.html#50434372_pgfId-295859">here</A> for more information.
+
+
+If the change is from Sheet to Solid or vice versa, the region(s) that must
+become solid/void are changed appropriately, no other change to the topology
+is performed (apart from setting the body type).
+
+The supplied type must be a valid and specific Parasolid body type,
+PK_BODY_type_unspecified_c is not allowed.
+
+Other Parasolid APIs exist that can be used to convert a model from one
+type to another or derive a model of a different type from pre-existing
+models. These APIs include:
+- <A HREF=../headers/pk_body_make_manifold_bodies.html>PK_BODY_make_manifold_bodies</A>
+- <A HREF=../headers/pk_region_make_solid.html>PK_REGION_make_solid</A>
+- <A HREF=../headers/pk_region_make_void.html>PK_REGION_make_void</A>
+- <A HREF=../headers/pk_edge_make_wire_body.html>PK_EDGE_make_wire_body</A>
+- <A HREF=../headers/pk_region_combine_bodies.html>PK_REGION_combine_bodies</A>
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

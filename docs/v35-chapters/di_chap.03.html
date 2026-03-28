@@ -1,0 +1,1141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>File Handling</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>File Handling</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.02.html">Introduction to the Frustrum</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.04.html">File Header Structure</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-286610">2.1	Introduction</A>
+<UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-286305">2.1.1	Key names vs. file names</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-273853">2.1.2	Filename extensions</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-286184">2.1.3	File guises</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-273929">2.1.4	File header</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-286088">2.1.5	Number of files open concurrently</A>
+</UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-285996">2.2	Unicode filenames</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-285974">2.3	File formats</A>
+<UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-285916">2.3.1	Text and binary</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-273960">2.3.2	Application I/O</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-283518">2.3.3	Indexed I/O</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-287448">2.3.4	Portability</A>
+</UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-273980">2.4	Characteristics of different file guises</A>
+<UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-273981">2.4.1	FFCSNP</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-273983">2.4.2	FFCJNL</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-273986">2.4.3	FFCXMT</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-285682">2.4.4	FFCSCH</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-285455">2.4.5	FFCLNC</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-274000">2.4.6	FFCXMP</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-274002">2.4.7	FFCXMD</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-282904">2.4.8	FFCDBG</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-295263">2.4.9	FFCXMM</A>
+</UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-285428">2.5	Open modes</A>
+<UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-285432">2.5.1	open_read</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-274017">2.5.2	open_new</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-274023">2.5.3	open_protected</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-274028">2.5.4	Summary of open modes</A>
+</UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-274153">2.6	Explanation of the special characters in a journal file</A>
+<UL>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-274156">2.6.1	Record and element symbols</A>
+<LI> <A HREF="di_chap.03.html#50548799_pgfId-274189">2.6.2	Punctuation symbols</A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548799_pgfId-286610"></A>2.1	<A NAME="50548799_marker-286609"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50548799_pgfId-286611"></A>Parts modelled in Parasolid are saved to external storage using functions in your application’s Frustrum. Parasolid part files (<STRONG>
+transmit</STRONG> or <STRONG>
+XT</STRONG> files) are intended to fit into an archiving system within your application. This could take the form of a controlled directory structure on the host computer, or some kind of database.</P>
+<P>
+<A NAME="50548799_pgfId-286310"></A>Parasolid also requires facilities to save and retrieve large amounts of data in order to support such operations as saving and restoring snapshots and journalling.</P>
+<P>
+<A NAME="50548799_pgfId-273844"></A>Whilst such facilities could be implemented in a number of ways, they are described here in terms of an implementation based on the use of files provided by the host operating system.</P>
+
+<H3>
+<A NAME="50548799_pgfId-286305"></A>	2.1.1 	<A NAME="50548799_marker-286301"></A><A NAME="50548799_marker-286302"></A>Key names vs. <A NAME="50548799_marker-286303"></A><A NAME="50548799_marker-286304"></A>file names</H3>
+<P>
+<A NAME="50548799_pgfId-286306"></A>A distinction is made between the name of a key, which is passed by Parasolid as an argument to FFOPRD and FFOPWR (or UCOPRD and UCOPWR for Unicode keys) and the name of a file (which is used internally to identify the Frustrum files to the operating system).</P>
+<P>
+<A NAME="50548799_pgfId-286211"></A>The name of the key which is passed to the Frustrum by Parasolid is exactly the same as the name which has been given in the relevant PK call (<A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A>, <A HREF=../headers/pk_session_transmit.html>PK_SESSION_transmit</A>, <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> etc.), except in the case of schema files where the key has been generated by Parasolid.</P>
+<P>
+<A NAME="50548799_pgfId-286200"></A>The file name depends entirely on the particular implementation of the Frustrum, but typically this might include the key plus directory prefixes and file extensions as appropriate.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-273853"></A>	2.1.2 	Filename extensions</H3>
+<P>
+<A NAME="50548799_pgfId-273854"></A>The following filename extensions are recommended for the Frustrum to generate and use.</P>
+<P>
+<A NAME="50548799_pgfId-273904"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-281418"></A>&nbsp;</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-281420"></A>FAT</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-281422"></A>UNIX/NTFS</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273863"></A>part</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273865"></A>.X_T</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273867"></A>.xmt_txt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-295945"></A>mesh</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-295947"></A>.M_T</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-295949"></A>.xmm_txt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273869"></A>schema</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273871"></A>.S_T</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273873"></A>.sch_txt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273875"></A>journal</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273877"></A>.J_T</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273879"></A>.jnl_txt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273881"></A>snapshot</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273883"></A>.N_T</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273885"></A>.snp_txt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273887"></A>partition</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273889"></A>.P_T</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273891"></A>.xmp_txt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273893"></A>delta</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273895"></A>.D_T</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273897"></A>.xmd_txt</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273899"></A>binary</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273901"></A>.*_B</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-273903"></A>.***_bin</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-282819"></A>debug report</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-282821"></A>*.xml</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-282823"></A>*.xml</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548799_pgfId-273905"></A>The Frustrum should test whether a file resides on a DOS style FAT device or a long name NTFS type device before opening the file, and act accordingly. Files can simply be renamed when transferring between the different systems.</P>
+<P>
+<A NAME="50548799_pgfId-273906"></A>Note that the 3 character extensions are shown in the table in upper case for clarity, though the case is ignored.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-286184"></A>	2.1.3 	<A NAME="50548799_marker-286182"></A><A NAME="50548799_marker-286183"></A>File guises</H3>
+<P>
+<A NAME="50548799_pgfId-286185"></A>Parasolid requires the Frustrum to support different types (or <STRONG>
+guises</STRONG>) of file, represented by six-character integer mnemonic codes.</P>
+<P>
+<A NAME="50548799_pgfId-273911"></A>The following guises are opened for reading by FFOPRD and UCOPRD. The file should already exist, and its contents can be read sequentially by FFREAD.</P>
+<UL>
+<LI>
+<A NAME="50548799_pgfId-273912"></A>FFCSNP snapshot file</LI>
+<LI>
+<A NAME="50548799_pgfId-286172"></A>FFCJNL journal file (FFOPRD only)</LI>
+<LI>
+<A NAME="50548799_pgfId-286173"></A>FFCXMT part transmit file</LI>
+<LI>
+<A NAME="50548799_pgfId-296001"></A>FFCXMM meshes transmit file</LI>
+<LI>
+<A NAME="50548799_pgfId-286174"></A>FFCSCH schema file (FFOPRD only)</LI>
+<LI>
+<A NAME="50548799_pgfId-273916"></A>FFCLNC licence file</LI>
+<LI>
+<A NAME="50548799_pgfId-273917"></A>FFCXMP partition transmit file</LI>
+<LI>
+<A NAME="50548799_pgfId-273918"></A>FFCXMD deltas transmit file</LI>
+</UL>
+<P>
+<A NAME="50548799_pgfId-273919"></A>The following guises are opened for writing by FFOPWR and UCOPWR. A new file is created, and it can be written to sequentially by FFWRIT:</P>
+<UL>
+<LI>
+<A NAME="50548799_pgfId-273920"></A>FFCSNP snapshot file</LI>
+<LI>
+<A NAME="50548799_pgfId-286150"></A>FFCJNL journal file (FFOPWR only)</LI>
+<LI>
+<A NAME="50548799_pgfId-286151"></A>FFCXMT part transmit file</LI>
+<LI>
+<A NAME="50548799_pgfId-296037"></A>FFCXMM meshes transmit file</LI>
+<LI>
+<A NAME="50548799_pgfId-286152"></A>FFCSCH schema file (FFOPWR only)</LI>
+<LI>
+<A NAME="50548799_pgfId-273924"></A>FFCXMP partition transmit file</LI>
+<LI>
+<A NAME="50548799_pgfId-273925"></A>FFCXMD deltas transmit file</LI>
+<LI>
+<A NAME="50548799_pgfId-282887"></A>FFCDBG debug report file (FFOPWR only) </LI>
+</UL>
+<P>
+<A NAME="50548799_pgfId-273926"></A>When all of a new file has been written or sufficient of an existing file has been read, the file is closed with FFCLOS. In the case of new files, the call specifies whether or not the new file is to be retained.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-273929"></A>	2.1.4 	<A NAME="50548799_marker-273927"></A><A NAME="50548799_marker-273928"></A>File header</H3>
+<P>
+<A NAME="50548799_pgfId-273930"></A>There is a standard format for a Frustrum file header, which is described in <A HREF="di_chap.04.html#50548800_24726">Chapter 3, “File Header Structure”</A>.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-286088"></A>	2.1.5 	<A NAME="50548799_marker-286086"></A><A NAME="50548799_marker-286087"></A>Number of files open concurrently</H3>
+<P>
+<A NAME="50548799_pgfId-286089"></A>In normal operation, Parasolid only has a journal file open, which is open for writing.</P>
+<P>
+<A NAME="50548799_pgfId-286090"></A>For short periods, Parasolid may need to have up to two more files open. These are either a snapshot file or a transmit file, possibly with its associated schema file.</P>
+<P>
+<A NAME="50548799_pgfId-285994"></A>The Frustrum implementation must therefore allow for three files to be open at the same time for each Parasolid process.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548799_pgfId-285996"></A>2.2	<A NAME="50548799_65159"></A>Unicode filenames
+
+
+</H1>
+<P>
+<A NAME="50548799_pgfId-282201"></A>Parasolid supports the use of 16-bit Unicode filenames in your application, as well as the native character set. This is achieved by using the following frustrum functions instead of FFOPRD and FFOPWR:</P>
+<P>
+<A NAME="50548799_pgfId-282207"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-282213"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-282215"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-282217"></A>UCOPRD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-282219"></A>Open various guises of part file for reading. The part file has a filename encoded in Unicode format.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-282221"></A>UCOPWR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-282278"></A>Open various guises of part file for writing. The part file has a filename encoded in Unicode format.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548799_pgfId-282321"></A>To use these functions, you must call <A NAME="50548799_marker-282404"></A><A HREF=../headers/pk_session_set_unicode.html>PK_SESSION_set_unicode</A> before registering the frustrum. Once called, you must then supply valid UCOPRD and UCOPWR functions instead of FFOPRD and FFOPWR functions when registering the frustrum. For more information about registering the frustrum, see <A HREF="di_chap.06.html#50548802_15203">Chapter 5, “Registering the Frustrum”</A>.</P>
+<P>
+<A NAME="50548799_pgfId-282379"></A>To find out whether Unicode keys are enabled within a given session, call <A NAME="50548799_marker-282405"></A><A HREF=../headers/pk_session_ask_unicode.html>PK_SESSION_ask_unicode</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548799_pgfId-285974"></A>2.3	<A NAME="50548799_marker-285971"></A><A NAME="50548799_marker-285972"></A><A NAME="50548799_31202"></A>File formats
+
+
+</H1>
+<P>
+<A NAME="50548799_pgfId-285975"></A>Parasolid regards a file as being simply a stream of bytes, which is written or read sequentially. It is assumed that the stream of bytes obtained when reading is identical to that which was written (except in the case of a file ported between systems, when the character set may change).</P>
+
+<H3>
+<A NAME="50548799_pgfId-285916"></A>	2.3.1 	Text and binary</H3>
+<P>
+<A NAME="50548799_pgfId-285917"></A>Parasolid distinguishes between <STRONG>
+binary</STRONG> files and <STRONG>
+text</STRONG> files:</P>
+<UL>
+<LI>
+<A NAME="50548799_pgfId-285918"></A>In a binary (FFBNRY) file, the stream of bytes has no inherent meaning or structure. It can contain bytes of any value.</LI>
+<LI>
+<A NAME="50548799_pgfId-273948"></A>For a text (FFTEXT) file, the stream of bytes consists of printing characters (as defined by the C library function <CODE>
+isprint</CODE>
+) interspersed with newline characters (corresponding to <CODE>
+\n</CODE>
+ in C) such that there are never more than 80 consecutive printing characters.</LI>
+</UL>
+<P>
+<A NAME="50548799_pgfId-273949"></A>When writing certain files via the Frustrum, the application needs to specify whether they are to be in text or binary format. A file must be written and read in the same format (thus is Frustrum dependent). When deciding which format to use, consider the following factors:</P>
+<UL>
+<LI>
+<A NAME="50548799_pgfId-273950"></A>Machine specific binary files can only be read back on the same type of machine as that on which they were written.</LI>
+<LI>
+<A NAME="50548799_pgfId-273951"></A>Text files (subject to conversion of the contents of the file to the local character set of the target machine) and neutral binary files should be portable between machines.</LI>
+<LI>
+<A NAME="50548799_pgfId-273952"></A>Binary, neutral or machine files are normally quicker both to generate and read back than text files, and take up less space. The format of files influences the amount of space required and so affects how space is allocated when the Frustrum is written.</LI>
+<LI>
+<A NAME="50548799_pgfId-285870"></A>Whether binary transmit files or neutral transmit files are created is dependent on the option switch passed to <A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A> and <A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A>.</LI>
+<LI>
+<A NAME="50548799_pgfId-285871"></A>Text files that comply with Parasolid’s standard are machine independent and Frustrum independent (the header of the file is in human readable form and may be of interest, but the rest of the file is not intended to be human readable).</LI>
+</UL>
+<P>
+<A NAME="50548799_pgfId-281376"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548799_pgfId-281399"></A>Note: We recommend that your Frustrum creates text files as stream, i.e. LF terminated, rather than using the DOS default (CR and LF terminated). Implementation details can be found in the Example Frustrum.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50548799_pgfId-273960"></A>	2.3.2 	<A NAME="50548799_marker-273957"></A><A NAME="50548799_marker-273958"></A><A NAME="50548799_11558"></A>Application I/O</H3>
+<P>
+<A NAME="50548799_pgfId-283506"></A>There is also a transmit file format called <STRONG>
+application i/o</STRONG>, or <STRONG>
+applio</STRONG>. When this <CODE>
+transmit_format</CODE>
+ is selected in <A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A> and <A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A>, transmit files are written and read using a suite of functions provided by the application. Using these functions enables the application to do further processing of the output data before storing it.</P>
+<P>
+<A NAME="50548799_pgfId-283510"></A>The applio function interfaces are defined in <A HREF="di_chap.11.html#50548807_28800">Appendix E, “Application I/O Functions”</A>.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-283518"></A>	2.3.3 	<A NAME="50548799_20081"></A>Indexed I/O</H3>
+<P>
+<A NAME="50548799_pgfId-287444"></A>There is also a transmit file format called <STRONG>
+indexed i/o</STRONG>, or <STRONG>
+indexio</STRONG>. When this <CODE>
+transmit_format</CODE>
+ is selected in <A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A> and <A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A>, transmit files are written using a suite of functions provided by the application. Using these functions enables your application to subsequently receive only specified faces from the parts contained in the transmitted files.</P>
+<P>
+<A NAME="50548799_pgfId-287445"></A>The indexio function interfaces are defined in <A HREF="di_chap.12.html#50548808_28800">Appendix F, “Indexed I/O Functions”</A>.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-287448"></A>	2.3.4 	<A NAME="50548799_marker-287446"></A><A NAME="50548799_marker-287447"></A>Portability</H3>
+<P>
+<A NAME="50548799_pgfId-285796"></A>It is clearly desirable that Parasolid files be portable between different machines and between different systems which use Parasolid (which have different Frustrum implementations). In practice, machine specific binary files cannot be ported from one type of machine to another, so the best that can be achieved is:</P>
+<UL>
+<LI>
+<A NAME="50548799_pgfId-273970"></A>All files shall be portable between different Frustrum implementations on the same machine type.</LI>
+<LI>
+<A NAME="50548799_pgfId-273971"></A>Text and neutral binary files shall be portable between different Frustrum implementations on different machine types.</LI>
+</UL>
+<P>
+<A NAME="50548799_pgfId-273972"></A>In order that files be portable between different Frustrum implementations, it is necessary to standardize the internal format of the file. For this reason, we recommend that all Frustrum implementations should generate files in the same format as is generated by the appropriate C runtime library functions on the appropriate machine. In the case of text files, this includes correct handling of newline (<CODE>
+\n</CODE>
+) characters.</P>
+<P>
+<A NAME="50548799_pgfId-273973"></A>To ensure portability of text files between different machine types, we require that:</P>
+<UL>
+<LI>
+<A NAME="50548799_pgfId-285762"></A>With the exception of newline characters, text files should only contain printing characters, as defined by the C library function <CODE>
+isprint</CODE>
+. All text data output from Parasolid conforms to this rule; however, the Frustrum must guarantee it for the Frustrum header data.</LI>
+<LI>
+<A NAME="50548799_pgfId-285732"></A>Text files should not contain lines of more than 80 characters. To ensure this is the case, Parasolid automatically inserts newline characters (<CODE>
+\n</CODE>
+) into all text data being output. The Frustrum must ensure sufficient newline characters appear in the Frustrum header.</LI>
+</UL>
+<P>
+<A NAME="50548799_pgfId-273976"></A>It is also necessary that, when a text file is ported to a different type of machine, it is converted to the local character set and C format for the the target machine.</P>
+<P>
+<A NAME="50548799_pgfId-273977"></A>If a Frustrum implementation does not follow the above recommendations it may prove impossible to read files which have been created by other systems or to forward its own files to other systems (such as when making a fault reporting). Problems of this sort may be revealed by running the Frustrum validation tests, but note that these tests cannot verify that the file format is consistent with the C runtime library, so some additional check is required to confirm that this is the case.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548799_pgfId-273980"></A>2.4	<A NAME="50548799_marker-273978"></A><A NAME="50548799_marker-273979"></A>Characteristics of different file guises
+
+
+</H1>
+
+<H3>
+<A NAME="50548799_pgfId-273981"></A>	2.4.1 	FFCSNP</H3>
+<P>
+<A NAME="50548799_pgfId-285705"></A>Snapshot files are created by <A HREF=../headers/pk_session_transmit.html>PK_SESSION_transmit</A>. The data within the snapshot files is schema dependent and Parasolid needs to have access to the corresponding schema file in order to interpret it.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-273983"></A>	2.4.2 	FFCJNL</H3>
+<P>
+<A NAME="50548799_pgfId-273984"></A>Journal files are created as a result of calling <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> with journalling switched on. They are always created in text format. The files are used to record the values of arguments which have been passed to and received from PK and KI functions. </P>
+<P>
+<A NAME="50548799_pgfId-273985"></A>Journal files are <EM>
+reasonably</EM> portable between machines, except where the arguments specify such machine dependent features as file names or database keys or where they refer to parts which were created in an earlier session.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-273986"></A>	2.4.3 	FFCXMT</H3>
+<P>
+<A NAME="50548799_pgfId-285695"></A>Transmit files containing parts, created by <A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A>. The data within the transmit files is schema dependent and Parasolid needs to have access to the corresponding schema file in order to interpret it.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-285682"></A>	2.4.4 	FFCSCH</H3>
+<P>
+<A NAME="50548799_pgfId-285683"></A>Schema files are created by Parasolid to have names of the form <CODE>
+sch_</CODE>
+<EM>
+n</EM> (where <EM>
+n</EM> represents an integer value).</P>
+<P>
+<A NAME="50548799_pgfId-285653"></A>The integer value is used internally by Parasolid to identify any changes which have been made to the Parasolid schema.</P>
+<P>
+<A NAME="50548799_pgfId-285620"></A>The schema describes the internal data structure which is used to represent part data within the Parasolid model, such as the ordering of geometric data and the relationships between edges and faces.</P>
+<P>
+<A NAME="50548799_pgfId-285529"></A>The Frustrum should store schema files in a separate directory. The KID Frustrum stores them in a directory which is referenced by the P_SCHEMA environment variable.</P>
+<P>
+<A NAME="50548799_pgfId-285530"></A>Note that the Parasolid release includes a set of schema files for all previous versions of Parasolid and for the current version of the Parasolid modeller. This ensures upgrade compatibility of old part files.</P>
+<P>
+<A NAME="50548799_pgfId-285464"></A>Application writers should include a full set of schema files with their product release, including one for the current version of the Parasolid modeller.</P>
+<P>
+<A NAME="50548799_pgfId-285465"></A>In operating systems which have case specific file names the KID Frustrum chooses to write and read the schema archive file in lower case. Any old schema files that are supplied with a release have lower case file names.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-285455"></A>	2.4.5 	FFCLNC</H3>
+<P>
+<A NAME="50548799_pgfId-285456"></A>Licence files may be used in subsequent versions to check that Parasolid is being used in accordance with the licencing agreement. The validation tests for Frustrum implementations require this guise of file to be supported by FFOPRD &amp; FFOPWR, so that the licence checking capability can be introduced in a later release of Parasolid, without the need to alter the Frustrum interface further.</P>
+<P>
+<A NAME="50548799_pgfId-285442"></A>It is intended that licence files are created in text format; consisting of a standard file header followed by one or more lines of licence checking data.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-274000"></A>	2.4.6 	FFCXMP</H3>
+<P>
+<A NAME="50548799_pgfId-274001"></A>Transmit files containing a partition, created by <A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A> and read by <A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A>.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-274002"></A>	2.4.7 	FFCXMD</H3>
+<P>
+<A NAME="50548799_pgfId-274003"></A>Transmit files containing deltas, created by <A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A> if the option to transmit deltas is selected. During the transmit, the partition's deltas are opened, read and output to the transmit file (using the delta handling functions registered with <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>).</P>
+<P>
+<A NAME="50548799_pgfId-274004"></A>Delta files can only be received in the version they were transmitted in. They are read by <A HREF=../headers/pk_partition_receive_deltas_2.html>PK_PARTITION_receive_deltas_2</A>, if the option to receive deltas later was selected when the relevant partition was read in by <A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A>.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-282904"></A>	2.4.8 	FFCDBG</H3>
+<P>
+<A NAME="50548799_pgfId-282928"></A>Debug report files are created as a result of calling <A HREF=../headers/pk_debug_report_start.html>PK_DEBUG_report_start</A>. They are always created in XML format. These files are used to record information such as the values of arguments passed to and returned by Parasolid functions, as well as embedding relevant part files. </P>
+
+
+<H3>
+<A NAME="50548799_pgfId-295263"></A>	2.4.9 	FFCXMM</H3>
+<P>
+<A NAME="50548799_pgfId-294823"></A>Transmit files containing Persistent Mesh (PSM) mesh data. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548799_pgfId-285428"></A>2.5	<A NAME="50548799_marker-295502"></A><A NAME="50548799_marker-295503"></A>Open modes
+
+
+</H1>
+<P>
+<A NAME="50548799_pgfId-285429"></A>There are the basic modes in which files are used by Parasolid.</P>
+
+<H3>
+<A NAME="50548799_pgfId-285432"></A>	2.5.1 	<A NAME="50548799_marker-285430"></A><A NAME="50548799_marker-285431"></A>open_read</H3>
+<P>
+<A NAME="50548799_pgfId-285407"></A>This mode is characteristic of receiving a Parasolid transmit file, receiving a snapshot file or reading an archived schema file.</P>
+<P>
+<A NAME="50548799_pgfId-274013"></A>A test is made first for whether there is any header data and whether the ‘skip header’ flag is set. If so, the header data is read and checked as deemed necessary by the implementation. If there is no header data or if the header data is to be left (for checking by the Frustrum validation tests), the file pointer is repositioned back to the start of the file.</P>
+<P>
+<A NAME="50548799_pgfId-274014"></A>The file is read sequentially until sufficient data has been read or until the end of file is reached. The file is then closed (and it is retained).</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-274017"></A>	2.5.2 	<A NAME="50548799_marker-274015"></A><A NAME="50548799_marker-274016"></A>open_new</H3>
+<P>
+<A NAME="50548799_pgfId-285392"></A>This mode is characteristic of recording a new journal or debug report file.</P>
+<P>
+<A NAME="50548799_pgfId-285393"></A>The file is opened for writing and the header data are written to it. Parasolid then writes sequentially to the file, journalling the arguments to each interface function. The new file is closed and is retained.</P>
+<P>
+<A NAME="50548799_pgfId-274020"></A>If the system crashes while the journal or debug report file is still open, the system is left with a (possibly incomplete) file. Even in its incomplete form, this file can be useful for debugging a session.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-274023"></A>	2.5.3 	<A NAME="50548799_marker-274021"></A><A NAME="50548799_marker-274022"></A>open_protected</H3>
+<P>
+<A NAME="50548799_pgfId-274024"></A>This mode is used for creating new transmit, schema and snapshot files.</P>
+<P>
+<A NAME="50548799_pgfId-285382"></A>The difference between the open_protected and the open_new modes is that the Frustrum helps to prevent Parasolid from accessing incomplete or otherwise erroneous files. If an error is detected by Parasolid when writing to a new file, the call to FFCLOS is made with the status code FFABOR, meaning that the file must be deleted when the strid is closed down.</P>
+<P>
+<A NAME="50548799_pgfId-285366"></A>However, if new files are not closed explicitly (as could occur after a system crash), it is possible that a newly created file is not complete.</P>
+<P>
+<A NAME="50548799_pgfId-285367"></A>The Frustrum can protect Parasolid from incomplete files by creating new transmit, schema and snapshot files with scratch names, only giving them their correct identity after the files have been closed explicitly by a call to FFCLOS.</P>
+
+
+<H3>
+<A NAME="50548799_pgfId-274028"></A>	2.5.4 	Summary of open modes</H3>
+<P>
+<A NAME="50548799_pgfId-274029"></A>The three basic methods of using files are summarized in the following table:</P>
+<P>
+<A NAME="50548799_pgfId-285357"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285208"></A>&nbsp;</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285210"></A>&nbsp;</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285212"></A>open_read</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285214"></A>open_new</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285216"></A>open_protected</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="4" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285218"></A>open mode</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285220"></A>FFOPRD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285222"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285224"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285226"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285230"></A>FFOPWR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285232"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285234"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285236"></A>Y</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285240"></A>UCOPRD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285242"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285244"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285246"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285250"></A>UCOPWR</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285252"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285254"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285256"></A>Y</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="6" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285258"></A>file guise </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285260"></A>FFCSCH</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285262"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285264"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285266"></A>Y</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285270"></A>FFCXMT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285272"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285274"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285276"></A>Y</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285280"></A>FFCSNP</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285282"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285284"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285286"></A>Y</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285290"></A>FFCJNL</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285292"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285294"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285296"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285300"></A>FFCLNC</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285302"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285304"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285306"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285310"></A>FFCDBG</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285312"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285314"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285316"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285318"></A>operation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285320"></A>FFREAD</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285322"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285324"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285326"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285330"></A>FFWRIT</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285332"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285334"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285336"></A>Y</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285338"></A>close mode</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285340"></A>FFCLOS with action normal</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285342"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285344"></A>Y</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285346"></A>Y</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285350"></A>FFCLOS with action abort</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285352"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285354"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-285356"></A>Y</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548799_pgfId-285358"></A>An entry <STRONG>
+Y</STRONG> denotes that Parasolid calls the given function in the way which is described by the comment above the column. The file guises XMP and XMD (transmit files containing partition and delta data) use the same methods as XMT (part transmit) files.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548799_pgfId-274153"></A>2.6	Explanation of the special characters in a journal file
+
+
+</H1>
+<P>
+<A NAME="50548799_pgfId-274155"></A><A NAME="50548799_Journal files"></A>Journal files contain the following markup characters to assist with interpretation of the contents.</P>
+
+<H3>
+<A NAME="50548799_pgfId-274156"></A>	2.6.1 	Record and element symbols</H3>
+<P>
+<A NAME="50548799_pgfId-274188"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-281504"></A>Symbol</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-281506"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274159"></A>:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274161"></A>The first and last lines are comment records, which start with a ‘:’ character.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274163"></A>&lt;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274165"></A>The ‘&lt;’ character at the beginning of each journal record is followed by the name of a PK function. This is followed by a sequence of lexical items, being tags, text strings, integers, doubles and punctuation symbols. These are separated by one or more spaces.</P>
+<UL>
+<LI>
+<A NAME="50548799_pgfId-274166"></A>when journal records are written over more than one line, the continuation lines start with a space</LI>
+<LI>
+<A NAME="50548799_pgfId-274167"></A>nested PK calls are shown with one angle bracket for each nesting depth; if there is an error, and <A HREF=../headers/pk_session_tidy.html>PK_SESSION_tidy</A> is called, the level is reset back to 0</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274169"></A>#</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274171"></A>A tag is represented by a ‘#’ character, followed by digits.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274173"></A>“ ”</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274175"></A>A string is enclosed in quotation marks (two successive quotation marks imply that the string itself contains a quotation mark).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274177"></A>(-)nnn</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274179"></A>Integer values are represented by an (optional) sign, followed by digits.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274181"></A>(-)nn.nnn<BR>
+5.6e07<BR>
+-5.6e-07</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274183"></A>Double values are represented by an (optional) sign, followed by a floating point representation (with a decimal point) or an exponent and mantissa representation (with an ‘e’ character).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274185"></A>@</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274187"></A>Function pointers are journalled as addresses.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50548799_pgfId-274189"></A>	2.6.2 	Punctuation symbols</H3>
+<P>
+<A NAME="50548799_pgfId-274211"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-281529"></A>Symbol</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-281531"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274192"></A>;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274194"></A>the semi-colon separates received arguments from returned arguments</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274196"></A>&amp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274198"></A>the ampersand concatenates adjacent text strings (the journalling system sometimes needs to split a long text string when writing it to file)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274200"></A>[ ]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274202"></A>square brackets enclose an array of some type (all elements of the array have the same type); if an array or pointer argument is supplied as NULL, this is journalled as the address value @0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274204"></A>( )</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274206"></A>round brackets enclose a list of doubles (e.g. vectors)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274208"></A>{ }</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50548799_pgfId-274210"></A>curly brackets enclose a list of structure members, e.g. a standard form</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548799_pgfId-110680"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.02.html">Introduction to the Frustrum</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.04.html">File Header Structure</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,1171 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Face Tapering</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Face Tapering</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.066.html">Replacing The Surfaces Of Faces</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.068.html">Body Tapering</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-690982">66.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-1382339">66.1.1	Creating and imprinting isocline curves </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-1394539">66.1.2	Calling PK_FACE_taper </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-294751">66.1.3	Reference entities </A>
+<UL>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-294782">66.1.3.1	Examples of using reference entities </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-294784">66.1.3.2	Example 1: Splitting a single face and tapering to the resulting faces </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-294827">66.1.3.3	Example 2: Selecting edges as reference entities </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-295807">66.1.3.4	Example 3: Using an adjacent face as the reference entity </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-296252">66.1.3.5	Example 4: Splitting a single face into multiple taper surfaces using reference edges </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-1395145">66.2	Summary of PK_FACE_taper options </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-298873">66.3	Taper methods </A>
+<UL>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-1395330">66.3.1	Isocline-based tapering </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-298929">66.3.2	Curve-based and surface-based tapering </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-299114">66.3.3	Offset tapering </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-299224">66.3.4	Normal-to-surface tapering </A>
+</UL>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-297097">66.4	Step tapering </A>
+<UL>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-297448">66.4.1	Step surfaces </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-297683">66.4.2	Automatic step tapering </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-298567">66.4.3	Creating steps between taper faces </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-298804">66.4.4	Creating step faces from a parting body </A>
+</UL>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-457328">66.5	Specifying multiple angles </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-296759">66.6	Controlling laminar edges </A>
+<LI> <A HREF="fd_chap.067.html#50422142_pgfId-297049">66.7	Controlling the growth of overflowing faces </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422142_pgfId-690982"></A>66.1	<A NAME="50422142_31282"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422142_pgfId-1394074"></A>This chapter describes how faces can be modified using tapering (often called drafting) when molding or casting a model part. Applying a taper (or adding draft) allows the part to be easily withdrawn from the mold as shown in <A HREF="fd_chap.067.html#50422142_96806"><EM>
+Figure 66-1</EM></A>. </P>
+<P>
+<A NAME="50422142_pgfId-1394112"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-751.gif">
+
+<P>
+<A NAME="50422142_pgfId-1394114"></A>Figure 66-1 <A NAME="50422142_96806"></A>Removing a tapered and untapered part from a mold</P>
+<P>
+<A NAME="50422142_pgfId-343381"></A><A NAME="50422142_18895"></A><A NAME="50422142_marker-343379"></A><A NAME="50422142_marker-343380"></A>Tapering is typically used to model parts for injection molding or casting, as it changes the angle of “steep” side surfaces, thereby allowing a part to be easily withdrawn from a mold.There are two stages involved in tapering a set of faces which are summarised here: </P>
+<UL>
+<LI>
+<A NAME="50422142_pgfId-816426"></A>Analysis: Where the body is divided into a set of faces that require tapering, and a set of faces which do not require tapering. See <A HREF="fd_chap.067.html#50422142_97516">Section 66.1.1, “Creating and imprinting isocline curves”</A> for more information on this stage.</LI>
+<LI>
+<A NAME="50422142_pgfId-1408564"></A>Tapering: Where the surfaces of the faces which require tapering are replaced by <STRONG>
+isocline surfaces</STRONG> using <A NAME="50422142_marker-1408546"></A><A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A>. An isocline surface is a surface such that, at any point on the surface, the angle between the steepest surface tangent and the draw direction is the taper angle.</LI>
+</UL>
+<P>
+<A NAME="50422142_pgfId-950670"></A>During both stages, the functionality requires a draw direction vector pointing into the mold and a draft angle.</P>
+<P>
+<A NAME="50422142_pgfId-1382786"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422142_pgfId-1394486"></A>Note: Throughout this tapering process an <STRONG>
+isocline curve</STRONG> is defined to be a boundary between an all-steep region and a non-steep region of a surface. At all points on an isocline curve the face normal makes an angle with the draw direction equal to π/2 - taper angle.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422142_pgfId-1394515"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\LOP\Taper</CODE>
+ folder located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422142_pgfId-1394522"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422142_pgfId-1394521"></A>Note: This functionality partially supports facet geometry. See <A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422142_pgfId-1408391"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1398724"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422142_pgfId-1394525"></A><A HREF="fd_chap.068.html#50422143_22949">Chapter 67, “Body Tapering”</A></LI>
+<LI>
+<A NAME="50422142_pgfId-1394529"></A><A HREF="fd_chap.073.html#50422148_">Chapter 72, “Generic Face Editing”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422142_pgfId-1382339"></A>	66.1.1 	<A NAME="50422142_97516"></A>Creating and imprinting isocline curves </H3>
+<P>
+<A NAME="50422142_pgfId-816426"></A>During the analysis stage of the process, <A NAME="50422142_marker-1408442"></A>you can use either <A HREF=../headers/pk_face_imprint_cus_isoclin.html>PK_FACE_imprint_cus_isoclin</A> or <A HREF=../headers/pk_surf_make_cus_isocline.html>PK_SURF_make_cus_isocline</A> to create and imprint isocline curves on a set of faces or a given surface.The set of faces must all come from the same body. Typically some faces are split during this analysis phase.</P>
+<P>
+<A NAME="50422142_pgfId-1455888"></A>If you are using facet geometry, the <CODE>
+mesh_normal_field</CODE>
+ option provides control over imprinting isocline curves on a mesh. This option allows you to specify whether mvertex normals or mfacet normals are used to generate isocline curves on a mesh. Unlike classic surfaces, you can choose how to determine the normal associated with a point on a mesh. This can either be a mfacet normal or a mvertex normal. For more information on these mesh normals, see <A HREF="fd_chap.089.html#50422166_38228">Section 88.3, “Mesh normals”</A>. </P>
+<P>
+<A NAME="50422142_pgfId-1460536"></A>The <CODE>
+mesh_normal_field</CODE>
+ option has the following values:</P>
+<P>
+<A NAME="50422142_pgfId-1460599"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1460614"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1460616"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1460618"></A><A HREF=../headers/pk_mesh_normal_field_t.html>PK_MESH_normal_field_mvertex_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1460620"></A>Whether isocline curves are generated using the mvertex normals of the mesh. These isocline curves may divide the existing mfacets. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1460622"></A><A HREF=../headers/pk_mesh_normal_field_t.html>PK_MESH_normal_field_mfacet_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1460624"></A>Whether isocline curves are generated along existing mfins using the mfacet normals of the mesh.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422142_pgfId-1459584"></A>The results of using either mvertex normals or mfacet normals to generate isocline curves are illustrated in <A HREF="fd_chap.067.html#50422142_60722"><EM>
+Figure 66-2</EM></A>.</P>
+<P>
+<A NAME="50422142_pgfId-1440570"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-752.gif">
+
+<P>
+<A NAME="50422142_pgfId-1440482"></A>Figure 66-2 <A NAME="50422142_60722"></A>Creating isocline curves on meshes using mvertex normals or mfacet normals</P>
+<P>
+<A NAME="50422142_pgfId-1455687"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422142_pgfId-1433729"></A>Note: The <CODE>
+mesh_normal_field</CODE>
+ option is not implemented for classic geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422142_pgfId-1455697"></A><A HREF=../headers/pk_face_imprint_cus_isoclin.html>PK_FACE_imprint_cus_isoclin</A> can also report whether the returned <CODE>
+ret_faces</CODE>
+ are steep. Faces are deemed to be <A NAME="50422142_marker-1461040"></A><A NAME="50422142_marker-1461041"></A>steep when, at all points, the face normal makes an angle with the draw direction which is greater than π/2 - taper angle, in radians. </P>
+
+
+<H3>
+<A NAME="50422142_pgfId-1394539"></A>	66.1.2 	Calling <A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A> </H3>
+<P>
+<A NAME="50422142_pgfId-1394540"></A><A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A> takes the following arguments:</P>
+<P>
+<A NAME="50422142_pgfId-759811"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394543"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394545"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394547"></A><CODE>
+n_faces <BR>
+faces</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394549"></A>The number of faces used in the taper operation and the faces themselves.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394551"></A><CODE>
+references</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394555"></A>The reference entities used in the taper operation. See <A HREF="fd_chap.067.html#50422142_14026">Section 66.1.3, “Reference entities”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394558"></A><CODE>
+direction </CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394560"></A>The direction of the face taper.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394562"></A><CODE>
+angle</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394564"></A>The angle of the face taper.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394566"></A><CODE>
+tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394568"></A>The maximum tolerance of the tapered surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394570"></A><CODE>
+options</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1394574"></A>A set of options to control the result of the tapering operation. See <A HREF="fd_chap.067.html#50422142_18149">Section 66.2, “Summary of <A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A> options”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422142_pgfId-294751"></A>	66.1.3 	<A NAME="50422142_14026"></A><A NAME="50422142_marker-760084"></A><A NAME="50422142_marker-760085"></A><A NAME="50422142_marker-760086"></A>Reference entities </H3>
+<P>
+<A NAME="50422142_pgfId-294752"></A><A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A> requires a reference entity from the <CODE>
+reference</CODE>
+ argument for each face it tapers. The reference entity is used to define the taper surface. It can be one of the following:</P>
+<P>
+<A NAME="50422142_pgfId-294773"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-294755"></A>Entity</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-294757"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-294759"></A>an edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-294761"></A>The reference edge stays fixed while the other edges of the taper face are altered to perform the taper. If isocline curves are imprinted during the analysis phase, the resulting edges can be used as reference edges during the tapering phase.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-294763"></A>a face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-294765"></A>The taper face acquires the same taper surfaces as the reference face. See <A HREF="fd_chap.067.html#50422142_17013">Section 66.1.3.4, “Example 3: Using an adjacent face as the reference entity”</A> for an example.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-294770"></A>a surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-294772"></A>The intersection of the taper face with the reference surface stays fixed.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422142_pgfId-1394602"></A>If a face is used as a reference entity, it must appear in both the <CODE>
+faces</CODE>
+ array and the <CODE>
+reference</CODE>
+ array such that each face entry in the <CODE>
+faces</CODE>
+ array maps to a single reference entity in the corresponding position in the <CODE>
+reference</CODE>
+ array. Multiple references can be specified by duplicating the faces in the <CODE>
+faces</CODE>
+ array.</P>
+<P>
+<A NAME="50422142_pgfId-294774"></A>Step tapering can be performed by passing a set of edges and surfaces as reference entities for a single face. See <A HREF="fd_chap.067.html#50422142_18074">Section 66.4, “Step tapering”</A> for more information.</P>
+
+<H4>
+<A NAME="50422142_pgfId-294782"></A>66.1.3.1 <A NAME="50422142_marker-1158783"></A><A NAME="50422142_marker-1158784"></A>Examples of using reference entities </H4>
+<P>
+<A NAME="50422142_pgfId-294783"></A>The following examples are intended to illustrate the different aspects of this functionality.</P>
+
+
+<H4>
+<A NAME="50422142_pgfId-294784"></A>66.1.3.2 Example 1: Splitting a single face and tapering to the resulting faces </H4>
+<P>
+<A NAME="50422142_pgfId-294789"></A>In <A HREF="fd_chap.067.html#50422142_32145"><EM>
+Figure 66-3</EM></A>: (a) the curved face has been analysed and split by two isocline curves into three faces, of which two need tapering; (b) shows the tapering stage complete and illustrates the isocline surfaces meeting the original face smoothly.</P>
+<P>
+<A NAME="50422142_pgfId-294824"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-753.gif">
+
+<P>
+<A NAME="50422142_pgfId-294826"></A>Figure 66-3 <A NAME="50422142_32145"></A>Splitting a single face and tapering two of the resulting faces</P>
+
+
+<H4>
+<A NAME="50422142_pgfId-294827"></A>66.1.3.3 Example 2: Selecting edges as reference entities </H4>
+<P>
+<A NAME="50422142_pgfId-294832"></A>In <A HREF="fd_chap.067.html#50422142_21178"><EM>
+Figure 66-4</EM></A>, both faces f0 and f1 require tapering. In this instance you may identify edges e0 and e1 as the reference entities that both retain their geometry after the taper is applied. In this example the taper surface for face f0 is a plane and for face f1 a ruled B-surface.</P>
+<P>
+<A NAME="50422142_pgfId-529359"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-754.gif">
+
+<P>
+<A NAME="50422142_pgfId-295805"></A>Figure 66-4 <A NAME="50422142_21178"></A>Selecting edges e0 and e1 as reference entities</P>
+
+
+<H4>
+<A NAME="50422142_pgfId-295807"></A>66.1.3.4 <A NAME="50422142_17013"></A>Example 3: Using an adjacent face as the reference entity </H4>
+<P>
+<A NAME="50422142_pgfId-1414628"></A>In <A HREF="fd_chap.067.html#50422142_34780"><EM>
+Figure 66-5</EM></A> two faces (f0 and f1) need tapering to produce the result shown. To achieve this result, you need to specify f0 and f1 as the faces to be tapered. In addition, e0 should be specified as the reference entity for f0, and f0 should be specified as the reference entity for f1, which means that f1 acquires the same taper surface as f0. <A HREF="fd_chap.067.html#50422142_34780"><EM>
+Figure 66-5</EM></A> shows the effect of using this specification and, since f0 and f1 are adjacent, they are merged into one face.</P>
+<P>
+<A NAME="50422142_pgfId-530412"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-755.gif">
+
+<P>
+<A NAME="50422142_pgfId-296251"></A>Figure 66-5 <A NAME="50422142_34780"></A>Using an adjacent face as the reference entity</P>
+
+
+<H4>
+<A NAME="50422142_pgfId-296252"></A>66.1.3.5 Example 4: Splitting a single face into multiple taper surfaces using reference edges </H4>
+<P>
+<A NAME="50422142_pgfId-1395020"></A>In <A HREF="fd_chap.067.html#50422142_95493"><EM>
+Figure 66-6</EM></A>, three edges (e0,e1 and e2) are specified as reference edges for face f0. Tapering the body results in splitting f0 at the common vertex of e0 and e1 and at the common vertex of e1 and e2 into faces f0, f1 and f2. These three faces are then tapered appropriately.</P>
+<P>
+<A NAME="50422142_pgfId-532903"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-756.gif">
+
+<P>
+<A NAME="50422142_pgfId-296373"></A>Figure 66-6 <A NAME="50422142_95493"></A>Using reference edges to taper face f0</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422142_pgfId-1395145"></A>66.2	<A NAME="50422142_18149"></A>Summary of <A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A> options 
+
+
+</H1>
+<P>
+<A NAME="50422142_pgfId-1395146"></A><A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A> contains a wide variety of options to let you control the result of the taper operation, The following table summarises the options available, full details of which are given in the rest of this chapter.</P>
+<P>
+<A NAME="50422142_pgfId-762366"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395149"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395151"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395153"></A>merge_face</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395155"></A>Whether tapered faces should be merged with their neighbouring faces.</P>
+<P>
+<A NAME="50422142_pgfId-1395156"></A>Default: PK_LOGICAL_true</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395158"></A>check_fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395160"></A>Whether to check for face-face inconsistencies.</P>
+<P>
+<A NAME="50422142_pgfId-1395161"></A>Default: <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_yes_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395163"></A>tapered_edges</PRE>
+<PRE><A NAME="50422142_pgfId-1395164"></A>normal_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395166"></A>When performing step tapers, a list of edges that produce tapered step faces, and a list of edges that produce normal step faces. See <A HREF="fd_chap.067.html#50422142_18074">Section 66.4, “Step tapering”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395171"></A>method</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395173"></A>Which taper method to use in the operation.</P>
+<P>
+<A NAME="50422142_pgfId-1395174"></A>Default: <A HREF=../headers/pk_taper_method_t.html>PK_taper_method_isocline_c</A></P>
+<P>
+<A NAME="50422142_pgfId-1395178"></A>See <A HREF="fd_chap.067.html#50422142_57713">Section 66.3, “Taper methods”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395180"></A>offset</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395182"></A>The offset distance used when <CODE>
+method</CODE>
+ is set to <A HREF=../headers/pk_taper_method_t.html>PK_taper_method_offset_c</A>. See <A HREF="fd_chap.067.html#50422142_83894">Section 66.3.3, “Offset tapering”</A> for more information</P>
+<P>
+<A NAME="50422142_pgfId-1395186"></A>Default: 0.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395188"></A>top_surface</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395190"></A>The surface on which the reference edge’s curve is projected when performing offset tapering. See <A HREF="fd_chap.067.html#50422142_83894">Section 66.3.3, “Offset tapering”</A> for more information</P>
+<P>
+<A NAME="50422142_pgfId-1395194"></A>Default: PK_ENTITY_null</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395196"></A>taper_smooth_step</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395198"></A>Whether to create step faces when you have a smooth boundary edge between a face which is to be tapered and a face that is not being tapered. See <A HREF="fd_chap.067.html#50422142_25319">Section 66.4.2, “Automatic step tapering”</A> for more information.</P>
+<P>
+<A NAME="50422142_pgfId-1395202"></A>Default: <A HREF=../headers/pk_taper_smooth_step_t.html>PK_taper_smooth_step_no_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395204"></A>taper_step_face</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395206"></A>Whether to create step faces between taper faces that have become disconnected as a result of the tapering operation. See <A HREF="fd_chap.067.html#50422142_62022">Section 66.4.3, “Creating steps between taper faces”</A> for more information.</P>
+<P>
+<A NAME="50422142_pgfId-1395210"></A>Default: <A HREF=../headers/pk_taper_step_face_t.html>PK_taper_step_face_no_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395212"></A>taper_faces</PRE>
+<PRE><A NAME="50422142_pgfId-1395213"></A>n_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395215"></A>A list of faces that are tapered using different taper angles for each face. See <A HREF="fd_chap.067.html#50422142_66282">Section 66.5, “Specifying multiple angles”</A> for more information.</P>
+<P>
+<A NAME="50422142_pgfId-1395219"></A>Default: NULL, 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395221"></A>angles</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395223"></A>An array of angles that you want to apply to the faces listed in <CODE>
+taper_faces</CODE>
+. The supplied angles are subject to the restrictions described in the description of <CODE>
+taper_faces</CODE>
+ in <A HREF="fd_chap.067.html#50422142_66282">Section 66.5, “Specifying multiple angles”</A>.</P>
+<P>
+<A NAME="50422142_pgfId-1395227"></A>Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395229"></A>position</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395233"></A>How to process laminar edge boundaries. See <A HREF="fd_chap.067.html#50422142_60296">Section 66.6, “Controlling laminar edges”</A> for more information.</P>
+<P>
+<A NAME="50422142_pgfId-1395235"></A>Default: <A HREF=../headers/pk_taper_laminar_edge_t.html>PK_taper_laminar_edge_normal_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395237"></A>grow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395241"></A>Whether to grow faces when repairing face clashes. See <A HREF="fd_chap.067.html#50422142_28692">Section 66.7, “Controlling the growth of overflowing faces”</A> for more information.</P>
+<P>
+<A NAME="50422142_pgfId-1395243"></A>Default: PK_FACE_grow_update_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395245"></A>parting_edges</PRE>
+<PRE><A NAME="50422142_pgfId-1395246"></A>n_parting_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395250"></A>Edges used to create step faces from <CODE>
+parting_body</CODE>
+. See <A HREF="fd_chap.067.html#50422142_48121">Section 66.4.4, “Creating step faces from a parting body”</A> for more information.</P>
+<P>
+<A NAME="50422142_pgfId-1395252"></A>Default: NULL, 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395254"></A>parting_body</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395256"></A>The body used to create step faces from <CODE>
+parting_edges</CODE>
+. This must be a sheet body. See <A HREF="fd_chap.067.html#50422142_48121">Section 66.4.4, “Creating step faces from a parting body”</A> for more information.</P>
+<P>
+<A NAME="50422142_pgfId-1395260"></A>Default: PK_ENTITY_null</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422142_pgfId-1395262"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1395264"></A>Update switch to maintain consistency when rebuilding models built in older version of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for more information.</P>
+<P>
+<A NAME="50422142_pgfId-1395272"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A> </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422142_pgfId-298873"></A>66.3	<A NAME="50422142_57713"></A>Taper methods 
+
+
+</H1>
+<P>
+<A NAME="50422142_pgfId-1395283"></A>Parasolid allows you to create a number of different types of tapers using the <CODE>
+method</CODE>
+ field in the options structure for <A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A>.</P>
+<P>
+<A NAME="50422142_pgfId-298885"></A>This field can take the following values:</P>
+<P>
+<A NAME="50422142_pgfId-1395328"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298888"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298890"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298892"></A><A HREF=../headers/pk_taper_method_t.html>PK_taper_method_isocline_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298894"></A>Isocline-based tapering is the default method. It calculates tapered faces with reference to the taper direction and the taper reference curve tangents. It fails if the taper condition is not satisfied. It is particularly suited to creating molds. See <A HREF="fd_chap.067.html#50422142_42494">Section 66.3.1, “Isocline-based tapering”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298896"></A><A HREF=../headers/pk_taper_method_t.html>PK_taper_method_curve_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298898"></A>Curve-based tapering calculates tapered faces with reference to the taper direction, and the direction perpendicular to the taper direction, and the reference edge’s curve tangent. This method is particularly suited to aesthetic tapering. The taper condition does not need to be satisfied for this method to succeed. See <A HREF="fd_chap.067.html#50422142_23512">Section 66.3.2, “Curve-based and surface-based tapering”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298903"></A><A HREF=../headers/pk_taper_method_t.html>PK_taper_method_surface_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298905"></A>Surface-based tapering calculates tapered faces with reference to the taper direction and the normal of the taper faces’ original surfaces. The taper condition does not need to be satisfied for this method to succeed. This method is particularly suited to aesthetic tapering. See <A HREF="fd_chap.067.html#50422142_23512">Section 66.3.2, “Curve-based and surface-based tapering”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298910"></A><A HREF=../headers/pk_taper_method_t.html>PK_taper_method_offset_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298912"></A>Offsetting tapering calculates tapered faces by projecting the curve of the reference edge onto the top surface, such that the resulting curve appears offset from the reference edge curve when viewed from the taper direction. This method is useful when creating a tapered surface against a single curved top surface.See <A HREF="fd_chap.067.html#50422142_83894">Section 66.3.3, “Offset tapering”</A>for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298917"></A><A HREF=../headers/pk_taper_method_t.html>PK_taper_method_normal_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298919"></A>Normal-to-surface tapering produces tapered surfaces similar to those created by the curve method, but here they are independent of the global taper direction. Instead, the draw direction varies according to the normal of the reference surface. This method is useful for creating a tapered surface that is independent of the global taper direction.See <A HREF="fd_chap.067.html#50422142_80384">Section 66.3.4, “Normal-to-surface tapering”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422142_pgfId-1395330"></A>	66.3.1 	<A NAME="50422142_42494"></A>Isocline-based tapering </H3>
+<P>
+<A NAME="50422142_pgfId-797721"></A>Isocline-based tapering lets you create tapered surfaces which satisfy the taper input condition: for all faces being tapered, the angle between the taper direction and the taper reference curve tangent must be greater or equal to the taper angle at all points along the curve. This is the default tapering method and has been described in previous sections.</P>
+
+
+<H3>
+<A NAME="50422142_pgfId-298929"></A>	66.3.2 	<A NAME="50422142_23512"></A><A NAME="50422142_marker-762448"></A><A NAME="50422142_marker-762449"></A><A NAME="50422142_marker-762450"></A><A NAME="50422142_marker-762451"></A>Curve-based and surface-based tapering </H3>
+<P>
+<A NAME="50422142_pgfId-298930"></A>Curve-based tapering lets you create tapered surfaces in cases where the taper condition is not satisfied (such as when the taper reference curve is in the same direction as the draw direction). It is particularly suited to aesthetic tapering.</P>
+<P>
+<A NAME="50422142_pgfId-298931"></A>Surface-based tapering also lets you create tapered surfaces in cases where the taper condition is not satisfied, using a different method of calculation. It is also particularly suited to aesthetic tapering.</P>
+<P>
+<A NAME="50422142_pgfId-1395367"></A>In some cases, surface-based and curve-based tapering yield identical solutions, as shown in <A HREF="fd_chap.067.html#50422142_87686"><EM>
+Figure 66-7</EM></A>. </P>
+<P>
+<A NAME="50422142_pgfId-495346"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-757.gif">
+
+<P>
+<A NAME="50422142_pgfId-299110"></A>Figure 66-7 <A NAME="50422142_87686"></A>Creating surface and curve-based tapers</P>
+
+
+<H3>
+<A NAME="50422142_pgfId-299114"></A>	66.3.3 	<A NAME="50422142_83894"></A><A NAME="50422142_marker-762497"></A><A NAME="50422142_marker-762498"></A>Offset tapering </H3>
+<P>
+<A NAME="50422142_pgfId-299115"></A>Offset tapering lets you create tapered surfaces in which the curve of the reference edge is projected onto a single top surface, creating a new “offset curve” that appears offset from the curve of the reference edge when viewed from the direction of taper, as shown in <A HREF="fd_chap.067.html#50422142_97267"><EM>
+Figure 66-8</EM></A>.</P>
+<P>
+<A NAME="50422142_pgfId-299119"></A>When producing this type of taper, you should use <CODE>
+top_surface</CODE>
+ to specify the surface on which the reference edge’s curve is projected. It must be the surface of a face in the body, and should not be the surface of any taper face.</P>
+<P>
+<A NAME="50422142_pgfId-523934"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-758.gif">
+
+<P>
+<A NAME="50422142_pgfId-524369"></A>Figure 66-8 <A NAME="50422142_97267"></A>Creating an offset taper</P>
+
+
+<H3>
+<A NAME="50422142_pgfId-299224"></A>	66.3.4 	<A NAME="50422142_80384"></A>Normal-to-surface tapering </H3>
+<P>
+<A NAME="50422142_pgfId-299225"></A>Normal-to-surface tapering produces tapered surfaces that are not dependent on the draw direction but vary with the normal of a reference surface. This may be supplied as a reference entity (see <A HREF="fd_chap.067.html#50422142_14026" CLASS="XRef">Section 66.1.3, “Reference entities”</A> for more information) or, where the reference entity is an edge, taken as the surface of the face adjacent to this reference edge. An example is shown in <A HREF="fd_chap.067.html#50422142_63901"><EM>
+Figure 66-9</EM></A>, where the results are compared with those from the default taper method (<A HREF=../headers/pk_taper_method_t.html>PK_taper_method_isocline_c</A>). The plan view shows that the normal-to-surface operation has constructed a tapered surface with a varying draw direction.</P>
+<P>
+<A NAME="50422142_pgfId-619925"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-759.gif">
+
+<P>
+<A NAME="50422142_pgfId-760553"></A>Figure 66-9 <A NAME="50422142_63901"></A>Creating a normal-to-surface taper</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422142_pgfId-297097"></A>66.4	<A NAME="50422142_18074"></A>Step tapering 
+
+
+</H1>
+<P>
+<A NAME="50422142_pgfId-297100"></A><A NAME="50422142_marker-763172"></A><A NAME="50422142_marker-763173"></A>In step tapering, the taper is based on both a reference surface and a parting line of reference edges. The specified faces are tapered in the same way as in regular tapering, but, contrary to regular tapering, these faces are not split into new faces stemming from the reference edges. Any of the reference edges that do not lie in the reference surface produce a new step face which extends from the reference edge to the tapered face. </P>
+<P>
+<A NAME="50422142_pgfId-297104"></A>A typical example of step tapering is shown in <A HREF="fd_chap.067.html#50422142_30936"><EM>
+Figure 66-10</EM></A>. The face to taper is marked f0, the reference surface is the plane marked s0 and the reference edges form the parting line. The taper direction is the upward vertical.</P>
+<P>
+<A NAME="50422142_pgfId-617615"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-760.gif">
+
+<P>
+<A NAME="50422142_pgfId-297327"></A>Figure 66-10 Partial step tapering <A NAME="50422142_30936"></A></P>
+<P>
+<A NAME="50422142_pgfId-297328"></A>As in regular tapering, the reference edges, the intersections of the faces to taper and the reference surface, are kept fixed. The reference surface, though, does not have to intersect the faces to taper, as shown in <A HREF="fd_chap.067.html#50422142_40711"><EM>
+Figure 66-11</EM></A>.</P>
+<P>
+<A NAME="50422142_pgfId-484694"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-761.gif">
+
+<P>
+<A NAME="50422142_pgfId-297383"></A>Figure 66-11 <A NAME="50422142_40711"></A>Step tapering </P>
+<P>
+<A NAME="50422142_pgfId-297384"></A>The reference surface may also split reference edges into new edges (as shown in <A HREF="fd_chap.067.html#50422142_17108"><EM>
+Figure 66-12</EM></A>), leading to the creation of the new-edge associated step faces, or merge reference edges, as required by the taper operation.</P>
+<P>
+<A NAME="50422142_pgfId-487807"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-762.gif">
+
+<P>
+<A NAME="50422142_pgfId-297442"></A>Figure 66-12 <A NAME="50422142_17108"></A>Edges of the reference surface are split</P>
+
+<H3>
+<A NAME="50422142_pgfId-297448"></A>	66.4.1 	<A NAME="50422142_74234"></A><A NAME="50422142_marker-763282"></A><A NAME="50422142_marker-763283"></A><A NAME="50422142_marker-763284"></A><A NAME="50422142_marker-763285"></A>Step surfaces </H3>
+<P>
+<A NAME="50422142_pgfId-297449"></A>The surfaces attached to the step faces created from reference edges during a step taper operation can be of two types:</P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422142_pgfId-297450"></A><STRONG>
+Tapered surfaces</STRONG> These surfaces are generated from <CODE>
+tapered_edges</CODE>
+ in the same manner as the main tapered surfaces, they therefore satisfy the taper condition.</LI>
+<LI>
+<A NAME="50422142_pgfId-297451"></A><STRONG>
+Normal surfaces</STRONG> These surfaces are ruled surfaces perpendicular (normal) to the relevant original main taper face and are generated from <CODE>
+normal_edges</CODE>
+. They do <STRONG>
+not</STRONG> necessarily satisfy the taper condition.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422142_pgfId-486316"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-763.gif">
+
+<P>
+<A NAME="50422142_pgfId-297678"></A>Figure 66-13 <A NAME="50422142_18510"></A>Step-tapered body with normal step face</P>
+
+
+<H3>
+<A NAME="50422142_pgfId-297683"></A>	66.4.2 	<A NAME="50422142_25319"></A><A NAME="50422142_marker-763330"></A><A NAME="50422142_marker-763331"></A><A NAME="50422142_marker-763332"></A>Automatic step tapering </H3>
+<P>
+<A NAME="50422142_pgfId-635689"></A>When there is a smooth edge between a face to be tapered and a face that is not being tapered, you can use the <CODE>
+taper_smooth_step</CODE>
+ option in <A HREF=../headers/pk_face_taper_o_t.html>PK_FACE_taper_o_t</A> to automatically create a step face. This is illustrated in <A HREF="fd_chap.067.html#50422142_62071"><EM>
+Figure 66-14</EM></A>.</P>
+<P>
+<A NAME="50422142_pgfId-635698"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-764.gif">
+
+<P>
+<A NAME="50422142_pgfId-635700"></A>Figure 66-14 <A NAME="50422142_62071"></A>Automatic creation of step faces</P>
+<P>
+<A NAME="50422142_pgfId-298565"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422142_pgfId-298561"></A>Note: The step faces created using this option have normal surfaces attached, rather than tapered. See <A HREF="fd_chap.067.html#50422142_74234">Section 66.4.1, “Step surfaces”</A>, for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422142_pgfId-298567"></A>	66.4.3 	<A NAME="50422142_62022"></A>Creating steps between taper faces </H3>
+<P>
+<A NAME="50422142_pgfId-298568"></A>Sometimes, taper faces that are connected in the original body can become separated as a result of the taper operation. This occurs, for example, when smoothly connected faces are tapered using multiple angles, as described in <A HREF="fd_chap.067.html#50422142_66282">Section 66.5, “Specifying multiple angles”</A>. </P>
+<P>
+<A NAME="50422142_pgfId-298572"></A>You can use the <CODE>
+taper_step_face</CODE>
+ option to control the creation of step faces between taper faces that get separated in this way. </P>
+<P>
+<A NAME="50422142_pgfId-298576"></A><A HREF="fd_chap.067.html#50422142_16143"><EM>
+Figure 66-15</EM></A> shows a body on which two adjacent faces are tapered by different angles. Parasolid has created a step faces between the resulting tapered faces. Notice also that step faces have been created between each tapered face and any adjacent non-taper faces that are smoothly connected, as described in <A HREF="fd_chap.067.html#50422142_25319">Section 66.4.2, “Automatic step tapering”</A>.</P>
+<P>
+<A NAME="50422142_pgfId-494142"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-765.gif">
+
+<P>
+<A NAME="50422142_pgfId-298776"></A>Figure 66-15 <A NAME="50422142_16143"></A>Creating step faces between taper faces</P>
+<P>
+<A NAME="50422142_pgfId-298777"></A>The <CODE>
+taper_step_face</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422142_pgfId-298802"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298780"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298782"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298788"></A><A HREF=../headers/pk_taper_step_face_t.html>PK_taper_step_face_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298790"></A>Do not create a step face between taper faces that are separated. Instead, Parasolid attempts to trim the taper faces appropriately. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1163941"></A><A HREF=../headers/pk_taper_step_face_t.html>PK_taper_step_face_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-1163943"></A>Create a step face between taper faces that are separated during the taper operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298795"></A>PK_taper_preserve_smooth_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-298797"></A>Step faces are created between any sharply connected faces that are separated, but Parasolid attempts to preserve the smooth boundary of any smoothly connected faces. </P>
+<P>
+<A NAME="50422142_pgfId-298801"></A>If you use this value when tapering using multiple angles, you must ensure that any smoothly connected faces all have the same taper angle. See <A HREF="fd_chap.067.html#50422142_66282">Section 66.5, “Specifying multiple angles”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422142_pgfId-298804"></A>	66.4.4 	<A NAME="50422142_48121"></A>Creating step faces from a parting body </H3>
+<P>
+<A NAME="50422142_pgfId-298805"></A>You can produce step faces from a parting sheet using the <CODE>
+parting_edges</CODE>
+ and <CODE>
+parting_body</CODE>
+ options in <A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A>.</P>
+<P>
+<A NAME="50422142_pgfId-298827"></A><A HREF="fd_chap.067.html#50422142_77168"><EM>
+Figure 66-16</EM></A> shows the creation of step faces using the imprinted edges of a parting sheet. The <CODE>
+parting_edges</CODE>
+ of the parting sheet are imprinted on the faces of the body that are to be tapered. Step faces are then created along these imprinted edges. </P>
+<P>
+<A NAME="50422142_pgfId-298863"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-766.gif">
+
+<P>
+<A NAME="50422142_pgfId-298865"></A>Figure 66-16 <A NAME="50422142_77168"></A>Creating step faces from a parting sheet</P>
+<P>
+<A NAME="50422142_pgfId-298868"></A>These options are also available in <A HREF=../headers/pk_face_change_taper_o_t.html>PK_FACE_change_taper_o_t</A>. See <A HREF="fd_chap.073.html#50422148_33410">Section 72.4.2, “Taper options”</A>, for more information. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422142_pgfId-457328"></A>66.5	<A NAME="50422142_66282"></A>Specifying multiple angles 
+
+
+</H1>
+<P>
+<A NAME="50422142_pgfId-1395715"></A>As well as tapering a set of faces using a single taper angle, you can taper multiple faces using multiple angles with the <CODE>
+taper_faces</CODE>
+ and <CODE>
+angles</CODE>
+ options. </P>
+<P>
+<A NAME="50422142_pgfId-1395716"></A>The <CODE>
+taper_faces</CODE>
+ option is an array of faces for which you want to specify multiple angles. The <CODE>
+angles</CODE>
+ option is an array of angles that you want to apply to those faces. Each face in <CODE>
+taper_faces</CODE>
+ should be unique, and should also be included in the list of <CODE>
+faces</CODE>
+ passed to <A HREF=../headers/pk_face_taper.html>PK_FACE_taper</A>. The <CODE>
+taper_faces</CODE>
+ may consist of faces that are connected, either sharply or smoothly. </P>
+<P>
+<A NAME="50422142_pgfId-1395717"></A>The <CODE>
+taper_faces</CODE>
+ and <CODE>
+angles</CODE>
+ specified are subject to the following restrictions:</P>
+<UL>
+<LI>
+<A NAME="50422142_pgfId-1395718"></A>If a taper face and its reference face are both included in this array, you must ensure that the same taper angle is specified for each face in the <CODE>
+angles</CODE>
+ array. </LI>
+<LI>
+<A NAME="50422142_pgfId-1395721"></A>If the <CODE>
+taper_step_face</CODE>
+ option is PK_taper_preserve_smooth_c (see <A HREF="fd_chap.067.html#50422142_62022">Section 66.4.3, “Creating steps between taper faces”</A>), then the same taper angle must be specified for all smoothly connected faces that are supplied in this list.</LI>
+</UL>
+<P>
+<A NAME="50422142_pgfId-864590"></A><A HREF="fd_chap.067.html#50422142_49304"><EM>
+Figure 66-17</EM></A> shows some examples of bodies where several faces have been tapered using different angles. </P>
+<P>
+<A NAME="50422142_pgfId-473759"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-767.gif">
+
+<P>
+<A NAME="50422142_pgfId-296648"></A>Figure 66-17 <A NAME="50422142_49304"></A>Creating face tapers using multiple angles</P>
+<P>
+<A NAME="50422142_pgfId-296673"></A>Very often, specifying multiple taper angles causes adjacent tapered faces to become separated as a result of the taper operation. Parasolid can repair these separations by adding a step face automatically, and we strongly recommend that you use this functionality. <A HREF="fd_chap.067.html#50422142_59675"><EM>
+Figure 66-18</EM></A> shows an example in which four step faces need to be added to repair the body. See <A HREF="fd_chap.067.html#50422142_62022">Section 66.4.3, “Creating steps between taper faces”</A>, for information.</P>
+<P>
+<A NAME="50422142_pgfId-616149"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-768.gif">
+
+<P>
+<A NAME="50422142_pgfId-616151"></A>Figure 66-18 <A NAME="50422142_59675"></A>Repairing separated taper faces</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422142_pgfId-296759"></A>66.6	<A NAME="50422142_60296"></A>Controlling laminar edges 
+
+
+</H1>
+<P>
+<A NAME="50422142_pgfId-296760"></A>You can control how the geometry attached to any laminar edges in a tapered face is created using the <CODE>
+position</CODE>
+ option. This can have a significant effect on the shape of the resulting tapered body. The <CODE>
+position</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422142_pgfId-296774"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-296763"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-296765"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-296767"></A><A HREF=../headers/pk_taper_laminar_edge_t.html>PK_taper_laminar_edge_normal_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-296769"></A>The geometry for the laminar edges on the tapered face is produced by projecting the geometry for the laminar edges on the untapered face along the normal of the tapered face. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-296771"></A><A HREF=../headers/pk_taper_laminar_edge_t.html>PK_taper_laminar_edge_draw_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422142_pgfId-296773"></A>The geometry for the laminar edges on the tapered face is produced by constructing ruled surfaces from the laminar edges of the untapered face that are orthogonal to the draw direction. The position of the laminar edges of the tapered face is then determined from the intersection of this ruled surface with the tapered face. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422142_pgfId-296778"></A><A HREF="fd_chap.067.html#50422142_65379"><EM>
+Figure 66-19</EM></A> shows how the result of a taper operation can be affected by using this option. In the illustration, a cylindrical face is tapered by a large angle using both methods. Using the default method, the tapered face is significantly shorter in the axis of the draw direction than using the alternative method. Using the alternative value, a tapered face with the same height as the cylindrical face is produced.</P>
+<P>
+<A NAME="50422142_pgfId-478999"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-769.gif">
+
+<P>
+<A NAME="50422142_pgfId-297047"></A>Figure 66-19 <A NAME="50422142_65379"></A>Controlling the position of laminar edges in tapered faces</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422142_pgfId-297049"></A>66.7	<A NAME="50422142_28692"></A>Controlling the growth of overflowing faces 
+
+
+</H1>
+<P>
+<A NAME="50422142_pgfId-297050"></A>When features with different convexities overflow each other as a result of tapering, you can control which of the clashing features is grown to heal the model using the <CODE>
+grow</CODE>
+ option. </P>
+<P>
+<A NAME="50422142_pgfId-297054"></A><A HREF="fd_chap.067.html#50422142_28250"><EM>
+Figure 66-20</EM></A> shows a simple example of the effects that you can achieve using this functionality. </P>
+<P>
+<A NAME="50422142_pgfId-297088"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-770.gif">
+
+<P>
+<A NAME="50422142_pgfId-297090"></A>Figure 66-20 <A NAME="50422142_28250"></A>Controlling the growth of overflowing features with different convexity</P>
+<P>
+<A NAME="50422142_pgfId-297091"></A>This option is available in a range of different functional areas, including local operations, hollowing, and thickening. For a full description, see <A HREF="fd_chap.073.html#50422148_61645">Section 72.5.5, “Controlling the growth of overflowing faces”</A>.</P>
+<P>
+<A NAME="50422142_pgfId-1380836"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.066.html">Replacing The Surfaces Of Faces</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.068.html">Body Tapering</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,144 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_spin</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_spin</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>         PK_FACE_spin
+(
+<I>--- received arguments ---
+</I>int                     n_faces,       --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>         faces[],       --- faces
+const <A HREF=../headers/pk_axis1_sf_t.html>PK_AXIS1_sf_t</A>    *axis,          --- spin axis
+double                  angle,         --- spin angle
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>            local_check,   --- whether local checking will be done
+
+<I>--- returned arguments ---
+</I>int              *const n_laterals,    --- number of laterals
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>       **const laterals,      --- new faces (may be NULL)
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>       **const bases,         --- edges swept into laterals
+                                       --- (may be NULL)
+<A HREF=../headers/pk_local_check_t.html>PK_local_check_t</A> *const check_result   --- result of local check
+)
+</B>
+<A NAME="description"></A>
+<I>This function spins one or more faces of a solid or sheet body.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity     Face(s) unsuitable for spin
+    PK_ERROR_wrong_entity          Bad arguments
+    PK_ERROR_bad_angle             bad angle
+    PK_ERROR_non_manifold          Can't spin face with non-manifold boundary
+    PK_ERROR_impossible_spin       Can't determine spun geometry
+    PK_ERROR_su_self_intersect     Spin would produce a self intersecting surf
+
+<A NAME="documentation"></A>
+The face(s) to be spun are moved along an arc specified by the axis leaving
+lateral entities in its wake.
+
+See <A HREF="../chapters/fd_chap.071.html#50434434_pgfId-296493">Local Ops: Spinning or Sweeping an Entity</A> for more information.
+
+Faces which may be spun, the laterals they produce and the type of the
+resulting body are identified in the following table.
+
+
+
+    Spun Bodies           |         Laterals         |       Result
+===========================================================================
+One or more faces of a    |   One or more faces      |      Solid body
+solid body                |                          |
+One or more faces of a    |   One or more faces      |      Sheet body
+sheet body                |                          |
+============================================================================
+
+For every entry in 'laterals', there is a corresponding entry in 'bases'. This
+array contains the topological entities extruded to create the lateral entities
+For every lateral face there is a spun edge from the original body and for
+every lateral edge there is a spun vertex.
+
+
+
+Suitable Spin Entities:
+
+   . Any group of manifold faces of a solid or sheet body. Entire shells must
+     not be contained within the list
+
+Attempting to spin a face which is not one of the above will give rise
+to one of PK_ERROR_wrong_entity, PK_ERROR_unsuitable_entity or
+PK_ERROR_non_manifold as appropriate.
+
+
+
+Permissible Spins:
+
+   . An entity may not be spun through more than 2pi or less than -2pi.
+     It is not possible to perform full spins (where the angle is 2pi or
+     -2pi) on faces of a solid or sheet.
+
+A face which has an edge whose attached curve is of the class PK_CLASS_fcurve
+(i.e. foreign geometry) or class PK_CLASS_cpcurve (i.e. constant parameter
+curve) cannot be spun.
+
+After a spin any coincident topology will not be fused or united.
+
+In general this procedure may give rise to self-intersecting body
+boundaries, which could cause unpredictable errors later.
+
+Any new surfaces created are analytic surfaces if possible. If it is
+not possible to use an analytic surface then the class of the new
+surface will be PK_CLASS_spun or PK_CLASS_bsurf depending upon the most
+recent call to <A HREF=../headers/pk_session_set_swept_spun_surfs.html>PK_SESSION_set_swept_spun_surfs</A>.
+
+If local checking is switched on (<B>'local_check'</B> = PK_LOGICAL_true), consistency
+checks will be made on newly created topological and geometrical
+entities, and the result of the check returned.
+A result of <A HREF=../headers/pk_local_check_t.html>PK_local_check_ok_c</A> indicates the body is valid. A result
+of <A HREF=../headers/pk_local_check_t.html>PK_local_check_negated_c</A> indicates that the result body was originally
+"inside out" but has been negated, and is now "positive" (has positive volume)
+and valid. A result of <A HREF=../headers/pk_local_check_t.html>PK_local_check_failed_c</A> indicates the body
+is self-intersecting and further modelling operations on it may fail.
+
+If <B>'local_check'</B> is PK_LOGICAL_false, local checking will be switched off and
+the result returned will be <A HREF=../headers/pk_local_check_t.html>PK_local_check_no_c</A>.
+
+A self-intersecting body can be returned.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,109 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_find_facesets</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_find_facesets</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_BODY_find_facesets
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                           body,       --- body
+int                                 n_edges,    --- no of bounding edges
+const <A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                     edges[],    --- bounding edges from body
+const <A HREF=../headers/pk_body_find_facesets_o_t.html>PK_BODY_find_facesets_o_t</A>    *options,    --- find options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_find_facesets_r_t.html>PK_BODY_find_facesets_r_t</A>    *const results     --- find results
+)
+</B>
+<A NAME="description"></A>
+<I>
+This function finds all the facesets on the body and splits those that are
+divided by the input edges into smaller facesets. It then returns the facesets
+that are selected by the options and, if requested, the input edges that
+bound each faceset.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_general_body           (MILD) <B>'body'</B> is a general body
+    PK_ERROR_unsuitable_topology    (MILD) one topology is unsuitable
+    PK_ERROR_inconsistent_facesets  (MILD) failure to find coherent faceset
+                                           and edgeset arrays.
+
+<A NAME="documentation"></A>
+
+Introduction
+
+This function finds all the facesets made up of back faces of the given <B>'body'</B>.
+From these facesets, it returns those that are selected by the options. The
+default behaviour is to return all the facesets.
+
+See <A HREF="../chapters/fd_chap.065.html#50434428_pgfId-294855">Finding facesets</A> in the Functional Description for more
+information.
+
+A faceset is all the faces in a shell of the <B>'body'</B> that contains back
+faces, unless the shell's faces are divided into two or more subsets by some
+of the input edges, in which case each subset is a separate faceset.
+
+The <B>'edges'</B> may be supplied in any order. If no edges are supplied then there
+will be as many facesets as there are shells that contain back faces in the
+body.
+
+This function is not supported for general bodies.
+
+
+PK_BODY_find_facesets Options
+
+The option structure passed to this function provides following controls:
+
+ o <B>'selector'</B> and <B>'alternate'</B> to specify whether and how the user
+   wants to restrict the facesets returned by the function.
+ o <B>'want_bounds'</B> to specify if the edges bounding each returned faceset
+   are required.
+
+Refer to the <B>'<A HREF=../headers/pk_body_find_facesets_o_t.html>PK_BODY_find_facesets_o_t</A>'</B> documentation for more
+detailed information about the options within this structure.
+
+
+Returned Arguments
+
+Refer to the <B>'<A HREF=../headers/pk_body_find_facesets_r_t.html>PK_BODY_find_facesets_r_t</A>'</B> documentation for information
+about the arrays returned in the <B>'results'</B> structure.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

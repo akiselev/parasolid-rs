@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_make_3_face_blend</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_make_3_face_blend</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_FACE_make_3_face_blend
+(
+<I>--- received arguments ---
+</I>int                                  n_left_wall_faces,   --- number of faces
+                                                          --- in left wall
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                      left_wall_faces[],   --- left wall faces
+int                                  n_right_wall_faces,  --- number of faces
+                                                          --- in right wall
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                      right_wall_faces[],  --- right wall faces
+int                                  n_centre_wall_faces, --- number of faces
+                                                          --- in centre wall
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                      centre_wall_faces[], --- centre wall faces
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                            guide,               --- wire body for
+                                                          --- blend planes
+const <A HREF=../headers/pk_face_make_3_face_blend_o_t.html>PK_FACE_make_3_face_blend_o_t</A> *options,             --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_face_make_3_face_blend_r_t.html>PK_FACE_make_3_face_blend_r_t</A> *const results,             --- results of blend
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>            *const tracking             --- tracking
+)
+</B>
+<A NAME="description"></A>
+<I>This function makes a three-face blend from the given faces.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_not_in_same_partition  Faces are not all in the same partition
+                                    (MILD)
+    PK_ERROR_bad_type               Guide is not a wire body (MILD)
+    PK_ERROR_bad_partition          User supplied partition is invalid (MILD)
+    PK_ERROR_bad_combination        User supplied options are incompatible
+                                    (MILD)
+    PK_ERROR_failed_to_blend        Could not create blend (SERIOUS)
+    PK_ERROR_general_body           General body (MILD)
+    PK_ERROR_instanced_body         The faces in the left and right walls are
+                                    from different bodies, and the right wall
+                                    faces belong to a body that is instanced
+                                    (MILD)
+    PK_ERROR_facet_geometry         The faces in one of the walls are from a
+                                    body with facet geometry (MILD)
+
+<A NAME="documentation"></A>
+This function creates one or more blends between the three sets of faces
+provided. For further details see <A HREF="../chapters/fd_chap.079.html#50434443_pgfId-294730">Three-face Blending</A> in the
+Functional Description.
+
+The function receives:
+
+<B>'left_wall_faces'</B>   An array of the faces which make up the left wall.
+                    These faces must all lie in the same shell of the same
+                    body.
+
+<B>'right_wall_faces'</B>  An array of the faces which make up the right wall.
+                    These faces must all lie in the same shell of the same
+                    body.
+
+<B>'centre_wall_faces'</B> An array of the faces which make up the centre wall.
+                    These faces must all lie in the same shell of the same
+                    body.
+
+<B>'guide'</B>             A wire body defining the cross-section planes of the
+                    blend.  This must be a manifold connected wire that is
+                    G1 continuous and contains no tolerant vertices.
+
+The three walls may be faces from either sheet or solid bodies.
+
+If the left body is solid, the faces of the right wall must also lie in that
+body. If the right body is solid, the faces in the left wall must also lie
+in that body.
+
+Three face blending does not support general bodies, if any of the supplied
+wall faces are associated with general bodies the PK_ERROR_general_body
+error will be reported.
+
+If the left and right walls lie in different bodies and if <B>'walls'</B> is set to
+<B>'<A HREF=../headers/pk_blend_walls_t.html>PK_blend_walls_attach_c</A>'</B> or <B>'<A HREF=../headers/pk_blend_walls_t.html>PK_blend_walls_solid_c</A>'</B>, their bodies will
+be combined, with the body containing the <B>'left_wall_faces'</B> being
+considered the target body. The body of the <B>'right_wall_faces'</B> may be negated
+before combining, if necessary to achieve a consistent result.
+
+The blend must pass through at least one of the master faces of the
+supplied walls, where the master face of each wall is the first face supplied.
+
+Further options can be supplied to the function in the
+<A HREF=../headers/pk_face_make_3_face_blend_o_t.html>PK_FACE_make_3_face_blend_o_t</A> option structure.
+
+If PK_FACE_make_3_face_blend has successfully created a blend or has not
+failed with a serious error, then:
+
+<B>'results'</B>      will consist of a <A HREF=../headers/pk_face_make_3_face_blend_r_t.html>PK_FACE_make_3_face_blend_r_t</A> structure
+               containing a token indicating the status of the blending
+               operation, the orientations used, and information associated
+               with any failure of the blending operation.
+
+<B>'tracking'</B>     will contain topology tracking information of type
+               PK_TOPOL_track_create_c, reporting blend faces created
+               and the ( possibly dead ) tags of the originating topology.
+               In general this will be the tags of the left, right and
+               centre wall faces and any other data that determined the
+               geometry of the blend face.
+
+               For capping faces the array will contain the tag/tags
+               of the appropriate original entities from which they
+               were derived. For capping faces derived from
+               user-supplied limiting topology/geometry the array will
+               contain the tag of the relevant user-supplied entity.
+
+               For capping faces the array may contain faces, edges,
+               planes or fins. Fins will be returned when they have
+               been supplied in the user-supplied <B>'limits'</B> array and the
+               capping face has arisen from using them to stop the blend.
+
+               For each limit or capping entity, two capping faces may be
+               created. To distinguish between them in addition to the
+               tag of the entity, a tag of a face from the corresponding
+               side and a tag of a face from the centre wall are added.
+
+               If the result is a sheet body and the field <B>'track_edges'</B>
+               is set to <A HREF=../headers/pk_blend_track_edges_t.html>PK_blend_track_edges_laminar_c</A> in the options
+               structure, additional tracking information will be
+               returned associated with the laminar edges of the sheet
+               body. For laminar edges the array may contain faces,
+               edges or planes.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

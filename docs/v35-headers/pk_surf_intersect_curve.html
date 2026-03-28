@@ -1,0 +1,141 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SURF_intersect_curve</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SURF_intersect_curve</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_SURF_intersect_curve
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                          surf,       --- surface
+<A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                         curve,      --- curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                      bounds,     --- interval
+const <A HREF=../headers/pk_surf_intersect_curve_o_t.html>PK_SURF_intersect_curve_o_t</A> *options,    --- options structure
+
+<I>--- returned arguments ---
+</I>int                         *const n_vectors,  --- number of intersections
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                **const vectors,    --- positions of intersections
+<A HREF=../headers/pk_uv_t.html>PK_UV_t</A>                    **const uvs,        --- parameters on surface
+double                     **const ts,         --- parameters on curve
+<A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_t</A>      **const types       --- types of intersections
+)
+</B>
+<A NAME="description"></A>
+<I>PK_SURF_intersect_curve finds the intersections between a surface and
+a curve.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_invalid_geometry          invalid geometry
+    PK_ERROR_not_on_curve              given parameters not on curves
+    PK_ERROR_bad_end_points            bad end points
+    PK_ERROR_bad_parameter             bad parameter given
+    PK_ERROR_cant_do_intersect         intersection cannot be done
+    PK_ERROR_mixed_geometry            cannot intersect foreign and facet
+                                       geometry
+
+<A NAME="documentation"></A>
+
+
+
+PK_SURF_intersect_curve finds the intersections between a bounded curve and a
+surface. It returns an array of intersection coordinates and
+an array of tokens classifying the intersections.
+The intersections are ordered along the bounded curve,
+and are classified according to the direction of the curve.
+
+The intersection coordinates are returned in an array of length <B>'n_vectors'</B>; if
+there are no intersections of the curve and surface within the bounds,
+<B>'n_vectors'</B> is returned as zero and <B>'vectors'</B> is returned as null.
+If <B>'n_vectors'</B> intersections are found the array <B>'ts'</B> contains <B>'n_vectors'</B>
+corresponding curve parameters and <B>'uvs'</B> contains the corresponding
+u,v pairs of surface parameters. The curve and surface parametrisations
+are defined in the documentation of <A HREF=../headers/pk_curve_ask_param.html>PK_CURVE_ask_param</A> and <A HREF=../headers/pk_surf_ask_params.html>PK_SURF_ask_params</A>.
+The surface parameters in <B>'uvs'</B> are only valid for simple and touch
+intersections. For coincident intersections the values in <B>'uvs'</B>
+are not defined.
+
+
+
+The intersection types are returned in an array of length <B>'n_vectors'</B>.
+There are four types of intersection, as follows:
+
+    <A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_simple_c</A> :  A simple intersection not
+                                    adjoining a region of coincidence.
+    <A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_tangent_c</A>:  The curve touches the surface
+                                    at a point.
+    <A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_start_c</A>  :  An intersection at the start
+                                    of a region of coincidence.
+    <A HREF=../headers/pk_intersect_vector_t.html>PK_intersect_vector_end_c</A>    :  An intersection at the end
+                                    of a region of coincidence.
+
+Whether an intersection is at the start or end of a region of coincidence
+is determined by the direction of the curve, <B>'curve'</B>. In the
+current version regions of coincidence will only be reported when the curve
+given is found to be coincident with the surface at all points within the
+bounds supplied.
+
+Coincident intersections are returned for all points
+lying at the bounds of regions of coincidence, including the ends of the
+bounded curve, which are coincident with the surface.
+
+
+
+The interval of the curve to be intersected with the surface is specified
+by giving start and end parameters. These are given in the argument <B>'interval'</B>,
+in the order start and then end.
+If the curve is a trimmed curve the supplied bounds are ignored. However
+a valid interval should be supplied.
+
+
+
+The option structure <A HREF=../headers/pk_surf_intersect_curve_o_t.html>PK_SURF_intersect_curve_o_t</A> contains two fields
+the first is a logical <B>'whether_box'</B>, if this is true a box is provided in
+the next field <B>'box'</B>, this describes the box that contains the area of
+interest. The box is used to improve performance. No guarantee is made that
+all the intersections returned will lie in it.
+
+For a box to be valid the difference between the maximum and minimum
+components in all three principal directions must be greater than zero.
+
+
+
+Any B-curve or B-surface or offset surface must be capable of passing the
+full checks imposed by <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

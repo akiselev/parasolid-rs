@@ -1,0 +1,794 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Calling Parasolid From Multiple Threads</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Calling Parasolid From Multiple Threads</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.113.html">Introduction To Session Support</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.115.html">Symmetric Multi-Processing In Parasolid</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-294765">113.1	What are application threads? </A>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-294843">113.2	How to set up and use application threads </A>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-308592">113.3	Controlling function exclusivity </A>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-294964">113.4	Fairness and thread selection </A>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-294993">113.5	Thread chaining </A>
+<UL>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-339702">113.5.1	How thread chaining works</A>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-336578">113.5.2	Using the consolidated version control mechanism within thread chains </A>
+</UL>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-295137">113.6	Handling errors </A>
+<UL>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-295161">113.6.1	Excluding application threads after a serious or fatal error </A>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-295178">113.6.2	Tidying up threads after a longjump </A>
+<LI> <A HREF="fd_chap.114.html#50422195_pgfId-393893">113.6.3	Reporting errors involving multiple error entities </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422195_pgfId-294765"></A>113.1	<A NAME="50422195_86929"></A>What are application threads? 
+
+
+</H1>
+<P>
+<A NAME="50422195_pgfId-294769"></A>Parasolid is <STRONG>
+thread-safe</STRONG>, in that it can be called from multiple threads within an application safely. Threads that an application sends into Parasolid are called <STRONG>
+application threads</STRONG>. They are not the same thing as the internal <STRONG>
+worker threads</STRONG> that are created by Parasolid SMP (as described in <A HREF="fd_chap.115.html#50422196_23582">Chapter 114, “Symmetric Multi-Processing In Parasolid”</A>). If Parasolid SMP is enabled, calling an SMP-enabled function in an application thread causes Parasolid to create and use worker threads.</P>
+<P>
+<A NAME="50422195_pgfId-294788"></A>The Parasolid PK and KI  APIs manage multiple application threads to ensure safety. In addition, Parasolid offers the ability to lock one or more partitions to an application thread.</P>
+<P>
+<A NAME="50422195_pgfId-387634"></A>Parasolid API functions can behave as one or more of the following types:</P>
+<UL>
+<LI>
+<A NAME="50422195_pgfId-384654"></A><STRONG>
+Concurrent</STRONG>: these functions can be executed simultaneously by different application threads.</LI>
+<LI>
+<A NAME="50422195_pgfId-384718"></A><STRONG>
+Exclusive</STRONG>: when an exclusive function is executing, no other thread can be in Parasolid, and therefore no concurrent functions can execute at the same time as an exclusive function.</LI>
+<LI>
+<A NAME="50422195_pgfId-387158"></A><STRONG>
+Locally exclusive</STRONG>: these functions are considered exclusive within a calling thread that has locked partitions. When there are no partitions locked, these behave as exclusive functions. When partitions are locked and they are called by a:</LI>
+<UL>
+<LI>
+<A NAME="50422195_pgfId-387936"></A>locking thread, they behave as concurrent functions</LI>
+<LI>
+<A NAME="50422195_pgfId-387272"></A>non-locking thread, they behave exclusively against other non-locking threads but concurrently against locking threads.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422195_pgfId-294801"></A>To achieve this, Parasolid has a queuing system within the PK and KI API layers, which operates as follows:</P>
+<UL>
+<LI>
+<A NAME="50422195_pgfId-294805"></A>If any PK function is called when the queue is empty, it goes straight into Parasolid and proceeds with its work.</LI>
+<LI>
+<A NAME="50422195_pgfId-294806"></A>If a concurrent or a locally exclusive PK function is called while there are other concurrent or a locally exclusive PK functions inside Parasolid, it also goes into Parasolid, unless the limit on the number of simultaneous threads inside Parasolid has been exceeded, in which case it waits for other threads to return from Parasolid.</LI>
+<LI>
+<A NAME="50422195_pgfId-294819"></A>If a concurrent PK function is called when an exclusive PK function is executing, it is held in the queue until the exclusive function returns, and then proceeds into Parasolid.</LI>
+<LI>
+<A NAME="50422195_pgfId-294826"></A>If an exclusive PK function is called while any functions are executing Parasolid code, it is held in the queue until those function have returned from Parasolid.</LI>
+</UL>
+<P>
+<A NAME="50422195_pgfId-386353"></A>Parasolid can be called from multiple application threads on all available platforms.</P>
+<P>
+<A NAME="50422195_pgfId-312683"></A>The <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> contains a list of which PK functions are exclusive, concurrent or locally exclusive. </P>
+<P>
+<A NAME="50422195_pgfId-326460"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422195_pgfId-294840"></A>Note: All KI functions are exclusive. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422195_pgfId-326513"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-326284"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422195_pgfId-326261"></A><A HREF="fd_chap.115.html#50422196_23582">Chapter 114, “Symmetric Multi-Processing In Parasolid”</A></LI>
+<LI>
+<A NAME="50422195_pgfId-326311"></A><A HREF="fd_chap.121.html#50422203_43483">Section 120.2.2, “Error severity”</A></LI>
+<LI>
+<A NAME="50422195_pgfId-326364"></A><A HREF="fd_chap.121.html#50422203_75033">Section 120.2.3, “Error-handling strategy”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422195_pgfId-294843"></A>113.2	<A NAME="50422195_90285"></A>How to set up and use application threads 
+
+
+</H1>
+<P>
+<A NAME="50422195_pgfId-294847"></A>If your application only ever uses a single thread to call Parasolid, you need to make sure that it has a large enough stack. The initial thread used to start a program automatically has a large enough stack in general, but other threads that your application creates may need to have their stack size increased. For details of stack sizes, see <A HREF="in_chap.06.html#68496">Section 5.5, “Stack sizes”</A>, in the Parasolid <EM><A HREF=../in_index.html>Installation Notes</A></EM>.</P>
+<P>
+<A NAME="50422195_pgfId-294869"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422195_pgfId-294862"></A>Note: When you are only using a single thread to call Parasolid, you should consider your whole session to be a single thread chain. When setting up the Parasolid session in an application, it is recommended to start a single thread chain with the thread <CODE>
+type</CODE>
+ set to <A HREF=../headers/pk_thread_t.html>PK_THREAD_chain_exclusive_c</A> to obtain optimal performance. It is the responsibility of the application to ensure that only a single calling thread is used. See <A HREF="fd_chap.114.html#50422195_19979">Section 113.5, “Thread chaining”</A> for more information about thread chaining. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422195_pgfId-294873"></A>You can use the following PK functions to manage application threads in Parasolid. See the documentation for each individual function for full details.</P>
+<P>
+<A NAME="50422195_pgfId-294962"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-316430"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-316432"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382655"></A><A HREF=../headers/pk_session_is_in_kernel_2.html>PK_SESSION_is_in_kernel_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382660"></A>Returns whether it has been called from within the Parasolid kernel or from outside the kernel. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382879"></A><A HREF=../headers/pk_thread_ask_error_cbs.html>PK_THREAD_ask_error_cbs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382881"></A>This function returns the error handler for the calling thread (if one is registered), or NULL. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382673"></A><A HREF=../headers/pk_thread_ask_exclusion.html>PK_THREAD_ask_exclusion</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382678"></A>This function returns whether the Parasolid interface is currently excluding other threads entering and whether the calling thread caused the exclusion. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382687"></A><A HREF=../headers/pk_thread_ask_function.html>PK_THREAD_ask_function</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382689"></A>This function returns the name of the PK function being executed in the calling thread and the total recursion depth of its current call stack. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-399304"></A><A HREF=../headers/pk_thread_ask_function_run.html>PK_THREAD_ask_function_run</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-399347"></A>This function asks whether the given PK functions will be run concurrently or exclusively in the calling thread. See <A HREF="fd_chap.114.html#50422195_62860">Section 113.3, “Controlling function exclusivity”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-399200"></A><A HREF=../headers/pk_thread_ask_id.html>PK_THREAD_ask_id</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-399202"></A>This function returns the thread ID of the calling thread.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382866"></A><A HREF=../headers/pk_thread_ask_last_error.html>PK_THREAD_ask_last_error</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382868"></A>Returns the standard form of the most recent PK error in the calling thread. For more information on the <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure returned, see <A HREF="fd_chap.121.html#50422203_47458">Section 120.2.5, “PK_ERROR functions and their use”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382891"></A><A HREF=../headers/pk_thread_ask_memory_cbs.html>PK_THREAD_ask_memory_cbs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382893"></A>This function returns the functions which are currently registered to the calling thread for allocating and freeing variable length information returned from the PK interface. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-383012"></A><A HREF=../headers/pk_thread_ask_partitions.html>PK_THREAD_ask_partitions</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-383014"></A>This function returns all the partitions that are locked to the calling thread.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382846"></A><A HREF=../headers/pk_thread_chain_start.html>PK_THREAD_chain_start</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382851"></A>This function starts chaining Parasolid functions in the calling thread. See <A HREF="fd_chap.114.html#50422195_19979">Section 113.5, “Thread chaining”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382856"></A><A HREF=../headers/pk_thread_chain_stop.html>PK_THREAD_chain_stop</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382861"></A>This function stops chaining Parasolid functions in the calling thread. See <A HREF="fd_chap.114.html#50422195_19979">Section 113.5, “Thread chaining”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382701"></A><A HREF=../headers/pk_thread_clear_exclusion.html>PK_THREAD_clear_exclusion</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382703"></A>This function tries to clear an exclusion that may be preventing other threads from entering Parasolid. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382901"></A><A HREF=../headers/pk_thread_clear_last_error.html>PK_THREAD_clear_last_error</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382903"></A>Clears the most recent PK error in the calling thread. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382905"></A><A HREF=../headers/pk_thread_is_in_kernel.html>PK_THREAD_is_in_kernel</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382907"></A>Returns whether the calling thread is executing inside the kernel. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382929"></A><A HREF=../headers/pk_thread_is_in_chain.html>PK_THREAD_is_in_chain</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382931"></A>This function tells you whether the calling thread is running in a chain, and returns information on the <CODE>
+type</CODE>
+ of chain and its properties. If the thread is not in a chain, <CODE>
+type</CODE>
+ <A HREF=../headers/pk_thread_t.html>PK_THREAD_chain_none_c</A> is returned. </P>
+<P>
+<A NAME="50422195_pgfId-382932"></A><A HREF=../headers/pk_thread_is_in_chain.html>PK_THREAD_is_in_chain</A> does not block other threads; for example, you can call it on a thread even if another thread is in an exclusive chain.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382946"></A><A HREF=../headers/pk_thread_lock_partitions.html>PK_THREAD_lock_partitions</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-382948"></A>This function locks specified partitions to the calling thread. This allows you to call locally exclusive functions from this thread simultaneously with other locally exclusive functions or concurrent functions from other threads.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-316484"></A><A HREF=../headers/pk_thread_register_error_cbs.html>PK_THREAD_register_error_cbs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-316486"></A>This function registers the given error handler to the calling thread. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-316488"></A><A HREF=../headers/pk_thread_register_memory_cbs.html>PK_THREAD_register_memory_cbs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-316490"></A>This function registers memory allocation and free functions to the calling thread for use in Parasolid when returning variable length information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-399812"></A><A HREF=../headers/pk_thread_set_function_run.html>PK_THREAD_set_function_run</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-399814"></A>This function sets whether the given PK functions will be run concurrently or exclusively in the calling thread. See <A HREF="fd_chap.114.html#50422195_62860">Section 113.3, “Controlling function exclusivity”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-399256"></A><A HREF=../headers/pk_thread_set_id.html>PK_THREAD_set_id</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-399258"></A>This function stores the given thread ID in the calling thread.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-316513"></A><A HREF=../headers/pk_thread_tidy.html>PK_THREAD_tidy</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-316518"></A>This function restores Parasolid to a valid state for the calling thread, if necessary, when a PK function has not completed. This might happen when Parasolid calls the application’s error handler, but that handler never returns control to the PK function.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-316520"></A><A HREF=../headers/pk_thread_unlock_partitions.html>PK_THREAD_unlock_partitions</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-355409"></A>This function unlocks and returns the partitions that were locked to the calling thread. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422195_pgfId-308592"></A>113.3	<A NAME="50422195_62860"></A>Controlling function exclusivity 
+
+
+</H1>
+<P>
+<A NAME="50422195_pgfId-308648"></A>You can use <A HREF=../headers/pk_thread_ask_function_run.html>PK_THREAD_ask_function_run</A> to find out whether functions are running exclusively or concurrently. In addition, for a small number of functions, you can use <A HREF=../headers/pk_thread_set_function_run.html>PK_THREAD_set_function_run</A> to change whether those functions should run exclusively or concurrently in the current thread. </P>
+<P>
+<A NAME="50422195_pgfId-309075"></A><A HREF=../headers/pk_thread_ask_function_run.html>PK_THREAD_ask_function_run</A> takes a list of functions - as identified using <A HREF=../headers/pk_function_find.html>PK_FUNCTION_find</A> - and returns a list of <CODE>
+run_values</CODE>
+ that indicate how each specified function is running in the current thread. <A HREF=../headers/pk_thread_ask_function_run.html>PK_THREAD_ask_function_run</A> may return any of the following <CODE>
+run_values</CODE>
+:</P>
+<P>
+<A NAME="50422195_pgfId-309436"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-309450"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-309452"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-309454"></A><A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_concurrent_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-309456"></A>The specified function must always run concurrently. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-309458"></A><A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_exclusive_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-310250"></A>The specified function must always run exclusively. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-309466"></A><A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_conc_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-309468"></A>The specified function is running concurrently, but can be made to run exclusively if desired. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-309470"></A><A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_exc_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-310415"></A>The specified function is running as locally exclusive, but can be made to run concurrently if desired. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422195_pgfId-310766"></A>If, for a given function, the corresponding value in <CODE>
+run_values</CODE>
+ is either <A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_conc_c</A> or <A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_exc_c</A>, then you can change the exclusivity of this function using <A HREF=../headers/pk_thread_set_function_run.html>PK_THREAD_set_function_run</A>. This function takes similar arguments to <A HREF=../headers/pk_thread_ask_function_run.html>PK_THREAD_ask_function_run</A>, except that <CODE>
+run_values</CODE>
+ is a received argument, rather than a returned argument. You should only specify the following <CODE>
+run_values</CODE>
+:</P>
+<P>
+<A NAME="50422195_pgfId-311059"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-311091"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-311093"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-311156"></A><A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_conc_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-311158"></A>Run the specified function concurrently. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-311160"></A><A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_exc_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-311252"></A>Run the specified function as locally exclusive. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422195_pgfId-329601"></A>If you change an exclusive function to run concurrently and your application makes multiple calls to the concurrent function from different application threads, then each function call may run simultaneously.</P>
+<P>
+<A NAME="50422195_pgfId-383396"></A>If, for a given function, the value in <CODE>
+run_values</CODE>
+ is set to <A HREF=../headers/pk_function_run_t.html>PK_FUNCTION_run_mutable_exc_c</A> then the corresponding functions will run as locally exclusive. If the thread has locked partitions, then these functions will run concurrently with functions in other threads that contain locked partitions. </P>
+<P>
+<A NAME="50422195_pgfId-311067"></A>Any changes you make to function exclusivity persist until either the value is changed again, or the Parasolid session is restarted. </P>
+<P>
+<A NAME="50422195_pgfId-399926"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422195_pgfId-399925"></A>Note: If you wish to call Parasolid’s rendering and faceting functions concurrently you can indicate that the GO functions registered by your application are thread-safe using the <CODE>
+go_thread_safe</CODE>
+ option in <A HREF=../headers/pk_session_register_fru_2.html>PK_SESSION_register_fru_2</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422195_pgfId-294964"></A>113.4	<A NAME="50422195_91518"></A>Fairness and thread selection 
+
+
+</H1>
+<P>
+<A NAME="50422195_pgfId-294968"></A>Since Parasolid is responsible for managing the system that queues calls to PK functions, it ensures that the queue never becomes blocked at any time: if a thread in your application is sending calls to Parasolid functions, and Parasolid is placing them in a queue, then the queue must keep “moving”: Parasolid never starves any application thread’s call for an indefinite period. For example, Parasolid guarantees never to continuously execute a list of concurrent PK functions being sent by several application threads if there is an exclusive function waiting for a point where no threads are inside Parasolid. Conversely, an exclusive function is not given priority over a concurrent function and cannot jump the queue if a concurrent function is already waiting.</P>
+<P>
+<A NAME="50422195_pgfId-294984"></A>The queue can only move as quickly as the PK function calls in the queue allow: if a given function in the queue takes an indefinite amount of time, then the queue will not move for this amount of time. </P>
+<P>
+<A NAME="50422195_pgfId-294988"></A>Parasolid depends on the local operating system with respect to scheduling multiple threads that are waiting for a shared resource, as well as locking fairness. See <A HREF="fd_chap.114.html#50422195_19979">Section 113.5, “Thread chaining”</A> for further information on ways you can control function queuing.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422195_pgfId-294993"></A>113.5	<A NAME="50422195_19979"></A>Thread chaining 
+
+
+</H1>
+<P>
+<A NAME="50422195_pgfId-294994"></A>Thread chaining is used to improve the performance of the thread. With thread chaining, applications can speed up sections of their code by indicating where contiguous Parasolid functions can be chained together to reduce the overhead of unlocking and locking between each function.</P>
+
+<H3>
+<A NAME="50422195_pgfId-339702"></A>	113.5.1 	How thread chaining works</H3>
+<P>
+<A NAME="50422195_pgfId-317942"></A>The chaining starts when a call to <A HREF=../headers/pk_thread_chain_start.html>PK_THREAD_chain_start</A> is made by the application thread and ends when <A HREF=../headers/pk_thread_chain_stop.html>PK_THREAD_chain_stop</A> is called. Thread chains can be either concurrent or exclusive, as specified by the <CODE>
+type</CODE>
+ parameter, and each chain is individually controlled by calls to <A HREF=../headers/pk_thread_chain_start.html>PK_THREAD_chain_start</A> and <A HREF=../headers/pk_thread_chain_stop.html>PK_THREAD_chain_stop</A>. In addition, each thread can split its chain into smaller links using the <CODE>
+length</CODE>
+ option. </P>
+<P>
+<A NAME="50422195_pgfId-295032"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1245.gif">
+
+<P>
+<A NAME="50422195_pgfId-295034"></A>Figure 113-1 <A NAME="50422195_11417"></A>Thread chaining with multiple application threads</P>
+<P>
+<A NAME="50422195_pgfId-295038"></A>As <A HREF="fd_chap.114.html#50422195_11417"><EM>
+Figure 113-1</EM></A> shows, each numbered slot is an application thread in which a number of functions, either concurrent or exclusive, run. In the top image of this figure, functions are unchained and thread protection is called before and after every single function has been executed. In the bottom image, functions are chained together with thread protection only called between each linked set of functions.</P>
+<P>
+<A NAME="50422195_pgfId-295039"></A>Within the chain, there can be one or more chains with splits between each one. <A HREF="fd_chap.114.html#50422195_99168"><EM>
+Figure 113-2</EM></A> shows a chain that contains an application thread with a chain of length one and another one with a chain length of four. The function calls from each thread are linked into consecutive links of the length specified for that thread until <A HREF=../headers/pk_thread_chain_stop.html>PK_THREAD_chain_stop</A> is called.</P>
+<P>
+<A NAME="50422195_pgfId-295076"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1246.gif">
+
+<P>
+<A NAME="50422195_pgfId-295078"></A>Figure 113-2 <A NAME="50422195_99168"></A>Thread chaining with a set chain link</P>
+<P>
+<A NAME="50422195_pgfId-295079"></A>If concurrent chains contain exclusive functions, the exclusive functions will run as though each resides in an exclusive chain of length one. If exclusive chains contain concurrent functions, the chain will run as though each function was exclusive. This can be seen in <A HREF="fd_chap.114.html#50422195_61358"><EM>
+Figure 113-3</EM></A>.</P>
+<P>
+<A NAME="50422195_pgfId-295116"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1247.gif">
+
+<P>
+<A NAME="50422195_pgfId-295118"></A>Figure 113-3 <A NAME="50422195_61358"></A>Chains containing concurrent and exclusive functions</P>
+<P>
+<A NAME="50422195_pgfId-295122"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422195_pgfId-295121"></A>Note: Exclusive functions still prevent calls to concurrent functions in other threads from being executed.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422195_pgfId-295123"></A>Examples of how chains may be used in applications for performance gain:</P>
+<UL>
+<LI>
+<A NAME="50422195_pgfId-295124"></A>If your application wants to call <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A> on many surfaces from multiple threads, it tells Parasolid that it wants to start a concurrent chain at the beginning of the loop of each thread and that it wants to stop the chain at the end of each thread.</LI>
+<LI>
+<A NAME="50422195_pgfId-295128"></A>If your application has an algorithm where one thread is calling many concurrent PK functions while another thread occasionally wants to call exclusive PK functions, then the first thread starts a concurrent chain with a non-zero maximum link length at the start of the algorithm. Setting the length too high will make the other thread wait longer on average for the next split.</LI>
+<LI>
+<A NAME="50422195_pgfId-295132"></A>If your application wants to call sequences of Parasolid functions in multiple threads and guarantee that each sequence will be atomic so threads cannot interfere with each other, an exclusive chain is started in each thread before the sequence and is stopped afterwards.</LI>
+<LI>
+<A NAME="50422195_pgfId-295136"></A>If your application only ever calls Parasolid from a main thread and a seldom used integrity checker thread, the main thread starts with an exclusive chain with a non-zero maximum link length after the modeller has started. Setting the length too high will make the integrity check wait longer. The chain does not need to be stopped unless the modeller is stopped.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422195_pgfId-336578"></A>	113.5.2 	<A NAME="50422195_23978"></A>Using the consolidated version control mechanism within thread chains </H3>
+<P>
+<A NAME="50422195_pgfId-336789"></A>You can set version controls locally within a thread chain using the <CODE>
+local_level</CODE>
+ option in <A HREF=../headers/pk_thread_chain_start.html>PK_THREAD_chain_start</A>. By setting these controls at a thread-level you can emulate old behaviour in different threads using different session settings in each thread. </P>
+<P>
+<A NAME="50422195_pgfId-338746"></A>To use the consolidated version control mechanism at a thread-level, set <CODE>
+local_level</CODE>
+ to <A HREF=../headers/pk_thread_local_t.html>PK_THREAD_local_versioning_c</A>. Once set, version controls will only affect subsequent operations within this thread chain. Calls to the same functions in other threads have no effect on operations within this thread chain. You can check the localisation level of a calling thread chain using <A HREF=../headers/pk_thread_ask_local_level.html>PK_THREAD_ask_local_level</A>.</P>
+<P>
+<A NAME="50422195_pgfId-337810"></A>See <A HREF="fd_chap.117.html#50422198_44470">Chapter 116, “Version Controls”</A> for more information on the version control mechanism.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422195_pgfId-295137"></A>113.6	<A NAME="50422195_27335"></A>Handling errors 
+
+
+</H1>
+<P>
+<A NAME="50422195_pgfId-295138"></A>There are two situations you need to consider when handling errors in an application that uses multiple application threads:</P>
+<UL>
+<LI>
+<A NAME="50422195_pgfId-295139"></A>If a given application thread raises an error that is serious or fatal, then your application cannot enter Parasolid again from a different application thread unless corrective action is taken.</LI>
+<LI>
+<A NAME="50422195_pgfId-295143"></A>If your error handling mechanism makes use of longjumping , then you must ensure that Parasolid is in a valid state for the calling thread whenever a longjump is made.</LI>
+</UL>
+<P>
+<A NAME="50422195_pgfId-295150"></A>This section provides an overview of the error handling that Parasolid performs in these situations. For a more complete discussion of Parasolid error handling in general, see <A HREF="fd_chap.121.html#50422203_35122">Chapter 120, “Error Handling”</A>, and <A HREF="fd_chap.122.html#50422204_35122">Chapter 121, “Signal Handling”</A>.</P>
+
+<H3>
+<A NAME="50422195_pgfId-295161"></A>	113.6.1 	<A NAME="50422195_66094"></A>Excluding application threads after a serious or fatal error </H3>
+<P>
+<A NAME="50422195_pgfId-321191"></A>If your application uses multiple threads, you need to ensure you handle each of these error types correctly.</P>
+<P>
+<A NAME="50422195_pgfId-320396"></A>After a serious error, the Parasolid session may be corrupt. In this case, other application threads need to be protected, and so they are prevented from entering Parasolid until the thread that caused the error has taken preventative measures. </P>
+<P>
+<A NAME="50422195_pgfId-321214"></A>The simplest and recommended way of cleaning up a session after a serious error is to roll the session or partition back. Rolling back the partition or session automatically clears the exclusion.</P>
+<P>
+<A NAME="50422195_pgfId-321219"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422195_pgfId-321217"></A>Note: If you cannot roll the session or partition back, then you can consider clearing the exclusion explicitly, by calling <A HREF=../headers/pk_thread_clear_exclusion.html><A HREF=../headers/pk_thread_clear_exclusion.html>PK_THREAD_clear_exclusion</A></A>. Calling <A HREF=../headers/pk_thread_clear_exclusion.html><A HREF=../headers/pk_thread_clear_exclusion.html>PK_THREAD_clear_exclusion</A></A> alone does not protect other threads from entering an invalid session. You therefore still need to ensure that the session is cleaned up before calling this function.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422195_pgfId-321218"></A>If several concurrent PK functions all separately raise a serious error at the same time (and you have to use <A HREF=../headers/pk_thread_clear_exclusion.html>PK_THREAD_clear_exclusion</A>), you should use <A HREF=../headers/pk_thread_ask_exclusion.html>PK_THREAD_ask_exclusion</A> to discover which thread was responsible; do not rely on the order in which each function call returns from the PK to determine the responsible thread. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422195_pgfId-321254"></A>After a fatal error, you must stop the modeller. This has the effect of turning off thread protection; if other threads were waiting, they will fail with the error PK_ERROR_modeller_not_started when the modeller is stopped.</P>
+
+
+<H3>
+<A NAME="50422195_pgfId-295178"></A>	113.6.2 	Tidying up threads after a longjump </H3>
+<P>
+<A NAME="50422195_pgfId-295179"></A>If the error handler in your application code uses longjumping, then when a concurrent thread raises an error, your application must ensure that Parasolid is in a valid state before continuing, since other threads may potentially be inside Parasolid at the time of the error. You should call <A HREF=../headers/pk_thread_tidy.html><A HREF=../headers/pk_thread_tidy.html>PK_THREAD_tidy</A></A> to do this. <A HREF=../headers/pk_thread_tidy.html><A HREF=../headers/pk_thread_tidy.html>PK_THREAD_tidy</A></A> ensures that Parasolid is in a valid state for the calling thread whenever a longjump is made. </P>
+<P>
+<A NAME="50422195_pgfId-295186"></A>If your application’s error handler does not make use of longjumps then you do not need to take any special action when a concurrent thread raises an error.</P>
+
+
+<H3>
+<A NAME="50422195_pgfId-393893"></A>	113.6.3 	<A NAME="50422195_25811"></A>Reporting errors involving multiple error entities </H3>
+<P>
+<A NAME="50422195_pgfId-394408"></A>Sometimes, several entities are involved in a given error. In such cases, Parasolid lets you control, for the calling thread, whether additional information about these entities is returned in the Parasolid Report using the following functions:</P>
+<P>
+<A NAME="50422195_pgfId-396437"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-393977"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-393979"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-393981"></A><A HREF=../headers/pk_thread_ask_err_reports.html>PK_THREAD_ask_err_reports</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-393983"></A>Enquire whether additional error information is returned in a Parasolid Report of type <A HREF=../headers/pk_report_4_t.html>PK_REPORT_4_t</A>.</P>
+<P>
+<A NAME="50422195_pgfId-396604"></A>Default: <A HREF=../headers/pk_error_reports_t.html>PK_ERROR_reports_inherit_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-393985"></A><A HREF=../headers/pk_thread_set_err_reports.html>PK_THREAD_set_err_reports</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422195_pgfId-394386"></A>Specify whether additional error information is returned in a Parasolid Report of type <A HREF=../headers/pk_report_4_t.html>PK_REPORT_4_t</A>. </P>
+<P>
+<A NAME="50422195_pgfId-396615"></A>Default: <A HREF=../headers/pk_error_reports_t.html>PK_ERROR_reports_inherit_c</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422195_pgfId-393957"></A>For more information on these functions, see the PK Reference,</P>
+<P>
+<A NAME="50422195_pgfId-394423"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422195_pgfId-396571"></A>Note: If these functions are set to their default values, the calling thread will inherit its behaviour for thread error reporting from the current session setting functions <A HREF=../headers/pk_session_ask_err_reports.html>PK_SESSION_ask_err_reports</A> and <A HREF=../headers/pk_session_set_err_reports.html>PK_SESSION_set_err_reports</A>. For information on these functions, see <A HREF="fd_chap.116.html#50422197_94193">Section 115.8, “Managing the session settings when reporting errors involving multiple error entities”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422195_pgfId-394691"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.113.html">Introduction To Session Support</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.115.html">Symmetric Multi-Processing In Parasolid</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

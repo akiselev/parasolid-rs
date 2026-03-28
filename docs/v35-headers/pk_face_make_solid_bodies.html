@@ -1,0 +1,113 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_make_solid_bodies</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_make_solid_bodies</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>          PK_FACE_make_solid_bodies
+(
+<I>--- received arguments ---
+</I>int                      n_faces,          --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>          faces[],          --- faces
+<A HREF=../headers/pk_face_heal_t.html>PK_FACE_heal_t</A>           heal_action,      --- method for healing wounds
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>             local_check,      --- whether to perform local check
+
+<I>--- returned arguments ---
+</I>int               *const n_bodies,
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>        **const bodies,           --- created solid bodies
+<A HREF=../headers/pk_local_check_t.html>PK_local_check_t</A> **const check_results     --- results of local check
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates solid bodies from a collection of faces
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_wire_body              (MILD) unable to make solid from wire body
+    PK_ERROR_dont_make_solid        (MILD) can't make solid from given <B>'faces'</B>
+    PK_ERROR_non_manifold           (MILD) can't heal wound with non-manifold
+                                           boundary
+    PK_ERROR_not_in_same_part       (MILD) <B>'faces'</B> not all from same body
+    PK_ERROR_general_body           (MILD) <B>'faces'</B> come from general body
+    PK_ERROR_not_implemented        (MILD) <B>'heal_action'</B> not implemented
+
+<A NAME="documentation"></A>
+The topologies of the given 'faces', which must belong to the same body, plus
+all their geometry and attributes are copied into a new solid body or bodies.
+A new body is created from each set of connected faces.
+
+If any of the copied topological entities are contained within groups, then
+these groups plus their attributes are copied into the appropriate new
+solid body or bodies.
+
+If a resulting body does not have a complete boundary, then any
+holes are treated as wounds which are healed as specified by <B>'heal_action'</B>.
+This may take the values:
+
+    PK_FACE_heal_no_c               don't heal wounds - leave rubber faces
+    PK_FACE_heal_cap_c              find a surface in which all edges of a hole
+                                    lie and attach this to a face covering the
+                                    hole
+    PK_FACE_heal_grow_from_child_c  faces around the hole are extended until
+                                    they cover the hole
+    PK_FACE_heal_grow_from_parent_c grow the faces the parent had around the
+                                    hole until they cover it
+
+The <B>'local_check'</B> argument specifies whether checks on newly created
+topological and geometrical entities are to be performed, and the
+<B>'check_results'</B> argument returns the result of such checks.
+<B>'check_results'</B> may take the values:
+
+    <A HREF=../headers/pk_local_check_t.html>PK_local_check_no_c</A>             local checking not performed either because
+                                    <B>'local_check'</B> was PK_LOGICAL_false or
+                                    <B>'heal_action'</B> was PK_FACE_heal_no_c
+    <A HREF=../headers/pk_local_check_t.html>PK_local_check_ok_c</A>             <B>'body'</B> passes local checks
+    <A HREF=../headers/pk_local_check_t.html>PK_local_check_negated_c</A>        as initially created, <B>'body'</B> was inside out
+                                    but it has been negated and is now valid
+    <A HREF=../headers/pk_local_check_t.html>PK_local_check_failed_c</A>         body fails local checks - it is
+                                    self-intersecting
+
+Rubber faces can not be grown to heal other wounds.
+
+This function will not operate on faces from a general body.
+
+See <A HREF="../chapters/fd_chap.072.html#50434435_pgfId-314575">Local Ops: Creating New Solids from Faces</A> and
+<A HREF="../chapters/fd_chap.016.html#50434373_pgfId-295223">Making a body from solid topology</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

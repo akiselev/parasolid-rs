@@ -1,0 +1,1136 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Error Handling </TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Error Handling </B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.120.html">Introduction To Error Handling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.122.html">Signal Handling</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-294723">120.1	Introduction </A>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-294751">120.2	PK errors </A>
+<UL>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-294769">120.2.1	Simplified outline of a Parasolid application </A>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-294835">120.2.2	Error severity </A>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-294879">120.2.3	Error-handling strategy </A>
+<UL>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-294903">120.2.3.1	Not registering an error handler </A>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-294998">120.2.3.2	Registering an error handler that does not use exceptions </A>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-295095">120.2.3.3	Registering an error handler that uses exceptions </A>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-311998">120.2.3.4	Benefits of registering an error handler </A>
+</UL>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-295193">120.2.4	Special errors </A>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-295270">120.2.5	PK_ERROR functions and their use </A>
+</UL>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-295413">120.3	Failure status codes </A>
+<UL>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-295417">120.3.1	Types of failure status code returned </A>
+<LI> <A HREF="fd_chap.121.html#50422203_pgfId-295430">120.3.2	Necessary action following a failure status code </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422203_pgfId-294723"></A>120.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422203_pgfId-294724"></A>This chapter describes how to handle errors and other failure status codes returned by Parasolid functions. It is essential that your application intercepts and deals with these errors.</P>
+<UL>
+<LI>
+<A NAME="50422203_pgfId-294726"></A>A Parasolid (PK) <STRONG>
+error</STRONG><A NAME="50422203_marker-294725"></A> occurs when a PK function fails and returns a non-zero error code (i.e., one that is different to PK_ERROR_no_errors). For example, calling the function <A HREF=../headers/pk_body_create_solid_cyl.html>PK_BODY_create_solid_cyl</A> with negative <CODE>
+radius</CODE>
+ or <CODE>
+height</CODE>
+ would return PK_ERROR_distance_le_0. Note that in the event of an error, the values of any returned arguments are undefined and should not be used.</LI>
+<LI>
+<A NAME="50422203_pgfId-294727"></A>A <STRONG>
+failure status code</STRONG> is returned when a PK function has not been able to perform its task as intended, and needs to return a more detailed diagnosis of the problem. The function returns a zero error code (PK_ERROR_no_errors) but gives information about the problem via a status code in its output arguments. For example, if <A HREF=../headers/pk_body_fix_blends.html>PK_BODY_fix_blends</A> is called and two or more blends are set to overlap, the function returns PK_ERROR_no_errors but sets its <CODE>
+fault</CODE>
+<A NAME="50422203_marker-294728"></A> argument to <A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_overlap_c</A>.</LI>
+</UL>
+<P>
+<A NAME="50422203_pgfId-294729"></A>A complete list of all Parasolid error codes, together with descriptions of each error code, and information about which functions can raise the error, can be found in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>. Common errors returned by a function are listed as “specific errors” in the documentation for that function, although this list is not exhaustive. Further frustrum-specific error information is available from the <EM>
+<A HREF=../di_index.html>Downward Interfaces</A></EM> manual. </P>
+<P>
+<A NAME="50422203_pgfId-321113"></A>For examples of handling PK errors, see the code examples in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+support\Error</CODE>
+ <CODE>
+Handling</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder. </P>
+<P>
+<A NAME="50422203_pgfId-326858"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-294738"></A>Note: None of these strategies is generally applicable to KI routines. For information on handling errors from these routines (which are indicated by a non-zero value for <CODE>
+ifail</CODE>
+<A NAME="50422203_marker-294739"></A>) see <A HREF="ki_chap.02.html#97279">Section 1.5, “Error returns”</A> of the <EM><A HREF=../ki_index.html>KI Programming Reference</A> Manual</EM>. Further information is available from <A HREF="ki_chap.04.html#32940">Appendix B, “Kernel Interface Error Codes”</A> in this manual.</ADDRESS><BR></TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-326893"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-326734"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422203_pgfId-326721"></A><A HREF="fd_chap.098.html#50422177_36055">Chapter 97, “Rollback”</A></LI>
+<LI>
+<A NAME="50422203_pgfId-326749"></A><A HREF="fd_chap.114.html#50422195_27335">Section 113.6, “Handling errors”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422203_pgfId-294751"></A>120.2	<A NAME="50422203_25848"></A>PK errors 
+
+
+</H1>
+<P>
+<A NAME="50422203_pgfId-294752"></A>There are two primary decisions to make when deciding how to handle PK errors: </P>
+<UL>
+<LI>
+<A NAME="50422203_pgfId-294753"></A>Whether your application should register an error-handling function with Parasolid.</LI>
+<LI>
+<A NAME="50422203_pgfId-294754"></A>Whether your application should use exceptions.</LI>
+</UL>
+<P>
+<A NAME="50422203_pgfId-294757"></A>Your application can register a particular function, known as an <STRONG>
+error handler</STRONG><A NAME="50422203_marker-294755"></A><A NAME="50422203_marker-294756"></A>, with Parasolid. This function is supplied by you and will be called whenever an error occurs, to perform certain recovery tasks. Parasolid automatically invokes this error-handling function just before returning from a failing PK function. If control is then passed back to the application (through the failing PK function), the values of any return arguments of the PK function are undefined.</P>
+<P>
+<A NAME="50422203_pgfId-294758"></A>In addition, your application can choose whether to throw an exception when it encounters an error, via the <CODE>
+try/throw/catch</CODE>
+ statements in C++ (or the equivalent <CODE>
+setjmp/longjmp</CODE>
+ functions in C). If your application uses a registered error handler combined with exceptions, it does not need to check the return status of each PK function before proceeding.</P>
+<P>
+<A NAME="50422203_pgfId-294759"></A>Whichever strategy you choose, the same recovery action needs to be taken at some point. This action depends on the severity of the error, as described in <A HREF="fd_chap.121.html#50422203_43483">Section 120.2.2, “Error severity”</A>.</P>
+<P>
+<A NAME="50422203_pgfId-294768"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-294766"></A>Note: For the purposes of this chapter, the <CODE>
+try/throw/catch</CODE>
+<A NAME="50422203_marker-294765"></A> statements (C++) and <CODE>
+setjmp/longjmp</CODE>
+ functions (C) are treated as equivalent, and our examples illustrating the use of <CODE>
+try/throw/catch</CODE>
+ should serve for both. Situations in C++ applications that require the use of <CODE>
+setjmp/longjmp</CODE>
+<A NAME="50422203_marker-294767"></A> instead of <CODE>
+try/throw/catch</CODE>
+ are beyond the scope of this manual.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422203_pgfId-294769"></A>	120.2.1 	Simplified outline of a Parasolid application </H3>
+<P>
+<A NAME="50422203_pgfId-294770"></A>To provide a context for comparing ways of handling PK errors, a simplified outline of a C++ driver routine for an interactive Parasolid application is given in <A HREF="fd_chap.121.html#50422203_35882"><EM>
+Figure 120-1</EM></A>. Execution proceeds in an infinite loop that starts by waiting for an instruction from the user. Once given, the instruction is processed according to its type, which may invoke one or more calls to Parasolid functions.</P>
+<P>
+<A NAME="50422203_pgfId-294774"></A>The code for processing the instructions is wrapped in a <CODE>
+try</CODE>
+ statement, with corresponding <CODE>
+catch</CODE>
+<A NAME="50422203_marker-294775"></A><A NAME="50422203_marker-294776"></A> blocks to deal with any types of error that arise (from Parasolid or otherwise). These blocks inform the user that the instruction has not been carried out, and make sure that the application is ready to receive the next instruction: this could be to try the previous instruction again, with different input data.</P>
+<P>
+<A NAME="50422203_pgfId-294830"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422203_pgfId-294779"></A><STRONG>while</STRONG> (<STRONG>true</STRONG>)</PRE>
+<PRE><A NAME="50422203_pgfId-294780"></A>{</PRE>
+<PRE><A NAME="50422203_pgfId-294781"></A>	// <EM>await input from the keyboard/mouse/etc.</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294782"></A>	myApp-&gt;getNextInstruction( &amp;instruction );</PRE>
+<PRE><A NAME="50422203_pgfId-294783"></A>	// <EM>process instruction</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294784"></A>	<STRONG>try</STRONG></PRE>
+<PRE><A NAME="50422203_pgfId-294785"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-294786"></A>		<STRONG>switch</STRONG> (instruction.type)</PRE>
+<PRE><A NAME="50422203_pgfId-294787"></A>		{</PRE>
+<PRE><A NAME="50422203_pgfId-294788"></A>		<STRONG>case</STRONG> i_type_1:</PRE>
+<PRE><A NAME="50422203_pgfId-294789"></A>		...</PRE>
+<PRE><A NAME="50422203_pgfId-294790"></A>		</PRE>
+<PRE><A NAME="50422203_pgfId-294792"></A>		<STRONG>case</STRONG><A NAME="50422203_marker-294791"></A> i_type_n:</PRE>
+<PRE><A NAME="50422203_pgfId-294793"></A>	// <EM>processing instruction initiates (at some point) </EM></PRE>
+<PRE><A NAME="50422203_pgfId-294794"></A>//<EM>a sequence of (related) PK functions</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294795"></A>	</PRE>
+<PRE><A NAME="50422203_pgfId-294796"></A>			... // <EM>PK function calls happen here</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294797"></A>	</PRE>
+<PRE><A NAME="50422203_pgfId-294799"></A>			// <EM>deal with any errors (from PK or otherwise)</EM><A NAME="50422203_marker-294798"></A></PRE>
+<PRE><A NAME="50422203_pgfId-294800"></A>			<STRONG>if</STRONG> ( myApp-&gt;isError() )</PRE>
+<PRE><A NAME="50422203_pgfId-294801"></A>			{</PRE>
+<PRE><A NAME="50422203_pgfId-294802"></A>				errorTypeN error = myApp-&gt;getError();</PRE>
+<PRE><A NAME="50422203_pgfId-294803"></A>				<STRONG>throw</STRONG> error;</PRE>
+<PRE><A NAME="50422203_pgfId-294804"></A>			}</PRE>
+<PRE><A NAME="50422203_pgfId-294806"></A>			<STRONG>break</STRONG><A NAME="50422203_marker-294805"></A>;</PRE>
+<PRE><A NAME="50422203_pgfId-294807"></A>		</PRE>
+<PRE><A NAME="50422203_pgfId-294808"></A>		...</PRE>
+<PRE><A NAME="50422203_pgfId-294809"></A>		}</PRE>
+<PRE><A NAME="50422203_pgfId-294810"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-294811"></A>	</PRE>
+<PRE><A NAME="50422203_pgfId-294812"></A>	<STRONG>catch</STRONG> (errorType1 error)</PRE>
+<PRE><A NAME="50422203_pgfId-294813"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-294814"></A>	// <EM>take appropriate recovery action and </EM></PRE>
+<PRE><A NAME="50422203_pgfId-294815"></A>//<EM>prepare to receive the next instruction</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294816"></A>		...</PRE>
+<PRE><A NAME="50422203_pgfId-294817"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-294818"></A>	</PRE>
+<PRE><A NAME="50422203_pgfId-294823"></A>	<STRONG>catch</STRONG><A NAME="50422203_marker-294819"></A><A NAME="50422203_marker-294820"></A><A NAME="50422203_marker-294821"></A><A NAME="50422203_marker-294822"></A> (errorType2 error)</PRE>
+<PRE><A NAME="50422203_pgfId-294824"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-294825"></A>		...</PRE>
+<PRE><A NAME="50422203_pgfId-294826"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-294827"></A>	</PRE>
+<PRE><A NAME="50422203_pgfId-294828"></A>	...</PRE>
+<PRE><A NAME="50422203_pgfId-294829"></A>}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-294832"></A>Figure 120-1 <A NAME="50422203_35882"></A>Simplified outline of the main loop in a Parasolid application</P>
+
+
+<H3>
+<A NAME="50422203_pgfId-294835"></A>	120.2.2 	<A NAME="50422203_43483"></A><A NAME="50422203_marker-294834"></A>Error severity </H3>
+<P>
+<A NAME="50422203_pgfId-294836"></A>PK errors (i.e., when a function returns a value other than PK_ERROR_no_errors) can be classified by their severity, which is either mild, serious or fatal. The consequences of the error, and steps necessary for recovery, depend on the severity, as described in the following table.</P>
+<P>
+<A NAME="50422203_pgfId-294865"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294839"></A> Severity</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294841"></A>Current state</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294843"></A>Required action</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294845"></A>Mild</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294847"></A>The operation failed but the parts involved were not altered.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294849"></A>Your application can continue as normal.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294851"></A>Serious</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294853"></A>The parts involved in the operation may have been altered, and may be invalid as a result. The rest of the Parasolid session is intact.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294855"></A>Your application should roll back to a valid state of the model. If rolling back has not been implemented, it should stop and restart the Parasolid session, and re-register the frustrum and the delta frustrum.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294860"></A>Fatal</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294862"></A>The Parasolid session has been corrupted; rolling back, if implemented, will not be effective.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-294864"></A>Your application should stop and restart the Parasolid session, and re-register the frustrum and the delta frustrum. Occasionally, it may be necessary for the application to exit.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-294866"></A>If your application does not carry out the necessary action after a serious or fatal error, data structures may become corrupt, leading to run-time errors at a later stage. You are therefore strongly advised to implement rollback functionality in your application, in order to restore a session after serious errors: see <A HREF="fd_chap.098.html#50422177_36055">Chapter 97, “Rollback”</A>, for details. Note that if you have more than one partition in your session, you should roll back <EM>
+every</EM><A NAME="50422203_marker-294870"></A> partition that contains entities affected by the error.</P>
+<P>
+<A NAME="50422203_pgfId-294871"></A>If you are dealing with multiple threads in your application and a serious error occurs in one or more of the threads you should call <A HREF=../headers/pk_thread_ask_exclusion.html>PK_THREAD_ask_exclusion</A> to assess whether the error needs to be handled. You can then either roll back or use <A HREF=../headers/pk_thread_clear_exclusion.html><A HREF=../headers/pk_thread_clear_exclusion.html>PK_THREAD_clear_exclusion</A></A>. See <A HREF="fd_chap.114.html#50422195_66094">Section 113.6.1, “Excluding application threads after a serious or fatal error”</A> for information on <A HREF=../headers/pk_thread_clear_exclusion.html><A HREF=../headers/pk_thread_clear_exclusion.html>PK_THREAD_clear_exclusion</A></A>.</P>
+<P>
+<A NAME="50422203_pgfId-294878"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-294877"></A>Warning: Certain error codes may denote a mild or a serious error, depending on the circumstances in which they are raised. It is therefore essential not to rely on the error code alone but to check the severity for an accurate diagnosis of the problem.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422203_pgfId-294879"></A>	120.2.3 	<A NAME="50422203_75033"></A>Error-handling strategy </H3>
+<P>
+<A NAME="50422203_pgfId-294880"></A>The ways to handle errors described in this section are:</P>
+<UL>
+<LI>
+<A NAME="50422203_pgfId-294881"></A>Not registering an error handler.</LI>
+<LI>
+<A NAME="50422203_pgfId-306304"></A>Registering an error handler that does not use exceptions.</LI>
+<LI>
+<A NAME="50422203_pgfId-306305"></A>Registering an error handler that uses exceptions.</LI>
+</UL>
+<P>
+<A NAME="50422203_pgfId-306306"></A>You register an error-handling function with Parasolid by calling <A HREF=../headers/pk_error_register_callbacks.html>PK_ERROR_register_callbacks</A>. Your error handler must receive a pointer to a <A HREF=../headers/pk_error_sf_t.html><A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A></A> structure and have the return type <A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>, although it need not necessarily return a value, as this is not used by Parasolid. The <A HREF=../headers/pk_error_sf_t.html><A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A></A> structure contains details of the error such as the name of the failing function, the error code, and the severity of the error. For more details, see <A HREF="fd_chap.121.html#50422203_47458">Section 120.2.5, “PK_ERROR functions and their use”</A> and also the error-handling code examples in the Example Application within the Jumpstart Kit.</P>
+<P>
+<A NAME="50422203_pgfId-294888"></A>Note that an error handler that uses exceptions does not have to throw an exception for every type of error. For example, you can design it to return to the failing PK function for certain errors and throw an exception for the rest.</P>
+<P>
+<A NAME="50422203_pgfId-294892"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-294891"></A>Warning: Your error handler should not attempt to alter any details of the current error (by modifying the <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure, or returning a different error code): Parasolid stores this information separately, and any such alterations have no effect.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-294893"></A>The strategies here also apply to <STRONG>
+re-entrant</STRONG> function calls, where a PK function is called from the GO or some other application function that has itself been called from Parasolid. They work in the same way, although any exceptions must be thrown back to a point outside of any PK function calls; they must not be thrown to functions called from Parasolid, as this could leave the PK kernel in an inconsistent state.</P>
+<P>
+<A NAME="50422203_pgfId-294894"></A>When dealing with multiple threads in an application, PK_THREAD_xxx functions should be used instead of PK_SESSION_xxx or PK_ERROR_xxx functions. For example, you should use <A HREF=../headers/pk_thread_ask_last_error.html>PK_THREAD_ask_last_error</A> in preference to <A HREF=../headers/pk_error_ask_last.html>PK_ERROR_ask_last</A>. See <A HREF="fd_chap.114.html#50422195_90285">Section 113.2, “How to set up and use application threads”</A>for a list of these functions.</P>
+<P>
+<A NAME="50422203_pgfId-294901"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-294900"></A>Warning: Calling PK functions other than <A HREF=../headers/pk_session_tidy.html>PK_SESSION_tidy</A> within an error handler that returns to your application via Parasolid may lead to unpredictable results.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422203_pgfId-294903"></A>120.2.3.1 <A NAME="50422203_marker-294902"></A>Not registering an error handler </H4>
+<P>
+<A NAME="50422203_pgfId-294910"></A>The example code of <A HREF="fd_chap.121.html#50422203_59117"><EM>
+Figure 120-2</EM></A> and <A HREF="fd_chap.121.html#50422203_61436"><EM>
+Figure 120-3</EM></A> illustrates handling errors without registering an error handler.</P>
+<P>
+<A NAME="50422203_pgfId-294911"></A>A sequence of PK function calls takes place. After each call, the application checks the return status of the function before the next call is made. If an error is encountered somewhere, the subsequent <CODE>
+if</CODE>
+ statements ensure that no further PK function calls are made until the error is dealt with. In the event of an error, the function <A HREF=../headers/pk_error_ask_last.html>PK_ERROR_ask_last</A> is called to obtain the relevant details (see <A HREF="fd_chap.121.html#50422203_47458" CLASS="XRef">Section 120.2.5, “PK_ERROR functions and their use”</A>), which are recorded by the application for later use (see <A HREF="fd_chap.121.html#50422203_35882"><EM>
+Figure 120-1</EM></A>). The application then calls its own function, handlePKError, which has not been registered with Parasolid.</P>
+<P>
+<A NAME="50422203_pgfId-294944"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422203_pgfId-294922"></A>	// <EM>call sequence of (related) PK functions</EM><A NAME="50422203_marker-294920"></A><A NAME="50422203_marker-294921"></A></PRE>
+<PRE><A NAME="50422203_pgfId-294923"></A>	PK_ERROR_t error = PK_XXX_fun_1( arg1, ..., argn );</PRE>
+<PRE><A NAME="50422203_pgfId-294924"></A>	// <EM>check the error return code each time before continuing</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294925"></A>	<STRONG>if</STRONG> (error == PK_ERROR_no_errors)</PRE>
+<PRE><A NAME="50422203_pgfId-294926"></A>		error = PK_XXX_fun_2( arg1, ..., argm );</PRE>
+<PRE><A NAME="50422203_pgfId-294927"></A>	<STRONG>if</STRONG> (error == PK_ERROR_no_errors)</PRE>
+<PRE><A NAME="50422203_pgfId-294928"></A>		error = PK_XXX_fun_3( arg1, ..., argr );</PRE>
+<PRE><A NAME="50422203_pgfId-294929"></A>	...</PRE>
+<PRE><A NAME="50422203_pgfId-294930"></A>	</PRE>
+<PRE><A NAME="50422203_pgfId-294931"></A>	// <EM>perform error handling after PK calls</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294932"></A>	<STRONG>if</STRONG> (error != PK_ERROR_no_errors)</PRE>
+<PRE><A NAME="50422203_pgfId-294933"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-294934"></A>		<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> was_error;</PRE>
+<PRE><A NAME="50422203_pgfId-294935"></A>		<A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> error_sf;</PRE>
+<PRE><A NAME="50422203_pgfId-294936"></A>		// <EM>get details of the error</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294937"></A>		<A HREF=../headers/pk_thread_ask_last_error.html>PK_THREAD_ask_last_error</A>( &amp;was_error, &amp;error_sf );</PRE>
+<PRE><A NAME="50422203_pgfId-294938"></A>	// <EM>set error information for the application and </EM></PRE>
+<PRE><A NAME="50422203_pgfId-294939"></A>//<EM>take appropriate action</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294940"></A>		myApp-&gt;setErrorStatus( <STRONG>true</STRONG> );</PRE>
+<PRE><A NAME="50422203_pgfId-294941"></A>		myApp-&gt;setError( “PK”, error_sf.severity, ... );</PRE>
+<PRE><A NAME="50422203_pgfId-294942"></A>		myApp-&gt;handlePKError( &amp;error_sf );</PRE>
+<PRE><A NAME="50422203_pgfId-294943"></A>	}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-294946"></A>Figure 120-2 <A NAME="50422203_59117"></A>Sequence of PK calls with no registered error handler</P>
+<P>
+<A NAME="50422203_pgfId-294947"></A>The function handlePKError performs certain PK-specific recovery tasks according to the severity of the error, as described in <A HREF="fd_chap.121.html#50422203_43483" CLASS="XRef">Section 120.2.2, “Error severity”</A>, and also any application-specific tidying up that needs to be done. Note that for mild and serious errors, the failing operation might be repeated (with different data); hence further action to prepare for this would be taken by the application in the main loop of the code (see <A HREF="fd_chap.121.html#50422203_35882"><EM>
+Figure 120-1</EM></A>).</P>
+<P>
+<A NAME="50422203_pgfId-294993"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422203_pgfId-294956"></A><STRONG>void</STRONG> myApp::handlePKError( <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A>* error_sf )</PRE>
+<PRE><A NAME="50422203_pgfId-294957"></A>{</PRE>
+<PRE><A NAME="50422203_pgfId-294958"></A>	<STRONG>if</STRONG> (error_sf-&gt;severity == PK_ERROR_mild)</PRE>
+<PRE><A NAME="50422203_pgfId-294959"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-294960"></A>		// <EM>warn user of a mild error</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294961"></A>		Message( &quot;Mild error in Parasolid function %s&quot;, error_sf-&gt;function );</PRE>
+<PRE><A NAME="50422203_pgfId-294962"></A>		... // <EM>perform any further application-specific clean-up tasks</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294963"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-294965"></A>	<STRONG>else</STRONG><A NAME="50422203_marker-294964"></A> <STRONG>if</STRONG> (error_sf-&gt;severity == PK_ERROR_serious)</PRE>
+<PRE><A NAME="50422203_pgfId-294966"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-294967"></A>		// <EM>warn user of a serious error</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294968"></A>		Message( &quot;Serious error in Parasolid function %s&quot;, error_sf-&gt;function );</PRE>
+<PRE><A NAME="50422203_pgfId-294969"></A>	// <EM>roll back the current partition (and any other affected partitions)</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294970"></A>		<A HREF=../headers/pk_session_ask_curr_partition.html>PK_SESSION_ask_curr_partition</A>( &amp;partition );</PRE>
+<PRE><A NAME="50422203_pgfId-294971"></A>		<A HREF=../headers/pk_partition_ask_pmark.html>PK_PARTITION_ask_pmark</A>( partition, &amp;pmark1, ... );</PRE>
+<PRE><A NAME="50422203_pgfId-294972"></A>		<CODE><A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A></CODE>
+( pmark1, &amp;n_new, &amp;new_entities, ... );</PRE>
+<PRE><A NAME="50422203_pgfId-294973"></A>		// <EM>free allocated memory where necessary</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294974"></A>		<STRONG>if</STRONG> (n_new) <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>( new_entities );</PRE>
+<PRE><A NAME="50422203_pgfId-294975"></A>		... // <EM>perform any further application-specific clean-up tasks</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294976"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-294978"></A>	<STRONG>else</STRONG><A NAME="50422203_marker-294977"></A> <STRONG>if</STRONG> (error_sf-&gt;severity == PK_ERROR_fatal)</PRE>
+<PRE><A NAME="50422203_pgfId-294979"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-294980"></A>		// <EM>warn user of a fatal error</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294981"></A>		Message( &quot;Fatal error in Parasolid function %s&quot;, error_sf-&gt;function );</PRE>
+<PRE><A NAME="50422203_pgfId-294982"></A>		// <EM>stop the current session</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294983"></A>		<A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>();</PRE>
+<PRE><A NAME="50422203_pgfId-294987"></A>	 //<EM>call application function containing PK calls to start a new session </EM><A NAME="50422203_marker-294984"></A><A NAME="50422203_marker-294985"></A><A NAME="50422203_marker-294986"></A></PRE>
+<PRE><A NAME="50422203_pgfId-294988"></A><CODE>//</CODE>
+<EM>and re-register the frustrum and delta frustrum</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294989"></A>		restartParasolid();</PRE>
+<PRE><A NAME="50422203_pgfId-294990"></A>		... // <EM>perform any further application-specific clean-up tasks</EM></PRE>
+<PRE><A NAME="50422203_pgfId-294991"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-294992"></A>}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-294997"></A>Figure 120-3 <A NAME="50422203_61436"></A><A NAME="50422203_marker-294995"></A><A NAME="50422203_marker-294996"></A>Example of a non-registered application function to handle errors</P>
+
+
+<H4>
+<A NAME="50422203_pgfId-294998"></A>120.2.3.2 Registering an error handler that does not use exceptions </H4>
+<P>
+<A NAME="50422203_pgfId-295005"></A>The example code of <A HREF="fd_chap.121.html#50422203_89618"><EM>
+Figure 120-4</EM></A> and <A HREF="fd_chap.121.html#50422203_92255"><EM>
+Figure 120-5</EM></A> illustrates handling errors with a registered error handler that does not use exceptions.</P>
+<P>
+<A NAME="50422203_pgfId-295009"></A>A sequence of PK function calls is shown in <A HREF="fd_chap.121.html#50422203_89618"><EM>
+Figure 120-4</EM></A>. After each call, the application checks the return status of the function before the next call is made. If an error is encountered somewhere, the registered error handler is invoked automatically just before the end of the failing PK function, and subsequently returns to that function.</P>
+<P>
+<A NAME="50422203_pgfId-295051"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422203_pgfId-295012"></A>	// <EM>call sequence of (related) PK functions</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295013"></A>	PK_ERROR_t error = PK_XXX_fun_1( arg1, ..., argn );</PRE>
+<PRE><A NAME="50422203_pgfId-295015"></A>	// <EM>check the error return code each time before continuing</EM><A NAME="50422203_marker-295014"></A></PRE>
+<PRE><A NAME="50422203_pgfId-295016"></A>	<STRONG>if</STRONG> (error == PK_ERROR_no_errors)</PRE>
+<PRE><A NAME="50422203_pgfId-295017"></A>		error = PK_XXX_fun_2( arg1, ..., argm );</PRE>
+<PRE><A NAME="50422203_pgfId-295018"></A>	<STRONG>if</STRONG> (error == PK_ERROR_no_errors)</PRE>
+<PRE><A NAME="50422203_pgfId-295019"></A>		error = PK_XXX_fun_3( arg1, ..., argr );</PRE>
+<PRE><A NAME="50422203_pgfId-295020"></A>	...</PRE>
+<PRE><A NAME="50422203_pgfId-295021"></A>	</PRE>
+<PRE><A NAME="50422203_pgfId-295023"></A>	// <EM>call error-processing PK functions outside of the error handler</EM><A NAME="50422203_marker-295022"></A></PRE>
+<PRE><A NAME="50422203_pgfId-295024"></A>	<STRONG>if</STRONG> (error != PK_ERROR_no_errors)</PRE>
+<PRE><A NAME="50422203_pgfId-295025"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-295026"></A>		<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> was_error;</PRE>
+<PRE><A NAME="50422203_pgfId-295027"></A>		<A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> error_sf;</PRE>
+<PRE><A NAME="50422203_pgfId-295028"></A>		// <EM>get details of the error</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295029"></A>		<A HREF=../headers/pk_thread_ask_last_error.html>PK_THREAD_ask_last_error</A>( &amp;was_error, &amp;error_sf );</PRE>
+<PRE><A NAME="50422203_pgfId-295030"></A>		// <EM>process serious or fatal errors</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295031"></A>		<STRONG>if</STRONG> (error_sf.severity == PK_ERROR_serious)</PRE>
+<PRE><A NAME="50422203_pgfId-295032"></A>		{</PRE>
+<PRE><A NAME="50422203_pgfId-295033"></A>	// <EM>roll back the current partition (and any other affected partitions)</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295034"></A>			<A HREF=../headers/pk_session_ask_curr_partition.html>PK_SESSION_ask_curr_partition</A>( &amp;partition );</PRE>
+<PRE><A NAME="50422203_pgfId-295035"></A>			<A HREF=../headers/pk_partition_ask_pmark.html>PK_PARTITION_ask_pmark</A>( partition, &amp;pmark1, ... );</PRE>
+<PRE><A NAME="50422203_pgfId-295036"></A>			<CODE><A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A></CODE>
+( pmark1, &amp;n_new, &amp;new_entities, ...);</PRE>
+<PRE><A NAME="50422203_pgfId-295037"></A>			// <EM>free memory where necessary</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295038"></A>			<STRONG>if</STRONG> (n_new) <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>( new_entities );</PRE>
+<PRE><A NAME="50422203_pgfId-295039"></A>		}</PRE>
+<PRE><A NAME="50422203_pgfId-295041"></A>		<STRONG>else</STRONG><A NAME="50422203_marker-295040"></A> <STRONG>if</STRONG> (error_sf.severity == PK_ERROR_fatal)</PRE>
+<PRE><A NAME="50422203_pgfId-295042"></A>		{</PRE>
+<PRE><A NAME="50422203_pgfId-295043"></A>			// <EM>stop the current session</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295044"></A>			<A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>();</PRE>
+<PRE><A NAME="50422203_pgfId-295046"></A>	// <EM>call application function containing PK calls to start a new session</EM><A NAME="50422203_marker-295045"></A></PRE>
+<PRE><A NAME="50422203_pgfId-295047"></A>//<EM>and re-register the frustrum and delta frustrum</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295048"></A>			restartParasolid();</PRE>
+<PRE><A NAME="50422203_pgfId-295049"></A>		}</PRE>
+<PRE><A NAME="50422203_pgfId-295050"></A>	}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295053"></A>Figure 120-4 <A NAME="50422203_89618"></A>Sequence of PK calls with a registered error handler that does not use exceptions (the code for the error handler is not shown in this figure)</P>
+<P>
+<A NAME="50422203_pgfId-295057"></A>The example error handler illustrated in <A HREF="fd_chap.121.html#50422203_92255"><EM>
+Figure 120-5</EM></A> provides information and performs application-specific clean-up tasks, but does not call any PK functions: the PK calls are made after returning to the application (as shown in <A HREF="fd_chap.121.html#50422203_89618"><EM>
+Figure 120-4</EM></A>), in order to avoid leaving the Parasolid kernel in an inconsistent state. The actual flow of execution resembles that of the previous case (with no registered error handler).</P>
+<P>
+<A NAME="50422203_pgfId-295089"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422203_pgfId-295063"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> myApp::handlePKError( <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A>* error_sf )</PRE>
+<PRE><A NAME="50422203_pgfId-295064"></A>{</PRE>
+<PRE><A NAME="50422203_pgfId-295065"></A>	// <EM>set error information for the application</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295066"></A>	myApp-&gt;setErrorStatus( <STRONG>true</STRONG> );</PRE>
+<PRE><A NAME="50422203_pgfId-295067"></A>	myApp-&gt;setError( “PK”, error_sf.severity, ... );</PRE>
+<PRE><A NAME="50422203_pgfId-295068"></A>	// <EM>report severity of error and failing function</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295069"></A>	<STRONG>if</STRONG> (error_sf-&gt;severity == PK_ERROR_mild)</PRE>
+<PRE><A NAME="50422203_pgfId-295070"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-295071"></A>		// <EM>warn user of a mild error</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295072"></A>		Message( &quot;Mild error in Parasolid function %s&quot;, error_sf-&gt;function );</PRE>
+<PRE><A NAME="50422203_pgfId-295073"></A>		... // <EM>perform any further application-specific clean-up tasks</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295074"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-295076"></A>	<STRONG>else</STRONG><A NAME="50422203_marker-295075"></A> <STRONG>if</STRONG> (error_sf-&gt;severity == PK_ERROR_serious)</PRE>
+<PRE><A NAME="50422203_pgfId-295077"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-295078"></A>		// <EM>warn user of a serious error: for safety, do not call the PK here</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295079"></A>		Message( &quot;Serious error in Parasolid function %s&quot;, error_sf-&gt;function );</PRE>
+<PRE><A NAME="50422203_pgfId-295080"></A>		... // <EM>perform any further application-specific clean-up tasks</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295081"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-295082"></A>	<STRONG>else</STRONG> <STRONG>if</STRONG> (error_sf-&gt;severity == PK_ERROR_fatal)</PRE>
+<PRE><A NAME="50422203_pgfId-295083"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-295084"></A>		// <EM>warn user of a fatal error: for safety, do not call the PK here</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295085"></A>		Message( &quot;Fatal error in Parasolid function %s&quot;, error_sf-&gt;function );</PRE>
+<PRE><A NAME="50422203_pgfId-295086"></A>		... // <EM>perform any further application-specific clean-up tasks</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295087"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-295088"></A>}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295094"></A>Figure 120-5 <A NAME="50422203_92255"></A><A NAME="50422203_marker-295091"></A><A NAME="50422203_marker-295092"></A><A NAME="50422203_marker-295093"></A>Example of a registered application function to handle errors without using exceptions</P>
+
+
+<H4>
+<A NAME="50422203_pgfId-295095"></A>120.2.3.3 Registering an error handler that uses exceptions </H4>
+<P>
+<A NAME="50422203_pgfId-295102"></A>The example code of <A HREF="fd_chap.121.html#50422203_72675"><EM>
+Figure 120-6</EM></A> and <A HREF="fd_chap.121.html#50422203_29457"><EM>
+Figure 120-7</EM></A> illustrates handling errors using a registered error handler that uses exceptions.</P>
+<P>
+<A NAME="50422203_pgfId-295155"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422203_pgfId-295105"></A>	<STRONG>try</STRONG></PRE>
+<PRE><A NAME="50422203_pgfId-295106"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-295107"></A>		// <EM>call sequence of (related) PK functions</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295108"></A>		PK_XXX_fun_1( arg1, ..., argn );</PRE>
+<PRE><A NAME="50422203_pgfId-295109"></A>		// <EM>no need to check the error return code each time</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295110"></A>		PK_XXX_fun_2( arg1, ..., argm );</PRE>
+<PRE><A NAME="50422203_pgfId-295111"></A>		PK_XXX_fun_3( arg1, ..., argr );</PRE>
+<PRE><A NAME="50422203_pgfId-295112"></A>		...</PRE>
+<PRE><A NAME="50422203_pgfId-295113"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-295114"></A>	</PRE>
+<PRE><A NAME="50422203_pgfId-295115"></A>	...</PRE>
+<PRE CLASS="Code"><A NAME="50422203_pgfId-295120"></A>	// <EM>could combine this with the catch statements in <A HREF="fd_chap.121.html#50422203_35882">Figure 120-1</A></EM><A NAME="50422203_marker-295116"></A></PRE>
+<PRE><A NAME="50422203_pgfId-295122"></A>	<STRONG>catch</STRONG><A NAME="50422203_marker-295121"></A>(<A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A>* error_sf)</PRE>
+<PRE><A NAME="50422203_pgfId-295123"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-295124"></A>		<STRONG>if</STRONG> (error_sf-&gt;severity == PK_ERROR_mild)</PRE>
+<PRE><A NAME="50422203_pgfId-295125"></A>		{</PRE>
+<PRE><A NAME="50422203_pgfId-295126"></A>			// <EM>warn user of a mild error</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295127"></A>			Message( &quot;Mild error in Parasolid function %s&quot;, error_sf-&gt;function );</PRE>
+<PRE><A NAME="50422203_pgfId-295128"></A>			... // <EM>perform any further application-specific clean-up tasks</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295129"></A>		}</PRE>
+<PRE><A NAME="50422203_pgfId-295131"></A>		<STRONG>else</STRONG><A NAME="50422203_marker-295130"></A> <STRONG>if</STRONG> (error_sf-&gt;severity == PK_ERROR_serious)</PRE>
+<PRE><A NAME="50422203_pgfId-295132"></A>		{</PRE>
+<PRE><A NAME="50422203_pgfId-295133"></A>			// <EM>warn user of a serious error</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295134"></A>			Message( &quot;Serious error in Parasolid function %s&quot;, error_sf-&gt;function );</PRE>
+<PRE><A NAME="50422203_pgfId-295135"></A>	// <EM>roll back the current partition (and any other affected partitions)</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295136"></A>			<A HREF=../headers/pk_session_ask_curr_partition.html>PK_SESSION_ask_curr_partition</A>( &amp;partition );</PRE>
+<PRE><A NAME="50422203_pgfId-295137"></A>			<A HREF=../headers/pk_partition_ask_pmark.html>PK_PARTITION_ask_pmark</A>( partition, &amp;pmark1, ... );</PRE>
+<PRE><A NAME="50422203_pgfId-295138"></A>			<CODE><A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A></CODE>
+( pmark1, &amp;n_new, &amp;new_entities, ...);</PRE>
+<PRE><A NAME="50422203_pgfId-295139"></A>			// <EM>free memory where necessary</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295140"></A>			<STRONG>if</STRONG> (n_new) <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>( new_entities );</PRE>
+<PRE><A NAME="50422203_pgfId-295141"></A>			... // <EM>perform any further application-specific clean-up tasks</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295142"></A>		}</PRE>
+<PRE><A NAME="50422203_pgfId-295143"></A>		<STRONG>else</STRONG> <STRONG>if</STRONG> (error_sf-&gt;severity == PK_ERROR_fatal)</PRE>
+<PRE><A NAME="50422203_pgfId-295144"></A>		{</PRE>
+<PRE><A NAME="50422203_pgfId-295145"></A>			// <EM>warn user of a fatal error</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295146"></A>			Message( &quot;Fatal error in Parasolid function %s&quot;, error_sf-&gt;function );</PRE>
+<PRE><A NAME="50422203_pgfId-295147"></A>			// <EM>stop the current session</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295148"></A>			<A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>();</PRE>
+<PRE><A NAME="50422203_pgfId-295149"></A>	// <EM>call application function containing PK calls to start a new session</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295150"></A>//<EM>and re-register the frustrum and delta frustrum</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295151"></A>			restartParasolid();</PRE>
+<PRE><A NAME="50422203_pgfId-295152"></A>			... // <EM>perform any further application-specific clean-up tasks</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295153"></A>		}</PRE>
+<PRE><A NAME="50422203_pgfId-295154"></A>	}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295157"></A>Figure 120-6 <A NAME="50422203_72675"></A>Sequence of PK calls with a registered error handler using exceptions</P>
+<P>
+<A NAME="50422203_pgfId-295161"></A>A sequence of PK function calls takes place within a <CODE>
+try</CODE>
+ block, as shown in <A HREF="fd_chap.121.html#50422203_72675"><EM>
+Figure 120-6</EM></A>. There is no need for the application to check the return status each time, however, because in the event of an error, execution does not resume at the next call in the sequence. Instead, the error handler is automatically invoked. After first preparing the Parasolid kernel with a call to <A HREF=../headers/pk_thread_tidy.html>PK_THREAD_tidy</A>, the error handler throws an exception that is caught by the <CODE>
+catch</CODE>
+ statement shown in <A HREF="fd_chap.121.html#50422203_72675"><EM>
+Figure 120-6</EM></A>.</P>
+<P>
+<A NAME="50422203_pgfId-295165"></A>In a real application, the error handler might throw different exceptions according to the severity of the error and other circumstances. The <CODE>
+catch</CODE>
+ statements for these could be combined with those in <A HREF="fd_chap.121.html#50422203_35882"><EM>
+Figure 120-1</EM></A>.</P>
+<P>
+<A NAME="50422203_pgfId-295182"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422203_pgfId-295171"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> myApp::handlePKError( <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A>* error_sf )</PRE>
+<PRE><A NAME="50422203_pgfId-295172"></A>{</PRE>
+<PRE><A NAME="50422203_pgfId-295173"></A>	// <EM>set the error information for the application</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295174"></A>	setErrorStatus( <STRONG>true</STRONG> );</PRE>
+<PRE><A NAME="50422203_pgfId-295175"></A>	setError( “PK”, error_sf-&gt;severity, ... );</PRE>
+<PRE><A NAME="50422203_pgfId-295176"></A>	// <EM>tidy the Parasolid session before throwing an exception</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295177"></A>	<STRONG>if</STRONG> (<A HREF=../headers/pk_thread_tidy.html>PK_THREAD_tidy</A>() != PK_ERROR_no_errors)</PRE>
+<PRE><A NAME="50422203_pgfId-295178"></A>		setPKTidyStatus( <STRONG>false</STRONG> );</PRE>
+<PRE><A NAME="50422203_pgfId-295179"></A>	// <EM>throw an exception</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295180"></A>	<STRONG>throw</STRONG> error_sf;</PRE>
+<PRE><A NAME="50422203_pgfId-295181"></A>}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295185"></A>Figure 120-7 <A NAME="50422203_29457"></A><A NAME="50422203_marker-295184"></A>Example of a registered application function to handle errors using exceptions</P>
+<P>
+<A NAME="50422203_pgfId-311996"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-311989"></A>Note: When your registered error handler throws an exception (and therefore passes control back to your application instead of Parasolid), you must call <A HREF=../headers/pk_thread_tidy.html>PK_THREAD_tidy</A> before calling another PK function. This tidies the Parasolid kernel and internal memory; it must be done before the exception is thrown.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422203_pgfId-311998"></A>120.2.3.4 <A NAME="50422203_marker-311997"></A>Benefits of registering an error handler </H4>
+<P>
+<A NAME="50422203_pgfId-312002"></A>Registering an error handler allows Parasolid to report errors immediately, and perform any application-specific processing automatically. Better still, using an error handler that throws exceptions allows you to process PK errors fully automatically; your application no longer needs to check the return values of the PK calls.</P>
+
+
+
+<H3>
+<A NAME="50422203_pgfId-295193"></A>	120.2.4 	<A NAME="50422203_34371"></A>Special errors </H3>
+<P>
+<A NAME="50422203_pgfId-295194"></A>This section describes some unusual Parasolid errors that require special treatment, or arise under particular circumstances.</P>
+<P>
+<A NAME="50422203_pgfId-321978"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295197"></A> Error</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295199"></A>Reason</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295201"></A>Required action</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295203"></A>PK_ERROR_system_error</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295205"></A>Parasolid has failed in an unexpected way.</P>
+<P>
+<A NAME="50422203_pgfId-295206"></A>This error can arise when argument checking has been turned off and incorrect data are passed to a PK function.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295208"></A>Your application should proceed according to the severity reported.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295210"></A>PK_ERROR_fatal_error</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295212"></A>A fatal error has occurred; the Parasolid session has been so badly corrupted that you cannot make any further PK calls.</P>
+<P>
+<A NAME="50422203_pgfId-295213"></A>This error can arise when run-time errors are processed by a signal handler; for details, see <A HREF="fd_chap.122.html#50422204_35122">Chapter 121, “Signal Handling”</A>.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295218"></A>Your application must stop and restart the Parasolid session in order to make further PK calls.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295220"></A>PK_ERROR_unhandleable_condition</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295222"></A>An unforeseeable error has occurred that Parasolid cannot diagnose and process internally; hence no specific information can be given in the <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure (see <A HREF="fd_chap.121.html#50422203_47458">Section 120.2.5, “PK_ERROR functions and their use”</A> for details).</P>
+<P>
+<A NAME="50422203_pgfId-295226"></A>This error can arise when run-time errors or user interrupts are processed by a signal handler. See <A HREF="fd_chap.122.html#50422204_35122">Section 121, “Signal Handling”</A> for details</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295231"></A>If your application uses a registered error handler with exceptions, it must throw an exception back to the application code. If the error can be dealt with, it should be possible to continue the Parasolid session afterwards (having called <A HREF=../headers/pk_session_tidy.html>PK_SESSION_tidy</A>).</P>
+<P>
+<A NAME="50422203_pgfId-295232"></A>If your application does not use a registered error handler with exceptions, Parasolid will flush the output buffers, close open files and call exit() to terminate the current process.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295234"></A>PK_ERROR_run_time_error</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295236"></A>A run-time error in the Parasolid kernel is being processed by a signal handler; for details, see <A HREF="fd_chap.122.html#50422204_35122">Chapter 121, “Signal Handling”</A>.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295241"></A>Your application should proceed according to the severity reported.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295243"></A>PK_ERROR_aborted</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295245"></A><A HREF=../headers/pk_session_abort.html>PK_SESSION_abort</A> has been called by a signal handler as a result of a user interrupt; for details, see <A HREF="fd_chap.122.html#50422204_35122">Chapter 121, “Signal Handling”</A>.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295250"></A>Your application should proceed according to the severity reported.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295252"></A>PK_ERROR_cant_be_aborted</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295254"></A>A user interrupt has been attempted during execution of a PK function that cannot be safely aborted; for details, see <A HREF="fd_chap.122.html#50422204_35122">Chapter 121, “Signal Handling”</A>.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295259"></A>No specific recovery action is required in your application.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-321985"></A>Therefore a further advantage of using a registered error handler with exceptions is that Parasolid can recover from the error code PK_ERROR_unhandleable_condition. See <A HREF="fd_chap.122.html#50422204_35122">Chapter 121, “Signal Handling”</A> for further details</P>
+<P>
+<A NAME="50422203_pgfId-321647"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-295263"></A>Note: If you encounter a system error and argument checking was not enabled, you should first enable it with a call to <A HREF=../headers/pk_session_set_check_arguments.html>PK_SESSION_set_check_arguments</A> and try the operation again before investigating further.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295264"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-321661"></A>Note: Parasolid can detect string buffer overruns and other errors in its string formatting code, and reports these as PK_ERROR_run_time_error although no signal is raised. They should be handled in your application in the same way as other run-time errors.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422203_pgfId-295270"></A>	120.2.5 	<A NAME="50422203_47458"></A>PK_ERROR functions and their use </H3>
+<P>
+<A NAME="50422203_pgfId-295271"></A>The error manipulation and enquiry functions available in Parasolid are described in the table below. They are used in situations where it is necessary to override the current error handler: for example, you might be developing a third-party plug-in for an existing Parasolid application, and have no knowledge of the master application’s error-handling strategy.</P>
+<P>
+<A NAME="50422203_pgfId-295278"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-295274"></A>Note: When using multiple thread applications, it is recommended that you use PK_THREAD_ functions instead of PK_ERROR_ functions. See <A HREF="fd_chap.114.html#50422195_90285">Section 113.2, “How to set up and use application threads”</A> for a list of these functions.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295321"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295281"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295283"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295286"></A><A NAME="50422203_marker-295285"></A><A HREF=../headers/pk_error_ask_last.html>PK_ERROR_ask_last</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-318096"></A>This function returns information about the last PK error raised. The information is returned (via the arguments) in a <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure that includes:</P>
+<UL>
+<LI>
+<A NAME="50422203_pgfId-313990"></A>The name of the PK function that raised the error</LI>
+<LI>
+<A NAME="50422203_pgfId-313991"></A>The error code</LI>
+<LI>
+<A NAME="50422203_pgfId-313992"></A>The severity of the error</LI>
+<LI>
+<A NAME="50422203_pgfId-313993"></A>The numbers and names of any invalid arguments</LI>
+<LI>
+<A NAME="50422203_pgfId-313994"></A>The entity to which the error applies</LI>
+</UL>
+<P>
+<A NAME="50422203_pgfId-295294"></A>If there is no error, or an error has been cleared (<CODE>
+was_error</CODE>
+ is PK_LOGICAL_false), then this structure has the values indicated below:</P>
+<UL>
+<LI>
+<A NAME="50422203_pgfId-318447"></A>PK function that requested the information (<A HREF=../headers/pk_error_ask_last.html>PK_ERROR_ask_last</A> or <A HREF=../headers/pk_thread_ask_last_error.html>PK_THREAD_ask_last_error</A>)</LI>
+<LI>
+<A NAME="50422203_pgfId-318595"></A>PK_ERROR_no_errors</LI>
+<LI>
+<A NAME="50422203_pgfId-318620"></A>PK_ERROR_none</LI>
+<LI>
+<A NAME="50422203_pgfId-318653"></A>No arguments</LI>
+<LI>
+<A NAME="50422203_pgfId-319051"></A>PK_ENTITY_null</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295297"></A><A NAME="50422203_marker-295296"></A><A HREF=../headers/pk_error_clear_last.html>PK_ERROR_clear_last</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295299"></A>This function clears the information about the last PK error raised. </P>
+<P>
+<A NAME="50422203_pgfId-295300"></A>Subsequent calls to <A HREF=../headers/pk_error_ask_last.html>PK_ERROR_ask_last</A> will not return any information until another error is raised.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295303"></A><A NAME="50422203_marker-295302"></A><A HREF=../headers/pk_error_raise.html>PK_ERROR_raise</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295305"></A>This function raises an (artificial) PK error, given as input in a <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure.</P>
+<P>
+<A NAME="50422203_pgfId-295306"></A>If your application has registered an error handler, it is invoked, and appropriate action taken according to the severity of the new error. If the error handler uses exceptions, then this function may not return; otherwise, it returns the error code corresponding to the new error.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295308"></A><A HREF=../headers/pk_error_reraise.html>PK_ERROR_reraise</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295310"></A>This function works in exactly the same way as <A HREF=../headers/pk_error_raise.html>PK_ERROR_raise</A>, only it raises the last error that occurred (i.e., that which would be returned by <A HREF=../headers/pk_error_ask_last.html>PK_ERROR_ask_last</A>). </P>
+<P>
+<A NAME="50422203_pgfId-295311"></A>The logical argument <CODE>
+was_error</CODE>
+ is set to true unless there has not been an error or the error was previously cleared, in which case no error is raised.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295313"></A><A HREF=../headers/pk_error_register_callbacks.html>PK_ERROR_register_callbacks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295315"></A>This function registers the error handler given as input in a <A HREF=../headers/pk_error_frustrum_t.html>PK_ERROR_frustrum_t</A> structure. Your error handler must return a <A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> and receive a pointer to a <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure.</P>
+<P>
+<A NAME="50422203_pgfId-295316"></A>A different error handler can be registered at any time simply by calling this function with an appropriate pointer.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295318"></A><A HREF=../headers/pk_error_ask_callbacks.html>PK_ERROR_ask_callbacks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422203_pgfId-295320"></A>This function returns the current error handler as a pointer to a <A HREF=../headers/pk_error_frustrum_t.html>PK_ERROR_frustrum_t</A> structure, if there is one. If not, it returns NULL.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295325"></A>The example third-party function in <A HREF="fd_chap.121.html#50422203_82513"><EM>
+Figure 120-8</EM></A> illustrates how the PK_ERROR_xxx functions and PK_THREAD_ xxx functions can be used. This function makes several calls to PK functions, and is designed not to be disrupted by mild errors. The behaviour of the master application’s error handler is not known, so it first replaces the current error handler (if any) with its own by calling <A HREF=../headers/pk_thread_register_error_cbs.html>PK_THREAD_register_error_cbs</A>. The new error handler throws an exception for serious and fatal errors but not mild errors, as shown in <A HREF="fd_chap.121.html#50422203_78312"><EM>
+Figure 120-9</EM></A>.</P>
+<P>
+<A NAME="50422203_pgfId-295386"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422203_pgfId-295331"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> thirdPartyApp::functionThatMakesPKCalls( <STRONG>void</STRONG> )</PRE>
+<PRE><A NAME="50422203_pgfId-295332"></A>{</PRE>
+<PRE><A NAME="50422203_pgfId-295333"></A>	<A HREF=../headers/pk_error_frustrum_t.html>PK_ERROR_frustrum_t</A> master_app_frustrum;</PRE>
+<PRE><A NAME="50422203_pgfId-295334"></A>	<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> was_error;</PRE>
+<PRE><A NAME="50422203_pgfId-295335"></A>	// <EM>main body of function wrapped in a ‘try’ block</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295336"></A>	<STRONG>try</STRONG></PRE>
+<PRE><A NAME="50422203_pgfId-295337"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-295338"></A>		<A HREF=../headers/pk_error_frustrum_t.html>PK_ERROR_frustrum_t</A> tp_app_frustrum;</PRE>
+<PRE><A NAME="50422203_pgfId-295339"></A>		// <EM>save the frustrum from the master application</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295340"></A>		<A HREF=../headers/pk_thread_ask_error_cbs.html>PK_THREAD_ask_error_cbs</A>( &amp;master_app_frustrum );</PRE>
+<PRE><A NAME="50422203_pgfId-295341"></A>	// <EM>temporarily replace the current error handler </EM></PRE>
+<PRE><A NAME="50422203_pgfId-295342"></A>//<EM>with ‘thirdPartyApp’ member function ‘handleError_NoMild’</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295343"></A>		tp_app_frustrum.handler_fn = &amp;handleError_NoMild;</PRE>
+<PRE><A NAME="50422203_pgfId-295344"></A>		<A HREF=../headers/pk_thread_register_error_cbs.html>PK_THREAD_register_error_cbs</A>( tp_app_frustrum );</PRE>
+<PRE><A NAME="50422203_pgfId-295345"></A>		</PRE>
+<PRE><A NAME="50422203_pgfId-295347"></A>		// <EM>clear the last error raised</EM><A NAME="50422203_marker-295346"></A></PRE>
+<PRE><A NAME="50422203_pgfId-295348"></A>		<A HREF=../headers/pk_thread_clear_last_error.html>PK_THREAD_clear_last_error</A>( &amp;was_error );</PRE>
+<PRE><A NAME="50422203_pgfId-295349"></A>		</PRE>
+<PRE><A NAME="50422203_pgfId-295351"></A>		// <EM>call PK functions</EM><A NAME="50422203_marker-295350"></A></PRE>
+<PRE><A NAME="50422203_pgfId-295352"></A>		PK_XXX_fun_1( arg1, ..., argn );</PRE>
+<PRE><A NAME="50422203_pgfId-295353"></A>		// <EM>no need to check the error return code each time</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295354"></A>		PK_XXX_fun_2( arg1, ..., argm );</PRE>
+<PRE><A NAME="50422203_pgfId-295355"></A>		PK_XXX_fun_3( arg1, ..., argr );</PRE>
+<PRE><A NAME="50422203_pgfId-295356"></A>		...</PRE>
+<PRE><A NAME="50422203_pgfId-295357"></A>		// <EM>re-register the frustrum from the master application</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295358"></A>		<A HREF=../headers/pk_thread_register_error_cbs.html>PK_THREAD_register_error_cbs</A>( master_app_frustrum );</PRE>
+<PRE><A NAME="50422203_pgfId-295360"></A>		// <EM>check to see if a mild error occurred somewhere</EM><A NAME="50422203_marker-295359"></A></PRE>
+<PRE><A NAME="50422203_pgfId-295361"></A>		<A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> error_sf;</PRE>
+<PRE><A NAME="50422203_pgfId-295362"></A>		<A HREF=../headers/pk_thread_ask_last_error.html>PK_THREAD_ask_last_error</A>( &amp;was_error, &amp;error_sf );</PRE>
+<PRE><A NAME="50422203_pgfId-295363"></A>		// <EM>alert the master application if an error occurred</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295364"></A>		<STRONG>if</STRONG> (was_error)</PRE>
+<PRE><A NAME="50422203_pgfId-295365"></A>		{</PRE>
+<PRE><A NAME="50422203_pgfId-295366"></A>	// <EM>if here, the error is mild, </EM></PRE>
+<PRE><A NAME="50422203_pgfId-295367"></A>//<EM>so there is no need to re-raise it</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295368"></A>			<STRONG>return</STRONG> error_sf.code;</PRE>
+<PRE><A NAME="50422203_pgfId-295369"></A>		}</PRE>
+<PRE><A NAME="50422203_pgfId-295370"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-295371"></A>	...</PRE>
+<PRE><A NAME="50422203_pgfId-295374"></A>	// <EM>catch all exceptions (serious and fatal errors) here</EM><A NAME="50422203_marker-295372"></A><A NAME="50422203_marker-295373"></A></PRE>
+<PRE><A NAME="50422203_pgfId-295375"></A>	<STRONG>catch</STRONG>(...)</PRE>
+<PRE><A NAME="50422203_pgfId-295376"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-295377"></A>		// <EM>re-register the frustrum from the master application</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295378"></A>		<A HREF=../headers/pk_thread_register_error_cbs.html>PK_THREAD_register_error_cbs</A>( master_app_frustrum );</PRE>
+<PRE><A NAME="50422203_pgfId-295379"></A>	// <EM>re-raise the error with the original error handler; </EM></PRE>
+<PRE><A NAME="50422203_pgfId-295380"></A>//<EM> if it returns (or does not exist), return the error code</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295381"></A>		<STRONG>return</STRONG> <A HREF=../headers/pk_error_reraise.html>PK_ERROR_reraise</A>( &amp;was_error );</PRE>
+<PRE><A NAME="50422203_pgfId-295382"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-295383"></A>	// <EM>if here, no errors took place</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295384"></A>	<STRONG>return</STRONG> PK_ERROR_no_errors;</PRE>
+<PRE><A NAME="50422203_pgfId-295385"></A>}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295388"></A>Figure 120-8 <A NAME="50422203_82513"></A>Example of a third-party function that makes Parasolid calls</P>
+<P>
+<A NAME="50422203_pgfId-295389"></A>The third-party function clears the memory of the last error raised using <A HREF=../headers/pk_thread_clear_last_error.html>PK_THREAD_clear_last_error</A>, and then makes a series of calls to PK functions. If a serious or fatal error is encountered, the error handler throws an exception, and execution continues inside the <CODE>
+catch(...)</CODE>
+ block in the function. Otherwise, execution continues in the <CODE>
+try</CODE>
+ block; in each case, the master application’s error handler is re-registered.</P>
+<P>
+<A NAME="50422203_pgfId-295390"></A>If a mild error has occurred (as indicated by <A HREF=../headers/pk_thread_ask_last_error.html>PK_THREAD_ask_last_error</A>), the function returns the corresponding error code to the master application (for information), but does not raise an error. After a serious or fatal error, however, the function calls <A HREF=../headers/pk_error_reraise.html>PK_ERROR_reraise</A> to handle the error with the master application’s error handler (if one exists); if the error handler returns (or does not exist), the function returns the corresponding error code to the master application.</P>
+<P>
+<A NAME="50422203_pgfId-295403"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422203_pgfId-295393"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> thirdPartyApp::handleError_NoMild( <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A>* error_sf )</PRE>
+<PRE><A NAME="50422203_pgfId-295394"></A>{</PRE>
+<PRE><A NAME="50422203_pgfId-295395"></A>	// <EM>respond to serious and fatal errors only</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295396"></A>	<STRONG>if</STRONG> (error_sf-&gt;severity != PK_ERROR_mild)</PRE>
+<PRE><A NAME="50422203_pgfId-295397"></A>	{</PRE>
+<PRE><A NAME="50422203_pgfId-295398"></A>		// <EM>tidy the session before throwing the exception</EM></PRE>
+<PRE><A NAME="50422203_pgfId-295399"></A>		<A HREF=../headers/pk_thread_tidy.html>PK_THREAD_tidy</A>()</PRE>
+<PRE><A NAME="50422203_pgfId-295400"></A>		<STRONG>throw</STRONG> error_sf-&gt;severity;</PRE>
+<PRE><A NAME="50422203_pgfId-295401"></A>	}</PRE>
+<PRE><A NAME="50422203_pgfId-295402"></A>}</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295407"></A>Figure 120-9 <A NAME="50422203_78312"></A><A NAME="50422203_marker-295405"></A><A NAME="50422203_marker-295406"></A>Example of a third-party error handler that ignores mild errors</P>
+<P>
+<A NAME="50422203_pgfId-295411"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-295410"></A>Warning: If you register an error handler with Parasolid, you must not call any of the PK_ERROR functions or PK_THREAD_equivalent functions described in this section from within the error handler.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422203_pgfId-295413"></A>120.3	<A NAME="50422203_60341"></A>Failure status codes 
+
+
+</H1>
+<P>
+<A NAME="50422203_pgfId-295414"></A>Some PK functions have the ability to return detailed diagnostic information following any failure to complete an operation in the manner intended. In these situations, it is not possible to return this information through the general PK_ERROR_sf structure; PK functions therefore return an error code of PK_ERROR_no_errors, and send error diagnostics back via a particular variable or structure among their output arguments known as a <STRONG>
+status code</STRONG>.</P>
+<P>
+<A NAME="50422203_pgfId-295415"></A>The documentation for each PK function indicates whether it may return failure information via a status code; if so, it tells you which variable to examine in order to determine the status (i.e., success or failure) of the operation.</P>
+
+<H3>
+<A NAME="50422203_pgfId-295417"></A>	120.3.1 	<A NAME="50422203_89014"></A>Types of failure status code returned </H3>
+<P>
+<A NAME="50422203_pgfId-295418"></A>Types of status code that are commonly used to indicate failures include:</P>
+<UL>
+<LI>
+<A NAME="50422203_pgfId-295419"></A><A HREF=../headers/pk_blend_fault_t.html>PK_blend_fault_t</A></LI>
+<LI>
+<A NAME="50422203_pgfId-295420"></A><A HREF=../headers/pk_body_fault_t.html>PK_BODY_fault_t</A></LI>
+<LI>
+<A NAME="50422203_pgfId-295421"></A><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_t</A></LI>
+<LI>
+<A NAME="50422203_pgfId-295422"></A><A HREF=../headers/pk_check_state_t.html>PK_check_state_t</A></LI>
+<LI>
+<A NAME="50422203_pgfId-295423"></A><A HREF=../headers/pk_local_status_t.html>PK_local_status_t</A></LI>
+<LI>
+<A NAME="50422203_pgfId-295424"></A><A HREF=../headers/pk_section_report_t.html>PK_section_report_t</A></LI>
+</UL>
+<P>
+<A NAME="50422203_pgfId-295425"></A>(Please note that this is not a complete list.) This status code may appear explicitly among the output arguments of the function, or as a field within a larger data structure describing the results of the operation.</P>
+<P>
+<A NAME="50422203_pgfId-295429"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-295428"></A>Warning: For functions that may return failure information via a status code (with an error code of PK_ERROR_no_errors), you must explicitly check the contents of their arguments in your application to establish the status of the operation. A registered error handler will <EM>
+not</EM> be called in these situations.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422203_pgfId-295430"></A>	120.3.2 	Necessary action following a failure status code </H3>
+<P>
+<A NAME="50422203_pgfId-295431"></A>In many cases when a function returns a failure status code, the model has not been changed, and hence no Parasolid-specific action is required; this is analogous to situations in which PK functions return a mild error. In the case of local operations, however, it is possible that the model has been corrupted, and hence deleting it afterwards could lead to a run-time error. Specifically, the functions that may have corrupted the model after a failure are those that return a <A HREF=../headers/pk_local_status_t.html>PK_local_status_t</A> code.</P>
+<P>
+<A NAME="50422203_pgfId-295435"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422203_pgfId-295434"></A>Warning: If a function returns a failure status code of type <A HREF=../headers/pk_local_status_t.html>PK_local_status_t</A>, we recommend that you roll back to a valid state of the model, in order to avoid any possibility of a run-time error later.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422203_pgfId-295436"></A>In addition, for boolean operations, the return of the failure status code <A HREF=../headers/pk_boolean_result_t.html><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_failed_c</A></A> may indicate that extra entities have been produced, causing undesirable changes to the model. The data structures should not be corrupt, but a call to <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> or <A HREF=../headers/pk_face_check.html>PK_FACE_check</A> may show the model to be invalid. Therefore we also recommend that if <A HREF=../headers/pk_boolean_result_t.html><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_failed_c</A></A> is returned from a call to <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> or <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>, the application should roll back to a valid state of the model.</P>
+<P>
+<A NAME="50422203_pgfId-295437"></A>If you are dealing with multiple threads in your application and a failure status code is returned, you should roll the session back. See <A HREF="fd_chap.114.html#50422195_66094">Section 113.6.1, “Excluding application threads after a serious or fatal error”</A>.</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.120.html">Introduction To Error Handling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.122.html">Signal Handling</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

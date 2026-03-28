@@ -1,0 +1,1274 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Body Tapering</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Body Tapering</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.067.html">Face Tapering</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.069.html">Patching</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-690982">67.1	Introduction </A>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-1417052">67.2	Calling PK_BODY_taper</A>
+<UL>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-309235">67.2.1	Specifying a parting body </A>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-1417325">67.2.2	Specifying reference entities and taper angles </A>
+<UL>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-1600494">67.2.2.1	References edges and draw convexity </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-752777">67.3	Summary of PK_BODY_taper options </A>
+<UL>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-1422069">67.3.1	Specifying taper methods </A>
+</UL>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-1417541">67.4	Mitering</A>
+<UL>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-753572">67.4.1	Specifying miter information </A>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-310916">67.4.2	Suppressing mitering information </A>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-311191">67.4.3	Repairing concave miter corners </A>
+</UL>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-311653">67.5	 Tapering sharp corners</A>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-311816">67.6	Improving performance by specifying parting edges </A>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-311894">67.7	Improving results by modifying the list of reference edges</A>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-312210">67.8	Enabling undercut </A>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-1418455">67.9	Calculating virtual reference edges from bound faces </A>
+<LI> <A HREF="fd_chap.068.html#50422143_pgfId-312643">67.10	Keeping protruding material </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-690982"></A>67.1	<A NAME="50422143_31282"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-325317"></A><A NAME="50422143_37443"></A><A NAME="50422143_18895"></A><A NAME="50422143_82647"></A><A NAME="50422143_marker-308979"></A><A NAME="50422143_marker-308980"></A>This chapter describes how <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> provides functionality to apply tapering to a solid body, making it particularly easy to design parted molds.</P>
+<P>
+<A NAME="50422143_pgfId-925138"></A>In body tapering, a <STRONG>
+parting body</STRONG> (usually a sheet) is used to indicate a division in the body to be tapered. When designing molds, the parting body represents the division between the two halves of the mold. Two general tapering operations are possible with <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A>:</P>
+<UL>
+<LI>
+<A NAME="50422143_pgfId-1416887"></A><STRONG>
+Single-sided tapering</STRONG>, in which taper is applied either above or below the parting body, but not both.</LI>
+<LI>
+<A NAME="50422143_pgfId-1416892"></A><STRONG>
+Double-sided tapering</STRONG>, in which taper is applied to the body to be tapered both above and below the parting body.</LI>
+</UL>
+<P>
+<A NAME="50422143_pgfId-1416896"></A>Examples of both body tapering operations are shown in <A HREF="fd_chap.068.html#50422143_33060"><EM>
+Figure 67-1</EM></A>.</P>
+<P>
+<A NAME="50422143_pgfId-1416935"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-772.gif">
+
+<P>
+<A NAME="50422143_pgfId-1416937"></A>Figure 67-1 <A NAME="50422143_33060"></A>Single-sided and double-sided tapering</P>
+<P>
+<A NAME="50422143_pgfId-308987"></A>For double-sided tapering, <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> also provides support for <STRONG>
+mitering</STRONG>, whereby material is added to the tapered body such that tapered faces in the resulting body meet at the parting sheet.</P>
+<P>
+<A NAME="50422143_pgfId-308991"></A><A HREF="fd_chap.068.html#50422143_95072"><EM>
+Figure 67-2</EM></A> shows, in cross-section, a double-sided taper of a block with an intersecting parting body. In order to be able to draw the block from the mold, only some parts of the block need to be tapered (<A HREF="fd_chap.068.html#50422143_95072"><EM>
+Figure 67-2</EM></A>(a)). However, additional material must also be added (<A HREF="fd_chap.068.html#50422143_95072"><EM>
+Figure 67-2</EM></A>(b)) in order to ensure that the tapered faces meet at the parting body. </P>
+<P>
+<A NAME="50422143_pgfId-620312"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-773.gif">
+
+<P>
+<A NAME="50422143_pgfId-309186"></A>Figure 67-2 <A NAME="50422143_95072"></A>Mitering a block so that tapered surfaces meet</P>
+<P>
+<A NAME="50422143_pgfId-1384320"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422143_pgfId-309189"></A>Note: The body tapering process attempts to simplify the resulting body as much as possible. As a result, any features that are completely consumed by a taper face will no longer be present in the tapered body. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422143_pgfId-691343"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\LOP\Body</CODE>
+ <CODE>
+Taper</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422143_pgfId-737594"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422143_pgfId-737608"></A>Note: This functionality does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422143_pgfId-689036"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1391923"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422143_pgfId-688721"></A><A HREF="fd_chap.067.html#50422142_22949">Chapter 66, “Face Tapering”</A></LI>
+<LI>
+<A NAME="50422143_pgfId-688702"></A><A HREF="fd_chap.073.html#50422148_">Chapter 72, “Generic Face Editing”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-1417052"></A>67.2	<A NAME="50422143_44355"></A>Calling <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A>
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-1417053"></A>In order to perform body tapering, you need to specify the following:</P>
+<P>
+<A NAME="50422143_pgfId-766652"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417056"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417058"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-1417060"></A><CODE>body</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417062"></A>A solid body to be tapered.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-1417064"></A><CODE>parting_body</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417068"></A>A body that is used to indicate a division in the body to be tapered. See <A HREF="fd_chap.068.html#50422143_98639">Section 67.2.1, “Specifying a parting body”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1597820"></A><CODE>
+n_refs_above<BR>
+refs_above</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417075"></A>A list of reference entities above the parting body. See <A HREF="fd_chap.068.html#50422143_39755">Section 67.2.2, “Specifying reference entities and taper angles”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1597889"></A><CODE>
+n_refs_below <BR>
+refs_below</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417082"></A>A list of reference entities below the parting body. See <A HREF="fd_chap.068.html#50422143_39755">Section 67.2.2, “Specifying reference entities and taper angles”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1598027"></A><CODE>
+angle_below <BR>
+angle_above</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417087"></A>The taper angle above and below the parting body, respectively. See <A HREF="fd_chap.068.html#50422143_39755">Section 67.2.2, “Specifying reference entities and taper angles”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-1417092"></A><CODE>direction</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417094"></A>The draw direction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-1417096"></A><CODE>options</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417098"></A> A set of options that control the result of the tapering operation. See <A HREF="fd_chap.068.html#50422143_23239">Section 67.3, “Summary of <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> options”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422143_pgfId-309235"></A>	67.2.1 	<A NAME="50422143_98639"></A><A NAME="50422143_marker-309233"></A><A NAME="50422143_marker-309234"></A>Specifying a parting body </H3>
+<P>
+<A NAME="50422143_pgfId-1417203"></A>The <CODE>
+parting_body</CODE>
+ is used to indicate a division of the original body into halves “above” and “below” where it intersects the parting body, with respect to the draw direction, as shown in <A HREF="fd_chap.068.html#50422143_66949"><EM>
+Figure 67-3</EM></A>. You can supply any solid or sheet body as the <CODE>
+parting_body</CODE>
+ in a double-sided or single-sided taper so long as the body does not have through holes. The supplied <CODE>
+parting_body</CODE>
+ must:</P>
+<UL>
+<LI>
+<A NAME="50422143_pgfId-1417204"></A>Be large enough to intersect the tapered faces in the final tapered body.</LI>
+<LI>
+<A NAME="50422143_pgfId-1417205"></A>Slice the original body completely (if performing a double-sided taper).</LI>
+<LI>
+<A NAME="50422143_pgfId-1417206"></A>Lie below the reference edges if performing a single-sided taper from above or lie above the reference edges if performing a single-sided taper from below.</LI>
+</UL>
+<P>
+<A NAME="50422143_pgfId-887389"></A>You need to supply reference entities and taper angles appropriate to either a double- or a single-sided taper, as discussed in <A HREF="fd_chap.068.html#50422143_39755">Section 67.2.2, “Specifying reference entities and taper angles”</A>.</P>
+<P>
+<A NAME="50422143_pgfId-910080"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-774.gif">
+
+<P>
+<A NAME="50422143_pgfId-309330"></A>Figure 67-3 <A NAME="50422143_66949"></A>Dividing the original body in halves “above” and “below” the parting body</P>
+<P>
+<A NAME="50422143_pgfId-621462"></A>If you use a solid parting body, the tapered body unites the parting body after the tapering operation, as shown in as shown in <A HREF="fd_chap.068.html#50422143_11579"><EM>
+Figure 67-4</EM></A></P>
+<P>
+<A NAME="50422143_pgfId-504137"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-775.gif">
+
+<P>
+<A NAME="50422143_pgfId-309503"></A>Figure 67-4 <A NAME="50422143_11579"></A>Specifying a solid parting body</P>
+<P>
+<A NAME="50422143_pgfId-309504"></A>You can specify that the body itself be used as the parting body, for either single-singled (a) or double-sided (b) tapering. This is illustrated in <A HREF="fd_chap.068.html#50422143_67325"><EM>
+Figure 67-5</EM></A> where the isocline curves have been generated using <A HREF=../headers/pk_face_imprint_cus_isoclin.html>PK_FACE_imprint_cus_isoclin</A> as described in <A HREF="fd_chap.067.html#50422142_31282">Section 66.1, “Introduction”</A>. </P>
+<P>
+<A NAME="50422143_pgfId-622019"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-776.gif">
+
+<P>
+<A NAME="50422143_pgfId-309806"></A>Figure 67-5 <A NAME="50422143_67325"></A>Single-and double-sided tapering using the body itself as the parting body</P>
+
+
+<H3>
+<A NAME="50422143_pgfId-1417325"></A>	67.2.2 	<A NAME="50422143_39755"></A><A NAME="50422143_marker-309812"></A><A NAME="50422143_marker-309813"></A><A NAME="50422143_marker-309814"></A><A NAME="50422143_marker-309815"></A><A NAME="50422143_marker-309816"></A><A NAME="50422143_marker-309817"></A><A NAME="50422143_marker-309818"></A>Specifying reference entities and taper angles </H3>
+<P>
+<A NAME="50422143_pgfId-1483238"></A>You need to supply a list of reference entities and a taper angle when you are tapering a body. The techniques that you use to create reference entities in face tapering operations can be used for body tapering. See <A HREF="fd_chap.067.html#50422142_14026">Section 66.1.3, “Reference entities”</A> for more information. </P>
+<P>
+<A NAME="50422143_pgfId-1576912"></A>If you choose to taper the half that is above the <CODE>
+parting_body</CODE>
+ you need to supply <CODE>
+refs_above</CODE>
+ and <CODE>
+angle_above</CODE>
+. If you choose to taper the half that is below the <CODE>
+parting_body</CODE>
+ you need to supply <CODE>
+refs_below</CODE>
+ and <CODE>
+angle_below</CODE>
+. If you choose to taper both above and below the <CODE>
+parting_body,</CODE>
+ you need to supply information to all four of these options. </P>
+<P>
+<A NAME="50422143_pgfId-309821"></A>The reference entities supplied must be edges on the body to be tapered, with the following constraints:</P>
+<UL>
+<LI>
+<A NAME="50422143_pgfId-1417381"></A>A reference edge should not cross a face in the parting body unless the following options are supplied:</LI>
+<UL>
+<LI>
+<A NAME="50422143_pgfId-1417382"></A><CODE>
+refs_above</CODE>
+, <CODE>
+angle_above</CODE>
+. <CODE>
+refs_below</CODE>
+ and <CODE>
+angle_below</CODE>
+</LI>
+<LI>
+<A NAME="50422143_pgfId-1417383"></A><CODE>
+miter_at_parting</CODE>
+ is set to PK_LOGICAL_true</LI>
+<LI>
+<A NAME="50422143_pgfId-1297945"></A><CODE>
+miter_type</CODE>
+ is set to PK_taper_miter_to_face_c</LI>
+</UL>
+<LI>
+<A NAME="50422143_pgfId-1417402"></A>Each reference edge should be adjacent to a face that is to be tapered.</LI>
+<LI>
+<A NAME="50422143_pgfId-1234484"></A>A reference edge cannot be self-shadowing (i.e cast a shadow on itself). See <A HREF="fd_chap.068.html#50422143_79373">Section 67.2.2.1, “References edges and draw convexity”</A> for more information.</LI>
+</UL>
+<P>
+<A NAME="50422143_pgfId-309825"></A>The reference entities you supply can be connected or unconnected. A sequence of one or more connected reference entities is often called a <EM>
+chain</EM> of reference entities. </P>
+<UL>
+<LI>
+<A NAME="50422143_pgfId-309826"></A>Chains of reference entities may be either open or closed (that is, the last entity in the list is connected to the first entity).</LI>
+<LI>
+<A NAME="50422143_pgfId-309827"></A>You can supply several disconnected chains of reference entities.</LI>
+<LI>
+<A NAME="50422143_pgfId-309828"></A>Multiple chains of reference entities can either be independent from each other, or can interact (that is, the taper faces resulting from each chain may interact with each other). <A HREF="fd_chap.068.html#50422143_38591"><EM>
+Figure 67-6</EM></A> shows several examples of multiple chains of reference edges that interact with each other. </LI>
+</UL>
+<P>
+<A NAME="50422143_pgfId-622534"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-777.gif">
+
+<P>
+<A NAME="50422143_pgfId-310140"></A>Figure 67-6 -<A NAME="50422143_38591"></A>Multiple interacting reference edges</P>
+<P>
+<A NAME="50422143_pgfId-1417483"></A>The effect of double-sided tapering on a body not only depends on the reference entities you supply, but also on whether you miter the taper so that the tapered faces meet at the parting body. <A HREF="fd_chap.068.html#50422143_43771"><EM>
+Figure 67-7</EM></A>, shows the different effects that you can achieve by tapering a block, and specifying reference edges on both sides of the parting body. See <A HREF="fd_chap.068.html#50422143_11157">Section 67.4, “MiteringDOC2011”</A>, for information on how you miter the taper.</P>
+<P>
+<A NAME="50422143_pgfId-883367"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422143_pgfId-1417486"></A>Note: The reference entities supplied to <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> are preserved during the operation, but can be split and deleted when mitering in a double-sided taper operation.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422143_pgfId-623031"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-778.gif">
+
+<P>
+<A NAME="50422143_pgfId-310422"></A>Figure 67-7 <A NAME="50422143_43771"></A>The effect of different reference entities and mitering on a body<A NAME="50422143_69949"></A></P>
+
+<H4>
+<A NAME="50422143_pgfId-1600494"></A>67.2.2.1 <A NAME="50422143_79373"></A>References edges and draw convexity </H4>
+<P>
+<A NAME="50422143_pgfId-1603221"></A>If you choose to use isocline curves as reference edges, there may be times when the edge is self-shadowing (ie. casts a shadow on itself). In these cases, <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> returns <A HREF=../headers/pk_local_status_t.html>PK_local_status_self_shadowing_c</A> in the returned <CODE>
+status</CODE>
+, and the self-shadowing reference edges in the returned <CODE>
+error_entities</CODE>
+. You can identify the self-shadowing parts of the isocline curves by splitting them at points where the draw convexity changes using the <CODE>
+isocline_split</CODE>
+ option in <A HREF=../headers/pk_face_imprint_cus_isoclin.html>PK_FACE_imprint_cus_isoclin</A>. </P>
+<P>
+<A NAME="50422143_pgfId-1603530"></A>The <STRONG>
+draw convexity</STRONG> is the convexity of the face in the cross-sectional plane defined by the surface normal and the draw direction. At points where the draw convexity is concave the taper surface cuts into the body being tapered and creates self-shadowing reference edges.</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-752777"></A>67.3	<A NAME="50422143_69465"></A><A NAME="50422143_23239"></A>Summary of PK_<A NAME="50422143_marker-752774"></A><A NAME="50422143_marker-752775"></A><A NAME="50422143_marker-752776"></A>BODY_taper options 
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-752778"></A><A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> takes a set of options in <A HREF=../headers/pk_body_taper_o_t.html>PK_BODY_taper_o_t</A>. The available options are as follows:</P>
+<P>
+<A NAME="50422143_pgfId-752895"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752781"></A>Option</PRE>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-752783"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752785"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419104"></A>Maximum tolerance for the operation.</P>
+<P>
+<A NAME="50422143_pgfId-772338"></A>Default: 1.0e-5.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752789"></A>miter_at_parting</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419109"></A>Whether to create miter faces to ensure that taper surfaces meet at the parting body. See <A HREF="fd_chap.068.html#50422143_59252">Section 67.4.1, “Specifying miter information”</A> for more information. </P>
+<P>
+<A NAME="50422143_pgfId-772195"></A>Default: PK_LOGICAL_true.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752796"></A>miter_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419114"></A>The method to use when creating miter faces. See <A HREF="fd_chap.068.html#50422143_59252">Section 67.4.1, “Specifying miter information”</A> for more information. </P>
+<P>
+<A NAME="50422143_pgfId-772204"></A>Default: PK_taper_miter_on_ref_c.</P>
+<ADDRESS>
+<A NAME="50422143_pgfId-752802"></A>Note: When <CODE>
+miter_type</CODE>
+ is PK_taper_miter_to_face_c, <CODE>
+non_miter_edges</CODE>
+ cannot be supplied.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752804"></A>non_miter_edges</PRE>
+<PRE><A NAME="50422143_pgfId-752805"></A>n_non_miter_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419122"></A>An array of reference edges on which taper faces should be constructed as if <CODE>
+miter_at_parting</CODE>
+ was set to PK_LOGICAL_false, together with the number of those faces. See <A HREF="fd_chap.068.html#50422143_99252">Section 67.4.2, “Suppressing mitering information”</A> for more information.</P>
+<P>
+<A NAME="50422143_pgfId-772213"></A>Defaults: NULL, 0.</P>
+<ADDRESS>
+<A NAME="50422143_pgfId-752808"></A>Note: When <CODE>
+miter_type</CODE>
+ is PK_taper_miter_to_face_c, <CODE>
+non_miter_edges</CODE>
+ cannot be supplied.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752810"></A>merge_face</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419132"></A>Whether tapered faces should be merged with their neighbours. </P>
+<P>
+<A NAME="50422143_pgfId-772222"></A>Default: PK_LOGICAL_true.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752814"></A>check_fa_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419137"></A>Whether to check for face-face inconsistencies. </P>
+<P>
+<A NAME="50422143_pgfId-772231"></A>Default: <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_yes_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752818"></A>default_method</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419145"></A>Default taper method to use on reference entities not specified in <CODE>
+method_refs</CODE>
+. See <A HREF="fd_chap.067.html#50422142_57713">Section 66.3, “Taper methods”</A> for more information.</P>
+<P>
+<A NAME="50422143_pgfId-776675"></A>Default: <A HREF=../headers/pk_taper_method_t.html>PK_taper_method_isocline_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752822"></A>n_methods</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419155"></A>Number of reference entities that do not use the specified <CODE>
+default_method</CODE>
+. This is the length of the <CODE>
+methods</CODE>
+ and <CODE>
+method_refs</CODE>
+ arrays. </P>
+<P>
+<A NAME="50422143_pgfId-772244"></A>Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752826"></A>methods</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419160"></A>An array containing tapering methods to use on reference entities instead of the specified <CODE>
+default_method</CODE>
+. The reference entities themselves are supplied in <CODE>
+method_refs</CODE>
+. </P>
+<P>
+<A NAME="50422143_pgfId-1419165"></A>Default: NULL.</P>
+<ADDRESS>
+<A NAME="50422143_pgfId-1477715"></A>See <A HREF="fd_chap.068.html#50422143_47986">Section 67.3.1, “Specifying taper methods”</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752830"></A>method_refs</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419174"></A>An array of reference entities for which the <CODE>
+default_method</CODE>
+ should not be used. Instead, the taper method specified in the corresponding element of methods is used. </P>
+<P>
+<A NAME="50422143_pgfId-772262"></A>Default: NULL.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752834"></A>corner_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419179"></A>How the gap between adjacent taper faces is filled. See <A HREF="fd_chap.068.html#50422143_22172">Section 67.5, “Tapering sharp cornersDOC0914”</A> for details.</P>
+<P>
+<A NAME="50422143_pgfId-776753"></A>Default: PK_taper_corner_extend_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752841"></A>parting_edges</PRE>
+<PRE><A NAME="50422143_pgfId-752842"></A>n_parting_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419187"></A>An array of all the edges of the body to be tapered that lie on the parting body, together with the number of those edges. See <A HREF="fd_chap.068.html#50422143_36178">Section 67.6, “Improving performance by specifying parting edges”</A> for more information.</P>
+<P>
+<A NAME="50422143_pgfId-772271"></A>Defaults: NULL, 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752846"></A>replace_edges</PRE>
+<PRE><A NAME="50422143_pgfId-752847"></A>n_replace_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419195"></A>An array of non-reference edges (together with the number of those edges) that can be replaced by the body taper operation, in order to allow adjacent faces to be extended to meet the taper faces. See <A HREF="fd_chap.068.html#50422143_33185">Section 67.7, “Improving results by modifying the list of reference edgesDOC0981”</A> for more information.</P>
+<P>
+<A NAME="50422143_pgfId-772280"></A>Defaults: NULL, 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752851"></A>undercut</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419203"></A>What action to take when undercut is detected. See <A HREF="fd_chap.068.html#50422143_19532">Section 67.8, “Enabling undercut”</A> for more information.</P>
+<P>
+<A NAME="50422143_pgfId-776927"></A>Default: <A HREF=../headers/pk_taper_undercut_t.html>PK_taper_undercut_ref_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752855"></A>upper_faces</PRE>
+<PRE><A NAME="50422143_pgfId-752856"></A>n_upper_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419240"></A>An array of faces (together with the number of faces) from whose upper bounds reference edges are calculated for the body taper. See <A HREF="fd_chap.068.html#50422143_75237">Section 67.9, “Calculating virtual reference edges from bound faces”</A>, for more information. </P>
+<P>
+<A NAME="50422143_pgfId-777007"></A>Defaults: NULL, 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752863"></A>lower_faces</PRE>
+<PRE><A NAME="50422143_pgfId-752864"></A>n_lower_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419263"></A>An array of faces (together with the number of faces) from whose lower bounds reference edges are calculated for the body taper. See <A HREF="fd_chap.068.html#50422143_75237">Section 67.9, “Calculating virtual reference edges from bound faces”</A>, for more information. </P>
+<P>
+<A NAME="50422143_pgfId-777046"></A>Defaults: NULL, 0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752871"></A>concave_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419286"></A>Which method to use when repairing miter at concave corners. See <A HREF="fd_chap.068.html#50422143_67525">Section 67.4.3, “Repairing concave miter corners”</A>, for more information. </P>
+<P>
+<A NAME="50422143_pgfId-772291"></A>Default: PK_taper_concave_none_c. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752878"></A>concave_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419312"></A>The radius of the blend surface that is used to repair miter at concave corners at the point where it intersects the parting body. This option only has an effect if <CODE>
+concave_type</CODE>
+ is either PK_taper_concave_radius_c or PK_taper_concave_mix_c. See <A HREF="fd_chap.068.html#50422143_67525">Section 67.4.3, “Repairing concave miter corners”</A> for more information.</P>
+<P>
+<A NAME="50422143_pgfId-772309"></A>Default: 0.0.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752882"></A>keep_material</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419320"></A>Whether to keep regions of material lying between the reference entities and the parting body that would protrude from the tapered faces. See <A HREF="fd_chap.068.html#50422143_55025">Section 67.10, “Keeping protruding material”</A> for more information.</P>
+<P>
+<A NAME="50422143_pgfId-772318"></A>Default: <A HREF=../headers/pk_taper_keep_material_t.html>PK_taper_keep_material_no_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422143_pgfId-752886"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1419325"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. See <A HREF="fd_chap.063.html#50422138_36784">Section 62.5.2, “Update control”</A>, for more information. </P>
+<P>
+<A NAME="50422143_pgfId-1174004"></A>Default: <A HREF=../headers/pk_local_ops_update_t.html>PK_local_ops_update_default_c</A>.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422143_pgfId-1422069"></A>	67.3.1 	<A NAME="50422143_47986"></A><A NAME="50422143_marker-310424"></A><A NAME="50422143_marker-310425"></A><A NAME="50422143_marker-310426"></A><A NAME="50422143_marker-310427"></A>Specifying taper methods </H3>
+<ADDRESS>
+<A NAME="50422143_pgfId-1599158"></A><A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> supports the isocline, curve, and surface taper methods. It does <EM>
+not</EM> support offset tapering. The default method is isocline tapering, but you can specify one of the other tapering methods, either for the entire body, or for individual reference entities within the body. See <A HREF="fd_chap.067.html#50422142_57713">Section 66.3, “Taper methods”</A>, for information on how you do this.</ADDRESS><BR>
+<P>
+<A NAME="50422143_pgfId-1601674"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422143_pgfId-1601686"></A>Note: When using the default method for <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A>, it is recommended that you imprint the isocline curves using <A HREF=../headers/pk_face_imprint_cus_isoclin.html>PK_FACE_imprint_cus_isoclin</A> with the <CODE>
+isocline_split</CODE>
+ option set to <A HREF=../headers/pk_isocline_split_t.html>PK_isocline_split_convexity_c</A>. This ensures that isoclines will be split at the points where the draw convexity changes, thereby creating better quality reference edges. For more information, see <A HREF="fd_chap.068.html#50422143_79373">Section 67.2.2.1, “References edges and draw convexity”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-1417541"></A>67.4	<A NAME="50422143_11157"></A>Mitering
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-1417542"></A><A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> provides support for mitering. When mitering, material is added to the tapered body so that tapered faces in the resulting body meet at the parting body. This section describes how to specify or suppress mitering information and how to repair concave corners created from mitering.</P>
+<P>
+<A NAME="50422143_pgfId-888835"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422143_pgfId-1417545"></A>Note: Mitering can only be used in double-sided tapering. If you are performing a single-sided taper operation, you must set the <CODE>
+miter_at_parting</CODE>
+ option to PK_LOGICAL_false otherwise the taper operation will fail.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422143_pgfId-753572"></A>	67.4.1 	<A NAME="50422143_59252"></A><A NAME="50422143_marker-310438"></A><A NAME="50422143_marker-310439"></A><A NAME="50422143_marker-310440"></A>Specifying miter information </H3>
+<P>
+<A NAME="50422143_pgfId-310442"></A><A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> lets you choose whether or not to add additional material to ensure that each edge created on the parting sheet is shared by two tapered faces. Miter faces ensure that the tapered surfaces added to the body above and below the parting body actually meet at a common edge on the parting body, as shown in <A HREF="fd_chap.068.html#50422143_95072"><EM>
+Figure 67-2</EM></A>.</P>
+<P>
+<A NAME="50422143_pgfId-310446"></A><A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> also lets you control how those miter faces are created using the <CODE>
+miter_type</CODE>
+ option:</P>
+<UL>
+<LI>
+<A NAME="50422143_pgfId-310447"></A><STRONG>
+On ref:</STRONG> When set to PK_taper_miter_on_ref_c, tapered faces are created from the specified reference edges to achieve a mitering effect. The boundary of each tapered face includes a reference edge or an edge split from an original reference edge.</LI>
+<LI>
+<A NAME="50422143_pgfId-623658"></A><STRONG>
+To face:</STRONG> When set to PK_taper_miter_to_face_c, tapered faces are created so that they meet the remaining faces in the body tangentially whenever possible. The reference edges corresponding to these tapered faces are deleted and replaced by edges that form the tangent lines.</LI>
+</UL>
+<P>
+<A NAME="50422143_pgfId-641562"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422143_pgfId-641568"></A>Note: When using PK_taper_miter_to_face_c, <CODE>
+non_miter_edges</CODE>
+ cannot be supplied. See <A HREF="fd_chap.068.html#50422143_99252">Section 67.4.2, “Suppressing mitering information”</A>, for more information on <CODE>
+non_miter_edges</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422143_pgfId-623662"></A><A HREF="fd_chap.068.html#50422143_79419"><EM>
+Figure 67-8</EM></A> shows the difference between the “On ref” and “To face” methods, using a sphere as an example.</P>
+<P>
+<A NAME="50422143_pgfId-623789"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-779.gif">
+
+<P>
+<A NAME="50422143_pgfId-1417636"></A>Figure 67-8 <A NAME="50422143_79419"></A>Different methods for creating a mitered effect</P>
+<P>
+<A NAME="50422143_pgfId-310627"></A>Miter faces are bound by reference edges where possible, but in any open parts of the chain of reference edges, the miter face is made tangent to the face that meets the parting body. <A HREF="fd_chap.068.html#50422143_76803"><EM>
+Figure 67-9</EM></A> shows a cylinder in which this combination of methods is used. In order to ensure that tapered faces meet at the parting body, miter faces need to be applied above the parting body where the reference edges do not form a complete chain. The non-mitered version of this body is also shown for comparison.</P>
+<P>
+<A NAME="50422143_pgfId-623990"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-780.gif">
+
+<P>
+<A NAME="50422143_pgfId-310903"></A>Figure 67-9 <A NAME="50422143_76803"></A>Combining “On ref” and “To face” mitering</P>
+<P>
+<A NAME="50422143_pgfId-310907"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422143_pgfId-310906"></A>Note: Mitering is not possible if you use a solid parting body.It is only supported when supplying a sheet parting body.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422143_pgfId-310916"></A>	67.4.2 	<A NAME="50422143_99252"></A><A NAME="50422143_marker-310913"></A><A NAME="50422143_marker-310914"></A><A NAME="50422143_marker-310915"></A>Suppressing mitering information </H3>
+<P>
+<A NAME="50422143_pgfId-310920"></A>If you have specified miter information, as described in <A HREF="fd_chap.068.html#50422143_59252">Section 67.4.1</A>, then you can also choose to suppress mitering along certain reference edges using the <CODE>
+non_miter_edges</CODE>
+ option. The taper faces along these reference edges are created as if no miter information had been specified, thus creating a non-mitered solution along those edges, while retaining a mitered solution along the remaining reference edges. </P>
+<P>
+<A NAME="50422143_pgfId-512003"></A>In <A HREF="fd_chap.068.html#50422143_53723"><EM>
+Figure 67-10</EM></A>, the taper faces above the parting body all require mitering in order to meet the taper faces below the parting body. By specifying that one of these reference edges should be non-mitered, you can suppress the mitering effect on just that taper face, as shown.</P>
+<P>
+<A NAME="50422143_pgfId-624367"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-781.gif">
+
+<P>
+<A NAME="50422143_pgfId-311047"></A>Figure 67-10 <A NAME="50422143_53723"></A>Suppressing miter information along some reference edges</P>
+<P>
+<A NAME="50422143_pgfId-311051"></A>Parasolid creates a triangular side face in cases where there is a shallow angle between a non-mitered edge and a mitered edge, as shown in <A HREF="fd_chap.068.html#50422143_59556"><EM>
+Figure 67-11</EM></A></P>
+<P>
+<A NAME="50422143_pgfId-624705"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-782.gif">
+
+<P>
+<A NAME="50422143_pgfId-311185"></A>Figure 67-11 <A NAME="50422143_59556"></A>Creating side faces between mitered and non-mitered edges</P>
+
+
+<H3>
+<A NAME="50422143_pgfId-311191"></A>	67.4.3 	<A NAME="50422143_67525"></A>Repairing concave miter corners </H3>
+<P>
+<A NAME="50422143_pgfId-311192"></A>Sometimes, adding miter information creates concave corners in the resulting body that at best are undesirable, and at worst can prevent the taper operation from completing successfully. Parasolid automatically repairs these concave corners and, in addition, gives you control over the method used to smooth the repair using the <CODE>
+concave_type</CODE>
+ option along with an associated <CODE>
+concave_radius</CODE>
+. </P>
+<P>
+<A NAME="50422143_pgfId-1417717"></A><A HREF="fd_chap.068.html#50422143_41835"><EM>
+Figure 67-12</EM></A> shows a sloping cylinder (and a parting body) together with the body that results from applying a non-mitered double-sided taper to it. The regions that cause concave corners requiring repair during the miter process are indicated.</P>
+<P>
+<A NAME="50422143_pgfId-1390939"></A><A NAME="50422143_16623"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-783.gif">
+
+<P>
+<A NAME="50422143_pgfId-1390941"></A>Figure 67-12 <A NAME="50422143_41835"></A>Concave corners requiring repair in order to add miter information</P>
+<P>
+<A NAME="50422143_pgfId-1417804"></A>The <CODE>
+concave_type</CODE>
+ option has the following values:</P>
+<P>
+<A NAME="50422143_pgfId-890793"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417807"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417809"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417811"></A>PK_taper_concave_none_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417813"></A>No attempt is made to smooth the repair. Default</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417815"></A>PK_taper_concave_radius_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417817"></A>The repair is smoothed by replacing the imprints at the concave corner with the intersection curves between the parting body and a contact cylinder whose radius is specified in <CODE>
+concave_radius</CODE>
+, and with an axis parallel to the draw direction. The overall appearance of the repair is that the concave corner has been replaced by a blend-like face. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417819"></A>PK_taper_concave_mix_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417821"></A>The repair is smoothed by combining the other two methods. The imprints at the concave corner are replaced by the intersection curves between the parting body and a combination of contact planes and a contact cylinder, whose radius is given by <CODE>
+concave_radius</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422143_pgfId-1577110"></A><A HREF="fd_chap.068.html#50422143_11140"><EM>
+Figure 67-13</EM></A> illustrates the results of applying these values to the tapered body in <A HREF="fd_chap.068.html#50422143_41835"><EM>
+Figure 67-12</EM></A>. The resulting body produced by each smoothing method is shown on the left of the figure. On the right of the figure is a schematic that illustrates the cross-section of the repaired region with the parting body for that method. In each case, the cross-section of the unmitered solution is also shown for comparison. </P>
+<P>
+<A NAME="50422143_pgfId-1399925"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-784.gif">
+
+<P>
+<A NAME="50422143_pgfId-311644"></A>Figure 67-13 <A NAME="50422143_11140"></A>The effect of different types of concave corner repair</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-311653"></A>67.5	<A NAME="50422143_22172"></A><A NAME="50422143_marker-1492805"></A><A NAME="50422143_marker-1492806"></A><A NAME="50422143_marker-1492807"></A> Tapering sharp corners
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-1417969"></A>When you specify adjacent edges as reference edges, you can choose how to fill any gaps that are created in the corners between the resulting adjacent tapered faces using the <CODE>
+corner_type</CODE>
+ option. This takes the following values:</P>
+<P>
+<A NAME="50422143_pgfId-1417983"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417972"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417974"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417976"></A>PK_taper_corner_extend_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417978"></A>Extend the surfaces of the adjacent taper faces until they intersect. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417980"></A>PK_taper_corner_plane_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1417982"></A>Create a planar face to fill the gap.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422143_pgfId-311660"></A>These are illustrated in <A HREF="fd_chap.068.html#50422143_74556"><EM>
+Figure 67-14</EM></A>.</P>
+<P>
+<A NAME="50422143_pgfId-625266"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-785.gif">
+
+<P>
+<A NAME="50422143_pgfId-311807"></A>Figure 67-14 <A NAME="50422143_74556"></A>Different methods of filling the gap between adjacent taper faces</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-311816"></A>67.6	<A NAME="50422143_36178"></A><A NAME="50422143_marker-311813"></A><A NAME="50422143_marker-311814"></A><A NAME="50422143_marker-311815"></A>Improving performance by specifying parting edges 
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-311817"></A>You can improve the performance of body tapering by supplying an array of parting edges that describe where the parting body intersects the body to be tapered. Use PK_BODY_imprint_bodies to create this list, and supply it in <CODE>
+parting_edges</CODE>
+ to improve performance of the subsequent taper operation. </P>
+<P>
+<A NAME="50422143_pgfId-515178"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-786.gif">
+
+<P>
+<A NAME="50422143_pgfId-311883"></A>Figure 67-15 Specifying an array of parting edges to improve performance</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-311894"></A>67.7	<A NAME="50422143_33185"></A><A NAME="50422143_marker-1530472"></A><A NAME="50422143_marker-1530473"></A><A NAME="50422143_marker-1530474"></A><A NAME="50422143_marker-1530475"></A><A NAME="50422143_marker-1530476"></A>Improving results by modifying the list of reference edges
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-311895"></A>Sometimes you may not get the result you want by supplying all of the edges in a chain as reference edges. Parasolid lets you supply some of those edges as <CODE>
+replace_edges</CODE>
+ rather than as reference edges. Edges supplied as <CODE>
+replace_edges</CODE>
+ are not used to generate tapered surfaces, producing an improved result. This is illustrated in <A HREF="fd_chap.068.html#50422143_61708"><EM>
+Figure 67-16</EM></A> where (a) shows the result of a body taper where all the edges above the parting body are supplied as reference edges, and (b) shows the result when some of the edges are supplied as reference edges and some are supplied as replace edges.</P>
+<P>
+<A NAME="50422143_pgfId-1528415"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422143_pgfId-1528449"></A>Note: Edges supplied as <CODE>
+replace_edges</CODE>
+ cannot be supplied as reference edges.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422143_pgfId-625533"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-787.gif">
+
+<P>
+<A NAME="50422143_pgfId-312201"></A>Figure 67-16 <A NAME="50422143_61708"></A>Specifying <CODE>
+replace_edges</CODE>
+ so that adjacent faces can be extended to meet taper faces</P>
+<P>
+<A NAME="50422143_pgfId-1528964"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1529028"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422143_pgfId-1529001"></A><A HREF="fd_chap.068.html#50422143_39755">Section 67.2.2, “Specifying reference entities and taper angles”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-312210"></A>67.8	<A NAME="50422143_19532"></A><A NAME="50422143_marker-892380"></A><A NAME="50422143_marker-892381"></A><A NAME="50422143_marker-892382"></A>Enabling undercut 
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-1418291"></A>In some cases, material needs to be removed from some parts of a body, in order for body tapering to succeed. In tapering this is referred to as undercut and is illustrated in <A HREF="fd_chap.068.html#50422143_16960"><EM>
+Figure 67-17</EM></A>. </P>
+<P>
+<A NAME="50422143_pgfId-1418297"></A>To enable undercut, use the <CODE>
+undercut</CODE>
+ option, which takes the following values:</P>
+<P>
+<A NAME="50422143_pgfId-1418311"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418300"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418302"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418304"></A><A HREF=../headers/pk_taper_undercut_t.html>PK_taper_undercut_ref_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418306"></A>Do nothing (Default).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418308"></A><A HREF=../headers/pk_taper_undercut_t.html>PK_taper_undercut_ref_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418310"></A>Attempt to remove the undercut and proceed with the taper operation.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422143_pgfId-625740"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-788.gif">
+
+<P>
+<A NAME="50422143_pgfId-312283"></A>Figure 67-17 <A NAME="50422143_16960"></A>Undercut in single-sided body tapering </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-1418455"></A>67.9	<A NAME="50422143_75237"></A>Calculating virtual reference edges from bound faces 
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-905892"></A>If a body to be tapered does not contain suitable reference edges you can specify a set of faces from which Parasolid determines suitable virtual reference edges. This can happen when a suitable edge doesn’t exist, or where an edge is available but its curve contains a section that is deemed too steep for tapering. To specify a set of faces, you use either the <CODE>
+upper_faces</CODE>
+ or <CODE>
+lower_faces</CODE>
+ option (or both if you are doing a double-taper operation). These will specify a set of faces above (<CODE>
+upper_faces</CODE>
+) or below (<CODE>
+lower_faces</CODE>
+) the parting body using upper and lower bounds respectively. This is illustrated in <A HREF="fd_chap.068.html#50422143_81109"><EM>
+Figure 67-18</EM></A>.</P>
+<P>
+<A NAME="50422143_pgfId-625911"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-789.gif">
+
+<P>
+<A NAME="50422143_pgfId-312495"></A>Figure 67-18 <A NAME="50422143_81109"></A>Calculating virtual reference edges from the upper or lower bounds of faces</P>
+<P>
+<A NAME="50422143_pgfId-312499"></A>When determining virtual reference edges from upper or lower bounds, Parasolid can determine different sets of upper or lower edges that are local to each set of adjacent bound faces. For example, <A HREF="fd_chap.068.html#50422143_95668"><EM>
+Figure 67-19</EM></A> shows a body for which two sets of local upper and lower virtual reference edges have been determined, based on the two sets of adjacent bound faces in the body to be tapered. </P>
+<P>
+<A NAME="50422143_pgfId-626053"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-790.gif">
+
+<P>
+<A NAME="50422143_pgfId-312637"></A>Figure 67-19 <A NAME="50422143_95668"></A>Local virtual reference edges for different sets of adjacent bound faces</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422143_pgfId-312643"></A>67.10	<A NAME="50422143_55025"></A>Keeping protruding material 
+
+
+</H1>
+<P>
+<A NAME="50422143_pgfId-1418598"></A>By default, <A HREF=../headers/pk_body_taper.html>PK_BODY_taper</A> will remove faces and edges of the body that are &quot;between&quot; the reference entities and the parting sheet and replace them with the tapered faces. In cases where portions of the body would protrude from the tapered faces, this is not always desirable. The keep_material option allows you to keep these portions of the body if you choose; it takes the following values:</P>
+<P>
+<A NAME="50422143_pgfId-1418612"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418601"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418603"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418605"></A><A HREF=../headers/pk_taper_keep_material_t.html>PK_taper_keep_material_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418607"></A>Do not attempt to keep the material. (Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418609"></A><A HREF=../headers/pk_taper_keep_material_t.html>PK_taper_keep_material_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422143_pgfId-1418611"></A>Attempt to keep the material</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422143_pgfId-626194"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-791.gif">
+
+<P>
+<A NAME="50422143_pgfId-312811"></A>Figure 67-20 <A NAME="50422143_80993"></A>Effects of the keep_material option: retaining material</P>
+<P>
+<A NAME="50422143_pgfId-312815"></A><A HREF="fd_chap.068.html#50422143_80993"><EM>
+Figure 67-20</EM></A> shows an example where the effect of <A HREF=../headers/pk_taper_keep_material_t.html>PK_taper_keep_material_yes_c</A> is to ensure the faces of the original body are united with the newly created taper faces to create a result that retains the extra material. </P>
+<P>
+<A NAME="50422143_pgfId-626368"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-792.gif">
+
+<P>
+<A NAME="50422143_pgfId-312995"></A>Figure 67-21 <A NAME="50422143_81902"></A>Effects of the keep_material option: retaining protruding features</P>
+<P>
+<A NAME="50422143_pgfId-312999"></A>In <A HREF="fd_chap.068.html#50422143_81902"><EM>
+Figure 67-21</EM></A>, the effect of <A HREF=../headers/pk_taper_keep_material_t.html>PK_taper_keep_material_yes_c</A> is to keep the protruding features of the original body; the hole on the original body is removed in both cases. This example illustrates how the value of keep_material only affects protruding material; interior features such as holes are never kept.</P>
+<P>
+<A NAME="50422143_pgfId-313128"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.067.html">Face Tapering</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.069.html">Patching</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

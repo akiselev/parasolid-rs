@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_DEBUG_SESSION_watch_fns</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_DEBUG_SESSION_watch_fns</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>              PK_DEBUG_SESSION_watch_fns
+(
+<I>--- received arguments ---
+</I>int                          n_fns,            --- number of functions
+                                               --- to watch
+const char                  *fns[],            --- functions to watch
+<A HREF=../headers/pk_pointer_t.html>PK_POINTER_t</A>                 entry_context,    --- entry context information
+<A HREF=../headers/pk_pointer_t.html>PK_POINTER_t</A>                 exit_context,     --- exit context information
+<A HREF=../headers/pk_debug_session_entry_cb_t.html>PK_DEBUG_SESSION_entry_cb_t</A>  entry_fn,         --- entry callback
+                                               --- (may be NULL)
+<A HREF=../headers/pk_debug_session_exit_cb_t.html>PK_DEBUG_SESSION_exit_cb_t</A>   exit_fn           --- exit callback
+                                               --- (may be NULL)
+)
+</B>
+<A NAME="description"></A>
+<I>This function registers an array of PK functions that are to be watched
+via two application callback functions.
+</I>
+<A NAME="documentation"></A>
+
+The application may register an array of PK functions to watch via an
+entry and an exit callback function. If the number of functions to
+watch is zero, and at least one of the callback functions is not NULL
+then all functions are watched.
+
+If the entry callback function is not NULL, it will be invoked at the
+point when one of the watched functions is entered. If the exit
+callback is not NULL, it will be invoked at the point when one of the
+watched functions is exited. The name of the function being watched
+and <B>'entry_context'</B> or <B>'exit_context'</B> will be passed to each of the
+callback functions.
+
+This function may be called before or after the session has been
+started (ie. before or after a call to <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A>). This
+function must not be invoked before a frustrum has been registered via
+<A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A>. Those PK functions that are called from
+registered callback functions will not be watched.
+
+The system to watch functions may be disabled by invoking the API and
+specifying NULL for both the entry and the exit callback functions.
+
+See <A HREF="../chapters/fd_chap.102.html#50434469_pgfId-322863">here</A> for more information on this function.
+
+NOTE: This function is only to be used for debugging purposes.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

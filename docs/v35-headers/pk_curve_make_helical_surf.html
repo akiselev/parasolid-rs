@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_make_helical_surf</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_make_helical_surf</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>         PK_CURVE_make_helical_surf
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>              curve,          --- curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>           curve_interval, --- curve interval
+const <A HREF=../headers/pk_axis1_sf_t.html>PK_AXIS1_sf_t</A>    *axis,           --- axis
+<A HREF=../headers/pk_hand_t.html>PK_HAND_t</A>               hand,           --- handedness
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>           turns,          --- range of turns
+double                  helical_pitch,  --- height of a single turn
+double                  spiral_pitch,   --- increase in radius of a single turn
+double                  tolerance,      --- used in approximations
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>        *const surface         --- created surface
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a helix, tapered helix or spiral surface by sweeping a
+part of a curve about an axis. The surface will be created as a b_surface to
+a tolerance supplied by the user.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_tolerances_too_tight   The requested tolerance could not be met.
+                                    (MILD)
+    PK_ERROR_cant_make_bspline      The requested surface could not be made.
+                                    (SERIOUS)
+    PK_ERROR_bad_parameter          Implied negative distance from the axis.
+                                    (MILD)
+    PK_ERROR_bad_tolerance          The requested tolerance is less than the
+                                    session precision. (MILD)
+
+<A NAME="documentation"></A>
+The interval of the curve is swept around the axis to form a helix, tapered
+helix or spiral surface.
+
+The <B>'helical_pitch'</B> is the distance along the axis moved in one turn and the
+<B>'spiral_pitch'</B> is the distance moved away from the axis in one turn. These
+distances may be negative. The <B>'turns'</B> argument specifies how many complete
+revolutions the surface should make. Note that in general, unless both ends of
+the interval are whole numbers, the surface may extend beyond the required
+number of turns in both directions. The surface will be supplied as an
+approximate bsurface to the tolerance supplied.
+
+If the <B>'spiral_pitch'</B>  is zero then a helical sweep is produced.
+If the <B>'helical_pitch'</B> is zero then a spiral sweep is produced.
+If both are zero then error PK_ERROR_bad_parameter results.
+Otherwise a tapered helical sweep is produced.
+
+The <B>'turns'</B> argument need not include position 0.0 - the supplied curve, but
+must not imply a negative distance from the axis.
+
+If the <B>'hand'</B> argument is <A HREF=../headers/pk_hand_t.html>PK_HAND_right_c</A> then the curve will be swept
+clockwise when viewed along the axis.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

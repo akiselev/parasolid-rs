@@ -1,0 +1,202 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_section_with_sheet_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_section_with_sheet_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_FACE_section_with_sheet_2
+(
+<I>--- received arguments ---
+</I>int                            n_targets,  --- number of target faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                targets[],  --- target faces
+int                            n_tools,    --- number of tool faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                tools[],    --- tool faces
+const <A HREF=../headers/pk_face_section_o_t.html>PK_FACE_section_o_t</A>     *options,    --- sectioning options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>      *const tracking,   --- tracking information
+<A HREF=../headers/pk_section_2_r_t.html>PK_section_2_r_t</A>        *const results     --- front/back faces/bodies
+)
+</B>
+<A NAME="description"></A>
+<I>This function sections selected regions of the target body with
+selected regions of the tool sheet body.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_contradictory_request      Bad combination of options or
+                                        data for type of boolean
+    PK_ERROR_missing_geom               Target or tool has incomplete
+                                        geometry
+    PK_ERROR_wire_body                  Target or tool is a wire body
+    PK_ERROR_partial_coi_found          Boolean failure due to to partial
+                                        coincidence
+    PK_ERROR_general_body               Target or tool is general body
+    PK_ERROR_same_tool_and_target       Tool body is also target body
+    PK_ERROR_instanced_tools            Instanced tool bodies
+    PK_ERROR_not_sheet                  Tool is not a sheet body
+    PK_ERROR_unsuitable_topology        A region selector is from boundary,
+                                        wrong body or ambiguous
+    PK_ERROR_partial_no_intersect       No imprinting in face boolean
+    PK_ERROR_boolean_failure            Inconsistent arguments, or
+                                        internal error
+
+
+<A NAME="documentation"></A>
+
+
+Introduction
+
+The given target body is sectioned with the given tool sheet body.
+
+When the section sheet body intersects with the target body, the body will
+be split, by the sheet faces, into two or more parts. The resulting
+bodies are split into two lists, those in front of the section sheet
+and those behind it. These bodies are returned in the <B>'front_bodies'</B> and
+<B>'back_bodies'</B> arrays of the <B>'results'</B> structure. All new faces associated
+with these bodies which lie in the sectioning sheet are returned in the
+<B>'front_faces'</B> and <B>'back_faces'</B> arrays of the <B>'results'</B> structure.
+
+The front of the section sheet is regarded as the side to which the
+face normals point.
+
+Any body unaffected by the sectioning operation will be left unchanged,
+but will be put into the appropriate array within the <B>'results'</B> structure.
+
+The operation of the sheet sectioning function may be controlled via
+an option structure passed to the function as an input argument.
+
+This function operates similarly to the <B>'<A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>'</B> function,
+especially with regard to the phases of the boolean algorithm, the
+region selectors and  rules concerning tag persistence. Refer to the
+<B>'<A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>'</B> documentation for information about these subjects.
+
+
+Section Options
+
+The function can be instructed, via the <B>'fence'</B> option, to :
+
+o Only calculate the bodies and faces in front of the section sheet.
+o Only calculate the bodies and faces behind the section sheet.
+o Calculate the bodies and faces in front and behind the section sheet.
+
+
+Status and Fault Reporting
+
+If the function returns an error code, PK_ERROR_not_sheet for example,
+none of the return arguments of the function will be set. This is standard
+practice for the PK interface. However, this is not the only mechanism by
+which this function may indicate that a failure has occurred. The <B>'results'</B>
+structure may return failure related information as well.
+
+Whenever the function returns <B>'PK_ERROR_no_errors'</B>, the application must
+inspect the contents of the <B>'results'</B> structure to check on the status of
+the section operation. The <B>'result'</B> field of the <B>'results'</B> structure will
+indicate the overall status of the section operation. If any bodies or
+faces are to be returned to the application, these will be contained within
+the <B>'front_bodies'</B>, <B>'back_bodies'</B>, <B>'front_faces'</B> and <B>'back_faces'</B> arrays.
+If the <B>'results'</B> field indicates a failure, the reason(s) for the failure
+will be contained within the array of report structures, referenced via the
+<B>'reports'</B> field.
+
+The meaning and implied actions of the <B>'result'</B> field is as follows :
+
+  1. <A HREF=../headers/pk_section_result_t.html>PK_section_result_ok_c</A>
+     o The section succeeded and the resultant entities are returned within
+       the appropriate arrays.
+
+  2. <A HREF=../headers/pk_section_result_t.html>PK_section_result_no_clash_c</A>
+     o The section succeeded and the resultant entities are returned within
+       the appropriate arrays. However, the target and tool entities did not
+       interact or clash in any manner.
+
+  3. <A HREF=../headers/pk_section_result_t.html>PK_section_result_fail_c</A>
+     o The section has failed.
+     o The result arrays will returned as null.
+     o The report structures must be inspected to determine the reason for the
+       failure and to identify the location of the failure.
+     o If this status is returned, the application cannot assume that the input
+       bodies are in a valid state.
+
+
+Each report structure contains a <B>'report'</B> field indicating the reason for the
+failure and, if possible, an array of entities. These entities may assist the
+application in identifying the region or entities that resulted in the failure.
+The <B>'entities'</B> array may contain topology from the target and tool bodies. The
+entities returned in the array will be members of the following classes :
+
+   o PK_CLASS_body
+   o PK_CLASS_shell
+   o PK_CLASS_face
+   o PK_CLASS_edge
+   o PK_CLASS_vertex
+
+
+NOTE: If the <B>'result'</B> field is set to <B>'<A HREF=../headers/pk_section_result_t.html>PK_section_result_fail_c</A>'</B>, the
+      application must not assume that the input bodies are in a valid
+
+
+Tracking Information
+
+The returned <B>'tracking'</B> structure is for future enhancements. Currently, the
+structure will always be returned with empty arrays.
+
+
+Function Restrictions
+
+The following restrictions apply to sheet sectioning operations :
+
+o This function does not support general bodies.
+
+
+Option Restrictions
+
+The following options within the input <B>'options'</B> are
+ignored by this function :
+    o <B>'tracking'</B>
+
+The following options within <B>'configuration'</B> options are
+ignored by this function :
+
+    o <B>'identical_intersect'</B>
+    o <B>'one_in_all_in'</B>
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

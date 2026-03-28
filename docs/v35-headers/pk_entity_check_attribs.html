@@ -1,0 +1,78 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_ENTITY_check_attribs</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_ENTITY_check_attribs</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_ENTITY_check_attribs
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A>                         entity,     --- entity
+<A HREF=../headers/pk_attdef_t.html>PK_ATTDEF_t</A>                         attdef,     --- attribute definition
+const <A HREF=../headers/pk_entity_check_attribs_o_t.html>PK_ENTITY_check_attribs_o_t</A>  *options,    --- options structure
+
+<I>--- returned arguments ---
+</I>int                          *const n_faults,   --- number of bad attributes
+<A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A>            **const faults      --- attribute fault information
+)
+</B>
+<A NAME="description"></A>
+<I>This function checks the system attributes attached to the given entity, and
+returns information concerning the faulty attributes found, if any.  These are
+attributes with definitions having names of the form "SDL/TYSA_xxx".
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_not_an_entity          the given entity or attdef is not a valid
+                                    entity
+    PK_ERROR_check_failure          checker failure (MILD)
+
+<A NAME="documentation"></A>
+The output array <B>'faults'</B> is only accessed if the option <B>'return_faults'</B> is
+set to PK_LOGICAL_true.  If not, the return variable <B>'n_faults'</B> will still be
+set to the number of attribute faults found.
+
+The input <B>'attdef'</B> specifies the checking only of those attributes belonging
+to the given attribute definition.  <B>'attdef'</B> can be set to PK_ENTITY_null, in
+which case all system attributes attached to the entity will be checked.
+
+If the <B>'faults'</B> array is requested, the state of each fault will be one of the
+PK_ATTRIB_state_xxx_c subset of tokens defined within <A HREF=../headers/pk_check_state_t.html>PK_check_state_t</A>.
+<B>'entity_1'</B> will be set to the attribute with the fault, and <B>'entity_2'</B> will
+be the owning entity of this attribute.  <B>'position'</B> is unused.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

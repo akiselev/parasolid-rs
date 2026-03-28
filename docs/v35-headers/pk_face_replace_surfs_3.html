@@ -1,0 +1,165 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_replace_surfs_3</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_replace_surfs_3</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_FACE_replace_surfs_3
+(
+<I>--- received arguments ---
+</I>int                              n_faces,        --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                  faces[],        --- faces
+const <A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                  surfs[],        --- replacement surfaces
+const <A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>               senses[],       --- surface orientation
+double                           tolerance,      --- tolerance for operation
+const <A HREF=../headers/pk_face_replace_surfs_o_t.html>PK_FACE_replace_surfs_o_t</A> *options,        --- options [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>        *const tracking,       --- tracking information
+<A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A>        *const results         --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function replaces the geometry of the given faces with the
+supplied surfaces.
+
+NOTE: This function supersedes <A HREF=../headers/pk_face_replace_surfs_2.html>PK_FACE_replace_surfs_2</A>, which is now obsolete.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_tolerance         (MILD)    proposed edge tolerance is too
+                                             small
+    PK_ERROR_wrong_entity_in_array (MILD)    given faces are not from same body
+    PK_ERROR_missing_geom          (MILD)    replace geometry not specified
+                                             for laminar edges in the supplied
+                                             <B>'edge_data'</B>.
+    PK_ERROR_not_in_same_partition (MILD)    faces and replacement orphan
+                                             geometry not in same partition
+    PK_ERROR_bad_combination       (MILD)    a mixture of facet and classic
+                                             geometry has been supplied
+    PK_ERROR_non_manifold          (SERIOUS) <B>'faces'</B> are not locally manifold
+
+<A NAME="documentation"></A>
+
+Introduction
+All geometry of the given faces is replaced by the given geometry in <B>'surfs'</B>.
+The surface orientation with respect to the face is specified by the logical
+value in <B>'senses'</B>.
+
+The number of surfaces and sense flags passed to the function, via the
+<B>'surfs'</B> and <B>'senses'</B> arguments, must be identical to the number of faces
+in the <B>'faces'</B> array.
+
+The faces can belong to a general body, so long as they are locally manifold.
+The replace cannot cause the faces to clash with non-manifold regions of the
+body.
+
+Recalculating Edge and Vertex Geometry
+The geometry of the edges and vertices connected to any modified faces
+will be deleted and recalculated. Where edges are adjacent to faces whose
+geometry is being replaced, the edge curves are re-computed as the
+intersection of the face surfaces.
+
+The user can prevent the recalculation of the geometry of particular
+edges and vertices by supplying the new edge and vertex geometry via the
+<B>'edge_data'</B> and <B>'vertex_data'</B> fields within the function's option structure.
+This data is optional and any edge or vertex, adjacent to a modified face,
+not specified within the structures will have its geometry recalculated.
+
+
+Surface Sense Parameters
+The sense flag, supplied to the function via the <B>'senses'</B> array, for a
+particular face/surface combination is interpreted as follows :
+
+ o PK_LOGICAL_true
+   When the new surface is attached to the face, the face normal must be
+   in the same direction as the natural surface normal (as calculated by
+   the function <A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A>).
+
+ o PK_LOGICAL_false
+   When the new surface is attached to the face, the face normal must be
+   in the opposite direction to the natural surface normal (as calculated by
+   the function <A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A>).
+
+
+Restrictions and Limitations
+The following restrictions and limitations apply to this function :
+
+  o Where edges or faces (sharing a vertex or edge at the boundary of
+    the faces to be modified) have geometry which is inextendable, it may
+    not be possible to recalculate vertices or edges. This is because the
+    curve or surface do not intersect the new surface. This is likely to
+    occur for tolerant edges since SP-curves are inextendable.
+
+  o If the specified faces belong to a sheet body, none of the faces may
+    form part of the boundary of the sheet. Ie. the face must not have
+    any laminar edges.
+    This restriction does not apply if the laminar edge geometry is
+    supplied by the user via the optional <B>'edge_data'</B> structure.
+
+  o Any edge with mixed geometry after the operation which has been supplied by
+    the user via the optional <B>'edge_data'</B> structure must have a minimum
+    tolerance of 5 times session precision.
+
+
+User options
+The <A HREF=../headers/pk_face_replace_surfs_o_t.html>PK_FACE_replace_surfs_o_t</A> structure contains user control options.
+In particular, it supports the notion of replacement edge/vertex geometry
+being supplied by the user.
+
+
+Tracking Information
+The <A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A> structure contains topology tracking information on
+the operation. In the case of this function, only tracking information
+records of the type PK_TOPOL_track_derive_c may be returned, if faces
+have been split or merged during the operation.
+
+
+Error handling
+If this function returns PK_ERROR_no_errors, the result of the operation
+will be indicated by the value of the <B>'status'</B> field of the <B>'results'</B>
+structure. When this value is not <A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A> or
+<A HREF=../headers/pk_local_status_t.html>PK_local_status_nocheck_c</A>, it indicates an operation failure and an array
+of entities involved in this failure is returned through the field
+<B>'error_entities'</B> of the <B>'results'</B> structure, when possible.
+For more information regarding the failure status code and the error_entities,
+refer to the PK documentation of the <A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A> structure.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

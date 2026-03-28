@@ -1,0 +1,84 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FIN_ask_geometry</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FIN_ask_geometry</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_FIN_ask_geometry
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_fin_t.html>PK_FIN_t</A>             fin,           --- fin for which geometry is required
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>         want_interval, --- whether parametric interval required
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>    *const curve,         --- curve of fin (may be PK_ENTITY_null)
+<A HREF=../headers/pk_class_t.html>PK_CLASS_t</A>    *const class,         --- class of curve
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>          ends[2],       --- positions at ends of fin
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A> *const t_int,         --- parametric interval of fin
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>  *const sense          --- whether curve in same direction as fin
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns the geometry of a fin
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_interval       The interval was requested but could not
+                                be computed (MILD)
+
+<A NAME="documentation"></A>
+If the fin has a curve attached, then this will be returned, otherwise, if the
+fin's edge has a curve attached then the curve of the edge will be returned,
+otherwise PK_ENTITY_null will be returned.  If <B>'curve'</B> is returned as
+PK_ENTITY_null, then all other returned arguments are undefined.
+
+The positions in <B>'ends'</B> are returned in the order of increasing parameter along
+the <B>'curve'</B>.  If <B>'want_interval'</B> is set to PK_LOGICAL_true, then the parametric
+interval of that part of the curve between <B>'ends'</B> is also returned.  If
+<B>'want_interval'</B> is set to PK_LOGICAL_false, then zero values are returned in
+<B>'t_int'</B>.
+
+The returned <B>'sense'</B> indicates whether the <B>'curve'</B> is in the same direction
+as the fin, and hence whether the elements of <B>'ends'</B> and <B>'t_int'</B> correspond
+to the start and end of the fin ( sense == PK_LOGICAL_true ) or, to the end
+and start of the fin ( sense == PK_LOGICAL_false ) respectively.
+
+If the fin has no vertices and its geometry is all of a periodic curve, then
+both <B>'ends'</B> are returned as the periodic seam point, and <B>'t_int'</B>, if
+requested, is the complete parameter range.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

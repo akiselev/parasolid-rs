@@ -1,0 +1,86 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_THREAD_unlock_partitions</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_THREAD_unlock_partitions</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                        PK_THREAD_unlock_partitions
+(
+<I>--- received arguments ---
+</I>const <A HREF=../headers/pk_thread_unlock_partitions_o_t.html>PK_THREAD_unlock_partitions_o_t</A> *options,
+
+<I>--- returned arguments ---
+</I>int                             *const n_partitions,    --- (&gt; 0)
+<A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>                 **const partitions
+)
+</B>
+<A NAME="description"></A>
+<I>This function unlocks and returns the <B>'partitions'</B> that were locked to the
+calling thread.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_rollback_not_started   Partitioned rollback is not active (MILD)
+    PK_ERROR_not_at_pmark           Partition is not at a pmark (MILD)
+    PK_ERROR_not_locked             Thread has no partitions locked (MILD)
+    PK_ERROR_not_stopped            Thread in a chain (MILD)
+    PK_ERROR_recursion_depth        Called within an outer PK or KI function
+                                    (MILD)
+    PK_ERROR_bb_not_empty           Bulletin board is not empty (MILD)
+
+<A NAME="documentation"></A>
+After this function has been called, <B>'partitions'</B> (and items within them) are
+no longer only usable in the calling thread. This thread can then use the
+same partitions (and items within them) as other threads with no locked
+partitions. The global current partition becomes the current partition for
+the calling thread and all thread-specific session settings will revert to
+their current global values. Any session marks created by this thread since
+it locked will be deleted, while any pre-existing ones will become usable
+again.
+
+A pre-existing session mark can only be rolled to once all threads that locked
+partitions since that mark was created have unlocked their partitions.
+
+If other threads are queuing inside <A HREF=../headers/pk_thread_lock_partitions.html>PK_THREAD_lock_partitions</A> for any of the
+<B>'partitions'</B>, then this function will signal to threads at the front of the
+queue that these partitions are now available. This ensures that the queue for
+partitions is both fair and efficient.
+
+This function should only be called when partitioned rollback has been started
+with <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

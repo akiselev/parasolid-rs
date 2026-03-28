@@ -1,0 +1,494 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Building Bodies from Profiles</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Building Bodies from Profiles</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.09.html">Convergent Modeling</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.11.html">Blending</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.10.html#50446338_pgfId-275656">9.1	Introduction</A>
+<LI> <A HREF="ov_chap.10.html#50446338_pgfId-275538">9.2	Extruding</A>
+<LI> <A HREF="ov_chap.10.html#50446338_pgfId-281086">9.3	Spinning</A>
+<LI> <A HREF="ov_chap.10.html#50446338_pgfId-275539">9.4	Sweeping</A>
+<UL>
+<LI> <A HREF="ov_chap.10.html#50446338_pgfId-762692">9.4.1	Sweeping solid bodies along a path</A>
+</UL>
+<LI> <A HREF="ov_chap.10.html#50446338_pgfId-275540">9.5	Lofting</A>
+<LI> <A HREF="ov_chap.10.html#50446338_pgfId-308581">9.6	Embossing</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446338_pgfId-275656"></A>9.1	<A NAME="50446338_marker-290667"></A><A NAME="50446338_marker-290715"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446338_pgfId-276823"></A>Parasolid provides many elementary functions for creating bodies. Some tools, such as those mentioned in <A HREF="ov_chap.04.html#50446350_16587">Chapter 3, &#8220;Model Structure&#8221;</A>, can create primitive bodies from scratch. You can use other tools to create more sophisticated bodies using only a minimum of starting information.</P>
+<P>
+<A NAME="50446338_pgfId-323225"></A>This chapter describes the functionality available for creating bodies based on wire or sheet profiles, such as those that can be created using the techniques described in <A HREF="ov_chap.07.html#50446372_64814">Chapter 6, &#8220;Working with Sheets and Wires&#8221;</A>. It also contains information on creating swept bodies from solid profiles.</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-323232"></A><A HREF="ov_chap.10.html#50446338_90634">Section 9.2, &#8220;Extruding&#8221;</A>, demonstrates bodies created by extruding a profile in a linear direction.</LI>
+<LI>
+<A NAME="50446338_pgfId-281040"></A><A HREF="ov_chap.10.html#50446338_31716">Section 9.3, &#8220;Spinning&#8221;</A>, demonstrates bodies created by spinning a profile around an axis.</LI>
+<LI>
+<A NAME="50446338_pgfId-326052"></A><A HREF="ov_chap.10.html#50446338_52551">Section 9.4, &#8220;Sweeping&#8221;</A>, demonstrates bodies created by sweeping a profile along a path.</LI>
+<LI>
+<A NAME="50446338_pgfId-281044"></A><A HREF="ov_chap.10.html#50446338_41729">Section 9.5, &#8220;Lofting&#8221;</A>, demonstrates bodies created by generating surfaces between a series of profiles.</LI>
+<LI>
+<A NAME="50446338_pgfId-307732"></A><A HREF="ov_chap.10.html#50446338_49897">Section 9.6, &#8220;Embossing&#8221;</A>, demonstrates modifying a body by creating emboss features using a specified profile.</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-275662"></A>Bodies created from profiles may be either sheets or solids, depending on the nature of the operation and the profiles used. Generally, a sheet profile creates a solid body and a wire profile creates a sheet body.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446338_pgfId-275538"></A>9.2	<A NAME="50446338_90634"></A><A NAME="50446338_marker-290669"></A><A NAME="50446338_marker-290735"></A><A NAME="50446338_marker-290725"></A>Extruding
+
+
+</H1>
+<P>
+<A NAME="50446338_pgfId-275579"></A>Parasolid can extrude a profile in a linear direction to create a new body. You can define how far the profile is extruded by specifying exactly where the extrusion should start and end. This can be either:</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-277444"></A>A specified distance from the profile</LI>
+<LI>
+<A NAME="50446338_pgfId-277448"></A>A surface or face that intersects the extrusion, trimming it appropriately</LI>
+<LI>
+<A NAME="50446338_pgfId-277449"></A>A solid or sheet body that intersects the extrusion, trimming it appropriately</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-460327"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-101.gif">
+
+<P>
+<A NAME="50446338_pgfId-277488"></A>Figure 9-1 Extruding a profile to create a new body</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446338_pgfId-281086"></A>9.3	<A NAME="50446338_31716"></A><A NAME="50446338_marker-290671"></A><A NAME="50446338_marker-290737"></A><A NAME="50446338_marker-290729"></A>Spinning
+
+
+</H1>
+<P>
+<A NAME="50446338_pgfId-281087"></A>You can create a body by spinning a profile about an axis, as shown in <A HREF="ov_chap.10.html#50446338_12525"><EM>
+Figure 9-2</EM></A>. Spinning functionality lets you:</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-281091"></A>Form a wire body from a minimum body</LI>
+<LI>
+<A NAME="50446338_pgfId-281092"></A>Form a sheet body from a wire profile</LI>
+<LI>
+<A NAME="50446338_pgfId-281093"></A>Form a solid body from a sheet profile</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-460742"></A>You can also spin profiles on an existing body to create new features.</P>
+<P>
+<A NAME="50446338_pgfId-460743"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-102.gif">
+
+<P>
+<A NAME="50446338_pgfId-281157"></A>Figure 9-2 <A NAME="50446338_12525"></A>Using spin to create new bodies and features</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446338_pgfId-275539"></A>9.4	<A NAME="50446338_52551"></A><A NAME="50446338_marker-290673"></A><A NAME="50446338_marker-290739"></A><A NAME="50446338_marker-290731"></A>Sweeping
+
+
+</H1>
+<P>
+<A NAME="50446338_pgfId-278064"></A>Parasolid&#8217;s extrusion and spinning functionality is complemented by sweeping, in which one or more profiles are swept along a path using possibly one or more guide wires to produce a new body. The path and guides are specified as wire bodies; unlike extrusion, the path does not need to be linear. <A HREF="ov_chap.10.html#50446338_12176"><EM>
+Figure 9-3</EM></A>, and <A HREF="ov_chap.10.html#50446338_49938"><EM>
+Figure 9-4</EM></A> show how bodies can be created by sweeping.</P>
+<P>
+<A NAME="50446338_pgfId-454507"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-103.gif">
+
+<P>
+<A NAME="50446338_pgfId-278750"></A>Figure 9-3 <A NAME="50446338_12176"></A>Sweeping profiles along a path to produce a body</P>
+<P>
+<A NAME="50446338_pgfId-454944"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-104.gif">
+
+<P>
+<A NAME="50446338_pgfId-314350"></A>Figure 9-4 <A NAME="50446338_49938"></A>Sweeping a profile along a path with a G1 discontinuous guide wire</P>
+<P>
+<A NAME="50446338_pgfId-323275"></A>Parasolid lets you control the orientation, size and rotation of profiles in sweep operations, leading to a variety of different effects, as shown in <A HREF="ov_chap.10.html#50446338_53285"><EM>
+Figure 9-5</EM></A>. </P>
+<P>
+<A NAME="50446338_pgfId-461028"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-105.gif">
+
+<P>
+<A NAME="50446338_pgfId-275922"></A>Figure 9-5 <A NAME="50446338_53285"></A>Varying <STRONG>
+(a)</STRONG> the orientation, <STRONG>
+(b)</STRONG> the size and <STRONG>
+(c)</STRONG> the rotation of the profile</P>
+<P>
+<A NAME="50446338_pgfId-281372"></A>You can also combine these effects, giving you a vast range of possibilities. Parasolid provides particularly strong support for creating helices by sweeping profiles, giving you control over the amount the pitch and taper varies along the extent of the sweep, as shown in <A HREF="ov_chap.10.html#50446338_58697"><EM>
+Figure 9-6</EM></A>.</P>
+<P>
+<A NAME="50446338_pgfId-459517"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-106.gif">
+
+<P>
+<A NAME="50446338_pgfId-279038"></A>Figure 9-6 <A NAME="50446338_58697"></A>Creating a tapered helix using sweep rotation and size controls</P>
+<P>
+<A NAME="50446338_pgfId-281173"></A><A NAME="50446338_marker-290838"></A><A NAME="50446338_marker-290892"></A>Parasolid&#8217;s sweeping functionality also includes many controls to let you, for example:</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-281177"></A>Specify the topology of the swept body</LI>
+<LI>
+<A NAME="50446338_pgfId-281181"></A>Minimise the amount of twist in a swept body</LI>
+<LI>
+<A NAME="50446338_pgfId-281189"></A>Repair certain types of self-intersection caused by the sweep operation</LI>
+<LI>
+<A NAME="50446338_pgfId-281202"></A>Simplify the surfaces of the swept body</LI>
+<LI>
+<A NAME="50446338_pgfId-407469"></A>Clamp the swept surface at certain profiles during a multi-profile sweep. For example clamping the start and end profiles to faces ensure the swept body meets these faces smoothly.</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-407598"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-107.gif">
+
+<P>
+<A NAME="50446338_pgfId-407600"></A>Figure 9-7 <A NAME="50446338_77922"></A>Sweeping profiles with face clamps</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-407471"></A>Lock the orientation of the sweep, either to a set of faces, or in a specified direction</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-367227"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-108.gif">
+
+<P>
+<A NAME="50446338_pgfId-409449"></A>Figure 9-8 Locking the orientation of the sweep to a set of faces</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-524230"></A>Produce mitred or rounded corners during a sweep operation, as shown in <A HREF="ov_chap.10.html#50446338_28710"><EM>
+Figure 9-9</EM></A></LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-524407"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-109.gif">
+
+<P>
+<A NAME="50446338_pgfId-524354"></A>Figure 9-9 <A NAME="50446338_28710"></A>Specifying the type of corner to produce in a sweep operation</P>
+<P>
+<A NAME="50446338_pgfId-409455"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-110.gif">
+
+<P>
+<A NAME="50446338_pgfId-375597"></A>Figure 9-10 The effect of locking the direction of a sweep</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-375273"></A>Create a series of cross-section profiles, rather than a swept body, for example for use as a preview tool.</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-455627"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-111.gif">
+
+<P>
+<A NAME="50446338_pgfId-367120"></A>Figure 9-11 <A NAME="50446338_10990"></A>Creating a series of cross-section profiles</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-340719"></A>Trim a swept body so that only the faces between the guide wires are returned</LI>
+</UL>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446338_pgfId-762692"></A>	9.4.1 	Sweeping solid bodies along a path</H2>
+<P>
+<A NAME="50446338_pgfId-520241"></A>In addition to sheet and wire profiles, Parasolid allows you to sweep a solid body along a path, as shown in <A HREF="ov_chap.10.html#50446338_21486"><EM>
+Figure 9-12</EM></A>. This function can be used to construct bodies that represent regions to be cut from another solid body using a machine tool.</P>
+<P>
+<A NAME="50446338_pgfId-439869"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-112.gif">
+
+<P>
+<A NAME="50446338_pgfId-335376"></A>Figure 9-12 <A NAME="50446338_21486"></A>Sweeping a solid tool profile along a path</P>
+<P>
+<A NAME="50446338_pgfId-522793"></A>You can also use it to specify any faces that will not be involved in a subsequent cutting operation, to generate a simpler set of swept surfaces for the resulting body as shown in <A HREF="ov_chap.10.html#50446338_58349"><EM>
+Figure 9-13</EM></A>. </P>
+<P>
+<A NAME="50446338_pgfId-523031"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-113.gif">
+
+<P>
+<A NAME="50446338_pgfId-519880"></A>Figure 9-13 <A NAME="50446338_58349"></A>Specifying non-cutting faces on a tool body</P>
+<P>
+<A NAME="50446338_pgfId-535554"></A>The supplied tool does not have to touch the path: you can choose whether to place the tool on the path prior to the sweeping, or whether to sweep the tool relative to a distant path. This can lead to very different results, as shown in <A HREF="ov_chap.10.html#50446338_87747"><EM>
+Figure 9-14</EM></A> and <A HREF="ov_chap.10.html#50446338_99880"><EM>
+Figure 9-15</EM></A>.</P>
+<P>
+<A NAME="50446338_pgfId-536013"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-114.gif">
+
+<P>
+<A NAME="50446338_pgfId-535951"></A>Figure 9-14 <A NAME="50446338_87747"></A>Sweeping a tool that lies on the path</P>
+<P>
+<A NAME="50446338_pgfId-615106"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-115.gif">
+
+<P>
+<A NAME="50446338_pgfId-615039"></A>Figure 9-15 <A NAME="50446338_99880"></A>Sweeping a tool that lies off the path</P>
+<P>
+<A NAME="50446338_pgfId-761598"></A>You can specify the edges of the path that are spun around a supplied axis as part of the sweeping operation as shown in <A HREF="ov_chap.10.html#50446338_32671"><EM>
+Figure 9-16</EM></A>. This is useful in lathing operations where it can help improve the quality of the sweep.</P>
+<P>
+<A NAME="50446338_pgfId-761810"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-116.gif">
+
+<P>
+<A NAME="50446338_pgfId-761749"></A>Figure 9-16 <A NAME="50446338_32671"></A>Specifying path edges in the sweeping operation</P>
+<P>
+<A NAME="50446338_pgfId-550590"></A>You can also choose to perform both the sweep and the boolean operation in one function call. This can reduce the complexity of modelling operations such as simulating lathing operations, where the volume of interest is often the volume remaining after a subtraction operation. <A HREF="ov_chap.10.html#50446338_50795"><EM>
+Figure 9-17</EM></A> shows two examples where you can either subtract or intersect a specified volume to create a result body.</P>
+<P>
+<A NAME="50446338_pgfId-551557"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-117.gif">
+
+<P>
+<A NAME="50446338_pgfId-550992"></A>Figure 9-17 <A NAME="50446338_50795"></A>Performing boolean operations with a swept tool body</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446338_pgfId-275540"></A>9.5	<A NAME="50446338_41729"></A><A NAME="50446338_marker-522955"></A><A NAME="50446338_marker-522956"></A><A NAME="50446338_marker-522957"></A>Lofting
+
+
+</H1>
+<P>
+<A NAME="50446338_pgfId-279110"></A>Parasolid supports the process of lofting, in which you create a sheet or solid body by fitting surfaces through a series of profiles. Unlike extrusion , lofting involves the use of any number of profiles.</P>
+<P>
+<A NAME="50446338_pgfId-461149"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-118.gif">
+
+<P>
+<A NAME="50446338_pgfId-280979"></A>Figure 9-18 Creating a lofted body using several different profiles</P>
+<P>
+<A NAME="50446338_pgfId-279338"></A>There are many ways that you can control the final appearance of a lofted body. For example, you can:</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-279362"></A><A NAME="50446338_marker-290848"></A>Specify which vertices should match between adjacent profiles. This is shown in <A HREF="ov_chap.10.html#50446338_64604"><EM>
+Figure 9-19</EM></A>, which illustrates two different bodies that can be formed from the same profiles by matching vertices on each adjacent profile in different ways.</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-461211"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-119.gif">
+
+<P>
+<A NAME="50446338_pgfId-279792"></A>Figure 9-19 <A NAME="50446338_64604"></A>Matching vertices across adjacent profiles to create different bodies</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-280107"></A><A NAME="50446338_marker-290852"></A><A NAME="50446338_marker-290890"></A>Include degenerate profiles at either end of the lofted body, as shown in <A HREF="ov_chap.10.html#50446338_79346"><EM>
+Figure 9-20</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-461265"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-120.gif">
+
+<P>
+<A NAME="50446338_pgfId-280118"></A>Figure 9-20 <A NAME="50446338_79346"></A>Using degenerate profiles in a loft</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-279369"></A><A NAME="50446338_marker-290856"></A>Control the shape of the lofted surface at each profile, as shown in <A HREF="ov_chap.10.html#50446338_38150"><EM>
+Figure 9-21</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-461328"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-121.gif">
+
+<P>
+<A NAME="50446338_pgfId-279961"></A>Figure 9-21 <A NAME="50446338_38150"></A>Controlling the shape of a lofted body</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-279386"></A><A NAME="50446338_marker-290860"></A><A NAME="50446338_marker-290888"></A><A NAME="50446338_marker-290886"></A>Constrain the shape of the lofted body by specifying additional guide curves, as shown in <A HREF="ov_chap.10.html#50446338_87556"><EM>
+Figure 9-22</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-446976"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-122.gif">
+
+<P>
+<A NAME="50446338_pgfId-280019"></A>Figure 9-22 <A NAME="50446338_87556"></A>Using a guide curve to control loft shape</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-576989"></A>Create a piecewise lofted body that is non-G1 smooth across the supplied repeated profiles. </LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-574515"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-123.gif">
+
+<P>
+<A NAME="50446338_pgfId-574316"></A>Figure 9-23 Piecewise lofting with repeated profiles</P>
+<P>
+<A NAME="50446338_pgfId-281219"></A>Other controls let you:</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-281229"></A>Specify the topology of the lofted body</LI>
+<LI>
+<A NAME="50446338_pgfId-281230"></A>Minimise the tolerances used in the lofted body</LI>
+<LI>
+<A NAME="50446338_pgfId-281232"></A>Simplify the surfaces of the loft body</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-307725"></A>As with sweeping, you can combine these options, making Parasolid lofting a powerful tool for creating free-form bodies using only the simplest of starting points.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446338_pgfId-308581"></A>9.6	<A NAME="50446338_marker-308577"></A><A NAME="50446338_marker-308578"></A><A NAME="50446338_marker-308579"></A><A NAME="50446338_49897"></A>Embossing
+
+
+</H1>
+<P>
+<A NAME="50446338_pgfId-428091"></A>Parasolid provides functionality for adding protruding (pad) or indented (pocket) emboss features to a target body. These operations can be applied globally, or locally to a selection of faces, and the features created can either be attached to the target body or returned as a separate body. The shape of emboss features is described using supplied profiles. </P>
+<P>
+<A NAME="50446338_pgfId-447307"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-124.gif">
+
+<P>
+<A NAME="50446338_pgfId-309190"></A>Figure 9-24 <A NAME="50446338_31760"></A>Creating pad and pocket emboss features on a target body</P>
+<P>
+<A NAME="50446338_pgfId-309613"></A>A fundamental part of Parasolid&#8217;s emboss functionality is creating sidewalls, as shown in <A HREF="ov_chap.10.html#50446338_31760"><EM>
+Figure 9-24</EM></A>, which is done automatically for emboss features. Parasolid can construct a sidewall using one of following methods:</P>
+<UL>
+<LI>
+<A NAME="50446338_pgfId-309622"></A>Tapered sidewalls can be created based on a specified draw direction and taper angle.</LI>
+<LI>
+<A NAME="50446338_pgfId-309623"></A>Ruled sidewalls can be created using the normals of faces in the supplied profile.</LI>
+<LI>
+<A NAME="50446338_pgfId-309624"></A>Swept sidewalls can be created based on a specified sweep direction.</LI>
+</UL>
+<P>
+<A NAME="50446338_pgfId-309674"></A>In each case, the geometry of the sidewall is formed by a set of ruled surfaces that pass through the boundary of the profile. An example of a pad emboss feature with sidewalls tapered at different angles is shown in <A HREF="ov_chap.10.html#50446338_31040"><EM>
+Figure 9-25</EM></A>.</P>
+<P>
+<A NAME="50446338_pgfId-447382"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-125.gif">
+
+<P>
+<A NAME="50446338_pgfId-309736"></A>Figure 9-25 <A NAME="50446338_31040"></A>Pad emboss feature with tapered sidewalls using different angles</P>
+<P>
+<A NAME="50446338_pgfId-309737"></A>As well as these methods of internal construction, you can supply a sidewall yourself.</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.09.html">Convergent Modeling</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.11.html">Blending</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,181 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_thicken_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_thicken_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_BODY_thicken_2
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                  body,            --- body to be thickened
+double                     front_default,   --- default front offset
+double                     back_default,    --- default back offset
+double                     tolerance,       --- tolerance
+const <A HREF=../headers/pk_body_thicken_o_t.html>PK_BODY_thicken_o_t</A> *options,         --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>  *const tracking,        --- tracking information
+<A HREF=../headers/pk_body_thicken_r_t.html>PK_BODY_thicken_r_t</A> *const results          --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>Thickens a sheet body into a solid
+
+NOTE: This function is deprecated and has been superseded by <A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_cant_thicken          thickening failure
+    PK_ERROR_bad_tolerance         proposed edge tolerance is too small
+    PK_ERROR_not_sheet             body is not a sheet body
+    PK_ERROR_bad_thickness         total thickness is zero
+    PK_ERROR_inconsistent_offset   the front (or the back ) offsets have
+                                   inconsistent sign
+    PK_ERROR_inconsistent_thicken  the thicken <B>'sense'</B> is inconsistent
+    PK_ERROR_not_a_unit_vector     the thicken method is
+                                   <A HREF=../headers/pk_thicken_method_t.html>PK_thicken_method_punch_c</A> and the
+                                   punch direction is not a unit vector
+    PK_ERROR_not_implemented       PK_offset_step_site_c not implemented (MILD)
+
+<A NAME="documentation"></A>
+
+Introduction
+The sheet <B>'body'</B> is thickened by <B>'front_default'</B> outwards (i.e. in the
+direction of the face normal) and <B>'back_default'</B> inwards. Exceptional
+faces, which have offsets other that the default, are given in the
+option structure together with their <B>'front'</B> and <B>'back'</B> offset.
+
+The sense of the thicken for a given face, is the sign of the sum of
+the front and back offsets of that face. It is an error for this
+sense to vary with face.
+
+It is an error if the sign of the front offset varies with
+face. Similarly it is an error if the sign of the back offset varies
+with face
+
+It is an error if there is a face with front and back offsets such that the
+the thickness produced is within RES_linear of zero.
+
+Only manifold sheet bodies can be thickened.
+
+Some edge geometry on the sheet boundary may have to be approximated by
+SP-curves in order to generate a boundary curve on the offset faces. If this
+is necessary, such edges will have a tolerance less than or equal to the
+tolerance supplied through the <B>'tolerance'</B> argument.
+
+Two situations can give rise to changes in the topology :
+
+    1) Dealing with geometry which fails to offset. If it is known that the
+       offset surface of a face would be self-intersecting an attempt is made
+       to remove the face. For example, a blend may be removed from an edge.
+       The investigation of self-intersection is not exhaustive, however,
+       and it can occur that instances are not trapped.
+
+    2) Dealing with configurations which can be repaired. For instance an
+       edge may offset to a point or a face become absorbed into the body.
+
+
+Checking options
+The extent to which checking is applied to the body is specified by
+the <B>'check_fa_fa'</B> field of the option structure. At present
+<B>'check_fa_fa'</B> field can only be used to turn on or off face-face
+checking, by setting it to <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_yes_c</A> or <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_no_c</A>
+respectively.  If face-face checking is turned on, then face-face
+checks are done on the body in addition to default checks.  For most
+applications face-face checking will be tuned off, which will give an
+adequate level of checking.
+
+Thickening which would lead to a self-intersecting or non-manifold
+solid is not allowed. Some of these cases will not be detected when
+face-face checking is switched off. In this case the resulting body
+will be invalid.
+
+Table of exact cases
+Boundary edges with the following curves on these surfaces will be treated
+exactly :
+
+    Surface           | Curve
+    -----------------------------------------
+    Plane             | Line, Circle, Ellipse or B-curve
+    Cylinder          | Line, Circle or B-curve equivalent
+    Cone              | Line, Circle or B-curve equivalent
+    Sphere            | Circle
+    Torus             | Circle
+    Swept Surface or  | Line, Profile curve or B-curve equivalent
+    B-surface equiv   |
+    Spun Surface or   | Circle, Profile curve or B-curve equivalent
+    B-surface equiv   |
+
+
+Cases handled
+Thickening only handles the cases where each vertex on the boundary of the
+sheet meets one of the following requirements.  Either the vertex is smooth
+(surface normals constant on all adjoining faces) or both adjoining boundary
+edges must have curves of the types treated exactly (see table above) or the
+thickening is into the angle of the edge (i.e. convex edges inwards only and
+concave edges outwards only).
+
+
+Tracking Information
+The function returns tracking information relating to which topology
+was split, deleted and created. For more information regarding
+these structures, please refer to the PK documentation for the
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A> structure.
+
+Returned Status and Error Information
+If this function returns a value of PK_ERROR_no_errors, the result of
+the "thicken" operation will be indicated by the value of the
+<B>'status'</B> field within the <B>'results'</B> structure.
+
+There are two values for the <B>'status'</B> field which can indicate a
+successful operation :
+
+ o <A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A>      : Indicates that the operation was successful
+                               and the modified body is valid.
+
+ o <A HREF=../headers/pk_local_status_t.html>PK_local_status_nocheck_c</A> : Indicates that the operation was successful,
+                               but the <B>'check_fa_fa'</B> field in the option
+                               structure was set to <A HREF=../headers/pk_check_fa_fa_t.html>PK_check_fa_fa_no_c</A>.
+
+The remaining `PK_local_status_...' codes indicate some failure. The failure
+code is normally accompanied by an array of entities which indicate where
+the failure or problem occurs. For more information regarding these failure
+codes and the returned error entities, please refer to the PK documentation
+for the <A HREF=../headers/pk_body_thicken_r_t.html>PK_BODY_thicken_r_t</A> structure.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

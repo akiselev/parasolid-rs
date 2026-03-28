@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_transform_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_transform_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>              PK_FACE_transform_2
+(
+<I>--- received arguments ---
+</I>int                          n_faces,         --- number of faces &gt; 0
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>              faces[],         --- faces to transform
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>            transfs[],       --- face transformations
+double                       tolerance,       --- tolerance
+
+const <A HREF=../headers/pk_face_transform_o_t.html>PK_FACE_transform_o_t</A> *options,         --- options [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>    *const tracking,        --- tracking information
+<A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A>    *const results          --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function transforms the given faces by the given transformations.
+
+NOTE : This function supersedes <A HREF=../headers/pk_face_transform.html>PK_FACE_transform</A>.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_component         (MILD)    transformation is a perspective
+    PK_ERROR_wrong_entity_in_array (MILD)    given faces are not from same body
+    PK_ERROR_wrong_transf          (MILD)    transform type is not compatible
+                                             with transform step face option
+    PK_ERROR_failed_to_transform   (SERIOUS) transform operation failed
+    PK_ERROR_non_manifold          (SERIOUS) <B>'faces'</B> are not locally manifold
+
+<A NAME="documentation"></A>
+
+Introduction
+All geometry of the given faces is replaced by geometry which is
+derived from the original geometry by transforming it through the
+given transformation.
+
+Replacement surfaces for the faces will satisfy the first possible
+of the following list of criteria :
+
+ 1 - be of the same class as the original geometry,
+ 2 - be exactly coincident with the transformation of the original
+     geometry,
+ 3 - not deviate by more than the given <B>'tolerance'</B> from the
+     transformation of the original geometry.
+
+Replacement curves for edges will satisfy the same criteria in order
+of precedence unless the curve lies on an edge which is at the junction
+of faces, of which at least one of the attached surfaces has been
+approximated (criterion 3), in which case, the edge curve will be
+re-computed as the intersection of the face surfaces.
+
+The original geometry of topological entities that acquire new
+geometry as a result of this operation will be deleted.
+
+The faces can belong to a general body, so long as they are locally manifold.
+The transform cannot cause the faces to clash with non-manifold regions of the
+body.
+
+User options
+The <A HREF=../headers/pk_face_transform_o_t.html>PK_FACE_transform_o_t</A> structure contains user control options. See
+its documentation for detail.
+
+Tracking
+The <A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A> structure contains topology tracking information on
+the operation. See its documentation for details.
+
+Error handling
+If this function returns PK_ERROR_no_errors, the result of the operation
+will be indicated by the value of the <B>'status'</B> field of the <B>'results'</B>
+structure. When this value is not <A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A> or
+<A HREF=../headers/pk_local_status_t.html>PK_local_status_nocheck_c</A>, it indicates an operation failure and an array
+of entities involved in this failure is returned through the field
+<B>'error_entities'</B> of the <B>'results'</B> structure, when possible.
+For more information regarding the failure status code and the error_entities,
+refer to the PK documentation of the <A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A> structure.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

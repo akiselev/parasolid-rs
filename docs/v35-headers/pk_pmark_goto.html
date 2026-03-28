@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_PMARK_goto</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_PMARK_goto</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_PMARK_goto
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_pmark_t.html>PK_PMARK_t</A>          pmark,          --- pmark to go to
+
+<I>--- returned arguments ---
+</I>int          *const n_new,          --- number of entities created
+<A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A> **const new_entities,   --- entities created (optional)
+int          *const n_mod,          --- number of entities modified
+<A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A> **const mod_entities,   --- entities modified (optional)
+int          *const n_del,          --- number of entities deleted
+int         **const del_entities    --- entities deleted (optional)
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns the partition to the state when the given pmark was
+created.
+
+NOTE: This function is deprecated and has been superseded by <A HREF=../headers/pk_pmark_goto_2.html>PK_PMARK_goto_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_rollback_not_started   Partitioned rollback is not active
+    PK_ERROR_bad_mark               The given pmark may not be rolled to
+    PK_ERROR_bb_not_empty           The bulletin board is on and not empty
+    PK_ERROR_frustrum_failure       (potentially FATAL) The frustrum returned
+                                    an error
+
+<A NAME="documentation"></A>
+If it is not possible to rollback, the function raises an error. The modeller
+state may have changed in that the partition may have been rolled part way to
+the given pmark, but if so, it will be 'at' some other pmark. If the failure
+is due to a 'disk full' error from the Frustrum, the roll operation may be
+retried after making more disk space available.
+
+The current partition may not be rolled back to its initial pmark.
+
+This function may not be called if the bulletin board is switched on and is
+not empty.
+
+The output arrays <B>'new_entities'</B>, <B>'mod_entities'</B> and <B>'del_entities'</B> are
+optional. If they are set to NULL, the function will only compute the numbers
+of entities created, modified or deleted by the roll operation.
+
+This function should only be called when partitioned rollback has been started
+by calling <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.
+
+The <B>'mod_entities'</B> list is generated using internal data structure changes.  It
+is not recommended for this list to be used in application tracking for the
+following reasons:
+
+    o Some changes (as perceived by the application) may not be present in the
+      list.
+    o Although all changed attributes ARE included in the list, some additional
+      entries may also be present.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

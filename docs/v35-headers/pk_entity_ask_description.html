@@ -1,0 +1,101 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_ENTITY_ask_description</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_ENTITY_ask_description</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_ENTITY_ask_description
+(
+<I>--- received arguments ---
+</I>int                                      tag, --- PK entity or internal tag
+const <A HREF=../headers/pk_entity_ask_description_o_t.html>PK_ENTITY_ask_description_o_t</A> *options, --- options structure
+
+<I>--- returned arguments ---
+</I>char **const                     description  --- ptr to null terminated string
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns a textual description of Parasolid's internal
+representation of a PK entity
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_not_a_tag                  Not value of external or internal tag
+
+
+<A NAME="documentation"></A>
+The function is first called with 'tag' set to the value of a PK entity.
+
+This returns a null terminated string which describes Parasolid's internal
+representation of the entity. If the tag value is set to PK_ENTITY_null,
+an empty string is returned, containing the single null character '\0'.
+
+The application can traverse an entity's underlying structure by scanning the
+descriptive text for integer tags (described later) and calling this function
+with the derived tag values.
+
+The tags will either be 'external' types belonging to one of the PK classes
+              <A HREF=../headers/pk_entity_t.html>PK_ENTITY_t</A>, <A HREF=../headers/pk_mark_t.html>PK_MARK_t</A>, <A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>, <A HREF=../headers/pk_pmark_t.html>PK_PMARK_t</A>
+or 'internal' Parasolid tags which do not belong to any of these PK classes.
+The application can detect such cases using the classification functions
+        <A HREF=../headers/pk_entity_is.html>PK_ENTITY_is</A>, <A HREF=../headers/pk_mark_is.html>PK_MARK_is</A>, <A HREF=../headers/pk_partition_is.html>PK_PARTITION_is</A>, <A HREF=../headers/pk_pmark_is.html>PK_PMARK_is</A>
+
+The returned text is divided into lines, each terminated by a '\n' character.
+
+The first line of text contains a summary description of the tag. If the tag
+belongs to the PK_ENTITY class, this will start with the name of its concrete
+class. If it belongs to another PK class, the description will start with this
+class name. In other cases the description will start with the word 'Internal'.
+
+The remainder of the description contains the names and values of constituent
+fields within the tag, followed by internal status data.
+
+The field names and values are separated by a ':' character. Field values may
+be continued on a following line. The relative ordering of the field / value
+pairs within the descriptive string is subject to change.
+If a field name refers to a tag, its value is written out in the form    #NNN
+where the 'NNN' represents an integer containing one or more decimal digits.
+
+The content and layout of internal status data at the end of the descriptive
+string is subject to change. This is provided solely for debugging purposes.
+
+The returned 'description' character pointer will refer to memory which has
+been allocated by the registered PK memory allocator function. This must be
+freed by the application after each call to this function.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

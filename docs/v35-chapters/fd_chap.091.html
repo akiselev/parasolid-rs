@@ -1,0 +1,972 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Importing Data</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Importing Data</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.090.html">Introduction To Importing And Exporting</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.092.html">Exporting Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-294727">90.1	Introduction </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-368996">90.2	Trimmed surface import route - summary </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-369005">90.3	Requirements for data import using the trimmed surface import route </A>
+<UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-294826">90.3.1	SP-curve data </A>
+<UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-294827">90.3.1.1	Introduction </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-294847">90.3.1.2	Criteria </A>
+</UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295539">90.3.2	Trimmed surface data passed into PK_SURF_make_sheet_trimmed </A>
+<UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295540">90.3.2.1	Introduction </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295565">90.3.2.2	Options for PK_SURF_make_sheet_trimmed </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295606">90.3.2.3	Criteria for SP-curves </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295689">90.3.2.4	Criteria for 3D curves </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295708">90.4	BREP import route </A>
+<UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295712">90.4.1	Sequence of events using BREP import route </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295787">90.4.2	Importing topology </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295835">90.4.3	Creating geometry </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-339254">90.4.4	Attaching geometry </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295942">90.4.5	Sharing geometry </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-295949">90.4.6	Repairing the data </A>
+<UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-924797">90.4.6.1	Examples </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-297877">90.5	Relevant Parasolid restrictions and conventions </A>
+<UL>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-297881">90.5.1	Face normals </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-297900">90.5.2	Loop directions and faces </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-297911">90.5.3	Non-manifold bodies </A>
+<LI> <A HREF="fd_chap.091.html#50422169_pgfId-297929">90.5.4	B-curves and edges </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422169_pgfId-294727"></A>90.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422169_pgfId-294730"></A><A NAME="50422169_marker-294728"></A><A NAME="50422169_marker-294729"></A>This chapter explains how models created by other modellers can be imported into Parasolid. </P>
+<P>
+<A NAME="50422169_pgfId-294731"></A>A model can only be successfully imported if its topology can be expressed as valid Parasolid topology, and its geometry corresponds to valid Parasolid geometric types.</P>
+<P>
+<A NAME="50422169_pgfId-294732"></A>There are two routes for importing external model data. These are:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-294733"></A>Trimmed surface import route</LI>
+<LI>
+<A NAME="50422169_pgfId-294734"></A>BREP import route</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-294735"></A>Which one to use in a given situation is dependent on whether the application knows the BREP topology of the model. When this is known use the BREP route. When the topology isn't known the data must be supplied in the form of trimmed surfaces (that is, as surfaces bounded by loops of surface parameter (SP) curves) in order to make use of the trimmed surface import route.</P>
+<P>
+<A NAME="50422169_pgfId-483622"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422169_pgfId-483632"></A>Note:  Facet geometry cannot be imported into Parasolid via the trimmed surface import route. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422169_pgfId-426602"></A>For examples of both of these routes, see the code examples in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+Support\Data</CODE>
+ <CODE>
+Import</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422169_pgfId-368996"></A>90.2	<A NAME="50422169_marker-368993"></A><A NAME="50422169_marker-368994"></A><A NAME="50422169_marker-368995"></A>Trimmed surface import route - summary 
+
+
+</H1>
+<P>
+<A NAME="50422169_pgfId-369001"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1108.gif">
+
+<P>
+<A NAME="50422169_pgfId-369281"></A>Figure 90-1 Trimmed surface import route</P>
+<P>
+<A NAME="50422169_pgfId-450731"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-450706"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-450722"></A><A HREF="fd_chap.018.html#50422087_94260">Chapter 17, “Geometry”</A></LI>
+<LI>
+<A NAME="50422169_pgfId-450726"></A><A HREF="fd_chap.019.html#50422088_13353">Chapter 18, “B-Curves And B-Surfaces”</A></LI>
+<LI>
+<A NAME="50422169_pgfId-450730"></A><A HREF="fd_chap.047.html#50422119_Sheet Sewing">Chapter 46, “Sewing and Knitting”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422169_pgfId-369005"></A>90.3	<A NAME="50422169_marker-369002"></A><A NAME="50422169_marker-369003"></A><A NAME="50422169_marker-369004"></A><A NAME="50422169_12421"></A>Requirements for data import using the trimmed surface import route 
+
+
+</H1>
+<P>
+<A NAME="50422169_pgfId-294814"></A>To model successfully in Parasolid with externally created models, there are some requirements that the imported data must satisfy. This section explains these requirements.</P>
+<P>
+<A NAME="50422169_pgfId-294822"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422169_pgfId-294817"></A>Note: This section discusses creating SP-curve data using <A HREF=../headers/pk_spcurve_create.html><A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A></A>. <A HREF=../headers/pk_curve_embed_in_surf_2.html><A HREF=../headers/pk_curve_embed_in_surf_2.html>PK_CURVE_embed_in_surf_2</A></A> performs a similar function to <A HREF=../headers/pk_spcurve_create.html><A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A></A>, and can be used in place of it in all references throughout this section. The functions differ in that <A HREF=../headers/pk_curve_embed_in_surf_2.html><A HREF=../headers/pk_curve_embed_in_surf_2.html>PK_CURVE_embed_in_surf_2</A></A>:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-294818"></A>Lets you supply 2D analytic curves as well as 2D B-spline curves.</LI>
+<LI>
+<A NAME="50422169_pgfId-294819"></A>Allows you to either extend the supplied surface where the given SP-curves deviate slightly outside the parameter range of the surface, or adjust the SP-curves to ensure they fit within the surface limits. </LI>
+<LI>
+<A NAME="50422169_pgfId-863313"></A>Splits SP-curves at parametric degeneracies and G1 discontinuities in the underlying surface.</LI>
+<LI>
+<A NAME="50422169_pgfId-852728"></A>Produces a Parasolid Report of type <A HREF=../headers/pk_report_record_3_t.html>PK_REPORT_record_3_t</A> with a status of <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_embed_curve_c</A> providing additional information on the operation.</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422169_pgfId-294821"></A>A 2D analytic curve, in this context, refers to a 3D analytic curve that lies in the Z=0 plane. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422169_pgfId-294826"></A>	90.3.1 	<A NAME="50422169_marker-294823"></A><A NAME="50422169_marker-294824"></A><A NAME="50422169_marker-294825"></A>SP-curve data </H3>
+
+<H4>
+<A NAME="50422169_pgfId-294827"></A>90.3.1.1 Introduction </H4>
+<P>
+<A NAME="50422169_pgfId-294831"></A><A NAME="50422169_marker-294828"></A><A NAME="50422169_marker-294829"></A><A NAME="50422169_marker-294830"></A>To create an SP-curve from surface and uv-space B-spline data call <A NAME="50422169_marker-294832"></A><A HREF=../headers/pk_spcurve_create.html><A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A></A>. The surface given to <A HREF=../headers/pk_spcurve_create.html><A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A></A> can be any Parasolid surface provided that it is an orphan. It is permissible for this surface to contain parametric singularities. </P>
+<P>
+<A NAME="50422169_pgfId-294839"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422169_pgfId-294835"></A>Note: <A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A> can only create SP-curves from 2D trimming curves and surfaces. If the data you are importing consists of surfaces and 3D trimming curves, use <A HREF=../headers/pk_curve_make_spcurves_2.html><A HREF=../headers/pk_curve_make_spcurves_2.html>PK_CURVE_make_spcurves_2</A></A> instead. <A HREF=../headers/pk_curve_make_spcurves_2.html><A HREF=../headers/pk_curve_make_spcurves_2.html>PK_CURVE_make_spcurves_2</A></A> contains options that let you control:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-294836"></A>Whether or not to create zero-length SP-curves to connect disjoint SP-curves that are created when trimmed curves pass through a degenerate surface.</LI>
+<LI>
+<A NAME="50422169_pgfId-294837"></A>Whether or not SP-curves are created in the same direction as the trimmed curves.</LI>
+<LI>
+<A NAME="50422169_pgfId-294838"></A>Whether or not to create SP-curves that are C2 continuous in the parameter space of the surface. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422169_pgfId-294840"></A>You can simplify geometry using <A HREF=../headers/pk_body_simplify_geom.html>PK_BODY_simplify_geom</A> or <A HREF=../headers/pk_face_simplify_geom.html>PK_FACE_simplify_geom</A>. See <A HREF="fd_chap.065.html#50422140_52751">Section 64.2, “Simplifying geometry”</A>, for more information.</P>
+
+
+<H4>
+<A NAME="50422169_pgfId-294847"></A>90.3.1.2 <A NAME="50422169_marker-294844"></A><A NAME="50422169_marker-294845"></A><A NAME="50422169_marker-294846"></A>Criteria </H4>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-294848"></A>SP-curves are NURBs in a surface parameter space. They can be of any degree and may be rational, and are supported on all Parasolid surface types. </LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-294853"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422169_pgfId-294851"></A>Note: All SP-curves generated by Parasolid for its own use, e.g. during a <A NAME="50422169_marker-294852"></A><A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A> operation, are non-rational quadratic curves.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-294854"></A>SP-curves are allowed to cross seams on periodic surfaces. There is no need for the application to artificially split curves here.</LI>
+<LI>
+<A NAME="50422169_pgfId-294855"></A>SP-curves may end at parametric singularities of the underlying (basis) surface, but may not pass through them. For example, a line of longitude on a sphere cannot be represented by a single SP-curve. Parasolid allows the creation of SP-curves which represent degenerate surface boundaries, though <A NAME="50422169_marker-294856"></A><A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> does not allow them to be incorporated into subsequent sheet bodies.</LI>
+<LI>
+<A NAME="50422169_pgfId-294857"></A>Unless <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A> is PK_LOGICAL_false, SP-curves must be G1 in their basis surface parameter space, as well as being G1 in 3-space.</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-399728"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1109.gif">
+
+<P>
+<A NAME="50422169_pgfId-354799"></A>Figure 90-2 <A NAME="50422169_16118"></A>SP-curve in 3-space</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-354803"></A>The SP-curve in <A HREF="fd_chap.091.html#50422169_16118"><EM>
+Figure 90-2</EM></A> is G1 in 3-space. However, since its underlying NURB surface is not C1, the uv-space representation of the same curve has a kink in it, i.e. the SP-curve is non-G1 in uv-space. Therefore it is necessary for the curve to be split into two SP-curves. When required, <A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A> optionally handles this splitting though it can only be done for surfaces for which Parasolid can detect discontinuities, e.g. it is not possible for Foreign Geometry basis surfaces.</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-354973"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1110.gif">
+
+<P>
+<A NAME="50422169_pgfId-355071"></A>Figure 90-3 SP-curve is G1 in 3-space, but not in uv-space</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295189"></A>Non-G1 SP-curves are allowed if <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A> is PK_LOGICAL_false, but it is up to your application to remove any such discontinuities at some later point in order to make the part valid. </LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295193"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422169_pgfId-295192"></A>Note: Another consequence of the G1 parameter space requirement is that multi-segment linear curves are not allowed. Therefore, all applications making use of piecewise linear curves must convert them to G1 quadratics or higher order.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295194"></A>SP-curves and their control vertices are allowed to cross the boundary of a bounded surface such as a B-surface, though this deviation must be within the continuation region of the surface.</LI>
+<LI>
+<A NAME="50422169_pgfId-295195"></A>SP-curves are allowed to be closed, and may have a periodic parameterisation if the curve is G1 in both 3-space and surface parameter space at its ends. Curves not satisfying the G1 condition are viewed as non-periodic, and are not attachable to pure ring edges.</LI>
+<LI>
+<A NAME="50422169_pgfId-295196"></A>Some SP-curves cause problems due to extremely small radii of curvature:</LI>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295200"></A><A HREF="fd_chap.091.html#50422169_35242"><EM>
+Figure 90-4</EM></A> shows a perfectly well-behaved curve except for a small hook region at one end. Such high curvature can sometimes result from the underlying surface having extremely non-uniform knot spacing.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422169_pgfId-352305"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1111.gif">
+
+<P>
+<A NAME="50422169_pgfId-295322"></A>Figure 90-4 <A NAME="50422169_35242"></A>SP-curve with small hook</P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295326"></A><A HREF="fd_chap.091.html#50422169_36811"><EM>
+Figure 90-5</EM></A> shows an SP-curve with a high curvature S-bend in the middle of the curve. As it isn't guaranteed that <A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A> flags all such configurations, it is inevitable that some examples like these find their way into models, resulting in a corresponding degradation in reliability.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422169_pgfId-400409"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1112.gif">
+
+<P>
+<A NAME="50422169_pgfId-295520"></A>Figure 90-5 <A NAME="50422169_36811"></A>SP-curve with high curvature S-bend in the middle</P>
+<P>
+<A NAME="50422169_pgfId-295521"></A>It is extremely difficult to specify exact figures for the minimum radius of curvature which imported SP-curves should meet in order that Parasolid models with the part reliably. Therefore these previous examples are guidelines as to which configurations are likely to be problematic.</P>
+
+
+
+<H3>
+<A NAME="50422169_pgfId-295539"></A>	90.3.2 	<A NAME="50422169_marker-295535"></A><A NAME="50422169_marker-295536"></A><A NAME="50422169_marker-295537"></A><A NAME="50422169_marker-295538"></A>Trimmed surface data passed into <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> </H3>
+
+<H4>
+<A NAME="50422169_pgfId-295540"></A>90.3.2.1 Introduction </H4>
+<P>
+<A NAME="50422169_pgfId-295545"></A><A NAME="50422169_marker-295541"></A><A NAME="50422169_marker-295542"></A><A NAME="50422169_marker-295543"></A><A NAME="50422169_marker-295544"></A>To create a sheet body, with a single face, from given surface geometry for the face and curve geometry for the edges, use <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>. Using this method of creation the topology of the resulting sheet is inferred from the geometry.</P>
+<P>
+<A NAME="50422169_pgfId-295546"></A><A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> receives a set of trim data consisting of a combination of SP-curves and 3D curves, together with information about intervals, face sets, and loops. </P>
+<P>
+<A NAME="50422169_pgfId-295547"></A>The curves that you pass to <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> must satisfy a set of criteria in order to be usable by the function: different criteria need to be satisfied depending on whether you are passing SP-curves or 3D curves. See <A HREF="fd_chap.091.html#50422169_73971">“Criteria for SP-curves”</A> and <A HREF="fd_chap.091.html#50422169_42987">“Criteria for 3D curves”</A>, respectively. </P>
+<P>
+<A NAME="50422169_pgfId-295556"></A>In addition, <A HREF=../headers/pk_surf_make_sheet_trimmed.html><A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A></A> receives a set of options. See <A HREF="fd_chap.091.html#50422169_41211">“Options for <A HREF=../headers/pk_surf_make_sheet_trimmed.html><A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A></A>”</A>, for details. </P>
+<P>
+<A NAME="50422169_pgfId-295558"></A>Faces in Parasolid obey a rule for determining on which side of a boundary the face lies. Namely:</P>
+<P>
+<A NAME="50422169_pgfId-295559"></A>“With the face normal upward and the tangent direction of the boundary curve forward, the area of surface within the face is on the left.”</P>
+<P>
+<A NAME="50422169_pgfId-295560"></A>If the data supplied to <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> implies the area of the surface within the face is on the right then the face sense is automatically set such that the outward side of the face is the reverse side of the surface. This then restores the ‘on the left’ rule.</P>
+<P>
+<A NAME="50422169_pgfId-295561"></A>The front side of the sheet can, in any case, easily be switched using <A NAME="50422169_marker-295562"></A><A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A>.</P>
+<P>
+<A NAME="50422169_pgfId-295563"></A>As <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> is designed for importing geometric data from other solid modelers which work to coarser accuracies than Parasolid, the geometry that is supplied need not conform to Parasolid's strict tolerances.</P>
+
+
+<H4>
+<A NAME="50422169_pgfId-295565"></A>90.3.2.2 <A NAME="50422169_41211"></A>Options for <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> </H4>
+<P>
+<A NAME="50422169_pgfId-295566"></A><A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> contains options allowing you to perform a range of different checks on the data. When used, these pick up the majority of the problems. The options you use should reflect your certainty about the validity of the data (for instance, following a call to <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>).</P>
+<P>
+<A NAME="50422169_pgfId-295567"></A>The following options are available:</P>
+<P>
+<A NAME="50422169_pgfId-295590"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295570"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295572"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422169_pgfId-295574"></A>check_wires</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295576"></A>Whether to identify wire topologies, e.g. seam lines, ensuring that the correct topology is made in such cases</P>
+<ADDRESS>
+<A NAME="50422169_pgfId-295577"></A>Note: Opposing and coincident (within tolerance) curves should be supplied wherever wires are required.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422169_pgfId-295579"></A>check_self_int</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295581"></A>Whether to check for topological self-intersections in the sheet body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422169_pgfId-295583"></A>check_loops</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295585"></A>Whether to check that face loops are consistent. Some limited corrective action is taken to reverse loops that are in the wrong direction, though this is <EM>
+not</EM> guaranteed to produce a valid sheet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422169_pgfId-295587"></A>nominal_geom</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295589"></A>Whether to attach supplied 3D curves as nominal geometry. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422169_pgfId-295591"></A>If all input sheet bodies pass these checks, your application can do one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295593"></A>Complete the sewing operation using <A NAME="50422169_marker-295592"></A><A HREF=../headers/pk_body_sew_bodies.html>PK_BODY_sew_bodies</A></LI>
+<LI>
+<A NAME="50422169_pgfId-295595"></A>Create and apply a knitting pattern using <A NAME="50422169_marker-295594"></A><A HREF=../headers/pk_body_find_knit_pattern.html>PK_BODY_find_knit_pattern</A> and <A NAME="50422169_marker-295596"></A><A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A>.</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295600"></A>For details on both of these techniques, see <A HREF="fd_chap.047.html#50422119_25517">Chapter 46, “Sewing and Knitting”</A>.</P>
+
+
+<H4>
+<A NAME="50422169_pgfId-295606"></A>90.3.2.3 <A NAME="50422169_marker-295601"></A><A NAME="50422169_marker-295602"></A><A NAME="50422169_marker-295603"></A><A NAME="50422169_marker-295604"></A><A NAME="50422169_73971"></A>Criteria for SP-curves </H4>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295607"></A>It is important that the SP-curves in each individual loop supplied are ordered in the correct sequence around that loop, with the intended face on the left when viewed in a direction opposing the intended face normal. <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> corrects the direction(s) of individual SP-curves which are reversed with respect to the rest, but does not attempt to resolve the correct sequence if curves are input out of order.</LI>
+<LI>
+<A NAME="50422169_pgfId-295608"></A>SP-curves supplied need not meet their neighbors to within the sum of the edge tolerances. Points for vertices are computed by Parasolid by averaging curve ends, and sensible tolerances deduced. This allows a loop representation in the case of a surface parametric singularity (sphere pole) which does not incorporate a zero length (in 3-space) SP-curve representing the degeneracy. Therefore the user can legitimately supply the following data:</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-400461"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1113.gif">
+
+<P>
+<A NAME="50422169_pgfId-295618"></A>Figure 90-6 <A NAME="50422169_13913"></A>Trimmed curves part of whole loop</P>
+<P>
+<A NAME="50422169_pgfId-295619"></A>From this data Parasolid computes vertex point and tolerance:</P>
+<P>
+<A NAME="50422169_pgfId-400643"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1114.gif">
+
+<P>
+<A NAME="50422169_pgfId-295628"></A>Figure 90-7 Trimmed curves part of whole loop plus computed vertex and tolerance</P>
+<UL>
+<P>
+<A NAME="50422169_pgfId-295629"></A>P is the average centroid point computed using end of C1 and start of C2. The tolerance is the maximum distance of C1 or C2 away from P.</P>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295636"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422169_pgfId-295632"></A>Note: If C1 and C2 do not follow on to within specified tolerances (as in the case in <A HREF="fd_chap.091.html#50422169_13913"><EM>
+Figure 90-6</EM></A>) <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> does NOT attempt corrective action in the case where C2 is reversed accidentally with respect to C1.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295637"></A>There is no need to represent surface seam-lines or portions thereof, but if these are included in the input loops, <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> handles them, provided the correct option is set.</LI>
+<LI>
+<A NAME="50422169_pgfId-295638"></A>No SP-curve should have a length less than twice the supplied edge tolerance.</LI>
+<LI>
+<A NAME="50422169_pgfId-295639"></A>SP-curves should not approach within the sum of the edge tolerances of others which do not share a common vertex.</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-400854"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1115.gif">
+
+<P>
+<A NAME="50422169_pgfId-295648"></A>Figure 90-8 SP-curves within edge tolerance of sum of others with no common vertex</P>
+<UL>
+<P>
+<A NAME="50422169_pgfId-295649"></A>Where SP-curves do share a common vertex, the curves should not come within the appropriate edge tolerance sum of one another after separating at the vertex.</P>
+</UL>
+<P>
+<A NAME="50422169_pgfId-401069"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1116.gif">
+
+<P>
+<A NAME="50422169_pgfId-369581"></A>Figure 90-9 SP-curves within edge tolerance of sum of others with no common vertex</P>
+<UL>
+<P>
+<A NAME="50422169_pgfId-369582"></A>Neither should SP-curves be entirely within edge tolerance sum of one another.</P>
+</UL>
+<P>
+<A NAME="50422169_pgfId-401122"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1117.gif">
+
+<P>
+<A NAME="50422169_pgfId-295668"></A>Figure 90-10 Edge E2 is wholly within E1 tolerance + E2 tolerance of E1</P>
+<P>
+<A NAME="50422169_pgfId-295672"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422169_pgfId-295671"></A>Note: All the configurations in Figs. 8, 9 and 10 can be detected by the means of the checking option <CODE>
+check_self_int</CODE>
+.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295673"></A>There should be no faces which are wholly within the supplied edge tolerance band. An example of when this can occur is when small faces have been introduced to avoid use of a degenerate B-surface. These faces are not required, nor likewise, are faces which have been created in order to fill slender gaps in the model. Such faces are automatically rejected, and <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> returns PK_ENTITY_null.</LI>
+<LI>
+<A NAME="50422169_pgfId-295674"></A>All intended vertices of the result should correspond to the ends of SP-curves. Loops such as those shown in <A HREF="fd_chap.091.html#50422169_40725"><EM>
+Figure 90-11</EM></A> are valid, but prove impossible to knit into composite sheets or solids later. This situation can be resolved by supplying one SP-curve per intended edge in order to tell Parasolid where the vertices of the resultant sheet are to be.</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-401298"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1118.gif">
+
+<P>
+<A NAME="50422169_pgfId-295687"></A>Figure 90-11 <A NAME="50422169_40725"></A>Examples of SP-curves and their vertices</P>
+
+
+<H4>
+<A NAME="50422169_pgfId-295689"></A>90.3.2.4 <A NAME="50422169_42987"></A>Criteria for 3D curves </H4>
+<P>
+<A NAME="50422169_pgfId-295690"></A>The data you are importing may contain 3D curves that represent the boundary loop of the trimmed surface, as well as (or instead of) SP-curves. <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A> can receive these 3D curves using the same <CODE>
+spcurves</CODE>
+ field in the <CODE>
+trim_data</CODE>
+ structure received by <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>. </P>
+<P>
+<A NAME="50422169_pgfId-295691"></A>Any 3D curves supplied must do one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295692"></A>Be coincident with the supplied <CODE>
+surf</CODE>
+.</LI>
+<LI>
+<A NAME="50422169_pgfId-295693"></A>Have a supplied interval that lies within precision of the supplied surface.</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295697"></A>In the latter case, Parasolid creates an SP-curve based on the supplied curve, and then can attach the supplied 3D curve as nominal geometry (depending on the setting of the <CODE>
+nominal_geom</CODE>
+ option: see <A HREF="fd_chap.091.html#50422169_41211">“Options for <A HREF=../headers/pk_surf_make_sheet_trimmed.html>PK_SURF_make_sheet_trimmed</A>”</A>). When creating an SP-curve, Parasolid may extend the supplied surf so that the surface of the resulting sheet body includes the entire length of the SP-curve. </P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422169_pgfId-295708"></A>90.4	<A NAME="50422169_marker-620715"></A><A NAME="50422169_marker-620716"></A><A NAME="50422169_marker-620717"></A><A NAME="50422169_52243"></A>BREP import route 
+
+
+</H1>
+
+<H3>
+<A NAME="50422169_pgfId-295712"></A>	90.4.1 	<A NAME="50422169_marker-620720"></A><A NAME="50422169_marker-620721"></A><A NAME="50422169_marker-620722"></A>Sequence of events using BREP import route </H3>
+<P>
+<A NAME="50422169_pgfId-927990"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1119.gif">
+
+<P>
+<A NAME="50422169_pgfId-904471"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-450830"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-450834"></A><A HREF="fd_chap.015.html#50422084_27838">Section 14.2, “Topological entities”</A></LI>
+<LI>
+<A NAME="50422169_pgfId-450838"></A><A HREF="fd_chap.015.html#50422084_37514">Section 14.7.4, “Loop, fin and edge directions”</A></LI>
+<LI>
+<A NAME="50422169_pgfId-450842"></A><A HREF="fd_chap.015.html#50422084_26659">Section 14.7.6, “Edge/fin orientation flag”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422169_pgfId-295787"></A>	90.4.2 	<A NAME="50422169_marker-766825"></A><A NAME="50422169_marker-766826"></A>Importing topology </H3>
+<P>
+<A NAME="50422169_pgfId-768723"></A>You can create topology using the generic create function <A HREF=../headers/pk_body_create_topology_2.html>PK_BODY_create_topology_2</A>, whose arguments define the topological entities and the relations between them. The topological entities are defined using the following classes:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295798"></A>PK_CLASS_body</LI>
+<LI>
+<A NAME="50422169_pgfId-295799"></A>PK_CLASS_region</LI>
+<LI>
+<A NAME="50422169_pgfId-295800"></A>PK_CLASS_shell</LI>
+<LI>
+<A NAME="50422169_pgfId-295801"></A>PK_CLASS_face</LI>
+<LI>
+<A NAME="50422169_pgfId-295802"></A>PK_CLASS_loop</LI>
+<LI>
+<A NAME="50422169_pgfId-295803"></A>PK_CLASS_fin</LI>
+<LI>
+<A NAME="50422169_pgfId-295804"></A>PK_CLASS_edge</LI>
+<LI>
+<A NAME="50422169_pgfId-295805"></A>PK_CLASS_vertex</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295806"></A>All of the body’s regions, shells, faces, loops, edges, and vertices must be present in the input. However, the presence of fins is optional, since these can be inferred from the loop that is the parent of each edge. </P>
+<P>
+<A NAME="50422169_pgfId-295807"></A>The first region received by <A HREF=../headers/pk_body_create_topology_2.html>PK_BODY_create_topology_2</A> must be the outer region of the body.</P>
+<P>
+<A NAME="50422169_pgfId-295808"></A>You must specify the sense of:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295809"></A>Regions (whether solid or void), as children of the body</LI>
+<LI>
+<A NAME="50422169_pgfId-295810"></A>Faces, as children of a shell</LI>
+<LI>
+<A NAME="50422169_pgfId-295811"></A>Edges, as children of fins or loops</LI>
+<LI>
+<A NAME="50422169_pgfId-295812"></A>Fins or loops, as children of edges.</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295813"></A>Wire bodies do not have any faces. For sheet bodies, each face appears twice in a shell with different senses.</P>
+
+
+<H3>
+<A NAME="50422169_pgfId-295835"></A>	90.4.3 	<A NAME="50422169_marker-295833"></A><A NAME="50422169_marker-295834"></A>Creating geometry </H3>
+<P>
+<A NAME="50422169_pgfId-295836"></A>There is an extensive range of primary geometry functions. The majority of these have names of the form PK_&lt;GEOM&gt;_create, for example:</P>
+<P>
+<A NAME="50422169_pgfId-295877"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295839"></A>Geometry</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295841"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295843"></A>Geometry</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295845"></A>Functions</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295847"></A>for points:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295849"></A><A HREF=../headers/pk_point_create.html>PK_POINT_create</A></P>
+</TD>
+<TD ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295851"></A>for surfaces:</P>
+</TD>
+<TD ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295853"></A><A HREF=../headers/pk_bsurf_create.html>PK_BSURF_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295854"></A><A HREF=../headers/pk_cone_create.html>PK_CONE_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295855"></A><A HREF=../headers/pk_cyl_create.html>PK_CYL_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295856"></A><A HREF=../headers/pk_fsurf_create.html>PK_FSURF_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295857"></A><A HREF=../headers/pk_offset_create.html>PK_OFFSET_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295858"></A><A HREF=../headers/pk_plane_create.html>PK_PLANE_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295859"></A><A HREF=../headers/pk_sphere_create.html>PK_SPHERE_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295860"></A><A HREF=../headers/pk_spun_create.html>PK_SPUN_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295861"></A><A HREF=../headers/pk_swept_create.html>PK_SWEPT_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295862"></A><A HREF=../headers/pk_torus_create.html>PK_TORUS_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295863"></A><A HREF=../headers/pk_vector_make_lsq_plane.html>PK_VECTOR_make_lsq_plane</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295865"></A>for curves:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295867"></A><A HREF=../headers/pk_bcurve_create.html>PK_BCURVE_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295868"></A><A HREF=../headers/pk_circle_create.html>PK_CIRCLE_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295869"></A><A HREF=../headers/pk_ellipse_create.html>PK_ELLIPSE_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295870"></A><A HREF=../headers/pk_fcurve_create.html>PK_FCURVE_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295871"></A><A HREF=../headers/pk_line_create.html>PK_LINE_create</A></P>
+<P>
+<A NAME="50422169_pgfId-295872"></A><A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422169_pgfId-295878"></A>B-geometry can also be created from spline data or piecewise data using:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295880"></A><A NAME="50422169_marker-295879"></A><A HREF=../headers/pk_bcurve_create_piecewise.html>PK_BCURVE_create_piecewise</A></LI>
+<LI>
+<A NAME="50422169_pgfId-295882"></A><A NAME="50422169_marker-295881"></A><A HREF=../headers/pk_bcurve_create_splinewise.html>PK_BCURVE_create_splinewise</A></LI>
+<LI>
+<A NAME="50422169_pgfId-295884"></A><A NAME="50422169_marker-295883"></A><A HREF=../headers/pk_bsurf_create_piecewise.html>PK_BSURF_create_piecewise</A></LI>
+<LI>
+<A NAME="50422169_pgfId-295886"></A><A NAME="50422169_marker-295885"></A><A HREF=../headers/pk_bsurf_create_splinewise.html>PK_BSURF_create_splinewise</A></LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295887"></A>As well as these there is a wide range of functions of the form PK_<EM>
+&lt;GEOM&gt;</EM>_make_<EM>
+&lt;something&gt;</EM> which make geometry from other geometry.</P>
+<P>
+<A NAME="50422169_pgfId-339247"></A>You can simplify geometry using <A HREF=../headers/pk_body_simplify_geom.html>PK_BODY_simplify_geom</A> or <A HREF=../headers/pk_face_simplify_geom.html>PK_FACE_simplify_geom</A>. See <A HREF="fd_chap.065.html#50422140_52751">Section 64.2, “Simplifying geometry”</A>, for more information.</P>
+
+
+<H3>
+<A NAME="50422169_pgfId-339254"></A>	90.4.4 	<A NAME="50422169_marker-339251"></A><A NAME="50422169_marker-339252"></A><A NAME="50422169_53406"></A>Attaching geometry </H3>
+<P>
+<A NAME="50422169_pgfId-295899"></A><A NAME="50422169_marker-295896"></A><A NAME="50422169_marker-295897"></A><A NAME="50422169_marker-295898"></A>To create a valid body, you must attach geometry of the correct class to all of its vertices, edges and faces; these entities having been returned by the appropriate PK_BODY_create_&lt;body_type&gt;_topology function. You can make any geometry construction geometry of the body using <A NAME="50422169_marker-295900"></A><A HREF=../headers/pk_part_add_geoms.html>PK_PART_add_geoms</A> before attaching it to particular topological entities.</P>
+<P>
+<A NAME="50422169_pgfId-295901"></A>You should attach the geometry to topology using the following functions in the order shown:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295903"></A>Attach points to vertices with <A NAME="50422169_marker-295902"></A><A HREF=../headers/pk_vertex_attach_points.html>PK_VERTEX_attach_points</A></LI>
+<LI>
+<A NAME="50422169_pgfId-295905"></A>Attach curves to edges with <A NAME="50422169_marker-295904"></A><A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A></LI>
+<LI>
+<A NAME="50422169_pgfId-295907"></A>Attach surfaces to faces with <A NAME="50422169_marker-295906"></A><A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A></LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295908"></A><A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A> accepts an option structure that lets you control:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295909"></A>Parameter intervals for the curves to be attached.</LI>
+<LI>
+<A NAME="50422169_pgfId-295910"></A>Whether to copy the curves before attaching them.</LI>
+<LI>
+<A NAME="50422169_pgfId-295911"></A>Whether to set the senses of the curves before attaching them.</LI>
+<LI>
+<A NAME="50422169_pgfId-295912"></A>Whether to enforce vertex and geometry checking.</LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-358605"></A>You must also ensure that curve directions and surface normal directions are correct. Parasolid conventions regarding curve directions and surface normal directions are described in <A HREF="fd_chap.015.html#50422084_36760">Chapter 14, “Model Structure”</A>. You can determine curve direction using <A HREF=../headers/pk_curve_eval.html>PK_CURVE_eval</A>. When a curve is attached to a face using PK_EDGE_attach_curve_2 your application must indicate whether the curve direction is in the same or opposite direction to that of the edge. You can determine surface normal direction using <A NAME="50422169_marker-358609"></A><A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A>. When a surface is attached to a face using <A NAME="50422169_marker-358610"></A><A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A> your application must indicate whether the surface normal is in the same or opposite direction to that of the face normal.</P>
+<P>
+<A NAME="50422169_pgfId-295921"></A>If you disable geometry checking using the <CODE>
+geom_checking</CODE>
+ option in <A HREF=../headers/pk_edge_attach_curves_2.html><A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A></A>, this overrides the session settings for checking continuity (defined using <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A>) and self-intersections (defined using <A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>), for the duration of the call to <A HREF=../headers/pk_edge_attach_curves_2.html><A HREF=../headers/pk_edge_attach_curves_2.html>PK_EDGE_attach_curves_2</A></A>.</P>
+<P>
+<A NAME="50422169_pgfId-295922"></A>If you do not want to use the <CODE>
+geom_checking</CODE>
+ option, you can set the checking behaviour for continuity and self-intersections separately, dependent on the nature of your data, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-295923"></A>Use <A HREF=../headers/pk_session_set_check_continuity.html>PK_SESSION_set_check_continuity</A> to turn continuity checking on or off in a Parasolid session temporarily. When continuity checking is on, Parasolid checks each B-curve or B-surface for G1 discontinuities before attaching it. If a G1 discontinuity is found, then that curve or surface cannot be attached to a single edge or face. By default, continuity checking is on.</LI>
+<LI>
+<A NAME="50422169_pgfId-295930"></A>Use <A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A> to turn self-intersection checking on or off in a Parasolid session temporarily. When this is on, Parasolid does not attach a curve or surface if that causes a self-intersection. By default, self-intersection checking is on.</LI>
+<LI>
+<A NAME="50422169_pgfId-295937"></A>Use <A HREF=../headers/pk_session_set_close_knots.html>PK_SESSION_set_close_knots</A> to temporarily allow B-geometry to have knots that are closer than session angular tolerance. </LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295938"></A>If you use these functions to attach geometry, then you should turn the settings off again afterwards. You should also try to repair any problems that have been created using <A HREF=../headers/pk_face_repair.html>PK_FACE_repair</A> and <A HREF=../headers/pk_edge_repair.html>PK_EDGE_repair</A>, or using a dedicated toolkit such as Parasolid Bodyshop. </P>
+
+
+<H3>
+<A NAME="50422169_pgfId-295942"></A>	90.4.5 	Sharing geometry </H3>
+<P>
+<A NAME="50422169_pgfId-295943"></A>Once all the geometry has been attached, you should call <A HREF=../headers/pk_body_share_geom.html>PK_BODY_share_geom</A> to remove any duplicate curves and surfaces. This reduces the size of the model by allowing curves and surfaces to be shared wherever possible.</P>
+<P>
+<A NAME="50422169_pgfId-295944"></A><A HREF=../headers/pk_body_share_geom.html>PK_BODY_share_geom</A> also ensures that SP-curves refer to the surfaces attached to faces when the geometry was constructed.</P>
+
+
+<H3>
+<A NAME="50422169_pgfId-295949"></A>	90.4.6 	<A NAME="50422169_marker-904276"></A><A NAME="50422169_marker-904277"></A><A NAME="50422169_marker-904278"></A><A NAME="50422169_17545"></A>Repairing the data </H3>
+<P>
+<A NAME="50422169_pgfId-295950"></A>You can use the following functions to find and repair any self-intersections in the geometry you have created:</P>
+<P>
+<A NAME="50422169_pgfId-928014"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295953"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295955"></A>Usage</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295957"></A><A HREF=../headers/pk_curve_find_self_int.html>PK_CURVE_find_self_int</A> </P>
+<P>
+<A NAME="50422169_pgfId-295958"></A><A HREF=../headers/pk_curve_fix_self_int.html>PK_CURVE_fix_self_int</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295960"></A>Find and repair self-intersections in curves.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295962"></A><A HREF=../headers/pk_surf_find_self_int.html>PK_SURF_find_self_int</A> </P>
+<P>
+<A NAME="50422169_pgfId-295963"></A><A HREF=../headers/pk_surf_fix_self_int.html>PK_SURF_fix_self_int</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422169_pgfId-295965"></A>Find and repair self-intersections in surfaces. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422169_pgfId-924771"></A>You can also use <A HREF=../headers/pk_surf_fix_degens.html>PK_SURF_fix_degens</A> and <A HREF=../headers/pk_curve_fix_degens.html>PK_CURVE_fix_degens</A> to repair degeneracies in any surfaces and curves you have created.</P>
+<P>
+<A NAME="50422169_pgfId-924772"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Inquiries\Model</CODE>
+ <CODE>
+Analysis\FindAndFixDegeneracies</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422169_pgfId-928049"></A>After the geometry has been attached, the part may need to be repaired to ensure that Parasolid tolerances are met as follows:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-924781"></A>Call <A NAME="50422169_marker-924780"></A><A HREF=../headers/pk_edge_repair.html><A HREF=../headers/pk_edge_repair.html>PK_EDGE_repair</A></A> on all the edges. This calculates the maximum distance between the edge curve and its adjacent surfaces. If an edge curve does not lie on its adjacent surfaces, or a vertex does not lie on its adjacent edges, then appropriate tolerances are computed and set on the edge or vertex. Alternatively, <A HREF=../headers/pk_edge_repair.html><A HREF=../headers/pk_edge_repair.html>PK_EDGE_repair</A></A> can calculate an accurate edge curve by intersecting the faces adjacent to the edge.</LI>
+<LI>
+<A NAME="50422169_pgfId-924783"></A>Call <A NAME="50422169_marker-924782"></A><A HREF=../headers/pk_face_repair.html>PK_FACE_repair</A> on all the faces. This splits the faces along any G1 discontinuities. It also attempts to exclude any regions of surface self-intersection from the face, by splitting the face.</LI>
+<LI>
+<A NAME="50422169_pgfId-924784"></A>Call <A HREF=../headers/pk_body_repair_shells.html><A HREF=../headers/pk_body_repair_shells.html>PK_BODY_repair_shells</A></A> on all the bodies. This repairs the structure of shells and regions in a part, and can fix topological clashes between shells, such as where two faces from different shells share a common edge. See the documentation for <A HREF=../headers/pk_body_repair_shells.html><A HREF=../headers/pk_body_repair_shells.html>PK_BODY_repair_shells</A></A> for a complete list of repairs. </LI>
+</UL>
+<P>
+<A NAME="50422169_pgfId-295975"></A>If desired, <A NAME="50422169_marker-295974"></A><A HREF=../headers/pk_edge_reset_precision_2.html>PK_EDGE_reset_precision_2</A> may be called on the edges. This attempts to compute accurate edge curves for non-tangent edges by intersecting the adjacent surfaces. Alternatively, the edges may be left with local tolerances.</P>
+<P>
+<A NAME="50422169_pgfId-924792"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422169_pgfId-924791"></A>Note: SP-curves that cross surface degeneracies will be fixed by splitting if possible. To repair surface degeneracies, additional calls to <A HREF=../headers/pk_surf_find_degens.html>PK_SURF_find_degens</A> and <A HREF=../headers/pk_surf_fix_degens.html>PK_SURF_fix_degens</A> are required.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422169_pgfId-924797"></A>90.4.6.1 <A NAME="50422169_marker-295980"></A><A NAME="50422169_marker-295981"></A><A NAME="50422169_marker-295982"></A><A NAME="50422169_marker-295983"></A>Examples </H4>
+<P>
+<A NAME="50422169_pgfId-924798"></A>You can find code examples that demonstrate how to establish the topology of a given model and how to import it into Parasolid using <A HREF=../headers/pk_body_create_topology_2.html>PK_BODY_create_topology_2</A> in the ExampleApplication folder on the Parasolid Jumpstart Kit.</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422169_pgfId-297877"></A>90.5	<A NAME="50422169_marker-297874"></A><A NAME="50422169_marker-297875"></A><A NAME="50422169_marker-297876"></A>Relevant Parasolid restrictions and conventions 
+
+
+</H1>
+
+<H3>
+<A NAME="50422169_pgfId-297881"></A>	90.5.1 	<A NAME="50422169_marker-297878"></A><A NAME="50422169_marker-297879"></A><A NAME="50422169_20960"></A>Face normals </H3>
+<P>
+<A NAME="50422169_pgfId-297884"></A><A NAME="50422169_marker-297882"></A><A NAME="50422169_marker-297883"></A>By convention in Parasolid, all face normals in a solid body point out of the material of the body. For faces bounding voids this means the normals point into the void. Face normals are determined by:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-297885"></A>the normal of the surface attached to the face;</LI>
+<LI>
+<A NAME="50422169_pgfId-297886"></A>the sense of the face.</LI>
+<P>
+<A NAME="50422169_pgfId-297888"></A>The sense of a face is set by the <CODE>
+senses</CODE>
+ argument to <A NAME="50422169_marker-297887"></A><A HREF=../headers/pk_face_attach_surfs.html>PK_FACE_attach_surfs</A>:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-297889"></A>If <CODE>
+sense</CODE>
+ is PK_LOGICAL_true, the face normal is parallel to the surface normal.</LI>
+<LI>
+<A NAME="50422169_pgfId-297890"></A>If <CODE>
+sense</CODE>
+ is PK_LOGICAL_false, the face normal is anti-parallel.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422169_pgfId-297891"></A>You can also reverse the orientation of a face in a non-manifold body using <A HREF=../headers/pk_face_reverse.html>PK_FACE_reverse</A>. </P>
+<P>
+<A NAME="50422169_pgfId-297894"></A>For more information, see <A HREF="fd_chap.015.html#50422084_40353">Section 14.7, “Relationships between topology and geometry of manifold bodies”</A>.</P>
+
+
+<H3>
+<A NAME="50422169_pgfId-297900"></A>	90.5.2 	<A NAME="50422169_marker-297896"></A><A NAME="50422169_marker-297897"></A><A NAME="50422169_marker-297898"></A><A NAME="50422169_marker-297899"></A>Loop directions and faces </H3>
+<P>
+<A NAME="50422169_pgfId-297903"></A><A NAME="50422169_marker-297901"></A><A NAME="50422169_marker-297902"></A>In Parasolid, the face of a loop is on its left, when looking from outside the material of the body and moving in the loop direction. </P>
+<P>
+<A NAME="50422169_pgfId-297904"></A>If the modeler from which a body is being imported has the opposite convention, all loop directions need to be reversed. This is done by either:</P>
+<UL>
+<LI>
+<A NAME="50422169_pgfId-297905"></A>Switching all edge senses as given in the senses argument received by PK_BODY_create_solid_topology_2.</LI>
+<LI>
+<A NAME="50422169_pgfId-297907"></A>Reversing curve directions, by for example, using <A NAME="50422169_marker-297906"></A><A HREF=../headers/pk_body_reverse_orientation.html><A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A></A>, in the case of bodies with curves on edges. Care must be taken that points are attached to vertices consistently with the direction of the loop. <A HREF=../headers/pk_body_reverse_orientation.html><A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A></A> must be called on the whole body for sheets with fin geometry.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422169_pgfId-297911"></A>	90.5.3 	<A NAME="50422169_marker-297908"></A><A NAME="50422169_marker-297909"></A><A NAME="50422169_marker-297910"></A>Non-manifold bodies </H3>
+<P>
+<A NAME="50422169_pgfId-297914"></A><A NAME="50422169_marker-297912"></A><A NAME="50422169_marker-297913"></A>All Parasolid bodies that are created in a session where <A NAME="50422169_marker-297915"></A><A HREF=../headers/pk_session_set_general_topology.html>PK_SESSION_set_general_topology</A> has not been run must be manifold, objects such as T-sheets or solid regions meeting at a point are not permitted.</P>
+<P>
+<A NAME="50422169_pgfId-297918"></A>For further information on manifold bodies and generalized topology, see <A HREF="fd_chap.016.html#50422085_20712">Chapter 15, “Body Types”</A>.</P>
+
+
+<H3>
+<A NAME="50422169_pgfId-297929"></A>	90.5.4 	<A NAME="50422169_marker-297923"></A><A NAME="50422169_marker-297924"></A><A NAME="50422169_marker-297925"></A><A NAME="50422169_marker-297926"></A><A NAME="50422169_marker-297927"></A><A NAME="50422169_marker-297928"></A>B-curves and edges </H3>
+<P>
+<A NAME="50422169_pgfId-297932"></A><A NAME="50422169_marker-297930"></A><A NAME="50422169_marker-297931"></A>The B-curve of an edge must be G1 continuous. It can have multi-segments so long as it is G1 continuous. If a B-curve is not G1 continuous it needs to be split at the G1 discontinuities, each of which can be attached to a separate edge.</P>
+<P>
+<A NAME="50422169_pgfId-855119"></A><A NAME="50422169_marker-854820"></A><A NAME="50422169_marker-854821"></A><A NAME="50422169_marker-854822"></A><A NAME="50422169_marker-854823"></A><A NAME="50422169_marker-854824"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.090.html">Introduction To Importing And Exporting</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.092.html">Exporting Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

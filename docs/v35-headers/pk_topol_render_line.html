@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TOPOL_render_line</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TOPOL_render_line</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                 PK_TOPOL_render_line
+(
+<I>--- received arguments ---
+</I>const int                       n_topols,        --- number of entities
+const <A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                topols[],        --- entities to rendered
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>               topol_transfs[], --- applied transformations
+const <A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>               view_transf,     --- viewing transformation
+const <A HREF=../headers/pk_topol_render_line_o_t.html>PK_TOPOL_render_line_o_t</A> *options          --- options structure [PF]
+)
+</B>
+<A NAME="description"></A>
+<I>Render an array of topological entities through GO as either a view-independent
+wire-frame drawing, a view-dependent wire-frame drawing or a hidden-line
+drawing according to values supplied in an options structure.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_duplicate_array_item   topol has duplicates but no transf array
+                                    (MILD)
+    PK_ERROR_bad_component          topol or view transf is inappropriate
+                                    (MILD)
+    PK_ERROR_field_of_wrong_type    options are inconsistent with each other
+                                    (MILD)
+    PK_ERROR_unsuitable_topology    entity in topols array is not an edge, face
+                                    or body (MILD)
+    PK_ERROR_bad_tolerance          is_&lt;tol&gt; is true but used with a bad &lt;tol&gt;
+                                    (MILD)
+    PK_ERROR_distance_too_small     unsuitable hatch line separation (MILD)
+
+    PK_ERROR_bad_2d_viewport        2D viewport has not been properly specified
+                                    (MILD)
+    PK_ERROR_missing_geom           <B>'ske_missing'</B> is set to
+                                    <A HREF=../headers/pk_render_ske_missing_t.html>PK_render_ske_missing_no_c</A> but topol has
+                                    incomplete geometry (MILD)
+
+    PK_ERROR_function_not_exclusive an option value is incompatible with the
+                                    function running concurrently in a thread
+                                    without locked partitions (MILD)
+
+<A NAME="documentation"></A>
+This function produces a 3D line drawing of topological entities in the world
+coordinate system via GO. Each topological entity may be a body, face or edge,
+if any other type of topological entity appears in <B>'topols'</B> the error
+PK_ERROR_unsuitable_topology will be returned.
+
+The function arguments determine what type of line drawing is created :
+
+       -   a view-independent wire-frame drawing
+       -   a view-dependent wire-frame drawing
+       -   a hidden-line drawing
+
+View-independent wire-frame drawings are created using the default visibility
+and silhouette settings defined by the macro PK_TOPOL_render_line_o_m.
+
+All view-dependent wire-frame drawings require the <B>'silhouette'</B> option
+switched to a value other than <B>'<A HREF=../headers/pk_render_silhouette_t.html>PK_render_silhouette_no_c</A>'</B>.
+
+Hidden-line drawings require the same arguments as for view-dependent
+wire-frame drawings and the <B>'visibility'</B> option switched to a value other
+than <B>'<A HREF=../headers/pk_render_vis_t.html>PK_render_vis_no_c</A>'</B>.
+
+See <A HREF="../chapters/fd_chap.105.html#50434473_pgfId-294731">Rendering functions</A> for more information.
+
+
+<B>'topol_transfs'</B>
+If <B>'topol_transfs'</B> is set to NULL, entities in <B>'topols'</B> are not transformed.
+The <B>'topols'</B> array may not contain duplicates in this case.
+
+If <B>'topol_transfs'</B> is not set to NULL, it refers to an array of TRANSFs of
+length <B>'n_topols'</B>. The <B>'topols'</B> array may contain duplicates in this case.
+Each entity in <B>'topols'</B> is transformed by the corresponding entry in
+<B>'topol_transfs'</B>.
+
+For both wire-frame rendering and hidden-line rendering, the <B>'topol_transfs'</B>
+matrices may only contain translation, rotation, and reflection components;
+they may not contain scales, shears or perspective terms. The components of a
+transformation matrix can be determined using <A HREF=../headers/pk_transf_classify.html>PK_TRANSF_classify</A>.
+
+If a <B>'topol_transfs'</B> entry is set to PK_ENTITY_null, it implies that the
+corresponding entity in <B>'topols'</B> is not to be transformed.
+
+See <A HREF="../chapters/fd_chap.105.html#50434473_pgfId-295067">View independent topology</A> for more information.
+
+<B>'view_transf'</B>
+The <B>'view_transf'</B> argument is needed when generating silhouettes for
+view-dependent wire-frame and hidden-line drawings.
+
+The application frustrum must apply a copy of its underlying view matrix to
+all graphics data passed through GO (which are output in a world coordinate
+system).
+
+A <B>'view_transf'</B> argument of PK_ENTITY_null is equivalent to providing the
+identity matrix. A perspective view is generated if <B>'view_transf'</B> contains
+non-zero perspective terms.
+
+See <A HREF="../chapters/fd_chap.111.html#50434479_pgfId-294730">Parasolid View Matrices</A> for more information.
+
+Restrictions:
+The following restrictions apply when generating view-independent wire-frame
+drawings:
+
+    -  the <B>'smoothness'</B> option must not be set to <A HREF=../headers/pk_render_smooth_t.html>PK_render_smooth_draft_c</A>
+    -  unfixed blends cannot be drawn when a viewport is specified
+
+The following restrictions apply when generating view-dependent wire-frame
+drawings:
+
+    -  the <B>'smoothness'</B> option must not be set to <A HREF=../headers/pk_render_smooth_t.html>PK_render_smooth_draft_c</A>
+    -  unfixed blends are drawn using the original unblended edge
+
+The following restrictions apply when generating hidden-line drawings:
+
+    -   only complete bodies are drawn
+        (any other topological entities in the <B>'topol'</B>s array are ignored).
+    -   if using <A HREF=../headers/pk_render_vis_t.html>PK_render_vis_inv_draft_c</A> ( or <A HREF=../headers/pk_render_vis_t.html>PK_render_vis_extended_c</A>
+            with invisible set to <A HREF=../headers/pk_render_invisible_t.html>PK_render_invisible_yes_c</A> and drafting
+            set to <A HREF=../headers/pk_render_drafting_t.html>PK_render_drafting_yes_c</A> ) the <B>'view_transf'</B> matrix
+            must not contain non-zero perspective terms
+    -   the <B>'silhouette'</B> option must not be set to <A HREF=../headers/pk_render_silhouette_t.html>PK_render_silhouette_no_c</A>
+    -   unfixed blends are drawn using the original unblended edge
+
+The following restrictions apply when running concurrently in a thread without
+locked partitions:
+
+    -   the <B>'ignore'</B> option must be set to <A HREF=../headers/pk_render_ignore_t.html>PK_render_ignore_no_c</A>
+    -   the <B>'unfix'</B> option must be set to <A HREF=../headers/pk_render_unfix_t.html>PK_render_unfix_no_c</A>.
+    -   the <B>'viewport_clipping'</B> option must be set to
+        <A HREF=../headers/pk_render_viewport_clip_t.html>PK_render_viewport_clip_no_c</A>
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

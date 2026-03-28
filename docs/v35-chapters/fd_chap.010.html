@@ -1,0 +1,745 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>PK Interface Programming Concepts </TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK Interface Programming Concepts </B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.009.html">Parasolid Source Code Collateral</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.011.html">Tracking And Labelling</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-307500">9.1	Introduction to the PK Interface </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-635215">9.2	PK functions </A>
+<UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-294763">9.2.1	PK classes </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-294771">9.2.2	Options structure </A>
+<UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-294777">9.2.2.1	Using a macro to initialise option structures </A>
+</UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-556511">9.2.3	Optional return arguments </A>
+<UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-667730">9.2.3.1	Using a macro to initialise the return structures </A>
+</UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-556527">9.2.4	Passing variables by reference </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-335125">9.2.5	Use of const </A>
+</UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-387335">9.3	Memory management </A>
+<UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-387337">9.3.1	Space for memory is declared at compile-time </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-387349">9.3.2	Space for memory is allocated at run-time </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-400614">9.3.3	Space for memory is allocated using the application-registered memory alloc function </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-294856">9.3.4	Memory management functions </A>
+<UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-294864">9.3.4.1	Structures containing pointers </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-294891">9.3.4.2	Freeing memory used by return structures </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-335455">9.4	Debug functions </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-335470">9.5	Deprecated functions </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-335484">9.6	Facet geometry support </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-556695">9.7	Differences between Parasolid versions </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-676292">9.8	Compatibility between Parasolid versions </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-556706">9.9	Undocumented PK functions </A>
+<UL>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-556708">9.9.1	Approximate evaluations on geometry </A>
+<LI> <A HREF="fd_chap.010.html#50422078_pgfId-556724">9.9.2	Other undocumented functions </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422078_pgfId-307500"></A>9.1	Introduction to the PK Interface 
+
+
+</H1>
+<P>
+<A NAME="50422078_pgfId-556219"></A>Calling Parasolid functionality from your application code is a simple process. Parasolid has a long history of strong design principles and offers its functionality through a consistent interface that is accompanied by complete and thorough reference documentation. </P>
+<P>
+<A NAME="50422078_pgfId-593282"></A>The PK interface is C-style callable from C/C++. It is presented as a collection of C declarations for tokens, structures and functions that are defined in the file <CODE>
+parasolid_kernel.h</CODE>
+. </P>
+<P>
+<A NAME="50422078_pgfId-631289"></A>A Microsoft .NET binding DLL for Parasolid is also available, which allows Parasolid-based applications to be written in the C# programming language. See <A HREF="fd_chap.013.html#50422081_18658">Chapter 12, “Calling Parasolid From .NET Code”</A>, for more information on C# binding.</P>
+<P>
+<A NAME="50422078_pgfId-572207"></A>For examples of the use of the PK Interface, see the code examples in the <EM>
+Parasolid</EM> <EM>
+Jumpstart</EM> <EM>
+Kit\example_applications\C++\Code</EM> <EM>
+Examples</EM> folder in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422078_pgfId-625104"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-625114"></A>Note: A good working knowledge of the C programming language is required as Parasolid has a C interface. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422078_pgfId-556250"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422078_pgfId-556245"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422078_pgfId-556249"></A><A HREF="fd_chap.003.html#50422070_19856">Chapter 2, “Parasolid Concepts”</A></LI>
+<LI>
+<A NAME="50422078_pgfId-627349"></A><A HREF="fd_chap.013.html#50422081_18658">Chapter 12, “Calling Parasolid From .NET Code”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422078_pgfId-635215"></A>9.2	<A NAME="50422078_56226"></A>PK functions 
+
+
+</H1>
+<P>
+<A NAME="50422078_pgfId-638735"></A>All Parasolid interfaces follow strict naming conventions that make them easy to use and identify. All PK functions have names of the form PK_<EM>
+&lt;CLASS&gt;</EM>_<EM>
+&lt;text&gt;</EM>, where <EM>
+&lt;CLASS&gt;</EM> is the class of entity on which the function can be called, and <EM>
+&lt;text&gt;</EM> is usually a verb/noun combination that describes the operation to be performed.</P>
+<P>
+<A NAME="50422078_pgfId-556289"></A>Every function has a fixed set of arguments. Some of these are used to supply data (received arguments) and some are used to return information (return arguments). Arguments must never be used for both purposes. The overall relationship between these different elements is illustrated in <A HREF="fd_chap.010.html#50422078_34009"><EM>
+Figure 9-1</EM></A>.</P>
+<P>
+<A NAME="50422078_pgfId-556328"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-23.gif">
+
+<P>
+<A NAME="50422078_pgfId-556329"></A>Figure 9-1 <A NAME="50422078_34009"></A>Structure of a typical function </P>
+<P>
+<A NAME="50422078_pgfId-432155"></A><A NAME="50422078_marker-556330"></A><A NAME="50422078_marker-556331"></A>See <A HREF="fd_chap.003.html#50422070_18698">Section 2.3, “PK interface functions”</A> for more information on PK functions and argument types.</P>
+
+<H3>
+<A NAME="50422078_pgfId-294763"></A>	9.2.1 	<A NAME="50422078_13698"></A>PK classes </H3>
+<P>
+<A NAME="50422078_pgfId-556398"></A>In Parasolid, objects of a similar type belong to a class which defines objects of a common type. For example, all cylindrical surfaces are of type PK_CLASS_cyl. Classes are grouped together to form a class hierarchy which is illustrated in <A HREF="fd_chap.003.html#50422070_78731"><EM>
+Figure 2-1</EM></A> in <A HREF="fd_chap.003.html#50422070_19856">Chapter 2, “Parasolid Concepts”</A>.</P>
+<P>
+<A NAME="50422078_pgfId-294765"></A>When the class has an object belonging to it (which it usually does) the name of their C type is of the form PK_&lt;<EM>
+CLASS</EM>&gt;_t. These objects may be either:</P>
+<UL>
+<LI>
+<A NAME="50422078_pgfId-294766"></A>context-free packets of data, e.g. a BODY, or </LI>
+<LI>
+<A NAME="50422078_pgfId-294767"></A>handles into the state of the kernel, e.g. a MARK or a PMARK</LI>
+</UL>
+<P>
+<A NAME="50422078_pgfId-294768"></A>Objects of some classes have tags which identify them within a Parasolid session. See <A HREF="fd_chap.003.html#50422070_21663">Section 2.4.2, “Tags”</A> for more information on tags.</P>
+<P>
+<A NAME="50422078_pgfId-294769"></A>A PK class often has other types associated with it, structures of one form or another or token enumerations, and these have names of the form PK_&lt;<EM>
+CLASS</EM>&gt;_&lt;<EM>
+text</EM>&gt;. When these types are more directly associated with a particular function their names reflect this as there are naming conventions for option structures, type classifications, etc.</P>
+<P>
+<A NAME="50422078_pgfId-556467"></A>Some classes have a special structure type called a <STRONG>
+standard form</STRONG> that represents the data encapsulated by objects belonging to the class. These structure types have names of the form PK_&lt;<EM>
+CLASS</EM>&gt;_sf_t. For example <A HREF=../headers/pk_cone_sf_t.html>PK_CONE_sf_t</A> is the standard form of a cone. See <A HREF="fd_chap.018.html#50422087_45701">Section 17.2, “Standard forms”</A> for more information.</P>
+<P>
+<A NAME="50422078_pgfId-437806"></A>For more information on PK classes, see <A HREF="fd_chap.003.html#50422070_22611">Section 2.2, “Parasolid class structure”</A>.</P>
+
+
+<H3>
+<A NAME="50422078_pgfId-294771"></A>	9.2.2 	<A NAME="50422078_50852"></A>Options structure </H3>
+<P>
+<A NAME="50422078_pgfId-406432"></A>Optional arguments and switches passed to functions are collected together in a single structure and passed as one argument called an option structure. Every option in the structure must be specified even if you only require the default behaviour. You must do this by calling the relevant macro as described in <A HREF="fd_chap.010.html#50422078_88906">Section 9.2.2.1, “Using a macro to initialise option structures”</A>.</P>
+<P>
+<A NAME="50422078_pgfId-446827"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-446826"></A>Note: Option structures are named by adding the string “_o_t” to the function name.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422078_pgfId-294777"></A>9.2.2.1 <A NAME="50422078_88906"></A>Using a macro to initialise option structures </H4>
+<P>
+<A NAME="50422078_pgfId-294778"></A>Each option structure must be initialised before use by using a corresponding macro so that all fields in a structure are set to their default values. After initialising with the macro, your application needs to reset the relevant fields in the option structure to a non-default value.The default values set by the macro are, in general, shown in the documentation for each option structure, in brackets after the field name and type. If the option structure contains an array of substructures, these must also be initialised by their macros if they are being supplied.</P>
+<P>
+<A NAME="50422078_pgfId-572113"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-572123"></A>Note: The default options are not recommend settings but are set for stability of legacy behaviour.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422078_pgfId-638851"></A> &nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-294782"></A>Note: Option structure initialiser macros are named by replacing the “_o_t” string at the end of the function name with “_o_m”.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422078_pgfId-294787"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-294786"></A>Warning: Each options structure has an <CODE>
+o_t_version</CODE>
+ field, which is initialised by the corresponding options macro, and should not be set directly by your application code. You should not edit this field as it allows Parasolid to detect which version the code was compiled with so later versions can interpret the option structure correctly. For more information, see <A HREF="fd_chap.010.html#50422078_87303">Section 9.8, “Compatibility between Parasolid versions”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422078_pgfId-294788"></A>Example of calling a PK function using an option structure:</P>
+<P>
+<A NAME="50422078_pgfId-667495"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422078_pgfId-335199"></A><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>    face;</PRE>
+<PRE><A NAME="50422078_pgfId-335200"></A><A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>   topol;</PRE>
+<PRE><A NAME="50422078_pgfId-335201"></A><A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>  point;</PRE>
+<PRE><A NAME="50422078_pgfId-335202"></A><A HREF=../headers/pk_face_contains_vectors_o_t.html>PK_FACE_contains_vectors_o_t</A>  option;</PRE>
+<PRE><A NAME="50422078_pgfId-335203"></A>point.coord[0] = 5.0;</PRE>
+<PRE><A NAME="50422078_pgfId-335204"></A>point.coord[1] = 5.0;</PRE>
+<PRE><A NAME="50422078_pgfId-335205"></A>point.coord[2] = 0.0;</PRE>
+<PRE><A NAME="50422078_pgfId-335206"></A>/*<EM>Initialise all fields in option structure for <A HREF=../headers/pk_face_contains_vectors.html>PK_FACE_contains_vectors</A></EM>*/</PRE>
+<PRE><A NAME="50422078_pgfId-335207"></A>PK_FACE_contains_vectors_o_m(option);</PRE>
+<PRE><A NAME="50422078_pgfId-335208"></A>/* <EM>Specify point</EM> */</PRE>
+<PRE><A NAME="50422078_pgfId-335209"></A>option.vectors = &amp;point;</PRE>
+<PRE><A NAME="50422078_pgfId-335210"></A>option.n_vectors = 1;</PRE>
+<PRE><A NAME="50422078_pgfId-639066"></A>&nbsp;</PRE>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422078_pgfId-556511"></A>	9.2.3 	<A NAME="50422078_88384"></A>Optional return arguments </H3>
+<P>
+<A NAME="50422078_pgfId-556512"></A>Some return arguments declared in the form:</P>
+<P>
+<A NAME="50422078_pgfId-556513"></A>type	 **const name</P>
+<P>
+<A NAME="50422078_pgfId-556514"></A>may be set to NULL before the function is called to indicate that this information is not to be returned and no space is to be allocated for it. Such arguments are indicated by the word ‘optional’ as shown in the following example:</P>
+<P>
+<A NAME="50422078_pgfId-556525"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422078_pgfId-556517"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> 	<A HREF=../headers/pk_body_ask_faces.html>PK_BODY_ask_faces</A></PRE>
+<PRE><A NAME="50422078_pgfId-556518"></A>(</PRE>
+<PRE><A NAME="50422078_pgfId-556519"></A>// <EM>received arguments</EM></PRE>
+<PRE><A NAME="50422078_pgfId-556520"></A><A HREF=../headers/pk_body_t.html>PK_BODY_t</A> 		body, 	// <EM>a body</EM> </PRE>
+<PRE><A NAME="50422078_pgfId-556521"></A>// <EM>returned arguments</EM></PRE>
+<PRE><A NAME="50422078_pgfId-556522"></A><STRONG>int</STRONG> 	*<STRONG>const</STRONG> n_faces, 	// <EM>number of faces (&gt;= 0)</EM></PRE>
+<PRE><A NAME="50422078_pgfId-556523"></A><A HREF=../headers/pk_face_t.html>PK_FACE_t</A> 		**<STRONG>const</STRONG> faces 	// <EM>faces (optional)</EM></PRE>
+<PRE><A NAME="50422078_pgfId-556524"></A>)</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422078_pgfId-556526"></A>You can call this function with <CODE>
+faces</CODE>
+ set to NULL. This use of NULL is only allowed in those cases where it is explicitly documented. </P>
+<P>
+<A NAME="50422078_pgfId-668078"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-668088"></A>Note: Functions which have option structures never have optional return arguments</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422078_pgfId-667730"></A>9.2.3.1 Using a macro to initialise the return structures </H4>
+<P>
+<A NAME="50422078_pgfId-668033"></A>Some functions require you to initialise their return structure before use by using a corresponding macro so that all fields in a structure are set to their default values. Only return structures that have an “_r_t_version” field need to be initialised in this way.</P>
+<P>
+<A NAME="50422078_pgfId-668276"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-668275"></A>Note: Return structure initialiser macros are named by replacing the “_r_t” string at the end of the function name with “_r_m”.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422078_pgfId-556527"></A>	9.2.4 	Passing variables by reference </H3>
+<P>
+<A NAME="50422078_pgfId-556531"></A>In general, Parasolid receives variables by reference when:</P>
+<UL>
+<LI>
+<A NAME="50422078_pgfId-556532"></A>they are too large and passing a big value may use excessive memory or processing effort</LI>
+<LI>
+<A NAME="50422078_pgfId-556533"></A>their size is variable </LI>
+<LI>
+<A NAME="50422078_pgfId-294806"></A>the definition of a structure may change between Parasolid versions (e.g. option structures)</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422078_pgfId-335125"></A>	9.2.5 	Use of const </H3>
+<P>
+<A NAME="50422078_pgfId-294794"></A>The <CODE>
+const</CODE>
+ modifier is used in Parasolid to protect the application’s data from being altered by Parasolid in any unintended way. More specifically, it is used to:</P>
+<UL>
+<LI>
+<A NAME="50422078_pgfId-294795"></A>prevent Parasolid from changing information that is passed to it. This is coded in the form:</LI>
+</UL>
+<P>
+<A NAME="50422078_pgfId-294796"></A>const <A HREF=../headers/pk_line_sf_t.html>PK_LINE_sf_t</A> *line_sf</P>
+<UL>
+<LI>
+<A NAME="50422078_pgfId-294797"></A>prevent Parasolid from putting return information in the wrong place. This is coded in the form: <CODE>
+int *const n_edges</CODE>
+</LI>
+</UL>
+<P>
+<A NAME="50422078_pgfId-556542"></A>When the type of a function argument is declared using <CODE>
+const</CODE>
+, this protection applies within that function and within any it calls to any depth; that is, constancy is propagated downwards. It is not necessary for applications to declare variables using the const modifier to pass them to Parasolid.</P>
+<P>
+<A NAME="50422078_pgfId-556548"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-556545"></A>Warning: If a function argument is declared as:</ADDRESS><BR>
+<P>
+<A NAME="50422078_pgfId-556546"></A>const type *arg</P>
+<ADDRESS>
+<A NAME="50422078_pgfId-556547"></A>then the constancy only applies when the space is accessed by that argument. If an application passes a pointer to the same space both for a received argument and a returned argument then the result is undefined.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422078_pgfId-387335"></A>9.3	<A NAME="50422078_36769"></A>Memory management 
+
+
+</H1>
+<P>
+<A NAME="50422078_pgfId-472991"></A>The amount of memory required for certain arguments returned from Parasolid functions cannot be determined at build time. For these arguments, memory must be allocated at run-time. Parasolid allocates the required memory using the function you specify in <A HREF=../headers/pk_memory_register_callbacks.html>PK_MEMORY_register_callbacks</A> (which may be different from the function you specify more general for Parasolid's memory usage, via <A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A>).  For these arguments, you must ensure that memory is freed correctly when it is no longer required. Variable length data is returned from the PK as C arrays which can be split into the following three categories with respect to their memory requirements.</P>
+
+<H3>
+<A NAME="50422078_pgfId-387337"></A>	9.3.1 	Space for memory is declared at compile-time </H3>
+<P>
+<A NAME="50422078_pgfId-387341"></A>The application declares the space at compile-time and passes a (constant) pointer to it to Parasolid. These arguments appear as, for example, <CODE>
+type name[3]</CODE>
+ in the PK function headers. Space declared at compile-time does not need to be explicitly freed.</P>
+<P>
+<A NAME="50422078_pgfId-387348"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-387344"></A>Note:  An exception to this case is data whose size is known at compile time, but is declared by a pointer in a field of a return structure. Parasolid decides whether to allocate space for it and sets the pointer to it.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422078_pgfId-387349"></A>	9.3.2 	Space for memory is allocated at run-time </H3>
+<P>
+<A NAME="50422078_pgfId-387353"></A>The application allocates space at run-time and passes a constant pointer to it to Parasolid. These arguments appear as <CODE>
+type name[]</CODE>
+ or <CODE>
+type *const name</CODE>
+ in the function headers, where <CODE>
+name</CODE>
+ is an array whose length is not known at compile-time. The space allocated should be freed by the application some time later when it is no longer required.</P>
+
+
+<H3>
+<A NAME="50422078_pgfId-400614"></A>	9.3.3 	Space for memory is allocated using the application-registered memory alloc function </H3>
+<P>
+<A NAME="50422078_pgfId-556597"></A>The application should declare a pointer to the returned type, and pass a constant pointer to this pointer to Parasolid. Parasolid sets the pointer to point to the returned information. These arguments usually appear as <CODE>
+type **const name</CODE>
+ in the function headers; they can also appear as arrays of pointers.</P>
+<P>
+<A NAME="50422078_pgfId-388746"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-556600"></A>Note: Your application is responsible for freeing the memory once it is no longer required.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422078_pgfId-294856"></A>	9.3.4 	<A NAME="50422078_10144"></A>Memory management functions </H3>
+<P>
+<A NAME="50422078_pgfId-294857"></A>The PK_MEMORY functions provide an interface by which the application can handle the allocation and freeing of space for variable length returned arguments from the PK:</P>
+<UL>
+<LI>
+<A NAME="50422078_pgfId-294858"></A>the application can clear away memory allocated by Parasolid</LI>
+<LI>
+<A NAME="50422078_pgfId-294859"></A>space can be freed consistently regardless of where it was originally allocated</LI>
+</UL>
+<P>
+<A NAME="50422078_pgfId-322905"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-556608"></A>Note: Your application must free all memory allocated on its behalf by the PK when returning arguments of the <CODE>
+type **const name</CODE>
+ form using <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422078_pgfId-345279"></A>The memory handling functions FMALLO and FMFREE must be provided via a call to <A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A> in order for the Parasolid session to start.The function <A HREF=../headers/pk_memory_register_callbacks.html>PK_MEMORY_register_callbacks</A> registers the allocation and freeing functions that Parasolid is to use for variable length PK returns with Parasolid. By default, Parasolid uses the C standard malloc and free runtime library. You should ensure that all registered allocation and freeing functions are compatible and thread-safe. In addition, <A HREF=../headers/pk_thread_register_memory_cbs.html>PK_THREAD_register_memory_cbs</A> can register thread-specific allocation and freeing functions. See <A HREF="fd_chap.114.html#50422195_90285">Section 113.2, “How to set up and use application threads”</A> for more information.</P>
+<P>
+<A NAME="50422078_pgfId-556627"></A>The functions <A HREF=../headers/pk_memory_alloc.html>PK_MEMORY_alloc</A> and <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A> make use of the registered allocation and freeing functions provided for applications that have a layered architecture. </P>
+<P>
+<A NAME="50422078_pgfId-638942"></A><A HREF=../headers/pk_memory_register_callbacks.html>PK_MEMORY_register_callbacks</A> can optionally register <A HREF=../headers/pk_memory_free_f_t.html>PK_MEMORY_free_f_t</A> and <A HREF=../headers/pk_memory_alloc_f_t.html>PK_MEMORY_alloc_f_t</A>. This type of memory is completely independent of the Parasolid session and is used to allocate return structures, arrays and PK memory blocks. By default, Parasolid uses the C standard malloc and free runtime library. For more information on managing memory, see <A HREF="fd_chap.007.html#50422075_26868">Section 6.5, “Memory management”</A>.</P>
+<P>
+<A NAME="50422078_pgfId-556632"></A>If a PK function succeeds, the space for any variable length returns can be freed by calling <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>. If a PK function fails, and has already allocated any space for variable length returns, then Parasolid frees that space by calling the registered free function.</P>
+
+<H4>
+<A NAME="50422078_pgfId-294864"></A>9.3.4.1 Structures containing pointers </H4>
+<P>
+<A NAME="50422078_pgfId-294865"></A>If the function returns a structure that contains a pointer, then the space it is pointing to is allocated by Parasolid and must be freed later by the application. In particular, standard forms are structures of fixed size but they may point to variable length arrays.</P>
+<P>
+<A NAME="50422078_pgfId-294866"></A>As an example, <A HREF=../headers/pk_bcurve_ask.html>PK_BCURVE_ask</A> returns <A HREF=../headers/pk_bcurve_sf_t.html>PK_BCURVE_sf_t</A> which, because it is of fixed size is declared as:</P>
+<P>
+<A NAME="50422078_pgfId-294867"></A><A HREF=../headers/pk_bcurve_sf_t.html>PK_BCURVE_sf_t</A>				 *const bcurve_sf</P>
+<P>
+<A NAME="50422078_pgfId-294868"></A>The structure <A HREF=../headers/pk_bcurve_sf_t.html>PK_BCURVE_sf_t</A> contains the field:</P>
+<P>
+<A NAME="50422078_pgfId-294869"></A>double		 *knot</P>
+<P>
+<A NAME="50422078_pgfId-294870"></A>and space for the knot vector is allocated by Parasolid.</P>
+<P>
+<A NAME="50422078_pgfId-294871"></A>Hence the more general rule is that whenever returned information has two levels of indirection, then the space is allocated by Parasolid. In the simple cases, the two levels of indirection are indicated by declarations of the form:</P>
+<P>
+<A NAME="50422078_pgfId-294872"></A>type	 **const name</P>
+<P>
+<A NAME="50422078_pgfId-294873"></A>but the two levels may be split where the first is a pointer to a structure and the second is a pointer within the structure.</P>
+
+
+<H4>
+<A NAME="50422078_pgfId-294891"></A>9.3.4.2 Freeing memory used by return structures </H4>
+<P>
+<A NAME="50422078_pgfId-294892"></A>Some return structures have code supplied to free the space pointed to by the structure. For a return structure whose name is of the form:</P>
+<P>
+<A NAME="50422078_pgfId-294893"></A>PK_&lt;<EM>
+something</EM>&gt;_r_t</P>
+<P>
+<A NAME="50422078_pgfId-294894"></A>then the freeing code is:</P>
+<P>
+<A NAME="50422078_pgfId-294895"></A>PK_&lt;<EM>
+something</EM>&gt;_r_f</P>
+<P>
+<A NAME="50422078_pgfId-556645"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-556648"></A>Note: This code is supplied to assist application developers and is not a core part of the PK interface.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422078_pgfId-335455"></A>9.4	Debug functions 
+
+
+</H1>
+<P>
+<A NAME="50422078_pgfId-345294"></A>Parasolid includes a number of PK_DEBUG functions that you can use to obtain additional information when debugging calls to PK functionality. Documentation for these functions is provided in <A HREF="fd_chap.102.html#50422181_91948">Chapter 101, “Debug Functionality”</A>. For further information, see the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>.</P>
+<P>
+<A NAME="50422078_pgfId-343011"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+Support\Archiving\Journal</CODE>
+ <CODE>
+Debug</CODE>
+ <CODE>
+Report</CODE>
+ <CODE>
+Session </CODE>
+folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422078_pgfId-335469"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-335468"></A>Note: You should not include calls to any PK_DEBUG functions in a released product.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422078_pgfId-335470"></A>9.5	Deprecated functions 
+
+
+</H1>
+<P>
+<A NAME="50422078_pgfId-335474"></A>When a PK function is deprecated - because it is replaced with an improved version - it remains in Parasolid so that it can continue to be used by legacy code. A list of these deprecated functions can be found in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>. By default deprecated functions are not listed in that manual, but they can be displayed by selecting ‘Show deprecated functions’ at the top of the contents page of that manual. </P>
+<P>
+<A NAME="50422078_pgfId-337764"></A>Replacement functions can usually be identified by a number at the end of the function name. For example, <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> replaces the deprecated function <A HREF=../headers/pk_body_boolean.html>PK_BODY_boolean</A>.</P>
+<P>
+<A NAME="50422078_pgfId-357684"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-335483"></A>Note: Once a function is deprecated, you should only use it in existing legacy code. Any new code should use the replacement function.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422078_pgfId-335484"></A>9.6	Facet geometry support 
+
+
+</H1>
+<P>
+<A NAME="50422078_pgfId-639002"></A>The majority of Parasolid functions support facet geometry. A list of some of the APIs along with their level of support for facet geometry is provided in the Functions with limited facet geometry support section of the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>. </P>
+<P>
+<A NAME="50422078_pgfId-666032"></A>In addition, interfaces that do not support facet geometry are marked [NF] in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> and these need to be left at their default values. Those that offer partial support are marked [PF] and can be changed to values that support facet geometry. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422078_pgfId-556695"></A>9.7	Differences between Parasolid versions 
+
+
+</H1>
+<P>
+<A NAME="50422078_pgfId-556699"></A>The following are not guaranteed to be consistent between different versions of Parasolid, and may change between releases without notice. Your application code should not rely on either of these:</P>
+<UL>
+<LI>
+<A NAME="50422078_pgfId-556700"></A>The order in which entities are returned from a given PK function</LI>
+<LI>
+<A NAME="50422078_pgfId-676287"></A>The type of geometry attached to face and edge topology</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422078_pgfId-676292"></A>9.8	<A NAME="50422078_87303"></A>Compatibility between Parasolid versions 
+
+
+</H1>
+<P>
+<A NAME="50422078_pgfId-676299"></A>Parasolid uses a plug-and-play mechanism that allows newer versions of Parasolid to interpret the options structures from older versions. This means that you can use any newer Parasolid build (as a dynamically linked library) at run time, without the need to rebuild your application.</P>
+<P>
+<A NAME="50422078_pgfId-678451"></A>This mechanism is helpful in situations where you need to use a newer Parasolid version, perhaps to access a bug fix, with minimal impact to your application. In general when upgrading your Parasolid version it’s recommended to rebuild your application to access functional enhancements in full.</P>
+<P>
+<A NAME="50422078_pgfId-676309"></A>The plug-and-play mechanism depends on the first field in all options structures, <CODE>
+o_t_version</CODE>
+. Before interpreting the rest of the options structure, Parasolid reads this field to determine the options structure version and thus work correctly with older versions of the options structure.</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422078_pgfId-676919"></A>Warning: The <CODE>
+o_t_version</CODE>
+ field should be initialised by the corresponding options macro and must not be altered directly by your application code. Changing this field will disable the mechanism and cause unexpected Parasolid behaviour.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422078_pgfId-556706"></A>9.9	Undocumented PK functions 
+
+
+</H1>
+
+<H3>
+<A NAME="50422078_pgfId-556708"></A>	9.9.1 	<A NAME="50422078_11108"></A>Approximate evaluations on geometry </H3>
+<P>
+<A NAME="50422078_pgfId-556712"></A>The following functions are present within Parasolid to support applications with legacy code. We do not recommend the use of these functions and as such, the functions are undocumented.</P>
+<UL>
+<LI>
+<A NAME="50422078_pgfId-556713"></A>PK_BCURVE_eval_approx</LI>
+<LI>
+<A NAME="50422078_pgfId-556714"></A>PK_BCURVE_set_approx</LI>
+<LI>
+<A NAME="50422078_pgfId-556715"></A>PK_BCURVE_unset_approx</LI>
+<LI>
+<A NAME="50422078_pgfId-556716"></A>PK_BSURF_eval_approx</LI>
+<LI>
+<A NAME="50422078_pgfId-556717"></A>PK_BSURF_set_approx</LI>
+<LI>
+<A NAME="50422078_pgfId-556718"></A>PK_BSURF_unset_approx</LI>
+<LI>
+<A NAME="50422078_pgfId-556719"></A>PK_SPCURVE_eval_approx</LI>
+</UL>
+<P>
+<A NAME="50422078_pgfId-556723"></A>To obtain the documentation or information regarding these functions, contact Parasolid Support.</P>
+
+
+<H3>
+<A NAME="50422078_pgfId-556724"></A>	9.9.2 	Other undocumented functions </H3>
+<P>
+<A NAME="50422078_pgfId-556725"></A>The following functions are undocumented and should not be used in application code. They are provided only for backward compatibility...</P>
+<UL>
+<LI>
+<A NAME="50422078_pgfId-556726"></A>PK_BODY_make_swept_profiles</LI>
+<LI>
+<A NAME="50422078_pgfId-556727"></A>PK_FACE_make_valid_faces</LI>
+<LI>
+<A NAME="50422078_pgfId-556728"></A>PK_LOOP_offset_planar</LI>
+<LI>
+<A NAME="50422078_pgfId-556729"></A>PK_PART_ask_attrib_owners</LI>
+<LI>
+<A NAME="50422078_pgfId-556730"></A>PK_PART_ask_attribs_filter</LI>
+<LI>
+<A NAME="50422078_pgfId-556731"></A>PK_SESSION_register_polling_cb</LI>
+<LI>
+<A NAME="50422078_pgfId-556732"></A>PK_SESSION_set_angle_precision</LI>
+<LI>
+<A NAME="50422078_pgfId-556733"></A>PK_SESSION_set_precision</LI>
+</UL>
+<P>
+<A NAME="50422078_pgfId-476087"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.009.html">Parasolid Source Code Collateral</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.011.html">Tracking And Labelling</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

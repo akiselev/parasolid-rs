@@ -1,0 +1,567 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Session Support</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Session Support</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.115.html">Symmetric Multi-Processing In Parasolid</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.117.html">Version Controls</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294726">115.1	Introduction </A>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294734">115.2	Session statistics </A>
+<UL>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294740">115.2.1	Memory usage </A>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294748">115.2.2	Tag bounds </A>
+</UL>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294793">115.3	Session transmit (snapshot) </A>
+<UL>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294805">115.3.1	Saving a session </A>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294849">115.3.2	Restoring a session </A>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294864">115.3.3	Session transmit version </A>
+</UL>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294872">115.4	Journal files </A>
+<UL>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-343184">115.4.1	Adding a comment to a journal file </A>
+</UL>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294918">115.5	Recursion </A>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294926">115.6	User fields </A>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-294958">115.7	Controlling memory allocation </A>
+<LI> <A HREF="fd_chap.116.html#50422197_pgfId-421964">115.8	Managing the session settings when reporting errors involving multiple error entities </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422197_pgfId-294726"></A>115.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422197_pgfId-294727"></A>This chapter introduces those areas of functionality that an application can use to control and get information about a Parasolid modelling session.</P>
+<P>
+<A NAME="50422197_pgfId-369510"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-369289"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422197_pgfId-369260"></A><A HREF="fd_chap.011.html#50422079_49464">Chapter 10, “Tracking And Labelling”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422197_pgfId-294734"></A>115.2	<A NAME="50422197_31698"></A><A NAME="50422197_marker-373036"></A><A NAME="50422197_marker-373037"></A>Session statistics 
+
+
+</H1>
+<P>
+<A NAME="50422197_pgfId-294737"></A><A NAME="50422197_Session statistics"></A><A NAME="50422197_marker-294736"></A>At any time during a session, information about the state of a modelling session can be returned.</P>
+
+<H3>
+<A NAME="50422197_pgfId-294740"></A>	115.2.1 	<A NAME="50422197_marker-294738"></A><A NAME="50422197_marker-294739"></A>Memory usage </H3>
+<P>
+<A NAME="50422197_pgfId-294744"></A><A NAME="50422197_marker-294741"></A><A NAME="50422197_marker-294742"></A><A NAME="50422197_marker-294743"></A><A HREF=../headers/pk_session_ask_memory_usage.html>PK_SESSION_ask_memory_usage</A> returns the amount of memory currently occupied by the model data structure. This can be tested if storage space problems are anticipated:</P>
+<P>
+<A NAME="50422197_pgfId-294745"></A><A HREF=../headers/pk_body_ask_memory_usage.html>PK_BODY_ask_memory_usage</A> returns the amount of memory currently occupied by a body’s data structures.</P>
+
+
+<H3>
+<A NAME="50422197_pgfId-294748"></A>	115.2.2 	<A NAME="50422197_marker-294746"></A><A NAME="50422197_marker-294747"></A>Tag bounds </H3>
+<P>
+<A NAME="50422197_pgfId-294751"></A><A NAME="50422197_marker-294749"></A><A NAME="50422197_marker-294750"></A>You can manage the tag values in a session using the following functions:</P>
+<P>
+<A NAME="50422197_pgfId-294785"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294754"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294756"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294759"></A><A NAME="50422197_marker-418112"></A><A HREF=../headers/pk_session_set_tag_limit.html>PK_SESSION_set_tag_limit</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294764"></A>Specify an upper bound range of Parasolid tag numbers to control the numerical range of tag values.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294767"></A><A NAME="50422197_marker-418120"></A><A HREF=../headers/pk_session_ask_tag_limit.html>PK_SESSION_ask_tag_limit</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294772"></A>Return the upper bound of Parasolid tag numbers.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294775"></A><A NAME="50422197_marker-418128"></A><A HREF=../headers/pk_session_ask_tag_highest.html>PK_SESSION_ask_tag_highest</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294780"></A>Confirm the maximum tag value currently being used in Parasolid.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294782"></A><A HREF=../headers/pk_session_ask_tags_remaining.html>PK_SESSION_ask_tags_remaining</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294784"></A>Return the number of tags that are currently available for use.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422197_pgfId-294789"></A>Normally the tag limit is not expected to be changed during a Parasolid session. However, if it is changed, it is not affected by either session or partition roll operations - it remains at the value most recently set.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422197_pgfId-294793"></A>115.3	<A NAME="50422197_marker-294790"></A><A NAME="50422197_marker-294791"></A><A NAME="50422197_marker-294792"></A><A NAME="50422197_31718"></A>Session transmit (snapshot) 
+
+
+</H1>
+<P>
+<A NAME="50422197_pgfId-294798"></A><A NAME="50422197_Session transmit (snapshot)"></A><A NAME="50422197_Snapshot"></A><A NAME="50422197_marker-294796"></A><A NAME="50422197_marker-294797"></A>A session transmit file, or snapshot, is an image of a session at a particular instant, which can be loaded to re-create the session. Typically snapshots are used to: </P>
+<UL>
+<LI>
+<A NAME="50422197_pgfId-294799"></A>Safeguard against losing data when a session stops unexpectedly. The user could make a snapshot at significant points in a session so that work done up to that point is not lost if the session stops unexpectedly.</LI>
+<LI>
+<A NAME="50422197_pgfId-294800"></A>Preserve data between sessions. The user can create a snapshot and stop a session, then resume work by restoring the snapshot.</LI>
+<LI>
+<A NAME="50422197_pgfId-294801"></A>Preserve the session so that faults can be re-created quickly and easily.</LI>
+</UL>
+
+<H3>
+<A NAME="50422197_pgfId-294805"></A>	115.3.1 	<A NAME="50422197_marker-399203"></A><A NAME="50422197_marker-399204"></A><A NAME="50422197_58114"></A>Saving a session </H3>
+<P>
+<A NAME="50422197_pgfId-294807"></A><A NAME="50422197_marker-399208"></A><A HREF=../headers/pk_session_transmit.html>PK_SESSION_transmit</A> and <A HREF=../headers/pk_session_transmit_u.html>PK_SESSION_transmit_u</A> are used to create a snapshot of a session. You can choose what format the file should be in using the <CODE>
+transmit_format</CODE>
+ option. It has the following formats:</P>
+<P>
+<A NAME="50422197_pgfId-402008"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294811"></A>Format</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294813"></A>Frustrum requirements</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294815"></A>text</P>
+</TD>
+<TD ROWSPAN="4" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294817"></A>these three use the FFOPWR frustrum function</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294819"></A>machine-dependent binary</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-404675"></A>machine-independent binary</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294823"></A>neutral binary</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294827"></A>“applio” (output via application-registered functions)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-294829"></A>this format uses the application frustrum functions which are registered by <A NAME="50422197_marker-402256"></A><A HREF=../headers/pk_session_register_applio_2.html>PK_SESSION_register_applio_2</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422197_pgfId-401915"></A>The chosen format should be provided in your application frustrum as required. For more information about using session files when reporting faults, see the Parasolid <EM>
+Fault Reporting</EM> manual.</P>
+<P>
+<A NAME="50422197_pgfId-294839"></A>You can also choose whether to save user fields, pmarks, session marks, and delta information, using the <CODE>
+transmit_user_fields</CODE>
+, <CODE>
+transmit_deltas</CODE>
+, and <CODE>
+transmit_marks</CODE>
+ options respectively. See <A HREF=../headers/pk_session_transmit_o_t.html>PK_SESSION_transmit_o_t</A> for more information. </P>
+<P>
+<A NAME="50422197_pgfId-294843"></A>For further information about transmit formats see <A HREF="di_chap.03.html#21045">Chapter 2, “File Handling”</A>, of the Parasolid <A HREF=../di_index.html>Downward Interfaces</A> manual.</P>
+
+<H3>
+<A NAME="50422197_pgfId-294849"></A>	115.3.2 	<A NAME="50422197_marker-405197"></A><A NAME="50422197_marker-405198"></A>Restoring a session </H3>
+<P>
+<A NAME="50422197_pgfId-294854"></A><A NAME="50422197_marker-405201"></A><A HREF=../headers/pk_session_receive.html>PK_SESSION_receive</A> and <A HREF=../headers/pk_session_receive_u.html>PK_SESSION_receive_u</A> restore a snapshot into the same version of Parasolid that transmitted it. For information on the options available in these functions, see <A HREF=../headers/pk_session_receive_o_t.html>PK_SESSION_receive_o_t</A>.</P>
+<P>
+<A NAME="50422197_pgfId-398254"></A>Restoring a snapshot has the following effects on the session:</P>
+<UL>
+<LI>
+<A NAME="50422197_pgfId-294855"></A>All the entities which previously existed in the session are deleted.</LI>
+<LI>
+<A NAME="50422197_pgfId-294856"></A>The new partitions and entities are the same as when the snapshot was saved.</LI>
+<LI>
+<A NAME="50422197_pgfId-294857"></A> If the snapshot was saved with the <CODE>
+transmit_marks</CODE>
+ option set to <A HREF=../headers/pk_session_xmt_marks_t.html>PK_SESSION_xmt_marks_all_c</A>, then all session marks (<A HREF=../headers/pk_mark_t.html>PK_MARK_t</A>) are the same as when the snapshot was saved; otherwise no session marks are available.</LI>
+<LI>
+<A NAME="50422197_pgfId-294858"></A>If the snapshot was saved with <CODE>
+transmit_deltas</CODE>
+ option set to PK_PARTITION_xmt_deltas_all_c, then all the pmarks in all partitions are the same as when the snapshot was saved; otherwise only the initial pmarks are available.</LI>
+<LI>
+<A NAME="50422197_pgfId-294859"></A>It is possible to roll back (using <A HREF=../headers/pk_mark_goto_2.html>PK_MARK_goto_2</A>) a restored snapshot to a previous state when that session was saved with session marks.</LI>
+</UL>
+<P>
+<A NAME="50422197_pgfId-396810"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-396860"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422197_pgfId-396844"></A><A HREF="fd_chap.098.html#50422177_37645">Section 97.2.2, “Partition marks”</A></LI>
+<LI>
+<A NAME="50422197_pgfId-396876"></A><A HREF="fd_chap.098.html#50422177_99663">Section 97.4.1, “Session marks”</A></LI>
+<LI>
+<A NAME="50422197_pgfId-398442"></A><A HREF="fd_chap.116.html#50422197_58114">Section 115.3.1, “Saving a session”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422197_pgfId-294864"></A>	115.3.3 	<A NAME="50422197_marker-294860"></A><A NAME="50422197_marker-294861"></A><A NAME="50422197_marker-294862"></A><A NAME="50422197_marker-294863"></A>Session transmit version </H3>
+<P>
+<A NAME="50422197_pgfId-294869"></A><A NAME="50422197_marker-294865"></A><A HREF=../headers/pk_session_receive_version.html>PK_SESSION_receive_version</A> and <A HREF=../headers/pk_session_receive_version_u.html>PK_SESSION_receive_version_u</A> return information about the version of Parasolid used to create a session transmit file.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422197_pgfId-294872"></A>115.4	<A NAME="50422197_marker-294870"></A><A NAME="50422197_marker-294871"></A>Journal files 
+
+
+</H1>
+<P>
+<A NAME="50422197_pgfId-294879"></A><A NAME="50422197_marker-402859"></A><A NAME="50422197_marker-402860"></A><A NAME="50422197_marker-402861"></A>A journal file is a record of all calls to Parasolid functions and the arguments returned from those calls. These files are intended as a debugging tool. A developer can inspect a journal file to identify faults in the application code (journal files are always stored in text format).</P>
+<P>
+<A NAME="50422197_pgfId-294891"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422197_pgfId-294890"></A>Performance issue: Journalling can be turned ON or OFF in a session. If the user or application may want to create a journal file at any stage, journalling must be enabled at the start of the session and switched OFF until required. This is important as journal files record a great deal of information and can become very large.</ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422197_pgfId-294892"></A>Control of journalling is provided by:</P>
+<UL>
+<LI>
+<A NAME="50422197_pgfId-294893"></A>passing a filename to <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> - the file is opened and journalling starts</LI>
+<LI>
+<A NAME="50422197_pgfId-294895"></A><A NAME="50422197_marker-294894"></A><A HREF=../headers/pk_session_set_journalling.html>PK_SESSION_set_journalling</A> to turn journalling on and off within a session</LI>
+<LI>
+<A NAME="50422197_pgfId-294897"></A><A NAME="50422197_marker-294896"></A><A HREF=../headers/pk_session_ask_journalling.html>PK_SESSION_ask_journalling</A> to enquire whether journalling is currently enabled</LI>
+</UL>
+<P>
+<A NAME="50422197_pgfId-294898"></A>A PK function which returns an error to the application journals a comment describing the error code and its severity (except when the user error handler long-jumps over Parasolid).</P>
+<P>
+<A NAME="50422197_pgfId-343180"></A>The generation of journal files is described in <A HREF="di_chap.03.html#21045">Chapter 2, “File Handling”</A>, of the Parasolid <A HREF=../di_index.html>Downward Interfaces</A> manual.</P><P>
+<A NAME="50422197_pgfId-359695"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application Support\Archiving\Journal</CODE>
+ <CODE>
+Debug</CODE>
+ <CODE>
+Report</CODE>
+ <CODE>
+Session</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H3>
+<A NAME="50422197_pgfId-343184"></A>	115.4.1 	<A NAME="50422197_marker-343181"></A><A NAME="50422197_marker-343182"></A><A NAME="50422197_marker-343183"></A>Adding a comment to a journal file </H3>
+<P>
+<A NAME="50422197_pgfId-343186"></A>When journalling is on, <A NAME="50422197_marker-343185"></A><A HREF=../headers/pk_session_comment.html>PK_SESSION_comment</A> can be used to assist deciphering files from the application. It enables a comment to be added to a journal file which can be used to link the PK function call to what the application was doing.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422197_pgfId-294918"></A>115.5	<A NAME="50422197_marker-294915"></A><A NAME="50422197_marker-294916"></A><A NAME="50422197_marker-294917"></A>Recursion 
+
+
+</H1>
+<P>
+<A NAME="50422197_pgfId-294922"></A><A NAME="50422197_Recursion"></A><A NAME="50422197_marker-294920"></A><A NAME="50422197_marker-294921"></A>The application’s GO functions are permitted to make calls to PK functions. This might be used, for example, to get data from an attribute attached to an entity being rendered. Only one level of recursion is allowed.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422197_pgfId-294926"></A>115.6	<A NAME="50422197_22973"></A><A NAME="50422197_marker-294924"></A><A NAME="50422197_marker-294925"></A>User fields 
+
+
+</H1>
+<P>
+<A NAME="50422197_pgfId-294933"></A><A NAME="50422197_marker-294927"></A><A NAME="50422197_marker-294928"></A><A NAME="50422197_marker-294929"></A><A NAME="50422197_marker-294930"></A><A NAME="50422197_marker-294931"></A>A <A NAME="50422197_marker-294932"></A>user field consists of a number of bytes of memory, allocated to every entity in a session, in which data needed by the application can be stored. The data contained in the user field of each entity can be set and read individually, using <A NAME="50422197_marker-294934"></A><A HREF=../headers/pk_entity_set_user_field.html>PK_ENTITY_set_user_field</A> and <A NAME="50422197_marker-294935"></A><A HREF=../headers/pk_entity_ask_user_field.html>PK_ENTITY_ask_user_field</A>.</P>
+<P>
+<A NAME="50422197_pgfId-294936"></A>The decision of whether to use user fields is fundamental to the architecture of the application. When deciding whether or not to use them compare the relative benefits of user fields and attributes:</P>
+<UL>
+<LI>
+<A NAME="50422197_pgfId-294937"></A>User fields use memory space more efficiently because they have fewer overheads than attributes.</LI>
+<LI>
+<A NAME="50422197_pgfId-294938"></A>User fields are expensive if the part consists of many entities. If the data that is required to be stored is only relevant to one entity, then it would be cheaper on memory space to store the data as an attribute of that particular entity.</LI>
+<LI>
+<A NAME="50422197_pgfId-294939"></A>User fields are considerably faster than attributes.</LI>
+<LI>
+<A NAME="50422197_pgfId-294940"></A>User fields are of fixed length (16 bytes) and are attached to every entity in a session so are most attractive if data is to be attached to a large proportion of entities in a body.</LI>
+<LI>
+<A NAME="50422197_pgfId-294941"></A>When user fields are enabled, one user field is attached to each entity in the session. It is not possible to attach further user fields to entities.</LI>
+<LI>
+<A NAME="50422197_pgfId-294942"></A>Attributes can be created more selectively. Attributes have a definition which specifies the order and types of the data that the attribute can store. Many attribute definitions can be created, in addition to those created by the system.</LI>
+<LI>
+<A NAME="50422197_pgfId-294943"></A>Only one attribute of each definition can be attached to an entity (except for attributes of classes 6 and 7) and only certain classes of entity may own attributes; however within these constraints, any combination and number of attributes can be attached to an entity.</LI>
+<LI>
+<A NAME="50422197_pgfId-294944"></A>Attributes can be automatically propagated when the entities they are attached to are copied or split. A user field remains with the original entity (i.e. the entity with the original tag), and the user field of new entities so created is empty.</LI>
+<LI>
+<A NAME="50422197_pgfId-294945"></A>When loading saved parts into a session the application can choose not to load user fields saved with the part. </LI>
+<LI>
+<A NAME="50422197_pgfId-294946"></A>When loading saved parts with user fields, only user fields that are either the same length or shorter than the user fields in use can be loaded in the session. If no user fields are in use in a session, no user fields can be loaded with saved parts.</LI>
+<LI>
+<A NAME="50422197_pgfId-294947"></A>Attributes are always loaded with a saved part. If the part has attribute definitions that conflict with those in the session, the part cannot be loaded. </LI>
+</UL>
+<P>
+<A NAME="50422197_pgfId-294949"></A>Users fields are enabled by passing the required length to <A NAME="50422197_marker-294948"></A><A HREF=../headers/pk_session_start.html>PK_SESSION_start</A>, and the current setting is returned by <A NAME="50422197_marker-294950"></A><A HREF=../headers/pk_session_ask_user_field_len.html>PK_SESSION_ask_user_field_len</A>.</P>
+<P>
+<A NAME="50422197_pgfId-294954"></A>For further details of attributes see <A HREF="fd_chap.096.html#50422175_41686">Chapter 95, “Attributes”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422197_pgfId-294958"></A>115.7	<A NAME="50422197_marker-294955"></A><A NAME="50422197_marker-294956"></A><A NAME="50422197_marker-294957"></A>Controlling memory allocation 
+
+
+</H1>
+<P>
+<A NAME="50422197_pgfId-294962"></A>When Parasolid requires memory for workspace or modelling operations, it calls the FMALLO function (<A HREF=../headers/pk_fmallo_f_t.html>PK_FMALLO_f_t</A>) that you supply in the frustrum. Parasolid provides you with two functions that let you manage the minimum amount of contiguous space that Parasolid requests when it calls FMALLO. In some circumstances, changing the value of this minimum amount of memory may improve performance, both in terms of time and memory. For example, if your application’s memory management works on blocks of a certain size, using the same block size in Parasolid may improve performance slightly.</P>
+<P>
+<A NAME="50422197_pgfId-294975"></A>You can use <A HREF=../headers/pk_memory_set_block_size.html><A HREF=../headers/pk_memory_set_block_size.html>PK_MEMORY_set_block_size</A></A> to set the minimum memory that Parasolid requests via FMALLO. This function lets you specify a minimum block size between about 1/8 Mbyte (the default) and 16 Mbytes. It can be called at any time, whether or not the modeller is running. To return the minimum block size to Parasolid's default, call <A HREF=../headers/pk_memory_set_block_size.html><A HREF=../headers/pk_memory_set_block_size.html>PK_MEMORY_set_block_size</A></A> with an argument of zero.</P>
+<P>
+<A NAME="50422197_pgfId-294979"></A>You can use <A HREF=../headers/pk_memory_ask_block_size.html>PK_MEMORY_ask_block_size</A> to return the current minimum block size.</P>
+<P>
+<A NAME="50422197_pgfId-294980"></A>If you stop the modeller, the minimum block size is always reset to the default value.</P>
+<P>
+<A NAME="50422197_pgfId-294998"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422197_pgfId-294986"></A>Note: <STRONG>
+1. </STRONG>Increasing the block size does <EM>
+not</EM> allow Parasolid to perform bigger modelling operations. Parasolid always requests the amount of memory it needs for a given job. Larger block sizes simply mean that fewer blocks are needed when passing memory to Parasolid, which in turn means that FMALLO and FMFREE are called less often.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422197_pgfId-294993"></A>Note: <STRONG>
+2. </STRONG>The more you increase the minimum block size above the default, the less likely it is that Parasolid will be able to release blocks to the operating system after use. This may affect the performance of other processes on the system. </ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422197_pgfId-294997"></A>Note: <STRONG>
+3. </STRONG>The exact limits of the block sizes you can set are platform-dependent. If you need to know these limits exactly, experiment by setting small and large values for <A HREF=../headers/pk_memory_set_block_size.html>PK_MEMORY_set_block_size</A> and then using <A HREF=../headers/pk_memory_ask_block_size.html>PK_MEMORY_ask_block_size</A> to see what values are returned.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422197_pgfId-421964"></A>115.8	<A NAME="50422197_94193"></A>Managing the session settings when reporting errors involving multiple error entities 
+
+
+</H1>
+<P>
+<A NAME="50422197_pgfId-422858"></A>Sometimes, several entities are involved in a given error. In such cases, Parasolid lets you control, for the current session, whether additional information about these entities is returned in the Parasolid Report using the following functions:</P>
+<P>
+<A NAME="50422197_pgfId-421985"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-421968"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-421970"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-421972"></A><A HREF=../headers/pk_session_ask_err_reports.html>PK_SESSION_ask_err_reports</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-421974"></A>Enquire whether additional error information is returned in a Parasolid Report of type <A HREF=../headers/pk_report_4_t.html>PK_REPORT_4_t</A> with the status <A HREF=../headers/pk_report_4_t.html>PK_REPORT_4_error_report_c</A>.Default: <A HREF=../headers/pk_error_reports_t.html>PK_ERROR_reports_off_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-421979"></A><A HREF=../headers/pk_session_set_err_reports.html>PK_SESSION_set_err_reports</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422197_pgfId-421981"></A>Specify whether additional error information is returned in a Parasolid Report of type <A HREF=../headers/pk_report_4_t.html>PK_REPORT_4_t</A> with the status <A HREF=../headers/pk_report_4_t.html>PK_REPORT_4_error_report_c</A>.Default: <A HREF=../headers/pk_error_reports_t.html>PK_ERROR_reports_off_c</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422197_pgfId-421986"></A>For more information on these functions, see the PK Reference,</P>
+<P>
+<A NAME="50422197_pgfId-423271"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422197_pgfId-422220"></A>Note: Individual application threads can override the session setting by calling <A HREF=../headers/pk_thread_set_err_reports.html>PK_THREAD_set_err_reports</A> with a value other than <A HREF=../headers/pk_error_reports_t.html>PK_ERROR_reports_inherit_c</A>. For more information on this function, see <A HREF="fd_chap.114.html#50422195_25811">Section 113.6.3, “Reporting errors involving multiple error entities”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422197_pgfId-350392"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.115.html">Symmetric Multi-Processing In Parasolid</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.117.html">Version Controls</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

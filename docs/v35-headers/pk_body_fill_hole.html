@@ -1,0 +1,214 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_fill_hole</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_fill_hole</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_BODY_fill_hole
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                        target,         --- target body
+int                              n_edges,        --- number of edges
+const <A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                  edges[],        --- boundary edges of hole
+double                           tolerance,      --- tolerance
+const <A HREF=../headers/pk_body_fill_hole_o_t.html>PK_BODY_fill_hole_o_t</A>     *options,        --- options structure [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>        *const tracking,       --- tracking information
+<A HREF=../headers/pk_fill_hole_fault_t.html>PK_fill_hole_fault_t</A>      *const fault,          --- status
+int                       *const n_fault_topols, --- number of fault topologies
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>               **const fault_topols    --- topologies associated
+                                                 --- with fault
+)
+</B>
+<A NAME="description"></A>
+<I>This function will fill a hole in a body or collection of bodies with a
+set of faces.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_not_in_same_partition  edges are not all in the same partition
+                                    (MILD)
+    PK_ERROR_bad_option_data        there is an error in the option data (MILD)
+    PK_ERROR_not_sheet              <B>'fill_sheet'</B> is not a sheet body (MILD)
+    PK_ERROR_not_in_same_body       <B>'target'</B> is a solid body and all the edges
+                                    are not in the same body (MILD)
+    PK_ERROR_wire_body              a wire edge has been supplied when using
+                                    option to trim to laminar edges of sheet
+                                    (MILD)
+    PK_ERROR_same_tool_and_target   <B>'fill_sheet'</B> is also target body (MILD)
+    PK_ERROR_cant_fill_hole         failed to patch hole (SERIOUS)
+    PK_ERROR_bad_wire               The wire supporting bodies supplied in
+                                    <B>'supporting_bodies'</B> are invalid (MILD)
+    PK_ERROR_bad_acorn              The acorn supporting body supplied in
+                                    <B>'supporting_bodies'</B> contains multiple
+                                    vertices (MILD)
+    PK_ERROR_grid_not_on_boundary   The general wire supporting body supplied
+                                    in `supporting bodies' does not meet the
+                                    hole boundary at a vertex (MILD)
+    PK_ERROR_grid_disjoint          The general wire supporting body supplied
+                                    in <B>'supporting_bodies'</B> contains multiple
+                                    components (MILD)
+    PK_ERROR_grid_not_wireframe     A supporting body has been supplied that
+                                    is not entirely wireframe (MILD)
+    PK_ERROR_grid_not_smooth        The general wire supporting body supplied
+                                    in <B>'supporting_bodies'</B> is not sufficiently
+                                    smooth, either internally or at the hole
+                                    boundary (MILD)
+    PK_ERROR_cant_attach_patch      A patch to fill the hole was created but
+                                    could not successfully be attached to the
+                                    target body (SERIOUS)
+    PK_ERROR_cant_extend            The adjacent faces could not be extended
+                                    to fill the hole successfully (SERIOUS)
+
+
+<A NAME="documentation"></A>
+PK_BODY_fill_hole will patch a hole with a collection of faces. The
+hole may consist of a gap in one or more sheet bodies, or it may be a
+single rubber face in a solid or sheet body.
+
+See <A HREF="../chapters/fd_chap.070.html#50434433_pgfId-412663">Filling a hole in a body</A> for more information.
+
+The boundary of the hole is specified by the array <B>'edges'</B>. If the
+hole is a rubber face, then the edges in <B>'edges'</B> should be the
+boundary edges of the rubber face. If the hole is a gap in one or more
+sheet bodies, then the edges in <B>'edges'</B> should be the laminar edges
+around the gap. At least one of the edges in <B>'edges'</B> should be an edge
+of the target body.
+
+The <B>'method'</B> field in the options structure is used to determine how
+the hole will be patched.
+
+If <B>'method'</B> is set to either of PK_fill_hole_trim_to_hole_c or
+PK_fill_hole_trim_to_sheet_c then the application must supply a fill
+sheet body to define the geometry to use for the patch over the
+hole. The fill sheet body should be sufficiently large to cover the
+hole. There must be only one connected set of laminar edges in the
+fill sheet body.
+
+If <B>'method'</B> is set to PK_fill_hole_trim_to_hole_c, then the fill
+sheet body will be trimmed back to the boundary edges of the hole
+before it is used to patch the hole. The geometry of the boundary
+edges of the hole must form a single closed loop. The boundaries of
+the hole must also all lie within <B>'tolerance'</B> of the fill sheet
+body. If the hole is a gap in one or more sheet bodies, then
+PK_BODY_fill_hole will accept edges of wire bodies in the <B>'edges'</B>
+array in order to specify the edge geometry of the patch between the
+bodies.
+
+If <B>'method'</B> is set to PK_fill_hole_trim_to_sheet_c, then the target
+bodies will be first trimmed back to meet the laminar edges of the
+fill sheet body.  The whole of the fill sheet body will then be used
+for the patch over the hole. The laminar edges of the fill sheet body
+must all lie within <B>'tolerance'</B> of a body where it is intended that
+the fill sheet should be joined to the body. At least one of the
+laminar edges of the fill sheet body should lie within <B>'tolerance'</B> of
+every body specified in the <B>'edges'</B> array.  Edges of wire bodies are
+not permitted in the <B>'edges'</B> array.
+
+If <B>'method'</B> is set to PK_fill_hole_create_patch_c, then no fill
+sheet body should be provided.  Instead Parasolid will create a
+suitable set of faces to fill the hole.  The boundary edges of the
+hole will be maintained and the created patch will meet the
+surrounding geometry smoothly where possible.
+See <A HREF="../chapters/fd_chap.070.html#50434433_pgfId-295314">here</A> for
+information on restrictions that apply when using this value.
+
+If <B>'smoothness'</B> is set to <A HREF=../headers/pk_continuity_t.html>PK_continuity_g2_c</A>, then G2 smoothness conditions
+must be met by the boundary faces, boundary edges, and any supporting bodies.
+These conditions are:
+  o For a boundary vertex where G2 smoothness is requested to adjacent faces
+    for both adjacent edges, then the faces must meet visibly G2 smoothly at
+    the vertex.
+  o For a boundary vertex where G2 smoothness is requested to the adjacent face
+    of only one adjacent edge, then the other adjacent edge must be visibly G2
+    smooth to that face.
+  o Where a boundary edge is to be G2 smooth to an adjacent face, there must be
+    no G2 discontinuities within the face that cross the boundary edge.
+  o Any supporting bodies should meet the boundary with visible G2 smoothness
+    to any adjacent faces where G2 smoothness is required.
+If these conditions are not met, then the option <B>'non_g2_behaviour'</B> controls
+what happens:
+  o If set to <A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_fail_c</A>, then the operation will return
+    status PK_fill_hole_too_complex_c.
+  o If set to <A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_allow_c</A>, then the operation will proceed,
+    but the resultant sheet will not be G2 smooth to the adjacent faces in
+    regions near these G2 discontinuities.
+In both cases, a Report of type <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_fill_hole_non_g2_c</A> will be
+generated indicating where the boundary does not satisfy these smoothness
+conditions (and in the case of <A HREF=../headers/pk_fill_hole_non_smooth_t.html>PK_fill_hole_non_smooth_allow_c</A>, we will not
+have been able to meet G2 smoothness to the boundary faces near these points).
+
+The bodies of <B>'edges'</B> should not intersect or have edges which meet
+other than at vertices in the boundary of the hole. The function will
+not attempt to sew the bodies of <B>'edges'</B> together if they do have any
+edges which breach this condition.
+
+
+Tracking
+If <B>'method'</B> is set to PK_fill_hole_create_patch_c the returned <B>'tracking'</B>
+structure contains topology tracking information on the operation.
+If the function is successful, then the faces which have been used to cover
+the hole will be returned in the <B>'product_topols'</B> array of a track record of
+type PK_TOPOL_track_create_c.
+Additional tracking can be requested using the <B>'tracking_control'</B> option of
+<A HREF=../headers/pk_body_fill_hole_o_t.html>PK_BODY_fill_hole_o_t</A>.
+
+
+Error handling
+If this function returns PK_ERROR_no_errors, the result of the
+operation will be indicated by the value of <B>'fault'</B>. When this value
+is not set to PK_fill_hole_ok_c, it indicates the operation has
+failed and an array of entities involved in this failure may also be
+returned in <B>'fault_topols'</B>. The number of <B>'fault_topols'</B> returned will
+depend on the value of <B>'fault'</B> and it might be zero. If the value of
+<B>'fault'</B> is PK_fill_hole_face_c or PK_fill_hole_face_face_c then
+this indicates that the hole has been patched, but the resultant body
+is invalid.
+
+This function is supported for general bodies where the boundary of the hole
+supplied is locally manifold i.e.
+    o  each boundary edge is manifold,
+    o  each boundary vertex is manifold,
+    o  all incident non-boundary edges of each boundary vertex are manifold.
+Note that the <B>'method'</B> option value PK_fill_hole_trim_to_sheet_c is not
+supported for general bodies.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

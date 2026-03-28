@@ -1,0 +1,274 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SURF_make_sheet_trimmed</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SURF_make_sheet_trimmed</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_SURF_make_sheet_trimmed
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                             surf,         --- surface
+<A HREF=../headers/pk_surf_trim_data_t.html>PK_SURF_trim_data_t</A>                   trim_data,    --- trim data
+double                                precision,    --- precision for each edge
+const <A HREF=../headers/pk_surf_make_sheet_trimmed_o_t.html>PK_SURF_make_sheet_trimmed_o_t</A> *options,      --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                      *const body,         --- sheet body
+<A HREF=../headers/pk_check_state_t.html>PK_check_state_t</A>               *const state         --- state of body
+)
+</B>
+<A NAME="description"></A>
+<I>Creates a sheet body given surface and trimmed curve data.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_tolerance           given edge precision too small
+    PK_ERROR_has_parent              surface or sp-curves are not orphans
+    PK_ERROR_unsuitable_entity       surface must be G1 and it must be
+                                     periodic if closed
+    PK_ERROR_not_on_surface          curve does not lie on surface
+    PK_ERROR_bad_sharing             curve is from another surface
+    PK_ERROR_bad_shared_dep          dependent of entity would be illegally
+                                     shared
+    PK_ERROR_failed_to_create_sp     SP-curve generator failed for unknown
+                                     reason
+
+<A NAME="documentation"></A>
+
+This function creates a sheet body with a single face, given surface
+geometry for the face and curve geometry for the edges.
+The topology of the resulting sheet will be inferred from the geometry.
+
+PK_SURF_make_sheet_trimmed is designed primarily for importing
+geometric data of lower precision than Parasolid default.
+The geometry supplied to the routine need not, therefore, conform to
+Parasolid's standard precision. The user is responsible
+for specifying the precision, the minimum distance two
+points have to be apart to be regarded as distinct, which will be stored
+with the edges of the resulting sheet body.
+
+
+Received arguments:
+
+
+<B>'surf'</B> will be the geometry attached to the single face of the body.  It
+can be of any type recognised by Parasolid, and must be orphan. If
+<B>'surf'</B> is a B-surface, it must be capable of passing the continuity
+checks imposed by <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>.
+
+
+
+<B>'trim_data'</B> provides the trimming information.  The <B>'spcurves'</B> in <B>'trim_data'</B>
+are described here.  For other information on <B>'trim_data'</B> see documentation for
+<A HREF=../headers/pk_surf_trim_data_t.html>PK_SURF_trim_data_t</A>.
+
+<B>'spcurves'</B> consists of an array of curves which describe the boundary
+           loops of the trimmed surface. <B>'spcurves'</B> is not
+           allowed to be null, except in the case of a wholly
+           closed sheet with no loops e.g. whole sphere or torus.
+           Each curve in 'spcurves' may either itself be an SP-curve or it
+           may be any 3-space curve which will be used to generate an
+           SP-curve.
+
+           Note that PK_SURF_make_sheet_trimmed will not incorporate
+           curves representing surface degeneracies
+           into the model, as these have zero 3-space length.
+           Similarly bounded curves shorter than the requisite tolerance
+           (in terms of chord length) will not appear in the model
+           (closed SP-curve are excepted).
+
+           Note that two coincident opposing curves must be supplied
+           if a wire edge (corresponding, for example, to a seam on a periodic
+           surface) is required. In addition, PK_SURF_make_sheet_trimmed
+           will always create closed loop topology, regardless of
+           the actual geometric closure of the supplied loops of curves.
+
+           If the supplied bounded curves are SP-curves, they must satisfy the
+           continuity requirements described under <A HREF=../headers/pk_spcurve_create.html>PK_SPCURVE_create</A> before
+           introduction into a model by means of PK_SURF_make_sheet_trimmed.
+
+           If SP-curves are not available, application can supply 3-space
+           curves in the 'spcurves' array, which constitute the boundary loops
+           of the trimmed surface.
+           These 3-space curves must either be coincident with the surface
+           or supplied interval of the curve must lie within the
+           supplied precision of the surface. If curve is not coincident
+           with the surface and lies within the supplied precision of the
+           surface, an SP-curve is computed internally and the supplied
+           3-space curve will be attached as nominal geometry to the
+           edge if nominal geometry is enabled.
+           If an SP-curve is computed internally then Parasolid may extend
+           the supplied <B>'surf'</B> so that the surface of the resulting sheet
+           body includes the entire length of the SP-curve.
+
+           The points stored on the vertices of the sheet body will be
+           computed by Parasolid, so the application has no need to
+           supply them. The position of the vertex is deemed to be the
+           centroid point of all the trimmed curve ends meeting at the vertex.
+           A suitable precision for the vertex is also computed.
+           It should be noted that because the vertex point and
+           precision are flexible to some extent, it is not necessary that
+           consecutive spcurves meet to within twice <B>'precision'</B> at the vertex.
+           As a safeguard against potentially incorrectly ordered data,
+           however, there will be a state code indicator returned when
+           any computed vertex tolerance exceeds 10 times <B>'precision'</B>.
+
+The <B>'trim_set'</B> field in <B>'trim_data'</B> is ignored.  The function may only be
+passed a single trim_set.
+
+If the resulting sheet body has its face normal in the wrong direction,
+then this can be swapped with <A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A>
+
+
+
+<B>'precision'</B> is a 3-space distance parameter, and will be stored with all of the
+edges of the resultant sheet. Refer to <A HREF=../headers/pk_edge_set_precision.html>PK_EDGE_set_precision</A> for the meaning
+of this tolerance within a model. From an application point of view,
+the value of <B>'precision'</B> will reflect the accuracy of the sending system's
+curve data, and must be greater than or equal to Parasolid's linear tolerance.
+<A HREF=../headers/pk_edge_set_precision.html>PK_EDGE_set_precision</A> can be used subsequently to modify the tolerance
+of any edge of the resultant sheet.
+
+
+checking option structure:
+
+There are three optional levels of checking available on the resulting
+sheet body. These can be employed by the application according to how much
+is known about the input data in terms of, for example, the consistency of
+the loops directions. Whichever option(s) used, PK_SURF_make_sheet_trimmed
+will attempt to correct any inconsistencies found within the limits
+imposed by the checks.
+Note that each option is independent of the others.
+
+
+
+<B>'check_wires'</B>    : This option allows the identification of wire topologies
+                   (e.g. seamlines) and will ensure that the
+                   correct topology is made in such cases.
+
+
+
+<B>'check_self_int'</B> : This option enables the application to detect
+                   topological self-intersections. Checks made are:
+
+ . All edges are tested pairwise with each other to detect points at which
+   their fin curves intersect which are NOT model vertices. There is no
+   possible corrective action that can be taken here. Such sheets will fail
+   <A HREF=../headers/pk_body_check.html>PK_BODY_check</A>.
+
+
+
+<B>'check_loops'</B>    : This will check that the loops of the face are consistent.
+                   With this option set to PK_LOGICAL_true checks are made to
+                   check whether:
+                       . The loops are correctly contained
+                         (i.e. all inner hole loops lie within
+                         the boundary or peripheral loop,
+                         where such can be determined).
+                       . The combination of loops is a valid
+                         one for the surface type (for
+                         example, a set of loops on a plane
+                         contains just one peripheral positive
+                         loop and the rest negative hole ones).
+
+ . If the above conditions are not met minimal corrective action is attempted.
+   In an attempt to create valid loops PK_SURF_make_sheet_trimmed
+   may reverse loops, and investigate singularities of <B>'surf'</B> introducing
+   them into the face as isolated vertices if necessary. This corrective
+   action is only attempted if <B>'check_loops'</B> is set to PK_LOGICAL_true,
+   and there no guarantee of valid result being found.
+
+
+<B>'nominal_geom'</B>    : This option enables the supplied 3-space curve to be
+                    attached as nominal geometry on the edge
+
+
+Returned arguments:
+
+
+
+The resulting sheet is returned in <B>'body'</B>.
+
+
+
+<B>'state'</B> is an indicator of the validity of the sheet after the chosen
+checking options have been performed on it. It is not intended to give
+detailed information (use <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> for this). The returns are:
+
+
+
+PK_BODY_state_ok_c:  Indicates that either all selected checks passed,
+and any attempted corrections were successful, or no checks were requested.
+
+
+
+PK_FACE_state_redundant_c : Face is redundant with respect to the
+supplied tolerances. This is because all the supplied curves were too short
+with respect to <B>'precision'</B> for the production of a valid face.
+
+
+
+PK_CURVE_state_inconsistent_c : Indicates that no sense could be made
+of the input loops of curves. This means that they did not follow
+round in the loop direction as indicated earlier, and there may be vertex
+tolerances computed as a result which exceed 10 times <B>'precision'</B>.
+
+
+
+PK_FACE_state_self_int_c : Indicates that the resultant sheet is
+self-intersecting because edges meet at a place other than a model vertex.
+
+
+
+PK_LOOP_state_invalid_c : Indicates that the loop structure of the
+resulting sheet is in some way invalid (e.g. there is no peripheral
+loop on a planar surface), and attempts to correct the problem failed.
+Such sheets should NOT be subsequently incorporated into solid bodies.
+
+
+
+PK_EDGE_state_bad_order_c : Indicates that the edges of the resulting sheet
+are incorrectly ordered at at least one of its vertices. This can be caused
+by the input data failing to comply with the convention on wire edges,
+for example.
+
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

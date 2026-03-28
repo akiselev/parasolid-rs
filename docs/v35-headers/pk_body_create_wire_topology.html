@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_create_wire_topology</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_create_wire_topology</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>         PK_BODY_create_wire_topology
+(
+<I>--- received arguments ---
+</I>int                     n_topols,    --- number of topols
+const <A HREF=../headers/pk_class_t.html>PK_CLASS_t</A>        classes[],   --- class of each topol
+int                     n_relations, --- number of relations
+const int               parents[],   --- parents
+const int               children[],  --- children
+const <A HREF=../headers/pk_topol_sense_t.html>PK_TOPOL_sense_t</A>  senses[],    --- sense in which child used by parent
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>        *const body,        --- created body
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>       *const topols,      --- created topols
+<A HREF=../headers/pk_body_fault_t.html>PK_BODY_fault_t</A>  *const fault,       --- fault indicator
+int              *const fault_index  --- index of fault topol
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates the topology of a wire body.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_body_create_topology_2.html>PK_BODY_create_topology_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_class             bad class in <B>'classes'</B> array
+    PK_ERROR_bad_value             a value in <B>'parents'</B> or <B>'children'</B> array
+                                   is not a valid index to <B>'classes'</B> array
+
+<A NAME="documentation"></A>
+Please refer to the documentation of <A HREF=../headers/pk_body_create_solid_topology.html>PK_BODY_create_solid_topology</A>.
+This function is the same as <A HREF=../headers/pk_body_create_solid_topology.html>PK_BODY_create_solid_topology</A> with the exceptions
+that the result is a wire body and the permitted classes and numbers of
+children and parents are as follows:
+
+--------------------------------------------------------------------
+Entity    Children      No. of children   Parents     No. of parents
+--------------------------------------------------------------------
+Body      Shell               1             -             -
+Shell     Face                1           Body            1
+Face      Loops               1 or 2      Shell           1
+Loop      Edges               &gt;=1         Face            1
+Edge      Vertices            &lt;=2         Loops           2
+Vertex    None                0           Edges           &gt;=1
+--------------------------------------------------------------------
+
+Note that although a face and one or two loops must be present in the
+input to this function, the created body has no faces or loops and the entries
+in <B>'topols'</B> corresponding to these inputs are set to zero.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

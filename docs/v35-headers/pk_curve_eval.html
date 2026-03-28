@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_eval</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_eval</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> PK_CURVE_eval
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>      curve,      --- curve
+double          t,          --- curve parameter
+int             n_derivs,   --- number of derivatives
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>     p[]         --- point and derivatives.
+)
+</B>
+<A NAME="description"></A>
+<I>This function evaluates a point and derivatives at a given parameter on the
+given curve.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_at_terminator            unable to calculate 2nd derivatives at
+                                      a terminator of <B>'curve'</B> (MILD)
+    PK_ERROR_bad_parameter            not permitted to evaluate outside of
+                                      range (MILD)
+    PK_ERROR_too_many_derivatives     too many derivatives requested (MILD)
+    PK_ERROR_eval_failure             internal evaluator failure (MILD)
+
+<A NAME="documentation"></A>
+The function calculates the Cartesian coordinates of the point at the given
+curve parameter <B>'t'</B>, and also the derivatives with respect to <B>'t'</B>, up to
+order <B>'n_derivs'</B>.
+
+In the array of returned data:
+
+            p[0] is the point itself
+            p[1] is the first derivative
+            p[2] is the second derivative
+            p[n] is the nth derivative
+
+It is not necessarily required that <B>'t'</B> lies inside the range as given by
+<A HREF=../headers/pk_curve_ask_param.html>PK_CURVE_ask_param</A>.  If the curve is <A HREF=../headers/pk_param_periodic_t.html>PK_PARAM_periodic_yes_c</A> or
+<A HREF=../headers/pk_param_periodic_t.html>PK_PARAM_periodic_seamed_c</A> then any value is acceptable.  For cases where it is
+not permitted to evaluate outside the range, PK_ERROR_bad_parameter will be
+returned.
+
+Where derivative discontinuities exist at a junction between segments, the
+derivatives just after the discontinuity are returned, i.e. on the right.
+An exception to this is where the curve is periodic, and <B>'t'</B> is at the top
+of the periodic range, in which case evaluation is on the left (parameters
+which are equal to the top of the range, plus a non-zero multiple of the
+period, still evaluate from the right).
+
+The maximum number of derivatives that can be computed depends on the class
+of the given curve:
+
+    curve type:               maximum number of derivatives
+    -----------               -----------------------------
+    line/circle/ellipse       10
+
+    intersection curve        2
+
+    foreign geometry          10
+
+    SP-curve                  2
+
+    B-curve                   10
+
+PK_ERROR_too_many_derivatives can also be returned when <B>'n_derivs'</B> is less than
+the maximum, if the function could evaluate at least the position, but is
+unable to evaluate all the requested derivatives due to internal evaluator
+failure.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

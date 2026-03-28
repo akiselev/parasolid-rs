@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_create_sheet_planar</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_create_sheet_planar</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                        PK_BODY_create_sheet_planar
+(
+<I>--- received arguments ---
+</I>int                                    n_vectors,  --- number of position
+                                                   --- vectors
+const <A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>                      vectors[],  --- position vectors
+                                                   --- at vertices
+const <A HREF=../headers/pk_body_create_sheet_planar_o_t.html>PK_BODY_create_sheet_planar_o_t</A> *options,    --- option structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                             *const body  --- sheet body returned
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a planar sheet whose boundary is an irregular polygon.
+The option also exists to create irregular polygonal holes within this sheet.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_box               (MILD) at least one point lies outside of
+                                   the size box
+    PK_ERROR_edges_intersect       (SERIOUS) edges of a loop intersect with
+                                   other edges of that loop
+    PK_ERROR_unsuitable_loop       (SERIOUS) badly orientated loop,
+    PK_ERROR_coincident_points     (SERIOUS) the same point occurs more than
+                                   once within the loops
+    PK_ERROR_lt_3_sides            (MILD) at least one loop has fewer than 3
+                                   edges
+
+<A NAME="documentation"></A>
+Within its local coordinate system, this function creates a planar sheet body
+with <B>'n_vectors'</B> on a given plane.
+
+The <B>'loops'</B> allow for the construction of holes within the sheet body.  If the
+<B>'loops'</B> field of the options structure is NULL (the default), then the
+position vectors given clockwise (when viewed in the direction of the
+surface normal) form a single loop which is the exterior of the sheet body.
+Loops are always completed by joining the last position in the loop to the
+first position in the loop. When multiple loops are input, the position vectors
+of the exterior loop must be given in order clockwise (when viewed in the
+direction of the surface normal).  All other loops are holes and must have
+their position vectors input anticlockwise (when viewed in the direction of the
+surface normal).  Each loop is assigned an arbitrary unique integer index.
+The <B>'loops'</B> field of the options structure is an array of the same length
+as <B>'vectors'</B>.  For each position vector in <B>'vectors'</B>, the corresponding entry
+in <B>'loops'</B> is the loop index for the loop to which the position belongs, the
+position vectors for each loop must be contiguous and given in order around the
+loop.
+
+It is not possible to use this function for the creation of disjoint sheet
+bodies.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

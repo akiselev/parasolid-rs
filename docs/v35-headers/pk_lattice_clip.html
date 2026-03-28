@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_LATTICE_clip</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_LATTICE_clip</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_LATTICE_clip
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_lattice_t.html>PK_LATTICE_t</A>               lattice,   --- lattice to be clipped
+const <A HREF=../headers/pk_lattice_clip_o_t.html>PK_LATTICE_clip_o_t</A> *options,   --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_lattice_clip_r_t.html>PK_LATTICE_clip_r_t</A> *const results    --- results structure
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates new lattices by clipping the supplied <B>'lattice'</B>.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity          One or more unsupported clipping
+                                        entities have been supplied. (MILD)
+    PK_ERROR_bad_option_data            No clipping entities, more than one
+                                        surface, faces from the same body with
+                                        different fences, an invalid
+                                        <B>'duplicate_tolerance'</B>, or an
+                                        inconsistent combination of <B>'lrod_clip'</B>
+                                        and <B>'lrod_min_length'</B> have been
+                                        supplied. (MILD)
+    PK_ERROR_clip_failure               The clipping operation encountered an
+                                        internal error. (SERIOUS)
+
+<A NAME="documentation"></A>
+
+
+Introduction
+
+This function creates new lattices corresponding to those portions of the
+supplied lattice that lie on the relevant side of the supplied clipping
+entities. The original lattice is unmodified by this operation. The clipping
+entities act on the centre lines of the lattice's lrods, rather than on the
+lattice volume.
+
+The clipping entities must be a single surface or one or more faces. Any faces
+must be from manifold non-disjoint bodies. A lattice topology lies in front of
+a surface or face if it is in the direction pointed to by that entity's normal.
+Correspondingly, a lattice topology lies behind a surface or face if it is in
+the opposite direction to that pointed to by the entity's normal. Whether the
+surviving set of lattice topologies lies in front of or behind each entity is
+specified using the <B>'fence'</B> option.
+
+To define a clip, at least one non-coincident lrod must cross from one side of
+a clipping entity to the other or have an lball that lies in a clipping entity.
+
+For any lrod that is divided by one or more clipping entities, the clipped
+lrods are those portions of it that lie on the sides of the entities specified
+in <B>'fence'</B>. These clipped lrods will survive if <B>'lrod_clip'</B> is
+<A HREF=../headers/pk_lrod_clip_t.html>PK_LROD_clip_keep_all_c</A>, or if <B>'lrod_clip'</B> is <A HREF=../headers/pk_lrod_clip_t.html>PK_LROD_clip_keep_connected_c</A> and
+the clipped lrod has a surviving lball. If <B>'lrod_clip'</B> is
+<A HREF=../headers/pk_lrod_clip_t.html>PK_LROD_clip_delete_c</A>, no clipped lrods survive.
+
+If an <B>'lrod_min_length'</B> is supplied, clipped lrods are further required to be
+greater than or equal to this value in length in order to survive.
+
+If an lrod is coincident with one or more clipping entities, it will survive if
+<B>'lrod_coi'</B> is <A HREF=../headers/pk_lrod_coi_t.html>PK_LROD_coi_keep_all_c</A>, or if <B>'lrod_coi'</B> is
+<A HREF=../headers/pk_lrod_coi_t.html>PK_LROD_coi_keep_connected_c</A> and the lrod is connected to surviving
+non-coincident ltopology. It will be deleted if <B>'lrod_coi'</B> is
+<A HREF=../headers/pk_lrod_coi_t.html>PK_LROD_coi_delete_c</A>.
+
+Each surviving clipped lrod has a new lball introduced where it has been
+clipped. The radii of these new lballs is controlled by the <B>'lball_radius'</B>
+option.
+
+If <B>'merge_duplicates'</B> is <A HREF=../headers/pk_ltopol_dup_merge_t.html>PK_LTOPOL_dup_merge_yes_c</A>, any set of lballs
+containing at least one new lball that are considered duplicates to within
+<B>'duplicate_tolerance'</B> will be merged into a single lball. If there are multiple
+lrods connecting another lball to lballs within the duplicate set, these will
+be merged into a single lrod.
+
+Return Information
+
+If the clipping operation has succeeded, <B>'results'</B> will contain an array of
+length <B>'n_lattices'</B> in <B>'lattices'</B>. Each entry in this array is a
+<A HREF=../headers/pk_clip_lattice_r_t.html>PK_clip_lattice_r_t</A> structure containing a <B>'lattice'</B> and some associated
+information. If the <B>'status'</B> indicates that the clipped <B>'lattice'</B> contains an
+invalidity created by the clipping operation, the relevant lattice topologies
+will be contained in the array <B>'error_ltopols'</B>.
+
+If <B>'want_clipped_lballs'</B> was set to PK_LOGICAL_true in the options structure
+then <B>'clipped_lballs'</B> will contain all those lballs in the new <B>'lattice'</B> that
+were involved in the clipping operation. <B>'lball_clip_types'</B> will contain a
+corresponding entry for each clipped lball indicating how it was involved.  If
+an entry has the value <A HREF=../headers/pk_lball_clipped_t.html>PK_LBALL_clipped_created_c</A> then the lball was created at
+an end of a clipped lrod. If an entry has the value <A HREF=../headers/pk_lball_clipped_t.html>PK_LBALL_clipped_touched_c</A>
+then the lball lay in one of the clipping entities.
+
+If none of the clipping entities clash with the lattice,
+<A HREF=../headers/pk_clip_result_t.html>PK_clip_result_no_clash_c</A> will be returned. If there is at least one clash but
+these clashes do not define a clip, <A HREF=../headers/pk_clip_result_t.html>PK_clip_result_no_clip_c</A> will be returned.
+In both cases, no <B>'lattices'</B> will be returned in <B>'results'</B>.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

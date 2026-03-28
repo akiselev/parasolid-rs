@@ -1,0 +1,628 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Overview Of Convergent Modeling</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Overview Of Convergent Modeling</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.082.html">Introduction To Convergent Modeling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.084.html">Facet Model Structure</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.083.html#50422160_pgfId-502003">82.1	What is Convergent Modeling? </A>
+<UL>
+<LI> <A HREF="fd_chap.083.html#50422160_pgfId-514925">82.1.1	Mesh and facet data requirements </A>
+</UL>
+<LI> <A HREF="fd_chap.083.html#50422160_pgfId-357329">82.2	How to make use of Convergent Modeling in Parasolid </A>
+<UL>
+<LI> <A HREF="fd_chap.083.html#50422160_pgfId-509204">82.2.1	Enabling support for facet geometry </A>
+<LI> <A HREF="fd_chap.083.html#50422160_pgfId-517130">82.2.2	Enquiring if facet geometry is present </A>
+<LI> <A HREF="fd_chap.083.html#50422160_pgfId-592247">82.2.3	Workflow for creating Parasolid meshes from foreign facet data </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422160_pgfId-502003"></A>82.1	<A NAME="50422160_94552"></A>What is Convergent Modeling? 
+
+
+</H1>
+<P>
+<A NAME="50422160_pgfId-311721"></A>Parasolid provides the ability to perform topological operations, such as booleans, sectioning and offsetting, on bodies containing any combination of classic and facet geometry. </P>
+<P>
+<A NAME="50422160_pgfId-641832"></A>The different combinations of facet and <A HREF="fd_chap.127.html#50422210_47512">“Classic Geometry”</A> that may be found in a body are described below:</P>
+<P>
+<A NAME="50422160_pgfId-637139"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-637153"></A>Type of body</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-637155"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-637157"></A>Classic body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-637159"></A>A <STRONG>
+classic body</STRONG> is a body that contains only classic Parasolid surface and curve geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-637161"></A>Facet body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-637493"></A>A <STRONG>
+facet body</STRONG> is a body that contains only facet geometry. Facet geometry comprises geometry composed of mesh and polyline data (often referred to collectively as facet data), rather than classic Parasolid surface and curve geometry.</P>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-637497"></A>A <STRONG>
+polyline</STRONG> is a curve consisting of a series of line segments. In a facet model, polylines are attached to model edges in place of classic curves. </LI>
+<LI>
+<A NAME="50422160_pgfId-637163"></A>A <STRONG>
+mesh</STRONG> is a type of facet surface consisting of a connected collection of triangular facets. In a facet model, meshes are attached to model faces in place of classic surfaces. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-637165"></A>Mixed body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-637167"></A>A <STRONG>
+mixed body </STRONG>is a body that contains a combination of both classic and facet geometry.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422160_pgfId-632222"></A>Within a mixed body you may find topology with combinations of facet or classic geometry as follows:</P>
+<P>
+<A NAME="50422160_pgfId-634823"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634920"></A>Geometry</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634922"></A>Topology</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634924"></A>Definition </P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634926"></A>Classic</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634928"></A>Edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634930"></A>A <STRONG>
+classic edge</STRONG> is an edge that has only classic geometry, and all of whose faces (if any) have only classic geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634932"></A>Facet</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634934"></A>Edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634936"></A>A <STRONG>
+facet edge</STRONG> is an edge that has only facet geometry, and all of whose faces (if any) have only facet geometry. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634938"></A>Mixed</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634940"></A>Edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634942"></A>A <STRONG>
+mixed edge</STRONG> is an edge that has a mixture of facet and classic geometry, and/or whose faces (if any) have a mixture of facet and classic geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634944"></A>Classic</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634946"></A>Vertex</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634948"></A>A <STRONG>
+classic vertex</STRONG> is a vertex whose faces (if any) and/or edges have only classic geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634950"></A>Facet</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634952"></A>Vertex</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634954"></A>A <STRONG>
+facet vertex</STRONG> is a vertex whose faces (if any) and/or edges have only facet geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634956"></A>Mixed</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634958"></A>Vertex</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-634960"></A>A <STRONG>
+mixed vertex</STRONG> is a vertex whose faces (if any) and/or edges have a mixture of facet and classic geometry. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422160_pgfId-639631"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422160_pgfId-639650"></A>Note: In a mixed body, Parasolid still supports rubber topology (that is, topology that has no geometry attached), as an interim stage between modelling operations. For example:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-639651"></A>An edge with a classic surface attached to one of its faces, and no geometry on the other face is considered a classic edge. </LI>
+<LI>
+<A NAME="50422160_pgfId-639638"></A>An edge with a mesh attached to one of its faces, and no geometry on the other face is considered a facet edge. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422160_pgfId-311736"></A>See <A HREF="fd_chap.084.html#50422161_93469">Chapter 83, “Facet Model Structure”</A> for more information on polylines and meshes.</P>
+<P>
+<A NAME="50422160_pgfId-632673"></A>See <A HREF="fd_chap.085.html#50422162_65426">Chapter 84.6, “Creating a mixture of facet and classic geometry”</A> for more information on combining mixed geometry.</P>
+<P>
+<A NAME="50422160_pgfId-641419"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422160_pgfId-641418"></A>Note: In the context of this volume, a mesh is <STRONG>
+not</STRONG> the same as a finite element mesh. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422160_pgfId-559852"></A>The following areas of Parasolid functionality can receive and operate on mesh data:</P>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-559853"></A>Booleans</LI>
+<LI>
+<A NAME="50422160_pgfId-559854"></A>Sheet Trim and Extend </LI>
+<LI>
+<A NAME="50422160_pgfId-559855"></A>Extrude </LI>
+<LI>
+<A NAME="50422160_pgfId-559856"></A>Sectioning</LI>
+<LI>
+<A NAME="50422160_pgfId-559857"></A>Imprinting</LI>
+<LI>
+<A NAME="50422160_pgfId-559858"></A>Hollow/Offset/Thicken</LI>
+<LI>
+<A NAME="50422160_pgfId-559859"></A>Hole-filling</LI>
+<LI>
+<A NAME="50422160_pgfId-559860"></A>Rendering</LI>
+<LI>
+<A NAME="50422160_pgfId-559861"></A>Faceting Output</LI>
+<LI>
+<A NAME="50422160_pgfId-559862"></A>Swept and Spun Outline</LI>
+<LI>
+<A NAME="50422160_pgfId-559863"></A>Topological and Geometric Enquiries</LI>
+<LI>
+<A NAME="50422160_pgfId-559864"></A>Clash detection</LI>
+<LI>
+<A NAME="50422160_pgfId-559865"></A>Mass properties</LI>
+<LI>
+<A NAME="50422160_pgfId-559866"></A>Min/Max distance (closest approach)</LI>
+<LI>
+<A NAME="50422160_pgfId-559867"></A>Read and Write XT</LI>
+<LI>
+<A NAME="50422160_pgfId-559868"></A>Repair of meshes</LI>
+<LI>
+<A NAME="50422160_pgfId-559869"></A>Replacing surfaces of selected faces</LI>
+<LI>
+<A NAME="50422160_pgfId-560038"></A>Edge blending</LI>
+<LI>
+<A NAME="50422160_pgfId-560055"></A>Deformation operations</LI>
+<LI>
+<A NAME="50422160_pgfId-604974"></A>Sewing an array of facet sheet bodies</LI>
+</UL>
+<P>
+<A NAME="50422160_pgfId-533929"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1067.gif">
+
+<P>
+<A NAME="50422160_pgfId-533962"></A>Figure 82-1  Performing a deformation operation on a mesh </P>
+<P>
+<A NAME="50422160_pgfId-579667"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1068.gif">
+
+<P>
+<A NAME="50422160_pgfId-533619"></A>Figure 82-2 Thickening and hollowing a facet body</P>
+
+<H3>
+<A NAME="50422160_pgfId-514925"></A>	82.1.1 	Mesh and facet data requirements </H3>
+<P>
+<A NAME="50422160_pgfId-311800"></A>Parasolid places some minimal requirements on the mesh and facet data that it can work with. This section explains what those requirements are.</P>
+<P>
+<A NAME="50422160_pgfId-532304"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-311803"></A>Requirement</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-311805"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-311807"></A><STRONG>
+Triangular facets</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-311809"></A>All facets in a mesh must be triangular. Any attempt to pass mesh data that contains non-triangular facets to Parasolid will be unsuccessful. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-311814"></A><STRONG>
+Manifold meshes</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-311816"></A>All meshes must be manifold, that is, they must have only two facets meeting along each mfin. If your application needs to pass non-manifold models to Parasolid, then you should use non-manifold topology with individual meshes that are themselves manifold.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-311821"></A><STRONG>
+Vertex matched meshes</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-311823"></A>Meshes that are attached to models must be vertex matched.This means that along the polyline dividing the two meshes, the facet vertices of both meshes must lie in the same location as the position vectors on the polyline, so that they match one-to-one with those position vectors. Such models will always be watertight (i.e.there are no gaps between facets along the polyline), as shown in <A HREF="fd_chap.083.html#50422160_41767"><EM>
+Figure 82-3</EM></A> (a).<A HREF="fd_chap.083.html#50422160_41767"><EM>
+Figure 82-3</EM></A> (b) shows an example where some facet vertices along the polyline do not match one-to-one with the position vectors.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422160_pgfId-583160"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1069.gif">
+
+<P>
+<A NAME="50422160_pgfId-311833"></A>Figure 82-3 <A NAME="50422160_41767"></A>Ensuring face meshes are vertex matched with the polyline of the edge</P>
+<P>
+<A NAME="50422160_pgfId-311837"></A>Disjoint meshes, that is, meshes with separate components, can be passed to Parasolid. These components must be split up before attaching them to Parasolid faces. </P>
+<P>
+<A NAME="50422160_pgfId-311844"></A>Self-intersecting meshes can also be passed to Parasolid, but you should treat these in the same way that you would treat self-intersecting B-surfaces: leave them as orphan geometry until you need them, and clean up the self-intersections before you attempt to model with them. </P>
+<P>
+<A NAME="50422160_pgfId-311851"></A>“Crab-claw” meshes are supported. These are meshes made up of connected sets of facets where facets also share a single common position at a single vertex with more than two laminar mfins. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422160_pgfId-357329"></A>82.2	<A NAME="50422160_39874"></A>How to make use of Convergent Modeling in Parasolid 
+
+
+</H1>
+<P>
+<A NAME="50422160_pgfId-637909"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422160_pgfId-637922"></A>Note: There are additional royalty fees for distributing your Parasolid-based products with Convergent Modelling functionality enabled. If you have not licensed Convergent Modelling, your current maintenance fees cover the use of Convergent Modelling functionality in your development environment for evaluation and prototyping purposes. Your Parasolid Sales Representative can provide full information if you have any questions. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422160_pgfId-508192"></A>All calls to Parasolid functions must take place within a Parasolid session. By default, support for Convergent Modeling is disabled when you start a Parasolid session. Before you can enable this functionality and begin to perform Convergent Modeling in Parasolid, you should do the following:</P>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-509571"></A>Ensure your application’s frustrum can handle the facet file guise FFCXMM. We recommend you use keys instead of filenames when loading facet models into a Parasolid session. See <A HREF="di_chap.03.html#21045">Chapter 2, “File Handling”</A> of the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual for more information on file guises and using key names.</LI>
+<LI>
+<A NAME="50422160_pgfId-509041"></A>Enable facet geometry using <A HREF=../headers/pk_session_set_facet_geometry.html>PK_SESSION_set_facet_geometry</A>. See <A HREF="fd_chap.083.html#50422160_89129">Section 82.2.1, “Enabling support for facet geometry”</A> for more information.</LI>
+<LI>
+<A NAME="50422160_pgfId-525760"></A>Create facet bodies in Parasolid using one of the following methods:</LI>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-571276"></A><A HREF=../headers/pk_body_make_facet_body.html>PK_BODY_make_facet_body</A> to convert classic bodies to facet bodies. See <A HREF="fd_chap.085.html#50422162_49311">Section 84.3, “Creating facet bodies directly from existing bodies”</A> for more information.</LI>
+<LI>
+<A NAME="50422160_pgfId-629965"></A><A HREF=../headers/pk_mesh_create_from_facets.html>PK_MESH_create_from_facets</A> to make Parasolid meshes from external facet data. See <A HREF="fd_chap.086.html#50422163_93469">Chapter 85, “Creating PSM Data From Foreign Facet Data”</A> for more information.</LI>
+<LI>
+<A NAME="50422160_pgfId-605294"></A><A HREF=../headers/pk_mesh_make_bodies.html>PK_MESH_make_bodies</A> to create Parasolid bodies from mesh data. See <A HREF="fd_chap.085.html#50422162_58644">Section 84.4, “Manipulating facet data”</A> for more information.</LI>
+</UL>
+<LI>
+<A NAME="50422160_pgfId-575737"></A>It is also possible to convert a mesh to a trimmed classic surface using <A HREF=../headers/pk_mesh_make_surf_trimmed.html>PK_MESH_make_surf_trimmed</A>. You can subsequently use the trimmed surface import route to create a classic body from this trimmed surface data. See <A HREF="fd_chap.085.html#50422162_44333">Section 84.5, “Creating classic geometry from a mesh”</A> for more information.</LI>
+<LI>
+<A NAME="50422160_pgfId-525752"></A>Perform operations on facet models using the APIs you are familiar with calling on classic B-rep models and the additional APIs provided for dedicated Convergent Modeling operations.</LI>
+</UL>
+<P>
+<A NAME="50422160_pgfId-564941"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422160_pgfId-518580"></A>Note: Not all Parasolid functions support Convergent Modeling.You should check the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> to see if the functions you wish to use support facet geometry. Interfaces that do not, are marked [NF] in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> and need to be left at their default values. Those that offer partial support are marked [PF] and can be changed to values that support facet geometry. In general, Parasolid functions that are not supported will give the error PK_ERROR_facet_geometry to indicate that the model contains facet geometry but the function does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422160_pgfId-518554"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-564970"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-564957"></A><A HREF="fd_chap.091.html#50422169_38621">Chapter 90, “Importing Data”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422160_pgfId-509204"></A>	82.2.1 	<A NAME="50422160_89129"></A>Enabling support for facet geometry </H3>
+<P>
+<A NAME="50422160_pgfId-388108"></A>Parasolid provides a number of functions that let you manage Convergent Modeling within your application: </P>
+<P>
+<A NAME="50422160_pgfId-357426"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-357358"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-357360"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-388706"></A><A HREF=../headers/pk_session_set_facet_geometry.html>PK_SESSION_set_facet_geometry</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-388708"></A>Allows you to enable or disable facet geometry within a session using <CODE>
+facet_geometry</CODE>
+, which has the following values:</P>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-389066"></A><A HREF=../headers/pk_facet_geometry_t.html>PK_facet_geometry_no_c</A>: facet geometry is disabled</LI>
+<LI>
+<A NAME="50422160_pgfId-389100"></A><A HREF=../headers/pk_facet_geometry_t.html>PK_facet_geometry_all_c</A>: facet geometry is enabled</LI>
+</UL>
+<P>
+<A NAME="50422160_pgfId-389200"></A>Default: <A HREF=../headers/pk_facet_geometry_t.html>PK_facet_geometry_no_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-388746"></A><A HREF=../headers/pk_session_ask_facet_geometry.html>PK_SESSION_ask_facet_geometry</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-388748"></A>Allows you to enquire whether facet geometry is enabled within the session using <CODE>
+facet_geometry</CODE>
+ as described in <A HREF=../headers/pk_session_set_facet_geometry.html>PK_SESSION_set_facet_geometry</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-638386"></A><A HREF=../headers/pk_part_receive.html>PK_PART_receive</A>, <A HREF=../headers/pk_part_receive_b.html>PK_PART_receive_b</A> and <A HREF=../headers/pk_part_receive_u.html>PK_PART_receive_u</A><BR>
+<A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A>, <A HREF=../headers/pk_partition_receive_b.html>PK_PARTITION_receive_b</A> and <A HREF=../headers/pk_partition_receive_u.html>PK_PARTITION_receive_u</A><BR>
+<A HREF=../headers/pk_partition_receive_deltas_2.html>PK_PARTITION_receive_deltas_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422160_pgfId-638388"></A>The <CODE>
+receive_mixed</CODE>
+ option within these functions allows you to control whether you want to receive mixed bodies in your application. On receiving any data into a Parasolid session, you can choose to either:</P>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-638677"></A>Generate an error on encountering a mixture of facet and classic geometry. This is the default.</LI>
+<LI>
+<A NAME="50422160_pgfId-638743"></A>Receive mixed parts into your application.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422160_pgfId-357433"></A>By default, facet geometry is disabled when you start a Parasolid session. To use mixed geometry you must have the <CODE>
+facet_geometry </CODE>
+and the <CODE>
+receive_mixed</CODE>
+ options enabled as follows:</P>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-642113"></A>To enable facet geometry, you must call <A HREF=../headers/pk_session_set_facet_geometry.html>PK_SESSION_set_facet_geometry</A> once you are in the session and set <CODE>
+facet_geometry</CODE>
+ to <A HREF=../headers/pk_facet_geometry_t.html>PK_facet_geometry_all_c</A>.</LI>
+<LI>
+<A NAME="50422160_pgfId-642180"></A>To enable receiving mixed geometry, you need to set <CODE>
+receive_mixed</CODE>
+ to a setting other than <A HREF=../headers/pk_receive_mixed_t.html>PK_receive_mixed_fail_c</A>. At the present time, only <A HREF=../headers/pk_receive_mixed_t.html>PK_receive_mixed_allow_c</A> is supported.</LI>
+</UL>
+<P>
+<A NAME="50422160_pgfId-498858"></A> <A HREF="fd_chap.083.html#50422160_73876"><EM>
+Figure 82-4</EM></A> shows the typical workflow required to create and work in a Parasolid session.</P>
+<P>
+<A NAME="50422160_pgfId-487458"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1070.gif">
+
+<P>
+<A NAME="50422160_pgfId-387746"></A>Figure 82-4 <A NAME="50422160_73876"></A>Typical workflow in a session using Convergent Modeling</P>
+
+
+<H3>
+<A NAME="50422160_pgfId-517130"></A>	82.2.2 	<A NAME="50422160_51208"></A>Enquiring if facet geometry is present </H3>
+<P>
+<A NAME="50422160_pgfId-517176"></A>You can check to see if facet geometry is present in a partition using <A HREF=../headers/pk_partition_ask_facet_geom.html>PK_PARTITION_ask_facet_geom</A>. This function determines if facet geometry is present in a partition. In addition, it can optionally return those parts that have facet geometry, and their geometric category, and any orphan facet geometry in the partition.</P>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-526952"></A>If <CODE>
+want_parts</CODE>
+ is PK_LOGICAL_true, all parts containing facet geometry are returned.</LI>
+<LI>
+<A NAME="50422160_pgfId-526963"></A>If <CODE>
+want_geoms</CODE>
+ is PK_LOGICAL_true, all orphan meshes and polylines are returned. </LI>
+</UL>
+<P>
+<A NAME="50422160_pgfId-526974"></A>See the <EM>
+PK Reference documentation</EM> for more information.</P>
+<P>
+<A NAME="50422160_pgfId-517447"></A>Parasolid also has two functions that provide information about the category of the geometric entities. </P>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-524625"></A><A HREF=../headers/pk_geom_ask_geom_category.html>PK_GEOM_ask_geom_category</A> returns the category of a given geometric entity.</LI>
+<LI>
+<A NAME="50422160_pgfId-524704"></A><A HREF=../headers/pk_topol_categorise_geom.html>PK_TOPOL_categorise_geom</A> returns the geometric category of the topology, along with the category of any geometry directly attached to it. The geometric category of the topology is a combination of the category of the direct geometry and the categories of any related topology. If <CODE>
+want_related_topols</CODE>
+ is <A HREF=../headers/pk_related_topols_t.html>PK_related_topols_top_c</A>, these related topologies and their categories are returned. In cases where the given topology is an assembly, only the top level component parts are returned.</LI>
+</UL>
+<P>
+<A NAME="50422160_pgfId-524992"></A>See the <EM>
+PK Reference documentation</EM> for more information on these functions.</P>
+
+
+<H3>
+<A NAME="50422160_pgfId-592247"></A>	82.2.3 	Workflow for creating Parasolid meshes from foreign facet data </H3>
+<P>
+<A NAME="50422160_pgfId-596833"></A>The following workflow describes the recommended best practice for creating Parasolid meshes from foreign facet data.</P>
+<UL>
+<LI>
+<A NAME="50422160_pgfId-592766"></A>Create the mesh from foreign facet data by calling <A HREF=../headers/pk_mesh_create_from_facets.html>PK_MESH_create_from_facets</A>. See <A HREF="fd_chap.086.html#50422163_93469">Chapter 85, “Creating PSM Data From Foreign Facet Data”</A> for more information.</LI>
+<LI>
+<A NAME="50422160_pgfId-592934"></A>After creating a Parasolid mesh you should attempt to repair any defects or invalidities present. See <A HREF="fd_chap.087.html#50422164_70778">Chapter 86, “Checking and Repairing Mesh Data”</A> for more information on detecting and repairing mesh defects. Any holes in the mesh can be filled using <A HREF=../headers/pk_mesh_fill_holes.html>PK_MESH_fill_holes</A>. See <A HREF="fd_chap.088.html#50422165_70508">Chapter 87, “Filling Holes In Facet Bodies”</A> for more information.</LI>
+<LI>
+<A NAME="50422160_pgfId-593521"></A>The mesh can be attached to topology to create a single-faced facet body, which can be split into individual faces to optimise downstream modelling operations. The simplest method is to call <A HREF=../headers/pk_mesh_make_bodies.html>PK_MESH_make_bodies</A> on the repaired mesh. See <A HREF="fd_chap.085.html#50422162_58644">Section 84.4, “Manipulating facet data”</A> for more information.</LI>
+</UL>
+<P>
+<A NAME="50422160_pgfId-505089"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.082.html">Introduction To Convergent Modeling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.084.html">Facet Model Structure</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

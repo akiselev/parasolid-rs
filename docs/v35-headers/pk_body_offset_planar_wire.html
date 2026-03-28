@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_offset_planar_wire</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_offset_planar_wire</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_BODY_offset_planar_wire
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                             wire_body,   --- planar wire body
+double                                offset,      --- offset distance
+<A HREF=../headers/pk_vector1_t.html>PK_VECTOR1_t</A>                          normal,      --- normal of the plane
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                             ref,         --- reference edge
+const <A HREF=../headers/pk_body_offset_planar_wire_o_t.html>PK_BODY_offset_planar_wire_o_t</A> *options,     --- options structure
+
+<I>--- returned arguments ---
+</I>int                            *const n_new_wires, --- number of new wires
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                     **const new_wires,   --- new wires
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>             *const tracking     --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function offsets a planar wire body in the plane by a specified
+distance. Edges of the new offset wire bodies are paired with their
+originating edges or vertices in the tracking information.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_value          An invalid input is detected.
+    PK_ERROR_cant_offset        Unable to produce valid edges for offset body.
+    PK_ERROR_check_error        An offset body failed local checking.
+    PK_ERROR_not_implemented    An unavailable functionality is called.
+    PK_ERROR_cant_get_point     Unable to get new vertex point to fill a gap.
+    PK_ERROR_cant_get_curve     Unable to get offset curve of an edge.
+    PK_ERROR_bad_angle          An angle supplied to the <B>'gap_fill_angle'</B>
+                                option is less than zero or greater than pi.
+    PK_ERROR_bad_edge           An edge is not completely on plane of <B>'normal'</B>
+
+<A NAME="documentation"></A>
+<B>'wire_body'</B> must be a manifold connected wire body and lie on a plane whose
+normal is <B>'normal'</B>. If an edge is found to be not completely on the expected
+plane, then PK_ERROR_bad_edge is returned with the edge as the error entity.
+The edge <B>'ref'</B> must be an edge of <B>'wire_body'</B> and it is used to determine the
+direction of the offset.  If you stand on the plane with <B>'normal'</B> pointing
+upwards, looking along <B>'ref'</B>, then a positive <B>'offset'</B> is to your right.
+
+Curves other than lines, circles and bcurves are converted to bcurves before
+offsetting.  The application can set the required accuracy of the curve
+conversion in the options structure.
+
+The edges of <B>'new_wires'</B> and their originating edges or vertices in
+<B>'wire_body'</B> are listed in the tracking information. Each new edge is either
+the offset of a portion of an edge of <B>'wire_body'</B> or a segment that fills the
+gap corresponding to a vertex of <B>'wire_body'</B> opened up by the offset operation.
+See documentation for <A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>.
+
+If the function fails, then an entity of <B>'wire_body'</B> will be placed in the
+error standard form to indicate the location of the error.
+
+The identity of the error locator defaults to <B>'wire_body'</B> and is then
+modified during the offset operation when a traceable error is encountered.
+For PK_ERROR_cant_get_point, the entity is set to the corresponding vertex
+of <B>'wire_body'</B> where gap filling is required by the offset operation. For
+PK_ERROR_cant_get_curve, the error locating entity is returned as the
+edge of <B>'wire_body'</B> whose offset curve has not been successfully found.
+For all other errors, the locating entity is reset to an edge or a
+vertex of the input wire body if it originates the product entity of the
+offset operation where the first error of the process is detected.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

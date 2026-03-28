@@ -1,0 +1,725 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Euler Operations</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Euler Operations</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.032.html">Introduction To Manipulating Topology</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.034.html">Controlling Redundant Topology</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-294723">32.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-294738">32.1.1	Terminology </A>
+<UL>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-294745">32.1.1.1	Edges </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-294784">32.1.1.2	Vertices </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-294794">32.2	Functionality provided by Parasolid </A>
+<UL>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-294811">32.2.1	Summary of functionality </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-294883">32.2.2	Specific Euler operations </A>
+<UL>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-294887">32.2.2.1	PK_EDGE_euler_slit </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-294963">32.2.2.2	PK_FACE_euler_unslit </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295021">32.2.2.3	PK_EDGE_euler_split </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295092">32.2.2.4	PK_VERTEX_euler_merge_edges </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295150">32.2.2.5	PK_LOOP_euler_make_edge </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-331812">32.2.2.6	PK_VERTEX_euler_delete </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295246">32.2.2.7	PK_VERTEX_euler_split </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295327">32.2.2.8	PK_EDGE_euler_merge_vertices </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295376">32.2.2.9	PK_EDGE_euler_open_zip </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295452">32.2.2.10	PK_EDGE_euler_close_zip </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295514">32.2.2.11	PK_FACE_euler_make_loop </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295568">32.2.2.12	PK_LOOP_euler_delete_isolated </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295612">32.2.2.13	PK_LOOP_euler_delete_make_edge </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295676">32.2.2.14	PK_EDGE_euler_delete_make_loop </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295740">32.2.2.15	PK_LOOP_euler_make_edge_face </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295820">32.2.2.16	PK_EDGE_euler_delete_with_face </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295882">32.2.2.17	PK_LOOP_euler_make_edge_loop </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295887">32.2.2.18	PK_EDGE_euler_delete_with_loop </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295892">32.2.2.19	PK_FACE_euler_make_ring_face </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-295943">32.2.2.20	PK_EDGE_euler_delete_ring_face </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-296009">32.2.2.21	PK_FACE_euler_make_ring_loop </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-296014">32.2.2.22	PK_EDGE_euler_delete_ring_loop </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-296019">32.2.2.23	PK_LOOP_euler_transfer </A>
+<LI> <A HREF="fd_chap.033.html#50422103_pgfId-296088">32.2.2.24	PK_FIN_euler_glue </A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422103_pgfId-294723"></A>32.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422103_pgfId-294724"></A>Euler operations are low-level functions that modify a small area of topology. Used in conjunction with functions to attach and detach geometry, these functions allow you to implement your own modeling operations, such as local operations and feature creation.</P>
+<P>
+<A NAME="50422103_pgfId-294725"></A>Euler operations always return a body with valid topological data-structures. However, the functions do not alter geometry - new topology created by an operation has no geometry attached, and any topology deleted by an operation has its geometry deleted first. This means that the resulting body is normally invalid, and you must attach suitable geometry to make the model valid yourself.</P>
+<P>
+<A NAME="50422103_pgfId-294726"></A>The fact that Euler operations are likely to produce invalid bodies makes these functions significantly different to most other PK functions. With the exception of functions to attach and detach geometry, other PK functions always return a valid body provided that it is valid when it is passed to the function. </P>
+<P>
+<A NAME="50422103_pgfId-294733"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422103_pgfId-294729"></A>Warning: It is your responsibility to ensure that a body edited with an Euler operation is returned to a valid state before passing it to other PK functions. Parasolid does not accept faults reported for failures in PK functions that have been passed invalid bodies.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422103_pgfId-294734"></A>The Euler operations are differentiated from other PK functions by including the word ‘euler’ in the function name, e.g. <A HREF=../headers/pk_edge_euler_split.html>PK_EDGE_euler_split</A>.</P>
+
+<H3>
+<A NAME="50422103_pgfId-294738"></A>	32.1.1 	<A NAME="50422103_marker-294735"></A><A NAME="50422103_marker-294736"></A><A NAME="50422103_marker-294737"></A>Terminology </H3>
+<P>
+<A NAME="50422103_pgfId-294742"></A>The following terms are used in the Euler functionality in Parasolid.</P>
+
+<H4>
+<A NAME="50422103_pgfId-294745"></A>32.1.1.1 <A NAME="50422103_marker-294743"></A><A NAME="50422103_marker-294744"></A>Edges </H4>
+<P>
+<A NAME="50422103_pgfId-294746"></A>Edges are classified as follows:</P>
+<P>
+<A NAME="50422103_pgfId-294780"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294749"></A>Edge Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294751"></A>Edge has...</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294753"></A>Wire-frame</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294755"></A>no fins</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294757"></A>Laminar</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294759"></A>one fin</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294761"></A>Manifold</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294763"></A>two fins with opposite senses (also called normal)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294765"></A>General</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294767"></A>two fins with the same sense or more than two fins</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294769"></A>Open</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294771"></A>two vertices</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294773"></A>Split Ring</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294775"></A>one vertex</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294777"></A>Ring</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294779"></A>no vertices</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422103_pgfId-294784"></A>32.1.1.2 <A NAME="50422103_marker-294781"></A><A NAME="50422103_marker-294782"></A><A NAME="50422103_marker-294783"></A>Vertices </H4>
+<P>
+<A NAME="50422103_pgfId-294785"></A>The number of oriented edges at a vertex is as described in <A HREF=../headers/pk_vertex_ask_oriented_edges.html>PK_VERTEX_ask_oriented_edges</A>. A vertex with no oriented edges is called isolated.</P>
+<P>
+<A NAME="50422103_pgfId-294786"></A>A vertex is manifold if either:</P>
+<UL>
+<LI>
+<A NAME="50422103_pgfId-294787"></A>it is connected to one loop, which is isolated, or</LI>
+<LI>
+<A NAME="50422103_pgfId-294788"></A>it is not connected to any isolated loops, all its edges are manifold, and its edges form a single face-connected set (i.e. the b-rep is locally manifold at the vertex). </LI>
+</UL>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422103_pgfId-294794"></A>32.2	<A NAME="50422103_marker-294789"></A><A NAME="50422103_marker-294790"></A>Functionality provided by Parasolid 
+
+
+</H1>
+<P>
+<A NAME="50422103_pgfId-294798"></A>This section explains the functionality provided by the Euler operations in Parasolid.</P>
+<UL>
+<LI>
+<A NAME="50422103_pgfId-294802"></A><A HREF="fd_chap.033.html#50422103_52339">Section 32.2.1</A> provides a summary of the Euler operations available, for easy reference.</LI>
+<LI>
+<A NAME="50422103_pgfId-294806"></A><A HREF="fd_chap.033.html#50422103_25512">Section 32.2.2</A> illustrates each Euler operation in turn.</LI>
+</UL>
+
+<H3>
+<A NAME="50422103_pgfId-294811"></A>	32.2.1 	<A NAME="50422103_52339"></A><A NAME="50422103_marker-294808"></A><A NAME="50422103_marker-294809"></A><A NAME="50422103_marker-294810"></A>Summary of functionality </H3>
+<P>
+<A NAME="50422103_pgfId-294815"></A>The following table summarizes the Euler functionality that Parasolid offers:</P>
+<P>
+<A NAME="50422103_pgfId-294879"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294818"></A>Functions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294820"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294822"></A><A HREF=../headers/pk_edge_euler_slit.html>PK_EDGE_euler_slit</A><BR>
+<A HREF=../headers/pk_face_euler_unslit.html>PK_FACE_euler_unslit</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294824"></A>Add or delete slit faces (faces with two edges) along an edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294826"></A><A HREF=../headers/pk_edge_euler_split.html>PK_EDGE_euler_split</A><BR>
+<A HREF=../headers/pk_vertex_euler_merge_edges.html>PK_VERTEX_euler_merge_edges</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294828"></A>Add or remove a vertex from an edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294830"></A><A HREF=../headers/pk_loop_euler_make_edge.html>PK_LOOP_euler_make_edge</A><BR>
+<A HREF=../headers/pk_vertex_euler_delete.html>PK_VERTEX_euler_delete</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294832"></A>Add an edge to a loop, or delete an vertex with an isolated edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294834"></A><A HREF=../headers/pk_vertex_euler_split.html>PK_VERTEX_euler_split</A><BR>
+<A HREF=../headers/pk_edge_euler_merge_vertices.html>PK_EDGE_euler_merge_vertices</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294836"></A>Split a vertex into two, separated by an edge, or merge two vertices, removing the intermediate edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294838"></A><A HREF=../headers/pk_edge_euler_open_zip.html>PK_EDGE_euler_open_zip</A><BR>
+<A HREF=../headers/pk_edge_euler_close_zip.html>PK_EDGE_euler_close_zip</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294840"></A>Split an edge into two lengthwise, or merge two edges lengthwise.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294842"></A><A HREF=../headers/pk_face_euler_make_loop.html>PK_FACE_euler_make_loop</A><BR>
+<A HREF=../headers/pk_loop_euler_delete_isolated.html>PK_LOOP_euler_delete_isolated</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294844"></A>Add or delete an isolated loop and vertex from a face</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294847"></A><A NAME="50422103_marker-294846"></A><A HREF=../headers/pk_loop_euler_delete_make_edge.html>PK_LOOP_euler_delete_make_edge</A><BR>
+<A NAME="50422103_marker-294848"></A><A HREF=../headers/pk_edge_euler_delete_make_loop.html>PK_EDGE_euler_delete_make_loop</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294850"></A>Merge two loops in a face by adding a connecting edge, or delete an edge from a loop, splitting it in two.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294853"></A><A NAME="50422103_marker-294852"></A><A HREF=../headers/pk_loop_euler_make_edge_face.html>PK_LOOP_euler_make_edge_face</A><BR>
+<A NAME="50422103_marker-294854"></A><A HREF=../headers/pk_edge_euler_delete_with_face.html>PK_EDGE_euler_delete_with_face</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294856"></A>Create a new face by adding an edge between two vertices, or delete an edge and merge two faces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294859"></A><A NAME="50422103_marker-294858"></A><A HREF=../headers/pk_loop_euler_make_edge_loop.html>PK_LOOP_euler_make_edge_loop</A><BR>
+<A NAME="50422103_marker-294860"></A><A HREF=../headers/pk_edge_euler_delete_with_loop.html>PK_EDGE_euler_delete_with_loop</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294862"></A>Create a new loop by joining two vertices in a loop, or delete an edge and merge two loops from the same face into one.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294865"></A><A NAME="50422103_marker-294864"></A><A HREF=../headers/pk_face_euler_make_ring_face.html>PK_FACE_euler_make_ring_face</A><BR>
+<A HREF=../headers/pk_edge_euler_delete_ring_face.html>PK_EDGE_euler_delete_ring_face</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294867"></A>Split a face by adding a ring edge, or delete a ring edge and face.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294870"></A><A NAME="50422103_marker-294869"></A><A HREF=../headers/pk_face_euler_make_ring_loop.html>PK_FACE_euler_make_ring_loop</A><BR>
+<A NAME="50422103_marker-294871"></A><A HREF=../headers/pk_edge_euler_delete_ring_loop.html>PK_EDGE_euler_delete_ring_loop</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294873"></A>Add a new loop to a face, or delete a bi-wire ring edge and face. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294876"></A><A NAME="50422103_marker-294875"></A><A HREF=../headers/pk_loop_euler_transfer.html>PK_LOOP_euler_transfer</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422103_pgfId-294878"></A>Transfer a loop from one face to another.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422103_pgfId-294883"></A>	32.2.2 	<A NAME="50422103_25512"></A><A NAME="50422103_marker-294881"></A><A NAME="50422103_marker-294882"></A>Specific Euler operations </H3>
+<P>
+<A NAME="50422103_pgfId-294884"></A>Each Euler operation is illustrated in this section. For more information, refer to the reference documentation for a specific function.</P>
+
+<H4>
+<A NAME="50422103_pgfId-294887"></A>32.2.2.1 <A NAME="50422103_marker-294885"></A><A NAME="50422103_marker-294886"></A><A HREF=../headers/pk_edge_euler_slit.html>PK_EDGE_euler_slit</A> </H4>
+<P>
+<A NAME="50422103_pgfId-294888"></A>This function slits an edge lengthwise, creating a new slit face. The <CODE>
+on_left</CODE>
+ argument specifies whether the new face lies on the left or right side of the given edge.</P>
+<P>
+<A NAME="50422103_pgfId-326268"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-228.gif">
+
+<P>
+<A NAME="50422103_pgfId-294960"></A>Figure 32-1 Slitting an edge lengthwise</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-294963"></A>32.2.2.2 <A NAME="50422103_marker-294961"></A><A NAME="50422103_marker-294962"></A><A HREF=../headers/pk_face_euler_unslit.html>PK_FACE_euler_unslit</A> </H4>
+<P>
+<A NAME="50422103_pgfId-294964"></A>This function deletes a slit face. The given face must have either one loop and two edges or two loops each with one ring edge.</P>
+<P>
+<A NAME="50422103_pgfId-327695"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-229.gif">
+
+<P>
+<A NAME="50422103_pgfId-295018"></A>Figure 32-2 Deleting a slit face</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295021"></A>32.2.2.3 <A NAME="50422103_marker-295019"></A><A NAME="50422103_marker-295020"></A><A HREF=../headers/pk_edge_euler_split.html>PK_EDGE_euler_split</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295022"></A>This function splits an edge by adding a vertex. The <CODE>
+forward</CODE>
+ argument determines whether the new vertex is the forward or backward vertex of the edge.</P>
+<P>
+<A NAME="50422103_pgfId-327907"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-230.gif">
+
+<P>
+<A NAME="50422103_pgfId-295090"></A>Figure 32-3 Splitting an edge</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295092"></A>32.2.2.4 <A NAME="50422103_marker-295091"></A><A HREF=../headers/pk_vertex_euler_merge_edges.html>PK_VERTEX_euler_merge_edges</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295093"></A>This function deletes a vertex from an edge.</P>
+<P>
+<A NAME="50422103_pgfId-328107"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-231.gif">
+
+<P>
+<A NAME="50422103_pgfId-295147"></A>Figure 32-4 Merging two edges</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295150"></A>32.2.2.5 <A NAME="50422103_marker-295148"></A><A NAME="50422103_marker-295149"></A><A HREF=../headers/pk_loop_euler_make_edge.html>PK_LOOP_euler_make_edge</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295151"></A>This function adds a trailing edge and vertex to a vertex in the specified <CODE>
+loop</CODE>
+. The vertex used is the forward vertex of the supplied <CODE>
+fin</CODE>
+. The direction of <CODE>
+new_edge</CODE>
+ is towards <CODE>
+new_vertex</CODE>
+. </P>
+<P>
+<A NAME="50422103_pgfId-328287"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-232.gif">
+
+<P>
+<A NAME="50422103_pgfId-331817"></A>Figure 32-5 Adding a trailing edge to a fin</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-331812"></A>32.2.2.6 <A NAME="50422103_marker-331810"></A><A NAME="50422103_marker-331811"></A><A HREF=../headers/pk_vertex_euler_delete.html>PK_VERTEX_euler_delete</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295209"></A>This function deletes a vertex and its single attached edge.</P>
+<P>
+<A NAME="50422103_pgfId-328481"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-233.gif">
+
+<P>
+<A NAME="50422103_pgfId-295243"></A>Figure 32-6 Deleting a vertex and its edge</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295246"></A>32.2.2.7 <A NAME="50422103_marker-295244"></A><A NAME="50422103_marker-295245"></A><A HREF=../headers/pk_vertex_euler_split.html>PK_VERTEX_euler_split</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295247"></A>This function splits a vertex, adding an intervening edge. The vertex must be a common forward vertex of the two fins supplied to the function.</P>
+<P>
+<A NAME="50422103_pgfId-328748"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-234.gif">
+
+<P>
+<A NAME="50422103_pgfId-295325"></A>Figure 32-7 Replacing a vertex with an edge</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295327"></A>32.2.2.8 <A NAME="50422103_marker-295326"></A><A HREF=../headers/pk_edge_euler_merge_vertices.html>PK_EDGE_euler_merge_vertices</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295328"></A>This function merges two vertices, deleting the intervening edge.</P>
+<P>
+<A NAME="50422103_pgfId-328960"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-235.gif">
+
+<P>
+<A NAME="50422103_pgfId-295374"></A>Figure 32-8 Replacing an edge with a vertex</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295376"></A>32.2.2.9 <A NAME="50422103_marker-295375"></A><A HREF=../headers/pk_edge_euler_open_zip.html>PK_EDGE_euler_open_zip</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295377"></A>This function splits an edge lengthwise, replacing it with two edges joined at one end. The vertex at which to split the edge is identified as the forward vertex of the supplied fin.</P>
+<P>
+<A NAME="50422103_pgfId-329109"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-236.gif">
+
+<P>
+<A NAME="50422103_pgfId-295449"></A>Figure 32-9 Splitting an edge into two lengthwise</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295452"></A>32.2.2.10 <A NAME="50422103_marker-295450"></A><A NAME="50422103_marker-295451"></A><A HREF=../headers/pk_edge_euler_close_zip.html>PK_EDGE_euler_close_zip</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295453"></A>This function ‘zips’ two edges together by merging the vertices at one end, deleting <CODE>
+edge2</CODE>
+. There must be more than one edge at each of the vertices to be merged.</P>
+<P>
+<A NAME="50422103_pgfId-329296"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-237.gif">
+
+<P>
+<A NAME="50422103_pgfId-295511"></A>Figure 32-10 Merging two edges lengthwise</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295514"></A>32.2.2.11 <A NAME="50422103_marker-295512"></A><A NAME="50422103_marker-295513"></A><A HREF=../headers/pk_face_euler_make_loop.html>PK_FACE_euler_make_loop</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295515"></A>This function adds an isolated vertex and loop to a face.</P>
+<P>
+<A NAME="50422103_pgfId-329469"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-238.gif">
+
+<P>
+<A NAME="50422103_pgfId-295565"></A>Figure 32-11 Adding a loop and isolated vertex to a face</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295568"></A>32.2.2.12 <A NAME="50422103_marker-295566"></A><A NAME="50422103_marker-295567"></A><A HREF=../headers/pk_loop_euler_delete_isolated.html>PK_LOOP_euler_delete_isolated</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295569"></A>This function deletes an isolated vertex and loop from a face.</P>
+<P>
+<A NAME="50422103_pgfId-329632"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-239.gif">
+
+<P>
+<A NAME="50422103_pgfId-295609"></A>Figure 32-12 Deleting a loop and isolated vertex from a face</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295612"></A>32.2.2.13 <A NAME="50422103_marker-295610"></A><A NAME="50422103_marker-295611"></A><A HREF=../headers/pk_loop_euler_delete_make_edge.html>PK_LOOP_euler_delete_make_edge</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295613"></A>This function merges two loops in the same face into one by joining their vertices with an edge. Loop2 is deleted.</P>
+<P>
+<A NAME="50422103_pgfId-329772"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-240.gif">
+
+<P>
+<A NAME="50422103_pgfId-295673"></A>Figure 32-13 Adding a connecting edge to merge two loops</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295676"></A>32.2.2.14 <A NAME="50422103_marker-295674"></A><A NAME="50422103_marker-295675"></A><A HREF=../headers/pk_edge_euler_delete_make_loop.html>PK_EDGE_euler_delete_make_loop</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295677"></A>This function deletes an edge from a loop splitting it into two loops. The logical <CODE>
+forward</CODE>
+ determines which loop is the new one.</P>
+<P>
+<A NAME="50422103_pgfId-329910"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-241.gif">
+
+<P>
+<A NAME="50422103_pgfId-295737"></A>Figure 32-14 Deleting an edge to create two loops in a face</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295740"></A>32.2.2.15 <A NAME="50422103_marker-295738"></A><A NAME="50422103_marker-295739"></A><A HREF=../headers/pk_loop_euler_make_edge_face.html>PK_LOOP_euler_make_edge_face</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295741"></A>This function joins two vertices in the same loop, creating a new face. The new face is on the right of the new edge. The vertices are identified as the forward vertices of the supplied fins.</P>
+<P>
+<A NAME="50422103_pgfId-330044"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-242.gif">
+
+<P>
+<A NAME="50422103_pgfId-295817"></A>Figure 32-15 Joining two vertices in a loop</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295820"></A>32.2.2.16 <A NAME="50422103_marker-295818"></A><A NAME="50422103_marker-295819"></A><A HREF=../headers/pk_edge_euler_delete_with_face.html>PK_EDGE_euler_delete_with_face</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295821"></A>This function deletes an edge and merges two faces and loops into one. The <CODE>
+on_left</CODE>
+ argument determines which face survives.</P>
+<P>
+<A NAME="50422103_pgfId-330232"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-243.gif">
+
+<P>
+<A NAME="50422103_pgfId-295879"></A>Figure 32-16 Merging two faces and loops</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295882"></A>32.2.2.17 <A NAME="50422103_marker-295880"></A><A NAME="50422103_marker-295881"></A><A HREF=../headers/pk_loop_euler_make_edge_loop.html>PK_LOOP_euler_make_edge_loop</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295883"></A>This function is similar to <A HREF=../headers/pk_loop_euler_make_edge_face.html>PK_LOOP_euler_make_edge_face</A>, but instead of splitting the face in two, it creates a new loop in the face, increasing its genus.</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295887"></A>32.2.2.18 <A NAME="50422103_marker-295885"></A><A NAME="50422103_marker-295886"></A><A HREF=../headers/pk_edge_euler_delete_with_loop.html>PK_EDGE_euler_delete_with_loop</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295888"></A>This function is similar to <A HREF=../headers/pk_edge_euler_delete_with_face.html>PK_EDGE_euler_delete_with_face</A>, except that it deletes an edge which has different loops in the same face on each side of it. It merges the loops into one, decreasing the genus of the face.</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295892"></A>32.2.2.19 <A NAME="50422103_marker-295890"></A><A NAME="50422103_marker-295891"></A><A HREF=../headers/pk_face_euler_make_ring_face.html>PK_FACE_euler_make_ring_face</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295893"></A>This function splits a face by adding a new ring edge. The new face is always on the right of the edge.</P>
+<P>
+<A NAME="50422103_pgfId-330376"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-244.gif">
+
+<P>
+<A NAME="50422103_pgfId-295941"></A>Figure 32-17 Splitting a face by adding a ring edge</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-295943"></A>32.2.2.20 <A NAME="50422103_marker-295942"></A><A HREF=../headers/pk_edge_euler_delete_ring_face.html>PK_EDGE_euler_delete_ring_face</A> </H4>
+<P>
+<A NAME="50422103_pgfId-295944"></A>This function deletes a ring edge and a face.</P>
+<P>
+<A NAME="50422103_pgfId-330517"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-245.gif">
+
+<P>
+<A NAME="50422103_pgfId-296006"></A>Figure 32-18 Deleting a ring edge and face</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-296009"></A>32.2.2.21 <A NAME="50422103_marker-296007"></A><A NAME="50422103_marker-296008"></A><A HREF=../headers/pk_face_euler_make_ring_loop.html>PK_FACE_euler_make_ring_loop</A> </H4>
+<P>
+<A NAME="50422103_pgfId-296010"></A>This function is similar to <A HREF=../headers/pk_face_euler_make_ring_face.html>PK_FACE_euler_make_ring_face</A>, except that instead of splitting the face in two, it creates a new loop in the face, thus increasing its genus.</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-296014"></A>32.2.2.22 <A NAME="50422103_marker-296012"></A><A NAME="50422103_marker-296013"></A><A HREF=../headers/pk_edge_euler_delete_ring_loop.html>PK_EDGE_euler_delete_ring_loop</A> </H4>
+<P>
+<A NAME="50422103_pgfId-296015"></A>This function is similar to <A HREF=../headers/pk_edge_euler_delete_with_face.html>PK_EDGE_euler_delete_with_face</A>, except that it deletes a ring edge which has different loops from the same face on each side, thus decreasing the genus of the face.</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-296019"></A>32.2.2.23 <A NAME="50422103_marker-296017"></A><A NAME="50422103_marker-296018"></A><A HREF=../headers/pk_loop_euler_transfer.html>PK_LOOP_euler_transfer</A> </H4>
+<P>
+<A NAME="50422103_pgfId-296020"></A>This function transfers a loop from one face to another. The two faces must have the same front and back shells.</P>
+<P>
+<A NAME="50422103_pgfId-330656"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-246.gif">
+
+<P>
+<A NAME="50422103_pgfId-296086"></A>Figure 32-19 Transferring a loop to a different face</P>
+
+
+<H4>
+<A NAME="50422103_pgfId-296088"></A>32.2.2.24 <A NAME="50422103_marker-296087"></A><A HREF=../headers/pk_fin_euler_glue.html>PK_FIN_euler_glue</A> </H4>
+<P>
+<A NAME="50422103_pgfId-296089"></A>This function glues two edges together by gluing fins together from two edges in the order in which they are passed to the function. The edge of the first fin passed to the function survives; the other edge is deleted.</P>
+<P>
+<A NAME="50422103_pgfId-296093"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422103_pgfId-296092"></A>Note: The curve of any edge deleted by <A HREF=../headers/pk_fin_euler_glue.html>PK_FIN_euler_glue</A> is not itself deleted. This is an exception to the general rule for Euler functions that geometry attached to deleted topology is itself deleted. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422103_pgfId-275053"></A>&nbsp;</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.032.html">Introduction To Manipulating Topology</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.034.html">Controlling Redundant Topology</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

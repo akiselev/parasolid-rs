@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_LOOP_ask_type</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_LOOP_ask_type</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>       PK_LOOP_ask_type
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_loop_t.html>PK_LOOP_t</A>             loop,     --- the loop
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_loop_type_t.html>PK_LOOP_type_t</A> *const loop_type --- the type of the loop
+)
+</B>
+<A NAME="description"></A>
+<I>This function classifies the given loop.
+</I>
+<A NAME="documentation"></A>
+The <B>'loop_type'</B> is one of:
+
+    PK_LOOP_type_vertex_c       loop is just a vertex without any edges
+    PK_LOOP_type_wire_c         loop has no interior, e.g. from a wire body
+    PK_LOOP_type_outer_c        simple peripheral loop
+    PK_LOOP_type_inner_c        loop is a simple hole
+    PK_LOOP_type_winding_c      winding loop on a periodic surface
+                                e.g. a circle on a cylinder or doughnut
+    PK_LOOP_type_inner_sing_c   loop is a hole around the surface singularity
+                                e.g. chopping the top off a cone
+    PK_LOOP_type_likely_outer_c an apparently peripheral loop on a doubly
+                                closed surface
+    PK_LOOP_type_likely_inner_c an apparent hole in a doubly closed surface
+    PK_LOOP_type_unclear_c      a loop dividing a periodic degenerate surface
+                                in two (contains just one pole), or in a face
+                                with facet geometry
+    PK_LOOP_type_error_c        invalid loop or algorithm failure
+
+The range of types returned depends on the behaviour of the underlying
+surface of the face to which the loop belongs.
+
+PK_LOOP_type_vertex_c and PK_LOOP_type_wire_c are generic return
+values that cover simple degenerate special cases; on solid and sheet
+bodies these loop types correspond to edges and vertices scribed
+inside a face.
+
+If the surface is a mesh, PK_LOOP_type_unclear_c is returned.
+
+For planes and other non-periodic surfaces, all 2D loops are either
+PK_LOOP_type_outer_c or PK_LOOP_type_inner_c. Each face has one outer
+peripheral loop (PK_LOOP_type_outer_c) and any number of holes
+(PK_LOOP_type_inner_c).
+
+For cylindrical topology, i.e. surfaces that are periodic in one
+parameter only, closed loops that wind once around the periodic
+parameter space are of type PK_LOOP_type_winding_c. To define the
+periphery of a face in a body that is periodic in one parameter, you
+need either:
+
+ * A matched pair of PK_LOOP_type_winding_c loops
+ * A PK_LOOP_type_outer_c loop
+
+A surface that is periodic in one parameter may contain any number of
+PK_LOOP_type_inner_c.
+
+Surfaces such as cones, that are periodic in one parameter and
+degenerate at one end, can be treated as if they were flattened into a
+plane (with the degeneracy in the centre of the plane). Thus, a
+cone contains just one PK_LOOP_type_outer_c. Conversely, such a
+surface can also be treated as a tapered cylinder if it has a winding
+loop that completely surrounds the degeneracy; such a loop is of type
+PK_LOOP_type_inner_sing_c.
+
+Doubly-periodic surfaces, such as doughnut torii, can have closed loops
+that wind one or more times in either parameter; these are of type
+PK_LOOP_type_winding_c. Any other loops form either the periphery of
+open regions, or holes in the whole closed surface.
+
+ * Those that could contain a winding loop are PK_LOOP_type_likely_inner_c
+ * Those that do not wrap around completely in parameter space are
+   PK_LOOP_type_likely_outer_c.
+
+Closed loops in spherical topology (closed in one parameter and
+degenerate in the other) split the whole surface in two. There are
+three types of closed loop on a spherical surface:
+
+ * A PK_LOOP_type_likely_outer_c loop contains neither pole
+ * A PK_LOOP_type_likely_inner_c loop surrounds both poles.
+ * A PK_LOOP_type_unclear_c loop is used for closed loops which surround
+   only one pole, dividing the surface in two.
+
+These types of loop apply to spherical topology in which the
+degeneracy is either smooth or sharp in 3D.
+
+Note that the doubly periodic topologies can support arbitrarily
+complex loops that are not intuitively holes or peripheries; but
+PK_LOOP_type_likely_outer_c and PK_LOOP_type_likely_inner_c are
+meaningful for simple faces.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,580 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Checking and Repairing Mesh Data</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Checking and Repairing Mesh Data</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.086.html">Creating PSM Data From Foreign Facet Data</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.088.html">Filling Holes In Facet Bodies</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.087.html#50422164_pgfId-340869">86.1	Introduction </A>
+<LI> <A HREF="fd_chap.087.html#50422164_pgfId-339908">86.2	Finding and fixing defects in meshes </A>
+<LI> <A HREF="fd_chap.087.html#50422164_pgfId-427044">86.3	Repairing meshes attached to faces </A>
+<LI> <A HREF="fd_chap.087.html#50422164_pgfId-339932">86.4	Checking meshes </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422164_pgfId-340869"></A>86.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422164_pgfId-340895"></A>You can use the standard checking APIs (<A HREF=../headers/pk_body_check.html>PK_BODY_check</A>, <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A>, etc.) to find invalidities in a mesh. </P>
+<P>
+<A NAME="50422164_pgfId-396563"></A>In addition, Parasolid provides APIs to find and fix defects in a mesh. Defects include invalidities and additionally other sub-optimal properties of a mesh whose removal may be desirable.</P>
+<P>
+<A NAME="50422164_pgfId-393436"></A>When creating a Parasolid mesh from foreign facet data, you should ensure that the resulting mesh is of good quality by attempting repair on any defects that may exist.</P>
+<P>
+<A NAME="50422164_pgfId-396906"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422164_pgfId-396956"></A>Note: It is recommended that any defects present on a mesh are removed prior to adding topology. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422164_pgfId-342502"></A>This chapter explains how you can use Parasolid functionality to manage defects and invalidities in mesh data. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422164_pgfId-339908"></A>86.2	<A NAME="50422164_18890"></A>Finding and fixing defects in meshes 
+
+
+</H1>
+<P>
+<A NAME="50422164_pgfId-339910"></A>Parasolid provides two functions to let you look for defects on a mesh, and to attempt to fix defects found, as follows:</P>
+<P>
+<A NAME="50422164_pgfId-428319"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-340024"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-340026"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-340028"></A><A HREF=../headers/pk_mesh_find_defects.html>PK_MESH_find_defects</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-340030"></A>Examine a mesh for defects and return a structure that contains details of any defects found.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-340032"></A><A HREF=../headers/pk_mesh_fix_defects.html>PK_MESH_fix_defects</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-340034"></A>Examine a mesh for defects, as in <A HREF=../headers/pk_mesh_find_defects.html>PK_MESH_find_defects</A>, and attempt to fix those defects. Return the new meshes created as a result of the repair operation, together with details of any defects still existing in the mesh.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422164_pgfId-339911"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422164_pgfId-428333"></A>Note: <A HREF=../headers/pk_mesh_find_defects.html>PK_MESH_find_defects</A> and <A HREF=../headers/pk_mesh_fix_defects.html>PK_MESH_fix_defects</A> work on orphan meshes. To repair meshes that are attached to faces you can use <A HREF=../headers/pk_face_fix_mesh_defects.html>PK_FACE_fix_mesh_defects</A>. For more information on this function, see <A HREF="fd_chap.087.html#50422164_83021">Section 86.3, “Repairing meshes attached to faces”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422164_pgfId-339926"></A><A HREF=../headers/pk_mesh_find_defects.html>PK_MESH_find_defects</A> returns the number of defects found, together with a <A HREF=../headers/pk_mesh_defect_details_t.html>PK_MESH_defect_details_t</A> structure that provides details about the types of defects found, the entities affected and position and parameter information.</P>
+<P>
+<A NAME="50422164_pgfId-339928"></A><A HREF=../headers/pk_mesh_fix_defects.html>PK_MESH_fix_defects</A> returns an array of new, repaired meshes, together with an array of <A HREF=../headers/pk_mesh_defect_details_t.html>PK_MESH_defect_details_t</A> structures (one for each mesh returned), providing details about any defects that remain in that mesh.</P>
+<P>
+<A NAME="50422164_pgfId-375211"></A>These two functions can identify and attempt to fix a diverse range of mesh defects. Examples and a description of each mesh defect type are provided in the following table.</P>
+<P>
+<A NAME="50422164_pgfId-403544"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357314"></A>Defect type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357316"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-364111"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1089.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357320"></A><A HREF=../headers/pk_mesh_defect_t.html>PK_MESH_defect_disjoint_c</A></P>
+<P>
+<A NAME="50422164_pgfId-376377"></A>The mesh has disjoint components.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-364155"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1090.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-358433"></A><A HREF=../headers/pk_mesh_defect_t.html>PK_MESH_defect_foldover_c</A></P>
+<P>
+<A NAME="50422164_pgfId-376391"></A>Folds occur when the smaller of the two angles between two mfin-adjacent mfacets is less than or equal to the value in radians specified in <CODE>
+max_foldover_angle</CODE>
+. A foldover is a chain of one or more folds that bound a region of facets whose normals are opposed to those of their neighbours and are within tolerance of the neighbouring facets. The detection of foldovers is carried out either to:</P>
+<UL>
+<LI>
+<A NAME="50422164_pgfId-407059"></A>session linear precision (default), </LI>
+<LI>
+<A NAME="50422164_pgfId-407833"></A>a linear precision specified using the <CODE>
+have_tolerance</CODE>
+ and <CODE>
+tolerance</CODE>
+ options, or</LI>
+<LI>
+<A NAME="50422164_pgfId-407075"></A>a tolerance specified using the <CODE>
+have_height_tolerance</CODE>
+ and <CODE>
+height_tolerance</CODE>
+ options in the <CODE>
+defect_tolerances</CODE>
+ sub-structure.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-367951"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1091.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-367953"></A><A HREF=../headers/pk_mesh_defect_t.html>PK_MESH_defect_flat_mfacet_c</A></P>
+<P>
+<A NAME="50422164_pgfId-378500"></A>An mfacet of zero area through having a perpendicular height smaller than either:</P>
+<UL>
+<LI>
+<A NAME="50422164_pgfId-407933"></A>session linear precision (default), </LI>
+<LI>
+<A NAME="50422164_pgfId-407943"></A>a linear precision specified using the <CODE>
+have_tolerance</CODE>
+ and <CODE>
+tolerance</CODE>
+ options, or</LI>
+<LI>
+<A NAME="50422164_pgfId-407952"></A>a tolerance specified using the <CODE>
+have_degen_tolerance</CODE>
+ and <CODE>
+degen_tolerance</CODE>
+ options in the <CODE>
+defect_tolerances</CODE>
+ sub-structure.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-364311"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1092.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357920"></A><A HREF=../headers/pk_mesh_defect_t.html>PK_MESH_defect_degen_mfacet_c</A></P>
+<P>
+<A NAME="50422164_pgfId-376411"></A>An mfacet with at least one mfin shorter than either:</P>
+<UL>
+<LI>
+<A NAME="50422164_pgfId-407209"></A>session linear precision (default), </LI>
+<LI>
+<A NAME="50422164_pgfId-407732"></A>a linear precision specified using the <CODE>
+have_tolerance</CODE>
+ and <CODE>
+tolerance</CODE>
+ options, or</LI>
+<LI>
+<A NAME="50422164_pgfId-407222"></A>a tolerance specified using the <CODE>
+have_degen_tolerance</CODE>
+ and <CODE>
+degen_tolerance</CODE>
+ options in the <CODE>
+defect_tolerances</CODE>
+ sub-structure. </LI>
+</UL>
+<P>
+<A NAME="50422164_pgfId-407805"></A>A degenerate mfacet is also flat by definition.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-364407"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1093.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357912"></A><A HREF=../headers/pk_mesh_defect_t.html>PK_MESH_defect_slit_c</A></P>
+<P>
+<A NAME="50422164_pgfId-376421"></A>The mesh contains laminar mfins that the occupy the same position. The detection of coincident laminar mfins is carried out either:</P>
+<UL>
+<LI>
+<A NAME="50422164_pgfId-407152"></A>to session linear precision (default), </LI>
+<LI>
+<A NAME="50422164_pgfId-407771"></A>to a linear precision specified using the <CODE>
+have_tolerance</CODE>
+ and <CODE>
+tolerance</CODE>
+ options, or</LI>
+<LI>
+<A NAME="50422164_pgfId-407164"></A>to a tolerance specified using the <CODE>
+have_slit_tolerance</CODE>
+ and <CODE>
+slit_tolerance</CODE>
+ options in the <CODE>
+defect_tolerances</CODE>
+ sub-structure.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-364445"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1094.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357908"></A><A HREF=../headers/pk_mesh_defect_t.html>PK_MESH_defect_self_int_c</A></P>
+<P>
+<A NAME="50422164_pgfId-376482"></A>The mesh contains intersecting mfacets.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-364488"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1095.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357904"></A><A HREF=../headers/pk_mesh_defect_t.html>PK_MESH_defect_non_manifold_c</A></P>
+<P>
+<A NAME="50422164_pgfId-376431"></A>The mesh is non-manifold.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-364536"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1096.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357900"></A><A HREF=../headers/pk_mesh_defect_t.html>PK_MESH_defect_mvertex_normal_c</A></P>
+<P>
+<A NAME="50422164_pgfId-376441"></A>The mesh has an mvertex with an incorrect normal direction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357332"></A>Corrupted mesh</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-357334"></A><A HREF=../headers/pk_mesh_defect_t.html>PK_MESH_defect_corrupt_c</A></P>
+<P>
+<A NAME="50422164_pgfId-376451"></A>The mesh’s data structure is corrupt.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422164_pgfId-396577"></A>See <A HREF=../headers/pk_mesh_find_defects_o_t.html>PK_MESH_find_defects_o_t</A> and <A HREF=../headers/pk_mesh_fix_defects_o_t.html>PK_MESH_fix_defects_o_t</A> for more detail about individual options. </P>
+<P>
+<A NAME="50422164_pgfId-358835"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422164_pgfId-358834"></A>Note: <A HREF=../headers/pk_mesh_fix_defects.html>PK_MESH_fix_defects</A> will have no effect on corrupt meshes or mvertices with bad mvertex normals.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422164_pgfId-396572"></A>If a mesh component containing slit defects (interior laminar mfins) is used to create a facet body, the resulting body will have non-boundary edges sat within faces, which are formed along the laminar mfins. These edges may be avoided if the mesh is repaired prior to creating bodies.</P>
+<P>
+<A NAME="50422164_pgfId-349439"></A>An mvertex has a bad normal when the normal at the mvertex points towards the mesh and not away from it as shown in <A HREF="fd_chap.087.html#50422164_88517"><EM>
+Figure 86-1</EM></A>. In cases where an mvertex has multiple normals, the mesh is deemed to have a bad normal when at least one of the normals at the mvertex points into the mesh.</P>
+<P>
+<A NAME="50422164_pgfId-343508"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1097.gif">
+
+<P>
+<A NAME="50422164_pgfId-343478"></A>Figure 86-1 <A NAME="50422164_88517"></A>Examples of good and bad normals at an mvertex of a mesh (shown in cross-section)</P>
+<P>
+<A NAME="50422164_pgfId-391941"></A>Bad mvertex normals on a mesh can be addressed by discarding the existing mvertex normals and allowing Parasolid to assign new ones dynamically. This can be achieved using <A HREF=../headers/pk_mesh_store_normals.html>PK_MESH_store_normals</A>, ensuring that the <CODE>
+replace</CODE>
+ option is set to <A HREF=../headers/pk_mesh_replace_normal_t.html>PK_MESH_replace_normal_mtopol_c</A>, and the mvertices with bad normals are supplied in the <CODE>
+mtopols</CODE>
+ array. See <A HREF="fd_chap.089.html#50422166_86359">Chapter 88.3.2, “Managing mvertex normals”</A>, for more information.</P>
+<P>
+<A NAME="50422164_pgfId-427083"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422164_pgfId-340307"></A>Note: <A HREF=../headers/pk_mesh_fix_defects.html>PK_MESH_fix_defects</A> may introduce new defects into the fixed meshes returned.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422164_pgfId-427044"></A>86.3	<A NAME="50422164_83021"></A>Repairing meshes attached to faces 
+
+
+</H1>
+<P>
+<A NAME="50422164_pgfId-427137"></A>You can perform a limited range of repairs on meshes that are attached to faces using <A HREF=../headers/pk_face_fix_mesh_defects.html>PK_FACE_fix_mesh_defects</A>. The returned tracking records contain the original faces, the mesh attached to each face, and the repaired mesh for all faces whose meshes were edited. </P>
+<P>
+<A NAME="50422164_pgfId-433515"></A>The amount of modification that Parasolid can make when fixing mesh defects can be controlled by the following options:</P>
+<P>
+<A NAME="50422164_pgfId-434024"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-433655"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-433657"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422164_pgfId-433659"></A><CODE>have_max_deviation</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-433661"></A>Whether a <CODE>
+max_deviation</CODE>
+ value is provided.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422164_pgfId-433663"></A><CODE>max_deviation</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-433665"></A>This value is the largest distance that the repaired mesh will be deformed from the original.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422164_pgfId-433645"></A>Setting a <CODE>
+max_deviation</CODE>
+ will allow Parasolid to carry out a greater level of repair, where possible, by altering the shape of the mesh, such that any point on the new mesh won’t be more than <CODE>
+max_deviation</CODE>
+ distance away from the original mesh. The requirements of your application should therefore be taken into consideration when setting a <CODE>
+max_deviation</CODE>
+, to ensure that resulting changes to the shape of the mesh would be suitable for your application. Typically, if you specify a modelling tolerance in other operations, you should use the same value here.</P>
+<P>
+<A NAME="50422164_pgfId-433503"></A>See the API documentation for <A HREF=../headers/pk_face_fix_mesh_defects.html>PK_FACE_fix_mesh_defects</A> for more information.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422164_pgfId-339932"></A>86.4	<A NAME="50422164_66771"></A>Checking meshes 
+
+
+</H1>
+<P>
+<A NAME="50422164_pgfId-339934"></A>In addition to finding and fixing mesh defects, you can check for invalidity in mesh data using the standard checking APIs.</P>
+<P>
+<A NAME="50422164_pgfId-341062"></A>You can use <A HREF=../headers/pk_body_check.html>PK_BODY_check</A> and <A HREF=../headers/pk_face_check.html>PK_FACE_check</A> to check meshes using the <CODE>
+mesh</CODE>
+ option, which can be set as follows:</P>
+<P>
+<A NAME="50422164_pgfId-341592"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-339977"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-339979"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-339981"></A><A HREF=../headers/pk_check_mesh_t.html>PK_check_mesh_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-339983"></A>Do not perform mesh invalidity checks.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-339985"></A><A HREF=../headers/pk_check_mesh_t.html>PK_check_mesh_basic_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-339987"></A>Perform basic mesh invalidity checks, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422164_pgfId-341753"></A>A mesh cannot be non-manifold. </LI>
+<LI>
+<A NAME="50422164_pgfId-341774"></A>A mesh cannot have an mfacet with a zero length mfin (degenerate mfacet). </LI>
+<LI>
+<A NAME="50422164_pgfId-341777"></A>A mesh cannot have an mfacet of zero area (flat mfacet). </LI>
+<LI>
+<A NAME="50422164_pgfId-341786"></A>A mesh cannot have an mvertex normal that is opposed to all adjacent mfacet normals. </LI>
+<LI>
+<A NAME="50422164_pgfId-341790"></A>A mesh that is attached to a face must not be disjoint. </LI>
+<LI>
+<A NAME="50422164_pgfId-341857"></A>A mesh that is attached to a face must have all its boundary mfins along each edge of that face matched to the segments of any polyline attached to the edge. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-339989"></A><A HREF=../headers/pk_check_mesh_t.html>PK_check_mesh_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422164_pgfId-339991"></A>Perform the same checks as <A HREF=../headers/pk_check_mesh_t.html>PK_check_mesh_basic_c</A>, and also check for the following: </P>
+<UL>
+<LI>
+<A NAME="50422164_pgfId-341837"></A>A mesh cannot have slits (laminar mfins that occupy the same position). </LI>
+<LI>
+<A NAME="50422164_pgfId-341838"></A>A mesh cannot self-intersect. </LI>
+</UL>
+<P>
+<A NAME="50422164_pgfId-341898"></A>This is the default.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422164_pgfId-339935"></A><A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A> can check meshes without specifying any additional options. Instead, it uses the <CODE>
+geom</CODE>
+ option to determine how to examine the given geometry, whether it is classic B-rep or facet geometry. </P>
+<P>
+<A NAME="50422164_pgfId-341354"></A><A HREF=../headers/pk_face_check_pair.html>PK_FACE_check_pair</A> can also be used to check for face-face clashes between pairs of faces that have facet geometry attached. </P>
+<P>
+<A NAME="50422164_pgfId-341977"></A>Please see <A HREF="fd_chap.031.html#50422100_">Chapter 30, “Checking”</A>, for more information on those APIs.</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.086.html">Creating PSM Data From Foreign Facet Data</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.088.html">Filling Holes In Facet Bodies</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

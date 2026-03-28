@@ -1,0 +1,316 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Using Reports</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Using Reports</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.011.html">Tracking And Labelling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.013.html">Calling Parasolid From .NET Code</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.012.html#50422080_pgfId-312232">11.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.012.html#50422080_pgfId-294743">11.1.1	Getting information from Parasolid’s report </A>
+</UL>
+<LI> <A HREF="fd_chap.012.html#50422080_pgfId-294755">11.2	Report structure </A>
+<UL>
+<LI> <A HREF="fd_chap.012.html#50422080_pgfId-294774">11.2.1	Record types </A>
+</UL>
+<LI> <A HREF="fd_chap.012.html#50422080_pgfId-294783">11.3	Re-entrant function calls and report data </A>
+<LI> <A HREF="fd_chap.012.html#50422080_pgfId-294834">11.4	Functions for managing reports </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422080_pgfId-312232"></A>11.1	<A NAME="50422080_"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422080_pgfId-294725"></A>In addition to specific errors and tracking information, Parasolid provides a mechanism for creating a report structure, allowing PK functions to provide you with extra information over and above what is available via a given function’s return arguments. Parasolid’s report is intended to complement both specific errors and tracking information. </P>
+<P>
+<A NAME="50422080_pgfId-294729"></A>PK functions can write a report whether they succeed or fail. When a function returns an error code other than PK_ERROR_no_errors, all of its return arguments are undefined. However, a failing function can still write a valid report. This makes it a useful tool for storing detailed information about why a PK function has failed. </P>
+<P>
+<A NAME="50422080_pgfId-294733"></A>Parasolid maintains a single report, which is created by a call to <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> and remains in existence until a call to <A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>. Reports are stored in memory separate from Parasolid’s modelling memory and the PK memory. This memory is managed entirely by Parasolid.</P>
+<P>
+<A NAME="50422080_pgfId-311838"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-311860"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422080_pgfId-311864"></A><A HREF="fd_chap.011.html#50422079_60637">Section 10.2.2, “Reports”</A></LI>
+<LI>
+<A NAME="50422080_pgfId-311868"></A><A HREF="fd_chap.076.html#50422152_70227">Section 75.3.12.3, “Reporting repairs”</A></LI>
+<LI>
+<A NAME="50422080_pgfId-311872"></A><A HREF="fd_chap.078.html#50422154_89171">Section 77.5.6, “Controlling the shape of the extension of underlying surfaces”</A></LI>
+<LI>
+<A NAME="50422080_pgfId-311876"></A><A HREF="fd_chap.078.html#50422154_61428">Section 77.18, “Reporting repaired blend faces”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422080_pgfId-294743"></A>	11.1.1 	<A NAME="50422080_52366"></A>Getting information from Parasolid’s report </H3>
+<P>
+<A NAME="50422080_pgfId-294747"></A>A report is an entity of type <A HREF=../headers/pk_report_t.html>PK_REPORT_t</A>. You can get Parasolid’s own report by calling <A HREF=../headers/pk_report_find.html>PK_REPORT_find</A> with a <CODE>
+name</CODE>
+ of <CODE>
+SDL/TYRP00</CODE>
+. You can then pass the resulting report to <A HREF=../headers/pk_report_ask.html>PK_REPORT_ask</A> in order to obtain the contents of the report.</P>
+<P>
+<A NAME="50422080_pgfId-294751"></A>Parasolid’s report is written before the PK interface’s error handling is invoked. Thus if your application has registered an error handler with Parasolid, then that error handler can call <A HREF=../headers/pk_report_ask.html>PK_REPORT_ask</A> to obtain the contents of the report.</P>
+<P>
+<A NAME="50422080_pgfId-307907"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+Support\Reports</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422080_pgfId-294755"></A>11.2	Report structure 
+
+
+</H1>
+<P>
+<A NAME="50422080_pgfId-294762"></A><A HREF="fd_chap.012.html#50422080_61537"><EM>
+Figure 11-1</EM></A> illustrates the way that report data is structured in Parasolid. </P>
+<P>
+<A NAME="50422080_pgfId-294766"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-50.gif">
+
+<P>
+<A NAME="50422080_pgfId-294768"></A>Figure 11-1 <A NAME="50422080_61537"></A>Structure of a report</P>
+<P>
+<A NAME="50422080_pgfId-294769"></A>The top-level <A HREF=../headers/pk_report_r_t.html>PK_REPORT_r_t</A> contains the name of the PK function that is writing to the report, together with a number of report records, each of type <A HREF=../headers/pk_report_record_t.html><A HREF=../headers/pk_report_record_t.html>PK_REPORT_record_t</A></A>. Each <A HREF=../headers/pk_report_record_t.html><A HREF=../headers/pk_report_record_t.html>PK_REPORT_record_t</A></A> contains the name of the PK function writing to the report, together with details about the <CODE>
+type</CODE>
+ of data contained in that report record, and the data itself. Included within the data is a <CODE>
+status</CODE>
+ that indicates the meaning of the data in the record. </P>
+<P>
+<A NAME="50422080_pgfId-294770"></A>In the vast majority of cases, the PK function in each <A HREF=../headers/pk_report_record_t.html>PK_REPORT_record_t</A> is the same as the PK function in the parent <A HREF=../headers/pk_report_r_t.html>PK_REPORT_r_t</A>. See <A HREF="fd_chap.012.html#50422080_74529">Section 11.3, “Re-entrant function calls and report data”</A>, for details of when this might not be the case. </P>
+
+<H3>
+<A NAME="50422080_pgfId-294774"></A>	11.2.1 	Record types </H3>
+<P>
+<A NAME="50422080_pgfId-294775"></A>Reports can contain different types of record, as denoted by the <CODE>
+type</CODE>
+ field in <A HREF=../headers/pk_report_record_t.html>PK_REPORT_record_t</A>. Record types contain different combinations of data, but are not tied to any functional area of Parasolid. New record types may be added in future versions of Parasolid if report information needs to be stored in a format that cannot be accommodated in an existing record type.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422080_pgfId-294783"></A>11.3	<A NAME="50422080_74529"></A>Re-entrant function calls and report data 
+
+
+</H1>
+<P>
+<A NAME="50422080_pgfId-294784"></A>At any time, you can think of a report as being in either an open or closed state:</P>
+<UL>
+<LI>
+<A NAME="50422080_pgfId-294785"></A>If a report is open, any new records are appended to the existing contents. </LI>
+<LI>
+<A NAME="50422080_pgfId-294786"></A>If a report is closed, then any existing content is deleted when a new report is to be written, the new data is then added to the report, and the report is opened. </LI>
+</UL>
+<P>
+<A NAME="50422080_pgfId-294787"></A>For the majority of cases, the report is closed as soon as your code leaves a PK function call. </P>
+<P>
+<A NAME="50422080_pgfId-294788"></A>However, the PK interface is re-entrant: that is, a PK function may be called from a frustrum or callback function that has itself been called from a PK function (see <A HREF="fd_chap.122.html#50422204_26137">Section 121.6, “Re-entrant function calls”</A>). In any series of re-entrant calls there is a single outermost PK call. When your code leaves a PK function, the Parasolid report may be left open, depending on whether the function is re-entrant or not:</P>
+<UL>
+<LI>
+<A NAME="50422080_pgfId-294798"></A>If the PK function is not re-entrant, then it is at the outermost level, and the Parasolid report is closed.</LI>
+<LI>
+<A NAME="50422080_pgfId-294799"></A>If the PK function is re-entrant, then it has been invoked, indirectly, by another Parasolid function. The report is not closed, and subsequent PK functions that write report information will write to the same report, until your code leaves the outermost PK function call.</LI>
+</UL>
+<P>
+<A NAME="50422080_pgfId-294803"></A>In this way, a series of re-entrant function calls may create a single report, consisting of a number of different report records. In each report record, the <CODE>
+function</CODE>
+ may be different to the <CODE>
+function</CODE>
+ in the report itself. Only after coming out of the outermost PK function is the report in the state where another attempt to write a report will first clear the existing contents. When a report contains several records then those records appear in the order in which they were added to the report.</P>
+<P>
+<A NAME="50422080_pgfId-294810"></A><A HREF="fd_chap.012.html#50422080_19882"><EM>
+Figure 11-2</EM></A> shows an example in which the Parasolid report is written to three times:</P>
+<UL>
+<LI>
+<A NAME="50422080_pgfId-294811"></A>Report 1 contains report records for three PK function calls, created as a result of re-entrant functions called by the frustrum.</LI>
+<LI>
+<A NAME="50422080_pgfId-294812"></A>Report 2 contains a report record for a single non-re-entrant PK function call. </LI>
+<LI>
+<A NAME="50422080_pgfId-294813"></A>Report 3 contains report records for two PK function calls, created as a result of a re-entrant function invoked by a callback. </LI>
+</UL>
+<P>
+<A NAME="50422080_pgfId-301741"></A>Report 3 overwrites Report 2, which in turn overwrites Report 1.</P>
+<P>
+<A NAME="50422080_pgfId-301746"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-51.gif">
+
+<P>
+<A NAME="50422080_pgfId-294820"></A>Figure 11-2 <A NAME="50422080_19882"></A>Re-entrant functions and reports</P>
+<P>
+<A NAME="50422080_pgfId-294824"></A>The contents of the Parasolid report lasts from the time it was first written by some Parasolid function until it gets overwritten by another Parasolid function that writes a report. The content of the report is not subject to rollback. It is therefore left to you to manage the contents of the Parasolid report at any given time. For example if you wish to deal with reports written by a specific PK function then you can call <A HREF=../headers/pk_report_clear.html>PK_REPORT_clear</A> to empty the report data before calling that function. After calling the function, use <A HREF=../headers/pk_report_ask.html>PK_REPORT_ask</A> to return the contents of any report written.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422080_pgfId-294834"></A>11.4	Functions for managing reports 
+
+
+</H1>
+<P>
+<A NAME="50422080_pgfId-294838"></A>The PK functions that you can use to access and manipulate Parasolid’s report are as follows:</P>
+<P>
+<A NAME="50422080_pgfId-294877"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294841"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294843"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294845"></A><A HREF=../headers/pk_report_find.html>PK_REPORT_find</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294850"></A>This is called with the name <CODE>
+SDL/TYRP00</CODE>
+ to obtain the identifier of the Parasolid report. You can call this function at any time between calls to <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> and <A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294852"></A><A HREF=../headers/pk_report_clear.html>PK_REPORT_clear</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294854"></A>This deletes any records currently in the report, thus freeing the memory used. It sets the number of records in the report to zero and the function of the report to the empty string. You can call this function at any time between calls to <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> and <A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>. </P>
+<ADDRESS>
+<A NAME="50422080_pgfId-294855"></A>Warning: If you call <A HREF=../headers/pk_report_clear.html>PK_REPORT_clear</A> from within a callback or frustrum function you could be clearing report contents that were written by another PK function, prior to entry of the current PK function.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294857"></A><A HREF=../headers/pk_report_ask.html>PK_REPORT_ask</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294862"></A>This returns the data in a report. It copies the report from Parasolid’s report memory to PK memory. The report is empty if the number of records is zero. <A HREF=../headers/pk_report_ask.html>PK_REPORT_ask</A> is similar to <A HREF=../headers/pk_error_ask_last.html>PK_ERROR_ask_last</A> in that when it is called it returns the most recently written report however many intervening PK calls there may have been.You can call this function at any time between calls to <A HREF=../headers/pk_session_start.html>PK_SESSION_start</A> and <A HREF=../headers/pk_session_stop.html>PK_SESSION_stop</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294864"></A><A HREF=../headers/pk_report_r_f.html>PK_REPORT_r_f</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294866"></A>This function is called to free the PK memory used by the return from <A HREF=../headers/pk_report_ask.html>PK_REPORT_ask</A>. It does not clear the report itself.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294868"></A><A HREF=../headers/pk_report_is_open.html>PK_REPORT_is_open</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422080_pgfId-294873"></A>Whether or not the report is open. The Parasolid report can only be open if the Parasolid session is still within an outermost level PK function and some report records have already been written. Therefore this function can only return PK_LOGICAL_true if called from within a callback or frustrum function that has itself been called from an outermost level PK function. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422080_pgfId-275053"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.011.html">Tracking And Labelling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.013.html">Calling Parasolid From .NET Code</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

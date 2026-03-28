@@ -1,0 +1,107 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BSURF_create_constrained</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BSURF_create_constrained</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                         PK_BSURF_create_constrained
+(
+<I>--- received arguments ---
+</I>const <A HREF=../headers/pk_bsurf_create_constrained_o_t.html>PK_BSURF_create_constrained_o_t</A>  *options,    --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_bsurf_t.html>PK_BSURF_t</A>                       *const bsurf,      --- constrained B-surface
+<A HREF=../headers/pk_bsurf_constrained_fault_t.html>PK_BSURF_constrained_fault_t</A>     *const fault       --- fault data
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a constrained B-surface.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_position           A position is repeated in <B>'positions'</B>, and
+                                    the repeated positions have different
+                                    normal constraints or parameters.
+                                    (MILD)
+
+    PK_ERROR_bad_parameter          Different positions are given the same
+                                    uv parameters by <B>'uvs'</B> or by normal
+                                    projection to the parameterising surface.
+                                    (MILD)
+
+    PK_ERROR_bad_tolerance          <B>'tolerance'</B> or <B>'angular_tolerance'</B> is
+                                    too small.
+                                    (MILD)
+
+    PK_ERROR_bad_value              Incorrect values are provided for
+                                    assigning <B>'normals'</B> to <B>'positions'</B>.
+                                    (MILD)
+
+    PK_ERROR_bad_combination        A non-zero <B>'angular_tolerance'</B> is supplied
+                                    without <B>'normals'</B>, or <B>'normals'</B> supplied
+                                    with a zero <B>'angular_tolerance'</B>.
+                                    Both <B>'uvs'</B> and <B>'uv_surface'</B> are supplied.
+                                    (MILD)
+
+    PK_ERROR_insufficient_points    Too few <B>'positions'</B> have been supplied
+                                    to support a least square plane.
+                                    (MILD)
+
+
+<A NAME="documentation"></A>
+
+The function will produce a <A HREF=../headers/pk_bsurf_t.html>PK_BSURF_t</A>. The resultant <B>'bsurf'</B> will be
+bicubic and with continuous second derivatives. It will be open in both
+u and v parameter directions.
+
+The shape of the surface is governed by the constraining <B>'positions'</B> and
+<B>'normals'</B> specified through <B>'options'</B>. The surface fit of the resultant
+<B>'bsurf'</B> to the <B>'positions'</B> and <B>'normals'</B> is controlled by the options
+<B>'tolerance'</B> and <B>'angular_tolerance'</B>.
+
+The constraints are formed primarily by <B>'positions'</B> where the resultant
+<B>'bsurf'</B> will need to fit within the <B>'tolerance'</B>. At some or all of these
+<B>'positions'</B>, <B>'normals'</B> may be imposed to further constrain the resultant
+<B>'bsurf'</B>. When supplied, the <B>'normals'</B> are assigned to their associated
+<B>'positions'</B> according to the indices provided in the <B>'normal_indices'</B>.
+
+When the <B>'tolerance'</B> or the <B>'angular_tolerance'</B> is unable to be met, an
+attempt will still be made to return a B-surface. This is identified by
+having the status PK_BSURF_constrained_not_fit_c in the <B>'fault'</B> structure.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

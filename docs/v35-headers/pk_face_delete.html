@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_delete</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_delete</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>          PK_FACE_delete
+(
+<I>--- received arguments ---
+</I>int                      n_faces,          --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>          faces[],          --- faces
+<A HREF=../headers/pk_face_heal_t.html>PK_FACE_heal_t</A>           heal_action,      --- method for healing wounds
+<A HREF=../headers/pk_face_heal_loops_t.html>PK_FACE_heal_loops_t</A>     heal_loops,       --- how to process the loops of
+                                           --- the wound
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>             local_check,      --- whether to perform local check
+
+<I>--- returned arguments ---
+</I>int               *const n_bodies,         --- number of bodies
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>        **const bodies,           --- remaining bodies
+<A HREF=../headers/pk_local_check_t.html>PK_local_check_t</A> **const check_results     --- result of local check
+)
+</B>
+<A NAME="description"></A>
+<I>This function deletes the given faces from a solid or sheet body and repairs
+any resulting holes.
+
+NOTE: This function is deprecated and has been superseded by <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_wire_body              (MILD) unable to delete faces from wire
+                                    body
+    PK_ERROR_non_manifold           (SERIOUS) can't heal wound with
+                                    non-manifold boundary
+    PK_ERROR_wrong_entity_in_array  (MILD )<B>'faces'</B> not all from same body
+    PK_ERROR_general_body           (SERIOUS ) <B>'faces'</B> come from general body
+    PK_ERROR_all_faces_in_body      (MILD) can not delete all faces in a body
+    PK_ERROR_cant_heal_wound        (SERIOUS) can't heal wound - impossible
+                                    geometry
+    PK_ERROR_not_implemented        (MILD) <B>'heal_action'</B> not implemented
+
+<A NAME="documentation"></A>
+See also <A HREF="../chapters/fd_chap.064.html#50434427_pgfId-300966">Local Ops: Deleting Faces and Healing Wounds</A> for more
+information.
+
+All of the given faces, which must belong to the same body, are deleted from
+that body.  If the resulting body does not have a complete boundary, then any
+holes are treated as wounds which are healed as specified by <B>'heal_action'</B>.
+This may take the values:
+
+    PK_FACE_heal_no_c               don't heal wounds - leave rubber faces
+    PK_FACE_heal_cap_c              find a surface in which all edges of a hole
+                                    lie and attach this to a face covering the
+                                    hole
+    PK_FACE_heal_grow_from_parent_c grow the faces the parent had around the
+                                    hole until they cover it
+    PK_FACE_heal_shrink_c           if extending faces does not yield a
+                                    solution, then shrinking the faces is tried
+
+The <B>'local_check'</B> argument specifies whether checks on newly created
+topological and geometrical entities are to be performed, and the
+<B>'check_results'</B> argument returns the result of such checks on each body.
+<B>'check_results'</B> may take the values:
+
+    <A HREF=../headers/pk_local_check_t.html>PK_local_check_no_c</A>             local checking not performed either because
+                                    <B>'local_check'</B> was PK_LOGICAL_false or
+                                    <B>'heal_action'</B> was PK_FACE_heal_no_c
+    <A HREF=../headers/pk_local_check_t.html>PK_local_check_ok_c</A>             <B>'body'</B> passes local checks
+    <A HREF=../headers/pk_local_check_t.html>PK_local_check_negated_c</A>        as initially created, <B>'body'</B> was inside out
+                                    but it has been negated and is now valid
+    <A HREF=../headers/pk_local_check_t.html>PK_local_check_failed_c</A>         body fails local checks - it is
+                                    self-intersecting
+
+Rubber faces can not be grown to heal other wounds.
+
+This function will not operate on faces from a general body.
+
+If <B>'heal_loops'</B> is set to PK_FACE_heal_loops_separate_c, then each closed loop
+of the wound face is healed independently.
+If <B>'heal_loops'</B> is set to PK_FACE_heal_loops_together_c, then the loops of the
+wound are healed together.
+If <B>'heal_loops'</B> is set to PK_FACE_heal_loops_auto_c, then the loops of the
+wound are healed either together or separate as appropriate.
+
+Healing loops separately can cause the original body to be split into more
+than one <B>'bodies'</B>.
+
+The faces may not form the shell of a sheet body, or the outer shell of a solid
+body, but may form an inner shell of a solid body, in which case the shell is
+deleted.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

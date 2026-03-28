@@ -1,0 +1,646 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Manifold Booleans</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Manifold Booleans</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.052.html">Introduction to Booleans</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.054.html">General Booleans</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-679990">52.1	Introduction </A>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-900509">52.2	Recommendations for best practices in booleans </A>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-302599">52.3	Limitations on booleans with generalised topology disabled </A>
+<UL>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-302648">52.3.1	Unite </A>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-302661">52.3.2	Subtract </A>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-302739">52.3.3	Intersect </A>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-918743">52.3.4	Effect of merge options on manifold topology</A>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-303010">52.3.5	Summary of permitted booleans with generalised topology disabled </A>
+</UL>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-346954">52.4	Specialised boolean operations </A>
+<UL>
+<LI> <A HREF="fd_chap.053.html#50422126_pgfId-303309">52.4.1	Subtracting sheet tools from wire targets </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422126_pgfId-679990"></A>52.1	<A NAME="50422126_59572"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422126_pgfId-717928"></A><A HREF="fd_chap.052.html#50422125_">Chapter 51, “Introduction to Booleans”</A> provided an overview on boolean operations and explained the different boolean options available in <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> and <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>. This chapter gives more specific information on performing boolean operations with manifold topology. </P>
+<P>
+<A NAME="50422126_pgfId-977031"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422126_pgfId-977030"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422126_pgfId-942567"></A>A <STRONG>
+manifold boolean</STRONG> is a boolean operation that is undertaken when generalised topology is disabled in a session. This type of boolean must be carried out on manifold bodies and all result bodies will be manifold and connected solid or sheet bodies. Both global and local boolean operations may be attempted with manifold topology.</P>
+<P>
+<A NAME="50422126_pgfId-679995"></A><A NAME="50422126_marker-931067"></A>The manifold boolean operations behave as follows:</P>
+<P>
+<A NAME="50422126_pgfId-680013"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-679998"></A>Operation</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680000"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680002"></A>Union</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680004"></A>Extends the target body by gluing to it all face sets of the tool bodies which are outside of the target body. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680006"></A>Subtraction</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680008"></A>Modifies the target body by removing all face sets which overlap the tool bodies. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680010"></A>Intersection</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680012"></A>Reduces the target body to only those face sets which overlap with the tool bodies</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422126_pgfId-680014"></A>The behaviour of the subtraction operation can be altered for:</P>
+<P>
+<A NAME="50422126_pgfId-680028"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680017"></A>Target/tool</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680019"></A>Behaviour</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680021"></A>solid target/sheet tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680023"></A>The subtraction can be altered to reduce the target to only those face sets in front or behind the sheet tool bodies</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680025"></A>sheet target/solid tools</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-680027"></A>The subtraction can be altered so that the tools punch the target and all faces on the target which overlap with the tools are removed; all face sets which are in front or behind the target body are glued to it</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422126_pgfId-680039"></A>If the model is not exact and a tool that is considered to be exactly the correct size for the operation is used, coincident features can be missed. In subtract cases, this can mean the wrong amount of material is removed. In unite cases, this can mean that the tool is not actually coincident with the face on the target which you are trying to attach the tool to. Therefore, you should use oversize tools when possible for optimising the success of unite and subtract functions.</P>
+<P>
+<A NAME="50422126_pgfId-680043"></A>For information about performing booleans with general bodies, see <A HREF="fd_chap.054.html#50422127_33276">Chapter 53, “General Booleans”</A>.</P>
+<P>
+<A NAME="50422126_pgfId-954138"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-954129"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422126_pgfId-954133"></A><A HREF="fd_chap.052.html#50422125_">Chapter 51, “Introduction to Booleans”</A></LI>
+<LI>
+<A NAME="50422126_pgfId-954137"></A><A HREF="fd_chap.054.html#50422127_33276">Chapter 53, “General Booleans”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422126_pgfId-900509"></A>52.2	Recommendations for best practices in booleans 
+
+
+</H1>
+<P>
+<A NAME="50422126_pgfId-900510"></A>When performing boolean operations on manifold booleans, it is strongly recommended that you do the following:</P>
+<UL>
+<LI>
+<A NAME="50422126_pgfId-900514"></A>Set local coordinate systems to be the same as the Parasolid coordinate system.</LI>
+<LI>
+<A NAME="50422126_pgfId-900515"></A>Use a multi-tool boolean instead of multiple single tools whenever possible.</LI>
+<LI>
+<A NAME="50422126_pgfId-900516"></A>Set the <CODE>
+match_style</CODE>
+ to <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A> to improve auto matching of topologies.</LI>
+<LI>
+<A NAME="50422126_pgfId-900517"></A>Use oversize tools when performing unite and subtract boolean operations. For subtract cases, the tool should protrude out of the target to avoid problems with near coincidences.</LI>
+<LI>
+<A NAME="50422126_pgfId-900518"></A>Switch on <CODE>
+selective_merge</CODE>
+ when using <CODE>
+merge_imprinted</CODE>
+.</LI>
+<LI>
+<A NAME="50422126_pgfId-900426"></A>Use <CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ instead of <CODE>
+fence</CODE>
+ when performing fencing operations.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422126_pgfId-302599"></A>52.3	<A NAME="50422126_marker-653933"></A><A NAME="50422126_marker-653934"></A><A NAME="50422126_50631"></A>Limitations on booleans with generalised topology disabled 
+
+
+</H1>
+<P>
+<A NAME="50422126_pgfId-302600"></A>This section describes some of the limitations of boolean operations when you are dealing exclusively with manifold bodies. When performing general booleans, as described in <A HREF="fd_chap.054.html#50422127_33276">Chapter 53, “General Booleans”</A>, these limitations do not apply.</P>
+<P>
+<A NAME="50422126_pgfId-302608"></A>If the target and the tool are the same body type (sheet or solid), you can use any of the three boolean operations. For targets and tools of different body types, the operations allowed are described below. </P>
+<P>
+<A NAME="50422126_pgfId-302609"></A>Booleans between sheet bodies cannot result in a sheet body with a ‘T’ or an ‘X’ shaped cross-section. This type of body is invalid and the boolean fails.</P>
+<P>
+<A NAME="50422126_pgfId-302610"></A>Most of the booleans illustrated below have a single tool, but you can supply a list of tool bodies:</P>
+<P>
+<A NAME="50422126_pgfId-302646"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-579.gif">
+
+<P>
+<A NAME="50422126_pgfId-302647"></A>Figure 52-1 Subtracting multiple solid bodies from a sheet</P>
+
+<H3>
+<A NAME="50422126_pgfId-302648"></A>	52.3.1 	Unite </H3>
+<P>
+<A NAME="50422126_pgfId-302651"></A><A NAME="50422126_marker-302649"></A><A NAME="50422126_marker-302650"></A>You can unite like with like, and you can also unite a solid with a sheet or a sheet with a solid by setting the <CODE>
+tool_material_side</CODE>
+, <CODE>
+target_material_side</CODE>
+, and <CODE>
+resulting_body_type</CODE>
+ options appropriately: see <A HREF="fd_chap.052.html#50422125_14703">Section 51.4.14, “Specifying the body type of tool and target”</A> and <A HREF="fd_chap.052.html#50422125_27105">Section 51.4.17, “Specifying the body type of the result”</A> respectively. When you are uniting two sheet bodies, they must meet at their edges, unless they have overlapping faces.</P>
+
+
+<H3>
+<A NAME="50422126_pgfId-302661"></A>	52.3.2 	<A NAME="50422126_marker-302658"></A><A NAME="50422126_marker-302659"></A><A NAME="50422126_marker-302660"></A>Subtract </H3>
+<P>
+<A NAME="50422126_pgfId-302664"></A><A NAME="50422126_marker-302662"></A><A NAME="50422126_marker-302663"></A>You can subtract like from like, but you can also subtract solids from sheets, and sheets from solids, so long as the sheet cuts the solid completely. If it doesn’t, PK_ERROR_non_manifold is returned.</P>
+<P>
+<A NAME="50422126_pgfId-302700"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-580.gif">
+
+<P>
+<A NAME="50422126_pgfId-302701"></A>Figure 52-2 Subtracting a sheet body from a solid body</P>
+<P>
+<A NAME="50422126_pgfId-302737"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-581.gif">
+
+<P>
+<A NAME="50422126_pgfId-302738"></A>Figure 52-3 Subtracting a solid body from a sheet body</P>
+
+
+<H3>
+<A NAME="50422126_pgfId-302739"></A>	52.3.3 	Intersect </H3>
+<P>
+<A NAME="50422126_pgfId-302742"></A><A NAME="50422126_marker-302740"></A><A NAME="50422126_marker-302741"></A>You can intersect solids with solids, as illustrated earlier.</P>
+<P>
+<A NAME="50422126_pgfId-302743"></A>When using more than one tool the resulting intersection is:</P>
+<UL>
+<P>
+<A NAME="50422126_pgfId-302744"></A>(target int (tool1 united tool2 united....))</P>
+</UL>
+<P>
+<A NAME="50422126_pgfId-302780"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-582.gif">
+
+<P>
+<A NAME="50422126_pgfId-302781"></A>Figure 52-4 Intersecting a solid with more than one tool</P>
+<P>
+<A NAME="50422126_pgfId-302782"></A>You can intersect sheets with sheets, so long as the faces have coincident surfaces. The following rules apply when intersecting sheets with sheets:</P>
+<UL>
+<LI>
+<A NAME="50422126_pgfId-302783"></A>if the faces overlap then the overlapped part of the target body produces the result</LI>
+<LI>
+<A NAME="50422126_pgfId-302784"></A>if the faces have opposite face normals, the normal of the result is the same as the normal of the target</LI>
+</UL>
+<P>
+<A NAME="50422126_pgfId-302819"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-583.gif">
+
+<P>
+<A NAME="50422126_pgfId-302820"></A>Figure 52-5 Intersecting sheet bodies that touch but do not overlap</P>
+<P>
+<A NAME="50422126_pgfId-302855"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-584.gif">
+
+<P>
+<A NAME="50422126_pgfId-302856"></A>Figure 52-6 Intersecting sheet bodies that have a single overlap</P>
+<P>
+<A NAME="50422126_pgfId-302891"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-585.gif">
+
+<P>
+<A NAME="50422126_pgfId-302892"></A>Figure 52-7 Intersecting sheet bodies that have multiple overlaps</P>
+<P>
+<A NAME="50422126_pgfId-302927"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-586.gif">
+
+<P>
+<A NAME="50422126_pgfId-302928"></A>Figure 52-8 Intersecting sheet bodies that have opposite face normals</P>
+<P>
+<A NAME="50422126_pgfId-302929"></A>If the faces have crossing surfaces then there is no intersection:</P>
+<P>
+<A NAME="50422126_pgfId-302964"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-587.gif">
+
+<P>
+<A NAME="50422126_pgfId-302965"></A>Figure 52-9 Intersecting sheet bodies that cross</P>
+<P>
+<A NAME="50422126_pgfId-302966"></A>You can intersect a sheet with a solid, and you can intersect a solid with a sheet by setting the <CODE>
+tool_material_side</CODE>
+, <CODE>
+target_material_side</CODE>
+, and <CODE>
+resulting_body_type</CODE>
+ options appropriately: see <A HREF="fd_chap.052.html#50422125_14703">Section 51.4.14, “Specifying the body type of tool and target”</A> and <A HREF="fd_chap.052.html#50422125_27105">Section 51.4.17, “Specifying the body type of the result”</A> respectively. </P>
+<P>
+<A NAME="50422126_pgfId-303008"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-588.gif">
+
+<P>
+<A NAME="50422126_pgfId-303009"></A>Figure 52-10 Intersecting a sheet body with a solid body</P>
+
+
+<H3>
+<A NAME="50422126_pgfId-918743"></A>	52.3.4 	Effect of merge options on manifold topology</H3>
+<P>
+<A NAME="50422126_pgfId-918778"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-589.gif">
+
+<P>
+<A NAME="50422126_pgfId-918779"></A>Figure 52-11 Results of merge options during boolean operations on manifold topology</P>
+<P>
+<A NAME="50422126_pgfId-918780"></A>We strongly recommend that <CODE>
+selective_merge</CODE>
+ and <CODE>
+merge_imprinted</CODE>
+ are both switched on when performing manifold boolean operations.</P>
+<P>
+<A NAME="50422126_pgfId-918787"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422126_pgfId-918783"></A>Warning: The <CODE>
+selective_merge</CODE>
+ and <CODE>
+merge_imprinted</CODE>
+ options should not be used in general booleans. For information about merging topology during general boolean operations, see <A HREF="fd_chap.054.html#50422127_51465">Section 53.3, “Merging redundant topology”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422126_pgfId-303010"></A>	52.3.5 	Summary of permitted booleans with generalised topology disabled </H3>
+<P>
+<A NAME="50422126_pgfId-303011"></A>Many different combinations of targets, tools, and boolean operations are possible when generalised topology is disabled, based on the configuration of the target and tool. In addition, you can use <CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ to temporarily change the body type of either the target or tool during the boolean operation, and <CODE>
+resulting_body_type</CODE>
+ to choose the type of the resulting body you would like, in order to increase the range of booleans that can be performed.</P>
+<P>
+<A NAME="50422126_pgfId-303012"></A>This section summarises what can be attempted, and what should be avoided. </P>
+<P>
+<A NAME="50422126_pgfId-303016"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422126_pgfId-303015"></A>Note: Any boolean operation has the potential to fail, depending on the precise configuration of the target and tool and the combination of options chosen. This section does not attempt to describe the outcome of all possible boolean configurations. Instead, it provides a guide as to what is potentially feasible. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422126_pgfId-303017"></A>If <CODE>
+resulting_body_type</CODE>
+ is left at its default value, then any combination of boolean operation, sheet or solid target, and sheet or solid tool is possible, except for the following:</P>
+<P>
+<A NAME="50422126_pgfId-303043"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303020"></A>Target</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303022"></A>Tool</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303024"></A>Boolean</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303026"></A>Solution</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303028"></A>sheet</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303030"></A>solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303032"></A>unite</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303034"></A>To unite a sheet target and a solid tool successfully, set <CODE>
+tool_material_side</CODE>
+ to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_none_c</A>, to emulate a sheet-sheet unite.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303036"></A>solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303038"></A>sheet</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303040"></A>intersect</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303042"></A>To intersect a solid target with a sheet tool, set <CODE>
+tool_material_side</CODE>
+ to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A> or <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_outside_c</A>, to emulate a solid-solid intersect.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422126_pgfId-303044"></A>In particular, subtract operations are possible using any combination of tool and target, with no additional option setting required.</P>
+<P>
+<A NAME="50422126_pgfId-303051"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422126_pgfId-303047"></A>Note: In many cases, uniting a solid target with a sheet tool leads to failure. In order for this combination to be successful, the sheet tool must enclose a solid region, as described in <A HREF="fd_chap.052.html#50422125_43839">Section 51.4.11, “Enclosing solid regions with a sheet body”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422126_pgfId-303055"></A>If <CODE>
+resulting_body_type</CODE>
+ (see <A HREF="fd_chap.052.html#50422125_27105">Section 51.4.17, “Specifying the body type of the result”</A>) is set to a non-default value, then any boolean combination is possible. By setting <CODE>
+resulting_body_type</CODE>
+ appropriately, you can use any type of target and tool, combine them using any boolean operation, and use any value of <CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422126_pgfId-346954"></A>52.4	<A NAME="50422126_11534"></A><A NAME="50422126_16058"></A><A NAME="50422126_marker-346951"></A><A NAME="50422126_marker-346952"></A><A NAME="50422126_marker-346953"></A>Specialised boolean operations 
+
+
+</H1>
+<P>
+<A NAME="50422126_pgfId-303265"></A>The following functions provide specialised boolean functionality in Parasolid:</P>
+<UL>
+<LI>
+<A NAME="50422126_pgfId-303267"></A><A NAME="50422126_marker-303266"></A><A HREF=../headers/pk_body_unite_bodies.html>PK_BODY_unite_bodies</A></LI>
+<LI>
+<A NAME="50422126_pgfId-303269"></A><A NAME="50422126_marker-303268"></A><A HREF=../headers/pk_body_subtract_bodies.html>PK_BODY_subtract_bodies</A></LI>
+<LI>
+<A NAME="50422126_pgfId-303271"></A><A NAME="50422126_marker-303270"></A><A HREF=../headers/pk_body_intersect_bodies.html>PK_BODY_intersect_bodies</A></LI>
+</UL>
+<P>
+<A NAME="50422126_pgfId-303272"></A>Although most of the functionality offered by these functions is also provided by the other boolean functions described in this chapter, some of these functions also let you perform boolean operations with wire target bodies. Wire tool bodies are not supported, however.</P>
+<P>
+<A NAME="50422126_pgfId-303273"></A>Each function receives a target body and an array of tool bodies, as detailed below.</P>
+<P>
+<A NAME="50422126_pgfId-303302"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303276"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303278"></A>Allowed target</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303280"></A>Allowed tools</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303283"></A><A NAME="50422126_marker-303282"></A><A HREF=../headers/pk_body_unite_bodies.html>PK_BODY_unite_bodies</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303285"></A>sheet, solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303287"></A>sheet, solid</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303290"></A><A NAME="50422126_marker-303289"></A><A HREF=../headers/pk_body_subtract_bodies.html>PK_BODY_subtract_bodies</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303292"></A>wire, sheet, solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303294"></A>sheet, solid</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303297"></A><A NAME="50422126_marker-303296"></A><A HREF=../headers/pk_body_intersect_bodies.html>PK_BODY_intersect_bodies</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303299"></A>wire, sheet, solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422126_pgfId-303301"></A>sheet, solid</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422126_pgfId-303303"></A>The bodies returned by each function replace the original target. Tool bodies are always deleted after the operation, unless the target is a wire and generalised topology is disabled in the session. In this case, the tools are not modified.</P>
+
+<H3>
+<A NAME="50422126_pgfId-303309"></A>	52.4.1 	<A NAME="50422126_72218"></A><A NAME="50422126_marker-303305"></A><A NAME="50422126_marker-303306"></A><A NAME="50422126_marker-303307"></A><A NAME="50422126_marker-303308"></A>Subtracting sheet tools from wire targets </H3>
+<P>
+<A NAME="50422126_pgfId-303311"></A>In the case of <A NAME="50422126_marker-303310"></A><A HREF=../headers/pk_body_subtract_bodies.html>PK_BODY_subtract_bodies</A>, if a wire target is partly contained by a sheet tool, it loses that part of the target that is contained. However, if a sheet tool intersects a wire target, the target is split at the point of intersection, and both bodies are returned. This is illustrated in <A HREF="fd_chap.053.html#50422126_51629"><EM>
+Figure 52-12</EM></A>. Note that the tools would not be modified in either of these examples, though this is not shown for simplicity.</P>
+<P>
+<A NAME="50422126_pgfId-303349"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-590.gif">
+
+<P>
+<A NAME="50422126_pgfId-303351"></A>Figure 52-12 <A NAME="50422126_51629"></A>Subtracting sheet tools from wire bodies</P>
+<P>
+<A NAME="50422126_pgfId-718349"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422126_pgfId-303354"></A>Note: Turning generalised topology on has no effect on these functions in cases where the target is a wire body.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422126_pgfId-1037046"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.052.html">Introduction to Booleans</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.054.html">General Booleans</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

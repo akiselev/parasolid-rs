@@ -1,0 +1,835 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Performing Evaluations On Meshes</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Performing Evaluations On Meshes</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.088.html">Filling Holes In Facet Bodies</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.090.html">Introduction To Importing And Exporting</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-339092">88.1	Introduction </A>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-339100">88.2	Differences between mesh parameterisation and surface parameterisation </A>
+<UL>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-355091">88.2.1	Evaluating mesh parameters </A>
+</UL>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-339116">88.3	Mesh normals </A>
+<UL>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-352281">88.3.1	Evaluating normals on a mesh </A>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-340349">88.3.2	Managing mvertex normals </A>
+<UL>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-351862">88.3.2.1	Enquiring the properties of normals in a mesh </A>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-339128">88.3.2.2	Using the mesh angle to control the “smoothness” of a mesh </A>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-367266">88.3.2.3	Finding sharp mvertices in meshes </A>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-408419">88.3.2.4	Finding sharp mfins in meshes </A>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-452192">88.3.2.5	Storing and discarding normals </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-367275">88.4	Finding perimeters of mfacets </A>
+<UL>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-389605">88.4.1	Including wire mfins in the perimeter of a set of mfacets </A>
+</UL>
+<LI> <A HREF="fd_chap.089.html#50422166_pgfId-420643">88.5	Finding the mtopology along a fin </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422166_pgfId-339092"></A>88.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422166_pgfId-339094"></A>There are fundamental differences between meshes and classic B-rep surfaces which mean that the evaluation of surface parameters and normals need to be treated differently in order to produce consistent and accurate results. This chapter explains those differences and describes the APIs you should use to manage them.</P>
+<P>
+<A NAME="50422166_pgfId-339096"></A>When used in traditional modelling, classic B-rep surfaces are generally smooth entities. While they can contain discontinuities, a surface that contains a G1-discontinuity cannot be attached to topology. G1-discontinuities in a classic B-rep surface always occur along constant parameter lines, and you can use <A HREF=../headers/pk_surf_eval_handed.html>PK_SURF_eval_handed</A>, <A HREF=../headers/pk_surf_eval_curvature_handed.html>PK_SURF_eval_curvature_handed</A>, and <A HREF=../headers/pk_surf_eval_with_normal_handed.html>PK_SURF_eval_with_normal_handed</A> to distinguish which side of a discontinuity you want to evaluate.</P>
+<P>
+<A NAME="50422166_pgfId-339098"></A>By contrast, meshes are inherently G1-discontinuous entities, with a line of (C0) discontinuity across every mfin, and every point on an mfin has multiple parameterisations. Meshes, of course, can be attached to topology. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422166_pgfId-339100"></A>88.2	<A NAME="50422166_52641"></A>Differences between mesh parameterisation and surface parameterisation 
+
+
+</H1>
+<P>
+<A NAME="50422166_pgfId-339102"></A>For the most part, Parasolid allows you to evaluate a mesh in much the same way as you evaluate a classic B-rep surface, using one of several PK_SURF_eval_... functions. You can find your position inside a mesh using the same functions you would use to find your position in a classic B-rep surface.</P>
+<P>
+<A NAME="50422166_pgfId-339104"></A>However, because there are no restrictions on the shape represented by a mesh, parameterisation of a mesh needs to be a discrete process that considers each facet individually, and this means that you cannot use Parasolid's surface evaluation functionality to march or step across a mesh. </P>
+<P>
+<A NAME="50422166_pgfId-339106"></A>Within each mfacet, Parasolid uses a linear mapping of a barycentric parameterisation . There is one mfin that is constant in U, one that is constant in V, and one that isn’t a constant in either U or V. Parasolid does not guarantee which mfin is which. This means that there is no clear U/V or left/right distinction for meshes, and so the Parasolid's “handed” evaluation functions cannot be supported for meshes.</P>
+<P>
+<A NAME="50422166_pgfId-339108"></A>These fundamental properties of meshes give rise to the following differences, compared to classic B-rep surfaces, when evaluating on meshes:</P>
+<UL>
+<LI>
+<A NAME="50422166_pgfId-339110"></A>Derivative information is not calculated for meshes.</LI>
+<LI>
+<A NAME="50422166_pgfId-339111"></A>UV-boxes are not calculated for meshes. </LI>
+<LI>
+<A NAME="50422166_pgfId-354387"></A>If you call <A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A> or <A HREF=../headers/pk_surf_eval_curvature.html>PK_SURF_eval_curvature</A> at parameters on an mfin or an mvertex, the value returned is the average of the individual normals or curvatures at that position. If you want to calculate individual normals or curvatures at a given mvertex you can call <A HREF=../headers/pk_mfin_ask_mvx_normal.html>PK_MFIN_ask_mvx_normal</A> or <A HREF=../headers/pk_mfin_ask_mvx_curvature.html>PK_MFIN_ask_mvx_curvature</A> on the appropriate mfin of the mvertex.</LI>
+<LI>
+<A NAME="50422166_pgfId-340189"></A>The <A HREF=../headers/pk_surf_eval.html>PK_SURF_eval</A>..._handed functions are not supported for meshes</LI>
+<LI>
+<A NAME="50422166_pgfId-339114"></A>When creating a facet body from a classic B-rep body using <A HREF=../headers/pk_body_make_facet_body.html>PK_BODY_make_facet_body</A>, the mesh does not inherit the parameterisation of the classic body. </LI>
+</UL>
+
+<H3>
+<A NAME="50422166_pgfId-355091"></A>	88.2.1 	<A NAME="50422166_58952"></A>Evaluating mesh parameters </H3>
+<P>
+<A NAME="50422166_pgfId-353669"></A><A NAME="50422166_17094"></A>Parasolid provides a number of functions for evaluating mesh parameters.These are as follows:</P>
+<P>
+<A NAME="50422166_pgfId-491114"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-352947"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-352949"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-352951"></A><A HREF=../headers/pk_mesh_eval_with_mtopol.html>PK_MESH_eval_with_mtopol</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-352953"></A>Evaluates at UV-parameters on a mesh and returns the mfacet and any mfin or mvertex at the position evaluated.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-352955"></A><A HREF=../headers/pk_mfacet_parameterise_vec.html>PK_MFACET_parameterise_vec</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-352957"></A>Calculates the mesh UV-parameters of a position known to lie in a given mfacet. If the mfacet is already known, it is a more efficient calculation than <A HREF=../headers/pk_surf_parameterise_vector.html>PK_SURF_parameterise_vector</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-491274"></A><A HREF=../headers/pk_surf_ask_params.html>PK_SURF_ask_params</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-491276"></A>Enquires the overall range for the UV-parameters on a given mesh. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this function.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422166_pgfId-339116"></A>88.3	<A NAME="50422166_38228"></A>Mesh normals 
+
+
+</H1>
+<P>
+<A NAME="50422166_pgfId-340408"></A>Like any other type of surface, any point on a mesh has an associated normal. Broadly speaking, there are two different types of normal that you can evaluate on a mesh:</P>
+<P>
+<A NAME="50422166_pgfId-356614"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-340498"></A>Normal type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-340500"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-340502"></A>Mfacet normal</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-340504"></A>The normal of the plane of a given mfacet. Each mfacet in a mesh has a single mfacet normal. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-340506"></A>Mvertex normal</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-340508"></A>The normal of a given mvertex. Each mfacet in a mesh has three mvertex normals associated with it. See <A HREF="fd_chap.089.html#50422166_86359">Section 88.3.2, “Managing mvertex normals”</A> for more information on mvertex normals.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422166_pgfId-352281"></A>	88.3.1 	<A NAME="50422166_12060"></A>Evaluating normals on a mesh </H3>
+<P>
+<A NAME="50422166_pgfId-341515"></A>Parasolid provides a number of functions for evaluating normals on a mesh:</P>
+<P>
+<A NAME="50422166_pgfId-358709"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-358693"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-358695"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-365221"></A><A HREF=../headers/pk_mfacet_ask_mvx_normals.html>PK_MFACET_ask_mvx_normals</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-365223"></A>Returns all the mvertex normals for the given mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-359155"></A><A HREF=../headers/pk_mfacet_ask_normal.html>PK_MFACET_ask_normal</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-358699"></A>Returns the mfacet normal of the given mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-358701"></A><A HREF=../headers/pk_mfin_ask_mvx_normal.html>PK_MFIN_ask_mvx_normal</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-358703"></A>Returns the normal at the mvertex of the given mfin.</P>
+<ADDRESS>
+<A NAME="50422166_pgfId-358704"></A>Note: If the mvertex has a unique normal, one shared by all mfins at the mvertex, then the normal returned by <A HREF=../headers/pk_mfin_ask_mvx_normal.html><A HREF=../headers/pk_mfin_ask_mvx_normal.html>PK_MFIN_ask_mvx_normal</A></A> will be the same as the one returned by <A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A>. If there are multiple normals at the mvertex, <A HREF=../headers/pk_mfin_ask_mvx_normal.html><A HREF=../headers/pk_mfin_ask_mvx_normal.html>PK_MFIN_ask_mvx_normal</A></A> will return the normal specific to the given mfin. Several mfins at an mvertex can share the same normal.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-365248"></A><A HREF=../headers/pk_mvertex_ask_normals.html>PK_MVERTEX_ask_normals</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-365250"></A>Returns all the unique normals of the given mvertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-365225"></A><A HREF=../headers/pk_surf_eval_with_normal.html>PK_SURF_eval_with_normal</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-365227"></A>Returns the averaged normal at a given position on the mesh.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422166_pgfId-340349"></A>	88.3.2 	<A NAME="50422166_86359"></A><A NAME="50422166_Managing mvertex normals"></A><A NAME="50422166_Managing mvertex normals"></A><A NAME="50422166_"></A><A NAME="50422166_"></A>Managing mvertex normals </H3>
+<P>
+<A NAME="50422166_pgfId-398707"></A>Parasolid offers a variety of methods for managing mvertex normals on a mesh: You can either:</P>
+<UL>
+<LI>
+<A NAME="50422166_pgfId-339119"></A>Ask Parasolid to calculate mvertex normals dynamically when enquiring mesh data</LI>
+<LI>
+<A NAME="50422166_pgfId-339120"></A>Store normal data for all mvertices in the mesh. </LI>
+</UL>
+<P>
+<A NAME="50422166_pgfId-339122"></A>In addition, if you choose to store normal data, you can either:</P>
+<UL>
+<LI>
+<A NAME="50422166_pgfId-339123"></A>Store a single normal at each mvertex, thereby treating the mfacets that surround it as essentially smooth</LI>
+<LI>
+<A NAME="50422166_pgfId-339124"></A>Store multiple normals at each mvertex, thereby allowing you to identify creases in the mesh along connected mfins. </LI>
+</UL>
+<P>
+<A NAME="50422166_pgfId-339126"></A>This section describes the APIs Parasolid offers for managing normal data. </P>
+
+<H4>
+<A NAME="50422166_pgfId-351862"></A>88.3.2.1 Enquiring the properties of normals in a mesh </H4>
+<P>
+<A NAME="50422166_pgfId-351866"></A>Parasolid provides functionality to let you enquire about the types of normal data available to a mesh. </P>
+<UL>
+<LI>
+<A NAME="50422166_pgfId-351867"></A><A HREF=../headers/pk_mesh_ask_normal_type.html>PK_MESH_ask_normal_type</A> tells you whether a mesh has stored normals, or whether they are calculated dynamically. </LI>
+<LI>
+<A NAME="50422166_pgfId-340845"></A><A HREF=../headers/pk_mesh_has_unique_normals.html><A HREF=../headers/pk_mesh_has_unique_normals.html>PK_MESH_has_unique_normals</A></A> tells you whether a given mesh has unique normals. It can be called on any mesh, whether it has stored normals or whether the normals are calculated dynamically. A mesh has unique normals if for every mvertex in the mesh, all the mfins at that mvertex share the same normal as returned by <A HREF=../headers/pk_mfin_ask_mvx_normal.html>PK_MFIN_ask_mvx_normal</A>. If any of the mvertices in the mesh have multiple normals, <A HREF=../headers/pk_mesh_has_unique_normals.html><A HREF=../headers/pk_mesh_has_unique_normals.html>PK_MESH_has_unique_normals</A></A> will return PK_LOGICAL_false. </LI>
+</UL>
+
+
+<H4>
+<A NAME="50422166_pgfId-339128"></A>88.3.2.2 <A NAME="50422166_11650"></A>Using the mesh angle to control the “smoothness” of a mesh </H4>
+<P>
+<A NAME="50422166_pgfId-339130"></A>Parasolid provides a session-wide mesh angle to let you control which parts of a mesh are considered to be smooth. You can set this mesh angle using <A HREF=../headers/pk_session_set_mesh_angle.html>PK_SESSION_set_mesh_angle</A>, and enquire its current value using <A HREF=../headers/pk_session_ask_mesh_angle.html>PK_SESSION_ask_mesh_angle</A>.</P>
+<P>
+<A NAME="50422166_pgfId-339132"></A>The mesh angle partitions the ordered ring of mfacets around an mvertex into sets of mfacets that are considered to be smoothly connected, based on the angle of the normals between adjacent mfacets.</P>
+<UL>
+<LI>
+<A NAME="50422166_pgfId-339134"></A>If the angle of the normals between adjacent facets is less than the mesh angle, then the boundary between those mfacets is considered smooth. Knowing this information can speed up some downstream operations because they do not need to check if the mfacet is considered smooth.</LI>
+<LI>
+<A NAME="50422166_pgfId-339136"></A>If the angle of the normals between adjacent facets is greater than mesh angle then the boundary between those mfacets is not considered smooth, and there is a crease between them. This can be beneficial in shading and rendering operations where it is preferable to use real sharp edges.</LI>
+</UL>
+<P>
+<A NAME="50422166_pgfId-339138"></A>For example, two ways in which you might use the mesh angle are as follows:</P>
+<UL>
+<LI>
+<A NAME="50422166_pgfId-339140"></A>If you set the mesh angle to pi (as shown in <A HREF="fd_chap.089.html#50422166_79896"><EM>
+Figure 88-1</EM></A>), this ensures that there is only a single normal at any mvertex: all fins at the mvertex share this normal and all mfacets appear smooth.</LI>
+<LI>
+<A NAME="50422166_pgfId-339142"></A>If you set the mesh angle to 0 (as shown in <A HREF="fd_chap.089.html#50422166_79896"><EM>
+Figure 88-1</EM></A>), this ensures that there are multiple normals at any mvertex whose adjacent mfacets are not completely smooth to within session tolerance. </LI>
+</UL>
+<P>
+<A NAME="50422166_pgfId-344916"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1102.gif">
+
+<P>
+<A NAME="50422166_pgfId-344726"></A>Figure 88-1 <A NAME="50422166_79896"></A>Examples of using the mesh angle to control the smoothness of the mesh</P>
+<P>
+<A NAME="50422166_pgfId-365126"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422166_pgfId-339322"></A>Note: The session mesh angle only controls the smoothness of dynamic normals within a mesh. For any stored normals, the mesh angle has no effect.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422166_pgfId-367266"></A>88.3.2.3 <A NAME="50422166_11846"></A>Finding sharp mvertices in meshes </H4>
+<P>
+<A NAME="50422166_pgfId-367609"></A>You can find the sharp mvertices in a given mesh using <A HREF=../headers/pk_mesh_find_sharp_mvxs.html>PK_MESH_find_sharp_mvxs</A>. A sharp mvertex is one that does not have a unique normal, i.e the mfins at this mvertex do not share the same normal as returned from <A HREF=../headers/pk_mfin_ask_mvx_normal.html>PK_MFIN_ask_mvx_normal</A>. See <A HREF="fd_chap.089.html#50422166_12060">Section 88.3.1, “Evaluating normals on a mesh”</A> for more information on this function.</P>
+<P>
+<A NAME="50422166_pgfId-381753"></A>By default, the <CODE>
+want_sharp_mvxs</CODE>
+ option returns the number of sharp mvertices together with a list of those mvertices. To return just the number of sharp mvertices, set the <CODE>
+want_sharp_mvxs</CODE>
+ option to PK_LOGICAL_false.</P>
+
+
+<H4>
+<A NAME="50422166_pgfId-408419"></A>88.3.2.4 <A NAME="50422166_91173"></A>Finding sharp mfins in meshes </H4>
+<P>
+<A NAME="50422166_pgfId-451829"></A>You can find the sharp mfins in a mesh using <A HREF=../headers/pk_mesh_find_sharp_mfins.html>PK_MESH_find_sharp_mfins</A>. An mfin is considered sharp if it is non-laminar, and if, for the mvertices at either end of the mfin, the two adjacent mfacets do not share a normal as returned by <A HREF=../headers/pk_mfacet_ask_mvx_normals.html>PK_MFACET_ask_mvx_normals</A>. Further control over the comparison of normals is given by the values of have_sharp_angle and sharp_angle. This function takes the following options:<A NAME="50422166_22328"></A></P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-440500"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-440502"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-440504"></A><CODE>
+want_sharp_mfins </CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-440506"></A>Whether to return the sharp mfins. </P>
+<P>
+<A NAME="50422166_pgfId-446298"></A>When this is set to PK_LOGICAL_false only the number of sharp mfins is returned. The default value is PK_LOGICAL_true.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-440508"></A><CODE>
+have_sharp_angle</CODE>
+</P>
+<P>
+<A NAME="50422166_pgfId-441012"></A><CODE>
+sharp_angle</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-440510"></A>Controls the angle at which an mfin is considered sharp.</P>
+<P>
+<A NAME="50422166_pgfId-449168"></A>If <CODE>
+have_sharp_angle</CODE>
+ is PK_LOGICAL_true and the two mfacets do not share a normal at an mvertex, the two normals will only be considered different if the angle between them is greater than <CODE>
+sharp_angle</CODE>
+.</P>
+<P>
+<A NAME="50422166_pgfId-448454"></A>The default value is PK_LOGICAL_false.</P>
+</TD>
+</TR>
+</TABLE>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422166_pgfId-448118"></A>Note: The decision over whether an mfin is considered sharp when <CODE>
+have_sharp_angle</CODE>
+ is PK_LOGICAL_false is affected by whether normals are stored or calculated dynamically. For more information about managing mvertex normals see, <A HREF="fd_chap.089.html#50422166_86359">Section 88.3.2, “Managing mvertex normals”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422166_pgfId-452192"></A>88.3.2.5 <A NAME="50422166_53011"></A>Storing and discarding normals </H4>
+<P>
+<A NAME="50422166_pgfId-388054"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422166_pgfId-388053"></A>Performance issue: You should only store normal data on a mesh if you have a specific need to maintain precise values during an operation.</ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422166_pgfId-339148"></A>You use <A HREF=../headers/pk_mesh_store_normals.html>PK_MESH_store_normals</A> to store or modify the normals on a mesh, replacing any existing stored data as required. You can choose whether to store normals for the entire mesh, or whether to replace the normals for specific mtopols in the mesh. If replacing specific normals, you can also choose whether to supply the normal data yourself, or whether to let Parasolid calculate it for you. </P>
+<P>
+<A NAME="50422166_pgfId-389141"></A>You do not have to store normal data on a mesh: Parasolid dynamically calculates any normals that are required if no stored data is available. These dynamic normals are stored in the mesh throughout the session and are discarded if the mesh changes.</P>
+<P>
+<A NAME="50422166_pgfId-389030"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-339369"></A>In order to:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-339371"></A>Do this:</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-339395"></A>Replace all normals in the mesh with calculated normals:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-339417"></A>Set <CODE>
+replace</CODE>
+ to <A HREF=../headers/pk_mesh_replace_normal_t.html>PK_MESH_replace_normal_all_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-339439"></A>Replace specific normals in the mesh with calculated normals:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-339461"></A>Set <CODE>
+replace</CODE>
+ to <A HREF=../headers/pk_mesh_replace_normal_t.html>PK_MESH_replace_normal_mtopol_c</A></P>
+<P>
+<A NAME="50422166_pgfId-339462"></A>Supply a combination of mfins and mvertices to specify the normals you want to store.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-339484"></A>Replace specific normals in the mesh with supplied normals:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-339506"></A>Set <CODE>
+replace</CODE>
+ to <A HREF=../headers/pk_mesh_replace_normal_t.html>PK_MESH_replace_normal_mtopol_c</A></P>
+<P>
+<A NAME="50422166_pgfId-339507"></A>Supply a combination of mfins and mvertices to specify the normals you want to store.</P>
+<P>
+<A NAME="50422166_pgfId-339508"></A>Supply <CODE>
+mtopol_normals</CODE>
+ and <CODE>
+mtopol_normal_indices</CODE>
+ to provide the normal data, together with a mapping of the supplied <CODE>
+mtopols</CODE>
+ to the supplied normal data. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-341174"></A>Replace all normals in the mesh with a combination of calculated and supplied normals</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-341176"></A>Set <CODE>
+replace</CODE>
+ to <A HREF=../headers/pk_mesh_replace_normal_t.html>PK_MESH_replace_normal_all_c</A></P>
+<P>
+<A NAME="50422166_pgfId-341181"></A>Supply a combination of mfins and mvertices to specify the normals you want to supply explicitly.</P>
+<P>
+<A NAME="50422166_pgfId-341177"></A>Supply <CODE>
+mtopol_normals</CODE>
+ and <CODE>
+mtopol_normal_indices</CODE>
+ to provide the normal data for those normals, together with a mapping of the supplied <CODE>
+mtopols</CODE>
+ to the supplied normal data. </P>
+<P>
+<A NAME="50422166_pgfId-341229"></A>Any normals that are not supplied will be calculated dynamically.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422166_pgfId-339161"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422166_pgfId-339568"></A>Note: When <CODE>
+replace</CODE>
+ is <A HREF=../headers/pk_mesh_replace_normal_t.html>PK_MESH_replace_normal_mtopol_c</A>, it is an error to supply both an mfin and its mvertex</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422166_pgfId-339164"></A>You can also use the <CODE>
+mesh_angle</CODE>
+ option to override any mesh angle specified for the session. </P>
+<P>
+<A NAME="50422166_pgfId-339166"></A>See <A HREF=../headers/pk_mesh_store_normals_o_t.html>PK_MESH_store_normals_o_t</A> for more information. </P>
+<P>
+<A NAME="50422166_pgfId-408417"></A>You can discard any stored normals in a mesh using <A HREF=../headers/pk_mesh_discard_normals.html>PK_MESH_discard_normals</A>. Once discarded, normals for that mesh are calculated dynamically by Parasolid until you store new normal data.</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422166_pgfId-367275"></A>88.4	<A NAME="50422166_59965"></A>Finding perimeters of mfacets 
+
+
+</H1>
+<P>
+<A NAME="50422166_pgfId-367276"></A>You can use <A HREF=../headers/pk_mfacet_find_perimeters.html>PK_MFACET_find_perimeters</A> to find the perimeters around a supplied set of mfacets. A perimeter is a set of mfins that form the boundary of a set of mfin-connected mfacets. </P>
+<P>
+<A NAME="50422166_pgfId-379616"></A>Perimeters are returned as a set of one or more mloops. An mloop is a connected set of mfins ordered into a closed loop in the direction of the mfins. Each mloop has to have a minimum of 2 mfins which have to be:</P>
+<UL>
+<LI>
+<A NAME="50422166_pgfId-372574"></A>Attached to an mfacet in the received array </LI>
+<LI>
+<A NAME="50422166_pgfId-372593"></A>Laminar or have an adjacent mfin that belongs to another mfacet that is not from the received array.</LI>
+</UL>
+<P>
+<A NAME="50422166_pgfId-374194"></A>Perimeters can contain more than one mloop. All mloops belonging to the same perimeter bound the same mfin-connected set of mfacets.</P>
+<P>
+<A NAME="50422166_pgfId-381194"></A><A HREF="fd_chap.089.html#50422166_90346"><EM>
+Figure 88-2</EM></A> shows the perimeters and mloops of supplied subsets of mfacets on a given mesh. In (A) two mfacets (coloured in red) are selected. These are mfin-connected and therefore return 1 perimeter. A single closed mloop is also returned. In (B), the mfacets selected are mvertex-connected not mfin-connected and therefore return two perimeters and two closed mloops.</P>
+<P>
+<A NAME="50422166_pgfId-377946"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1103.gif">
+
+<P>
+<A NAME="50422166_pgfId-379183"></A>Figure 88-2 <A NAME="50422166_90346"></A>Finding perimeters and mloops on a subset of mfacets on a mesh</P>
+<P>
+<A NAME="50422166_pgfId-381010"></A><A NAME="50422166_80318"></A>Knowing the perimeters and mloops for a subset of mfacets allows you to split complex mesh bodies into multiple mesh faces, making it easier to modify or replace certain parts of the mesh body.</P>
+<P>
+<A NAME="50422166_pgfId-382319"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422166_pgfId-373489"></A>Note: In cases where the mfin-connected set of mfacets form a closed set, (for example the mfacets of a topological sphere) the set of mfacets will not have a perimeter and therefore will not contain mloops.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422166_pgfId-383121"></A><A HREF=../headers/pk_mfacet_find_perimeters.html>PK_MFACET_find_perimeters</A> takes the following options:</P>
+<P>
+<A NAME="50422166_pgfId-413387"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382802"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382804"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382806"></A><CODE>
+want_plines</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382808"></A>Whether to return further information about each mloop. When this is set to PK_LOGICAL_true, the polylines that represent the mloop and the tracking mfin for each polyline are returned. </P>
+<P>
+<A NAME="50422166_pgfId-383640"></A>Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382810"></A><CODE>
+select_cb</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382812"></A>A callback function used to determine how to propagate from an initial seed mtopol. See <A HREF="fd_chap.085.html#50422162_23097">Section 84.4.2, “Creating meshes from mesh topology”</A>, for more information.</P>
+<P>
+<A NAME="50422166_pgfId-413787"></A>If you use a <CODE>
+select_cb</CODE>
+ that calls <A HREF=../headers/pk_mfin_is_sharp.html>PK_MFIN_is_sharp</A>, the perimeter will include sharp mfins. See <A HREF="fd_chap.089.html#50422166_91173">Section 88.3.2.4, “Finding sharp mfins in meshes”</A> for more information on sharp mfins.</P>
+<P>
+<A NAME="50422166_pgfId-382813"></A>Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382815"></A><CODE>
+select_data</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382817"></A>Context information required by <CODE>
+select_cb</CODE>
+. See <A HREF="fd_chap.085.html#50422162_23097">Section 84.4.2, “Creating meshes from mesh topology”</A>, for more information.</P>
+<P>
+<A NAME="50422166_pgfId-382818"></A>Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382820"></A><CODE>
+select_mtopol_class</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-382822"></A>The class type of the input mtopol to pass to <CODE>
+select_cb</CODE>
+. See <A HREF="fd_chap.085.html#50422162_23097">Section 84.4.2, “Creating meshes from mesh topology”</A>, for more information.</P>
+<P>
+<A NAME="50422166_pgfId-382823"></A>Default: PK_CLASS_mfin</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-388179"></A><CODE>
+select_wire_mfins</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-388181"></A>Whether to include wire mfins in the perimeter of an mfacetset. See <A HREF="fd_chap.089.html#50422166_81761">Section 88.4.1, “Including wire mfins in the perimeter of a set of mfacets”</A>, for more information.</P>
+<P>
+<A NAME="50422166_pgfId-388340"></A>Default: <A HREF=../headers/pk_selector_type_t.html>PK_selector_type_exclude_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-425887"></A><CODE>
+min_n_mfacets</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-426154"></A>The minimum number of mfacets in an mfacetset. The perimeter and other data for mfacetsets that contain at least this number of mfacets is returned. </P>
+<P>
+<A NAME="50422166_pgfId-426018"></A>Default: 1</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422166_pgfId-389605"></A>	88.4.1 	<A NAME="50422166_81761"></A>Including wire mfins in the perimeter of a set of mfacets </H3>
+<P>
+<A NAME="50422166_pgfId-403727"></A>If the supplied set of mfacets contains internal edges that you want to use in further operations, you can use the <CODE>
+select_wire_mfins</CODE>
+ option to return them by including wire mfins in the perimeter. An mfin that forms part of the perimeter of a set of mfacets is considered to be a wire mfin if both it and its adjacent mfin (i.e the mfin returned from <A HREF=../headers/pk_mfin_ask_mfin_adjacent.html>PK_MFIN_ask_mfin_adjacent</A>) lie on the perimeter. </P>
+<P>
+<A NAME="50422166_pgfId-406232"></A>The <CODE>
+select_wire_mfins </CODE>
+option takes the following values:</P>
+<P>
+<A NAME="50422166_pgfId-404452"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-391231"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-391233"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-391235"></A><A HREF=../headers/pk_selector_type_t.html>PK_selector_type_include_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-391237"></A>Wire mfins and their adjacent mfins are included in the perimeter, as illustrated in <A HREF="fd_chap.089.html#50422166_16281"><EM>
+Figure 88-3</EM></A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-391239"></A><A HREF=../headers/pk_selector_type_t.html>PK_selector_type_exclude_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422166_pgfId-391241"></A>Wire mfins are not included in the perimeter, as illustrated in <A HREF="fd_chap.089.html#50422166_16281"><EM>
+Figure 88-3</EM></A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422166_pgfId-397369"></A><A HREF="fd_chap.089.html#50422166_16281"><EM>
+Figure 88-3</EM></A> shows an example where the selected set of mfacets contain sharp mfins. A) shows the perimeter returned when wire mfins are included in the result, and B) shows the perimeter returned when wire mfins are excluded.</P>
+<P>
+<A NAME="50422166_pgfId-392558"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1104.gif">
+
+<P>
+<A NAME="50422166_pgfId-392560"></A>Figure 88-3 <A NAME="50422166_16281"></A>Including and excluding wire mfins in the perimeter</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422166_pgfId-420643"></A>88.5	<A NAME="50422166_25826"></A>Finding the mtopology along a fin 
+
+
+</H1>
+<P>
+<A NAME="50422166_pgfId-420823"></A>You can find the mvertices and/or mfins along a given fin using <A HREF=../headers/pk_fin_find_mtopols.html>PK_FIN_find_mtopols</A>.</P>
+<P>
+<A NAME="50422166_pgfId-424127"></A>The <CODE>
+want_mvertices</CODE>
+ option controls whether to return an array of mvertices along with the number of those mvertices. The <CODE>
+want_mfins</CODE>
+ option controls whether to return an array of mfins along with the number of those mfins. By default, these options are set to PK_LOGICAL_true. To return just the number of mvertices and/or mfins, these options must be set to PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422166_pgfId-421468"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1105.gif">
+
+<P>
+<A NAME="50422166_pgfId-420831"></A>Figure 88-4 Finding the mfins and mvertices along a fin </P>
+<P>
+<A NAME="50422166_pgfId-381254"></A>&nbsp;</P>
+
+
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.088.html">Filling Holes In Facet Bodies</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.090.html">Introduction To Importing And Exporting</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

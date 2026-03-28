@@ -1,0 +1,143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_thicken_3</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_thicken_3</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_BODY_thicken_3
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                  body,            --- body to be thickened
+double                     front_default,   --- default front offset
+double                     back_default,    --- default back offset
+double                     tolerance,       --- tolerance
+const <A HREF=../headers/pk_body_thicken_o_t.html>PK_BODY_thicken_o_t</A> *options,         --- options [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>  *const tracking,        --- tracking information
+<A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A>  *const results          --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function thickens a sheet body into a solid body.
+
+NOTE: This function supersedes <A HREF=../headers/pk_body_thicken_2.html>PK_BODY_thicken_2</A>, which is now obsolete.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_cant_thicken          (SERIOUS) thickening failure
+    PK_ERROR_bad_tolerance         (MILD) proposed edge tolerance is too small
+    PK_ERROR_not_sheet             (MILD) body is not a sheet body
+    PK_ERROR_bad_thickness         (MILD) total thickness is zero
+    PK_ERROR_inconsistent_offset   (MILD) the front (or the back ) offsets have
+                                   inconsistent sign
+    PK_ERROR_inconsistent_thicken  (MILD) the thicken "sense" is inconsistent
+    PK_ERROR_not_a_unit_vector     (MILD) the thicken method is
+                                   <A HREF=../headers/pk_thicken_method_t.html>PK_thicken_method_punch_c</A> and the
+                                   punch direction is not a unit vector
+
+<A NAME="documentation"></A>
+
+Introduction
+The sheet <B>'body'</B> is thickened by <B>'front_default'</B> outwards (i.e. in the
+direction of the face normal) and <B>'back_default'</B> inwards. Exception
+faces, which have offsets other that the default, can be specified
+within the option structure, together with their <B>'front'</B> and <B>'back'</B>
+offsets.
+
+Only manifold sheet bodies can be thickened.
+
+Some edge geometry on the sheet boundary may have to be approximated by
+SP-curves in order to generate a boundary curve on the offset faces. If
+this is necessary, such edges will have a tolerance less than or equal
+to the tolerance supplied through the <B>'tolerance'</B> argument.
+
+See <A HREF="../chapters/fd_chap.046.html#50434406_pgfId-299203">Thickening a sheet body</A> for more information.
+
+
+Offset Values
+The following points must be considered when specifying offset values
+for the sheet thickening operation :
+
+ o The "sense" of the thicken for a given face, is the sign of the sum of
+   the front and back offsets for that face. This function will return
+   PK_ERROR_inconsistent_thicken, if the "sense" varies over the faces
+   of the specified sheet body.
+
+ o If any face within the sheet body has a front and back offset such
+   that the resulting thickness is within the session precision of zero,
+   then this function will return PK_ERROR_bad_thickness.
+
+Checking Results
+Thickening which would lead to a self-intersecting or non-manifold solid
+is not allowed. Some of these cases will not be detected when face-face
+checking is switched off (via the <B>'check_fa_fa'</B> field in the option
+structure). In this event the resulting body will be invalid.
+
+
+User options
+The <A HREF=../headers/pk_body_thicken_o_t.html>PK_BODY_thicken_o_t</A> structure contains user control options. See
+its documentation for detail.
+
+Tracking
+The <A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A> structure contains topology tracking information on
+the operation. In the case of this function, two types of tracking information
+records may be returned :
+1)  PK_TOPOL_track_create_c, to report newly created offset faces and
+    side faces (or faces deriving from them). Offset faces will have their
+    relevant original face as original topologies whereas, those of side faces
+    will be their originating edges or vertices.
+2)  PK_TOPOL_track_derive_c, to report faces deriving from existing ones,
+    through any combination of splitting and merging.
+
+Error Handling
+If this function returns PK_ERROR_no_errors, the result of the operation
+will be indicated by the value of the <B>'status'</B> field of the <B>'results'</B>
+structure.
+
+When the value of the <B>'status'</B> field is not <A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A> or
+<A HREF=../headers/pk_local_status_t.html>PK_local_status_nocheck_c</A>, it indicates an operation failure. When
+possible, an array of entities involved in the failure is returned via
+the <B>'error_entities'</B> field of the <B>'results'</B> structure.
+
+For more information regarding the failure status code and the returned
+entities, refer to the <A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A> documentation.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

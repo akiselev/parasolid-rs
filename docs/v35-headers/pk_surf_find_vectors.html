@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SURF_find_vectors</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SURF_find_vectors</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_SURF_find_vectors
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>                            surface,      --- surface
+<A HREF=../headers/pk_uv_t.html>PK_UV_t</A>                              uv_start,     --- start u,v parameter pair
+<A HREF=../headers/pk_uv_t.html>PK_UV_t</A>                              uv_end,       --- end u,v parameter pair
+double                               tolerance,    --- tolerance
+const <A HREF=../headers/pk_surf_find_vectors_o_t.html>PK_SURF_find_vectors_o_t</A>      *options,      --- options [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_surf_find_vectors_r_t.html>PK_SURF_find_vectors_r_t</A>      *const found_vectors --- result
+)
+</B>
+<A NAME="description"></A>
+<I>The function will return position vectors on the supplied <B>'surface'</B> between the
+given <B>'uv_start'</B> and <B>'uv_end'</B>, in accordance with the supplied <B>'options'</B>.
+
+This function offers partial support for facet geometry.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+PK_ERROR_cant_get_vectors        (MILD)  The operation failed when looking for
+                                         the position vectors. Returned only
+                                         on request.
+
+PK_ERROR_cant_get_curve          (MILD)  The operation failed when computing
+                                         the path curve of the vectors.
+
+PK_ERROR_bad_chord               (MILD)  Chord measurements or a chord
+                                         projection method have been supplied
+                                         in <B>'options'</B>, but the surface points
+                                         at <B>'uv_start'</B> and <B>'uv_end'</B> are not
+                                         distinct (up to <B>'tolerance'</B>).
+
+PK_ERROR_bad_combination         (MILD)  One of the following has been
+                                         supplied via <B>'options'</B>:
+                                         a) both a <B>'help_point'</B> and a
+                                         <B>'proj_direction'</B>.
+                                         b) a <B>'help_point'</B> with <B>'curve_type'</B>
+                                         not set to PK_SURF_curve_linear_sp_c.
+                                         c) a <B>'proj_direction'</B> with
+                                         <B>'curve_type'</B> not set to
+                                         PK_SURF_curve_vec_proj_c.
+
+PK_ERROR_bad_position            (MILD)  The <B>'help_point'</B> supplied via
+                                         <B>'options'</B> lies outside the size box.
+
+PK_ERROR_bad_tolerance           (MILD)  The given <B>'tolerance'</B> has to be larger
+                                         than the session tolerance.
+
+PK_ERROR_interval_exceed_period  (MILD)  The <B>'surface'</B> is periodic and the
+                                         interval between <B>'uv_start'</B> and
+                                         'uv_end' is longer than the period of
+                                         the <B>'surface'</B>.
+
+PK_ERROR_eval_failure            (MILD)  The <B>'surface'</B> could not be evaluated
+                                         at either (or both) <B>'uv_start'</B> and
+                                         <B>'uv_end'</B>.
+
+PK_ERROR_no_measurements         (MILD)  No <B>'measurements'</B> have been supplied
+                                         via <B>'options'</B>.
+
+PK_ERROR_facet_geometry          (MILD)  The <B>'surface'</B> type is <A HREF=../headers/pk_mesh_t.html>PK_MESH_t</A> and
+                                         <B>'curve_type'</B> is set to
+                                          PK_curve_linear_sp_c in <B>'options'</B>.
+
+PK_ERROR_not_unique              (MILD)  The given <B>'options'</B> would produce an
+                                         ambiguous result. A suitable
+                                         <B>'help_point'</B> or <B>'proj_direction'</B>
+                                         may be required.
+
+<A NAME="documentation"></A>
+The returned position vectors satisfy (up to <B>'tolerance'</B>) the conditions
+imposed by the <B>'measurements'</B> supplied in <B>'options'</B>. The <B>'measurements'</B> are
+either distances in 3-space or ratios of distances in 3-space. See the
+documentation of the option structure <A HREF=../headers/pk_surf_find_vectors_o_t.html>PK_SURF_find_vectors_o_t</A> for the
+details on how the <B>'measurements'</B> are defined.
+
+The position vectors are returned in the return structure <B>'found_vectors'</B> of
+type <A HREF=../headers/pk_surf_find_vectors_r_t.html>PK_SURF_find_vectors_r_t</A>. See the documentation of
+<A HREF=../headers/pk_surf_find_vectors_r_t.html>PK_SURF_find_vectors_r_t</A> for more details.
+
+The error PK_ERROR_cant_get_vectors is only returned if requested via the
+option structure. See its documentation for details.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

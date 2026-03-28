@@ -1,0 +1,486 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_boolean_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_boolean_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_BODY_boolean_2
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                      target,    --- target body
+int                            n_tools,   --- number of tool bodies
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                tools[],   --- tool bodies
+const <A HREF=../headers/pk_body_boolean_o_t.html>PK_BODY_boolean_o_t</A>     *options,   --- boolean options [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>      *const tracking,  --- tracking information
+<A HREF=../headers/pk_boolean_r_t.html>PK_boolean_r_t</A>          *const results    --- boolean results
+)
+</B>
+<A NAME="description"></A>
+<I>This function performs a boolean operation between the target body
+and the list of tool bodies.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_contradictory_request      bad combination of options or
+                                        data for type of boolean (MILD)
+    PK_ERROR_same_tool_and_target       tool body is also target body (MILD)
+    PK_ERROR_missing_geom               target or tool has incomplete
+                                        geometry (SERIOUS)
+    PK_ERROR_wire_body                  target or tool is a wire body
+                                        and the operation is not a union
+                                        or subtraction occuring between
+                                        generalised wire bodies with
+                                        general topology enabled (MILD)
+    PK_ERROR_duplicate_tools            duplication in list of tool bodies
+                                        (MILD)
+    PK_ERROR_instanced_tools            instanced tool bodies (MILD)
+    PK_ERROR_mixed_sheets_solids        mixture of sheet and solid
+                                        tool bodies (MILD)
+    PK_ERROR_cant_unite_solid_sheet     attempt to unite sheet target and
+                                        solid tool
+                                        (SERIOUS)
+    PK_ERROR_opposed_sheets             attempt to unite opposed sheets
+                                        (SERIOUS)
+    PK_ERROR_cant_intsc_solid_sheet     can't intersect solid target with
+                                        sheet tool bodies (MILD)
+    PK_ERROR_boolean_failure            inconsistent arguments, or
+                                        internal error (SERIOUS)
+    PK_ERROR_unsupported_operation      target or tool body is not a sheet
+                                        body and general topology is not
+                                        enabled, when completing imprint.
+                                        non-default values for
+                                        target/tool_material_side have been
+                                        supplied together with multiple tool
+                                        bodies (MILD)
+    PK_ERROR_cant_complete_imprint      unable to complete the imprint
+                                        (SERIOUS)
+    PK_ERROR_not_general                one or more of the options
+                                        merge_in_solid, merge_in_face or
+                                        merge_in_edge is PK_LOGICAL_true but
+                                        general topology is not enabled
+                                        (MILD)
+    PK_ERROR_unsuitable_topology        bad choice of selector topology, or
+                                        bad topological configuration for
+                                        material side (SERIOUS)
+    PK_ERROR_bad_position               bad choice of help point for topolset
+                                        selection (SERIOUS)
+    PK_ERROR_inconsistent_selection     attempt to both exclude and include
+                                        the same selected topolset (SERIOUS)
+    PK_ERROR_ambiguous_selector         selector is ambiguous and propagate
+                                        option is not set (SERIOUS)
+    PK_ERROR_solid_region               bad body; the first region is solid
+                                        rather than void (MILD)
+    PK_ERROR_bad_combination            a mixture of facet and classic
+                                        geometry has been supplied (MILD)
+    PK_ERROR_instanced_body             the target is instanced and the
+                                        operation would result in it being
+                                        deleted (SERIOUS)
+
+
+<A NAME="documentation"></A>
+
+
+INTRODUCTION
+
+A boolean operation between the target body and the tool bodies is
+performed. The target body is modified and the tool bodies are deleted.
+The resulting body or bodies replace the target, and are returned in
+an array within a results structure.
+
+This function will accept general bodies in <B>'target'</B> or <B>'tools'</B> only if
+generalised topology is enabled.
+
+See also <A HREF="../chapters/fd_chap.052.html#50434413_pgfId-392742">Boolean Operations</A> for more information.
+
+
+THE BOOLEAN ALGORITHM
+
+A boolean may be a union, subtraction or intersection. The type of boolean
+performed can be selected by setting the <B>'function'</B> field in the option
+structure. If no function code is supplied, the default action is union.
+
+Booleans in Parasolid may be thought of as being performed in three main
+phases. These are imprinting, gluing, and selection.
+
+o Imprinting : The faces of the target and the tool bodies are
+               intersected with each other to produce new edges where
+               they meet. These edges divide the faces of each body
+               into facesets which are either inside, outside, or on
+               the boundary of, the other bodies.
+
+o Gluing     : The resulting sets of faces are joined together into
+               a single intermediate body.
+
+o Selection  : The parts of the model which are to be kept or rejected
+               are selected, according to the type of boolean being
+               performed and the options supplied, using information
+               gained in the earlier phases.
+
+If more than one tool body is supplied, the union of overlapping tool
+bodies is computed first, and then the boolean between <B>'tools'</B> and
+<B>'target'</B> is performed.
+
+See <A HREF="../chapters/fd_chap.052.html#50434413_pgfId-392832">here#DOC0087# and #here</A> for more information.
+
+
+BOOLEANS PERFORMED WITH GENERALISED TOPOLOGY DISABLED
+
+See also <A HREF="../chapters/fd_chap.053.html#50434414_pgfId-679990">here</A> for more information.
+
+If generalised topology is disabled, the result of the boolean may be any
+number of bodies, each of which is a manifold and connected solid
+or sheet.
+
+o A union extends the target body by gluing to it all facesets of the tool
+  bodies which are outside the target body.
+
+o A subtraction modifies the target body by removing all facesets which
+  overlap with the tool bodies.
+
+o An intersection reduces the target body to only those facesets which
+  overlap with the tool bodies.
+
+The behaviour of the subtraction function can be altered for solid/sheet,
+sheet/sheet and sheet/solid booleans via the <B>'fence'</B> option.
+
+o Subtract sheet tools from a solid or sheet target body. The resultant
+  bodies are of the same type (solid or sheet) as the original target
+  body.
+  o Fence = Front : Section the target body with the sheet tool, but only
+                    return solid or sheet bodies in front of the sheet
+                    tool body.
+  o Fence = Back  : Section the target body with the sheet tool, but only
+                    return solid or sheet bodies behind the sheet tool
+                    body.
+  o Fence = None  : Section the target body with the sheet tool, returning
+                    solid or sheet bodies in front and behind the sheet
+                    tool body.
+
+o Subtract solid tools from a sheet target body. The resultant bodies are
+  sheet bodies.
+  o Fence = Front : The sheet target is modified by removing all facesets
+                    which overlap with the solid tool bodies and then gluing
+                    to it all the facesets of the tool bodies which are in
+                    front of the sheet target body. A sheet body is returned.
+  o Fence = Back  : The operation is the same as for the fence option being
+                    set to <B>'Front'</B> except the facesets of the tool bodies
+                    behind the sheet target body are maintained.
+  o Fence = None  : The sheet target is modified by removing all facesets
+                    which overlap with the solid tool bodies.
+
+
+A valid manifold solid/sheet unite operation is possible when the surviving
+regions of the unite operation enclose manifold volumes in the resultant body.
+It is the responsibility of the application to ensure the following:
+  o The regions that survive the unite operation must specify a manifold
+    resultant body.
+  o The normals of the faces of the sheet tool body must be appropriate
+    to specify manifold enclosed volumes.
+
+The behaviour of all types of Boolean operations can be altered via the
+<B>'target_material_side'</B> and <B>'tool_material_side'</B> options.  These alter the
+implementation of outside and overlap when determining which faces will
+survive the Boolean operation.
+
+  o Material Side = None    : A solid body is treated as having no solid
+                              material inside its faces, so non-coincident
+                              faces will always be outside.
+
+  o Material Side = Inside  : A sheet body is treated as part of the boundary
+                              of a solid - the face normal points away from
+                              the solid material, where overlap will occur.
+
+  o Material Side = Outside : A sheet body is treated as part of the boundary
+                              of a solid - the face normal points into
+                              the solid material, where overlap will occur.
+
+  o Material Side = Default : Behaviour depends on body type, except for the
+                              special case of a solid/sheet unite described
+                              above.
+
+Supplying non-default values for the <B>'fence'</B> option and <B>'material_side'</B> options
+together is not allowed.
+
+See also <A HREF="../chapters/fd_chap.052.html#50434413_pgfId-395829">here</A> for more information.
+
+The behaviour of all types of Boolean operations can also be altered by
+providing <B>'selected_topolset'</B> data. Topolsets are connected sets of solid
+regions and boundary regions which are bounded by the imprint. Topolsets from
+the target and/or tool bodies can be selected to exclude from or include in
+the Boolean operation. This can alter the result of the Boolean operation by
+discarding topolsets that would otherwise have been present in the result, or
+keeping topolsets that would otherwise have been discarded, depending on the
+Boolean operation. This option is only available for manifold Boolean
+operations. See the documentation for the <B>'selected_topolset'</B> option for
+more details.
+
+The type of the resulting body of a Boolean operation can be controlled via the
+<B>'resulting_body_type'</B> option.  Supplying non-default values for the <B>'fence'</B>
+option and <B>'resulting_body_type'</B> options together is not allowed.
+
+
+BOOLEANS PERFORMED WITH GENERALISED TOPOLOGY ENABLED
+
+See also <A HREF="../chapters/fd_chap.054.html#50434415_pgfId-335689">here</A> for more information.
+
+If generalised topology is enabled, the result of the boolean will be a single
+body, which may be disconnected, non-manifold, of mixed dimension, or any
+combination of these. The options <B>'prune_in_solid'</B> and <B>'prune_in_void'</B> may
+be used to `prune off' lower-dimension components of the result (see below).
+Note that the <B>'allow_disjoint'</B> option is ignored when generalised topology is
+enabled. The result is always a single body which may be disjoint.
+
+o A union extends the target body after imprinting to include all the
+  facesets and wireframe edges from both <B>'tools'</B> and <B>'target'</B>.
+
+o A subtraction modifies the target body by removing from it those pieces
+  which overlap with the union of the tool bodies.
+
+o An intersection reduces the target body to those pieces which overlap
+  with the union of the tool bodies.
+
+The value of the <B>'fence'</B> option is ignored within the context of booleans
+performed with generalised topology enabled. Topolset selection is also
+disabled when generalised topology is enabled.
+
+If the input bodies contain wireframe edges then generally only the union
+operation (PK_boolean_unite_c) is allowed, however if the bodies consist of
+only wireframe edges then a subtraction is allowed, see below.
+
+The type of the resulting body of a general boolean operation can be controlled
+via the <B>'resulting_body_type'</B> option.
+
+If all the input bodies are wire bodies then generalised topology must be
+enabled.  If the result of such a Boolean operation is manifold, the resultant
+bodies will be wire bodies if the <B>'resulting_body_type'</B> setting allows.
+Otherwise, the resultant bodies will be general bodies.
+
+If generalised topology is enabled, it is possible to perform a
+subtraction operation upon a set of tool and target bodies that wholly
+consists of wire or general wire bodies.  For these general wire boolean
+operations the <B>'fence'</B> and <B>'material_side'</B> options have, in general, no natural
+interpretation and are restricted.  <B>'fence'</B> must be set to the default,
+<A HREF=../headers/pk_boolean_fence_t.html>PK_boolean_fence_none_c</A> and the <B>'tool_material_side'</B> and <B>'target_material_side'</B>
+options to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_none_c</A> or <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_default_c</A>.
+
+With generalised topology enabled in the session, imprint completion may be
+carried out on general bodies by setting the <B>'imprint_complete_targ'</B> and
+<B>'imprint_complete_tool'</B> options. The functionality is the same as the manifold
+version, except that if the imprint meets a general edge then it will always
+stop there. If the imprint meets a general vertex then it will stop there too,
+unless it is possible for the imprint to continue on the same "manifold piece"
+of the body, as defined in <A HREF=../headers/pk_body_make_manifold_bodies.html>PK_BODY_make_manifold_bodies</A>.
+
+
+MERGING AND TAG PERSISTENCE
+
+The result of a boolean may contain a number of new mergable faces,
+edges and vertices. These are not merged away unless requested by
+setting the <B>'merge_imprinted'</B> option. Only new mergable entities are
+deleted. The mergable faces, edges and vertices of the original target
+and tool bodies are not merged away.
+
+The boolean operation obeys tag persistence rules under the
+appropriate conditions. For a description of the persistent behaviour
+of tags for a boolean operation, please refer to the section,
+<A HREF="../chapters/fd_chap.003.html#50434358_pgfId-299852">here</A>, in the Functional Description.
+
+
+OPTIMISING BOOLEANS
+
+The boolean operation can be optimised, depending on the configuration of
+the target and tool bodies, when additional information is known
+regarding tool bodies not clashing with each other, or not clashing with
+edges on the <B>'target'</B> body.
+
+This optimisation is enabled by the options <B>'no_tool_intersect'</B> and
+<B>'no_loop_intersect'</B> within the <B>'configuration'</B> options'. These
+apply not only to instancing operations, but also to booleans with
+multiple tools which need not be instances of the same body.
+
+o If the <B>'no_tool_intersect'</B> option is set, the edges of each tool
+  body may clash with the edges of the target body, but the tool bodies
+  must not clash with each other.
+
+o If the <B>'no_loop_intersect'</B> option is set, the tool bodies may clash
+  with each other, but must not clash with existing edges on the
+  target body.
+
+A combination of both options will ensure no edge intersection tests are
+performed between the target and tool bodies.
+
+See <A HREF="../chapters/fd_chap.052.html#50434413_pgfId-393957">here</A> for more information.
+
+
+STATUS AND FAULT REPORTING
+
+If the function returns an error code, PK_ERROR_duplicate_tools for
+example, none of the return arguments of the function will be
+set. This is standard practice for the PK interface. However, this is
+not the only mechanism by which this function may indicate that a
+failure has occurred. The <B>'results'</B> structure may return failure
+related information as well.
+
+Whenever the function returns PK_ERROR_no_errors, the application
+must inspect the contents of the <B>'results'</B> structure to check on the
+status of the boolean operation. The <B>'result'</B> field of the <B>'results'</B>
+structure will indicate the overall status of the boolean
+operation. The meaning and implied actions of the <B>'result'</B> field are
+explained under <A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_t</A>. If any bodies are to be returned
+to the application, these will be contained within the <B>'bodies'</B>
+array. For some values of the <B>'result'</B> field additional information
+may be returned in an array of report structures, referenced via the
+<B>'reports'</B> field.
+
+If the <B>'result'</B> field indicates a failure, the reason(s) for the
+failure will be contained within the reports.  Each report structure
+contains a <B>'report'</B> field indicating the reason for the failure and,
+if possible, an array of entities. These entities may assist the
+application in identifying the region or entities that resulted in the
+failure.  The <B>'entities'</B> array may contain topology from the target
+and tool bodies. The entities returned in the array will be members of
+the following classes :
+
+   o PK_CLASS_body
+   o PK_CLASS_shell
+   o PK_CLASS_face
+   o PK_CLASS_edge
+   o PK_CLASS_vertex
+
+NOTE: If the <B>'result'</B> field is set to <A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_failed_c</A>,
+      the application must not assume that the input bodies are in a
+      valid state.
+
+
+TRACKING INFORMATION
+
+If tracking information is requested by the <B>'tracking'</B> option the <B>'tracking'</B>
+structure contains topology tracking information on the operation. In the
+case of this function, tracking information for edges from <B>'target'</B> involved
+in the imprint is returned, and tracking information for regions may also
+optionally be returned if general_topology is enabled in the session.
+
+Edge Tracking
+
+For booleans other than generalised wire body unite and subtraction operations
+the edge tracking is as per the following description.
+
+For any new edge returned in the structure the <B>'track'</B> field  has the value
+PK_TOPOL_track_derive_c and the single edge in <B>'product_topols'</B>
+originated in the <B>'n_original_topols'</B> entities in <B>'original_topols'</B>.
+The entity type of each of these is recorded in <B>'original_classes'</B>
+array. In most cases this is either 2 original faces for which the
+product edge is the intersection, or a face and an edge or two edges where
+the imprint was along a pre-existing edge on one or other or both bodies.
+If there is more than one tool then there may be more than 2 <B>'original_topols'</B>
+as an edge may derive from more than 2 of the input bodies.
+
+Imprinted edges arising from any requested imprint completion are tracked
+by the same method. The original topology associated with the body upon
+which the completion is occurring is tracked as normal. The topology upon
+the other body i.e. that which is implied to cause the imprint is handled
+slightly differently. The topology upon this body which causes the imprint
+of the vertex from which completion occurs is tracked. This topology will
+either be a pre-existing vertex upon that body or an edge of the body
+causing the imprinted vertex when imprinted upon the other body, note this
+edge will only be coincident with the imprint at the point associated with
+the completion vertex.
+
+For general wire booleans when general topology is enabled, tracking records
+are returned reporting new and altered topology. The following tracking may
+arise within these tracking records (<A HREF=../headers/pk_topol_track_record_r_t.html>PK_TOPOL_track_record_r_t</A>):
+
+    1. New edges. These are tracked to the edges from which they arose.
+    Multiple product edges may arise from an original edge. Where coincident
+    bodies are used, resultant edges may track to multiple originators (edges).
+
+    2. New vertices. A new vertex will be tracked to all the original bodies
+    that intersect where the vertex is created. If the original body possesses
+    a vertex at this point the topology to which the new vertex tracks will
+    be that vertex, otherwise it will be the appropriate original edge of the
+    body.
+
+    3. Modified vertices. Vertices which exist on the original body but have
+    been altered by the operation will track to the topologies of the
+    original bodies in the same way as new vertices. Operations that will
+    modify vertices include unites where additional edges are united to an
+    existing vertex.
+
+For mixed dimension booleans, those with bodies containing both faces and
+wireframe edges, the tracking of new wireframe edges from existing wirefame
+edges and the tracking of vertices on these edges are as above for the
+general wire boolean.  When a wireframe edge is imprinted on a face then the
+resulting edge is tracked from the original wireframe edge and the face and
+when a wireframe edge intersects a face then the resulting vertex is tracked
+from the wireframe edge and the face.
+
+Region Tracking
+
+For booleans with general topology enabled in the session, region tracking
+information is returned if the option <B>'track_regions'</B> is set to
+<A HREF=../headers/pk_track_regions_t.html>PK_track_regions_basic_c</A>. A set of region tracking records
+(<A HREF=../headers/pk_topol_track_record_r_t.html>PK_TOPOL_track_record_r_t</A>) is returned, which contains tracking information
+for every result region created or affected by the operation.
+A PK_TOPOL_track_derive_c record indicates that the result regions in
+<B>'product_topols'</B> were derived from the original regions in <B>'original_topols'</B>.
+A PK_TOPOL_track_create_c record indicates that the result region in
+<B>'product_topols'</B> is new.
+
+New Bodies
+
+New bodies are returned within the <B>'bodies'</B> field of the <A HREF=../headers/pk_boolean_r_t.html>PK_boolean_r_t</A>
+<B>'results'</B> structure.
+
+
+OPTION RESTRICTIONS
+
+The following options within <B>'configuration'</B> options are
+ignored by this function :
+
+    o <B>'identical_intersect'</B>
+    o <B>'one_in_all_in'</B>
+
+See the documentation for <A HREF=../headers/pk_body_boolean_o_t.html>PK_BODY_boolean_o_t</A> and <A HREF="../chapters/fd_chap.052.html#50434413_pgfId-393182">here</A> for more
+information about the options available for this function.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

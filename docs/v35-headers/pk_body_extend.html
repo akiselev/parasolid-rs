@@ -1,0 +1,119 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_extend</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_extend</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_BODY_extend
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                        body,             --- body
+int                              n_boundary_edges, --- number of boundary edges
+const <A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                 *boundary_edges,   --- boundary edges
+const <A HREF=../headers/pk_body_extend_o_t.html>PK_BODY_extend_o_t</A>        *options,          --- options structure [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>        *const tracking,         --- tracking information
+<A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A>        *const results           --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function will extend a body across a set of laminar boundary edges.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity      body is not a sheet or general body
+                                    (MILD)
+    PK_ERROR_not_in_same_body       all the edges are not in the same body
+                                    (MILD)
+    PK_ERROR_cant_extend            failed to extend the body
+                                    (SERIOUS)
+    PK_ERROR_bad_edge               boundary edges are not laminar
+                                    (MILD)
+    PK_ERROR_wrong_entity           unexpected target entity
+                                    (MILD)
+    PK_ERROR_bad_combination        non-terminal vertex of the chain of
+                                    edges is specified with <B>'extend_side_data'</B>
+                                    (MILD)
+    PK_ERROR_non_manifold           boundary edges are not locally manifold or
+                                    their extension intersects non-manifold
+                                    edges or vertices of the target body
+                                    (SERIOUS)
+
+<A NAME="documentation"></A>
+PK_BODY_extend will extend a body across given boundaries of laminar edges.
+Options are available to specify the shape and extent of the extension.
+Tracking and status information is returned.
+
+See <A HREF="../chapters/fd_chap.049.html#50434409_pgfId-294750">Extending Body</A> for more information.
+
+The function receives:
+
+<B>'body'</B>             the body to extend.  This must be a sheet or general
+                   body.
+
+<B>'n_boundary_edges'</B> number of boundary edges.  This must be positive.
+
+<B>'boundary_edges'</B>   an array of laminar edges belonging to <B>'body'</B> and
+                   defining the boundaries which need to be extended
+                   across.  The edges need not form a single connected chain.
+
+Further options can be supplied in the <A HREF=../headers/pk_body_extend_o_t.html>PK_BODY_extend_o_t</A> option structure.
+
+The function will return:
+
+<B>'tracking'</B>         tracking information identifying any new faces with the
+                   corresponding received boundary edge or vertex, and any
+                   new laminar side edges with the corresponding received
+                   boundary vertex.
+
+<B>'results'</B>          a structure containing the results of the operation.
+                   If the function returns PK_ERROR_no_errors, the result of
+                   the operation will be indicated by the value of the
+                   <B>'status'</B> field of this structure.  When this value is not
+                   <A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A> or <A HREF=../headers/pk_local_status_t.html>PK_local_status_nocheck_c</A>, it
+                   indicates an operation failure and an array of entities
+                   involved in this failure is returned through the field
+                   <B>'error_entities'</B>, when possible.
+
+                   For more information regarding the failure status code and
+                   the error_entities, refer to the PK documentation of the
+                   <A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A> structure.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

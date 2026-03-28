@@ -1,0 +1,2442 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>B-Curves And B-Surfaces</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>B-Curves And B-Surfaces</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.018.html">Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.020.html">Nominal Geometry</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-486575">18.1	Introduction </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-294769">18.2	Explicit and automatic creation </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-294778">18.3	Surfaces in Parasolid </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-765773">18.4	Creating B-curve and B-surface geometry </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-294809">18.4.1	B-spline data </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-296083">18.4.2	Piecewise data </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-296914">18.4.3	Combining B-curves </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-296924">18.4.4	Sweeping and spinning </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298221">18.4.5	Creating B-geometry from existing curves and surfaces </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298265">18.4.6	General splining </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298513">18.4.6.1	Controlling the spline method used </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298536">18.4.6.2	Creating periodic B-curves </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-1050202">18.4.6.3	Specifying the degree of B-curves </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298542">18.4.6.4	Specifying parameter information </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298585">18.4.6.5	Supplying derivative information </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298666">18.4.6.6	Specifying knot sets </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298717">18.4.6.7	Confining the B-curve to a defined box </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298770">18.4.6.8	Specifying a chordal tolerance </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298816">18.4.6.9	Returning several B-curves </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298858">18.4.6.10	Update control </A>
+</UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-298902">18.4.7	Splining B-surfaces </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-300347">18.4.8	Rebuilding curves and surfaces </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-300701">18.4.9	Creating constrained surfaces </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-300822">18.4.10	Lofting </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-302769">18.4.11	Constant parameter curves </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-302773">18.4.12	Re-parameterising curves </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-302900">18.4.13	Isocline curves and isocline surfaces </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-302910">18.4.13.1	Isocline curves </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-312254">18.4.13.2	Isocline surfaces </A>
+</UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-507322">18.4.14	Creating a smooth continuous curve </A>
+</UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314473">18.5	Modifying B-curves and B-surfaces </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314479">18.5.1	Adding and removing knots </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314497">18.5.2	Clamping knot-sets to have Bezier ends </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314500">18.5.3	Raising and lowering the degree of B-geometry </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314513">18.5.4	Reparameterising B-geometry </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314518">18.5.5	Extending B-curves </A>
+</UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314691">18.6	Entering curves and surfaces into Parasolid </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314699">18.6.1	Creating sheet bodies from B-curves and B-surfaces </A>
+</UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314707">18.7	Modeling with B-curve and B-surface geometry </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314714">18.7.1	Sweeping and spinning </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-314723">18.7.1.1	Examples </A>
+</UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-315239">18.7.2	Tweaking </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-315367">18.7.3	Capping </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-315774">18.7.4	Subtracting sheet from solid </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-316518">18.7.5	Sewing </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-316528">18.7.6	Restrictions on B-curves and B-surfaces </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-316536">18.7.6.1	Curve restrictions </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-316555">18.7.6.2	Surface restrictions </A>
+</UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-316590">18.7.7	Restrictions on use </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-316862">18.7.7.1	Coincident regions </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-316983">18.8	Offset surfaces </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-318868">18.8.1	Creating an offset surface </A>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-318877">18.8.2	Introducing offset surfaces into a model </A>
+<UL>
+<LI> <A HREF="fd_chap.019.html#50422088_pgfId-318899">18.8.2.1	Restrictions on offset surfaces </A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422088_pgfId-486575"></A>18.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422088_pgfId-486578"></A>Parasolid contains fully integrated B-curves and B-surfaces. By this, we mean you can attach the curves and surfaces to edges and faces, and then apply any operation offered through the PK Interface to them, from boolean operations to the attachment of attributes.</P>
+<P>
+<A NAME="50422088_pgfId-294762"></A>B-geometry is parametrically defined piecewise polynomial or rational polynomial geometry which is represented in Parasolid as B-spline (NURBS) curves and surfaces.</P>
+<P>
+<A NAME="50422088_pgfId-807619"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-807229"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-807204"></A><A HREF="fd_chap.018.html#50422087_47573">Section 17.2.1, “B-curve”</A></LI>
+<LI>
+<A NAME="50422088_pgfId-807263"></A><A HREF="fd_chap.018.html#50422087_45508">Section 17.2.3, “B-surface”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422088_pgfId-294769"></A>18.2	<A NAME="50422088_marker-294763"></A><A NAME="50422088_marker-294764"></A><A NAME="50422088_marker-294765"></A><A NAME="50422088_marker-294766"></A><A NAME="50422088_marker-294767"></A><A NAME="50422088_marker-294768"></A>Explicit and automatic creation 
+
+
+</H1>
+<P>
+<A NAME="50422088_pgfId-294770"></A>B-curve and B-surface geometry may be made either explicitly or automatically in Parasolid:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-294771"></A>The explicit method is for the user to either supply pre-defined curves or surfaces to the kernel interface, e.g. as B-spline data, or to create curves or surfaces by splining or lofting. B-curves and B-surfaces may then be formed into wires and sheets.</LI>
+<LI>
+<A NAME="50422088_pgfId-294772"></A>B-surfaces may be made during a modeling operation; this is the automatic method. For example, if a B-curve is swept, the result can be a B-surface.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-294773"></A>B-surfaces can be combined with existing bodies by means of:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-294774"></A>boolean operations</LI>
+<LI>
+<A NAME="50422088_pgfId-294775"></A>sweeping and swinging</LI>
+<LI>
+<A NAME="50422088_pgfId-294776"></A>local operations</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-294777"></A>There is no concept of a ‘primitive free form solid’, in the way that, for example, spherical surfaces correspond to solid spheres. Therefore a sequence of modeling operations is required to produce a solid body incorporating B-curve and B-surface geometry. Useful sequences of operations are described in a later section.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422088_pgfId-294778"></A>18.3	Surfaces in Parasolid 
+
+
+</H1>
+<P>
+<A NAME="50422088_pgfId-294779"></A>Surfaces in Parasolid belong to one of the following general types:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-294780"></A>Analytic surfaces, from planes to tori</LI>
+<LI>
+<A NAME="50422088_pgfId-294781"></A>Blends</LI>
+<LI>
+<A NAME="50422088_pgfId-294782"></A>Generated surfaces</LI>
+<LI>
+<A NAME="50422088_pgfId-294783"></A>B-surfaces</LI>
+<LI>
+<A NAME="50422088_pgfId-294784"></A>Foreign geometry surfaces</LI>
+<LI>
+<A NAME="50422088_pgfId-294785"></A>Offset surfaces</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-294786"></A>The first two types are implicit surfaces; they are defined as the solutions to an implicit equation of the form f(<STRONG>
+x</STRONG>)=0, where <STRONG>
+x</STRONG> is a point in space and f is a function of <STRONG>
+x</STRONG>. The function f actually divides space into two regions: points for which f(<STRONG>
+x</STRONG>) is positive, and points for which it is negative. The surface is the boundary between the two regions. It is always closed, like a sphere, or infinite like a plane or cylinder.</P>
+<P>
+<A NAME="50422088_pgfId-294787"></A>B-surfaces are different, in that they are only defined over a finite region of space; they have boundaries and do not necessarily divide space into distinct regions.</P>
+<P>
+<A NAME="50422088_pgfId-765765"></A>In a similar way, B-curves are bounded. Generated surfaces are surfaces which may be produced when sweeping or spinning. Swept surfaces are infinite in the sweep direction and spun surfaces closed in the spin direction. The form of the other direction depends on the geometry of the swept or spun curve.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422088_pgfId-765773"></A>18.4	<A NAME="50422088_marker-765767"></A><A NAME="50422088_marker-765768"></A><A NAME="50422088_marker-765769"></A><A NAME="50422088_marker-765770"></A><A NAME="50422088_marker-765771"></A><A NAME="50422088_marker-765772"></A>Creating B-curve and B-surface geometry 
+
+
+</H1>
+<P>
+<A NAME="50422088_pgfId-294797"></A><A NAME="50422088_marker-294796"></A>B-curves and B-surfaces may be created in several ways, including:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-294798"></A>From B-spline control points</LI>
+<LI>
+<A NAME="50422088_pgfId-294799"></A>From piecewise data (Bezier, Hermite, polynomial, Taylor series)</LI>
+<LI>
+<A NAME="50422088_pgfId-294800"></A>By sweeping or spinning B-curves</LI>
+<LI>
+<A NAME="50422088_pgfId-294801"></A>By converting lines, circles or ellipses to B-curves</LI>
+<LI>
+<A NAME="50422088_pgfId-294802"></A>By representing portions of surfaces as B-surfaces</LI>
+<LI>
+<A NAME="50422088_pgfId-294803"></A>By splining or meshing a set of points</LI>
+<LI>
+<A NAME="50422088_pgfId-294804"></A>By lofting a set of B-curves</LI>
+<LI>
+<A NAME="50422088_pgfId-294805"></A>By extracting constant parameter B-curves</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-793176"></A>For examples showing the creation of B-geometry, see the code examples in the <CODE>
+C++\Code Examples\Modelling\Geometry</CODE>
+ <CODE>
+Creation</CODE>
+ folder, and the code examples in the <CODE>
+C#\ExampleApplication.Net\Code</CODE>
+ <CODE>
+Examples\Modelling\B-Geometry</CODE>
+ folder located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H3>
+<A NAME="50422088_pgfId-294809"></A>	18.4.1 	<A NAME="50422088_marker-294806"></A><A NAME="50422088_marker-294807"></A><A NAME="50422088_59502"></A>B-spline data </H3>
+<P>
+<A NAME="50422088_pgfId-294812"></A><A NAME="50422088_marker-294810"></A><A NAME="50422088_marker-294811"></A>A curve or surface may be created from B-spline control points and knot vectors using <A NAME="50422088_marker-294813"></A><A HREF=../headers/pk_bcurve_create.html>PK_BCURVE_create</A> and <A NAME="50422088_marker-294814"></A><A HREF=../headers/pk_bsurf_create.html>PK_BSURF_create</A> respectively. Both rational and non-rational B-spline curves and B-surfaces may be created this way. The diagram below shows a B-spline curve with its control polygon.</P>
+<P>
+<A NAME="50422088_pgfId-562892"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-123.gif">
+
+<P>
+<A NAME="50422088_pgfId-294891"></A>Figure 18-1 B-spline curve</P>
+<P>
+<A NAME="50422088_pgfId-294892"></A>The curve or surface can be forced to be periodic. A periodic curve must be closed and meet itself smoothly. A surface can be periodic in either u or v directions giving a tubular surface, or in both directions giving a toroidal surface.</P>
+<P>
+<A NAME="50422088_pgfId-563264"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-124.gif">
+
+<P>
+<A NAME="50422088_pgfId-296079"></A>Figure 18-2 A periodic surface</P>
+<P>
+<A NAME="50422088_pgfId-296080"></A><A HREF=../headers/pk_bcurve_create.html>PK_BCURVE_create</A> and <A HREF=../headers/pk_bsurf_create.html>PK_BSURF_create</A> can make B-geometry with knots that are closer together than the session angular precision if <A HREF=../headers/pk_session_set_close_knots.html>PK_SESSION_set_close_knots</A> is called with PK_LOGICAL_true. This will result in invalid entities that are not suitable for general modeling purposes, so it is up to your application to remove any such knots at some later point in order to make the part valid.</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-296083"></A>	18.4.2 	<A NAME="50422088_marker-296081"></A><A NAME="50422088_marker-296082"></A>Piecewise data </H3>
+<P>
+<A NAME="50422088_pgfId-296088"></A><A NAME="50422088_marker-296084"></A><A NAME="50422088_marker-296085"></A><A NAME="50422088_marker-296086"></A><A HREF=../headers/pk_bcurve_create_piecewise.html>PK_BCURVE_create_piecewise</A> and <A NAME="50422088_marker-296087"></A><A HREF=../headers/pk_bsurf_create_piecewise.html>PK_BSURF_create_piecewise</A> create a curve or surface from piecewise data. The data may be in several forms, namely Bezier, Hermite, polynomial or Taylor series. By ‘piecewise’ it is meant that each segment of a curve or patch of a surface is independent of the other segments or patches (except that the curve or surface must be position (G0) continuous across adjacent segments or patches). The curve or surface can be either rational or non-rational.</P>
+<P>
+<A NAME="50422088_pgfId-564534"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-125.gif">
+
+<P>
+<A NAME="50422088_pgfId-296909"></A>Figure 18-3 A surface created from piecewise data</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-296914"></A>	18.4.3 	<A NAME="50422088_marker-296910"></A><A NAME="50422088_marker-296911"></A><A NAME="50422088_marker-296912"></A><A NAME="50422088_marker-296913"></A>Combining B-curves </H3>
+<P>
+<A NAME="50422088_pgfId-296917"></A><A HREF=../headers/pk_bcurve_join.html>PK_BCURVE_join</A> creates a B-curve by combining a sequence of curves which meet head to tail. In general, the resultant curve is parameterised such that, where possible, joins at which the curves are G1-continuous are made C1-continuous. You can override this property by supplying knot values, where the curves join, via the option structure which may be used in preference to those computed to establish the continuity condition. The value of the <CODE>
+snap_tolerance</CODE>
+ is used to control whether a supplied knot value is used in preference to the computed one. The resultant curve is parameterised on the interval [0, 1].</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-296924"></A>	18.4.4 	<A NAME="50422088_marker-296920"></A><A NAME="50422088_marker-296921"></A><A NAME="50422088_marker-296922"></A><A NAME="50422088_marker-296923"></A>Sweeping and spinning </H3>
+<P>
+<A NAME="50422088_pgfId-296930"></A><A NAME="50422088_marker-296925"></A><A NAME="50422088_marker-296926"></A><A NAME="50422088_marker-296927"></A><A NAME="50422088_marker-296928"></A>You can sweep or spin an existing B-curve into a B-surface using <A NAME="50422088_marker-296929"></A><A HREF=../headers/pk_bcurve_sweep.html>PK_BCURVE_sweep</A> and <A NAME="50422088_marker-296931"></A><A HREF=../headers/pk_bcurve_spin.html>PK_BCURVE_spin</A>, respectively.</P>
+<P>
+<A NAME="50422088_pgfId-296932"></A>When a B-curve is spun, the angle of spin must not be greater than 2π or less than -2π.</P>
+<P>
+<A NAME="50422088_pgfId-565719"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-126.gif">
+
+<P>
+<A NAME="50422088_pgfId-298215"></A>Figure 18-4 A surface created by spinning a B-curve</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-298221"></A>	18.4.5 	<A NAME="50422088_marker-298216"></A><A NAME="50422088_marker-298217"></A><A NAME="50422088_marker-298218"></A><A NAME="50422088_marker-298219"></A><A NAME="50422088_84640"></A>Creating B-geometry from existing curves and surfaces </H3>
+<P>
+<A NAME="50422088_pgfId-298225"></A>Parasolid provides several functions that let you produce a B-geometry representation from an existing geometry:</P>
+<P>
+<A NAME="50422088_pgfId-298239"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298228"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298230"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298232"></A><A HREF=../headers/pk_curve_make_bcurve_2.html>PK_CURVE_make_bcurve_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298234"></A>Produces an exact B-curve representation of a parametric interval of an input curve. The resultant B-curve can be forced to have any specific continuity up to and including C2 or G2.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1172903"></A><A HREF=../headers/pk_curve_make_bcurve_array.html>PK_CURVE_make_bcurve_array</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1172905"></A>Produces an exact B-curve representation of a parametric interval for each curve in the supplied array of <CODE>
+curves</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298236"></A><A HREF=../headers/pk_surf_make_bsurf_2.html>PK_SURF_make_bsurf_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298238"></A>Produces an exact B-surface representation of a parametric interval of an input surface. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1072017"></A><A HREF=../headers/pk_surf_make_bsurf_array.html>PK_SURF_make_bsurf_array</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1072019"></A>Produces an exact B-surface representation of a parametric interval for each surface in the supplied array of <CODE>
+surfs</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-298240"></A>By default, these functions return an exact representation wherever possible. In particular, they can return exact representations of conics and existing regions of B-geometry. Otherwise an approximation is produced.</P>
+<P>
+<A NAME="50422088_pgfId-298241"></A>You can use these functions to extract a region of an existing B-surface or B-curve.</P>
+<P>
+<A NAME="50422088_pgfId-298242"></A>These functions share the following options:</P>
+<P>
+<A NAME="50422088_pgfId-1073255"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1103937"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1103939"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1103941"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1103943"></A>The tolerance of any approximation used in the resulting geometry.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1103949"></A>continuity</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1103951"></A>The preferred continuity of the resulting geometry. Default: PK_continuity_c1. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1103953"></A>force_continuity</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1103955"></A>The handling of discontinuities of an input curve. If a continuity level is supplied, small curve discontinuities are removed up to that specific continuity. Large discontinuities that are not removed are reported as <A HREF=../headers/pk_report_3_t.html>PK_REPORT_3_discontinuities_c</A>. Default: <A HREF=../headers/pk_force_continuity_t.html>PK_force_continuity_no_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1106088"></A>force_non_rational</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1106090"></A>The preferred form of the resulting geometry, where the output can be forced to be non-rational. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-1109052"></A><A HREF=../headers/pk_curve_make_bcurve_2.html>PK_CURVE_make_bcurve_2</A> and <A HREF=../headers/pk_curve_make_bcurve_array.html>PK_CURVE_make_bcurve_array</A> share the following additional options:</P>
+<P>
+<A NAME="50422088_pgfId-1109245"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1109157"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1109159"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1109199"></A>have_degree</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1109201"></A>Whether <CODE>
+degree</CODE>
+ is specified. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1109204"></A>degree</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1109206"></A>The degree of the resultant <CODE>
+bcurve</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1109209"></A>force_bezier</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1109211"></A>Whether the resulting <CODE>
+bcurve</CODE>
+ should be a piecewise-Bezier curve. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-1173126"></A>In addition, <A HREF=../headers/pk_curve_make_bcurve_array.html>PK_CURVE_make_bcurve_array</A> has the following option:</P>
+<P>
+<A NAME="50422088_pgfId-1173208"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1173218"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1173220"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1173234"></A><CODE>
+destination</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1173416"></A>Allows you to specify the destination for the resulting array of b-curves. If the destination is:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-1173417"></A><A HREF=../headers/pk_part_t.html>PK_PART_t</A>: The b-curves will be construction geometry in that part.</LI>
+<LI>
+<A NAME="50422088_pgfId-1173418"></A><A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>: The b-curves will be orphan geometry in that partition.</LI>
+<LI>
+<A NAME="50422088_pgfId-1173236"></A>PK_ITEM_null: The b-curves will be orphan geometry in the current partition. (Default)</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-1109147"></A><A HREF=../headers/pk_surf_make_bsurf_2.html>PK_SURF_make_bsurf_2</A> has the following additional option:</P>
+<P>
+<A NAME="50422088_pgfId-1109311"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1109330"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1109332"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1109366"></A>force_cubic</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1109368"></A>Whether the resulting <CODE>
+bcurve</CODE>
+ should be cubic. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-1112007"></A><A HREF=../headers/pk_surf_make_bsurf_array.html>PK_SURF_make_bsurf_array</A> has the following additional options:</P>
+<P>
+<A NAME="50422088_pgfId-1112044"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1112010"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1112012"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1112014"></A>have_u_degree</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1112016"></A>Whether the degree of the resultant b-surface in the <CODE>
+u</CODE>
+ direction is specified.</P>
+<P>
+<A NAME="50422088_pgfId-1112017"></A>If <CODE>
+have_u_degree</CODE>
+ is set to:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-1112018"></A>PK_LOGICAL_true, then <CODE>
+u_degree</CODE>
+ must be set to 3. </LI>
+<LI>
+<A NAME="50422088_pgfId-1112019"></A>PK_LOGICAL_false, the degree in the u direction will depend on the input surface. </LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-1112020"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1112022"></A>u_degree</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1112024"></A>The degree of the resultant b-surface in the <CODE>
+u</CODE>
+ direction. Default: 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1112026"></A>have_v_degree</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1112028"></A>Whether the degree of the resultant b-surface in the <CODE>
+v</CODE>
+ direction is specified.</P>
+<P>
+<A NAME="50422088_pgfId-1112029"></A>If <CODE>
+have_v_degree</CODE>
+ is set to:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-1112030"></A>PK_LOGICAL_true, then <CODE>
+v_degree</CODE>
+ must be set to 3. </LI>
+<LI>
+<A NAME="50422088_pgfId-1112031"></A>PK_LOGICAL_false, the degree in the <CODE>
+v</CODE>
+ direction will depend on the input surface. </LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-1112032"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1112034"></A>v_degree</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1112036"></A>The degree of the resultant b-surface in the <CODE>
+v</CODE>
+ direction. Default: 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-1112038"></A>destination</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-1112040"></A>Allows you to specify the destination for the resulting array of b-surfaces. If the destination is:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-1112041"></A><A HREF=../headers/pk_part_t.html>PK_PART_t</A>: The b-surfaces will be construction geometry in that part.</LI>
+<LI>
+<A NAME="50422088_pgfId-1112042"></A><A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>: The b-surfaces will be orphan geometry in that partition.</LI>
+<LI>
+<A NAME="50422088_pgfId-1112043"></A>PK_ITEM_null: The b-surfaces will be orphan geometry in the current partition. (Default)</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-298259"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422088_pgfId-298252"></A>Note: Parasolid also provides <A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A> and <A HREF=../headers/pk_bsurf_create_fitted.html>PK_BSURF_create_fitted</A>. These functions also create B-geometry from existing geometry, but based on a set of points sampled from the existing geometry. They differ from the functions described here in the following ways:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-298253"></A>They cannot return exact representations, except in the trivial line or plane cases.</LI>
+<LI>
+<A NAME="50422088_pgfId-298254"></A>They cannot be used to extract regions of existing b-geometry.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-298258"></A>See <A HREF="fd_chap.019.html#50422088_47759">Section 18.4.8, “Rebuilding curves and surfaces”</A>, for information on these functions. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422088_pgfId-298265"></A>	18.4.6 	<A NAME="50422088_marker-298260"></A><A NAME="50422088_marker-298261"></A><A NAME="50422088_marker-298262"></A><A NAME="50422088_marker-298263"></A><A NAME="50422088_70055"></A>General splining </H3>
+<P>
+<A NAME="50422088_pgfId-298472"></A><A NAME="50422088_marker-298468"></A><A NAME="50422088_marker-298469"></A>You can create a B-curve in parameter space by interpolating or fitting a set of<A NAME="50422088_marker-298470"></A> <A NAME="50422088_marker-298471"></A>positions using <A NAME="50422088_marker-298473"></A><A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A>. Parasolid fits a piecewise curve that is (depending on the options used) continuous in slope and curvature through the specified positions, and creates a suitable set of knots and control points to support the generated curve.</P>
+<P>
+<A NAME="50422088_pgfId-298510"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-127.gif">
+
+<P>
+<A NAME="50422088_pgfId-298511"></A>Figure 18-5 A B-curve created by interpolating and fitting to a set of positions</P>
+<P>
+<A NAME="50422088_pgfId-298512"></A>You can control the splining operation in a number of ways to further define the shape of the curve or surface using the options available in <A HREF=../headers/pk_bcurve_create_spline_2_o_t.html>PK_BCURVE_create_spline_2_o_t</A>. </P>
+
+<H4>
+<A NAME="50422088_pgfId-298513"></A>18.4.6.1 Controlling the spline method used </H4>
+<P>
+<A NAME="50422088_pgfId-298514"></A><A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A> lets you choose between creating a B-curve by interpolating through the received positions, or fitting a B-curve to within a specified tolerance of those positions. You can also combine these two methods by specifying that certain positions are interpolated, while others are fitted.</P>
+<P>
+<A NAME="50422088_pgfId-298515"></A><A HREF=../headers/pk_bcurve_create_spline_2_o_t.html>PK_BCURVE_create_spline_2_o_t</A> contains the following options to let you control this behaviour:</P>
+<P>
+<A NAME="50422088_pgfId-298535"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298518"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298520"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-298522"></A>spline_method</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298524"></A>Whether to create a B-curve by fitting to the supplied positions within tolerance, or by interpolating through the supplied positions. By default, the B-curve is interpolated. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-298526"></A>n_special</PRE>
+<PRE><A NAME="50422088_pgfId-298527"></A>special_indices</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298529"></A>A list of any positions that you want to treat using a different method to the one supplied in <CODE>
+spline_method</CODE>
+. The <CODE>
+n_special</CODE>
+ field is the number of positions that you want to treat differently, and <CODE>
+special_indices</CODE>
+ is an array of length <CODE>
+n_special</CODE>
+ that provides indices into the received positions. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-298531"></A>have_fit_tol</PRE>
+<PRE><A NAME="50422088_pgfId-298532"></A>fit_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-298534"></A>The tolerance to use for any positions that are used to fit the curve. If any of the received positions are used to fit the B-curve, then <CODE>
+have_fit_tol</CODE>
+ must be PK_LOGICAL_true, and a tolerance must be supplied in <CODE>
+fit_tol</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422088_pgfId-298536"></A>18.4.6.2 Creating periodic B-curves </H4>
+<P>
+<A NAME="50422088_pgfId-298538"></A><A NAME="50422088_marker-298537"></A>The <CODE>
+is_periodic</CODE>
+ option specifies that the B-curve should be periodic: the resulting B-curve meets itself smoothly at its ends. </P>
+<P>
+<A NAME="50422088_pgfId-1050478"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-128.gif">
+
+<P>
+<A NAME="50422088_pgfId-1050258"></A>Figure 18-6 <A NAME="50422088_96492"></A>A periodic B-curve created from three supplied positions</P>
+
+
+<H4>
+<A NAME="50422088_pgfId-1050202"></A>18.4.6.3 Specifying the degree of B-curves </H4>
+<P>
+<A NAME="50422088_pgfId-298541"></A><A NAME="50422088_marker-298540"></A>The <CODE>
+degree</CODE>
+ option specifies the degree of the resulting B-curve.</P>
+
+
+<H4>
+<A NAME="50422088_pgfId-298542"></A>18.4.6.4 Specifying parameter information </H4>
+<P>
+<A NAME="50422088_pgfId-298544"></A><A NAME="50422088_marker-298543"></A>You can supply parameter information for any of the positions passed to the function to control the shape. <A HREF="fd_chap.019.html#50422088_98480"><EM>
+Figure 18-7</EM></A> shows an example where a B-curve is splined through five positions. By supplying parameter information (shown in bold) for some of the points, the shape of the curve can be controlled as shown.</P>
+<P>
+<A NAME="50422088_pgfId-298581"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-129.gif">
+
+<P>
+<A NAME="50422088_pgfId-298583"></A>Figure 18-7 <A NAME="50422088_98480"></A>Controlling B-curves using parameter information</P>
+<P>
+<A NAME="50422088_pgfId-298584"></A>In addition to controlling parameter information at each position, you can define the parameter range for the whole B-curve.</P>
+<P>
+<A NAME="50422088_pgfId-1044246"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422088_pgfId-1041747"></A>Note: For periodic B-curves, either the start or the end of the parameter range (but not both) can be supplied as parameters as shown in <A HREF="fd_chap.019.html#50422088_96492"><EM>
+Figure 18-6</EM></A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422088_pgfId-298585"></A>18.4.6.5 Supplying derivative information </H4>
+<P>
+<A NAME="50422088_pgfId-298586"></A>You can supply derivative information for any of the positions passed to the function. This gives you a broad range of control over the shape of the resultant curve. For example:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-298590"></A><A NAME="50422088_marker-298587"></A>To ensure that the curve has zero curvature at either end (a <A NAME="50422088_marker-298588"></A>natural <A NAME="50422088_marker-298589"></A>end condition), specify a zero vector as the 2nd derivative at the corresponding position.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-298624"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-130.gif">
+
+<P>
+<A NAME="50422088_pgfId-298625"></A>Figure 18-8 A curve with natural end conditions - zero curvature</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-298629"></A><A NAME="50422088_marker-298626"></A>To specify the tangents at the ends of a curve (a <A NAME="50422088_marker-298627"></A>clamped <A NAME="50422088_marker-298628"></A>end condition), specify the first derivative of the corresponding position.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-298663"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-131.gif">
+
+<P>
+<A NAME="50422088_pgfId-298664"></A>Figure 18-9 A curve with specified tangents at the ends</P>
+<P>
+<A NAME="50422088_pgfId-298665"></A>Any derivative information specified must have an order less than 4.</P>
+
+
+<H4>
+<A NAME="50422088_pgfId-298666"></A>18.4.6.6 Specifying knot sets </H4>
+<P>
+<A NAME="50422088_pgfId-298668"></A><A NAME="50422088_marker-298667"></A>Another way that you can control the shape of the B-curve is by using knot sets. If you just pass a series of positions to <A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A>, Parasolid creates a suitable set of knots for the resulting B-curve. However, you can also specify a knot set yourself. Each knot value supplied lies on the boundary between segments of the resulting B-curve. The spacing between values in the knot set gives an indication of the amount of curve in that segment. Increasing the gap between two knots increases the length of curve in the segment of the curve defined by that portion of the knot set.</P>
+<P>
+<A NAME="50422088_pgfId-298705"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-132.gif">
+
+<P>
+<A NAME="50422088_pgfId-298706"></A>Figure 18-10 A curve with its shape changed by supplying a knot set explicitly</P>
+<P>
+<A NAME="50422088_pgfId-298708"></A><A NAME="50422088_marker-298707"></A>You can control the multiplicity of the knots supplied to <A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A> using the <CODE>
+knot_mults</CODE>
+ option. In general, the higher the multiplicity of a knot, the less continuity can be guaranteed between those segments in the resulting B-curve. </P>
+<P>
+<A NAME="50422088_pgfId-298710"></A><A NAME="50422088_marker-298709"></A>If you supply <A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A> with too few knots to support the positions and derivatives to be interpolated, Parasolid may be unable to generate a suitable B-curve. In this case, you can use the <CODE>
+overdefined</CODE>
+ option to request that Parasolid generates additional knots as required. By default, <A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A> fails if you supply too few knots (unless you do not supply a knot set at all).</P>
+
+
+<H4>
+<A NAME="50422088_pgfId-298717"></A>18.4.6.7 Confining the B-curve to a defined box </H4>
+<P>
+<A NAME="50422088_pgfId-298718"></A>You can control the shape of the resulting B-curve by supplying clamp information that restricts the resulting B-curve to the box defined by the positions received by <A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A>, such that:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-298719"></A>If a series of adjacent positions lie on the same axis-aligned line, the resulting curve lies along that line, over the range of those positions (a <STRONG>
+constant</STRONG> clamp).</LI>
+<LI>
+<A NAME="50422088_pgfId-298720"></A>If a position is supplied that is locally extreme along an axis, locally no part of the resulting curve lies further along that axis, i.e. the position is the local extremum of the curve. </LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-298721"></A>You can use the <CODE>
+clamp</CODE>
+ option to specify one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-298722"></A>A constant clamp (PK_BCURVE_clamp_constant_c). </LI>
+<LI>
+<A NAME="50422088_pgfId-330733"></A>Both a constant and a locally extreme clamp (PK_BCURVE_clamp_extreme_c). </LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-330734"></A><A HREF="fd_chap.019.html#50422088_73995"><EM>
+Figure 18-11</EM></A> illustrates the three different B-curves that can be created from the same set of received positions by changing the supplied <CODE>
+clamp</CODE>
+. </P>
+<P>
+<A NAME="50422088_pgfId-298761"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-133.gif">
+
+<P>
+<A NAME="50422088_pgfId-298763"></A>Figure 18-11 <A NAME="50422088_73995"></A>Specifying clamp conditions for B-curves</P>
+<P>
+<A NAME="50422088_pgfId-298764"></A>You should also supply a set of axes using the <CODE>
+clamp_axes</CODE>
+ and <CODE>
+have_clamp_axes</CODE>
+ options, in order to specify the axis along which the coincident values are aligned. </P>
+<P>
+<A NAME="50422088_pgfId-298768"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422088_pgfId-298767"></A>Note: Supplying a clamp can have the effect of removing the continuity in slope and curvature of the B-curve. It can also produce degenerate curves.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-298769"></A>If you supply clamp information, a number of constraints apply. See the documentation for <A HREF=../headers/pk_bcurve_create_spline_2_o_t.html>PK_BCURVE_create_spline_2_o_t</A> for details. </P>
+
+
+<H4>
+<A NAME="50422088_pgfId-298770"></A>18.4.6.8 Specifying a chordal tolerance </H4>
+<P>
+<A NAME="50422088_pgfId-298771"></A>You can specify a chordal tolerance for any B-curve created using the <CODE>
+have_chordal_tol</CODE>
+ and <CODE>
+chordal_tol</CODE>
+ options. These options ensure that the B-curve created by <A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A> is within a specified distance of the chords between consecutive positions, as shown in <A HREF="fd_chap.019.html#50422088_47597"><EM>
+Figure 18-12</EM></A>. </P>
+<P>
+<A NAME="50422088_pgfId-298808"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-134.gif">
+
+<P>
+<A NAME="50422088_pgfId-298810"></A>Figure 18-12 <A NAME="50422088_47597"></A>Specifying a chordal tolerance</P>
+<P>
+<A NAME="50422088_pgfId-298811"></A>To specify a chordal tolerance, set <CODE>
+have_chordal_tol</CODE>
+ to PK_LOGICAL_true, and supply a suitable <CODE>
+chordal_tol</CODE>
+, subject to the following constraints:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-298812"></A><CODE>
+chordal_tol</CODE>
+ is greater than or equal to any <CODE>
+fit_tol</CODE>
+ supplied.</LI>
+<LI>
+<A NAME="50422088_pgfId-298813"></A><CODE>
+n_knots</CODE>
+ is 0.</LI>
+<LI>
+<A NAME="50422088_pgfId-298814"></A><CODE>
+degree</CODE>
+ is 0 or 3.</LI>
+<LI>
+<A NAME="50422088_pgfId-298815"></A><CODE>
+clamp</CODE>
+ is PK_BCURVE_no_clamp_c.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50422088_pgfId-298816"></A>18.4.6.9 Returning several B-curves </H4>
+<P>
+<A NAME="50422088_pgfId-298817"></A>By default, <A HREF=../headers/pk_bcurve_create_spline_2.html>PK_BCURVE_create_spline_2</A> returns a single B-curve. However, you can use the <CODE>
+n_breaks</CODE>
+ and <CODE>
+break_indices</CODE>
+ options to specify positions where you want to split the B-curve, thereby allowing you to create smooth chains of B-curves from the data. </P>
+<P>
+<A NAME="50422088_pgfId-298821"></A><A HREF="fd_chap.019.html#50422088_91286"><EM>
+Figure 18-13</EM></A> shows a simple example in which the resultant B-curve is split into three components by specifying breaks at the positions shown.</P>
+<P>
+<A NAME="50422088_pgfId-298855"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-135.gif">
+
+<P>
+<A NAME="50422088_pgfId-298857"></A>Figure 18-13 <A NAME="50422088_91286"></A>Returning several B-curves from the splining operation</P>
+
+
+<H4>
+<A NAME="50422088_pgfId-298858"></A>18.4.6.10 Update control </H4>
+<P>
+<A NAME="50422088_pgfId-781314"></A>If your application relies on reproducing behaviour when updating models built using earlier versions of Parasolid, you can use the <CODE>
+update</CODE>
+ option to help eliminate differences in rebuild results. This option lets you turn off some of the enhancements to general splining, to ensure that you get the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_spline_update_t.html>PK_spline_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<P>
+<A NAME="50422088_pgfId-756103"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422088_pgfId-756102"></A>Note: The default value is <A HREF=../headers/pk_spline_update_t.html>PK_spline_update_default_c</A> which uses all appropriate general splining enhancements. Setting to a non-default value disables all appropriate general splining enhancements.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422088_pgfId-298902"></A>	18.4.7 	<A NAME="50422088_marker-298901"></A>Splining B-surfaces </H3>
+<P>
+<A NAME="50422088_pgfId-298903"></A>You can create B-surfaces using splining techniques by interpolating a mesh of points using <A NAME="50422088_marker-298904"></A><A HREF=../headers/pk_bsurf_create_splinewise.html>PK_BSURF_create_splinewise</A>. The points form the corners of the patches of a surface.</P>
+<P>
+<A NAME="50422088_pgfId-298907"></A><A NAME="50422088_marker-298905"></A>Like B-curves, B-surfaces created by <A NAME="50422088_marker-298906"></A><A HREF=../headers/pk_bsurf_create_splinewise.html>PK_BSURF_create_splinewise</A> can be periodic in either the u or the v directions to form a “tubular” surface, or in both directions to form a “toroidal” surface, as shown in <A HREF="fd_chap.019.html#50422088_57742"><EM>
+Figure 18-14</EM></A>.</P>
+<P>
+<A NAME="50422088_pgfId-568776"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-136.gif">
+
+<P>
+<A NAME="50422088_pgfId-299472"></A>Figure 18-14 <A NAME="50422088_57742"></A>A periodic surface in either the u or v directions</P>
+<P>
+<A NAME="50422088_pgfId-299476"></A><A NAME="50422088_marker-299473"></A>B-surfaces may be clamped along a boundary by specifying the <A NAME="50422088_marker-299474"></A><A NAME="50422088_marker-299475"></A>first derivatives on the relevant boundary at the spline points. For example, the first row of points supplied to <A HREF=../headers/pk_bsurf_create_splinewise.html>PK_BSURF_create_splinewise</A> form the v = 0 boundary of the splined surface, so to clamp this boundary, vectors representing the first derivatives with respect to the v parameter at each spline point of the row should be supplied.</P>
+<P>
+<A NAME="50422088_pgfId-569107"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-137.gif">
+
+<P>
+<A NAME="50422088_pgfId-300339"></A>Figure 18-15 A surface clamped along a boundary by specifying the first derivatives</P>
+<P>
+<A NAME="50422088_pgfId-300342"></A><A NAME="50422088_marker-300340"></A><A NAME="50422088_marker-300341"></A>If two adjacent boundaries of a B-surface are clamped then the derivative with respect to both u and v at the corner where the clamped boundaries meet can be specified. This vector is called a twist vector.</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-300347"></A>	18.4.8 	<A NAME="50422088_marker-300343"></A><A NAME="50422088_marker-300344"></A><A NAME="50422088_marker-300345"></A><A NAME="50422088_47759"></A>Rebuilding curves and surfaces </H3>
+<P>
+<A NAME="50422088_pgfId-300351"></A>Parasolid provides the functions <A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A> and <A HREF=../headers/pk_bsurf_create_fitted.html>PK_BSURF_create_fitted</A> to let you build B-curves and B-surfaces from a set of points sampled from existing curves or surfaces: a process often referred to as curve or surface fitting. These functions are principally used in the following ways:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300352"></A>To improve the quality of existing geometry. For example after importing curve or surface data into Parasolid, you may decide to rebuild data that is not C2 continuous using these functions.</LI>
+<LI>
+<A NAME="50422088_pgfId-300356"></A>To create a geometry given only a definition of a curve or surface, rather than actual geometric data. For example you can create a B-curve based on the definition of a sine wave. </LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-300357"></A>These functions accept a curve or surface, or an evaluator function that defines a curve or surface, together with options that control the final result. Parasolid then fits a B-curve or B-surface to the supplied curve or surface data by sampling points. The returned B-geometry is guaranteed to be C2-continuous.</P>
+<P>
+<A NAME="50422088_pgfId-569929"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-138.gif">
+
+<P>
+<A NAME="50422088_pgfId-300459"></A>Figure 18-16 A B-curve created by tolerantly fitting a set of points</P>
+<P>
+<A NAME="50422088_pgfId-300460"></A>All input to <A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A> and <A HREF=../headers/pk_bsurf_create_fitted.html>PK_BSURF_create_fitted</A> is done via options structures. The information that you enter falls into the following categories:</P>
+<P>
+<A NAME="50422088_pgfId-300500"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300463"></A>Information</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300465"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300467"></A>Curve or surface</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300469"></A>The geometry information (as appropriate) that you are using to create B-geometry. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300471"></A>Range</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300473"></A>A parameter range for the geometry. </P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300474"></A>For curves, a single parameter range is supplied. </LI>
+<LI>
+<A NAME="50422088_pgfId-300475"></A>For surfaces, both u and v ranges are supplied. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300477"></A>Tolerance</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300479"></A>Distance and angular tolerance values that are used to determine how closely the resulting B-geometry will fit to the supplied geometry information. Parasolid uses these values to decide how to sample points from the supplied information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300484"></A>Interpolation parameters</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300486"></A>An array of parameter values that lie within the specified range. The resulting B-geometry is guaranteed to pass through the sample points at these parameter values, as shown in <A HREF="fd_chap.019.html#50422088_72141"><EM>
+Figure 18-17</EM></A>. </P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300490"></A>For curves, a single array of interpolation parameters is supplied. </LI>
+<LI>
+<A NAME="50422088_pgfId-300491"></A>For surfaces, two arrays of interpolation parameters are supplied, in the u and v directions.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300493"></A>Parameterisation options (<A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A> only)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300495"></A>The <CODE>
+preserve_parameterisation</CODE>
+ option dictates how closely the parameterisation of the resulting B-curve resembles that of the input curve. This option may take the following values:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300496"></A>PK_LOGICAL_true (the default). For every parameter <EM>
+t</EM> in the parameter range, if both the input curve and the resulting B-curve are evaluated at <EM>
+t</EM> to give points <EM>
+p1</EM> and <EM>
+p2</EM>, respectively, the distance between <EM>
+p1</EM> and <EM>
+p2</EM> is less than the input tolerance value.</LI>
+<LI>
+<A NAME="50422088_pgfId-300497"></A>PK_LOGICAL_false. For every parameter <EM>
+t</EM> in the parameter range, if the resulting B-curve is evaluated at <EM>
+t</EM> to give a point <EM>
+p</EM>, the distance between <EM>
+p</EM> and the <EM>
+closest point</EM> on the input curve is less than the input tolerance value.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-300498"></A>In either case, the geometry of the resulting B-curve matches that of the input curve to within the input tolerance.</P>
+<ADDRESS>
+<A NAME="50422088_pgfId-300499"></A>Note: By setting <CODE>
+preserve_parameterisation</CODE>
+ to PK_LOGICAL_false in <A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A>, B-curves with far fewer knots may be created.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-300501"></A>The functions return the resulting B-geometry, together with a structure of fault information that contains details about the maximum distance and angular errors in the fitting operation. </P>
+<P>
+<A NAME="50422088_pgfId-571223"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-139.gif">
+
+<P>
+<A NAME="50422088_pgfId-300604"></A>Figure 18-17 <A NAME="50422088_72141"></A>A B-curve fitted using interpolation parameters</P>
+<P>
+<A NAME="50422088_pgfId-300605"></A>If you are improving the quality of existing geometry, you just need to pass in the relevant curve or surface.</P>
+<P>
+<A NAME="50422088_pgfId-300606"></A>If you want to create a B-curve or B-surface from a geometry definition, you need to provide Parasolid with the following information:</P>
+<P>
+<A NAME="50422088_pgfId-300642"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300612"></A>Information</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300614"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300616"></A>An evaluator function</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300618"></A>A function you define that, when passed appropriate data, returns point and derivative information that can be used as a sample data point for the new B-geometry. This function needs to receive parameter, derivative, and directional information, as well as the evaluator data described below. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300620"></A>Evaluator data</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300622"></A>A pointer to a set of data that is passed to the evaluator function. This data should be provided by your application and is used, in conjunction with the evaluator function, to generate sample data. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300624"></A>Dimension</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300626"></A>In the case of curve fitting, the dimension of the curve to be fitted. This is not required in the case of surface fitting. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300628"></A>Derivative information</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300630"></A>The highest derivative that can be returned by the evaluator function (in both u and v ranges in the case of surfaces). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300632"></A>Topology information</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300634"></A>Whether the curve or surface is periodic and/or closed (in both u and v ranges in the case of surfaces). </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300636"></A>Discontinuities</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300641"></A>Information about any known discontinuities in the curve or surface. Parasolid does not attempt to maintain C2 continuity at any parameter specified as a discontinuity (in both u and v ranges in the case of surfaces). </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-300645"></A><A NAME="50422088_marker-300643"></A><A NAME="50422088_marker-300644"></A>If you need to create several B-curves simultaneously, each with the same parameterisation and knot-set, you can use <A NAME="50422088_marker-300646"></A><A HREF=../headers/pk_bcurve_create_by_fitting.html><A HREF=../headers/pk_bcurve_create_by_fitting.html>PK_BCURVE_create_by_fitting</A></A> instead. This function takes a broadly similar set of options as <A HREF=../headers/pk_bcurve_create_fitted.html><A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A></A>, but can return several B-curves instead of just one. However, <A NAME="50422088_marker-300647"></A><A HREF=../headers/pk_bcurve_create_by_fitting.html><A HREF=../headers/pk_bcurve_create_by_fitting.html>PK_BCURVE_create_by_fitting</A></A> differs from <A HREF=../headers/pk_bcurve_create_fitted.html><A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A></A> in the following ways:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300648"></A>It only ensures that the resulting B-curves are continuous in their first derivatives.</LI>
+<LI>
+<A NAME="50422088_pgfId-300652"></A>It uses a different method to create sample data for Parasolid curves: an internal chain-of-curves evaluator.</LI>
+<P>
+<A NAME="50422088_pgfId-300654"></A><A NAME="50422088_marker-300653"></A><A HREF=../headers/pk_bcurve_create_by_fitting.html>PK_BCURVE_create_by_fitting</A> fits B-curves to <EM>
+chains</EM> - connected sets of trimmed curves defined by an array of curves and a matching array of parameter intervals - as shown in <A HREF="fd_chap.019.html#50422088_80026"><EM>
+Figure 18-18</EM></A>.</P>
+</UL>
+<P>
+<A NAME="50422088_pgfId-571575"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-140.gif">
+
+<P>
+<A NAME="50422088_pgfId-300699"></A>Figure 18-18 <A NAME="50422088_80026"></A>A B-curve fitted to a chain of curves</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-300701"></A>	18.4.9 	<A NAME="50422088_23364"></A>Creating constrained surfaces </H3>
+<P>
+<A NAME="50422088_pgfId-300702"></A>You can use <A HREF=../headers/pk_bsurf_create_constrained.html>PK_BSURF_create_constrained</A> to create a B-surface from a cloud of constraining points. This function creates geometry based on a set of positions and, optionally a set of associated normal data. The shape of the surface that is created is constrained by these positions, and by their normals, if supplied. To further constrain the resulting surface, you can also supply parameterisation information for the set of positions. </P>
+<P>
+<A NAME="50422088_pgfId-300706"></A><A HREF="fd_chap.019.html#50422088_94152"><EM>
+Figure 18-19</EM></A> shows an example in which a B-surface has been created from a set of 7 position vectors, together with the normals of those position vectors. </P>
+<P>
+<A NAME="50422088_pgfId-300707"></A>All information is passed into <A HREF=../headers/pk_bsurf_create_constrained.html>PK_BSURF_create_constrained</A> using a single received options structure. The options available are as follows:</P>
+<P>
+<A NAME="50422088_pgfId-300764"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300710"></A>Options</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300712"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-300714"></A>n_positions</PRE>
+<PRE><A NAME="50422088_pgfId-300715"></A>positions</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300717"></A>Position constraints for <A HREF=../headers/pk_bsurf_create_constrained.html>PK_BSURF_create_constrained</A>. Each position in this array denotes a point in the cloud of constraining points used to create the surface.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-300719"></A>uvs</PRE>
+<PRE><A NAME="50422088_pgfId-300720"></A>uv_surface</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300722"></A>Parameterisation information for the <CODE>
+positions</CODE>
+ passed to <A HREF=../headers/pk_bsurf_create_constrained.html>PK_BSURF_create_constrained</A>. You can specify this information either by:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300723"></A>Supplying an array of <CODE>
+uvs</CODE>
+, one for each specified position.</LI>
+<LI>
+<A NAME="50422088_pgfId-300724"></A>Supplying a single <CODE>
+uv_surface</CODE>
+. Parameterisation information is then derived by projecting normals from this surface onto the supplied <CODE>
+positions</CODE>
+. </LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-300728"></A>If you supply neither of these, Parasolid derives parameterisation information automatically. </P>
+<ADDRESS>
+<A NAME="50422088_pgfId-300729"></A>Note: You should not supply both <CODE>
+uvs</CODE>
+ and <CODE>
+uv_surface</CODE>
+. </ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-300731"></A>n_normals</PRE>
+<PRE><A NAME="50422088_pgfId-300732"></A>normals</PRE>
+<PRE><A NAME="50422088_pgfId-300733"></A>normal_indices</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300735"></A>Normal constraint information for the <CODE>
+positions</CODE>
+ passed to <A HREF=../headers/pk_bsurf_create_constrained.html>PK_BSURF_create_constrained</A>. If you supply this information, then both <CODE>
+normals</CODE>
+ and <CODE>
+normal_indices</CODE>
+ should be arrays of length <CODE>
+n_normals</CODE>
+.</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300736"></A><CODE>
+normals</CODE>
+ contains the normal information.</LI>
+<LI>
+<A NAME="50422088_pgfId-300737"></A><CODE>
+normal_indices</CODE>
+ is an array mapping normal information onto the supplied <CODE>
+positions</CODE>
+. For example, a 0 entry in <CODE>
+normal_indices</CODE>
+ indicates that the corresponding normal in <CODE>
+normals</CODE>
+ should be used for the first position supplied in <CODE>
+positions</CODE>
+. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-300739"></A>tolerance</PRE>
+<PRE><A NAME="50422088_pgfId-300740"></A>angular_tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300742"></A>Tolerance information for the resulting B-surface:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300743"></A>The B-surface matches position constraints to within the supplied <CODE>
+tolerance</CODE>
+.</LI>
+<LI>
+<A NAME="50422088_pgfId-300744"></A>The B-surface matches normal constraints to within the supplied <CODE>
+angular_tolerance</CODE>
+.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-300746"></A>optimise</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-300748"></A>Whether to optimise the operation for performance or improved surface smoothness. This option can take the following values:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300749"></A><A HREF=../headers/pk_constrained_opt_t.html>PK_constrained_opt_perf_c</A>: Optimise for performance. This is the default. </LI>
+<LI>
+<A NAME="50422088_pgfId-300750"></A><A HREF=../headers/pk_constrained_opt_t.html>PK_constrained_opt_smoothness_c</A>: Optimise for better quality surfaces. The resulting surfaces will typically have lower curvatures, but the algorithm may be slower. In addition, the surfaces may require a larger number of control points. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-300752"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-773448"></A>If your application relies on reproducing behaviour when updating models built using earlier versions of Parasolid, you can use the <CODE>
+update</CODE>
+ option to help eliminate differences in rebuild results. This option lets you turn off some of the enhancements to constrained surface creation, to ensure that you get the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_constrained_update_t.html>PK_constrained_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<ADDRESS>
+<A NAME="50422088_pgfId-773534"></A>Note: The default value is <A HREF=../headers/pk_constrained_update_t.html>PK_constrained_update_default_c</A> which uses all appropriate constrained surface creation enhancements. Setting to a non-default value disables all appropriate constrained surface enhancements.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422088_pgfId-781640"></A>&nbsp;</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-300798"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-141.gif">
+
+<P>
+<A NAME="50422088_pgfId-300800"></A>Figure 18-19 <A NAME="50422088_94152"></A>Creating constrained surfaces</P>
+<P>
+<A NAME="50422088_pgfId-300807"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422088_pgfId-300803"></A>Note: <A HREF=../headers/pk_bsurf_create_constrained.html>PK_BSURF_create_constrained</A> does not impose specific limitations on the data passed to it, but its performance and memory requirement are dependent on the number of constraints you specify and the tolerances to be achieved. Whenever possible, follow these guidelines:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-300804"></A>Limit the number of constraints to a few hundred.</LI>
+<LI>
+<A NAME="50422088_pgfId-300805"></A>Use the default <CODE>
+tolerance</CODE>
+ (1.0e-5).</LI>
+<LI>
+<A NAME="50422088_pgfId-300806"></A>Supply an <CODE>
+angular_tolerance</CODE>
+ of half a degree (about 0.0087 radian) or greater.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422088_pgfId-300822"></A>	18.4.10 	<A NAME="50422088_marker-300820"></A><A NAME="50422088_marker-300821"></A>Lofting </H3>
+<P>
+<A NAME="50422088_pgfId-300827"></A><A NAME="50422088_marker-300823"></A><A NAME="50422088_marker-300824"></A><A NAME="50422088_marker-300825"></A><A NAME="50422088_marker-300826"></A>A B-surface can be created by interpolating a set of pre-defined B-curves using <A NAME="50422088_marker-300828"></A><A HREF=../headers/pk_bcurve_make_bsurf_lofted.html>PK_BCURVE_make_bsurf_lofted</A>. This is called lofting.</P>
+<P>
+<A NAME="50422088_pgfId-300830"></A><A NAME="50422088_marker-300829"></A>The surface is continuous up to second order in the loft direction and each curve lies along a constant v parameter line.</P>
+<P>
+<A NAME="50422088_pgfId-572146"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-142.gif">
+
+<P>
+<A NAME="50422088_pgfId-301909"></A>Figure 18-20 A B-surface created by lofting</P>
+<P>
+<A NAME="50422088_pgfId-301910"></A>Various controls can be put on the lofting to alter the shape of the lofted surface. Some of these are mutually exclusive. For example, asking for both <A NAME="50422088_marker-301911"></A><A NAME="50422088_marker-301912"></A>clamped and <A NAME="50422088_marker-301913"></A><A NAME="50422088_marker-301914"></A>periodic end conditions is invalid. The controls are:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-301916"></A><A NAME="50422088_marker-301915"></A>The resulting surface can be made periodic in the loft direction in which case the surface returns to the first curve and meets itself with <A NAME="50422088_marker-301917"></A>C2 continuity (curvature-continuous).</LI>
+<LI>
+<A NAME="50422088_pgfId-301919"></A><A NAME="50422088_marker-301918"></A>The lofted surface can degenerate to a point at either the start or the end (or both) of the loft. This degeneracy may be supplied either as a single point or as a degenerate b-spline curve. By using a degenerate b-spline curve you retain greater control when lofting curves that are rational.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-573919"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-574531"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-143.gif">
+
+<P>
+<A NAME="50422088_pgfId-302238"></A>Figure 18-21 A lofted surface that is degenerate at both ends</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-302240"></A><A NAME="50422088_marker-302239"></A>If the supplied curves have differing knot vectors then the knot vectors can be amalgamated. That is, the resulting knot vector for the curves is the union of all the curve knot vectors by the addition of corresponding knot points on all of the relevant curves. However, this can greatly increase the number of patches on the surface.</LI>
+<P>
+<A NAME="50422088_pgfId-302242"></A><A NAME="50422088_marker-302241"></A><A HREF=../headers/pk_bcurve_make_matched.html>PK_BCURVE_make_matched</A> is supplied to allow you to do this amalgamation outside of lofting before passing the curves in.</P>
+</UL>
+<P>
+<A NAME="50422088_pgfId-574913"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-575840"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-144.gif">
+
+<P>
+<A NAME="50422088_pgfId-302636"></A>Figure 18-22 Curves with and without amalgamation</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-302637"></A>Similar to splining, a knot vector for the loft direction may be supplied.</LI>
+<LI>
+<A NAME="50422088_pgfId-302640"></A><A NAME="50422088_marker-302638"></A><A NAME="50422088_marker-302639"></A>Degenerate segments can be added to the start and end curves when lofting. A degenerate segment is one which has zero length, and causes a patch of the resultant lofted surface to have a degenerate boundary. The diagram below shows a typical degenerate segment:</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-577780"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-578158"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-145.gif">
+
+<P>
+<A NAME="50422088_pgfId-302751"></A>Figure 18-23 A degenerate segment added to a curve</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-302752"></A>The resulting surface can be clamped along the first or last supplied curve using either of the following two methods to specify derivatives across the relevant curves: </LI>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-302754"></A><A NAME="50422088_marker-302753"></A>clamp the surface with a list of derivative vectors</LI>
+<LI>
+<A NAME="50422088_pgfId-302756"></A><A NAME="50422088_marker-302755"></A>clamp the surface using a derivative B-spline curve.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-302760"></A>For further information see <A HREF="fd_chap.124.html#50422207_12301">Chapter B, “The Mathematical Form Of B-Geometry”</A>.</P>
+<P>
+<A NAME="50422088_pgfId-302761"></A>Twist vectors at either of the corners of a clamped boundary may be supplied, and have a similar effect to clamping in splining.</P>
+<LI>
+<A NAME="50422088_pgfId-302762"></A>The resulting surface may have natural end conditions along the first and last supplied curves. This causes the curvature across the start or end curve to be zero.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422088_pgfId-302769"></A>	18.4.11 	<A NAME="50422088_marker-302763"></A><A NAME="50422088_marker-302764"></A><A NAME="50422088_marker-302765"></A><A NAME="50422088_marker-302766"></A><A NAME="50422088_marker-302767"></A><A NAME="50422088_74473"></A>Constant parameter curves </H3>
+<P>
+<A NAME="50422088_pgfId-302770"></A>You can extract a constant parameter curve from a surface in either its U or V direction using <A HREF=../headers/pk_surf_make_curve_isoparam.html><A HREF=../headers/pk_surf_make_curve_isoparam.html>PK_SURF_make_curve_isoparam</A></A>. This function receives any type of surface (including B-surface types) and returns the constant parameter curve together with, optionally, the interval of the portion of the curve that lies on the surface. Wherever possible, <A HREF=../headers/pk_surf_make_curve_isoparam.html><A HREF=../headers/pk_surf_make_curve_isoparam.html>PK_SURF_make_curve_isoparam</A></A> tries to simplify the extracted constant parameter curve to be in the form of an analytic curve, though you can influence the curve type returned using the <CODE>
+preferred_curve_type</CODE>
+ option. </P>
+<P>
+<A NAME="50422088_pgfId-689647"></A>You can enquire whether a curve on a given surface is a constant parameter using <A HREF=../headers/pk_curve_is_isoparam.html>PK_CURVE_is_isoparam</A>. This function receives a curve with a specific range and a given surface. If the curve is a constant parameter, the surface parameter in which the curve is constant and its value are returned. You can choose to return the surface range occupied by the curve using the <CODE>
+want_interval</CODE>
+ option. You can also choose to return information on how the non-constant surface parameter varies with respect to the parameterisation of the curve using the <CODE>
+want_alignment</CODE>
+ option.</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-302773"></A>	18.4.12 	<A NAME="50422088_marker-302771"></A><A NAME="50422088_marker-302772"></A>Re-parameterising curves </H3>
+<P>
+<A NAME="50422088_pgfId-302775"></A><A NAME="50422088_marker-302774"></A><A HREF=../headers/pk_curve_make_approx.html>PK_CURVE_make_approx</A> creates a re-parameterised approximation of a curve. You can use this function to clean up a badly-parameterised curve without changing the curve’s position in 3-space, as shown in <A HREF="fd_chap.019.html#50422088_10996"><EM>
+Figure 18-24</EM></A>. Two types of parameterisation are possible:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-302779"></A><STRONG>
+Arc-length parameterisation:</STRONG> The parameter value is proportional to the length along the curve</LI>
+<LI>
+<A NAME="50422088_pgfId-302780"></A><STRONG>
+Even parameterisation:</STRONG> This is identical to arc-length parameterisation for all curve types except circles. For circles, even parameterisation is proportional to the angle around the curve, ensuring that a full circle is evenly parameterised from 0 to 2pi.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-578918"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-578919"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-146.gif">
+
+<P>
+<A NAME="50422088_pgfId-302875"></A>Figure 18-24 <A NAME="50422088_10996"></A>Re-parameterisng a badly parameterised curve</P>
+<P>
+<A NAME="50422088_pgfId-302876"></A>Whenever possible, <A HREF=../headers/pk_curve_make_approx.html>PK_CURVE_make_approx</A> uses the same type of geometry in the new curve as was used in the original curve. For example, re-parameterising a straight line or a circular interval creates a new line or circle, respectively. If it is not possible to use the same type of geometry, then a b-curve is used to approximate the original.</P>
+<P>
+<A NAME="50422088_pgfId-302877"></A><A HREF=../headers/pk_curve_make_approx.html>PK_CURVE_make_approx</A> takes a curve, an interval of that curve for which an approximation is to be created, and a set of options. It returns a new curve, a new interval, and a boolean that indicates whether or not the new curve uses the same geometry as the original.</P>
+<P>
+<A NAME="50422088_pgfId-302878"></A>The options that can be set are:</P>
+<P>
+<A NAME="50422088_pgfId-302895"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-302881"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-302883"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-302885"></A>approx_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-302887"></A>The type of approximation to be used on the new curve. This can have two values:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-302888"></A>PK_CURVE_approx_arclength_c - create a curve with arc-length approximation (default)</LI>
+<LI>
+<A NAME="50422088_pgfId-302889"></A>PK_CURVE_approx_even_c - create a curve with even approximation </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-302891"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-302893"></A>The tolerance within which a new curve is created. Default: 0.00001.</P>
+<P>
+<A NAME="50422088_pgfId-302894"></A>This tolerance represents the fit through a series of sample points on the original curve. Values smaller than the default may create an excessive number of vertices on the resulting curve.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422088_pgfId-302900"></A>	18.4.13 	<A NAME="50422088_marker-302896"></A><A NAME="50422088_marker-302897"></A><A NAME="50422088_marker-302898"></A><A NAME="50422088_marker-302899"></A>Isocline curves and isocline surfaces </H3>
+<P>
+<A NAME="50422088_pgfId-302905"></A><A NAME="50422088_marker-302901"></A><A NAME="50422088_marker-302902"></A>Isocline curves and <A NAME="50422088_marker-302903"></A><A NAME="50422088_marker-302904"></A>isocline surfaces are represented in Parasolid by existing geometric entities. This means that, in the general case, Parasolid's representation is approximate and therefore a tolerance argument is used with the functions described in this section. The tolerance is the maximum 3-space deviation allowed between mathematical isocline geometry and the representation.</P>
+<P>
+<A NAME="50422088_pgfId-302906"></A>Isocline curves are normally represented by SP-curves. The basis surface for the SP-curve is the supplied surface on which isocline curves are sought.</P>
+
+<H4>
+<A NAME="50422088_pgfId-302910"></A>18.4.13.1 <A NAME="50422088_marker-302907"></A><A NAME="50422088_marker-302908"></A><A NAME="50422088_marker-302909"></A>Isocline curves </H4>
+<P>
+<A NAME="50422088_pgfId-302912"></A>Parasolid has adopted a boundary definition of an isocline curve. The direction in which the curve parameter along an isocline curve increases is defined as:</P>
+<P>
+<A NAME="50422088_pgfId-302913"></A><STRONG>
+Hold the surface with its normal pointing upwards and move along the isocline curve in the direction from the start to the end, then the surface is steep on the right and not steep on the left.</STRONG> </P>
+<P>
+<A NAME="50422088_pgfId-302917"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422088_pgfId-302916"></A>Note: A position on a surface where any surface tangent makes an angle greater than or equal to zero, and less than the draft angle, with the draw direction is said to be steep.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-302919"></A>To create isocline curves use <A NAME="50422088_marker-302918"></A><A HREF=../headers/pk_surf_make_cus_isocline.html>PK_SURF_make_cus_isocline</A> which, in addition to its primary task of creation, also returns whether or not the surface is steep.</P>
+<P>
+<A NAME="50422088_pgfId-302923"></A><A HREF="fd_chap.019.html#50422088_41567"><EM>
+Figure 18-25</EM></A> illustrates contour-map style diagrams where families of isocline curves have been generated for an arithmetic progression of draft angles and scribed onto their relevant faces.</P>
+<P>
+<A NAME="50422088_pgfId-579380"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-579300"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-147.gif">
+
+<P>
+<A NAME="50422088_pgfId-312251"></A>Figure 18-25 <A NAME="50422088_41567"></A>Contour-map style diagrams</P>
+
+
+<H4>
+<A NAME="50422088_pgfId-312254"></A>18.4.13.2 <A NAME="50422088_marker-312252"></A><A NAME="50422088_marker-312253"></A>Isocline surfaces </H4>
+<P>
+<A NAME="50422088_pgfId-312255"></A>Through any curve there are, in general, two isocline surfaces, which are distinguished as follows:</P>
+<P>
+<A NAME="50422088_pgfId-312256"></A><STRONG>
+If you walk along the curve in the direction from the start parameter to end parameter with your head pointing in the draw direction, then there are two isocline surfaces below you: one to your left and one to your right. These surfaces are called the left surface and the right surface.</STRONG></P>
+<P>
+<A NAME="50422088_pgfId-312257"></A>To create an isocline surface that passes through a given curve use <A NAME="50422088_marker-312258"></A><A HREF=../headers/pk_curve_make_surf_isocline.html>PK_CURVE_make_surf_isocline</A>.</P>
+<P>
+<A NAME="50422088_pgfId-312259"></A>Isocline surfaces are defined by the envelope of a conical cutter whose axis is the draw direction tracing out the reference curve being drafted through at its tip. There are two such resultant surfaces, see <A HREF="fd_chap.019.html#50422088_16471"><EM>
+Figure 18-26</EM></A> for which Parasolid has adopted the previous convention to choose between the two solutions.</P>
+<P>
+<A NAME="50422088_pgfId-589216"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-584502"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-148.gif">
+
+<P>
+<A NAME="50422088_pgfId-313526"></A>Figure 18-26 <A NAME="50422088_16471"></A>Two isocline surfaces and a cutter</P>
+<P>
+<A NAME="50422088_pgfId-313527"></A>Though it is possible to control the <CODE>
+range</CODE>
+ of the isocline surface along the draw direction, the function automatically trims this range back in order to prevent the surface becoming degenerate, see <A HREF="fd_chap.019.html#50422088_41249"><EM>
+Figure 18-27</EM></A> This trimming process attempts to ensure that the surface does not locally self-intersect.</P>
+<P>
+<A NAME="50422088_pgfId-590766"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-590101"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-149.gif">
+
+<P>
+<A NAME="50422088_pgfId-314466"></A>Figure 18-27 <A NAME="50422088_41249"></A>Trimmed isocline surface</P>
+<P>
+<A NAME="50422088_pgfId-314467"></A>If no surface exists which can satisfy the conditions, e.g. the given curve is steep, then there is no solution and the value PK_ENTITY_null is returned.</P>
+
+
+
+<H3>
+<A NAME="50422088_pgfId-507322"></A>	18.4.14 	<A NAME="50422088_90810"></A>Creating a smooth continuous curve </H3>
+<P>
+<A NAME="50422088_pgfId-507376"></A>You can use <A HREF=../headers/pk_edge_make_curve.html>PK_EDGE_make_curve</A> to create a single smooth continuous curve from a chain of connected edges to a given tolerance. The function receives a number of edges, a tolerance and options, and returns tracking information on the curve. The <CODE>
+curve_dir </CODE>
+option is this function is used to determine the direction of the curve.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422088_pgfId-314473"></A>18.5	<A NAME="50422088_marker-314471"></A><A NAME="50422088_marker-314472"></A>Modifying B-curves and B-surfaces 
+
+
+</H1>
+<P>
+<A NAME="50422088_pgfId-314477"></A>Parasolid provides several ways to modify B-curves and B-surfaces in your model. This section describes the main functionality available that is specifically designed to operate with B-geometry. </P>
+<P>
+<A NAME="50422088_pgfId-793424"></A>For examples of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Modify</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H3>
+<A NAME="50422088_pgfId-314479"></A>	18.5.1 	<A NAME="50422088_53473"></A>Adding and removing knots </H3>
+<P>
+<A NAME="50422088_pgfId-314482"></A><A NAME="50422088_marker-314480"></A><A NAME="50422088_marker-314481"></A>A parameter or parameter line can be added to a B-curve or B-surface using <A NAME="50422088_marker-314483"></A><A HREF=../headers/pk_bcurve_add_knot.html>PK_BCURVE_add_knot</A> or <A NAME="50422088_marker-314484"></A><A NAME="50422088_marker-314485"></A><A HREF=../headers/pk_bsurf_add_u_knot.html>PK_BSURF_add_u_knot</A>/<A HREF=../headers/pk_bsurf_add_v_knot.html>PK_BSURF_add_v_knot</A>. This has the effect of increasing the number of segments on a curve or the number of rows or columns of a surface.</P>
+<P>
+<A NAME="50422088_pgfId-314487"></A><A NAME="50422088_marker-314486"></A>Conversely, parameters or parameter lines can be removed from a B-curve or B-surface using <A HREF=../headers/pk_bcurve_remove_knots.html>PK_BCURVE_remove_knots</A> or <A HREF=../headers/pk_bsurf_remove_knots.html>PK_BSURF_remove_knots</A> respectively. These functions both provide options to let you specify:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-314488"></A>The knots to be removed</LI>
+<LI>
+<A NAME="50422088_pgfId-314489"></A>The number of times a knot may be removed</LI>
+<LI>
+<A NAME="50422088_pgfId-314490"></A>The tolerance within which the curve or surface may be modified as a result of the operation</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-314491"></A><A HREF=../headers/pk_bsurf_remove_knots.html>PK_BSURF_remove_knots</A> takes an additional argument to let you specify which parameter direction knots should be removed in. </P>
+<P>
+<A NAME="50422088_pgfId-314495"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422088_pgfId-314494"></A>Note: You can query a B-curve or B-surface for its knots and multiplicities using <A HREF=../headers/pk_bcurve_ask_knots.html>PK_BCURVE_ask_knots</A> and <A HREF=../headers/pk_bsurf_ask_knots.html>PK_BSURF_ask_knots</A> respectively.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422088_pgfId-314497"></A>	18.5.2 	<A NAME="50422088_48307"></A>Clamping knot-sets to have Bezier ends </H3>
+<P>
+<A NAME="50422088_pgfId-314498"></A>Parasolid provides the functions <A HREF=../headers/pk_bcurve_clamp_knots.html>PK_BCURVE_clamp_knots</A> and <A HREF=../headers/pk_bsurf_clamp_knots.html>PK_BSURF_clamp_knots</A> in order to ensure that a B-curve or B-surface has Bezier end conditions. These functions do not return any information after a successful operation. If an input entity already has Bezier end conditions, these functions leave it unmodified.</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-314500"></A>	18.5.3 	<A NAME="50422088_30477"></A>Raising and lowering the degree of B-geometry </H3>
+<P>
+<A NAME="50422088_pgfId-314502"></A><A NAME="50422088_marker-314501"></A>You can use <A HREF=../headers/pk_bcurve_raise_degree.html>PK_BCURVE_raise_degree</A> or <A HREF=../headers/pk_bsurf_raise_degree.html>PK_BSURF_raise_degree</A> to raise the degree of a B-curve or B-surface respectively.</P>
+<P>
+<A NAME="50422088_pgfId-314504"></A><A NAME="50422088_marker-314503"></A>You can use <A HREF=../headers/pk_bcurve_lower_degree.html>PK_BCURVE_lower_degree</A> and <A HREF=../headers/pk_bsurf_lower_degree.html>PK_BSURF_lower_degree</A> to undo the effects of <A HREF=../headers/pk_bcurve_raise_degree.html>PK_BCURVE_raise_degree</A> and <A HREF=../headers/pk_bsurf_raise_degree.html>PK_BSURF_raise_degree</A>. This can be especially useful if raising the degree has resulted in a slightly perturbed curve or surface. </P>
+<P>
+<A NAME="50422088_pgfId-314511"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422088_pgfId-314507"></A>Note: Lowering the degree of a general nth-degree curve or surface is usually not possible. Instead, you should rebuild such B-geometry use the curve and surface fitting functionality described in <A HREF="fd_chap.019.html#50422088_47759">Section 18.4.8, “Rebuilding curves and surfaces”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422088_pgfId-314513"></A>	18.5.4 	<A NAME="50422088_91133"></A>Reparameterising B-geometry </H3>
+<P>
+<A NAME="50422088_pgfId-314515"></A><A NAME="50422088_marker-826663"></A>You can use <A HREF=../headers/pk_bcurve_reparameterise.html>PK_BCURVE_reparameterise</A> or <A HREF=../headers/pk_bsurf_reparameterise.html>PK_BSURF_reparameterise</A> to rescale (uniformly) and translate the knot vector of a given B-curve or B-surface, respectively. B-surfaces can be reparameterised in either the U or the V directions (or both), by setting appropriate options in <A HREF=../headers/pk_bsurf_reparameterise_o_t.html>PK_BSURF_reparameterise_o_t</A>. In addition, you can choose to transpose the U and V directions, or reverse one or both of them. In the context of topology, you can use <A HREF=../headers/pk_face_reparameterise_surf.html>PK_FACE_reparameterise_surf</A> to reparameterise the surfaces of an attached set of faces where a similar set of options is provided. When using these functions, only the curve and surface parameterisation is changed. Position and shape is preserved. </P>
+
+
+<H3>
+<A NAME="50422088_pgfId-314518"></A>	18.5.5 	<A NAME="50422088_32578"></A>Extending B-curves </H3>
+<P>
+<A NAME="50422088_pgfId-314520"></A><A NAME="50422088_marker-314519"></A>You can use <A HREF=../headers/pk_bcurve_extend.html>PK_BCURVE_extend</A> to extend a B-curve in either direction, using one of several methods. This function receives a B-curve, together with an options structure that contains information detailing how the B-curve should be extended. The options structure holds the following fields: </P>
+<P>
+<A NAME="50422088_pgfId-314535"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314523"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314525"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-314527"></A>high_control</PRE>
+<PRE><A NAME="50422088_pgfId-314528"></A>low_control</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314530"></A>The type of extension required at either end of the curve.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-314532"></A>extend_closed</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314534"></A>Whether to extend closed (including periodic) B-curves.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-314536"></A>The fields <CODE>
+high_control</CODE>
+ and <CODE>
+low_control</CODE>
+, each of type <A HREF=../headers/pk_extend_control_t.html>PK_extend_control_t</A>, are structures that contain information describing how to extend the given B-curve at the high- and low-parameter ends of the curve, respectively. They each contain the following fields:</P>
+<P>
+<A NAME="50422088_pgfId-314570"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314539"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314541"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-314543"></A>extension_shape</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314545"></A>The method used to extend the B-curve. The following extension shapes are available:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-314546"></A>Linear (the default), curvature-continuous (soft) and reflective, as used by <A HREF=../headers/pk_body_extend.html>PK_BODY_extend</A>. See <A HREF="fd_chap.049.html#50422121_99946">Section 48.1.4, “Specifying the shape of the extension”</A>, for further details.</LI>
+<LI>
+<A NAME="50422088_pgfId-314552"></A>Natural and arc, as used by <A HREF=../headers/pk_surf_extend.html>PK_SURF_extend</A>. See <A HREF="fd_chap.049.html#50422121_99946">Section 48.1.4, “Specifying the shape of the extension”</A>, for further details.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-314557"></A><A HREF="fd_chap.019.html#50422088_84834"><EM>
+Figure 18-28</EM></A> illustrates the difference between each of these extension shapes. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-314559"></A>extension_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314561"></A>The method used to measure how far to extend the B-curve. You can choose between the following:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-314562"></A>PK_BCURVE_extension_none_c: no extension. This is the default. </LI>
+<LI>
+<A NAME="50422088_pgfId-314563"></A>PK_BCURVE_extension_distance_c: extend by the arc length distance specified by <CODE>
+value</CODE>
+. </LI>
+<LI>
+<A NAME="50422088_pgfId-314564"></A>PK_BCURVE_extension_to_parm_c: extend to the absolute parameter value specified by <CODE>
+value</CODE>
+. For example, if the existing B-curve has a parameter range 0-0.9, then specifying a value of 1.0 will extend the curve so that it has the range 0-1.0. </LI>
+<LI>
+<A NAME="50422088_pgfId-314565"></A>PK_BCURVE_extension_parm_ratio_c: extend by a ratio of the current parameter range, as specified by <CODE>
+value</CODE>
+. For example, if the existing B-curve has a parameter range 0-0.5, then specifying a value of 2 will extend the curve so that it has the range 0-1.5.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422088_pgfId-314567"></A>value</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314569"></A>How far to extend the B-curve, as determined by the specified <CODE>
+extension_type</CODE>
+. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-591819"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-548663"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-150.gif">
+
+<P>
+<A NAME="50422088_pgfId-314663"></A>Figure 18-28 <A NAME="50422088_84834"></A>Shapes available when extending B-curves</P>
+<P>
+<A NAME="50422088_pgfId-314664"></A>The field <CODE>
+extend_closed</CODE>
+, of type <A HREF=../headers/pk_extend_closed_t.html>PK_extend_closed_t</A>, determines whether to extend closed B-curves. It can take the following values:</P>
+<P>
+<A NAME="50422088_pgfId-314682"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314667"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314669"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314671"></A><A HREF=../headers/pk_extend_closed_t.html>PK_extend_closed_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314673"></A>Do not extend closed curves. Parasolid returns a status of PK_BCURVE_extend_unextended_c if the input B-curve is closed. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314675"></A><A HREF=../headers/pk_extend_closed_t.html>PK_extend_closed_non_periodic_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314677"></A>Allow extension of non-periodic closed curves.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314679"></A><A HREF=../headers/pk_extend_closed_t.html>PK_extend_closed_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422088_pgfId-314681"></A>Allow extension of all closed curves.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422088_pgfId-314686"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422088_pgfId-314685"></A>Warning: Extending a closed B-curve will result in a self-intersecting B-curve.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422088_pgfId-314691"></A>18.6	<A NAME="50422088_marker-314687"></A><A NAME="50422088_marker-314688"></A><A NAME="50422088_marker-314689"></A><A NAME="50422088_marker-314690"></A>Entering curves and surfaces into Parasolid 
+
+
+</H1>
+<P>
+<A NAME="50422088_pgfId-314692"></A>There are a few restrictions placed on curves and surfaces created using these methods. These are to ensure that the curve or surface does not self-intersect or have a cusp. Any function which requires a surface that has been checked performs these checks. These checks are only be performed once, with the result being stored in the data structure. <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A> can be used to test if the surface is acceptable to Parasolid for modeling purposes. Full details of the restrictions on parametric curves and surfaces are given in a later section.</P>
+<P>
+<A NAME="50422088_pgfId-314693"></A>For reasons of performance it is recommended that any rational curve or surface whose weights are all identical be entered as non-rational and the weights ignored.</P>
+
+<H3>
+<A NAME="50422088_pgfId-314699"></A>	18.6.1 	<A NAME="50422088_marker-314694"></A><A NAME="50422088_marker-314695"></A><A NAME="50422088_marker-314696"></A><A NAME="50422088_marker-314697"></A><A NAME="50422088_marker-314698"></A>Creating sheet bodies from B-curves and B-surfaces </H3>
+<P>
+<A NAME="50422088_pgfId-314702"></A><A NAME="50422088_marker-314700"></A><A NAME="50422088_marker-314701"></A>A B-curve or B-surface, or a portion of one, can be made into a wire or sheet body by <A NAME="50422088_marker-314703"></A><A HREF=../headers/pk_curve_make_wire_body_2.html>PK_CURVE_make_wire_body_2</A> and <A NAME="50422088_marker-314704"></A><A HREF=../headers/pk_surf_make_sheet_body.html>PK_SURF_make_sheet_body</A>. The form of the resulting body is dependent on whether or not the B-curve or B-surface passes the composite geometry checks. When it does not pass the composite geometry checks Parasolid splits it as required in order to produce the minimum number of edges/faces possible.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422088_pgfId-314707"></A>18.7	<A NAME="50422088_marker-314705"></A><A NAME="50422088_marker-314706"></A>Modeling with B-curve and B-surface geometry 
+
+
+</H1>
+<P>
+<A NAME="50422088_pgfId-314709"></A><A NAME="50422088_marker-314708"></A>This section describes some of the ways of building models incorporating B-geometry. It assumes that the user has already created B-curves or B-surfaces, and input them to Parasolid as wires or sheets.</P>
+
+<H3>
+<A NAME="50422088_pgfId-314714"></A>	18.7.1 	<A NAME="50422088_marker-314710"></A><A NAME="50422088_marker-314711"></A><A NAME="50422088_marker-314712"></A><A NAME="50422088_marker-314713"></A>Sweeping and spinning </H3>
+<P>
+<A NAME="50422088_pgfId-314719"></A><A NAME="50422088_marker-314715"></A><A NAME="50422088_marker-314716"></A><A NAME="50422088_marker-314717"></A><A NAME="50422088_marker-314718"></A>All wires and sheets, except for foreign geometry, can be swept or spun using <A NAME="50422088_marker-314720"></A><A HREF=../headers/pk_body_spin.html>PK_BODY_spin</A> and <A NAME="50422088_marker-314721"></A><A HREF=../headers/pk_body_sweep.html>PK_BODY_sweep</A>, in the same way as any other wire or sheet.</P>
+<P>
+<A NAME="50422088_pgfId-314722"></A>A wire is swept or spun into a sheet, and a sheet into a solid. It is also possible to make a profile by scribing B-curves onto a face until a closed loop is formed, then sweeping or spinning the profile to make a solid body.</P>
+
+<H4>
+<A NAME="50422088_pgfId-314723"></A>18.7.1.1 Examples </H4>
+
+<H4>
+<A NAME="50422088_pgfId-314724"></A>Example 1:</H4>
+<P>
+<A NAME="50422088_pgfId-314725"></A><STRONG>
+Sheet body made by spinning a composite B-curve wire</STRONG> </P>
+<P>
+<A NAME="50422088_pgfId-592124"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-592045"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-151.gif">
+
+<P>
+<A NAME="50422088_pgfId-314960"></A>Figure 18-29 A sheet body created by spinning a composite B-curve wire</P>
+
+
+<H4>
+<A NAME="50422088_pgfId-314961"></A>Example 2:</H4>
+<P>
+<A NAME="50422088_pgfId-314962"></A><STRONG>
+Solid body made by sweeping a planar profile composed of B-curves and straight lines</STRONG> </P>
+<P>
+<A NAME="50422088_pgfId-592774"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-592488"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-152.gif">
+
+<P>
+<A NAME="50422088_pgfId-315062"></A>Figure 18-30 A solid body created by sweeping a planar profile</P>
+<P>
+<A NAME="50422088_pgfId-593607"></A>&nbsp;</P>
+
+
+<H4>
+<A NAME="50422088_pgfId-593609"></A>Example 3:</H4>
+<P>
+<A NAME="50422088_pgfId-315064"></A><STRONG>
+Solid body made by spinning a B-surface sheet</STRONG> </P>
+<P>
+<A NAME="50422088_pgfId-315232"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-153.gif">
+
+<P>
+<A NAME="50422088_pgfId-315233"></A>Figure 18-31 A solid body created by spinning a B-surface sheet</P>
+
+
+
+
+<H3>
+<A NAME="50422088_pgfId-315239"></A>	18.7.2 	<A NAME="50422088_marker-315234"></A><A NAME="50422088_marker-315235"></A><A NAME="50422088_marker-315236"></A><A NAME="50422088_marker-315237"></A><A NAME="50422088_marker-315238"></A>Tweaking </H3>
+<P>
+<A NAME="50422088_pgfId-315243"></A><A NAME="50422088_marker-315240"></A><A NAME="50422088_marker-315241"></A>The tweak operation, supported by <A NAME="50422088_marker-315242"></A><A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A>, can be used to replace the surface of a face by a B-surface. It automatically extends or reduces the adjacent faces, if possible, to meet the B-surface within a specified tolerance, provided this does not change the topology. </P>
+<P>
+<A NAME="50422088_pgfId-315244"></A>Top face of cylinder tweaked to a B-surface:</P>
+<P>
+<A NAME="50422088_pgfId-594248"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-593804"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-154.gif">
+
+<P>
+<A NAME="50422088_pgfId-315364"></A>Figure 18-32 Tweaking the top face of a cylinder to a B-surface</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-315367"></A>	18.7.3 	<A NAME="50422088_marker-315365"></A><A NAME="50422088_marker-315366"></A>Capping </H3>
+<P>
+<A NAME="50422088_pgfId-315370"></A><A NAME="50422088_marker-315368"></A><A NAME="50422088_marker-315369"></A>If a sheet created from a B-surface is closed in one direction, it is often possible to make a solid body by 'capping' the holes in the body. This requires the edge loops surrounding the holes to be simple enough to be fitted by a single surface - for example, if the edges are coplanar then a plane is used to cover the hole. If a wire body is spun about an axis through a full rotation, the edge loops are always coplanar. The function which supports capping is <A NAME="50422088_marker-315371"></A><A HREF=../headers/pk_face_make_solid_bodies.html>PK_FACE_make_solid_bodies</A>. </P>
+<P>
+<A NAME="50422088_pgfId-315372"></A>A special case is when the surface sheet is already closed through being degenerate: (like a lemon), or because it is closed in both directions (like a torus). In this case, there are no holes to cover, and <A HREF=../headers/pk_face_make_solid_bodies.html>PK_FACE_make_solid_bodies</A> automatically creates a solid from the closed sheet. </P>
+<P>
+<A NAME="50422088_pgfId-315373"></A>Solid made from the faces of the spun sheet body seen earlier, with the ends capped with planar surfaces:</P>
+<P>
+<A NAME="50422088_pgfId-594805"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-594643"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-155.gif">
+
+<P>
+<A NAME="50422088_pgfId-315615"></A>Figure 18-33 Solid created by capping the ends of the sheet body in Fig. 10-18<A NAME="50422088_3YFSmrich"></A></P>
+<P>
+<A NAME="50422088_pgfId-315616"></A>Non-circular torus made from a closed sheet body whose only surface is a doubly periodic B-surface:</P>
+<P>
+<A NAME="50422088_pgfId-595520"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-595246"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-156.gif">
+
+<P>
+<A NAME="50422088_pgfId-315766"></A>Figure 18-34 Non-circular torus created from a closed sheet body</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-315774"></A>	18.7.4 	<A NAME="50422088_marker-315767"></A><A NAME="50422088_marker-315768"></A><A NAME="50422088_marker-315769"></A><A NAME="50422088_marker-315770"></A><A NAME="50422088_marker-315771"></A><A NAME="50422088_marker-315772"></A><A NAME="50422088_marker-315773"></A>Subtracting sheet from solid </H3>
+<P>
+<A NAME="50422088_pgfId-315777"></A><A NAME="50422088_marker-315775"></A><A NAME="50422088_marker-315776"></A>The most useful and reliable way of introducing B-surfaces to a solid model is by using the subtract operation, supported by <A NAME="50422088_marker-315778"></A><A HREF=../headers/pk_body_section_with_sheet_2.html>PK_BODY_section_with_sheet_2</A> or <A NAME="50422088_marker-315779"></A><A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>. This can be performed between a solid body and a B-surface sheet body. The sheet body must be sufficiently large to cut through the solid completely, otherwise the function fails. It may be necessary to extend the sheet body to cut the solid in the required manner; <A NAME="50422088_marker-315780"></A><A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A>, with the PK_FACE_heal_grow_from_parent_c option, or <A HREF=../headers/pk_body_sweep.html>PK_BODY_sweep</A>, can be used to do this. Examples of the use of each of these sequences are shown below.</P>
+<P>
+<A NAME="50422088_pgfId-315781"></A>Block sectioned by subtracting a B-surface sheet body. Resulting bodies moved apart.</P>
+<P>
+<A NAME="50422088_pgfId-596543"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-596544"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-157.gif">
+
+<P>
+<A NAME="50422088_pgfId-315992"></A>Figure 18-35 Sectioning a block by subtracting a B-surface sheet body</P>
+<P>
+<A NAME="50422088_pgfId-315993"></A>In this example the solid needs to be extended before the sheet can be subtracted.</P>
+<P>
+<A NAME="50422088_pgfId-597555"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-597556"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-158.gif">
+
+<P>
+<A NAME="50422088_pgfId-316171"></A>Figure 18-36 Tweaking a solid body to a B-surface</P>
+<P>
+<A NAME="50422088_pgfId-316172"></A>The first method is to remove the top planar face using <A HREF=../headers/pk_face_delete_2.html>PK_FACE_delete_2</A> with the grow option, and then subtract the sheet to produce this:</P>
+<P>
+<A NAME="50422088_pgfId-597977"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-597766"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-159.gif">
+
+<P>
+<A NAME="50422088_pgfId-316323"></A>Figure 18-37 Deleting the top face using the grow option</P>
+<P>
+<A NAME="50422088_pgfId-316324"></A>The second method is to sweep the top face before subtracting, which produces this:</P>
+<P>
+<A NAME="50422088_pgfId-598449"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-598265"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-160.gif">
+
+<P>
+<A NAME="50422088_pgfId-316515"></A>Figure 18-38 Sweeping the top face</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-316518"></A>	18.7.5 	<A NAME="50422088_marker-316516"></A><A NAME="50422088_marker-316517"></A>Sewing </H3>
+<P>
+<A NAME="50422088_pgfId-316521"></A><A NAME="50422088_marker-316519"></A><A NAME="50422088_marker-316520"></A>Sewing is the final method for building B-surface sheets into solids. For further information on this see <A HREF="fd_chap.047.html#50422119_25517">Chapter 46, “Sewing and Knitting”</A>.</P>
+
+
+<H3>
+<A NAME="50422088_pgfId-316528"></A>	18.7.6 	<A NAME="50422088_marker-316525"></A><A NAME="50422088_marker-316526"></A><A NAME="50422088_96098"></A>Restrictions on B-curves and B-surfaces </H3>
+<P>
+<A NAME="50422088_pgfId-316531"></A><A NAME="50422088_marker-316529"></A><A NAME="50422088_marker-316530"></A>There are a number of restrictions on the shape of B-curves and B-surfaces which can be made into wires or sheets. Some, such as the restriction on self-intersection, are designed to prevent the creation of invalid bodies. Others are designed to limit the complexity of curves and surfaces.</P>
+
+<H4>
+<A NAME="50422088_pgfId-316536"></A>18.7.6.1 <A NAME="50422088_marker-316532"></A><A NAME="50422088_marker-316533"></A><A NAME="50422088_marker-316534"></A><A NAME="50422088_marker-316535"></A>Curve restrictions </H4>
+<P>
+<A NAME="50422088_pgfId-316537"></A>The following restrictions apply to B-curves:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-316538"></A>B-curves may not have any first derivative of zero length.</LI>
+<LI>
+<A NAME="50422088_pgfId-316539"></A>B-curves may not contain cusps except at segment ends (knot points).</LI>
+<LI>
+<A NAME="50422088_pgfId-316540"></A>B-curves must, at the minimum, have G0 continuity.</LI>
+<LI>
+<A NAME="50422088_pgfId-316541"></A>B-curves may not self-intersect. </LI>
+<P>
+<A NAME="50422088_pgfId-316542"></A>Checking for self-intersection can be switched ON or OFF in a session using <A NAME="50422088_marker-316543"></A><A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>.</P>
+<P>
+<A NAME="50422088_pgfId-316547"></A>See <A HREF="fd_chap.031.html#50422100_12509">Chapter 30, “Checking”</A> for further information on geometric self-intersection checking. </P>
+</UL>
+<P>
+<A NAME="50422088_pgfId-316548"></A>In addition, if a B-curve is to be attached to an edge:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-316549"></A>It must, at the minimum, have G1 continuity.</LI>
+<LI>
+<A NAME="50422088_pgfId-316550"></A>If it is closed, it must have periodic parameterisation.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-316552"></A>If the B-curve does not obey these restrictions then <A NAME="50422088_marker-316551"></A><A HREF=../headers/pk_curve_make_wire_body_2.html>PK_CURVE_make_wire_body_2</A> splits it into two or more curves. </P>
+
+
+<H4>
+<A NAME="50422088_pgfId-316555"></A>18.7.6.2 <A NAME="50422088_marker-316553"></A><A NAME="50422088_marker-316554"></A>Surface restrictions </H4>
+<P>
+<A NAME="50422088_pgfId-316557"></A><A NAME="50422088_marker-316556"></A>The restrictions on surfaces are divided into two groups - those on the shape of the composite surface and restrictions on surface degeneracies. Degenerate (i.e. two or three sided) B-surfaces are allowed, as are surfaces with partially degenerate boundaries, but only in certain configurations.</P>
+
+<H4>
+<A NAME="50422088_pgfId-316558"></A>Restrictions on B-surface shape </H4>
+<P>
+<A NAME="50422088_pgfId-316559"></A>The following restrictions apply to the shape of a B-surface:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-316560"></A>A B-surface may not contain any zero first order partial derivatives, except at a legal degeneracy (see below). In this situation, the first derivative along the boundary is zero, while the cross boundary first derivative must still be non-zero.</LI>
+<LI>
+<A NAME="50422088_pgfId-316561"></A>B-surfaces may not self-intersect. </LI>
+<P>
+<A NAME="50422088_pgfId-316562"></A>Checking for self-intersection can be switched ON or OFF in a session using <A NAME="50422088_marker-316563"></A><A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A>. See <A HREF="fd_chap.031.html#50422100_12509">Chapter 30, “Checking”</A><A NAME="50422088_SxtLp10josi"></A>.</P>
+<LI>
+<A NAME="50422088_pgfId-316568"></A>B-surfaces must, at the minimum, have G0 continuity.</LI>
+<LI>
+<A NAME="50422088_pgfId-316569"></A>B-surfaces may not contain cusps or ridges except at patch boundaries (knot lines).</LI>
+<LI>
+<A NAME="50422088_pgfId-316570"></A>A B-surface may meet itself in either the u or the v direction or both to form a closed surface. If it does meet itself, then it must do so by two opposite boundary curves being coincident and having identical parameterisation. It is illegal for the surface to meet itself at a single point.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-316571"></A>In addition if a B-surface is to be attached to a face the following composite geometry restrictions apply:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-316572"></A>The surface must have G1 continuity.</LI>
+<LI>
+<A NAME="50422088_pgfId-316573"></A>The constant parameter lines of the surface must have G1 continuity.</LI>
+<LI>
+<A NAME="50422088_pgfId-316574"></A>If the surface is closed in either direction then it must have periodic parameterisation in that direction.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-316576"></A>If the B-surface does not obey these restrictions then <A NAME="50422088_marker-316575"></A><A HREF=../headers/pk_surf_make_sheet_body.html>PK_SURF_make_sheet_body</A> splits it into two or more surfaces.</P>
+
+
+<H4>
+<A NAME="50422088_pgfId-316577"></A>Restrictions on degeneracies </H4>
+<P>
+<A NAME="50422088_pgfId-316579"></A><A NAME="50422088_marker-316578"></A>Degenerate B-surfaces are allowed, but only in certain situations. A degeneracy is a place where a region of the parameter space of the surface reduces to a single point of Cartesian space. In this region one or both first partial derivatives are zero. The restrictions on such degeneracies are:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-316582"></A><A NAME="50422088_marker-316580"></A><A NAME="50422088_marker-316581"></A>Interior Degeneracies - Degeneracies are only allowed along the boundary of a B-surface. They may not occur in the interior, nor may they extend from the boundary inwards. </LI>
+<LI>
+<A NAME="50422088_pgfId-316583"></A>Degeneracies into the surface - The zero derivative of any degeneracy must be along the boundary, not into the surface itself. </LI>
+<LI>
+<A NAME="50422088_pgfId-316584"></A>Partially degenerate boundaries - In general, there must be no partially degenerate boundaries. The only exception to this restriction is that a partially degenerate boundary in the form of an entirely degenerate Bezier patch is allowed. </LI>
+<LI>
+<A NAME="50422088_pgfId-316587"></A><A NAME="50422088_marker-316585"></A><A NAME="50422088_marker-316586"></A>At any point a B-surface may only be degenerate in one of its parameters.   In particular a corner of a B-surface may not be degenerate in both parameters, and a B-surface may not have two adjacent completely degenerate boundaries.</LI>
+</UL>
+
+
+
+
+<H3>
+<A NAME="50422088_pgfId-316590"></A>	18.7.7 	<A NAME="50422088_marker-316588"></A><A NAME="50422088_marker-316589"></A>Restrictions on use </H3>
+<P>
+<A NAME="50422088_pgfId-316592"></A><A NAME="50422088_marker-316591"></A>The restrictions on the use of B-surfaces arise mainly from the property that the surfaces are bounded. This implies that any operation which requires a surface to be extended beyond its boundaries may not be possible. A face on a surface patch often has boundaries inside the patch boundaries; if so, the face may be extended to the patch boundary, but no further. </P>
+<P>
+<A NAME="50422088_pgfId-599582"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-599583"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-161.gif">
+
+<P>
+<A NAME="50422088_pgfId-316858"></A>Figure 18-39 Extending a face to the patch boundary</P>
+<P>
+<A NAME="50422088_pgfId-316859"></A>An example of the manifestations of this restriction is that you cannot transform the side of this block outwards, because it is limited by the boundary of the B-surface on the top face.</P>
+
+<H4>
+<A NAME="50422088_pgfId-316862"></A>18.7.7.1 <A NAME="50422088_marker-316860"></A><A NAME="50422088_marker-316861"></A>Coincident regions </H4>
+<P>
+<A NAME="50422088_pgfId-316863"></A>Parasolid does not support regions of coincidence. Therefore when these occur an error message is returned from the relevant boolean and intersection functions.</P>
+<P>
+<A NAME="50422088_pgfId-600190"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-599891"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-162.gif">
+
+<P>
+<A NAME="50422088_pgfId-316980"></A>Figure 18-40 Coincident regions</P>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422088_pgfId-316983"></A>18.8	<A NAME="50422088_marker-316981"></A><A NAME="50422088_marker-316982"></A>Offset surfaces 
+
+
+</H1>
+<P>
+<A NAME="50422088_pgfId-316986"></A><A NAME="50422088_marker-316984"></A><A NAME="50422088_marker-316985"></A>For the purpose of Parasolid an <EM>
+offset surface</EM> is defined as a smooth, G1-continuous surface, from any point of which the minimum distance to the underlying surface is exactly equal to the required offset distance.</P>
+<P>
+<A NAME="50422088_pgfId-316987"></A>An offset surface may be introduced into a solid body by:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-316988"></A>creating a sheet body from it and using the newly created sheet body to split the solid,</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-600423"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-600324"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-163.gif">
+
+<P>
+<A NAME="50422088_pgfId-317967"></A>Figure 18-41 Using an offset surface to split a solid</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-317968"></A>offsetting faces by tweaking.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-601496"></A>&nbsp;</P>
+<P>
+<A NAME="50422088_pgfId-600970"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-164.gif">
+
+<P>
+<A NAME="50422088_pgfId-318837"></A>Figure 18-42 Offsetting faces by tweaking</P>
+<P>
+<A NAME="50422088_pgfId-318838"></A>Offset surfaces can only be created provided the result contains no:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-318841"></A><A NAME="50422088_marker-318839"></A><A NAME="50422088_marker-318840"></A>cusps,</LI>
+<LI>
+<A NAME="50422088_pgfId-318844"></A><A NAME="50422088_marker-318842"></A><A NAME="50422088_marker-318843"></A>singularities,</LI>
+<LI>
+<A NAME="50422088_pgfId-318847"></A><A NAME="50422088_marker-318845"></A><A NAME="50422088_marker-318846"></A>self-intersections. </LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-318848"></A>As it is not possible to model with self-intersecting surfaces Parasolid checks the geometry of the underlying surface to ensure that the resulting surface is not self-intersecting before creating the offset surface from any surface other than a B-surface. This check is completed regardless of whether <A NAME="50422088_marker-318849"></A><A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A> has been called.</P>
+<P>
+<A NAME="50422088_pgfId-318850"></A>If the surface to be offset is a B-surface, then its offset may only be created if it is capable of passing the composite geometry checks outlined in <A HREF=../headers/pk_geom_check.html><A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A></A>, however checks for self-intersection are not made. The created offset surface may be checked for self-intersection by explicitly calling <A NAME="50422088_marker-318851"></A><A HREF=../headers/pk_session_set_check_self_int.html>PK_SESSION_set_check_self_int</A> and <A HREF=../headers/pk_geom_check.html><A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A></A>.</P>
+<UL>
+<P>
+<A NAME="50422088_pgfId-318852"></A>For further details on geometric self-intersection checking of offset surfaces, see <A HREF="fd_chap.031.html#50422100_12509">Chapter 30, “Checking”</A>.</P>
+</UL>
+<P>
+<A NAME="50422088_pgfId-318856"></A>Wherever possible the surface created are not explicitly of type offset surface but of one of the simple analytic types. For example, a plane always offsets to a plane. This rule also applies where a simple type includes all of the proper offset surface, but extends beyond the region where the offset surface would be meaningful. An example of this is a cone offset outwards. Although the offset surface strictly only extends to a truncated cone, <A NAME="50422088_marker-318857"></A><A HREF=../headers/pk_offset_create.html>PK_OFFSET_create</A> returns the cone surface type, as that includes all of the desired surface.</P>
+<P>
+<A NAME="50422088_pgfId-318858"></A>Therefore it is only the following underlying surface types that lead to an offset surface type:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-318859"></A>B-surface,</LI>
+<LI>
+<A NAME="50422088_pgfId-318860"></A>Foreign Geometry surface,</LI>
+<LI>
+<A NAME="50422088_pgfId-318861"></A>Swept surface,</LI>
+<LI>
+<A NAME="50422088_pgfId-318862"></A>Spun surface,</LI>
+<LI>
+<A NAME="50422088_pgfId-318863"></A>Offset surface. This leads to a new offset of the existing underlying type. </LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-318864"></A>If a sequence of offset operations results in the original surface being recreated, Parasolid automatically discards all the offset surface data and uses the original surface data.</P>
+
+<H3>
+<A NAME="50422088_pgfId-318868"></A>	18.8.1 	<A NAME="50422088_marker-318865"></A><A NAME="50422088_marker-318866"></A><A NAME="50422088_marker-318867"></A>Creating an offset surface </H3>
+<P>
+<A NAME="50422088_pgfId-318870"></A><A NAME="50422088_marker-318869"></A>Their are two offsetting functions available through the PK interface:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-318872"></A><A NAME="50422088_marker-318871"></A><A HREF=../headers/pk_offset_create.html>PK_OFFSET_create</A> constructs an offset surface (type <A HREF=../headers/pk_offset_t.html>PK_OFFSET_t</A>) from the underlying surface; and</LI>
+<LI>
+<A NAME="50422088_pgfId-318874"></A><A NAME="50422088_marker-318873"></A><A HREF=../headers/pk_surf_offset.html>PK_SURF_offset</A> creates a copy of the previous listed underlying surface types that is offset by the given distance.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422088_pgfId-318877"></A>	18.8.2 	<A NAME="50422088_marker-318875"></A><A NAME="50422088_marker-318876"></A>Introducing offset surfaces into a model </H3>
+<P>
+<A NAME="50422088_pgfId-318878"></A>There are three methods of introducing offset surfaces into a model. These are:</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-318879"></A>A body can be expanded by making offsets of the surfaces attached to all its faces, and then tweaking each face to the appropriate offset surface</LI>
+<LI>
+<A NAME="50422088_pgfId-318882"></A>By the use of functions <A NAME="50422088_marker-318880"></A><A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A>, <A NAME="50422088_marker-318881"></A><A HREF=../headers/pk_body_offset_2.html>PK_BODY_offset_2</A>, <A NAME="50422088_marker-318883"></A><A HREF=../headers/pk_face_offset_2.html>PK_FACE_offset_2</A>, <A NAME="50422088_marker-318884"></A><A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A>, and <A NAME="50422088_marker-318885"></A><A HREF=../headers/pk_face_hollow_3.html>PK_FACE_hollow_3</A>.</LI>
+<LI>
+<A NAME="50422088_pgfId-318887"></A>By using <A NAME="50422088_marker-318886"></A><A HREF=../headers/pk_surf_make_sheet_body.html>PK_SURF_make_sheet_body</A> to create a sheet body from an offset surface, and <A NAME="50422088_marker-318888"></A><A HREF=../headers/pk_face_replace_surfs_3.html>PK_FACE_replace_surfs_3</A> to tweak the geometry of a face onto an offset surface. For example, a sheet part might be modeled as follows:</LI>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-318889"></A>A sheet body could be made from a set of surfaces, and another from their offsets.</LI>
+<LI>
+<A NAME="50422088_pgfId-318890"></A>These sheet bodies can then be subtracted, using the subtract option of the <A NAME="50422088_marker-318891"></A><A HREF=../headers/pk_body_section_with_sheet_2.html>PK_BODY_section_with_sheet_2</A> or <A NAME="50422088_marker-318892"></A><A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> function, from a large block, leaving the desired sheet metal part.</LI>
+</UL>
+<P>
+<A NAME="50422088_pgfId-318893"></A>To create a sheet body from a general surface and a wire body from a one or more general curves use <A NAME="50422088_marker-318894"></A><A HREF=../headers/pk_surf_make_sheet_body.html>PK_SURF_make_sheet_body</A> and <A NAME="50422088_marker-318895"></A><A HREF=../headers/pk_curve_make_wire_body_2.html>PK_CURVE_make_wire_body_2</A>. Parametric limits may be supplied to enable the range to be defined. If they are not supplied the default is to use the whole parameter range for the relevant parameter. When the surface or curve is periodic the first parametric limit must lie in the range, and the difference between the two must not exceed the period for the given parameter. If the surface or curve is not periodic, both limits must lie in the range.</P>
+</UL>
+
+<H4>
+<A NAME="50422088_pgfId-318899"></A>18.8.2.1 <A NAME="50422088_marker-318896"></A><A NAME="50422088_marker-318897"></A><A NAME="50422088_marker-318898"></A>Restrictions on offset surfaces </H4>
+<P>
+<A NAME="50422088_pgfId-318900"></A>The following restrictions apply to offset surfaces</P>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-318902"></A><A NAME="50422088_marker-318901"></A>It is not possible to sweep or spin an entity containing an offset surface.</LI>
+<LI>
+<A NAME="50422088_pgfId-318905"></A><A NAME="50422088_marker-318903"></A><A HREF=../headers/pk_body_section_with_surf.html>PK_BODY_section_with_surf</A>/<A NAME="50422088_marker-318904"></A><A HREF=../headers/pk_face_section_with_sheet_2.html>PK_FACE_section_with_sheet_2</A> does not work with an offset surface.</LI>
+<LI>
+<A NAME="50422088_pgfId-318906"></A>Not every intersection curve between pairs of surfaces meeting tangentially is representable. Constant parameter curves are implemented on offset surfaces and are used to:</LI>
+<UL>
+<LI>
+<A NAME="50422088_pgfId-318907"></A>describe the edge of sheet bodies made from general surface types;</LI>
+<LI>
+<A NAME="50422088_pgfId-318908"></A>enable some intersection curves to be described.</LI>
+</UL>
+<LI>
+<A NAME="50422088_pgfId-318909"></A>An offset B-surface is only created if the underlying B-surface fulfills all of the composite geometry requirements to enable it to be attachable to a single face.</LI>
+<LI>
+<A NAME="50422088_pgfId-754747"></A>Restrictions that apply to Foreign Geometry surfaces apply to their offsets.</LI>
+</UL>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.018.html">Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.020.html">Nominal Geometry</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

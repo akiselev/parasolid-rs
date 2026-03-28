@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_simplify_geom</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_simplify_geom</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_BODY_simplify_geom
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>         body,         --- body
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>      local,        --- whether partial replacement allowed
+
+<I>--- returned arguments ---
+</I>int        *const n_geoms,      --- number of geoms returned
+<A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A> **const geoms         --- new geoms (optional)
+)
+</B>
+<A NAME="description"></A>
+<I>This function simplifies the classic geometry of a body where possible.
+</I>
+<A NAME="documentation"></A>
+This function takes a body and attempts to simplify its free form, classic
+geometry.  The body itself, and topological nodes in the body are not affected;
+the geometric ones may be replaced by simpler geometries, and the old
+geometries deleted.  The number of new geometric entities is returned in
+<B>'n_geoms'</B>.  The new geometric entities may be returned in <B>'geoms'</B>.
+
+The output array <B>'geoms'</B> is optional. If it is set to NULL, the function
+will only return the number of new geometries in the body.
+
+
+Two levels of simplification are available:
+
+ o local = PK_LOGICAL_false - Global simplification
+
+            A B-curve or B-surface will only be replaced if a single
+            curve or surface can replace the entire original.
+
+ o local = PK_LOGICAL_true  - Local simplification
+
+            A B-curve or B-surface may be partially replaced by simpler
+            curves or surfaces. A side effect of this is that edges or faces
+            that were originally on the same B-curve or B-surface, may
+            be on different curves or surfaces after the simplification
+
+
+The following simplifications may be made on curves:
+
+        original form           simplified form
+        -------------           ---------------
+        Rational B-curve        Non-rational B-curve, line, circle
+        Non-rational B-curve    line
+
+
+The following simplifications may be made on surfaces:
+
+        original form           simplified form
+        -------------           ---------------
+       Rational B-surface       Non-rational B-surface, plane, cylinder, cone,
+                                sphere, torus
+       Non-rational B-surface   plane
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

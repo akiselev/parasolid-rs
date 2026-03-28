@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_MTOPOL_make_meshes</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_MTOPOL_make_meshes</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_MTOPOL_make_meshes
+(
+<I>--- received arguments ---
+</I>int                              n_mtopols, --- the number of mtopols
+const <A HREF=../headers/pk_mtopol_t.html>PK_MTOPOL_t</A>                mtopols[], --- the mtopols
+const <A HREF=../headers/pk_mtopol_make_meshes_o_t.html>PK_MTOPOL_make_meshes_o_t</A> *options,   --- options
+
+<I>--- returned arguments ---
+</I>int                       *const n_meshes,  --- the number of meshes
+<A HREF=../headers/pk_mesh_t.html>PK_MESH_t</A>                **const meshes     --- the meshes
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates meshes from a collection of mtopols. Optionally,
+the set of mfacets can be expanded by a callback function that uses the
+given mtopols as seeds to propagate out from.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_mtopols_not_same_mesh  <B>'mtopols'</B> not all from same mesh (MILD)
+    PK_ERROR_wrong_mtopol           An input mtopol is not an mfacet (MILD)
+    PK_ERROR_callback_failed        The callback function failed     (MILD)
+
+<A NAME="documentation"></A>
+A mesh or meshes are made from copies of the given <B>'mtopols'</B> which must be
+mfacets. The mesh of which the <B>'mtopols'</B> are elements is unchanged. Duplicate
+entries in <B>'mtopols'</B> are ignored.
+
+The <B>'mtopols'</B> must be mfacets from the same mesh unless the <B>'faces'</B> option is
+non-NULL. If the <B>'faces'</B> option is non-NULL then <B>'mtopols'</B> must be mfacets
+from the meshes attached to the faces in <B>'faces'</B>. If multiple <B>'faces'</B> are
+supplied, mfacets in the resultant <B>'meshes'</B> will inherit connectivity from
+topological edges between faces. Mfacets from different <B>'faces'</B> that border
+a common edge will become adjacent mfacets in the resulting mesh. For <B>'faces'</B>
+from a general body, no more than two faces that meet at a single multi-face
+edge may be supplied.
+
+The mesh components produced by PK_MTOPOL_make_meshes are maximal mfin
+connected sets of mfacets.
+
+The option <B>'select_cb'</B> allows the application to pass a callback function to
+control an mfacet propagation algorithm. This algorithm will propagate
+outwards from the mfacets given as input in the argument <B>'mtopols'</B>, which
+now act as seeds of the propagation. The criterion for propagation must be
+implemented in the callback function and this can either be formulated in
+terms of adjacent mfacets or mfins. The <B>'select_cb'</B> option is not allowed if
+the <B>'n_faces'</B> option is non zero.
+
+If the option <B>'select_type'</B> is set to <A HREF=../headers/pk_selector_type_t.html>PK_selector_type_exclude_c</A>, as
+opposed to the default value <A HREF=../headers/pk_selector_type_t.html>PK_selector_type_include_c</A>, the resulting mesh
+will be created from the set of mfacets which are not selected by the
+application or the callback function.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

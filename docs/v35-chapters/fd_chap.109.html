@@ -1,0 +1,515 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Faceting Output Via GO </TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Faceting Output Via GO </B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.108.html">Facet Mesh Generation</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.110.html">Tabular Output Of Faceting</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294742">108.1	Introduction </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294779">108.2	Output through GO </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294798">108.3	PK_TOPOL_render_facet_go_o_t options </A>
+<UL>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294803">108.3.1	go_normals </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294823">108.3.2	go_parameters </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294846">108.3.3	go_curvatures </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294850">108.3.4	go_edges </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294872">108.3.5	go_strips </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294894">108.3.6	go_interleaved </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294927">108.3.7	go_max_facets_per_strip </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294931">108.3.8	split_strips </A>
+<LI> <A HREF="fd_chap.109.html#50422189_pgfId-294940">108.3.9	consistent_parms </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422189_pgfId-294742"></A>108.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422189_pgfId-294747"></A><A NAME="50422189_marker-329813"></A><A NAME="50422189_marker-329814"></A><A NAME="50422189_marker-329815"></A><A NAME="50422189_marker-329816"></A>This chapter describes the output of facet geometry through the Graphical Output (GO) interface. <A NAME="50422189_marker-329818"></A>This is the output method used by <A NAME="50422189_marker-329819"></A><A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>.</P>
+<P>
+<A NAME="50422189_pgfId-332416"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422189_pgfId-332430"></A>Note: This function offers partial support for topology that has facet geometry (meshes and plines). See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422189_pgfId-294752"></A>There is further information on this method of graphical output in <A HREF="di_chap.05.html#42323">Chapter 4, “Graphical Output”</A>, of the Parasolid <A HREF=../di_index.html>Downward Interfaces</A> Manual.</P><P>
+<A NAME="50422189_pgfId-324252"></A>For an example of this faceting functionality, see the code example in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+Support\Rendering</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder</P>
+<P>
+<A NAME="50422189_pgfId-294760"></A>See <A HREF="fd_chap.110.html#50422190_27922">Chapter 109, “Tabular Output Of Faceting”</A>, for information on Parasolid’s alternative method of faceting: the tabular output of facet geometry. </P>
+<P>
+<A NAME="50422189_pgfId-294761"></A>Both methods of faceting can take advantage of the multi-threading capabilities of a processor, if SMP has been enabled in the Parasolid session:</P>
+<UL>
+<LI>
+<A NAME="50422189_pgfId-294765"></A>If faceting output via the GO, then you need to use the <CODE>
+go_interleaved</CODE>
+ option. See the description of <CODE>
+go_interleaved</CODE>
+ in <A HREF="fd_chap.109.html#50422189_25908">Section 108.3, “<A HREF=../headers/pk_topol_render_facet_go_o_t.html>PK_TOPOL_render_facet_go_o_t</A> options”</A> for more information on the benefits this can have.</LI>
+<LI>
+<A NAME="50422189_pgfId-294771"></A>If using tabular faceting, then you need to use the <CODE>
+smp</CODE>
+ option. See <A HREF="fd_chap.110.html#50422190_26560">Section 109.3, “Tabular faceting and threads”</A>, for more information. </LI>
+</UL>
+<P>
+<A NAME="50422189_pgfId-294776"></A>See <A HREF="fd_chap.115.html#50422196_23582">Chapter 114, “Symmetric Multi-Processing In Parasolid”</A>, for more information about SMP.</P>
+<P>
+<A NAME="50422189_pgfId-329903"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-329719"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422189_pgfId-329698"></A><A HREF="fd_chap.108.html#50422188_89301">Section 107.2.16, “Incremental faceting”</A></LI>
+<LI>
+<A NAME="50422189_pgfId-329742"></A><A HREF="di_chap.05.html#42323">Chapter 4, “Graphical Output”</A> in the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual</LI>
+<LI>
+<A NAME="50422189_pgfId-329765"></A><A HREF="di_chap.08.html#18688">Appendix B, “Graphical Output Functions”</A> in the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual</LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422189_pgfId-294779"></A>108.2	<A NAME="50422189_marker-294777"></A><A NAME="50422189_marker-294778"></A>Output through GO 
+
+
+</H1>
+<P>
+<A NAME="50422189_pgfId-294780"></A>The output of the facet mesh is controlled by the option structure <A HREF=../headers/pk_topol_render_facet_o_t.html>PK_TOPOL_render_facet_o_t</A>, which itself references two option structures:</P>
+<UL>
+<LI>
+<A NAME="50422189_pgfId-294781"></A><A HREF=../headers/pk_topol_facet_mesh_o_t.html>PK_TOPOL_facet_mesh_o_t</A> controls generation of the facet mesh, as described in <A HREF="fd_chap.108.html#50422188_30298">Chapter 107, “Facet Mesh Generation”</A>.</LI>
+<LI>
+<A NAME="50422189_pgfId-294785"></A><A HREF=../headers/pk_topol_render_facet_go_o_t.html><A HREF=../headers/pk_topol_render_facet_go_o_t.html>PK_TOPOL_render_facet_go_o_t</A></A> controls the type of data which is output through GO, as described below in the section on <A HREF="fd_chap.109.html#50422189_25908">“<A HREF=../headers/pk_topol_render_facet_go_o_t.html><A HREF=../headers/pk_topol_render_facet_go_o_t.html>PK_TOPOL_render_facet_go_o_t</A></A> options”</A>.</LI>
+</UL>
+
+<H4>
+<A NAME="50422189_pgfId-294789"></A>Example:</H4>
+<P>
+<A NAME="50422189_pgfId-294790"></A>The following sample code shows how to set up the <STRONG>
+default</STRONG> option settings, prior to calling <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>.</P>
+<P>
+<A NAME="50422189_pgfId-294794"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422189_pgfId-294793"></A>/* declaration and initialisation */</PRE>
+<PRE><A NAME="50422189_pgfId-329362"></A><A HREF=../headers/pk_topol_render_facet_o_t.html>PK_TOPOL_render_facet_o_t</A>  my_render_option_struct;</PRE>
+<PRE><A NAME="50422189_pgfId-327705"></A>PK_TOPOL_render_facet_o_m  (my_render_option_struct);</PRE>
+<PRE><A NAME="50422189_pgfId-327712"></A>/* set default mesh and GO options */</PRE>
+<PRE><A NAME="50422189_pgfId-327719"></A>/* now set application-specific mesh options */</PRE>
+<PRE><A NAME="50422189_pgfId-327726"></A>my_render_option_struct.control.&lt;field1&gt; = &lt;value1&gt;;</PRE>
+<PRE><A NAME="50422189_pgfId-327733"></A>my_render_option_struct.control.&lt;field2&gt; = &lt;value2&gt;;</PRE>
+<PRE><A NAME="50422189_pgfId-327736"></A>/* and set application-specific GO options */</PRE>
+<PRE><A NAME="50422189_pgfId-327739"></A>my_render_option_struct.go_option.&lt;field1&gt; = &lt;value1&gt;;</PRE>
+<PRE><A NAME="50422189_pgfId-327746"></A>my_render_option_struct.go_option.&lt;field2&gt; = &lt;value2&gt;;</PRE>
+<PRE><A NAME="50422189_pgfId-327749"></A>/* ... now call <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A>( ... ); */</PRE>
+<PRE><A NAME="50422189_pgfId-327752"></A>&nbsp;</PRE>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422189_pgfId-294798"></A>108.3	<A NAME="50422189_25908"></A><A NAME="50422189_marker-294796"></A><A NAME="50422189_marker-294797"></A><A HREF=../headers/pk_topol_render_facet_go_o_t.html>PK_TOPOL_render_facet_go_o_t</A> options 
+
+
+</H1>
+
+<H3>
+<A NAME="50422189_pgfId-294803"></A>	108.3.1 	<A NAME="50422189_marker-294799"></A><A NAME="50422189_marker-294800"></A><A NAME="50422189_marker-294801"></A><A NAME="50422189_marker-294802"></A>go_normals </H3>
+<P>
+<A NAME="50422189_pgfId-294804"></A><A HREF=../headers/pk_facet_go_normals_t.html>PK_facet_go_normals_t</A> controls whether facet normal data are calculated at facet vertices and output through GO. The possible settings are:</P>
+<P>
+<A NAME="50422189_pgfId-294818"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294807"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294809"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294811"></A><A HREF=../headers/pk_facet_go_normals_t.html>PK_facet_go_normals_no_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294813"></A>do not output surface normals</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294815"></A><A HREF=../headers/pk_facet_go_normals_t.html>PK_facet_go_normals_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294817"></A>output surface normals</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422189_pgfId-294823"></A>	108.3.2 	<A NAME="50422189_marker-294819"></A><A NAME="50422189_marker-294820"></A><A NAME="50422189_marker-294821"></A><A NAME="50422189_marker-294822"></A>go_parameters </H3>
+<P>
+<A NAME="50422189_pgfId-294824"></A><A HREF=../headers/pk_facet_go_parameters_t.html>PK_facet_go_parameters_t</A> controls whether surface parameter data are calculated at facet vertices and output through GO. The possible settings are:</P>
+<P>
+<A NAME="50422189_pgfId-335555"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294827"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294829"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294831"></A><A HREF=../headers/pk_facet_go_parameters_t.html>PK_facet_go_parameters_no_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294833"></A>do not output surface parameter data</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294835"></A><A HREF=../headers/pk_facet_go_parameters_t.html>PK_facet_go_parameters_d0_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294837"></A>output surface parameters at vertices</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294839"></A><A HREF=../headers/pk_facet_go_parameters_t.html>PK_facet_go_parameters_d1_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294841"></A>output surface parameters plus first derivative data at vertices</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294843"></A><A HREF=../headers/pk_facet_go_parameters_t.html>PK_facet_go_parameters_d2_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294845"></A>output surface parameters plus first and second derivative data at vertices</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422189_pgfId-294846"></A>	108.3.3 	go_curvatures </H3>
+<P>
+<A NAME="50422189_pgfId-335590"></A><A HREF=../headers/pk_facet_go_curvatures_t.html>PK_facet_go_curvatures_t</A> controls whether principal directions and curvatures of the face are output through GO. The possible settings are:</P>
+<P>
+<A NAME="50422189_pgfId-335763"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-335773"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-335775"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-335777"></A><A HREF=../headers/pk_facet_go_curvatures_t.html>PK_facet_go_curvatures_no_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-335779"></A>do not output principal directions and curvatures of the face.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-335781"></A><A HREF=../headers/pk_facet_go_curvatures_t.html>PK_facet_go_curvatures_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-335783"></A>output principal directions and curvatures of the face at facet vertices.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422189_pgfId-294850"></A>	108.3.4 	<A NAME="50422189_marker-335536"></A><A NAME="50422189_marker-335537"></A><A NAME="50422189_marker-335538"></A>go_edges </H3>
+<P>
+<A NAME="50422189_pgfId-294851"></A><A HREF=../headers/pk_facet_go_edges_t.html>PK_facet_go_edges_t</A> controls whether edge entity values are output through GO. These allow the application to identify which facet edges (fins) lie on the boundary of a facet mesh and to associate them with an originating edge entity.</P>
+<P>
+<A NAME="50422189_pgfId-294865"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294854"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294856"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294858"></A><A HREF=../headers/pk_facet_go_edges_t.html>PK_facet_go_edges_no_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294860"></A>do not output edge data</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294862"></A><A HREF=../headers/pk_facet_go_edges_t.html>PK_facet_go_edges_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294864"></A>output edge entities at facet edges</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422189_pgfId-294872"></A>	108.3.5 	<A NAME="50422189_marker-294866"></A><A NAME="50422189_marker-294867"></A><A NAME="50422189_marker-294868"></A><A NAME="50422189_marker-294869"></A><A NAME="50422189_marker-294870"></A><A NAME="50422189_marker-294871"></A>go_strips </H3>
+<P>
+<A NAME="50422189_pgfId-294873"></A><A HREF=../headers/pk_facet_go_strips_t.html>PK_facet_go_strips_t</A> controls whether facets are output individually through GO or as facet strips. The latter are a repeating sequence of connected triangular facets which are output through GO in terms of shared coordinates</P>
+<P>
+<A NAME="50422189_pgfId-294874"></A>The value of <CODE>
+max_facet_sides</CODE>
+ in the facet mesh options structure is ignored when facet strips are output (facets are always triangular).</P>
+<P>
+<A NAME="50422189_pgfId-294888"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294877"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294879"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294881"></A><A HREF=../headers/pk_facet_go_strips_t.html>PK_facet_go_strips_no_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294883"></A>Do not output facet strips.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294885"></A><A HREF=../headers/pk_facet_go_strips_t.html>PK_facet_go_strips_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294887"></A>Output facet strips. Requires <CODE>
+go_max_facets_per_strip</CODE>
+ to be &gt;1</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422189_pgfId-294894"></A>	108.3.6 	<A NAME="50422189_32289"></A><A NAME="50422189_marker-294890"></A><A NAME="50422189_marker-294891"></A><A NAME="50422189_marker-294892"></A><A NAME="50422189_marker-294893"></A>go_interleaved </H3>
+<P>
+<A NAME="50422189_pgfId-322385"></A><A NAME="50422189_marker-322383"></A><A NAME="50422189_marker-322384"></A><A HREF=../headers/pk_facet_go_interleaved_t.html>PK_facet_go_interleaved_t</A> controls whether facets are output from the GO on a body by body basis (that is, all the faces from one body are output, then all the faces from the next body, and so on), or whether faces from the total list of bodies output are interleaved (so that faces from different bodies may be output consecutively). Interleaving helps reduce the amount of facet data that is stored prior to outputting. Parasolid always outputs facets from a single face together, whether interleaving is used or not.</P>
+<P>
+<A NAME="50422189_pgfId-294911"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294900"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294902"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294904"></A><A HREF=../headers/pk_facet_go_interleaved_t.html>PK_facet_go_interleaved_no_c</A> (default)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294906"></A>Output faces on a body by body basis.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294908"></A><A HREF=../headers/pk_facet_go_interleaved_t.html>PK_facet_go_interleaved_yes_c</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422189_pgfId-294910"></A>Output faces on an interleaved basis.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422189_pgfId-294912"></A>If interleaving is used, and you need to keep track of the body with which a given face is associated, then you should use its occurrence number. For more information about occurrence numbers, see <A HREF="fd_chap.105.html#50422185_27683">“Occurrence numbers”</A> in <A HREF="fd_chap.105.html#50422185_16951">Chapter 104, “Rendering Functions”</A>.</P>
+<P>
+<A NAME="50422189_pgfId-294919"></A>If interleaving is used and multi-threading is enabled, then:</P>
+<UL>
+<LI>
+<A NAME="50422189_pgfId-294920"></A>Multiple threads can invoke the GO.</LI>
+<LI>
+<A NAME="50422189_pgfId-294921"></A>Only one thread can invoke the GO at any one time (the thread is locked in Parasolid).</LI>
+<LI>
+<A NAME="50422189_pgfId-294922"></A>All the faces in a body are output by the same thread.</LI>
+</UL>
+<P>
+<A NAME="50422189_pgfId-321883"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422189_pgfId-321904"></A>Note: If faceting concurrently, facets may be interleaved with facets from calls to <A HREF=../headers/pk_topol_render_facet.html>PK_TOPOL_render_facet</A> from other threads which are also faceting concurrently.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422189_pgfId-294927"></A>	108.3.7 	<A NAME="50422189_marker-294923"></A><A NAME="50422189_marker-294924"></A><A NAME="50422189_marker-294925"></A><A NAME="50422189_marker-294926"></A>go_max_facets_per_strip </H3>
+<P>
+<A NAME="50422189_pgfId-294928"></A>Specifies the maximum number of facets that should be combined into a single facet strip. Default: 0.</P>
+
+
+<H3>
+<A NAME="50422189_pgfId-294931"></A>	108.3.8 	<A NAME="50422189_marker-294929"></A><A NAME="50422189_marker-294930"></A><A NAME="50422189_28821"></A>split_strips </H3>
+<P>
+<A NAME="50422189_pgfId-294934"></A>Whether to split facet strips on periodic surfaces. See <A HREF="fd_chap.110.html#50422190_43768">Section 109.4.5, “Options for outputting topological information”</A>, for details. </P>
+
+
+<H3>
+<A NAME="50422189_pgfId-294940"></A>	108.3.9 	<A NAME="50422189_marker-294936"></A><A NAME="50422189_marker-294937"></A><A NAME="50422189_marker-294938"></A><A NAME="50422189_marker-294939"></A>consistent_parms </H3>
+<P>
+<A NAME="50422189_pgfId-294943"></A>Whether to ensure consistent parameter values on periodic surfaces. See <A HREF="fd_chap.110.html#50422190_43768">Section 109.4.5, “Options for outputting topological information”</A>, for details. </P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.108.html">Facet Mesh Generation</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.110.html">Tabular Output Of Faceting</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

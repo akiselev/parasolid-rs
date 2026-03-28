@@ -1,0 +1,127 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SURF_make_bsurf</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SURF_make_bsurf</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_SURF_make_bsurf
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>           surf,           --- surface
+<A HREF=../headers/pk_uvbox_t.html>PK_UVBOX_t</A>          uvbox,          --- parameter bounds: required part of surf
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>        cubic,          --- force cubic BCURVE
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>        non_rational,   --- force non_rational BCURVE
+double              tolerance,      --- for approximate result
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_bsurf_t.html>PK_BSURF_t</A>   *const b_surf,         --- created BSURF
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> *const exact           --- whether b_surf is exact
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a bsurf which is coincident with the given parametric
+<B>'uvbox'</B> of the given <B>'surf'</B>.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_surf_make_bsurf_2.html>PK_SURF_make_bsurf_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_cant_make_bspline      failed to create equivalent geometry (MILD)
+    PK_ERROR_bad_uvbox              <B>'uvbox'</B> does not define valid extent
+                                    of <B>'surf'</B> (MILD)
+    PK_ERROR_tolerances_too_tight   tolerance is too tight (MILD)
+
+<A NAME="documentation"></A>
+The created bsurf will be exactly coincident with the given <B>'surf'</B> if
+possible.  Where this is not possible, the maximum distance between <B>'surf'</B> and
+<B>'b_surf'</B> will be limited by <B>'tolerance'</B>.  The function will usually achieve
+this condition but this is not guaranteed.
+
+When the <B>'surf'</B> is being approximated, and excessive subdivision of the
+<B>'surf'</B> has failed to achieve the requested <B>'tolerance'</B>, then the function will
+fail with the error PK_ERROR_tolerances_too_tight.  A looser tolerance may
+allow the function to succeed.
+
+Representations of planes and the rational forms of cylinders, cones, spheres
+and tori are exact.
+When the representation of a bsurf is changed it will, in general,
+only be exact when the order is not decreased.  The returned argument <B>'exact'</B>
+is set to PK_LOGICAL_true if the <B>'result'</B> is exact, otherwise to
+PK_LOGICAL_false.
+
+If <B>'cubic'</B> is set to PK_LOGICAL_true, then the resulting bsurf is forced to
+be cubic.  If `non-rational' is set to PK_LOGICAL_true, then the resulting
+bsurf is forced to be non-rational.
+
+The form of the created bsurf depends upon the given values of <B>'cubic'</B> and
+`non-rational' as follows:
+
+        |  false     true       true     false  | cubic
+surf    |  false     false      true     true   | non_rational
+--------|---------|---------|---------|---------|
+plane   |  1 1 3  |  3 3 3  |  3 3 3  |  1 1 3  |
+        |         |         |         |         |
+cyl     |  3 1 4  |  3 3 4  |  3 3 3  |  3 1 3  |
+cone    |  3 1 4  |  3 3 4  |  3 3 3  |  3 1 3  |
+        |         |         |         |         |
+sphere  |  3 3 4  |  3 3 4  |  3 3 3  |  3 3 3  |
+torus   |  3 3 4  |  3 3 4  |  3 3 3  |  3 3 3  |
+        |         |         |         |         |
+bsurf   |  * * *  |  3 3 !  |  3 3 3  |  ! ! 3  |
+        |         |         |         |         |
+swept   |  * 1 *  |  3 3 !  |  3 3 3  |  * 1 3  |
+        |         |         |         |         |
+spun    |  * 3 3  |  3 3 3  |  3 3 3  |  * 1 3  |
+        |         |         |         |         |
+offset  |  * * *  |  3 3 *  |  3 3 3  |  * * 3  |
+        |         |         |         |         |
+others  |  3 3 3  |  3 3 3  |  3 3 3  |  3 3 3  |
+--------|---------|---------|---------|---------|
+
+where each table entry contains three items: U V D where:
+
+   U - degree of surface in U direction
+   V - degree of surface in V direction
+   D - dimensionality of control points: 3 - non-rational
+                                         4 - rational
+   * - inherited from given <B>'surf'</B>
+   ! - inherited from given <B>'surf'</B> if representation is exact, otherwise 3
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

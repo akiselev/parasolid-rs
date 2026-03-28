@@ -1,0 +1,858 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>General Booleans</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>General Booleans</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.053.html">Manifold Booleans</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.055.html">Instancing And Patterning </A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.054.html#50422127_pgfId-335689">53.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.054.html#50422127_pgfId-294746">53.1.1	Basic operations </A>
+<LI> <A HREF="fd_chap.054.html#50422127_pgfId-294781">53.1.2	Enabling general boolean operations </A>
+</UL>
+<LI> <A HREF="fd_chap.054.html#50422127_pgfId-294788">53.2	Examples of general booleans </A>
+<LI> <A HREF="fd_chap.054.html#50422127_pgfId-294923">53.3	Merging redundant topology </A>
+<UL>
+<LI> <A HREF="fd_chap.054.html#50422127_pgfId-454731">53.3.1	Finer control over region survival and inheritance </A>
+</UL>
+<LI> <A HREF="fd_chap.054.html#50422127_pgfId-295079">53.4	Simplifying the result </A>
+<LI> <A HREF="fd_chap.054.html#50422127_pgfId-295140">53.5	Booleans between wire bodies </A>
+<LI> <A HREF="fd_chap.054.html#50422127_pgfId-295229">53.6	Unsupported options </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422127_pgfId-335689"></A>53.1	<A NAME="50422127_marker-294724"></A><A NAME="50422127_marker-294725"></A><A NAME="50422127_marker-294726"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422127_pgfId-294731"></A><A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A>, described the range of boolean operations that you can perform on manifold bodies using functions such as <A HREF=../headers/pk_body_boolean_2.html><A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A></A>. You can also use <A HREF=../headers/pk_body_boolean_2.html><A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A></A> to perform boolean operations on general bodies, or to perform boolean operations on manifold bodies that may result in general bodies. This chapter describes the results you can expect from such operations, and the options you can use to control the results. For convenience, boolean operations on general bodies, or boolean operations that result in general bodies are both referred to as <STRONG>
+general booleans</STRONG>. </P>
+<P>
+<A NAME="50422127_pgfId-341515"></A>Before attempting general booleans in a Parasolid session, you need to enable generalised topology. To do this, use <A HREF=../headers/pk_session_set_general_topology.html>PK_SESSION_set_general_topology</A>.</P>
+<P>
+<A NAME="50422127_pgfId-294736"></A>When generalised topology is enabled, any combination of bodies can be used as tools or target, with one exception: acorn vertices cannot be used in boolean operations. </P>
+<P>
+<A NAME="50422127_pgfId-294738"></A><A NAME="50422127_marker-294737"></A>The result of a general boolean is usually a single general body which may be disconnected, non-manifold, of mixed dimensions, or any combination of these. The result may also be a manifold body, if the <CODE>
+resulting_body_type</CODE>
+ option has been set to a suitable value. See <A HREF="fd_chap.054.html#50422127_80117">Section 53.4, “Simplifying the result”</A>. </P>
+<P>
+<A NAME="50422127_pgfId-348929"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422127_pgfId-294744"></A>Note: Only global boolean operations may be attempted with generalised topology enabled. <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> can only be used on manifold bodies. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-330530"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422127_pgfId-348947"></A>Note: This functionality offers partial support for facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-294745"></A>For examples of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Booleans\General Booleans</CODE>
+ folder,</P>
+<P>
+<A NAME="50422127_pgfId-335502"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-335351"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422127_pgfId-335334"></A><A HREF="fd_chap.016.html#50422085_20712">Chapter 15, “Body Types”</A></LI>
+<LI>
+<A NAME="50422127_pgfId-360942"></A><A HREF="fd_chap.052.html#50422125_">Chapter 51, “Introduction to Booleans”</A></LI>
+<LI>
+<A NAME="50422127_pgfId-335370"></A><A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422127_pgfId-294746"></A>	53.1.1 	Basic operations </H3>
+<P>
+<A NAME="50422127_pgfId-294747"></A>The following table summarises the effect of different boolean operations on general bodies:</P>
+<P>
+<A NAME="50422127_pgfId-294779"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294750"></A>Operation</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294752"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294754"></A>Unite</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294756"></A>The result of uniting a target body with one or more tools when generalised topology is enabled is that the target body contains all entities from the target and tool bodies. Depending on the settings of the various merge options (see <A HREF="fd_chap.054.html#50422127_51465">Section 53.3, “Merging redundant topology”</A>), some redundant topologies may be removed from the result. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294761"></A>Subtract</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294763"></A>The result of subtracting one or more tool bodies from a target is that any part of the union of the tool bodies that overlaps the target is removed. This can produce different results, depending on the configuration of the tools and target. Some examples are shown in <A HREF="fd_chap.054.html#50422127_10911">Section 53.2, “Examples of general booleans”</A>. </P>
+<P>
+<A NAME="50422127_pgfId-294767"></A>Subtracting a body from itself results in an empty body. The various merge options can also affect the topologies that remain in the result (see <A HREF="fd_chap.054.html#50422127_51465">Section 53.3, “Merging redundant topology”</A>). </P>
+<P>
+<A NAME="50422127_pgfId-294771"></A>The tool bodies are always deleted by the operation. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294773"></A>Intersect</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294775"></A>The result of intersecting one or more tool bodies with a target is that the target body is reduced to those entities that overlap with the union of the tools. Again, the various merge options can affect the topologies that remain in the result (see <A HREF="fd_chap.054.html#50422127_51465">Section 53.3, “Merging redundant topology”</A>).</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-294780"></A>Irregular boolean operations (such as boolean operations between two bodies, each containing a single open shell) are supported when generalised topology is enabled. </P>
+
+
+<H3>
+<A NAME="50422127_pgfId-294781"></A>	53.1.2 	Enabling general boolean operations </H3>
+<P>
+<A NAME="50422127_pgfId-294782"></A>As well as enabling generalised topology, you are strongly recommended to leave the <CODE>
+update</CODE>
+ option in <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> at its default setting when performing general booleans. In particular, if update is set to <A HREF=../headers/pk_boolean_update_t.html>PK_boolean_update_0_c</A>, then performing general booleans may lead to unexpected results.</P>
+<P>
+<A NAME="50422127_pgfId-294785"></A>The <CODE>
+update</CODE>
+ option is described in more detail in <A HREF="fd_chap.053.html#50422126_11534">Section 52.4, “Specialised boolean operations”</A>. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422127_pgfId-294788"></A>53.2	<A NAME="50422127_10911"></A>Examples of general booleans 
+
+
+</H1>
+<P>
+<A NAME="50422127_pgfId-294792"></A><A HREF="fd_chap.054.html#50422127_14357"><EM>
+Figure 53-1</EM></A> shows the result of subtracting a solid tool from a sheet target that is coplanar with one face of the tool: material is removed from the target where it clashes with the tool. </P>
+<P>
+<A NAME="50422127_pgfId-294828"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-592.gif">
+
+<P>
+<A NAME="50422127_pgfId-294830"></A>Figure 53-1 <A NAME="50422127_14357"></A>Subtracting a solid tool from a sheet target</P>
+<P>
+<A NAME="50422127_pgfId-294834"></A>By contrast, <A HREF="fd_chap.054.html#50422127_54175"><EM>
+Figure 53-2</EM></A> shows the effect of subtracting a sheet tool from a solid target, using the same bodies. Here, the result is unchanged, since removing a face from a solid is considered to have no effect. </P>
+<P>
+<A NAME="50422127_pgfId-294870"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-593.gif">
+
+<P>
+<A NAME="50422127_pgfId-294872"></A>Figure 53-2 <A NAME="50422127_54175"></A>Subtracting a sheet tool from a solid target</P>
+<P>
+<A NAME="50422127_pgfId-294879"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422127_pgfId-294875"></A>Note: If the tool intersects the solid, rather than is coincident with it, then the result depends on how you have chosen to merge redundant topology: see <A HREF="fd_chap.054.html#50422127_51465">Section 53.3, “Merging redundant topology”</A>, for details. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-294883"></A>Finally, <A HREF="fd_chap.054.html#50422127_69862"><EM>
+Figure 53-3</EM></A> shows the result of subtracting a sheet tool from a sheet target, where the tool is coplanar with one of the faces of the target. Here, the face is deleted from the target, in this case leaving an open sheet body. </P>
+<P>
+<A NAME="50422127_pgfId-294919"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-594.gif">
+
+<P>
+<A NAME="50422127_pgfId-294921"></A>Figure 53-3 <A NAME="50422127_69862"></A>Subtracting a sheet tool from a sheet target</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422127_pgfId-294923"></A>53.3	<A NAME="50422127_51465"></A>Merging redundant topology 
+
+
+</H1>
+<P>
+<A NAME="50422127_pgfId-294924"></A>As with manifold booleans, performing a general boolean can often leave topology in the result body that you consider redundant, because it no longer serves any useful purpose. A face may be completely enclosed by a solid, or an edge may be surrounded by a face, for example. You may decide that keeping this redundant topology in the result body is useful, or you may want to get rid of it completely. <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> provides the following options to let you control this behaviour. </P>
+<P>
+<A NAME="50422127_pgfId-294931"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422127_pgfId-294927"></A>Note: The options described in this section should only be used for general boolean operations. To merge redundant topology in manifold bodies, use the <CODE>
+selective_merge</CODE>
+ and <CODE>
+merge_imprinted</CODE>
+ options, as described in <A HREF="fd_chap.052.html#50422125_98716">Section 51.4.13, “Imprint completion”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-294964"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294934"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294936"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-294938"></A>merge_in_edge</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294940"></A>Whether to merge out any redundant vertices on edges in the result body which were created or altered as part of the boolean operation. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-294942"></A>merge_in_face</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294944"></A>Whether to merge out any redundant topologies in faces of the result body which were created or altered as part of the boolean operation. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-294946"></A>merge_in_solid</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294948"></A>Whether to merge out any topologies which become surrounded by solid in the result body. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-294950"></A>merge_in_face_dimension</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294952"></A>When merging topologies inside faces (<CODE>
+merge_in_face</CODE>
+ is PK_LOGICAL_true), this represents the highest dimension of topology that is merged. This takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422127_pgfId-294953"></A>PK_TOPOL_dimension_0_c: merge out isolated vertices.</LI>
+<LI>
+<A NAME="50422127_pgfId-294954"></A>PK_TOPOL_dimension_1_c: merge out isolated vertices, together with edges and associated vertices. </LI>
+<LI>
+<A NAME="50422127_pgfId-294955"></A>PK_TOPOL_dimension_any_c: merge out all redundant topologies from faces. This is the default, and is equivalent to PK_TOPOL_dimension_1_c.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-294957"></A>merge_in_solid_dimension</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-294959"></A>When merging topologies surrounded by solid (<CODE>
+merge_in_solid</CODE>
+ is PK_LOGICAL_true), this represents the highest dimension of topology that is merged. This takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422127_pgfId-294960"></A>PK_TOPOL_dimension_0_c: merge out acorn vertices</LI>
+<LI>
+<A NAME="50422127_pgfId-294961"></A>PK_TOPOL_dimension_1_c: merge out isolated vertices, together with wireframe edges and associated vertices. </LI>
+<LI>
+<A NAME="50422127_pgfId-294962"></A>PK_TOPOL_dimension_2_c: merge out vertices, wireframe edges, and faces that are surrounded by solid. </LI>
+<LI>
+<A NAME="50422127_pgfId-294963"></A>PK_TOPOL_dimension_any_c: merge out all redundant topologies from solids. This is the default, and is equivalent to PK_TOPOL_dimension_2_c.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-469976"></A>impose_bodies</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-470304"></A>Whether the target body should impose on the tool bodies or vice versa. Default: <A HREF=../headers/pk_boolean_impose_t.html>PK_boolean_impose_no_c</A>.</P>
+<P>
+<A NAME="50422127_pgfId-469978"></A>See <A HREF="fd_chap.054.html#50422127_49078">Section 53.3.1, “Finer control over region survival and inheritance”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-479263"></A>merge_tools</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-479265"></A>Whether to merge overlapping tools in a multi-tool boolean. Default: <A HREF=../headers/pk_merge_tools_t.html>PK_merge_tools_no_c</A>.</P>
+<P>
+<A NAME="50422127_pgfId-479269"></A>See <A HREF="fd_chap.054.html#50422127_49078">Section 53.3.1, “Finer control over region survival and inheritance”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-294965"></A>The default values of <CODE>
+merge_in_face_dimension</CODE>
+ and <CODE>
+merge_in_solid_dimension</CODE>
+ are set such that all newly redundant topologies are merged out of faces and solids just by setting <CODE>
+merge_in_face</CODE>
+ or <CODE>
+merge_in_solid</CODE>
+ respectively to PK_LOGICAL_true. </P>
+<P>
+<A NAME="50422127_pgfId-294969"></A><A HREF="fd_chap.054.html#50422127_36823"><EM>
+Figure 53-4</EM></A> demonstrates how you can control merging of topologies in a solid body. In the example, a solid target is united with a sheet tool. When <CODE>
+merge_in_solid</CODE>
+ is PK_LOGICAL_true then the part of the tool that lies internal to the target is removed from the result. When <CODE>
+merge_in_solid</CODE>
+ is PK_LOGICAL_false (the default), the internal face remains. In this example, the value of <CODE>
+merge_in_face</CODE>
+ has no effect, since no faces contain topologies that may be merged.</P>
+<P>
+<A NAME="50422127_pgfId-295003"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-595.gif">
+
+<P>
+<A NAME="50422127_pgfId-295005"></A>Figure 53-4 <A NAME="50422127_36823"></A>Merging topologies during unite operations</P>
+<P>
+<A NAME="50422127_pgfId-295009"></A><A HREF="fd_chap.054.html#50422127_28775"><EM>
+Figure 53-5</EM></A> shows a case that uses the same solid and tool in a subtract operation. Here, the value of <CODE>
+merge_in_face</CODE>
+ is significant as well. The effects of different values of <CODE>
+merge_in_solid</CODE>
+ and <CODE>
+merge_in_face</CODE>
+ are as follows:</P>
+<P>
+<A NAME="50422127_pgfId-295041"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295012"></A><STRONG>merge_in_solid</STRONG> </PRE>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295014"></A><STRONG>merge_in_face</STRONG> </PRE>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295016"></A>Result</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295018"></A>PK_LOGICAL_false</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295020"></A>PK_LOGICAL_false</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295022"></A>The internal face remains, and the imprinted edges on the outside of the block remain. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295024"></A>PK_LOGICAL_true</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295026"></A>PK_LOGICAL_false</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295028"></A>The internal face is removed, but the imprinted edges on the outside of the block remain.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295030"></A>PK_LOGICAL_true</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295032"></A>PK_LOGICAL_true</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295034"></A>Both the internal face and the imprinted edges on the outside of the block are removed. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295036"></A>PK_LOGICAL_false</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295038"></A>PK_LOGICAL_true</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295040"></A>Both the internal face and the imprinted edges on the outside of the block remain. In this case, the value of <CODE>
+merge_in_face</CODE>
+ has no effect since no faces contain topologies that may be merged. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-295075"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-596.gif">
+
+<P>
+<A NAME="50422127_pgfId-295077"></A>Figure 53-5 <A NAME="50422127_28775"></A>Merging topologies during subtract operations</P>
+
+<H3>
+<A NAME="50422127_pgfId-454731"></A>	53.3.1 	<A NAME="50422127_49078"></A>Finer control over region survival and inheritance </H3>
+<P>
+<A NAME="50422127_pgfId-477007"></A>Whereas the <CODE>
+merge_in_solid</CODE>
+ option allows you to fully merge each set of adjacent solid regions in the result (producing from each a region that inherits from all the originating overlapping regions) the <CODE>
+impose_bodies</CODE>
+ and <CODE>
+merge_tools</CODE>
+ options provide finer controls to choose which regions survive and from what parent regions they inherit. </P>
+<P>
+<A NAME="50422127_pgfId-460522"></A>The <CODE>
+impose_bodies</CODE>
+ option controls interactions between the target and tool bodies and takes the following values:</P>
+<P>
+<A NAME="50422127_pgfId-471645"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460617"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460619"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460621"></A><A HREF=../headers/pk_boolean_impose_t.html>PK_boolean_impose_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460623"></A>Neither the target nor the tool bodies impose on each other therefore all result regions survive and inherit from both target and tool parent regions as illustrated in <A HREF="fd_chap.054.html#50422127_55484"><EM>
+Figure 53-7</EM></A> (a). This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460625"></A><A HREF=../headers/pk_boolean_impose_t.html>PK_boolean_impose_target_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460627"></A>The solid regions of the target body are imposed onto the tool bodies. The resultant regions inherit only from their parent regions in the target. Any topologies of the tool bodies that lie within the solid regions of the target are considered redundant and deleted as illustrated in <A HREF="fd_chap.054.html#50422127_55484"><EM>
+Figure 53-7</EM></A> (b)..</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460629"></A><A HREF=../headers/pk_boolean_impose_t.html>PK_boolean_impose_tools_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460631"></A>The solid regions of the tool bodies are imposed onto the target body. The resultant regions inherit only from their parent regions in the tool(s). Any topologies of the target that lie within the solid regions of the tool bodies are considered redundant and deleted as illustrated in <A HREF="fd_chap.054.html#50422127_55484"><EM>
+Figure 53-7</EM></A> (c). </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-455122"></A>Further control over the behaviour of overlapping tool regions in multi-tool booleans is provided by the <CODE>
+merge_tools</CODE>
+ option. It takes the following values:</P>
+<P>
+<A NAME="50422127_pgfId-468349"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460867"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460869"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460871"></A><A HREF=../headers/pk_merge_tools_t.html>PK_merge_tools_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-460873"></A>Tool bodies are not merged and therefore topologies are not deleted as illustrated in <A HREF="fd_chap.054.html#50422127_68312"><EM>
+Figure 53-6</EM></A>. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-461225"></A><A HREF=../headers/pk_merge_tools_t.html>PK_merge_tools_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-461227"></A>All connected tool regions are merged and any topologies that lie within the solid material of any other tool body are considered redundant and deleted as illustrated in <A HREF="fd_chap.054.html#50422127_68312"><EM>
+Figure 53-6</EM></A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-466400"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-597.gif">
+
+<P>
+<A NAME="50422127_pgfId-466334"></A>Figure 53-6 <A NAME="50422127_68312"></A>Effects of setting the <CODE>
+merge_tools</CODE>
+ option</P>
+<P>
+<A NAME="50422127_pgfId-457580"></A>When used together, these options allow you to control what material is retained in the result regions after the boolean operation as illustrated in <A HREF="fd_chap.054.html#50422127_55484"><EM>
+Figure 53-7</EM></A>. </P>
+<P>
+<A NAME="50422127_pgfId-456410"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-598.gif">
+
+<P>
+<A NAME="50422127_pgfId-456256"></A>Figure 53-7 <A NAME="50422127_55484"></A>Effects of setting different values of <CODE>
+impose_regions</CODE>
+ and <CODE>
+merge_tools</CODE>
+ options</P>
+<P>
+<A NAME="50422127_pgfId-465663"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422127_pgfId-465581"></A>Note: When using these options the following must apply:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422127_pgfId-465582"></A>general topology is enabled</LI>
+<LI>
+<A NAME="50422127_pgfId-465583"></A><CODE>
+function</CODE>
+ option must be set to PK_boolean_unite_c</LI>
+<LI>
+<A NAME="50422127_pgfId-465584"></A><CODE>
+merge_in_solid</CODE>
+ option must be set to PK_LOGICAL_false</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422127_pgfId-295079"></A>53.4	<A NAME="50422127_80117"></A>Simplifying the result 
+
+
+</H1>
+<P>
+<A NAME="50422127_pgfId-295080"></A>The <CODE>
+resulting_body_type</CODE>
+ option can be used to produce a result body that has the simplest form possible. This can be useful when performing general booleans, because it gives you a straightforward way to convert a general body into a manifold body based on the topology that the body already has.</P>
+<P>
+<A NAME="50422127_pgfId-295084"></A><A HREF="fd_chap.054.html#50422127_40492"><EM>
+Figure 53-8</EM></A> shows an example in which two tools - a solid cube and a (non-manifold) wire cube - are intersected with a solid cube target so as to produce a wire result. If <CODE>
+resulting_body_type</CODE>
+ is set to <A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_simplest_c</A>, then the type of the result body (as returned by <A HREF=../headers/pk_body_ask_type.html>PK_BODY_ask_type</A>) is PK_BODY_type_wire_c. However, if <CODE>
+resulting_body_type</CODE>
+ is left at the default setting of <A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_original_c</A>, then the type of the result body would be PK_BODY_type_general_c. </P>
+<P>
+<A NAME="50422127_pgfId-295091"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422127_pgfId-295090"></A>Note: In <A HREF="fd_chap.054.html#50422127_40492"><EM>
+Figure 53-8</EM></A>, remember that the intersection between a target and several tools is the same as the intersection between the target and the union of all the tools. It is <EM>
+not</EM> the mutual intersection of all the individual bodies. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-295127"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-599.gif">
+
+<P>
+<A NAME="50422127_pgfId-295129"></A>Figure 53-8 <A NAME="50422127_40492"></A>Simplifying the result of a general boolean</P>
+<P>
+<A NAME="50422127_pgfId-295130"></A>When performing general booleans, <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> returns a single body which may be disjoint regardless of the<CODE>
+ allow_disjoint</CODE>
+ option. </P>
+<P>
+<A NAME="50422127_pgfId-295134"></A>See <A HREF="fd_chap.015.html#50422084_18488">Section 14.2.1, “Body”</A>, for more information about different types of body. </P>
+<P>
+<A NAME="50422127_pgfId-295138"></A>See <A HREF="fd_chap.052.html#50422125_27105">Section 51.4.17, “Specifying the body type of the result”</A>, for more information about the <CODE>
+resulting_body_type</CODE>
+ option. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422127_pgfId-295140"></A>53.5	<A NAME="50422127_37394"></A>Booleans between wire bodies 
+
+
+</H1>
+<P>
+<A NAME="50422127_pgfId-295141"></A>This section provides a summary of the limitations that apply when performing boolean operations on wire bodies.</P>
+<P>
+<A NAME="50422127_pgfId-295142"></A>You can unite, subtract, and intersect manifold or general wire bodies. </P>
+<P>
+<A NAME="50422127_pgfId-295143"></A>In order to perform boolean operations on wire bodies, general topology must be switched on using <A HREF=../headers/pk_session_set_general_topology.html>PK_SESSION_set_general_topology</A> (even when the wire bodies are themselves manifold). In most cases, the resulting body will be a general body, except when all input bodies are manifold. In this case, the result may be another manifold body if the configuration of the bodies is suitable. </P>
+<P>
+<A NAME="50422127_pgfId-295147"></A>In addition to the options listed in <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>, you should leave <CODE>
+default_tol</CODE>
+ at its default value when performing booleans between wire bodies, since it is not valid to set a tolerance on an edge in a wire body. Instead, if you want to represent tolerance information, set a tolerance on the vertices, using <A HREF=../headers/pk_vertex_set_precision.html>PK_VERTEX_set_precision</A>. </P>
+<P>
+<A NAME="50422127_pgfId-295148"></A>When subtracting wire bodies, remember that boolean operations subtract all coincident elements. This may lead to unexpected results, particularly if you are more used to performing booleans on solid bodies. <A HREF="fd_chap.054.html#50422127_44816"><EM>
+Figure 53-9</EM></A>, for example, shows the result when you perform a subtract operation on wire bodies that have coincident edges. In this example, because the target has several edges that are coincident with the tool, those edges are also removed in the result body. </P>
+<P>
+<A NAME="50422127_pgfId-295185"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-600.gif">
+
+<P>
+<A NAME="50422127_pgfId-295187"></A>Figure 53-9 <A NAME="50422127_44816"></A>Subtracting wire bodies with coincident edges</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422127_pgfId-295229"></A>53.6	<A NAME="50422127_90458"></A>Unsupported options 
+
+
+</H1>
+<P>
+<A NAME="50422127_pgfId-295230"></A>A number of options in <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> are unsupported when performing general booleans, and must be left at their default settings. The table below gives details of the affected options.</P>
+<P>
+<A NAME="50422127_pgfId-295294"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295233"></A>Options</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295235"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295237"></A>fence</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295239"></A>Use of the <CODE>
+fence</CODE>
+ option to perform trimming or punching operations on general booleans is not supported. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295241"></A>target_material_side</PRE>
+<PRE><A NAME="50422127_pgfId-295242"></A>tool_material_side</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295244"></A>The use of material side options to trim bodies is not supported with general booleans. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295251"></A>flag_no_effect</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295256"></A>You cannot request that Parasolid tells you if the target body is unaffected by the tools during general booleans. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295258"></A>target_face_overflow</PRE>
+<PRE><A NAME="50422127_pgfId-295259"></A>tool_face_overflow</PRE>
+<PRE><A NAME="50422127_pgfId-295260"></A>interior_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295265"></A>You cannot control Parasolid’s behaviour if imprinted edges overflow from the target to the tool, or from the tool to the target, with general booleans. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295267"></A>nm_edge_repair</PRE>
+<PRE><A NAME="50422127_pgfId-295268"></A>blend_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295273"></A>You cannot request that Parasolid repairs non-manifold results by replacing edges with blend edges, during general booleans.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295275"></A>merge_imprinted</PRE>
+<PRE><A NAME="50422127_pgfId-295276"></A>selective_merge</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295278"></A>To control merging of redundant topology in general booleans, use the options described in <A HREF="fd_chap.054.html#50422127_51465">Section 53.3, “Merging redundant topology”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295283"></A>imprint_overlapping</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295285"></A>In cases where faces in the target and tool share the same surface, you cannot request that Parasolid preserves overlapping boundaries during general booleans. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422127_pgfId-295291"></A>configuration</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422127_pgfId-295293"></A>During general booleans that use several tools, you cannot optimise performance in cases where either none of the tools intersect with each other, or when none of the tools intersect with the existing boundary edges of the target. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422127_pgfId-295298"></A>See <A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A>, for more information about all of these options. </P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.053.html">Manifold Booleans</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.055.html">Instancing And Patterning </A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

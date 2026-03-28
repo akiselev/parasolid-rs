@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_THREAD_ask_function</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_THREAD_ask_function</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>    PK_THREAD_ask_function
+(
+<I>--- received arguments ---
+</I>int                depth,       --- recursion depth
+
+<I>--- returned arguments ---
+</I>const char **const fn_name,     --- function name string (may be NULL)
+int         *const total_depth  --- current total recursion depth (&gt;= 0)
+)
+</B>
+<A NAME="description"></A>
+<I>This function returns the name of the PK function being executed in the
+calling thread and the total recursion depth of its current call stack.
+</I>
+<A NAME="documentation"></A>
+If <B>'depth'</B> is -1 this function will return the innermost PK function in the
+call stack. If <B>'depth'</B> is non-negative it will return the PK function at that
+position in the call stack starting at 0 for the outermost. If <B>'depth'</B> is
+equal to or greater than the returned value of <B>'total_depth'</B> then <B>'fn_name'</B>
+will be NULL.
+
+The function may be invoked from within a PK registered application
+callback function. The function will return the name of the PK function that
+is responsible for invoking the callback function. The name of the function
+is returned as a ASCII string which resides in read-only memory. The
+application must not attempt to modify or free this string.
+
+If this function is invoked whilst no PK function is being executed in the
+calling thread then the function will return <B>'fn_name'</B> value of NULL and a
+<B>'total_depth'</B> value of 0.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

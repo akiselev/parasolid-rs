@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_section</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_section</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                 PK_BODY_make_section
+(
+<I>--- received arguments ---
+</I>int                             n_targets, --- number of target bodies
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                       targets[], --- target bodies
+int                             n_tools,   --- number of tool bodies
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                       tools[],   --- tool bodies
+const <A HREF=../headers/pk_body_make_section_o_t.html>PK_BODY_make_section_o_t</A> *options,   --- Sectioning options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>       *const tracking,  --- tracking information
+<A HREF=../headers/pk_body_make_section_r_t.html>PK_BODY_make_section_r_t</A> *const results    --- resultant bodies
+)
+</B>
+<A NAME="description"></A>
+<I>This function generates sections of target bodies using set of tool bodies.
+Target bodies remain unchanged.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_contradictory_request      Bad combination of options or bad value
+                                        for option <B>'result_body_type'</B>(MILD)
+    PK_ERROR_missing_geom               Target or tool has incomplete
+                                        geometry(SERIOUS)
+    PK_ERROR_wire_body                  Target or tool is a wire body(MILD)
+    PK_ERROR_non_manifold               Non-manifold result(SERIOUS)
+    PK_ERROR_boolean_failure            Inconsistent arguments, or
+                                        internal error(SERIOUS)
+    PK_ERROR_general_body               Target or tool is a general body(MILD)
+    PK_ERROR_not_sheet                  Tool is not a sheet body(MILD)
+    PK_ERROR_same_tool_and_target       Tool body is also target body(MILD)
+
+<A NAME="documentation"></A>
+
+
+Introduction
+
+The given set of tool bodies is used to generate sections of target bodies.
+Target bodies remain unchanged.
+
+Targets may be solid or sheet bodies. Tools must be sheet bodies.
+
+When targets are imprinted on tools, faces of tools may be split to generate
+new faces. After imprinting, any tool faces that are inside target bodies are
+retained, and any tool faces that are outside target bodies are deleted. If
+this results in the tool body being split into several disjoint manifold
+components, <B>'allow_disjoint'</B> in the options structure controls whether the
+tool body is split or not.
+
+The behaviour of the sectioning operation can be controlled via the options
+structure <B>'options'</B>.
+
+See <A HREF="../chapters/fd_chap.056.html#50434417_pgfId-296117">Non-destructive sectioning</A> for more information.
+
+Output of the operation is returned in the <B>'results'</B> structure.
+
+Section Options
+
+If the <B>'tracking'</B> option is set to PK_LOGICAL_true, then tracking information
+for all faces and edges of <B>'bodies'</B> in <B>'results'</B> is returned.
+
+If the <B>'allow_disjoint'</B> option is set to PK_LOGICAL_true, then <B>'bodies'</B> in
+<B>'results'</B> may contain disjoint manifold components.
+If this option is set to PK_LOGICAL_false, resultant bodies having disjoint
+components will be split such that each body has a single connected
+component.
+
+<B>'result_body_type'</B> can either be PK_BODY_type_sheet_c or PK_BODY_type_wire_c.
+If <B>'result_body_type'</B> is PK_BODY_type_wire_c, attempts will be made to ensure
+that <B>'bodies'</B> contains valid wire bodies, i.e no vertex has more than three
+edges meeting.
+
+Returned Arguments
+
+Tracking
+
+The <B>'tracking'</B> structure contains topology tracking information on the
+operation. In the case of this function, tracking information for all the
+faces and the edges from <B>'bodies'</B> is returned.
+
+For the faces, the <A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A> structure in <B>'tracking'</B> will be of type
+PK_TOPOL_track_derive_c and <B>'original_topols'</B> will contain the tag of the
+original face from the <B>'tools'</B>. For the faces <B>'n_original_topols'</B> will be 1.
+
+If the edge is newly created as a result of imprint of target and tool face
+<B>'<A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A>'</B> will be of type PK_TOPOL_track_create_c. <B>'original_topols'</B>
+will contain tags of these two faces. For such edges <B>'n_original_topols'</B>
+will be 2.
+
+If the edge is result of imprint of target and tool face, but lies on existing
+tool edge, <B>'<A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A>'</B> will be of type PK_TOPOL_track_derive_c and
+<B>'original_topols'</B> will contain tag of the tool edge. For such edges
+<B>'n_original_topols'</B> will be 2.
+
+In both the above cases, if the edge is coincident with the target edge,
+tag of the target edge will be returned. The first entity will be from the
+target body and second from the tool body.
+
+If the edge is not result of imprint and comes from the edge on tool body,
+<B>'<A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A>'</B> will be of type PK_TOPOL_track_derive_c. <B>'original_topols'</B>
+will contain tag of the tool edge. For such edges <B>'n_original_topols'</B> will be
+1.
+
+Status and Fault Reporting
+
+The <B>'results'</B> structure contains resultant bodies and additional information,
+if any about the operation.
+
+If the function returns <B>'PK_ERROR_no_errors'</B>, then resultant bodies will be
+contained within the <B>'bodies'</B> array.
+
+The <B>'reports'</B> will provide information about non-manifold or other invalid
+sections.
+
+Each report structure contains a <B>'report'</B> field indicating the reason for the
+failure and, if possible, an array of entities. These entities may assist the
+application in identifying the region or entities that resulted in the failure.
+The <B>'entities'</B> array may contain topology from the target and tool bodies. The
+entities returned in the array will be members of the following classes :
+
+   o PK_CLASS_body
+   o PK_CLASS_shell
+   o PK_CLASS_face
+   o PK_CLASS_edge
+   o PK_CLASS_vertex
+
+If <B>'report'</B> is <A HREF=../headers/pk_boolean_report_t.html>PK_boolean_report_non_manifold_c</A>, the invalid section body will
+be returned in <B>'entities'</B> array.
+
+Function Restrictions
+
+The following restrictions apply to the sectioning operation :
+
+o Targets can be solid bodies or sheet bodies.
+
+o Tools must be sheet bodies.
+
+o This function does not support general bodies.
+
+
+Option Restrictions
+The following options within the input <B>'options'</B> are
+ignored by this function :
+    o <B>'default_tol'</B>
+    o <B>'max_tol'</B>
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

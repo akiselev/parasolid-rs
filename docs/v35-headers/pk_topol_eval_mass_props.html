@@ -1,0 +1,250 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TOPOL_eval_mass_props</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TOPOL_eval_mass_props</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_TOPOL_eval_mass_props
+(
+<I>--- received arguments ---
+</I>int                                 n_topols,    --- number of topols ( &gt;0 )
+const <A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                    topols[],    --- topological entities array
+double                              accuracy,    --- 0.0 &lt;= accuracy &lt;= 1.0
+const <A HREF=../headers/pk_topol_eval_mass_props_o_t.html>PK_TOPOL_eval_mass_props_o_t</A> *options,     --- options structure
+
+<I>--- returned arguments ---
+</I>double                              amount[],    --- amount
+double                              mass[],      --- mass
+double                              c_of_g[],    --- centre of gravity
+double                              m_of_i[],    --- moment of inertia
+double                              periphery[]  --- periphery
+)
+</B>
+<A NAME="description"></A>
+<I>This function evaluates mass properties of a given set of topological
+entities.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_accuracy          accuracy must lie between 0.0 and 1.0
+                                   (MILD)
+    PK_ERROR_empty_assy            no bodies referenced from given assemblies
+                                   (MILD)
+    PK_ERROR_wrong_entity          wrong entity type (MILD)
+    PK_ERROR_different_types       topols must all be of the same type
+                                   (MILD)
+    PK_ERROR_request_not_supported requested properties not all implemented
+                                   for the given topology (MILD)
+    PK_ERROR_missing_geom          missing geometry (MILD)
+    PK_ERROR_density_lt_0          strictly negative density (MILD)
+    PK_ERROR_mass_eq_0             mass is zero (MILD)
+    PK_ERROR_negative_body         mass is negative (MILD)
+    PK_ERROR_mass_failure          internal mass properties failure (MILD)
+
+<A NAME="documentation"></A>
+This routine calculates the following geometric properties of certain
+topological entities:
+
+  Type          "Amount"       "Mass"   "Centre of "Moment of  "Periphery"
+                                         Gravity"   inertia"
+  ========================================================================
+  Edge           Length         Mass     C_of_g     M_of_i      -
+  Face           Area           Mass     C_of_g     M_of_i      Circumference
+  Void region    Volume         -        -          -           Surface Area
+  Solid region   Volume         Mass     C_of_g     M_of_i      Surface Area
+  Wire body      Length         Mass     C_of_g     M_of_i      -
+  Sheet Body     Surface Area   Mass     C_of_g     M_of_i      Circumference
+  Solid Body     Volume         Mass     C_of_g     M_of_i      Surface Area
+  Face/sheet)
+  considered)    Volume          -       C_of_g     M_of_i      Surface Area
+  as Solid  )
+  Assembly       Total amount   Mass     As for components      Total periphery
+  General Bodies:
+   dimension 3   Volume         Mass     C_of_g     M_of_i      Face area
+   dimension 2   Surface area   Mass     C_of_g     M_of_i      Edge length
+   dimension 1   Length         Mass     C_of_g     M_of_i      -
+   dimension 0   -              Mass     C_of_g     M_of_i      -
+
+No other types are acceptable. The array of topologies <B>'topols'</B> must all
+be of the same type, and the results are totals, except for the centre of
+gravity and inertia, which refer to the collection of topologies.  For an
+array of assemblies, the results take account of all body occurrences
+in the assemblies or sub-assemblies; these occurrences must all be
+the same body type.
+
+The values of results given as '-' are undefined on return.
+
+The mass of a body is the product of its density and its amount, where the
+density is obtained from an attached attribute and the amount depends on the
+maximum dimension of the body.  In the absence of a density attribute, the
+density has a default value of 1.  The dimension of a body is at least 0 if it
+contains a vertex, 1 if it contains an edge, 2 if it contains a face and 3 if
+it contains a solid region.  The amount of a body is shown in the following
+table:
+
+   Max. Dimension            Amount
+=============================================
+         3            Volume of solid regions
+         2            Surface area of faces
+         1            Length of edges
+         0            Number of vertices
+
+For manifold bodies the dimension of all the bodies in a list must be the same
+but, for general bodies, the dimension of a list of bodies is the maximum of
+the dimensions of the bodies in the list.
+
+Density attributes may also be attached to regions, faces, edges or vertices.
+Such attributes are referred to as 'local densities'. The effect of local
+densities on mass properties calculations is controlled by the options
+<B>'same_dim_density'</B> and <B>'lower_dim_density'</B>.
+
+As with bodies, the mass of an entity is the product of its effective density
+and its amount (a vertex with density is regarded as a point mass, so the
+density is its mass).  The density of a void region is always zero and if a
+density attribute is attached to a void region it will be ignored.
+
+Density attribute values strictly less than zero will cause a
+PK_ERROR_density_lt_0 error to be returned.  Zero-valued density attributes are
+supported and will yield correct volume calculations, but in the case that
+returned mass is zero and amount is not zero, centre of gravity and moment of
+inertia are undefined.
+Note in particular that this does not apply to the example of zero density
+instance parts within assemblies containing other parts with non-zero density;
+in this case, the zero density parts simply make no contribution to the
+assembly's centre of gravity, as expected.
+
+The periphery of a general body also depends on its maximum dimension.  The
+periphery of a body of dimension 3 is the surface area of all faces which bound
+a void region.  The periphery of a body of dimension 2 is the length of all
+laminar or wireframe edges.  The periphery of a body of dimension 1 or lower is
+not defined.
+
+For bodies or assemblies, <B>'m_of_i'</B> is the inertia tensor at the centre of
+gravity ( with respect to the X, Y, Z axis directions ).
+
+Accuracy of calculation:
+  If the calculation requested only involves simple geometries, an accurate
+  method of integration is used, and the parameter <B>'accuracy'</B> is ignored.  In
+  complex cases <B>'accuracy'</B> is used to determine the accuracy of the
+  calculation: it must be in the range 0.0 to 1.0, and as it approaches 1.0,
+  the calculation will be more accurate but slower. The dependence of
+  results on 'accuracy' is not linear, and values below 0.9 will give
+  only coarse approximations. A great deal of calculation may be required
+  to satisfy an 'accuracy' of 1.0, and in general convergence cannot be
+  guaranteed.  Supplying an accuracy parameter of 1.0 for parts involving
+  B-surfaces is not recommended.
+
+Topologies are regions, faces or edges:
+  Arrays of regions, faces or edges are treated similarly to corresponding
+  solid, sheet or wire bodies.  Dependent on the values of the
+  <B>'same_dim_density'</B> and <B>'lower_dim_density'</B> options, attached local densities
+  may be taken into account, as may body density attached to the owning body
+  or local densities on any lower-dimensional topologies attached to those
+  provided within the owning body.
+  An array of regions, faces or edges will be sorted internally into sets based
+  on the transformations specified by <B>'n_transfs'</B> and <B>'transfs'</B>. A set
+  contains unique topologies sharing a transformation. If a
+  topology-transformation pair is repeated, this leads to the creation of a new
+  set. If no transformations are specified by <B>'n_transfs'</B> and <B>'transfs'</B> there
+  will therefore be a number of sets equal to the largest number of times a
+  topology is repeated in <B>'topols'</B>.
+  Sub-topologies (for example edges when faces are supplied) are counted
+  only once per containing set when calculating all mass properties but
+  periphery. That is, a dense edge will only make one contribution even if
+  shared by two provided faces with the same transformation.
+  Periphery when topologies are regions, faces or edges is calculated as the
+  sum of the peripheries of each individual topology, unlike the case when
+  topologies are bodies as detailed above.  For example, a closed sheet body
+  such as a hollow unit cube will give a periphery of 0.0, but a
+  calculation performed with the same cube's faces will yield a periphery of
+  24.0.
+
+Periphery of regions:
+  It is only possible to find the periphery of the exterior region and any
+  other request will result in the error PK_ERROR_request_not_supported being
+  returned.  It is only possible to find the periphery and volume of a void
+  region and any other request will result in the error
+  PK_ERROR_request_not_supported being returned.  It is possible to specify a
+  mixture of solid and void regions, but only if the request is supported for
+  void regions.
+
+Transformations:
+  The mass properties may be calculated for transformed topologies of the input
+  topologies <B>'topols'</B> rather than for the input topologies by using the
+  <B>'n_transfs'</B> and <B>'transfs'</B> options.
+  If <B>'n_transfs'</B> is equal to <B>'n_topols'</B> then transformations <B>'transfs'</B> are
+  applied to the corresponding topology in <B>'topols'</B> for the purposes of the
+  calculation.
+  If <B>'n_transfs'</B> is equal to 1 then the transformation will be applied to all
+  topologies in <B>'topols'</B> for the purposes of the calculation.
+
+Returned arrays
+  The application must provide space for the returned information.
+  Parasolid will not attempt to write to return addresses for data which has
+  not been requested.
+  The size of the return arrays depends upon the setting of <B>'bound'</B> in the
+  options structure.
+
+            <A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_no_c</A> <A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_modulus_c</A> <A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_interval_c</A>
+  ---------+------------------+-----------------------+------------------------
+  amount   |        1         |            2          |          3
+  mass     |        1         |            2          |          3
+  c_of_g   |        3         |            4          |          9
+  m_of_i   |        9         |           10          |         27
+  periphery|        1         |            2          |          3
+  ---------+------------------+-----------------------+------------------------
+
+  For amount, mass and periphery, the zeroth array element is always the value.
+  If <B>'bound'</B> is <A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_modulus_c</A> then the 1st array element is the
+  modulus.
+  If <B>'bound'</B> is <A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_interval_c</A> then the 1st array element is the
+  lower bound and the 2nd array element is the upper bound.
+
+  For c_of_g, array elements 0, 1 and 2 always contain the coordinates of the
+  centre of gravity.
+  If <B>'bound'</B> is <A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_modulus_c</A> then the 4th array element is the
+  modulus.
+  If <B>'bound'</B> is <A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_interval_c</A> then elements 3, 4 and 5 contain the
+  lower bounds and elements 6, 7 and 8 contain the upper bounds.
+
+  For m_of_i, array elements 0 through 8 always contain the moment of inertia.
+  If <B>'bound'</B> is <A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_modulus_c</A> then the 9th array element is the
+  modulus.
+  If <B>'bound'</B> is <A HREF=../headers/pk_mass_bound_t.html>PK_mass_bound_interval_c</A> then elements 9 through 17 contain the
+  lower bounds and elements 18 through 26 contain the upper bounds.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

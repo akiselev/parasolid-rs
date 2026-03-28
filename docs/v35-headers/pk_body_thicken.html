@@ -1,0 +1,187 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_thicken</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_thicken</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_BODY_thicken
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>           body,              --- sheet body to be thickened
+double              front,             --- thickness on front of face
+double              back,              --- thickness on back of face
+double              tolerance,         --- tolerance for SP-curve conversion
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>        face_face_check,   --- do face face checks
+
+<I>--- returned arguments ---
+</I>int          *const n_topols,          --- number of topols
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>  **const old_topols,        --- original topology (optional)
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>  **const new_topols         --- new topology      (optional)
+)
+</B>
+<A NAME="description"></A>
+<I>Thickens a sheet body into a solid
+
+NOTE: This function is deprecated and has been superseded by <A HREF=../headers/pk_body_thicken_3.html>PK_BODY_thicken_3</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_cant_thicken          thickening failure
+    PK_ERROR_bad_tolerance         proposed edge tolerance is too small
+    PK_ERROR_not_sheet             body is not a sheet body
+    PK_ERROR_bad_thickness         total thickness is zero
+    PK_ERROR_cant_get_point        failed to find vertex geometry
+    PK_ERROR_cant_get_curve        failed to find edge geometry
+    PK_ERROR_cant_offset           surf failed to offset or face could not
+                                   be deleted
+    PK_ERROR_cant_get_side_surf    failed to find side surface
+    PK_ERROR_cant_get_side_curve   failed to find side curve
+    PK_ERROR_point_contact         point contact found in sheet body
+
+<A NAME="documentation"></A>
+
+Introduction
+The sheet <B>'body'</B> is thickened by <B>'front'</B> outwards (i.e. in the direction of
+the face normal) and <B>'back'</B> inwards.  Either <B>'front'</B> or <B>'back'</B> may be
+negative, but the total thickness must be non-zero.
+
+Only manifold sheet bodies can be thickened.
+
+Some edge geometry on the sheet boundary may have to be approximated by
+SP-curves in order to generate a boundary curve on the offset faces. If this
+is necessary, such edges will have a tolerance less than or equal to the
+tolerance supplied through the <B>'tolerance'</B> argument.
+
+Two situations can give rise to changes in the topology :
+
+    1) Dealing with geometry which fails to offset. If it is known that the
+       offset surface of a face would be self-intersecting an attempt is made
+       to remove the face. For example, a blend may be removed from an edge.
+       The investigation of self-intersection is not exhaustive, however,
+       and it can occur that instances are not trapped.
+
+    2) Dealing with configurations which can be repaired. For instance an
+       edge may offset to a point or a face become absorbed into the body.
+
+
+Checking options
+The extent to which checking is applied to the body is specified by the
+<B>'face_face_check'</B> argument. If <B>'face_face_check'</B> is true then
+face-face checks are done on the body  in addition to default checks.
+For most applications setting <B>'face_face_check'</B> false will give an
+adequate level of checking.
+
+Thickening which would lead to a self-intersecting or non-manifold solid is
+not allowed. Some of these cases will not be detected when face-face checks
+are not done, in this case the resulting body will be invalid.
+
+
+Table of exact cases
+Boundary edges with the following curves on these surfaces will be treated
+exactly :
+
+    Surface           | Curve
+    -----------------------------------------
+    Plane             | Line, Circle, Ellipse or B-curve
+    Cylinder          | Line, Circle or B-curve equivalent
+    Cone              | Line, Circle or B-curve equivalent
+    Sphere            | Circle
+    Torus             | Circle
+    Swept Surface or  | Line, Profile curve or B-curve equivalent
+    B-surface equiv   |
+    Spun Surface or   | Circle, Profile curve or B-curve equivalent
+    B-surface equiv   |
+
+
+Cases handled
+Thickening only handles the cases where each vertex on the boundary of the
+sheet meets one of the following requirements.  Either the vertex is smooth
+(surface normals constant on all adjoining faces) or both adjoining boundary
+edges must have curves of the types treated exactly (see table above) or the
+thickening is into the angle of the edge (i.e. convex edges inwards only and
+concave edges outwards only).
+
+
+old_topols and new_topols return args
+Each new face in the resulting body will have been generated by either
+a face, an exterior edge or a vertex in the original sheet. The pairs
+of original faces, edges or vertices and corresponding new faces are
+returned in the <B>'old_topols'</B> and <B>'new_topols'</B> arguments. Both lists
+may contain null tags where faces have vanished. If the total
+thickness is positive the tag of a face in the original body will
+remain on the front of the resulting body with the same sense
+otherwise it will be on the back with the opposite sense.
+
+Error handling
+When an error occurs, the function will, where possible, make extra
+information regarding the error available to the application
+by means of a GROUP.
+This GROUP is accessible from the standard form of the error.  Note that,
+while the members of the GROUP will be objects which existed before the
+call (and so will survive rollback), the GROUP itself will be destroyed by
+rollback.  The members of the GROUP will be as follows:
+
+    PK_ERROR_cant_offset            1 FACE     Failed to offset or face could
+                                               not be deleted
+
+    PK_ERROR_cant_get_point         1 VERTEX   Failed to find new geometry for
+                                               existing vertex
+                                    n FACEs    Failed to find geometry for
+                                               new vertex.
+
+    PK_ERROR_cant_get_curve         1 EDGE     Failed to find new geometry for
+                                               existing edge
+                                    n FACEs    Failed to find geometry for
+                                               new edge
+
+    PK_ERROR_cant_get_side_curve    1 VERTEX   Failed to find side curve
+
+    PK_ERROR_cant_get_side_surf     1 EDGE     Failed to find side surface
+
+    PK_ERROR_face_check_fails       1 FACE     Face which failed check
+
+    PK_ERROR_face_face_check_fails  2 FACEs    Pair of faces where
+                                               inconsistency found.
+
+    PK_ERROR_point_contact          1 VERTEX   Vertex where point
+                                               contact found.
+
+This function is not supported for general bodies.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

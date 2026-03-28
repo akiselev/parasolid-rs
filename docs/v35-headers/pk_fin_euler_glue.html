@@ -1,0 +1,149 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FIN_euler_glue</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FIN_euler_glue</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> PK_FIN_euler_glue
+(
+<I>--- received arguments ---
+</I>int             n_fins,     --- number of fins
+const <A HREF=../headers/pk_fin_t.html>PK_FIN_t</A>  fins[],     --- fins to glue
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>    same_dir    --- orientation of fins belonging to second edge
+)
+</B>
+<A NAME="description"></A>
+<I>This function glues fins from two edges in the order indicated so that in the
+result the fins all belong to one edge.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_bad_fin                <B>'fins'</B> does not contain the complete set
+                                     of fins from the edges, contains a
+                                     duplicate, re-orders the fins of an
+                                     edge or fins from an edge are not
+                                     given contiguously.
+
+    PK_ERROR_wrong_number_edges     the total number of edges referenced by
+                                    <B>'fins'</B> is not two.
+
+    PK_ERROR_edge_closure_mismatch  the two edges referenced by <B>'fins'</B> are not
+                                    of the same closure type eg open, closed
+                                    or ring.
+
+    PK_ERROR_bad_sharing            Incorrect value of <B>'same_dir'</B> supplied when
+                                    edges already share a vertex.
+
+    PK_ERROR_non_manifold           Generalised topology is disabled and the
+                                    owning part(s) of the edges are general
+                                    or the part resulting from the glue
+                                    operation would be general.
+
+
+<A NAME="documentation"></A>
+
+This function glues fins from two edges in the order indicated so that in the
+result the fins all belong to one edge. The edge of the first fin in <B>'fins'</B>
+will survive, the second edge is deleted.
+
+<B>'fins'</B> must contain the complete set of fins from two distinct edges.
+
+The order of fins about an edge is cyclic so that <A HREF=../headers/pk_fin_ask_next_of_edge.html>PK_FIN_ask_next_of_edge</A> may
+be used repeatedly to return to the fin first visited.
+
+The fins in <B>'fins'</B> which belong to each edge in turn must preserve the
+cyclic order of that edge and must appear as a contiguous sequence so that
+fins of the second edge are all inserted at the same point in the cyclic
+sequence of fins from the first edge.
+
+The first fin of each edge (as given by <A HREF=../headers/pk_edge_ask_first_fin.html>PK_EDGE_ask_first_fin</A>)
+may appear at any position in <B>'fins'</B> as <B>'fins'</B> is treated as a cyclic array.
+
+The two edges must each have at least one fin, the edges must have the
+same number of vertices (zero, one or two).
+
+The order of fins in the surviving edge will be as indicated by <B>'fins'</B>. The
+cyclic nature of fin ordering means that the first fin of the surviving edge
+as returned by <A HREF=../headers/pk_edge_ask_first_fin.html>PK_EDGE_ask_first_fin</A> will not necessarily be the first member
+of <B>'fins'</B>.
+
+No geometry is deleted or detached from its owning topology with the following
+exceptions.
+
+o A curve attached to the second edge is detached since the second edge does
+  not survive; the caller is left to delete this curve if no longer required.
+
+o Point geometry belonging to a vertex of the second edge is deleted along with
+  that vertex unless it is shared by the surviving edge.
+
+Attached geometries are not modified and do not affect the result, in addition
+the precision of edges and vertices being of geometric nature is not altered
+and will simply reflect the original values of the surviving topologies.
+
+<B>'same_dir'</B> applies to the direction of the second edge.
+
+If <B>'same_dir'</B> is supplied PK_LOGICAL_true then fins from the second
+edge will not change sign when transferred to the surviving edge.
+
+If <B>'same_dir'</B> is supplied PK_LOGICAL_false then fins from the second
+edge will change sign when transferred to the surviving edge.
+
+If the edges are not closed and share a common vertex and the vertex represents
+the start of one edge and the end of the other edge then <B>'same_dir'</B> must be
+supplied with value PK_LOGICAL_false. Similarly if the common vertex represents
+either the start of both edges or the end of both edges then the value of
+<B>'same_dir'</B> must be supplied PK_LOGICAL_true. Failure to supply the correct
+value of <B>'same_dir'</B> in these cases will result in a return of
+PK_ERROR_bad_sharing.
+
+If the edges are from different parts then the contents of the part that owns
+the second edge will be transferred to the part that owns the first edge, and
+the part that owns the second edge will be deleted.
+
+The resultant part will be general except when all of the following conditions
+are met.
+
+o <B>'fins'</B> contains the fin from each of two laminar edges.
+o  The original part(s) are manifold.
+o  The resultant edge contains one positive and one negative fin
+
+An error condition will arise if generalised topology is disabled and the other
+criteria are not met.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

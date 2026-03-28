@@ -1,0 +1,120 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_trim_neutral_sheets</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_trim_neutral_sheets</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_BODY_trim_neutral_sheets
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                      body,             --- the target body
+int                            n_pairs,          --- the number of pairs
+const <A HREF=../headers/pk_face_set_pair_t.html>PK_FACE_set_pair_t</A>       pairs[],          --- array of pairs
+double                         tol,              --- tolerance for curves
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                      neutral_sheets[], --- neutral sheets
+<A HREF=../headers/pk_neutral_error_t.html>PK_neutral_error_t</A>             errors[],         --- status of neutral sheets
+<A HREF=../headers/pk_face_neutral_causes_array_t.html>PK_FACE_neutral_causes_array_t</A> causes[]          --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function trims the neutral sheets in accordance with their pairs
+of face sets.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_body_trim_neutral_sheets_2.html>PK_BODY_trim_neutral_sheets_2</A>.
+
+</I>
+<A NAME="documentation"></A>
+
+
+This function trims some neutral sheets as specified by
+<B>'pairs'</B>.  All the faces in the facesets must belong to <B>'body'</B>, which
+should be a solid.
+
+The argument <B>'tol'</B> is used to specify a tolerance in case an
+approximate curve is constructed by the function.  If it is zero, the
+function will choose its own non-zero value.
+
+
+The returned arrays <B>'neutral_sheets'</B>, <B>'errors'</B> and <B>'causes'</B> must be the same
+length as the given array of pairs. Each entry in the returned arrays
+will correspond to the pair in the same position in the input array.
+Each body in <B>'neutral_sheets'</B> will be the same as the sheet body in
+the same position in <B>'pairs'</B>.  The value of the entry in <B>'errors'</B> will
+indicate the status of the corresponding sheet body in
+<B>'neutral_sheets'</B>.  The possible values are as follows:
+
+    Value                     Meaning
+    -----                     -------
+    PK_neutral_success_c         No problems were detected and a trimmed
+                              neutral sheet has been returned.
+
+    PK_neutral_illegal_input_c   Either a neutral sheet has not been
+                              supplied, or a face has been used in
+                              more than one pair.
+    PK_neutral_numerical_failure_c
+                              An error has occurred while trying to
+                              find the trim curves and their
+                              endpoints.  The returned neutral sheet
+                              will not be trimmed correctly.
+
+    PK_neutral_unknown_config_c  The disposition of pair faces and side
+                              faces is not one which the algorithm
+                              recognises.  This is a limitation.
+    PK_neutral_imprint_failure_c
+                              An error has occurred while imprinting
+                              the trim curves onto the neutral sheet.
+                              This often means there is a bug in
+                              finding the trim curves.
+
+Each entry in <B>'causes'</B> will be an array containing the tracking
+information for the corresponding neutral sheet, each element of this
+array being the information for a face in the neutral sheet.
+
+Where trimming has failed, the neutral sheet may have changed and may
+have new edges scribed onto it.
+
+If the face set pairs are incomplete for the body, it is possible that
+the sheet not be trimmed properly, even though the status is
+PK_neutral_success_c.  It is also possible that a neutral sheet will
+become disconnected.  If this happens it will be converted to a
+general body.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,1040 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Blending</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Blending</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.10.html">Building Bodies from Profiles</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.12.html">Importing Foreign Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279737">10.1	Introduction</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279262">10.2	Edge blending</A>
+<UL>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279264">10.2.1	Types of edge blend</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279270">10.2.2	Controlling the appearance of edge blends</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-418988">10.2.3	Edge blend overflows</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279276">10.2.4	Controlling blend propagation</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-443425">10.2.5	Creating blend limits</A>
+</UL>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-1011402">10.3	Face-face blending</A>
+<UL>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279279">10.3.1	Cross-sectional planes</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-728457">10.3.2	Contact points</A>
+<UL>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279281">10.3.2.1	Specifying the size of the blend</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279283">10.3.2.2	Specifying the blend boundary</A>
+</UL>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279286">10.3.3	Cross-sectional shape</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-279290">10.3.4	Trimming</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-1059108">10.3.5	Propagation and notches</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-300617">10.3.6	User-supplied surfaces</A>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-507573">10.3.7	Wire-face blends</A>
+</UL>
+<LI> <A HREF="ov_chap.11.html#50446340_pgfId-284163">10.4	Three-face blending</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446340_pgfId-279737"></A>10.1	<A NAME="50446340_marker-336744"></A><A NAME="50446340_marker-336892"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446340_pgfId-292837"></A>In Parasolid, <STRONG>
+blending</STRONG> is used as a broad term that encompasses the following operations:</P>
+<UL>
+<LI>
+<A NAME="50446340_pgfId-295821"></A>Smoothing off sharp edges in a body - often known as filleting and chamfering. </LI>
+<P>
+<A NAME="50446340_pgfId-295854"></A><STRONG>
+Filleting</STRONG><A NAME="50446340_marker-336778"></A>: replace edges with new blend faces that meet the adjoining faces of the original edges smoothly. You can fillet a sharp edge on a piece of wood by smoothing it off using sandpaper.</P>
+<P>
+<A NAME="50446340_pgfId-295867"></A><STRONG>
+Chamfering</STRONG><A NAME="50446340_marker-336780"></A><A NAME="50446340_marker-336986"></A><A NAME="50446340_marker-336966"></A>: replace edges with new blend faces that have a linear cross-section, but do not meet the adjoining faces of the original edges smoothly. You can chamfer a sharp edge on a piece of wood by flattening it off using a plane.</P>
+<LI>
+<A NAME="50446340_pgfId-295831"></A>Constructing blend faces between non-adjacent faces, either from a single body or from different bodies.</LI>
+<P>
+<A NAME="50446340_pgfId-295906"></A>Here, new surfaces are created between faces that are not necessarily connected, possibly joining bodies together in the process.</P>
+</UL>
+<P>
+<A NAME="50446340_pgfId-930379"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-127.gif">
+
+<P>
+<A NAME="50446340_pgfId-281031"></A>Figure 10-1 Blending in Parasolid</P>
+<P>
+<A NAME="50446340_pgfId-279935"></A>Parasolid provides three specific kinds of blending:</P>
+<P>
+<A NAME="50446340_pgfId-279979"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-279993"></A>Blend</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-279995"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-279997"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-279999"></A>You supply a set of edges and Parasolid replaces them with new blend faces that meet the adjoining faces of the original edges. See <A HREF="ov_chap.11.html#50446340_39014">Section 10.2</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-280001"></A>Face-face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-280003"></A>You supply two sets of faces (which need not be in the same body) and Parasolid creates new blend faces that lie between them. See <A HREF="ov_chap.11.html#50446340_26979">Section 10.3</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-280005"></A>Three-face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-280007"></A>A specialized variation of face-face blending: you supply three sets of faces and Parasolid blends them, destroying the middle set in the process. See <A HREF="ov_chap.11.html#50446340_53365">Section 10.4</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446340_pgfId-279837"></A><A NAME="50446340_marker-337258"></A>Rather than being alternatives, these different types of blending have complementary strengths so that, when combined, they can work powerfully together.</P>
+<P>
+<A NAME="50446340_pgfId-296159"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-296213"></A>Strengths of edge blending</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-296215"></A>Strengths of face blending</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50446340_pgfId-296296"></A>Can create complicated configurations of blends </LI>
+<LI>
+<A NAME="50446340_pgfId-296406"></A>Simpler to use</LI>
+<LI>
+<A NAME="50446340_pgfId-296429"></A>Can create webs of blends rather than a single chain</LI>
+</UL>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50446340_pgfId-296318"></A>Good for creating long sweeps of blends</LI>
+<LI>
+<A NAME="50446340_pgfId-296554"></A>One step process</LI>
+<LI>
+<A NAME="50446340_pgfId-296620"></A>Provides more user interaction</LI>
+<LI>
+<A NAME="50446340_pgfId-296621"></A>Provides a huge variety of controls for defining the result</LI>
+<LI>
+<A NAME="50446340_pgfId-296622"></A>Can blend between disjoint components</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446340_pgfId-279262"></A>10.2	<A NAME="50446340_39014"></A><A NAME="50446340_marker-336746"></A><A NAME="50446340_marker-336968"></A><A NAME="50446340_marker-336930"></A><A NAME="50446340_marker-336888"></A>Edge blending
+
+
+</H1>
+<P>
+<A NAME="50446340_pgfId-292191"></A>During edge blending, Parasolid generates a series of faces to replace a set of specified edges in a body. These new faces meet the faces that were separated by the original edges, usually smoothly.</P>
+<P>
+<A NAME="50446340_pgfId-292897"></A><A NAME="50446340_marker-292895"></A><A NAME="50446340_marker-292896"></A>Edge blends are initially attached as attributes to the edges they will replace. Such blends are referred to as <STRONG>
+unfixed</STRONG><A NAME="50446340_marker-336782"></A><A NAME="50446340_marker-336970"></A><A NAME="50446340_marker-336932"></A><A NAME="50446340_marker-336910"></A><A NAME="50446340_marker-336972"></A><A NAME="50446340_marker-336934"></A> and can be modified or deleted. </P>
+<P>
+<A NAME="50446340_pgfId-292951"></A>Once defined, unfixed blends need to be fixed, incorporating them into the body and replacing the original edges. </P>
+<P>
+<A NAME="50446340_pgfId-296847"></A>This two-stage process allows Parasolid to resolve all the dependencies between multiple blends, such as that shown in <A HREF="ov_chap.11.html#50446340_18799"><EM>
+Figure 10-2</EM></A>, which illustrates several intersecting blends of different radii. If a single-stage process was used, you would have to decide the order in which to apply multiple blends - a far from straightforward task! </P>
+<P>
+<A NAME="50446340_pgfId-930471"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-128.gif">
+
+<P>
+<A NAME="50446340_pgfId-300954"></A>Figure 10-2 <A NAME="50446340_18799"></A>Creating complex intersecting blends using edge blending</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-279264"></A>	10.2.1 	<A NAME="50446340_marker-336748"></A><A NAME="50446340_marker-336916"></A><A NAME="50446340_marker-336906"></A>Types of edge blend</H2>
+<P>
+<A NAME="50446340_pgfId-796057"></A>Parasolid can create a variety of edge blends. </P>
+<P>
+<A NAME="50446340_pgfId-796251"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796212"></A>Blend Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796214"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796216"></A>Example</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796219"></A>Constant-radius<A NAME="50446340_marker-1381315"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796221"></A>A blend with a circular cross-section: the result of rolling a ball along the two surfaces adjoining the edge. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796226"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-129.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796229"></A>Chamfer<A NAME="50446340_marker-1381325"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796231"></A>A rolling-ball blend with a linear cross-section. Chamfer blends are not tangent-continuous with the faces adjoining the original edge. There are two types of chamfer blends: </P>
+<UL>
+<LI>
+<A NAME="50446340_pgfId-1381241"></A>face offset chamfer blends</LI>
+<LI>
+<A NAME="50446340_pgfId-1381278"></A>apex-range chamfer blends</LI>
+</UL>
+<P>
+<A NAME="50446340_pgfId-1408228"></A>Apex-range chamfer blends provide greater control over the width and angle of the resulting chamfer.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796236"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-130.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796239"></A>Variable-radius <A NAME="50446340_marker-1381349"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796241"></A>A rolling-ball blend in which the radius of the ball varies along the length of the blend. These blends need not even be circular: Parasolid can create blends with elliptical, parabolic or hyperbolic cross-sections.<A NAME="50446340_marker-1381356"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-796250"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-131.gif">
+
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-279270"></A>	10.2.2 	<A NAME="50446340_marker-336874"></A><A NAME="50446340_marker-336872"></A>Controlling the appearance of edge blends</H2>
+<P>
+<A NAME="50446340_pgfId-739299"></A>Parasolid provides many options to allow you to control the appearance of edge blends. Some of the most common are illustrated here.</P>
+<P>
+<A NAME="50446340_pgfId-739557"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739328"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739330"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739332"></A>Example</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739334"></A>Cliff-edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739336"></A>A cliff-edge blend is tangent to only one of the faces adjacent to the original blend edge.<A NAME="50446340_marker-739337"></A><A NAME="50446340_marker-739338"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-939451"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-132.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739379"></A>Vertex blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739381"></A>Vertex blending can be used to roll over adjacent sharp edges at a vertex, further smoothing the blend.<A NAME="50446340_marker-739382"></A><A NAME="50446340_marker-739383"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-939732"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-133.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739412"></A>Y-shaped </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739417"></A>Parasolid can create flatter &#8220;Y-shaped&#8221; blends when two edges of different convexity meet at a vertex with three or more edges.<A NAME="50446340_marker-739418"></A><A NAME="50446340_marker-739419"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-939891"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-134.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739457"></A>Setback </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739459"></A>When three or more blends meet at a vertex, a setback blend can be used to create a larger, flatter blend area in the region where the blends meet.<A NAME="50446340_marker-739460"></A><A NAME="50446340_marker-739461"></A>. Setback blends can be implemented with or without collar faces.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739500"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-135.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739502"></A>Preserving topology </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-739504"></A>Any topology that is completely overlapped by a blend face can be preserved. Alternatively, such topology can be deleted from the part.<A NAME="50446340_marker-739505"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-940144"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-136.gif">
+
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-418988"></A>	10.2.3 	<A NAME="50446340_marker-418985"></A><A NAME="50446340_marker-418986"></A><A NAME="50446340_marker-418987"></A>Edge blend overflows</H2>
+<P>
+<A NAME="50446340_pgfId-297024"></A>Many blends cannot fit entirely inside one or both of the faces adjacent to the blended edge. Parasolid has a number of strategies that enable such blends to be fixed successfully. This process is known as creating <STRONG>
+blend overflows</STRONG><A NAME="50446340_marker-336786"></A><A NAME="50446340_marker-336864"></A>. Parasolid can create a number of different types of overflow, depending on the appearance you want and the exact configuration of the body in the region of the blend: </P>
+<P>
+<A NAME="50446340_pgfId-297056"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299919"></A>Overflow</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299921"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299923"></A>Example</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-300995"></A>No overflow</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-300997"></A>The body before edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-940706"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-137.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299925"></A>Smooth</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299927"></A>In the overflowing region, the blend surface is changed so that it flows across the smooth edge into the adjacent face. </P>
+<ADDRESS>
+<A NAME="50446340_pgfId-301305"></A>Note: In the example, the blend along the front edge of the block is already present.</ADDRESS><BR>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-941074"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-138.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-300116"></A>Cliff</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-300118"></A>In the overflowing region, the blend surface is changed so that it blends along the edge using a cliff-edge blend. </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-941146"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-139.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-300209"></A>Notch</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-300211"></A>In the overflowing region, the blend surface is trimmed by extending the neighboring faces. The blend remains the same in all other respects.<A NAME="50446340_marker-337394"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-941371"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-140.gif">
+
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-279276"></A>	10.2.4 	<A NAME="50446340_marker-336870"></A><A NAME="50446340_marker-336868"></A>Controlling blend propagation</H2>
+<P>
+<A NAME="50446340_pgfId-442747"></A>Parasolid can propagate blends along chains of tangent edges. You create a blend on one edge, and Parasolid will create a blend on the next edge if it meets the previous edge smoothly, continuing the chain of blends until a non-smooth edge is met. </P>
+<P>
+<A NAME="50446340_pgfId-930692"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-141.gif">
+
+<P>
+<A NAME="50446340_pgfId-442922"></A>Figure 10-3 Propagating blends along smooth edges</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-443425"></A>	10.2.5 	<A NAME="50446340_marker-443423"></A><A NAME="50446340_marker-443424"></A>Creating blend limits</H2>
+<P>
+<A NAME="50446340_pgfId-847302"></A>Parasolid can limit an edge blend to stop it short of its natural finishing point, using either vertex or edge limits, or information about where blends would overlap each other. </P>
+<P>
+<A NAME="50446340_pgfId-847504"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-142.gif">
+
+<P>
+<A NAME="50446340_pgfId-847505"></A>Figure 10-4 Creating blend limits for overlapping blends</P>
+<P>
+<A NAME="50446340_pgfId-847459"></A>These methods can be combined, as shown in <A HREF="ov_chap.11.html#50446340_30555"><EM>
+Figure 10-5</EM></A>.</P>
+<P>
+<A NAME="50446340_pgfId-930765"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-143.gif">
+
+<P>
+<A NAME="50446340_pgfId-553200"></A>Figure 10-5 <A NAME="50446340_30555"></A>Blends limited at a vertex and along two edges</P>
+<P>
+<A NAME="50446340_pgfId-1212338"></A>In addition, you can stop a blend short by capping it with either faces from the body, a plane, or a sheet body.</P>
+<P>
+<A NAME="50446340_pgfId-553249"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-144.gif">
+
+<P>
+<A NAME="50446340_pgfId-1011397"></A>Figure 10-6 <A NAME="50446340_73544"></A>Trimming edge blends to a face in the body</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446340_pgfId-1011402"></A>10.3	<A NAME="50446340_26979"></A><A NAME="50446340_marker-1011400"></A><A NAME="50446340_marker-1011401"></A>Face-face blending
+
+
+</H1>
+<P>
+<A NAME="50446340_pgfId-281077"></A>Face-face blending differs from edge blending as follows:</P>
+<UL>
+<LI>
+<A NAME="50446340_pgfId-281078"></A>The sets of faces between which you are blending do not need to be adjacent, or even in the same body.</LI>
+<LI>
+<A NAME="50446340_pgfId-281079"></A>Face-face blends are created and fixed in a single operation. There is no such thing as an unfixed face-face blend.</LI>
+</UL>
+<P>
+<A NAME="50446340_pgfId-308500"></A>To create a face-face blend, you choose two sets of faces, known as the left and right <STRONG>
+walls</STRONG><A NAME="50446340_marker-336788"></A><A NAME="50446340_marker-336974"></A><A NAME="50446340_marker-336942"></A> of the blend. You then define the blend in terms of the three independent properties shown in <A HREF="ov_chap.11.html#50446340_65750"><EM>
+Figure 10-7</EM></A>. </P>
+<P>
+<A NAME="50446340_pgfId-931027"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-145.gif">
+
+<P>
+<A NAME="50446340_pgfId-308575"></A>Figure 10-7 <A NAME="50446340_65750"></A>General definition of a face-face blend</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-279279"></A>	10.3.1 	<A NAME="50446340_marker-336758"></A><A NAME="50446340_marker-336878"></A>Cross-sectional planes</H2>
+<P>
+<A NAME="50446340_pgfId-281666"></A>You can create different face-face blend effects by varying the cross-sectional plane, as shown in <A HREF="ov_chap.11.html#50446340_91901"><EM>
+Figure 10-8</EM></A>. </P>
+<P>
+<A NAME="50446340_pgfId-931098"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-146.gif">
+
+<P>
+<A NAME="50446340_pgfId-287483"></A>Figure 10-8 <A NAME="50446340_91901"></A>Creating blends with <STRONG>
+(a)</STRONG> rolling-ball, <STRONG>
+(b)</STRONG> disc and <STRONG>
+(c)</STRONG> isoparameter cross-sectional planes</P>
+<P>
+<A NAME="50446340_pgfId-728453"></A><A NAME="50446340_marker-728449"></A><A NAME="50446340_marker-728450"></A><A NAME="50446340_marker-728451"></A><A NAME="50446340_marker-728452"></A>Rolling-ball and disc blends are the most common form of cross-sectional plane. <A NAME="50446340_marker-728454"></A><A NAME="50446340_marker-728455"></A>Isoparameter blends are specialized blends that are useful, for example, in turbine design.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-728457"></A>	10.3.2 	<A NAME="50446340_marker-728456"></A>Contact points</H2>
+<P>
+<A NAME="50446340_pgfId-728458"></A>Each cross-sectional plane in a blend contains two contact points, where the blend surface touches one of the blend walls. You can determine the position of these contact points in two ways:</P>
+<UL>
+<LI>
+<A NAME="50446340_pgfId-282093"></A>You specify the size of the blend and let Parasolid calculate the position of the contact points</LI>
+<LI>
+<A NAME="50446340_pgfId-282094"></A>You specify the blend boundary that the contact points should lie on, and Parasolid ensures the blend fits inside it. </LI>
+</UL>
+
+<H4>
+<A NAME="50446340_pgfId-279281"></A>10.3.2.1 <A NAME="50446340_marker-336900"></A>Specifying the size of the blend</H4>
+<P>
+<A NAME="50446340_pgfId-288655"></A>The following types of blend are defined in terms of the size of the blend:</P>
+<P>
+<A NAME="50446340_pgfId-299122"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299128"></A>Blend type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299130"></A>Description</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299132"></A>Example</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299134"></A>Constant-size face offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299136"></A>The blend spine (arrowed line) remains the same distance from each wall along the length of the blend.<A NAME="50446340_marker-1406026"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-941604"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-147.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299140"></A>Variable-size face offset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299142"></A>The distance of the blend spine from each wall varies according to ranges you specify.<A NAME="50446340_marker-1406036"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-941757"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-148.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299146"></A>Constant-width</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-299148"></A>The width of the blend remains constant along the length of the blend.<A NAME="50446340_marker-1406046"></A><A NAME="50446340_marker-1406047"></A><A NAME="50446340_marker-1406048"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-941801"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-149.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-718519"></A>Variable-width</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-718521"></A>The width of the blend varies according to ranges you specify.<A NAME="50446340_marker-1406058"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-941914"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-150.gif">
+
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-1380416"></A>Apex-range chamfer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-1407235"></A>The distance of the chamfer apex from each wall and/or the angle of the chamfer to an underlying wall varies according to the data you specify.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-1409737"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-151.gif">
+
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50446340_pgfId-279283"></A>10.3.2.2 <A NAME="50446340_marker-336898"></A><A NAME="50446340_marker-336896"></A><A NAME="50446340_marker-336984"></A>Specifying the blend boundary</H4>
+<P>
+<A NAME="50446340_pgfId-282395"></A>The following types of blend boundary, or <STRONG>
+holdline</STRONG><A NAME="50446340_marker-336802"></A><A NAME="50446340_marker-336976"></A><A NAME="50446340_marker-336952"></A>, can be defined. Parasolid creates blends that are bounded by these holdlines.</P>
+<P>
+<A NAME="50446340_pgfId-285063"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-285069"></A>Type of holdline</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-285071"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-285073"></A>Tangent <A NAME="50446340_marker-337492"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-285075"></A>You define the position of one boundary and let Parasolid calculate the position of the other boundary.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-285077"></A>Single conic<A NAME="50446340_marker-337501"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-285079"></A>You define the position of one boundary and use the standard blend size controls to define the position of the other boundary. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-285081"></A>Double conic<A NAME="50446340_marker-337507"></A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-285083"></A>You define the position of both boundaries and let Parasolid fit the blend within them. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50446340_pgfId-931245"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-152.gif">
+
+<P>
+<A NAME="50446340_pgfId-282768"></A>Figure 10-9 <A NAME="50446340_56709"></A>Supplying <STRONG>
+(a)</STRONG> tangent holdlines and <STRONG>
+(b)</STRONG> double conic holdlines</P>
+<P>
+<A NAME="50446340_pgfId-289159"></A>Holdlines can also be inverted, so that the blend is tangent to the face above the holdline rather than the face below, as shown in <A HREF="ov_chap.11.html#50446340_22891"><EM>
+Figure 10-10</EM></A>. </P>
+<P>
+<A NAME="50446340_pgfId-931308"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-153.gif">
+
+<P>
+<A NAME="50446340_pgfId-289208"></A>Figure 10-10 <A NAME="50446340_22891"></A>Using inverted holdline blends to control the tangency of a blend</P>
+<P>
+<A NAME="50446340_pgfId-282918"></A>You can also specify that a boundary should form a <A NAME="50446340_marker-282916"></A><A NAME="50446340_marker-282917"></A>cliff-edge blend. As with edge blends, a face-face blend does not have to join the blend wall tangentially along the cliff edge. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-279286"></A>	10.3.3 	<A NAME="50446340_marker-336766"></A><A NAME="50446340_marker-336880"></A>Cross-sectional shape</H2>
+<P>
+<A NAME="50446340_pgfId-284284"></A>Within a cross-sectional plane, you can control the shape of the blend (that is, the curve that joins the two contact points). Parasolid can create the following types of cross-sectional shape:</P>
+<P>
+<A NAME="50446340_pgfId-288333"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-288355"></A>Cross-section</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-288357"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-288359"></A>Conic</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-288361"></A>A circular, elliptical, hyperbolic or parabolic cross-section.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-288363"></A>Chamfer, or linear</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-288365"></A>A straight line between the contact points. <A NAME="50446340_marker-337687"></A><A NAME="50446340_marker-337685"></A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-288367"></A>Curvature-continuous, G2-continuous</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50446340_pgfId-288369"></A>A cross-section with the same curvature as the wall at each contact point. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-279290"></A>	10.3.4 	<A NAME="50446340_marker-336768"></A><A NAME="50446340_marker-336978"></A><A NAME="50446340_marker-336954"></A>Trimming</H2>
+<P>
+<A NAME="50446340_pgfId-623196"></A>Parasolid provides different ways of trimming a face-face blend to its surrounding faces so as to produce the required final shape. Trimming may involve removing material from the blend surface, the walls, or both. The blend may be attached to the walls or created as a separate sheet body.</P>
+<P>
+<A NAME="50446340_pgfId-952657"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-154.gif">
+
+<P>
+<A NAME="50446340_pgfId-1095176"></A>Figure 10-11 Trimming blend faces and blend walls</P>
+<P>
+<A NAME="50446340_pgfId-1095183"></A>Parasolid can also trim blend walls using its imprint completion functionality as shown in <A HREF="ov_chap.11.html#50446340_59637"><EM>
+Figure 10-12</EM></A>.</P>
+<P>
+<A NAME="50446340_pgfId-1095188"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-155.gif">
+
+<P>
+<A NAME="50446340_pgfId-1070603"></A>Figure 10-12 <A NAME="50446340_59637"></A>Trimming blend walls with imprint complete</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-1059108"></A>	10.3.5 	<A NAME="50446340_marker-1059102"></A><A NAME="50446340_marker-1059103"></A><A NAME="50446340_marker-1059104"></A><A NAME="50446340_marker-1059105"></A><A NAME="50446340_marker-1059106"></A><A NAME="50446340_marker-1059107"></A>Propagation and notches</H2>
+<P>
+<A NAME="50446340_pgfId-1059109"></A>As with edge blends, you can control a wide range of properties, such as propagation, behaviour at notches and so on.</P>
+<P>
+<A NAME="50446340_pgfId-931390"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-156.gif">
+
+<P>
+<A NAME="50446340_pgfId-283854"></A>Figure 10-13 Propagation and notch behaviour in face-face blends</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-300617"></A>	10.3.6 	<A NAME="50446340_35232"></A><A NAME="50446340_marker-336772"></A><A NAME="50446340_marker-336912"></A>User-supplied surfaces</H2>
+<P>
+<A NAME="50446340_pgfId-300621"></A>Rather than have Parasolid generate a blend surface, you can supply a surface to use in a blend operation. This is essential if your application makes use of specialized surface types that you want to use in conjunction with Parasolid&#8217;s face-face blending functionality.</P>
+<P>
+<A NAME="50446340_pgfId-931448"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-157.gif">
+
+<P>
+<A NAME="50446340_pgfId-300675"></A>Figure 10-14 Blending faces with a user-supplied surface</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446340_pgfId-507573"></A>	10.3.7 	Wire-face blends</H2>
+<P>
+<A NAME="50446340_pgfId-507593"></A>It is possible to make a cliff-edge blend between a wall of faces and the edges of a wire body, known as a <EM>
+wire-face</EM> blend. There are a number of restrictions on the use of this functionality.</P>
+<P>
+<A NAME="50446340_pgfId-931506"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-158.gif">
+
+<P>
+<A NAME="50446340_pgfId-507724"></A>Figure 10-15 <A NAME="50446340_45815"></A>Example of a wire-face blend</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446340_pgfId-284163"></A>10.4	<A NAME="50446340_53365"></A><A NAME="50446340_marker-336774"></A><A NAME="50446340_marker-336962"></A><A NAME="50446340_marker-336960"></A>Three-face blending
+
+
+</H1>
+<P>
+<A NAME="50446340_pgfId-289249"></A>In addition to standard face-face blending, you can create three-face blends (sometimes known as <EM>
+full round fillets</EM>), which are blends between three sets of faces. </P>
+<P>
+<A NAME="50446340_pgfId-289257"></A><A HREF="ov_chap.11.html#50446340_65158"><EM>
+Figure 10-16</EM></A> shows a part containing a number of ribs, each of which has a three-face blend along the top.</P>
+<P>
+<A NAME="50446340_pgfId-931575"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-159.gif">
+
+<P>
+<A NAME="50446340_pgfId-289378"></A>Figure 10-16 <A NAME="50446340_65158"></A>Blending three sets of faces</P>
+<P>
+<A NAME="50446340_pgfId-289380"></A>When creating three-face blends, three sets of walls are provided, rather than two. The resulting blend is trimmed and attached to the body automatically.</P>
+<P>
+<A NAME="50446340_pgfId-681226"></A>Three-face blending shares many options with face-face blending, as illustrated in <A HREF="ov_chap.11.html#50446340_99138"><EM>
+Figure 10-17</EM></A>. </P>
+<UL>
+<LI>
+<A NAME="50446340_pgfId-681241"></A>Blends can propagate to adjoining faces in the body (even across sharp edges in the centre wall of the three walls provided).</LI>
+<LI>
+<A NAME="50446340_pgfId-681251"></A>Blend faces can be trimmed to the boundaries of the blend walls.</LI>
+<LI>
+<A NAME="50446340_pgfId-681266"></A>Blend walls can be trimmed to the boundaries of the blend faces.</LI>
+<LI>
+<A NAME="50446340_pgfId-681273"></A>Blend faces can be capped, either from the body being blended or by using a plane.</LI>
+<LI>
+<A NAME="50446340_pgfId-691089"></A>Blend faces can be stopped short using a limit plane.</LI>
+</UL>
+<P>
+<A NAME="50446340_pgfId-681215"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-160.gif">
+
+<P>
+<A NAME="50446340_pgfId-681312"></A>Figure 10-17 <A NAME="50446340_99138"></A>Options when creating three-face blends</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.10.html">Building Bodies from Profiles</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.12.html">Importing Foreign Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

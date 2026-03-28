@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_PARTITION_reset_attribs</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_PARTITION_reset_attribs</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_PARTITION_reset_attribs
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_partition_t.html>PK_PARTITION_t</A>                        partition, --- partition
+int                                   n_attdefs, --- number of attdefs
+const <A HREF=../headers/pk_attdef_t.html>PK_ATTDEF_t</A>                     attdefs[], --- attdefs to consider
+<A HREF=../headers/pk_attrib_reset_cb_f_t.html>PK_ATTRIB_reset_cb_f_t</A>                reset_cb,  --- callback to obtain revised
+                                                 --- values for an attribute
+<A HREF=../headers/pk_pointer_t.html>PK_POINTER_t</A>                          context,   --- context data for callback
+const <A HREF=../headers/pk_partition_reset_attribs_o_t.html>PK_PARTITION_reset_attribs_o_t</A> *options    --- options
+)
+</B>
+<A NAME="description"></A>
+<I>This function allows changes to the contents of selected attributes in
+the given partition.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_rollback_not_started  Partitioned rollback is not active (MILD)
+    PK_ERROR_not_at_pmark          Partition is not at a pmark (MILD)
+    PK_ERROR_unsuitable_entity     One of <B>'attdefs'</B> is a Parasolid system
+                                   attribute definition (MILD)
+    PK_ERROR_reset_failed          Operation stopped before visiting all
+                                   pmarks in partition (SERIOUS)
+    PK_ERROR_deltas_not_available  Partition has been received or
+                                   transmitted with the option to
+                                   receive or transmit deltas later,
+                                   and has not yet done so (MILD)
+
+<A NAME="documentation"></A>
+This function visits all the pmarks in <B>'partition'</B> and, at each pmark,
+it finds the attribute values which have been created or changed and
+obtains replacement values by calling the callback <B>'reset_cb'</B>.
+
+The pmarks are visited starting at the partition's initial pmark,
+rolling forward a single pmark at a time.  At each pmark, it finds
+attributes which have been created or changed during the roll.  If the
+attdef of the attribute is one of those in the array <B>'attdefs'</B>, the
+callback will be called allowing the application to return new values
+for the attribute.  The values in the attribute will be changed to
+these new values, and these will become the values of the attribute
+whenever the partition is rolled to this pmark. The callback must only
+make read-only calls to Parasolid.
+
+When this function is called, the partition must be at a pmark.  When
+the function has finished without error, the partition will be
+returned to this starting pmark.
+
+This function should only be called when partitioned rollback has been
+started with <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.
+
+The attdefs must be of class PK_ATTDEF_class_01_c or
+PK_ATTDEF_class_06_c.  Also, <B>'attdefs'</B> must not include any Parasolid
+system attribute definitions.
+
+Warning: if there is a failure during the call to this function, it
+will not be possible, using the rollback mechanism, to restore the
+attributes to the same state as when it was called.  However, the
+partition should still be valid so, if the application can resolve the
+problem causing the failure (for example by increasing available
+memory after running out), the function can be called again.  Note
+that each call to this function will scan the whole partition, so a
+recovery procedure needs to know those attributes which have already
+been processed and those which have not been processed.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

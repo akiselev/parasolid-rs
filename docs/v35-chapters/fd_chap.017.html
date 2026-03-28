@@ -1,0 +1,736 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Session And Local Precision</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Session And Local Precision</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.016.html">Body Types</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.018.html">Geometry</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-343967">16.1	Introduction </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-294755">16.2	Session precision </A>
+<UL>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-294837">16.2.1	Coincident points </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-294881">16.2.2	Tangent intersections </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-294925">16.2.3	Sharp cones </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-294970">16.2.4	Scaling </A>
+</UL>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-294983">16.3	Tolerant modelling and local precision </A>
+<UL>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-295023">16.3.1	Setting precision on an edge </A>
+<UL>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-295069">16.3.1.1	Setting local precision on an edge with no previous local precision </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-295166">16.3.1.2	Replacing a curve with several SP-curves </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-330303">16.3.1.3	Setting a new precision on an edge that already has local precision </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-295286">16.3.1.4	Removing local precision from an edge </A>
+</UL>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-295360">16.3.2	Setting precision on a vertex </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-295369">16.3.3	Improving local precision at tolerant vertices </A>
+<UL>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-295410">16.3.3.1	Closing gaps in periodic faces </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-295465">16.3.3.2	Closing gaps by extending and trimming SP-curves </A>
+<LI> <A HREF="fd_chap.017.html#50422086_pgfId-295507">16.3.3.3	Closing gaps by reparameterising the surface </A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422086_pgfId-343967"></A>16.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422086_pgfId-294750"></A>This chapter tells you about the accuracy that Parasolid uses in modelling operations. In particular, it describes:</P>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-294751"></A>The default session precision used by Parasolid, and associated restrictions.</LI>
+<LI>
+<A NAME="50422086_pgfId-294752"></A>How to use Tolerant Modelling by setting local precision on edges and vertices in parts created by importing models from non-Parasolid powered applications.</LI>
+</UL>
+<P>
+<A NAME="50422086_pgfId-342390"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-342277"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-342260"></A><A HREF="fd_chap.015.html#50422084_30214">Section 14.8, “Representation of exact and tolerant edges”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422086_pgfId-294755"></A>16.2	<A NAME="50422086_marker-294753"></A><A NAME="50422086_marker-294754"></A>Session precision 
+
+
+</H1>
+<P>
+<A NAME="50422086_pgfId-294761"></A>Parasolid performs all calculations to fixed accuracies called the <STRONG>
+session precision</STRONG><A NAME="50422086_marker-294759"></A><A NAME="50422086_marker-294760"></A> and <STRONG>
+session angle precision</STRONG><A NAME="50422086_marker-294762"></A><A NAME="50422086_marker-294763"></A>.</P>
+<P>
+<A NAME="50422086_pgfId-294779"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-294766"></A>Precision</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-294768"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-294770"></A>Session precision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-294772"></A>The linear precision of the modeller. Distances less than this value are treated as zero and distances that differ by no more than this value are treated as equal. The session precision is returned by <A NAME="50422086_marker-294773"></A><A HREF=../headers/pk_session_ask_precision.html>PK_SESSION_ask_precision</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-294775"></A>Session angle precision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-294777"></A>The smallest angle (in radians) that is treated as different from zero. Angles less than this value are treated as zero and angles that differ by no more than this value are treated as equal. The session angle precision is returned by <A NAME="50422086_marker-294778"></A><A HREF=../headers/pk_session_ask_angle_precision.html>PK_SESSION_ask_angle_precision</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422086_pgfId-294780"></A>A Parasolid model is very precise; typically points are not considered coincident unless they are less than 1.0e-8 units apart (linear precision). Also, directions are considered to be parallel if they differ by less than 1.0e-11 radians. It is important that data passed to Parasolid is at least this accurate. </P>
+<P>
+<A NAME="50422086_pgfId-294782"></A><A NAME="50422086_marker-294781"></A>To allow precision to be handled correctly, all parts of a body must be within a box (called the <STRONG>
+size box</STRONG><A NAME="50422086_marker-294783"></A>) whose size is 1000 by 1000 by 1000, and is centered at the origin, as shown in <A HREF="fd_chap.017.html#50422086_29201"><EM>
+Figure 16-1</EM></A>. You are highly recommended to set the default unit in your application code to one meter, giving 1 kilometer as the maximum distance, in any one direction, that can be modelled.</P>
+<P>
+<A NAME="50422086_pgfId-294787"></A>To handle the precision of arcs correctly, the radius used when creating an arc must be less than a factor of 10 times the dimension of the size box.</P>
+<P>
+<A NAME="50422086_pgfId-294821"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-96.gif">
+
+<P>
+<A NAME="50422086_pgfId-294823"></A>Figure 16-1 <A NAME="50422086_29201"></A>Linear and angular precision</P>
+<P>
+<A NAME="50422086_pgfId-294824"></A>If possible, we recommend that you do not use models with geometry dimensions at or near to the linear and angular precisions, in order to enhance the reliability of your models. You should try to make sure that:</P>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-294825"></A>Vertices that are not intended to be coincident are separated by more than 100 times linear precision (i.e.100 x1.0e-8 for session precision) </LI>
+<LI>
+<A NAME="50422086_pgfId-294826"></A>Edges that are not intended to be parallel are separated by more than 100 times angular precision (i.e.100 x1.0e-11 for session angle precision) </LI>
+</UL>
+<P>
+<A NAME="50422086_pgfId-294833"></A>Sections <A HREF="fd_chap.017.html#50422086_16680">16.2.1</A> to <A HREF="fd_chap.017.html#50422086_26070">16.2.4</A> discuss some difficult precision issues.</P>
+<P>
+<A NAME="50422086_pgfId-531690"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422086_pgfId-531735"></A>Note: There are certain situations, where geometric and topological entities fit inside the size box, but can be positioned by a large transformation outside the size box. For more information on the support Parasolid provides when working with these transformations, see <A HREF="fd_chap.022.html#50422091_46697">Section 21.2, “Creating transformations”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422086_pgfId-294837"></A>	16.2.1 	<A NAME="50422086_16680"></A><A NAME="50422086_marker-294835"></A><A NAME="50422086_marker-294836"></A>Coincident points </H3>
+<P>
+<A NAME="50422086_pgfId-294841"></A>For a body to be valid, linear precision must be transitive. <A HREF="fd_chap.017.html#50422086_23313"><EM>
+Figure 16-2</EM></A>, for example, shows three points for which this is not the case. The distance between points 1 and 2 and points 2 and 3 is such that Parasolid would consider them coincident. However, the distance between points 1 and 3 infers that they are not. Such a body would be declared invalid.</P>
+<P>
+<A NAME="50422086_pgfId-294875"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-97.gif">
+
+<P>
+<A NAME="50422086_pgfId-294877"></A>Figure 16-2 <A NAME="50422086_23313"></A>Coincident points</P>
+
+
+<H3>
+<A NAME="50422086_pgfId-294881"></A>	16.2.2 	<A NAME="50422086_marker-294878"></A><A NAME="50422086_marker-294879"></A><A NAME="50422086_marker-294880"></A>Tangent intersections </H3>
+<P>
+<A NAME="50422086_pgfId-294886"></A>In <A HREF="fd_chap.017.html#50422086_17103"><EM>
+Figure 16-3</EM></A>, <A NAME="50422086_lh?Rmrich"></A>points ‘b1’ and ‘b2’ lie on both curves, but if distance ‘a’ is not greater than Parasolid's linear precision, Parasolid returns the intersection at ‘x’.</P>
+<P>
+<A NAME="50422086_pgfId-294920"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-98.gif">
+
+<P>
+<A NAME="50422086_pgfId-294922"></A>Figure 16-3 <A NAME="50422086_17103"></A>Tangent intersection of two curves</P>
+
+
+<H3>
+<A NAME="50422086_pgfId-294925"></A>	16.2.3 	<A NAME="50422086_marker-294923"></A><A NAME="50422086_marker-294924"></A>Sharp cones </H3>
+<P>
+<A NAME="50422086_pgfId-294926"></A>If angle ‘a’ is less than the angular precision of Parasolid, line ‘b1’ and the axis are returned as parallel. Subsequently spinning the line from ‘x’ to ‘y’ about the axis (the shaded area) creates a cylindrical surface, not a conical surface.</P>
+<P>
+<A NAME="50422086_pgfId-294965"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-99.gif">
+
+<P>
+<A NAME="50422086_pgfId-294966"></A>Figure 16-4 A cone that is too ‘sharp’ to be defined in Parasolid</P>
+
+
+<H3>
+<A NAME="50422086_pgfId-294970"></A>	16.2.4 	<A NAME="50422086_26070"></A><A NAME="50422086_marker-294968"></A><A NAME="50422086_marker-294969"></A>Scaling </H3>
+<P>
+<A NAME="50422086_pgfId-294972"></A><A NAME="50422086_marker-294971"></A>You may sometimes want to scale parts that have been imported from other modellers, usually as a modelling operation. This may be necessary in order to ensure that the imported parts conform to Parasolid’s requirements for precision. However, scaling needs to be performed carefully, for the following reasons:</P>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-294976"></A>Scaling up a part may make it invalid because, for example, points may no longer lie on the curves.</LI>
+<LI>
+<A NAME="50422086_pgfId-294977"></A>Scaling down a part may make it invalid because distinct points may become coincident after scaling.</LI>
+</UL>
+<P>
+<A NAME="50422086_pgfId-294978"></A>Modest scaling, up to a factor of 2, is unlikely to cause any problems.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422086_pgfId-294983"></A>16.3	<A NAME="50422086_marker-294979"></A><A NAME="50422086_marker-294980"></A><A NAME="50422086_marker-294981"></A><A NAME="50422086_marker-294982"></A><A NAME="50422086_81774"></A>Tolerant modelling and local precision 
+
+
+</H1>
+<P>
+<A NAME="50422086_pgfId-294989"></A>Parts created by other modellers can be imported into Parasolid (as described in <A HREF="fd_chap.091.html#50422169_38621">Chapter 90, “Importing Data”</A>) and used in modelling operations. However, such parts were probably created in a modeller that uses a lower precision. Once imported, they may contain inconsistencies between their topological and geometric data: edges which, topologically, should meet at a common point have attached geometric data that does not intersect.</P>
+<P>
+<A NAME="50422086_pgfId-294991"></A>To enable Parasolid to model successfully with imported parts, you can set a local precision on the edges and vertices of any externally created part that contains such inconsistencies. Setting local precision in this way is known as <STRONG>
+Tolerant Modelling</STRONG>.</P>
+<P>
+<A NAME="50422086_pgfId-294992"></A>When setting local precision, think of edges as tubes, and vertices as spheres. The lower the precision, the thicker the tube or the larger the diameter of the sphere. To use Tolerant Modelling effectively, you need to examine the topology for each part, and, where there is inconsistency in the data, lower the local precision (make the tubes fatter and the spheres bigger) until the geometric data intersects. This can be done with a function such as <A NAME="50422086_marker-294993"></A><A HREF=../headers/pk_edge_repair.html>PK_EDGE_repair</A>, or any of the checking functionality described in <A HREF="fd_chap.031.html#50422100_12509">Chapter 30, “Checking”</A>.</P>
+<P>
+<A NAME="50422086_pgfId-294997"></A>The precision value is stored as a parameter associated with an edge or vertex. It represents the minimum distance (in 3-space) that a point and an entity must be apart in order to be distinct.</P>
+<P>
+<A NAME="50422086_pgfId-295001"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422086_pgfId-295000"></A>Note: Your application should consider the use of local precisions a modelling operation, since it can affect both the topology and the geometry of a model.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422086_pgfId-295002"></A>Edges and vertices which don’t have a local precision set are considered <STRONG>
+exact</STRONG> by Parasolid, and have a precision of one half of the session precision.</P>
+<P>
+<A NAME="50422086_pgfId-295003"></A>The following subsections describe:</P>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-295007"></A>How to set local precision on edges (<A HREF="fd_chap.017.html#50422086_42393">Section 16.3.1</A>)</LI>
+<LI>
+<A NAME="50422086_pgfId-295011"></A>How to set local precision on vertices (<A HREF="fd_chap.017.html#50422086_34387">Section 16.3.2</A>)</LI>
+</UL>
+<P>
+<A NAME="50422086_pgfId-467238"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422086_pgfId-295014"></A>Note: Tolerant Modelling is not only useful when importing data: it is also used by Parasolid for certain modelling operations. Although the vast majority of calculations are performed to very precise fixed accuracies, so as to maintain session precision and consistency between topological and geometric data, some calculations (for instance, many involving B-surfaces) use a local precision.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422086_pgfId-295023"></A>	16.3.1 	<A NAME="50422086_42393"></A><A NAME="50422086_marker-354990"></A><A NAME="50422086_marker-354991"></A><A NAME="50422086_marker-354992"></A>Setting precision on an edge </H3>
+<P>
+<A NAME="50422086_pgfId-295026"></A><A NAME="50422086_marker-295024"></A><A NAME="50422086_marker-295025"></A>The result of setting precision on an edge depends on whether the edge has already had its precision changed. There are four possible scenarios:</P>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-295030"></A><A HREF="fd_chap.017.html#50422086_21718">Setting local precision on an edge with no previous local precision</A></LI>
+<LI>
+<A NAME="50422086_pgfId-295034"></A><A HREF="fd_chap.017.html#50422086_14074">Replacing a curve with several SP-curves</A></LI>
+<LI>
+<A NAME="50422086_pgfId-295038"></A><A HREF="fd_chap.017.html#50422086_26110">Setting a new precision on an edge that already has local precision</A></LI>
+<LI>
+<A NAME="50422086_pgfId-295042"></A><A HREF="fd_chap.017.html#50422086_10402">Removing local precision from an edge</A></LI>
+</UL>
+<P>
+<A NAME="50422086_pgfId-295044"></A>You usually set local precision using <A NAME="50422086_marker-295043"></A><A HREF=../headers/pk_edge_repair.html>PK_EDGE_repair</A>, which can set an appropriate precision for you automatically. <A NAME="50422086_marker-295045"></A><A HREF=../headers/pk_edge_ask_precision.html>PK_EDGE_ask_precision</A> returns the current precision for an edge.</P>
+<P>
+<A NAME="50422086_pgfId-295046"></A>Alternatively, you can use <A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A> to set local precision on an edge. This function takes the edge and the desired precision as input along with an options structure containing the following fields:</P>
+<P>
+<A NAME="50422086_pgfId-295064"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295049"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295051"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422086_pgfId-295053"></A>sp_method</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295055"></A>This datatype is used to indicate the method used to generate SP-curves. It takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-295056"></A>PK_set_precision_default_c: SP-curves are G1 (but not C1) continuous in the parameter space of the surface. This is the default.</LI>
+<LI>
+<A NAME="50422086_pgfId-295057"></A>PK_set_precision_c2_c: SP-curves are C2 continuous in the parameter space of the surface.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422086_pgfId-295059"></A>report_short_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295061"></A>Determines the manner in which a failure resulting from the edge or one of its neighboring edges being too short is reported. This can take the following values:</P>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-295063"></A><A HREF=../headers/pk_set_precision_report_t.html>PK_set_precision_report_yes_c</A>: If short edges are present, a Parasolid Report of type <A HREF=../headers/pk_report_4_t.html>PK_REPORT_4_t</A> is generated with the status of <A HREF=../headers/pk_report_4_t.html>PK_REPORT_4_error_report_c</A> which contains the short edges in a single item array. The error code PK_ERROR_edge_too_short is also returned and a group of the short edges will be placed in the <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure. </LI>
+<LI>
+<A NAME="50422086_pgfId-295062"></A><A HREF=../headers/pk_set_precision_report_t.html>PK_set_precision_report_no_c</A>: No report is generated. If short edges are present, the error code PK_ERROR_bad_tolerance_c is returned. This is the default.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422086_pgfId-295069"></A>16.3.1.1 <A NAME="50422086_21718"></A><A NAME="50422086_marker-295066"></A><A NAME="50422086_marker-295067"></A><A NAME="50422086_marker-295068"></A>Setting local precision on an edge with no previous local precision </H4>
+<P>
+<A NAME="50422086_pgfId-295073"></A>In <A HREF="fd_chap.017.html#50422086_41574"><EM>
+Figure 16-5</EM></A>, edge E1 (which has Parasolid session precision) is attached to a number of other edges at vertices V1 and V2.</P>
+<P>
+<A NAME="50422086_pgfId-295107"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-100.gif">
+
+<P>
+<A NAME="50422086_pgfId-295109"></A>Figure 16-5 <A NAME="50422086_41574"></A>Initial configuration - all edges and vertices are exact</P>
+<P>
+<A NAME="50422086_pgfId-295111"></A>Suppose that local precision is applied to E1 using <A NAME="50422086_marker-295110"></A><A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A>. Once local precision is set, the following apply (see Figure 4-6 <A NAME="50422086_Fs?Rmrich"></A>below):</P>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-295113"></A>E1 has the new precision, and is represented geometrically by two SP-curves attached to its fins.</LI>
+<LI>
+<A NAME="50422086_pgfId-295114"></A>The 3-space curve attached to edge E1 is deleted (unless nominal geometry is enabled for the body).</LI>
+</UL>
+<P>
+<A NAME="50422086_pgfId-295118"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422086_pgfId-295117"></A>Note: It is important to note this difference of geometric representation between edges with and without local precision set.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-295119"></A>The vertices V1 and V2 automatically have their local precision set to the same as that of edge E1. Their geometric points are unchanged. The precision of a vertex must always be at least as large as the largest precision of any edge ending at that vertex.</LI>
+<LI>
+<A NAME="50422086_pgfId-295120"></A>The edges and vertices affected are bulletined as changed.</LI>
+<LI>
+<A NAME="50422086_pgfId-295121"></A>All other geometry and topology in the part is unchanged.</LI>
+</UL>
+<P>
+<A NAME="50422086_pgfId-295155"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-101.gif">
+
+<P>
+<A NAME="50422086_pgfId-295157"></A>Figure 16-6 <A NAME="50422086_33011"></A>Final configuration after precision has been set</P>
+<P>
+<A NAME="50422086_pgfId-295161"></A>For more information about nominal geometry, see <A HREF="fd_chap.020.html#50422089_36760">Chapter 19, “Nominal Geometry”</A>.</P>
+
+
+<H4>
+<A NAME="50422086_pgfId-295166"></A>16.3.1.2 <A NAME="50422086_14074"></A><A NAME="50422086_marker-295163"></A><A NAME="50422086_marker-295164"></A><A NAME="50422086_marker-295165"></A>Replacing a curve with several SP-curves </H4>
+<P>
+<A NAME="50422086_pgfId-295169"></A><A NAME="50422086_marker-295167"></A><A NAME="50422086_marker-295168"></A>Sometimes, it is not possible to compute a single SP-curve from the original curve and the relevant face surface. This is usually due to G1 discontinuities in the surface parameter space, where it is necessary to split the curve and introduce extra vertices on the edge. In such cases, the edge is split a number of times, once for every surface singularity or discontinuity on the original curve. SP-curves are then computed for every relevant fin on the new edges.</P>
+<P>
+<A NAME="50422086_pgfId-295173"></A><A HREF="fd_chap.017.html#50422086_17289"><EM>
+Figure 16-7</EM></A> shows a simple ring edge passing through the poles of a sphere. There are two curves, split at the parameter singularities, which both have local precision set.<A NAME="50422086_Ft?Rmrich"></A></P>
+<P>
+<A NAME="50422086_pgfId-295183"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422086_pgfId-295182"></A>Note: <A NAME="50422086_marker-295177"></A><A NAME="50422086_marker-295178"></A><A NAME="50422086_marker-295179"></A><A NAME="50422086_marker-295180"></A>If you use a function such as <A NAME="50422086_marker-295181"></A><A HREF=../headers/pk_edge_repair.html>PK_EDGE_repair</A> to set local precision, then edges are split automatically if any G1 discontinuities are found.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422086_pgfId-295220"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-102.gif">
+
+<P>
+<A NAME="50422086_pgfId-295222"></A>Figure 16-7 <A NAME="50422086_17289"></A>Involving edge splitting</P>
+<P>
+<A NAME="50422086_pgfId-295223"></A>To set local precision correctly, the edge is split into two and SP-curves attached to the relevant fins. Any edges created by this means are returned in a list.</P>
+<P>
+<A NAME="50422086_pgfId-295224"></A>The fins of edge E1 have coincident and reversed SP-curves attached (single-segment linear SP-curves in this example, though more generally they would be quadratic B-splines).</P>
+<P>
+<A NAME="50422086_pgfId-295228"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422086_pgfId-295227"></A>Performance issue: You should not set precision too tight, as this may incur a performance penalty. Precision in the range 1.0e-6 to 1.0e-8 modeller units is likely to result in the generation of SP-curves with large numbers of segments, these can result in a corresponding drop in performance.</ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422086_pgfId-330303"></A>16.3.1.3 <A NAME="50422086_26110"></A><A NAME="50422086_marker-330300"></A><A NAME="50422086_marker-330301"></A><A NAME="50422086_marker-330302"></A>Setting a new precision on an edge that already has local precision </H4>
+<P>
+<A NAME="50422086_pgfId-330304"></A>The simplest way to set an appropriate precision on an edge that already has local precision is to use <A HREF=../headers/pk_edge_optimise.html><A HREF=../headers/pk_edge_optimise.html>PK_EDGE_optimise</A></A>. This function attempts to reset the precision on an already tolerant edge to a value that lies between a given precision (which can be the current precision), and a maximum deviation determined by the greatest deviation between any of the curves attached to the edge. Thus, <A HREF=../headers/pk_edge_optimise.html><A HREF=../headers/pk_edge_optimise.html>PK_EDGE_optimise</A></A> attempts to lower the current precision, without making it too small for the SP-curves attached to the edge. By default, short edges are not optimised. If you wish to optimise them, set <CODE>
+optimise_short</CODE>
+ to PK_EDGE_optimise_yes_c. An edge is considered a short edge if all positions along that edge lie within at least one of the vertex bubbles.</P>
+<P>
+<A NAME="50422086_pgfId-295235"></A>Alternatively, you can use <A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A> to set the local precision of an edge to a different value, regardless of the SP-curves on the edge. Note that the existing SP-curves <EM>
+are not</EM> replaced, even if the precision value supplied is numerically smaller. The precision of any vertices of the edge is set to the supplied value if this is greater than the value already stored there, otherwise, they are left alone. <A HREF="fd_chap.017.html#50422086_19361"><EM>
+Figure 16-8</EM></A> shows the effect of resetting edge precision for the edge shown in <A HREF="fd_chap.017.html#50422086_33011"><EM>
+Figure 16-6</EM></A>.</P>
+<P>
+<A NAME="50422086_pgfId-295275"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-103.gif">
+
+<P>
+<A NAME="50422086_pgfId-295277"></A>Figure 16-8 <A NAME="50422086_19361"></A>Resetting edge precision to <STRONG>
+(a)</STRONG> a smaller value <STRONG>
+(b)</STRONG> a larger value</P>
+<P>
+<A NAME="50422086_pgfId-295281"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422086_pgfId-295280"></A>Note: It is possible to cause the model to fail checking by setting an edge precision to a numerically smaller value, because the existing SP-curves attached to the fins may well not lie within the new precision of each other. To rectify, the SP-curves must be replaced. We recommend that applications do not decrease precision in this manner.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422086_pgfId-295286"></A>16.3.1.4 <A NAME="50422086_10402"></A><A NAME="50422086_marker-295283"></A><A NAME="50422086_marker-295284"></A><A NAME="50422086_marker-295285"></A>Removing local precision from an edge </H4>
+<P>
+<A NAME="50422086_pgfId-310994"></A><A NAME="50422086_marker-310992"></A>You can use <A NAME="50422086_marker-310993"></A><A HREF=../headers/pk_edge_reset_precision_2.html>PK_EDGE_reset_precision_2</A> to remove local precision from an edge, so that it is once more represented geometrically by an unbounded 3-space curve. In order to recreate this curve, Parasolid removes the SP-curves attached to the edge, and computes the position of the new curve by finding the intersection of the underlying surfaces for each face. This is illustrated in <A HREF="fd_chap.017.html#50422086_14726"><EM>
+Figure 16-9</EM></A>.</P>
+<P>
+<A NAME="50422086_pgfId-311005"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-104.gif">
+
+<P>
+<A NAME="50422086_pgfId-295331"></A>Figure 16-9 <A NAME="50422086_14726"></A>Removing local precision from an edge</P>
+<P>
+<A NAME="50422086_pgfId-295332"></A>This operation may not always be successful if the adjacent surfaces are tangent or nearly tangent.</P>
+<P>
+<A NAME="50422086_pgfId-295333"></A>You can control how the edge geometry is determined using the <CODE>
+method</CODE>
+ option. This option has the following values:</P>
+<P>
+<A NAME="50422086_pgfId-295351"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295336"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295338"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295340"></A><A HREF=../headers/pk_reset_prec_method_t.html>PK_reset_prec_method_any_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295342"></A>Any curve that is coincident within session precision to the adjacent surfaces is acceptable.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295344"></A><A HREF=../headers/pk_reset_prec_method_t.html>PK_reset_prec_method_inter_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295346"></A>The true intersection curve is preferable.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295348"></A><A HREF=../headers/pk_reset_prec_method_t.html>PK_reset_prec_method_int_only_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295350"></A>Only the true intersection curve is acceptable.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422086_pgfId-295355"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422086_pgfId-295354"></A>Performance issue: Using <A HREF=../headers/pk_edge_reset_precision_2.html>PK_EDGE_reset_precision_2</A> on simple surface geometry often improves performance, because enquiries on exact geometry are usually faster than enquiries on approximate SP-curves.</ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422086_pgfId-295360"></A>	16.3.2 	<A NAME="50422086_34387"></A><A NAME="50422086_marker-295357"></A><A NAME="50422086_marker-295358"></A><A NAME="50422086_marker-295359"></A>Setting precision on a vertex </H3>
+<P>
+<A NAME="50422086_pgfId-295361"></A>When local precision is applied to a vertex, the precision value represents the radius of a sphere of uncertainty around the point of the vertex. The lower the precision, the larger the precision value, and the larger the sphere of uncertainty. </P>
+<P>
+<A NAME="50422086_pgfId-295362"></A>Vertex precision is usually set as a by-product of setting edge precision, either by calling <A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A> or by other modelling operations. In addition, vertex precision may be modified when calling <A HREF=../headers/pk_vertex_optimise.html>PK_VERTEX_optimise</A>. Your application should not normally need to set an individual precision for a vertex. However, <A NAME="50422086_marker-295363"></A>if necessary, you can use <A HREF=../headers/pk_vertex_set_precision.html>PK_VERTEX_set_precision</A> to set a vertex precision, provided that:</P>
+<UL>
+<LI>
+<A NAME="50422086_pgfId-295364"></A>it is not smaller than the existing precision</LI>
+<LI>
+<A NAME="50422086_pgfId-295365"></A>it is not less than the maximum of the precision of the edges meeting there</LI>
+<LI>
+<A NAME="50422086_pgfId-348243"></A>none of the edges of the vertex lie completely within the sphere of uncertainty</LI>
+</UL>
+<P>
+<A NAME="50422086_pgfId-295367"></A><A NAME="50422086_marker-295366"></A><A HREF=../headers/pk_vertex_ask_precision.html>PK_VERTEX_ask_precision</A> returns the current precision of any vertex.</P>
+
+
+<H3>
+<A NAME="50422086_pgfId-295369"></A>	16.3.3 	<A NAME="50422086_41934"></A>Improving local precision at tolerant vertices </H3>
+<P>
+<A NAME="50422086_pgfId-295370"></A>Depending on the functionality in your application, you may need to export model data that contains tolerance information from Parasolid into other systems. Many of these external systems place constraints on the representations that they will accept, and you can address this by ensuring that the tolerance information on your models is as optimal as possible. </P>
+<P>
+<A NAME="50422086_pgfId-295374"></A>You can use <A HREF=../headers/pk_loop_close_gaps.html>PK_LOOP_close_gaps</A> and <A HREF=../headers/pk_face_close_gaps.html>PK_FACE_close_gaps</A> to improve the tolerance information at vertices by ensuring that loops are closed, either in model space or parameter space. These functions receives either a loop or a face (depending on the function you use) on which there should be vertices that contain tolerance information, together with an options structure with the following options:</P>
+<P>
+<A NAME="50422086_pgfId-356073"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295377"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295379"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422086_pgfId-295381"></A>gap_in_3_space</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295383"></A>Whether to close gaps in the loop at tolerant vertices in model space. If set to PK_LOOP_3_space_gap_close_c, the SP-curves at tolerant vertices are modified wherever possible so as to close the loop. Default: PK_LOOP_3_space_gap_close_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422086_pgfId-295385"></A>gap_in_2_space</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295387"></A>Whether to close gaps in the loop at tolerance vertices in parameter space. Default: PK_LOOP_2_space_gap_no_c.</P>
+<P>
+<A NAME="50422086_pgfId-295388"></A>If set to PK_LOOP_2_space_gap_minimise_c, any gaps in parameter space between adjacent fins are minimised if possible by transforming the parameter space B-curves underlying the SP-curves so that they meet in the same period. This value only has an effect if the surface attached to the received loop’s face is periodic. See <A HREF="fd_chap.017.html#50422086_61319">“Closing gaps in periodic faces”</A>. </P>
+<P>
+<A NAME="50422086_pgfId-295392"></A>If set to PK_LOOP_2_space_gap_close_cu_c, any gaps in parameter space between adjacent fins are minimised if possible by extending or trimming the SP-curves to meet within the tolerance specified in tol_in_2_space. See <A HREF="fd_chap.017.html#50422086_55733">“Closing gaps by extending and trimming SP-curves”</A>. </P>
+<P>
+<A NAME="50422086_pgfId-295396"></A>If set to PK_LOOP_2_space_gap_close_all_c, SP-curves are extended or trimmed to minimise gaps to within tol_in_2_space if possible. If this is not possible, then the underlying surface is reparameterised. See <A HREF="fd_chap.017.html#50422086_58639">“Closing gaps by reparameterising the surface”</A>. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422086_pgfId-295401"></A>tol_in_2_space</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295403"></A>A tolerance value for controlling the parameter space gap at tolerant vertices in the loop. If <CODE>
+gap_in_2_space</CODE>
+ is either PK_LOOP_2_space_gap_close_cu_c or PK_LOOP_2_space_gap_close_all_c, gaps are closed to within this tolerance. Default: 1.0e-6.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422086_pgfId-295405"></A>trim_fin_geom</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422086_pgfId-295407"></A>Whether to remove that part of the SP-curve geometry on tolerant edges that lies outside the bounds of the fins that comprise those edges. Default: PK_LOOP_trim_geom_no_c. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422086_pgfId-295408"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422086_pgfId-356141"></A>Note: This functionality does not support facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422086_pgfId-295410"></A>16.3.3.1 <A NAME="50422086_61319"></A>Closing gaps in periodic faces </H4>
+<P>
+<A NAME="50422086_pgfId-295414"></A>In the example shown in <A HREF="fd_chap.017.html#50422086_42423"><EM>
+Figure 16-10</EM></A>, a cylindrical body has edges at the seams of the underlying cylindrical surface (corresponding to u=0) and at u=pi. When tolerance information is placed on all the edges in the cylinder, then both fins of the edge at the seam have SP-curves at u=0. This means that one of the cylinder’s loops is not closed in parameter space, as shown. </P>
+<P>
+<A NAME="50422086_pgfId-295415"></A>If you set <CODE>
+gap_in_2_space</CODE>
+ to PK_LOOP_2_space_gap_minimise_c, <A HREF=../headers/pk_loop_close_gaps.html>PK_LOOP_close_gaps</A> and <A HREF=../headers/pk_face_close_gaps.html>PK_FACE_close_gaps</A> transform the underlying B-curve of the shared SP-curve such that the loop is closed in parameter space, as shown. In addition, it correctly identifies which is the high seam and which is the low seam. </P>
+<P>
+<A NAME="50422086_pgfId-295449"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-105.gif">
+
+<P>
+<A NAME="50422086_pgfId-295463"></A>Figure 16-10 <A NAME="50422086_42423"></A>Closing loops in parameter space for a tolerant cylinder</P>
+
+
+<H4>
+<A NAME="50422086_pgfId-295465"></A>16.3.3.2 <A NAME="50422086_55733"></A>Closing gaps by extending and trimming SP-curves </H4>
+<P>
+<A NAME="50422086_pgfId-295469"></A><A HREF="fd_chap.017.html#50422086_42532"><EM>
+Figure 16-11</EM></A> shows a simple example in which gaps in the loop can be closed by extending or trimming the relevant SP-curves. If you set <CODE>
+gap_in_2_space</CODE>
+ to PK_LOOP_2_space_gap_close_cu_c, <A HREF=../headers/pk_loop_close_gaps.html>PK_LOOP_close_gaps</A> and <A HREF=../headers/pk_face_close_gaps.html>PK_FACE_close_gaps</A> modify the SP-curves attached to the face as relevant, in order to close any gaps, as shown. </P>
+<P>
+<A NAME="50422086_pgfId-295503"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-106.gif">
+
+<P>
+<A NAME="50422086_pgfId-295505"></A>Figure 16-11 <A NAME="50422086_42532"></A>Closing loops in parameter space by extending and trimimng SP-curves</P>
+
+
+<H4>
+<A NAME="50422086_pgfId-295507"></A>16.3.3.3 <A NAME="50422086_58639"></A>Closing gaps by reparameterising the surface </H4>
+<P>
+<A NAME="50422086_pgfId-295511"></A>In the example shown in <A HREF="fd_chap.017.html#50422086_21332"><EM>
+Figure 16-12</EM></A>, the face shown has an open loop that cannot be closed by extending or trimming the attached SP-curves. Instead, the only possible workaround is to reparameterise the surface so as to minimise the gap between the existing SP-curves. </P>
+<P>
+<A NAME="50422086_pgfId-295512"></A>If you set <CODE>
+gap_in_2_space</CODE>
+ to PK_LOOP_2_space_gap_close_all_c, <A HREF=../headers/pk_loop_close_gaps.html>PK_LOOP_close_gaps</A> and <A HREF=../headers/pk_face_close_gaps.html>PK_FACE_close_gaps</A> reparamaterise the surface, in order to minimise the gap in the loop, as shown. </P>
+<P>
+<A NAME="50422086_pgfId-295516"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422086_pgfId-295515"></A>Note: Reparameterising the surface will minimise gaps, but is not guaranteed to close them within tolerance. Before reparameterising a surface, PK_LOOP_2_space_gap_close_all_c first tries to close gaps by extending and trimming SP-curves, as with PK_LOOP_2_space_gap_close_cu_c.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422086_pgfId-295550"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-107.gif">
+
+<P>
+<A NAME="50422086_pgfId-295552"></A>Figure 16-12 <A NAME="50422086_21332"></A>Closing gaps in parameter space by reparameterising the surface</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.016.html">Body Types</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.018.html">Geometry</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

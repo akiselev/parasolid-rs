@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_SURF_eval</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_SURF_eval</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> PK_SURF_eval
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>       surf,       --- surface
+<A HREF=../headers/pk_uv_t.html>PK_UV_t</A>         uv,         --- u and v parameter pair
+int             n_u_derivs, --- number of u derivatives [NF]
+int             n_v_derivs, --- number of v derivatives [NF]
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>    triangular, --- triangular derivative array required
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>     p[]         --- point and derivatives
+)
+</B>
+<A NAME="description"></A>
+<I>This function evaluates a point and derivatives at a parameter pair on
+the given surface.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_parameter            not permitted to evaluate outside of
+                                      range (MILD)
+    PK_ERROR_too_many_derivatives     too many derivatives requested (MILD)
+    PK_ERROR_num_derivs_not_equal     where triangular format was requested
+                                      (MILD)
+    PK_ERROR_eval_failure             internal evaluator failure (MILD)
+
+<A NAME="documentation"></A>
+The function calculates the cartesian coordinates of the point at the
+given parameter pair <B>'uv'</B>,  and also the derivatives with respect to <B>'uv'</B>,
+up to order <B>'n_u_derivs'</B> and <B>'n_v_derivs'</B> respectively. <B>'triangular'</B> controls
+whether the returned array of derivatives is triangular or not.
+
+It is not necessarily required that the supplied parameters lie inside the
+ranges as given by <A HREF=../headers/pk_surf_ask_params.html>PK_SURF_ask_params</A>.  If the surface is
+<A HREF=../headers/pk_param_periodic_t.html>PK_PARAM_periodic_yes_c</A> or <A HREF=../headers/pk_param_periodic_t.html>PK_PARAM_periodic_seamed_c</A> in a parametric direction
+then any value is acceptable for that parameter.  For cases where it is not
+permitted to evaluate outside the range, PK_ERROR_bad_parameter will be
+returned.
+
+Where derivative discontinuities occur at patch boundaries, the derivatives
+just after the discontinuity are returned.
+
+There is a limit on the number of derivatives which may be requested.
+
+In the case of mesh surfaces (PK_CLASS_mesh), no derivatives can be returned.
+<B>'n_u_derivs'</B> and <B>'n_v_derivs'</B> must be set to 0.
+
+In the case of foreign geometry surfaces (PK_CLASS_fsurf), the maximum number
+of derivatives that can be returned by this function is determined by the
+surface's external evaluator, but it is still restricted to values smaller than
+ten. The evaluator should, at least, be  able to calculate up to second order
+derivatives.
+
+The following table shows the derivatives that can be requested for other
+surface types.
+
+                              u derivs
+
+                      |   0   |   1   |   2   |  3-10 |
+                --------------------------------------
+                   0  |   A   |   A   |   B   |   D   |
+                --------------------------------------
+     v derivs      1  |   A   |   A   |   C   |   D   |
+                --------------------------------------
+                   2  |   B   |   C   |   C   |   D   |
+                --------------------------------------
+                 3-10 |   D   |   D   |   D   |   D   |
+                --------------------------------------
+
+  A - All surface types.
+  B - All surface types (blend surfaces will approximate derivatives).
+  C - All surface types (blend & offset surfaces will approximate derivatives).
+  D - All surface types, excluding blend and offset surfaces.
+
+The return argument <B>'p'</B> is a vector array returning the point and possibly
+derivatives.  This array is filled as follows:
+
+    p[0] is the point on the surface itself.
+
+If derivatives are required and <B>'triangular'</B> is PK_LOGICAL_false then
+a rectangular derivative matrix is returned. The derivatives are stored
+as follows:
+
+    The i'th derivative ( i &lt;= <B>'n_u_derivs'</B> ) with respect to u and
+    the j'th derivative ( j &lt;= <B>'n_v_derivs'</B> ) with respect to v is
+        p[  i + ( <B>'n_u_derivs'</B>+1 ) * j )  ]
+
+For example, if <B>'n_u_derivs'</B> is 2 and <B>'n_v_derivs'</B> is 3, then the array
+contains 12 vectors:-
+
+    p(u,v)     p(u,v)     p(u,v)
+                     u          uu
+then:-
+
+    p(u,v)     p(u,v)     p(u,v)
+          v          uv         uuv
+then:-
+
+    p(u,v)     p(u,v)     p(u,v)
+          vv         uvv        uuvv
+then:-
+
+    p(u,v)     p(u,v)     p(u,v)
+          vvv        uvvv       uuvvv
+
+where
+    p(u,v)       for example is the first derivative with respect to u
+          uvv    and the second derivative with respect to v.
+
+
+Alternatively, if <B>'triangular'</B> is PK_LOGICAL_true then a triangular derivative
+matrix is returned. The derivatives are stored as follows:
+
+    The i'th derivative ( i &lt;= <B>'n_u_derivs'</B> ) with respect to u and
+    the j'th derivative ( j &lt;= <B>'n_v_derivs'</B> ) with respect to v is
+        p[ i + ( <B>'n_u_derivs'</B>+1 ) * j - 0.5 * j * ( j-1) ]
+
+In this case it is an error if <B>'n_u_derivs'</B> and <B>'n_v_derivs'</B> are not
+equal. This will only be detected when argument checking is turned on.
+
+For example, if <B>'n_u_derivs'</B> is 2 and <B>'n_v_derivs'</B> is 2, then the array
+contains 6 vectors:-
+
+    p(u,v)     p(u,v)     p(u,v)
+                     u          uu
+then:-
+
+    p(u,v)     p(u,v)
+          v          uv
+then:-
+
+    p(u,v)
+          vv
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

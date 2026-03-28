@@ -1,0 +1,917 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Model Structure</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Model Structure</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="xt_chap.04.html">Physical Layout</A></TD>
+  <TD><A HREF="../xt_index.html">Chapters</A></TD>
+  <TD><A HREF="xt_chap.06.html">Schema Definitions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294625">4.1	Topology</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294635">4.2	General points</A>
+<UL>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-490101">4.2.1	Linear and angular resolution</A>
+</UL>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-299011">4.3	Entity definitions</A>
+<UL>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-299012">4.3.1	Assembly</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294643">4.3.2	Instance</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-487754">4.3.3	Body</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294653">4.3.4	Region</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294662">4.3.5	Shell</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294671">4.3.6	Face</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294676">4.3.7	Loop</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294687">4.3.8	Halfedge</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294694">4.3.9	Edge</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294702">4.3.10	Vertex</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294705">4.3.11	Attributes</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294710">4.3.12	Features</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294714">4.3.13	Identifiers</A>
+</UL>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294715">4.4	Entity matrix</A>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294882">4.5	Representation of manifold bodies</A>
+<UL>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-294883">4.5.1	Body types</A>
+<UL>
+<LI> <A HREF="xt_chap.05.html#50487394_pgfId-472589">4.5.1.1	Restrictions on entity relationships for manifold body types</A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50487394_pgfId-294625"></A>4.1	Topology
+
+
+</H1>
+<P>
+<A NAME="50487394_pgfId-298872"></A>This section describes the XT Topology model, it gives an overview of how the nodes in the XT data are joined together. In this section the word ‘entity’ means a node which is visible to an XT application - a table of which nodes are visible at the XT interface appears in the section 'Node Types'.</P>
+<P>
+<A NAME="50487394_pgfId-295356"></A>The topological representation allows for:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294629"></A>Non-manifold solids.</LI>
+<LI>
+<A NAME="50487394_pgfId-294630"></A>Solids with internal partitions.</LI>
+<LI>
+<A NAME="50487394_pgfId-294631"></A>Bodies of mixed dimension (i.e. with wire, sheet, and solid 'bits').</LI>
+<LI>
+<A NAME="50487394_pgfId-294632"></A>Pure wire-frame bodies.</LI>
+<LI>
+<A NAME="50487394_pgfId-294633"></A>Disconnected bodies.</LI>
+<LI>
+<A NAME="50487394_pgfId-490085"></A>Compound bodies.</LI>
+<LI>
+<A NAME="50487394_pgfId-490086"></A>Child bodies.</LI>
+<LI>
+<A NAME="50487394_pgfId-490087"></A>Standard bodies.</LI>
+</UL>
+<P>
+<A NAME="50487394_pgfId-490088"></A><STRONG>
+Compound bodies</STRONG> are containers for child bodies that are expected to be related in some way such that they are able to share some physical aspects. Within compound bodies, a <STRONG>
+child body</STRONG> is used to define one representation of a part. <STRONG>
+Standard</STRONG> bodies are the basic “unit” of modelling used in Parasolid. A child body is identical to a standard body except that it can share geometry where appropriate with other child bodies within the compound body.</P>
+<P>
+<A NAME="50487394_pgfId-294634"></A>Each entity is described, and its properties and links to other entities given.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50487394_pgfId-294635"></A>4.2	<A NAME="50487394_56059"></A>General points
+
+
+</H1>
+<P>
+<A NAME="50487394_pgfId-498099"></A>This section provides information on some XT Format terminology used in this manual.</P>
+<P>
+<A NAME="50487394_pgfId-301403"></A>In this section a set is called finite if it can be enclosed in a ball of finite radius - not that it has a finite number of members.</P>
+<P>
+<A NAME="50487394_pgfId-294637"></A>A set of points in 3-dimensional space is called open if it does not contain its boundary.</P>
+<P>
+<A NAME="50487394_pgfId-300208"></A>Back-pointers, next and previous pointers in a chain, and derived pointers are not described explicitly here. For information on this see the following description of the schema-level model.</P>
+
+<H3>
+<A NAME="50487394_pgfId-490101"></A>	4.2.1 	Linear and angular resolution</H3>
+<P>
+<A NAME="50487394_pgfId-490106"></A>XT data structures use fixed accuracies called <STRONG>
+linear resolution </STRONG><A NAME="50487394_marker-490102"></A><A NAME="50487394_marker-490103"></A>and <STRONG>
+angular resolution</STRONG><A NAME="50487394_marker-490104"></A><A NAME="50487394_marker-490105"></A>, which can be described as follows:</P>
+<P>
+<A NAME="50487394_pgfId-490120"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-490109"></A>Resolution</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-490111"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-490113"></A>Linear resolution</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-490115"></A>The linear precision. Distances less than this value are considered to be zero and distances that differ by no more than this value are considered to be equal. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-490117"></A>Angular resolution</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-490119"></A>The smallest angle (in radians) that is considered to be different from zero. Angles less than this value are considered to be zero and angles that differ by no more than this value are treated as equal. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487394_pgfId-490121"></A>By default, in XT data points are not considered coincident unless they are less than 1.0e-8 units apart (linear resolution). Directions are considered to be parallel if they differ by less than 1.0e-11 radians (angular resolution). It is important that any data passed to a Parasolid-enabled application is at least this accurate. You are recommended not to change these values when authoring XT data.</P>
+<P>
+<A NAME="50487394_pgfId-490130"></A><A NAME="50487394_marker-490125"></A>All parts of a body must be within a box called the <STRONG>
+size box</STRONG><A NAME="50487394_marker-490126"></A>, as shown in <A HREF="xt_chap.05.html#50487394_29201"><EM>
+Figure 4-1</EM></A>, whose size is 1000 by 1000 by 1000 and is centered at the origin. </P>
+<P>
+<A NAME="50487394_pgfId-498112"></A>You are highly recommended to set the default unit to one meter, giving 1 kilometer as the maximum distance, in any one direction, that can be modelled.</P>
+<P>
+<A NAME="50487394_pgfId-490132"></A>To handle the angular resolution of arcs correctly, the radius used when representing an arc must be less than a factor of 10 times the dimension of the size box.</P>
+<P>
+<A NAME="50487394_pgfId-490167"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/xt_chap-7.gif">
+
+<P>
+<A NAME="50487394_pgfId-490169"></A>Figure 4-1 <A NAME="50487394_29201"></A>Linear and angular resolution</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50487394_pgfId-299011"></A>4.3	Entity definitions
+
+
+</H1>
+
+<H3>
+<A NAME="50487394_pgfId-299012"></A>	4.3.1 	Assembly</H3>
+<P>
+<A NAME="50487394_pgfId-299013"></A>An assembly is a collection of instances of bodies or assemblies. It may also contain construction geometry. An assembly has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294641"></A>A set of instances.</LI>
+<LI>
+<A NAME="50487394_pgfId-294642"></A>A set of geometry (surfaces, curves and points).</LI>
+</UL>
+
+
+<H3>
+<A NAME="50487394_pgfId-294643"></A>	4.3.2 	Instance</H3>
+<P>
+<A NAME="50487394_pgfId-298027"></A>An instance is a reference to a body or an assembly, with an optional transform:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294644"></A>Body or assembly.</LI>
+<LI>
+<A NAME="50487394_pgfId-294645"></A>Transform. If null, the identity transform is assumed.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50487394_pgfId-487754"></A>	4.3.3 	Body</H3>
+<P>
+<A NAME="50487394_pgfId-294646"></A>A body is a collection of faces, edges and vertices, together with the 3-dimensional connected regions into which space is divided by these entities. Each region is either solid or void (indicating whether it represents material or not).</P>
+<P>
+<A NAME="50487394_pgfId-294647"></A>The point-set represented by the body is the disjoint union of the point-sets represented by its solid regions, faces, edges, and vertices. This point-set need not be connected, but it shall be finite.</P>
+<P>
+<A NAME="50487394_pgfId-298045"></A>A body has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294649"></A>A set of regions.</LI>
+<P>
+<A NAME="50487394_pgfId-487764"></A>A body has one or more regions. These, together with their boundaries, make up the whole of 3-space, and do not overlap, except at their boundaries. One region in the body is distinguished as the exterior region, which shall be infinite; all other regions in the body shall be finite.</P>
+<LI>
+<A NAME="50487394_pgfId-294651"></A>A set of geometry (surfaces, curves and/or points).</LI>
+<LI>
+<A NAME="50487394_pgfId-294652"></A>A body-type. This may be wire, sheet, solid or general.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50487394_pgfId-294653"></A>	4.3.4 	Region</H3>
+<P>
+<A NAME="50487394_pgfId-298062"></A>A region is an open connected subset of 3-dimensional space whose boundary is a collection of vertices, edges, and oriented faces.</P>
+<P>
+<A NAME="50487394_pgfId-294654"></A>Regions are either solid or void, and they may be non-manifold. A solid region contributes to the point-set of its owning body; a void region does not (although its boundary will).</P>
+<P>
+<A NAME="50487394_pgfId-294655"></A>Two regions may share a face, one on each side.</P>
+<P>
+<A NAME="50487394_pgfId-294656"></A>A region may be infinite, but a body shall have exactly one infinite region. The infinite region of a body shall be void.</P>
+<P>
+<A NAME="50487394_pgfId-294657"></A>A region has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294658"></A>A logical indicating whether the region is solid.</LI>
+<LI>
+<A NAME="50487394_pgfId-294659"></A>A set of shells. The positive shell of a region, if it has one, is not distinguished.</LI>
+</UL>
+<P>
+<A NAME="50487394_pgfId-294660"></A>The shells of a region do not overlap or share faces, edges or vertices.</P>
+<P>
+<A NAME="50487394_pgfId-294661"></A>A region may have no shells, in which case it represents all space (and will be the only region in its body, which will have no faces, edges or vertices).</P>
+
+
+<H3>
+<A NAME="50487394_pgfId-294662"></A>	4.3.5 	Shell</H3>
+<P>
+<A NAME="50487394_pgfId-298074"></A>A shell is a connected component of the boundary of a region. As such it will be defined by a collection of faces, each used by the shell on one 'side', or on both sides; and some edges and vertices.</P>
+<P>
+<A NAME="50487394_pgfId-294663"></A>A shell has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294664"></A>A set of (face, logical) pairs.</LI>
+<P>
+<A NAME="50487394_pgfId-487779"></A>Each pair represents one side of a face (where true indicates the front of the face, i.e. the side towards which the face normal points), and means that the region to which the shell belongs lies on that side of the face. The same face may appear twice in the shell (once with each orientation), in which case the face is a 2-dimensional cut subtracted from the region which owns the shell.</P>
+<LI>
+<A NAME="50487394_pgfId-294666"></A>A set of wireframe edges.</LI>
+<P>
+<A NAME="50487394_pgfId-487784"></A>Edges are called wireframe if they do not bound any faces, and so represent 1-dimensional cuts in the shell's region. These edges are not shared by other shells.</P>
+<LI>
+<A NAME="50487394_pgfId-294668"></A>A vertex.</LI>
+<P>
+<A NAME="50487394_pgfId-487789"></A>This is only non-null if the shell is an acorn shell, i.e. it represents a 0-dimensional hole in its region, and has one vertex, no edges and no faces.</P>
+</UL>
+<P>
+<A NAME="50487394_pgfId-294670"></A>A shell shall contain at least one vertex, edge, or face.</P>
+
+
+<H3>
+<A NAME="50487394_pgfId-294671"></A>	4.3.6 	Face</H3>
+<P>
+<A NAME="50487394_pgfId-298086"></A>A face is an open finite connected subset of a surface, whose boundary is a collection of edges and vertices. It is the 2-dimensional analogy of a region.</P>
+<P>
+<A NAME="50487394_pgfId-294672"></A>A face has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294673"></A>A set of loops. A face may have zero loops (e.g. a full spherical face), or any number.</LI>
+<LI>
+<A NAME="50487394_pgfId-294674"></A>Surface. This may be null, and may be used by other faces.</LI>
+<LI>
+<A NAME="50487394_pgfId-294675"></A>Sense. This logical indicates whether the normal to the face is aligned with or opposed to that of the surface.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50487394_pgfId-294676"></A>	4.3.7 	Loop</H3>
+<P>
+<A NAME="50487394_pgfId-298098"></A>A loop is a connected component of the boundary of a face. It is the 2-dimensional analogy of a shell. As such it will be defined by a collection of fins and a collection of vertices.</P>
+<P>
+<A NAME="50487394_pgfId-294677"></A>A loop has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294678"></A>An ordered ring of fins.</LI>
+<P>
+<A NAME="50487394_pgfId-487799"></A>Each fin represents the oriented use of an edge by a loop. The sense of the fin indicates whether the loop direction and the edge direction agree or disagree. A loop may not contain the same edge more than once in each direction.</P>
+<P>
+<A NAME="50487394_pgfId-487800"></A>The ordering of the fins represents the way in which their owning edges are connected to each other via common vertices in the loop (i.e. nose to tail, taking the sense of each fin into account).</P>
+<P>
+<A NAME="50487394_pgfId-487801"></A>The loop direction is such that the face is locally on the left of the loop, as seen from above the face and looking in the direction of the loop.</P>
+<LI>
+<A NAME="50487394_pgfId-294682"></A>A vertex.</LI>
+<P>
+<A NAME="50487394_pgfId-487806"></A>This is only non-null if the loop is an isolated loop, i.e. has no fins and represents a 0-dimensional hole in the face.</P>
+</UL>
+<P>
+<A NAME="50487394_pgfId-487807"></A>Consequently, a loop shall consist either of:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294684"></A>A single fin whose owning ring edge has no vertices, or</LI>
+<LI>
+<A NAME="50487394_pgfId-294685"></A>At least one fin and at least one vertex, or</LI>
+<LI>
+<A NAME="50487394_pgfId-294686"></A>A single vertex.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50487394_pgfId-294687"></A>	4.3.8 	Halfedge</H3>
+<P>
+<A NAME="50487394_pgfId-298110"></A>A halfedge represents the oriented use of an edge by a loop. </P>
+<P>
+<A NAME="50487394_pgfId-295531"></A>A halfedge has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294688"></A>A logical sense indicating whether the orientation of the halfedge (and thus the orientation of its owning loop) is the same as that of its owning edge, or different.</LI>
+<LI>
+<A NAME="50487394_pgfId-294689"></A>A curve. This is only non-null if the edge of the halfedge is tolerant, in which case every halfedge of that edge will reference a trimmed SP-curve. The underlying surface of the SP-curve shall be the same as that of the corresponding face. The curve shall not deviate by more than the edge tolerance from curves on other halfedges of the edge, and its ends shall be within vertex tolerance of the corresponding vertices.</LI>
+</UL>
+<P>
+<A NAME="50487394_pgfId-498201"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50487394_pgfId-498200"></A>Note: Halfedges are referred to as ‘fins’ in the PK Interface.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50487394_pgfId-294694"></A>	4.3.9 	Edge</H3>
+<P>
+<A NAME="50487394_pgfId-320026"></A>An edge is an open finite connected subset of a curve; its boundary is a collection of zero, one or two vertices. It is the 1-dimensional analogy of a region. An edge has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294695"></A>Start vertex.</LI>
+<LI>
+<A NAME="50487394_pgfId-294696"></A>End vertex. If one vertex is null, then so is the other; the edge will then be called a ring edge.</LI>
+<LI>
+<A NAME="50487394_pgfId-294697"></A>An ordered ring of distinct fins.</LI>
+<P>
+<A NAME="50487394_pgfId-487837"></A>The ordering of the fins represents the spatial ordering of their owning faces about the edge (with a right-hand screw rule, i.e. looking in the direction of the edge the fin ordering is clockwise). The edge may have zero or any number of fins; if it has none, it is called a wireframe edge.</P>
+<LI>
+<A NAME="50487394_pgfId-294699"></A>A curve. This will be null if the edge has a tolerance. Otherwise, the vertices shall lie within vertex tolerance of this curve, and if it is a Trimmed Curve, they shall lie within vertex tolerance of the corresponding ends of the curve. The curve shall also lie in the surfaces of the faces of the edge, to within modeller resolution.</LI>
+<LI>
+<A NAME="50487394_pgfId-294700"></A>Sense. This logical indicates whether the direction of the edge (start to end) is the same as that of the curve.</LI>
+<LI>
+<A NAME="50487394_pgfId-294701"></A>A tolerance. If this is null-double, the edge is accurateand is regarded as having a tolerance of half the modeller linear resolution, otherwise the edge is called tolerant.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50487394_pgfId-294702"></A>	4.3.10 	Vertex</H3>
+<P>
+<A NAME="50487394_pgfId-323976"></A>A vertex represents a point in space. It is the 0-dimensional analogy of a region. A vertex has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294703"></A>A geometric point.</LI>
+<LI>
+<A NAME="50487394_pgfId-294704"></A>A tolerance. If this is null-double, the vertex is accurate and is regarded as having a tolerance of half the modeller linear resolution.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50487394_pgfId-294705"></A>	4.3.11 	Attributes</H3>
+<P>
+<A NAME="50487394_pgfId-298146"></A>An attribute is an entity which contains data, and which can be attached to any other entity except attributes, fins, lists, transforms or attribute definitions. An attribute has the following fields:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294706"></A>Definition. An attribute definition is an entity which defines the number and type of the data fields in a specific type of attribute, which entities may have such an attribute attached, and what happens to the attribute when its owning entity is changed. XT data shall not contain duplicate attribute definitions. Each attribute of a given type should reference the same instance of the attribute definition for that type. It is incorrect, for example, to create a copy of an attribute definition for each instance of the attribute of that type. Only those attribute definitions referenced by attributes in the part occur in the data.</LI>
+<LI>
+<A NAME="50487394_pgfId-294707"></A>Owner.</LI>
+<LI>
+<A NAME="50487394_pgfId-294708"></A>Fields. These are data fields consisting of one or more integers, doubles, vectors etc.</LI>
+</UL>
+<P>
+<A NAME="50487394_pgfId-294709"></A>There are a number of system attribute definitions which XT creates on startup. These are documented in the section 'System Attribute Definitions'. XT applications can create user attribute definitions during an XT session. These are included in the XT data along with any attributes that use them.</P>
+
+
+<H3>
+<A NAME="50487394_pgfId-294710"></A>	4.3.12 	Features</H3>
+<P>
+<A NAME="50487394_pgfId-298158"></A>A feature is a collection of entities in the same part. Features in assemblies may contain instances, surfaces, curves and points. Features in bodies may contain regions, faces, edges, vertices, surfaces, curves, points, loops and other features. </P>
+<P>
+<A NAME="50487394_pgfId-492810"></A>Featureshave:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294711"></A>Owning part.</LI>
+<LI>
+<A NAME="50487394_pgfId-294712"></A>A set of member entities.</LI>
+<LI>
+<A NAME="50487394_pgfId-294713"></A>Type. The type of the feature specifies the allowed type of its members, e.g. a ‘face’ featurein a body may only contain faces, whereas a ‘mixed’ feature may have any valid members.</LI>
+</UL>
+<P>
+<A NAME="50487394_pgfId-498274"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50487394_pgfId-498273"></A>Note: Features are referred to as ‘groups’ in the PK Interface.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50487394_pgfId-294714"></A>	4.3.13 	Identifiers</H3>
+<P>
+<A NAME="50487394_pgfId-295595"></A>All entities in a part, other than halfedges and 2D B-curves referenced by SP-curves, have a non-zero integer identifier. All non-zero integer identifiers are unique within a part. This is intended to enable the entity to be identified within the XT data.</P>
+<P>
+<A NAME="50487394_pgfId-498298"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50487394_pgfId-498297"></A>Note: Identifiers are referred to as ‘node-ids’ in the PK Interface.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50487394_pgfId-294715"></A>4.4	Entity matrix
+
+
+</H1>
+<P>
+<A NAME="50487394_pgfId-294716"></A>Thus the relations between entities can be represented in matrix form as follows. The numbers represent the number of distinct entities connected (either directly or indirectly) to the given one.</P>
+<P>
+<A NAME="50487394_pgfId-294881"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294720"></A>&nbsp;</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294722"></A>Body</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294724"></A>Region</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294726"></A>Shell</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294728"></A>Face</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294730"></A>Loop</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294732"></A>Fin</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294734"></A>Edge</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294736"></A>Vertex</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294738"></A>Body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294740"></A>-</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294742"></A>&gt;0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294744"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294746"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294748"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294750"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294752"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294754"></A>any</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294756"></A>Region</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294758"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294760"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294762"></A>-</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294764"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294766"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294768"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294770"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294772"></A>any</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294774"></A>Shell</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294776"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294778"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294780"></A>-</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294782"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294784"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294786"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294788"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294790"></A>any</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294792"></A>Face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294794"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294796"></A>1-2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294798"></A>1-2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294800"></A>-</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294802"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294804"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294806"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294808"></A>any</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294810"></A>Loop</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294812"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294814"></A>1-2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294816"></A>1-2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294818"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294820"></A>-</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294822"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294824"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294826"></A>any</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294828"></A>Fin</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294830"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294832"></A>1-2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294834"></A>1-2</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294836"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294838"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294840"></A>-</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294842"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294844"></A>0-2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294846"></A>Edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294848"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294850"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294852"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294854"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294856"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294858"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294860"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294862"></A>any</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294864"></A>Vertex</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294866"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294868"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294870"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294872"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294874"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294876"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294878"></A>any</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487394_pgfId-294880"></A>-</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50487394_pgfId-294882"></A>4.5	Representation of manifold bodies
+
+
+</H1>
+
+<H3>
+<A NAME="50487394_pgfId-294883"></A>	4.5.1 	Body types</H3>
+<P>
+<A NAME="50487394_pgfId-295611"></A>XT bodies have a field body_type which takes values from an enumeration indicating whether the body is</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294884"></A>solid, representing a manifold 3-dimensional volume, possibly with internal voids. It need not be connected.</LI>
+<LI>
+<A NAME="50487394_pgfId-294885"></A>sheet, representing a 2-dimensional subset of 3-space which is either manifold or manifold with boundary (certain cases are not strictly manifold - see below for details). It need not be connected.</LI>
+<LI>
+<A NAME="50487394_pgfId-294886"></A>wire, representing a 1-dimensional subset of 3-space which is either manifold or manifold with boundary, and which need not be connected. An acorn body, which represents a single 0-dimensional point in space, also has body-type wire.</LI>
+<LI>
+<A NAME="50487394_pgfId-294887"></A>general - none of the above.</LI>
+</UL>
+<P>
+<A NAME="50487394_pgfId-298226"></A>A general body is not necessarily non-manifold, but at the same time it is not constrained to be manifold, connected, or of a particular dimensionality (indeed, it may be of mixed dimensionality).</P>
+
+<H4>
+<A NAME="50487394_pgfId-472589"></A>4.5.1.1 Restrictions on entity relationships for manifold body types</H4>
+<P>
+<A NAME="50487394_pgfId-298228"></A>Solid, sheet, and wire bodies are best regarded as special cases of the topological model; for convenience we call them the manifold body types (although as stated above, a general body may also be manifold).</P>
+<P>
+<A NAME="50487394_pgfId-294891"></A>In particular, bodies of these manifold types must obey the following constraints:</P>
+<UL>
+<LI>
+<A NAME="50487394_pgfId-294892"></A>An acorn body shall consist of a single void region with a single shell consisting of a single vertex.</LI>
+<LI>
+<A NAME="50487394_pgfId-294893"></A>A wire body shall consist of a single void region, with one or more shells, consisting of one or more wireframe edges and zero or more vertices (and no faces). Every vertex in the body must be used by exactly one or two of the edges (so, in particular, there are no acorn vertices).</LI>
+<P>
+<A NAME="50487394_pgfId-487952"></A>So each connected component will be either: closed, where every vertex has exactly two edges; or open, where all but two vertices have exactly two edges each.</P>
+<P>
+<A NAME="50487394_pgfId-487953"></A>A wire is called open if all its components are open, and closed if all its components are closed.</P>
+<LI>
+<A NAME="50487394_pgfId-294896"></A>Solid and sheet bodies shall each contain at least one face; they may not contain any wireframe edges or acorn vertices.</LI>
+<LI>
+<A NAME="50487394_pgfId-294897"></A>A solid body shall consist of at least two regions; at least one of its regions shall be solid. Every face in a solid body shall have a solid region on its negative side and a void region on its positive side (in other words, every face forms part of the boundary of the solid, and the face normals always point away from the solid).</LI>
+<LI>
+<A NAME="50487394_pgfId-294898"></A>Every edge in a solid body shall have exactly two fins, which will have opposite senses. Every vertex in a solid body shall either belong to a single isolated loop, or belong to one or more edges; in the latter case, the faces which use those edges shall form a single edgewise-connected set (when considering only connections via the edges which meet at the vertex).</LI>
+<P>
+<A NAME="50487394_pgfId-487993"></A>These constraints ensure that the solid is manifold.</P>
+<LI>
+<A NAME="50487394_pgfId-294900"></A>All the regions of a sheet body shall be void. It is known as an open sheet if it has one region, and a closed sheet if it has no boundary.</LI>
+<LI>
+<A NAME="50487394_pgfId-294901"></A>Every edge in a sheet body shall have exactly one or two fins; if it has two, these shall have opposite senses. In a closed sheet body, all the edges will have exactly two fins. Every vertex in a sheet body shall either belong to a single isolated loop, or belong to one or more edges; in the latter case, the faces which use those edges must either form a single edgewise-connected set where all the edges involved have exactly two fins, or any number of edgewise-connected sets, each of which shall involve exactly two edges with one fin each (again, considering only connections via the edges which meet at the vertex).</LI>
+</UL>
+<P>
+<A NAME="50487394_pgfId-472682"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50487394_pgfId-472681"></A>Note: Although the constraints on edges and vertices in a sheet body are very similar to those which apply to a solid, in this case they do not guarantee that the body will be manifold; indeed, the rather complicated rules about vertices in an open sheet body specifically allow bodies which are non-manifold (such as a body consisting of two square faces which share a single corner vertex).</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487394_pgfId-371744"></A>&nbsp;</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="xt_chap.04.html">Physical Layout</A></TD>
+  <TD><A HREF="../xt_index.html">Chapters</A></TD>
+  <TD><A HREF="xt_chap.06.html">Schema Definitions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

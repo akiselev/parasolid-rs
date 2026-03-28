@@ -1,0 +1,4143 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Version Controls</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Version Controls</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.116.html">Session Support</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.118.html">Implementing Version Control In Applications</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.117.html#50422198_pgfId-377932">116.1	Introduction </A>
+<LI> <A HREF="fd_chap.117.html#50422198_pgfId-377940">116.2	Reproducing behaviour from specific releases </A>
+<UL>
+<LI> <A HREF="fd_chap.117.html#50422198_pgfId-377941">116.2.1	Session behaviours </A>
+<LI> <A HREF="fd_chap.117.html#50422198_pgfId-377945">116.2.2	Setting and asking session behaviour </A>
+</UL>
+<LI> <A HREF="fd_chap.117.html#50422198_pgfId-377947">116.3	Reproducing behaviour using the original system </A>
+<UL>
+<LI> <A HREF="fd_chap.117.html#50422198_pgfId-378094">116.3.1	Session-level switches that should not be set without advice </A>
+<LI> <A HREF="fd_chap.117.html#50422198_pgfId-379058">116.3.2	Session-level switches that should be set when rebuilding features created in previous Parasolid versions </A>
+<LI> <A HREF="fd_chap.117.html#50422198_pgfId-379091">116.3.3	Session-level switches that can be set to enable updated behaviour when creating new features </A>
+</UL>
+<LI> <A HREF="fd_chap.117.html#50422198_pgfId-384909">116.4	Debugging version control settings </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422198_pgfId-377932"></A>116.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422198_pgfId-386574"></A>As improvements are made to Parasolid, the behaviour of some functions may change in certain conditions. In the vast majority of cases your application should take advantage of these changes in behaviour. However, sometimes your application might need to rely on the old (inferior) behaviour. Typically, this may be the case if you need to ensure that legacy parts are updated consistently. Rarely, it may be because you are unable to make the necessary adjustments to your application immediately. In these cases you need to be able to reproduce the inferior behaviour in newer Parasolid versions. Parasolid supports two separate version control systems to allow you to manage this behaviour in your application code. </P>
+<P>
+<A NAME="50422198_pgfId-401437"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-401390"></A>System</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-401392"></A>Control</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-401394"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-401396"></A><STRONG>
+Consolidated system</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-401398"></A>Session behaviours:</P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-401399"></A><A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A></LI>
+<LI>
+<A NAME="50422198_pgfId-401400"></A><A HREF=../headers/pk_session_ask_behaviour.html>PK_SESSION_ask_behaviour</A></LI>
+<LI>
+<A NAME="50422198_pgfId-413558"></A><A HREF=../headers/pk_session_ask_latest_behaviour.html>PK_SESSION_ask_latest_behaviour</A></LI>
+</UL>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-401402"></A>For legacy parts created in newer versions of Parasolid, you should use a consolidated version control mechanism that includes the ability to emulate the behaviour of any specific customer release in V28.1 or later. </P>
+<P>
+<A NAME="50422198_pgfId-401406"></A><STRONG>
+All customers integrating version control for the first time should use this system.</STRONG> </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-401415"></A><STRONG>
+Original system</STRONG></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-401417"></A>Session and update switches:</P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-401418"></A><A HREF=../headers/pk_session_set_software_option.html>PK_SESSION_set_software_option</A></LI>
+<LI>
+<A NAME="50422198_pgfId-426887"></A>Update switches</LI>
+</UL>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-401423"></A>For legacy parts created in older versions of Parasolid (including all versions prior to V28.1), Parasolid provides a system of session switches and update switches. Update switches can be used to emulate legacy behaviour for specific APIs, whereas session switches can be used to emulate legacy behaviour across a session. </P>
+<P>
+<A NAME="50422198_pgfId-401432"></A>Session switches are described in <A HREF="fd_chap.117.html#50422198_25921">Section 116.3, “Reproducing behaviour using the original system”</A>. <A HREF="fd_chap.119.html#50422200_54445">Chapter 118, “Update Switches”</A>, lists all the update switches that are available in the Parasolid PK interface. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422198_pgfId-389132"></A>The consolidated system provides a number of benefits over the original system: </P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-390815"></A>You can emulate the behaviour of any release of Parasolid in V28.1 or later, including patch releases.</LI>
+<LI>
+<A NAME="50422198_pgfId-377935"></A>You can emulate the behaviour of a previous Parasolid release using a single API call. Prior to V28.1, multiple API calls are required to emulate old behaviour.</LI>
+<LI>
+<A NAME="50422198_pgfId-427160"></A>You can set version controls at a thread-level enabling you to emulate old behaviour in different threads using different session settings in each thread. See <A HREF="fd_chap.114.html#50422195_23978">Section 113.5.2, “Using the consolidated version control mechanism within thread chains”</A> for more information.</LI>
+<LI>
+<A NAME="50422198_pgfId-377936"></A>It will be possible to provide fixes at patch releases, even if those fixes require version protection. The original system required you to wait until the First Customer Shipment (FCS) release of the next Parasolid version to receive these fixes.</LI>
+<LI>
+<A NAME="50422198_pgfId-377937"></A>Your application’s version control can now be fully centralised, allowing each feature to make a call to your centralised application code. Individual features no longer need to manage their own version control, resulting in reduced duplication of effort, and reduced risk of inconsistent approaches. </LI>
+</UL>
+<P>
+<A NAME="50422198_pgfId-390500"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422198_pgfId-390511"></A>Note: If your application already implements version control using the original system, we strongly recommend you implement the consolidated system for versioning features created in Parasolid V28.1 and beyond. Features built in V28.0 or earlier must continue to be versioned using the original system.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422198_pgfId-389445"></A>This chapter describes both version control systems in detail:</P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-389532"></A><A HREF="fd_chap.117.html#50422198_10479">Section 116.2, “Reproducing behaviour from specific releases”</A>, describes the consolidated system.</LI>
+<LI>
+<A NAME="50422198_pgfId-389562"></A><A HREF="fd_chap.117.html#50422198_25921">Section 116.3, “Reproducing behaviour using the original system”</A>, describes the original system.</LI>
+<LI>
+<A NAME="50422198_pgfId-389588"></A><A HREF="fd_chap.117.html#50422198_71223">Section 116.4, “Debugging version control settings”</A>, introduces the APIs provided by Parasolid to help you debug your version control code. </LI>
+</UL>
+<P>
+<A NAME="50422198_pgfId-389575"></A><A HREF="fd_chap.118.html#50422199_44626">Chapter 117, “Implementing Version Control In Applications”</A>, provides implementation advice on how to use the two systems, depending on the needs of your application. This includes specific advice on how to implement version control using both systems.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422198_pgfId-377940"></A>116.2	<A NAME="50422198_10479"></A>Reproducing behaviour from specific releases 
+
+
+</H1>
+<P>
+<A NAME="50422198_pgfId-382837"></A>This section describes the APIs you need to use to make use of the consolidated system. See <A HREF="fd_chap.118.html#50422199_44626">Chapter 117, “Implementing Version Control In Applications”</A>, for specific examples on how to implement version control using these APIs. </P>
+
+<H3>
+<A NAME="50422198_pgfId-377941"></A>	116.2.1 	<A NAME="50422198_55820"></A>Session behaviours </H3>
+<P>
+<A NAME="50422198_pgfId-379882"></A>In order to manage version control in your application, you need to decide what session behaviour you need to specify. Parasolid lets you choose between three different types of session behaviour, as follows:</P>
+<P>
+<A NAME="50422198_pgfId-379957"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379963"></A>Behaviour</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379965"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379967"></A>Latest</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379969"></A>Use the latest behaviour for the current version of Parasolid. This is the behaviour that you should use most of the time (i.e. whenever you do not need to emulate older versions of Parasolid).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379971"></A>Value</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379973"></A>Use the behaviour from a specific release of Parasolid. This type of behaviour can be used to emulate any release (full or patch) from the point at which you first implemented the consolidated system. Use the unset behaviour if you need to emulate older versions of Parasolid.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379975"></A>Unset</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379977"></A>Use this behaviour if you need to emulate Parasolid behaviour from versions released before you implemented the consolidated system. Using this type of behaviour enables the original system, allowing you to emulate old behaviour by setting session switches for the entire Parasolid session, and update switches for individual functions. </P>
+<P>
+<A NAME="50422198_pgfId-380879"></A><A HREF="fd_chap.117.html#50422198_25921">Section 116.3, “Reproducing behaviour using the original system”</A>, explains how to use session switches. </P>
+<P>
+<A NAME="50422198_pgfId-380889"></A><A HREF="fd_chap.119.html#50422200_54445">Chapter 118, “Update Switches”</A>, describes the update controls available for individual Parasolid functions. </P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422198_pgfId-377945"></A>	116.2.2 	Setting and asking session behaviour </H3>
+<P>
+<A NAME="50422198_pgfId-377946"></A>You use the functions <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> and <A HREF=../headers/pk_session_ask_behaviour.html>PK_SESSION_ask_behaviour</A> to manage which version control behaviour is used in a Parasolid session. </P>
+<P>
+<A NAME="50422198_pgfId-379569"></A><A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> sets a specific behaviour for the session. It receives a single argument, <CODE>
+behaviour_requested</CODE>
+, and returns three arguments, <CODE>
+behaviour_set,</CODE>
+ <CODE>
+behaviour_previous</CODE>
+, and a <CODE>
+status</CODE>
+:</P>
+<P>
+<A NAME="50422198_pgfId-414635"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379722"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379724"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422198_pgfId-379726"></A>behaviour_requested</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379728"></A>The version control behaviour that you wish to use in the current Parasolid session. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422198_pgfId-379730"></A>behaviour_set</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379732"></A>The version control behaviour that was set as a result of the call to <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>. </P>
+<P>
+<A NAME="50422198_pgfId-382516"></A>In some circumstances, this may not be the same as <CODE>
+behaviour_requested</CODE>
+. For example, if  a feature was created using the 4th patch release of V28.1, but is being rebuilt using an application that only has access to the 3rd patch, then <CODE>
+behaviour_set</CODE>
+ would be the 3rd patch release of V28.1.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422198_pgfId-379734"></A>behaviour_previous</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379736"></A>The version control behaviour that was in use prior to the call to <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422198_pgfId-413964"></A>status</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-413966"></A>A return status for the operation, as follows:</P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-414055"></A><A HREF=../headers/pk_behaviour_status_t.html>PK_behaviour_status_ok_c</A>: the behaviour was set as requested.</LI>
+<LI>
+<A NAME="50422198_pgfId-414162"></A><A HREF=../headers/pk_behaviour_status_t.html>PK_behaviour_status_unknown_c</A>: the behaviour requested is not known to the current version of the modeller. Parasolid sets the behaviour to the closest match before the requested value. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422198_pgfId-380995"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422198_pgfId-414646"></A>Note: We recommend that you do not change the session behaviour by calling <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> from within a callback function.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422198_pgfId-379716"></A><A HREF=../headers/pk_session_ask_behaviour.html>PK_SESSION_ask_behaviour</A> lets you find out which version control behaviour is currently in use in your Parasolid session. This function returns a single <CODE>
+behaviour</CODE>
+ argument.</P>
+<P>
+<A NAME="50422198_pgfId-413614"></A>In addition, <A HREF=../headers/pk_session_ask_latest_behaviour.html>PK_SESSION_ask_latest_behaviour</A> returns the latest allowed behaviour of the modeller, regardless of any behaviour that may have been set via a call to <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> in the current Parasolid session. </P>
+<P>
+<A NAME="50422198_pgfId-381181"></A>Every argument for these functions uses a structure of type <A HREF=../headers/pk_session_behaviour_t.html>PK_SESSION_behaviour_t</A>, which contains the following fields:</P>
+<P>
+<A NAME="50422198_pgfId-394687"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-381299"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-381301"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422198_pgfId-381303"></A>behaviour_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-381305"></A>The type of behaviour for the session. This is one of:</P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-381435"></A><A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_latest_c</A>. Use the latest behaviour. </LI>
+<LI>
+<A NAME="50422198_pgfId-381447"></A><A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_value_c</A>. Use the behaviour from a specific patch release. </LI>
+<LI>
+<A NAME="50422198_pgfId-381459"></A><A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_unset_c</A>. Use Parasolid’s original system. </LI>
+</UL>
+<P>
+<A NAME="50422198_pgfId-381412"></A>See <A HREF="fd_chap.117.html#50422198_55820">Section 116.2.1, “Session behaviours”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422198_pgfId-381307"></A>behaviour_value</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-381309"></A>If <CODE>
+behaviour_type</CODE>
+ is <A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_value_c</A>, then this integer must describe a specific patch release of Parasolid, using the format <EM>
+MMmmpp</EM>, where:</P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-382140"></A><EM>
+MM</EM> is the major version number</LI>
+<LI>
+<A NAME="50422198_pgfId-382150"></A><EM>
+mm</EM> is the minor version number</LI>
+<LI>
+<A NAME="50422198_pgfId-382169"></A><EM>
+pp</EM> is a patch number assigned by Parasolid, with 00 representing the First Customer Shipment (FCS) release</LI>
+</UL>
+<P>
+<A NAME="50422198_pgfId-382227"></A>For example, 280103 specifies a specific patch release of V28.1, and 290000 specifies the FCS release of V29.0.</P>
+<P>
+<A NAME="50422198_pgfId-381730"></A>When used as a received argument in <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A>, if <CODE>
+behaviour_type</CODE>
+ is any other value, then <CODE>
+behaviour_value</CODE>
+ should be 0.</P>
+<P>
+<A NAME="50422198_pgfId-394351"></A>When used as a returned argument in <A HREF=../headers/pk_session_set_behaviour.html>PK_SESSION_set_behaviour</A> or <A HREF=../headers/pk_session_ask_behaviour.html>PK_SESSION_ask_behaviour</A>, if <CODE>
+behaviour_type</CODE>
+ is <A HREF=../headers/pk_session_behave_as_t.html>PK_SESSION_behave_as_latest_c</A>, <CODE>
+behaviour_value</CODE>
+ is set to the non-zero value that represents the Parasolid version you are running. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422198_pgfId-414795"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422198_pgfId-394726"></A>Warning: When creating a new feature, you should record the non-zero <CODE>
+behaviour_value</CODE>
+ returned by <A HREF=../headers/pk_session_ask_behaviour.html>PK_SESSION_ask_behaviour</A> and store it with that feature. This value should then be used when rebuilding the feature in future versions. You should always store the <CODE>
+behaviour_value</CODE>
+ returned by <A HREF=../headers/pk_session_ask_behaviour.html>PK_SESSION_ask_behaviour</A> rather than trying to programmatically predict or reconstruct this value yourself. See <A HREF="fd_chap.118.html#50422199_44626">Chapter 117, “Implementing Version Control In Applications”</A>, for more information. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422198_pgfId-381289"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422198_pgfId-414808"></A>Note: Like other session-level controls, behaviour values do not roll with partitioned rollback. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422198_pgfId-377947"></A>116.3	<A NAME="50422198_25921"></A>Reproducing behaviour using the original system 
+
+
+</H1>
+<P>
+<A NAME="50422198_pgfId-378024"></A>In order to emulate legacy behaviour for features created in applications that do not use the consolidated sytem, you need to use a combination of session switches and update switches: </P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-378031"></A>If changes in behaviour affect a single API, you can control its behaviour using an update switch provided in the options structure for that API. Available update switches are listed in <A HREF="fd_chap.119.html#50422200_54445">Chapter 118, “Update Switches”</A>, and described in more detail in the relevant chapters of the <EM>
+<A HREF=../fd_index.html>Functional Description</A></EM>.</LI>
+<LI>
+<A NAME="50422198_pgfId-378038"></A>If changes in behaviour affect a wide variety of APIs, you can control behaviour using a session switch. These need to be set at the session level. Available session switches are described in this section.</LI>
+</UL>
+<P>
+<A NAME="50422198_pgfId-378042"></A>In addition, after First Customer Shipment (FCS) of a Parasolid version, improvements to behaviour may be added to subsequent patch releases. You can use a session switch to turn on these improvements when creating new models. </P>
+<P>
+<A NAME="50422198_pgfId-378043"></A>Session-level switches are manipulated by the following two functions:</P>
+<P>
+<A NAME="50422198_pgfId-378059"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378046"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378048"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378051"></A><A NAME="50422198_marker-378050"></A><A HREF=../headers/pk_session_set_software_option.html>PK_SESSION_set_software_option</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378053"></A>Set session-level switches to turn off specific improvements to functionality.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378056"></A><A NAME="50422198_marker-378055"></A><A HREF=../headers/pk_session_ask_software_option.html>PK_SESSION_ask_software_option</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378058"></A>Return the current settings for session-level switches.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422198_pgfId-378060"></A>There are three general types of session-level switches:</P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-378061"></A>Modifications to a wide range of behaviour that are likely to affect only a small number of customers. These are described in <A HREF="fd_chap.117.html#50422198_33370">Section 116.3.1</A>.</LI>
+<LI>
+<A NAME="50422198_pgfId-378065"></A>Modifications to a wide range of behaviour that are added prior to the release of a major Parasolid version, and are likely to affect all customers rebuilding features originally created in an earlier version. These are described in <A HREF="fd_chap.117.html#50422198_26083">Section 116.3.2</A>.</LI>
+<LI>
+<A NAME="50422198_pgfId-378072"></A>Modifications to a wide range of behaviour that have been added subsequent to the release of a major Parasolid version (but before the release of the next version). Such improvements are likely to affect all customers who want to create or modify features using that major Parasolid version. These are described in <A HREF="fd_chap.117.html#50422198_38381">Section 116.3.3</A>.</LI>
+</UL>
+<P>
+<A NAME="50422198_pgfId-378082"></A>The values of session-level switches are stored in the <A HREF=../headers/pk_session_software_option_t.html>PK_SESSION_software_option_t</A> structure. </P>
+
+<H3>
+<A NAME="50422198_pgfId-378094"></A>	116.3.1 	<A NAME="50422198_33370"></A>Session-level switches that should not be set without advice </H3>
+<P>
+<A NAME="50422198_pgfId-378095"></A>Session level switches that only affect a small number of customers are shown below, organised according to the Parasolid version whose behaviour they replicate. To turn a particular switch on, set the value for the corresponding field to 1.</P>
+<P>
+<A NAME="50422198_pgfId-378111"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422198_pgfId-378104"></A>Warning: You should contact Parasolid Support for advice or possible work-arounds before using any of these switches. If advised by Parasolid Support to integrate one of these switches, it needs to be used when updating models created using a previous version of Parasolid, but is <STRONG>
+not</STRONG> required when performing new modelling operations. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422198_pgfId-379056"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378114"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378116"></A>Restricted behaviour if set to 1</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378118"></A>Behaviour used</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378120"></A>PK_SESSION_SURF_coincide_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378122"></A>Swept surface coincidence</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378124"></A>V9.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378126"></A>PK_SESSION_old_isoclines_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378128"></A>Isocline curve creation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378130"></A>V10.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378132"></A>PK_SESSION_ENTITY_persist_alt_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378134"></A>Tag persistence</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378136"></A>V12.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378138"></A>PK_SESSION_old_blend_bounds_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378140"></A>Smooth intersection curve edge generation along blends (between the blend itself and the adjacent supporting surface).</P>
+<ADDRESS>
+<A NAME="50422198_pgfId-378141"></A>Note: Many Parasolid functions may need to recompute side blend boundary edges; setting this field does not solely affect blend creation.</ADDRESS><BR>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378143"></A>V12.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378145"></A>PK_SESSION_PLANE_exact_coi_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378147"></A>Merging planes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378149"></A>V12.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378151"></A>PK_SESSION_FACE_old_uvbox_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378153"></A><A HREF=../headers/pk_face_find_uvbox.html>PK_FACE_find_uvbox</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378155"></A>V13.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378157"></A>PK_SESSION_local_ops_pre_v132_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378159"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378161"></A>V13.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378163"></A>PK_SESSION_point_int_pre_v132_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378165"></A>Calculating point contacts between surfaces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378167"></A>V13.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378169"></A>PK_SESSION_check_pre_v140_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378171"></A>Checker ignores degeneracies found on ruled boundaries</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378173"></A>V13.2 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378175"></A>PK_SESSION_boolean_pre_v141_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378177"></A>Boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378179"></A>V14.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378181"></A>PK_SESSION_check_pre_v141_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378183"></A>Offset surface checking</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378185"></A>V14.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378187"></A>PK_SESSION_old_helix_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378189"></A>Helix creation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378191"></A>V14.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378193"></A>PK_SESSION_SURF_old_min_radii_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378195"></A>Calculation of minimum radius of curvature on each side of swept and spun surfaces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378197"></A>V14.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378199"></A>PK_SESSION_check_transmit_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378201"></A>Checks partitions during transmit and makes <A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A> return an error if a corruption is found. You should only enable this option if specifically instructed to do so by Parasolid Support.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378203"></A>N/A: added at V14.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-455798"></A>PK_SESSION_old_hir_wire_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-455800"></A>Hidden line rendering</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-455802"></A>V31.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378205"></A>PK_SESSION_pre_v150_switch_1_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378207"></A>Edge merging during local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378209"></A>V14.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378211"></A>PK_SESSION_pre_v150_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378213"></A>Self-intersection checking in B-spline surfaces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378215"></A>V14.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378217"></A>PK_SESSION_pre_v150_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378219"></A>Some local operations functionality</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378221"></A>V14.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378223"></A>PK_SESSION_region_gt_pre_v150_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378225"></A>Region behaviour in respect of tag persistence, and attribute and group handling</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378227"></A>V14.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378229"></A>PK_SESSION_pre_v151_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378231"></A>Curve imprinting on faces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378233"></A>V15.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378235"></A>PK_SESSION_pre_v160_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378237"></A>Miscellaneous functionality</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378239"></A>V15.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378241"></A>PK_SESSION_pre_v161_switch_1_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378243"></A>Edge blend capping</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378245"></A>V16.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378247"></A>PK_SESSION_pre_v161_switch_2_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378249"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378251"></A>V16.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378253"></A>PK_SESSION_pre_v161_switch_3_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378255"></A>Faceting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378257"></A>V16.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378259"></A>PK_SESSION_pre_v161_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378261"></A>Capping functionality during taper operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378263"></A>V16.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378265"></A>PK_SESSION_pre_v161_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378267"></A>Conversion of blend surfaces to B-surfaces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378269"></A>V16.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378271"></A>PK_SESSION_pre_v161_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378273"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378275"></A>V16.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378277"></A>PK_SESSION_pre_v170_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378279"></A>Miscellaneous functionality</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378281"></A>V16.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378283"></A>PK_SESSION_pre_v170_switch_2_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378285"></A>B-surface creation when blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378287"></A>V16.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378289"></A>PK_SESSION_pre_v170_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378291"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378293"></A>V16.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378295"></A>PK_SESSION_pre_v170_switch_4_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378297"></A>Lofting and blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378299"></A>V16.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378301"></A>PK_SESSION_pre_v170_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378303"></A>Minimum distance calculation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378305"></A>V16.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378307"></A>PK_SESSION_pre_v171_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378309"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378311"></A>V17.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378313"></A>PK_SESSION_pre_v180_switch_1_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378315"></A>Fitting a plane to a set of lines</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378317"></A>V17.1 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378319"></A>PK_SESSION_pre_v180_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378321"></A>Finding the minimum of a multi-dimensional scalar function</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378323"></A>V17.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378325"></A>PK_SESSION_pre_v180_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378327"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378329"></A>V17.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378331"></A>PK_SESSION_pre_v180_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378333"></A>Vertex splitting during local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378335"></A>V17.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378337"></A>PK_SESSION_pre_v181_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378339"></A>Face-face checking.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378341"></A>V18.0 </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378343"></A>PK_SESSION_pre_v181_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378345"></A>Creation of rational B-surface blends.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378347"></A>V18.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378349"></A>PK_SESSION_pre_v181_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378351"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378353"></A>V18.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378355"></A>PK_SESSION_pre_v181_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378357"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378359"></A>V18.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378361"></A>PK_SESSION_pre_v181_switch_5_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378363"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378365"></A>V18.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378367"></A>PK_SESSION_pre_v181_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378369"></A>Lofting and sweeping</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378371"></A>V18.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378373"></A>PK_SESSION_pre_v181_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378375"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378377"></A>V18.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378379"></A>PK_SESSION_pre_v181_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378381"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378383"></A>V18.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378385"></A>PK_SESSION_pre_v181_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378387"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378389"></A>V18.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378391"></A>PK_SESSION_pre_v191_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378393"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378395"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378397"></A>PK_SESSION_pre_v191_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378399"></A>Replacing the surfaces of faces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378401"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378403"></A>PK_SESSION_pre_v191_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378405"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378407"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378409"></A>PK_SESSION_pre_v191_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378411"></A>Curve imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378413"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378415"></A>PK_SESSION_pre_v191_switch_5_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378417"></A>Blend vertex identification</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378419"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378421"></A>PK_SESSION_pre_v191_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378423"></A>Self-intersection repair in booleans and sweeping</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378425"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378427"></A>PK_SESSION_pre_v191_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378429"></A>Merging redundant edges and vertices in local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378431"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378433"></A>PK_SESSION_pre_v191_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378435"></A>Identifying blends</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378437"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378439"></A>PK_SESSION_pre_v191_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378441"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378443"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378445"></A>PK_SESSION_pre_v191_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378447"></A>Attribute processing during blend deletion</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378449"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378451"></A>PK_SESSION_pre_v191_switch_11_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378453"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378455"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378457"></A>PK_SESSION_pre_v191_switch_12_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378459"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378461"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378463"></A>PK_SESSION_pre_v191_switch_13_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378465"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378467"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378469"></A>PK_SESSION_pre_v191_switch_14_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378471"></A>Fill hole</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378473"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378475"></A>PK_SESSION_pre_v191_switch_15_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378477"></A>Fill hole</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378479"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378481"></A>PK_SESSION_pre_v191_switch_16_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378483"></A>Delete blends</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378485"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378487"></A>PK_SESSION_pre_v191_switch_17_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378489"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378491"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378493"></A>PK_SESSION_pre_v191_switch_18_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378495"></A>Tapering</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378497"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378499"></A>PK_SESSION_pre_v191_switch_19_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378501"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378503"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378505"></A>PK_SESSION_pre_v191_switch_20_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378507"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378509"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378511"></A>PK_SESSION_pre_v191_switch_21_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378513"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378515"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378517"></A>PK_SESSION_pre_v191_switch_22_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378519"></A>Curve imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378521"></A>V19.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378523"></A>PK_SESSION_pre_v210_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378525"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378527"></A>V20.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378529"></A>PK_SESSION_pre_v210_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378531"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378533"></A>V20.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378535"></A>PK_SESSION_pre_v210_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378537"></A>Evaluating the smoothness of vertices</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378539"></A>V20.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378541"></A>PK_SESSION_pre_v210_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378543"></A>Healing wounds</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378545"></A>V20.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378547"></A>PK_SESSION_pre_v210_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378549"></A>Vertex splitting during local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378551"></A>V20.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378553"></A>PK_SESSION_pre_v221_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378555"></A>Sewing</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378557"></A>V22.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378559"></A>PK_SESSION_pre_v221_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378561"></A>B-geometry</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378563"></A>V22.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378565"></A>PK_SESSION_pre_v221_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378567"></A>Curve approximation using B-curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378569"></A>V22.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378571"></A>PK_SESSION_pre_v221_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378573"></A>Deleting faces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378575"></A>V22.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378577"></A>PK_SESSION_pre_v221_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378579"></A>Improvements to blending in tight regions</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378581"></A>V22.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378583"></A>PK_SESSION_pre_v221_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378585"></A>Vertex geometry</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378587"></A>V22.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378589"></A>PK_SESSION_pre_v221_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378591"></A>Locating modified vertices during local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378593"></A>V22.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378595"></A>PK_SESSION_pre_v230_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378597"></A>Loop handling</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378599"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378601"></A>PK_SESSION_pre_v230_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378603"></A>Surface intersections in periodic and offset B-surfaces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378605"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378607"></A>PK_SESSION_pre_v230_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378609"></A>Point surface closest approach</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378611"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378613"></A>PK_SESSION_pre_v230_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378615"></A>Evaluating loop types</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378617"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378619"></A>PK_SESSION_pre_v230_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378621"></A>Evaluating points on blend bound curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378623"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378625"></A>PK_SESSION_pre_v230_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378627"></A>Fitting a plane to a set of lines</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378629"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378631"></A>PK_SESSION_pre_v230_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378633"></A>Evaluating loop types </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378635"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378637"></A>PK_SESSION_pre_v230_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378639"></A>Improvement to wire body functionality</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378641"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378643"></A>PK_SESSION_pre_v230_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378645"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378647"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378649"></A>PK_SESSION_pre_v230_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378651"></A>Face transformation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378653"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378655"></A>PK_SESSION_pre_v230_switch_11_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378657"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378659"></A>V22.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378661"></A>PK_SESSION_pre_v231_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378663"></A>Finding minimum radius of curvature</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378665"></A>V23.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378667"></A>PK_SESSION_pre_v231_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378669"></A>Processing degree 1 B-curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378671"></A>V23.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378673"></A>PK_SESSION_pre_v231_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378675"></A>Evaluating on intersection curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378677"></A>V23.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378679"></A>PK_SESSION_pre_v231_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378681"></A>Handling of notches in blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378683"></A>V23.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378685"></A>PK_SESSION_pre_v231_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378687"></A>Vector curve imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378689"></A>V23.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378691"></A>PK_SESSION_pre_v231_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378693"></A>SP-curve extension</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378695"></A>V23.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378697"></A>PK_SESSION_pre_v231_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378699"></A>Removing imprinted edges in boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378701"></A>V23.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411089"></A>PK_SESSION_pre_v231_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411091"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411093"></A>V23.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378703"></A>PK_SESSION_pre_v240_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378705"></A>Improvements to the blending algorithm</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378707"></A>V23.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378709"></A>PK_SESSION_pre_v240_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378711"></A>Self-intersecting repair</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378713"></A>V23.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378715"></A>PK_SESSION_pre_v240_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378717"></A>Improving help points</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378719"></A>V23.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378721"></A>PK_SESSION_pre_v240_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378723"></A>Mass property calculations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378725"></A>V23.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378727"></A>PK_SESSION_pre_v240_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378729"></A>Hidden line rendering</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378731"></A>V23.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378733"></A>PK_SESSION_pre_v240_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378735"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378737"></A>V23.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378739"></A>PK_SESSION_pre_v240_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378741"></A>Curve imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378743"></A>V23.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378745"></A>PK_SESSION_pre_v240_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378747"></A>SP-curve boxing</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378749"></A>V23.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378751"></A>PK_SESSION_pre_v241_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378753"></A>Improving the evaluation of SP-curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378755"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378757"></A>PK_SESSION_pre_v241_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378759"></A>Detecting coincidence of spun surfaces</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378761"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378763"></A>PK_SESSION_pre_v241_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378765"></A>Healing in local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378767"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378769"></A>PK_SESSION_pre_v241_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378771"></A>Sweeping</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378773"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378775"></A>PK_SESSION_pre_v241_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378777"></A>Offsetting planar wires</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378779"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378781"></A>PK_SESSION_pre_v241_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378783"></A>Offsetting planar wires</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378785"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378787"></A>PK_SESSION_pre_v241_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378789"></A>Sweeping</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378791"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378793"></A>PK_SESSION_pre_v241_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378795"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378797"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378799"></A>PK_SESSION_pre_v241_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378801"></A>Curve imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378803"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-422539"></A>PK_SESSION_pre_v241_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-422541"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-422543"></A>V24.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378805"></A>PK_SESSION_pre_v250_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378807"></A>Checking system attribute validity</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378809"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378811"></A>PK_SESSION_pre_v250_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378813"></A>Sweeping</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378815"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378817"></A>PK_SESSION_pre_v250_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378819"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378821"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378823"></A>PK_SESSION_pre_v250_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378825"></A>Edge repair in local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378827"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378829"></A>PK_SESSION_pre_v250_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378831"></A>Delete blends</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378833"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378835"></A>PK_SESSION_pre_v250_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378837"></A>Curve and spun outline generation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378839"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378841"></A>PK_SESSION_pre_v250_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378843"></A>Spun outline</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378845"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378847"></A>PK_SESSION_pre_v250_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378849"></A>Curve and spun outline generation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378851"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378853"></A>PK_SESSION_pre_v250_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378855"></A>Curve and spun outline generation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378857"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378859"></A>PK_SESSION_pre_v250_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378861"></A>Locating intersections in boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378863"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378865"></A>PK_SESSION_pre_v250_switch_11_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378867"></A>Imprinting curves down face normals</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378869"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378871"></A>PK_SESSION_pre_v250_switch_12_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378873"></A>Isoparameter curve detection</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378875"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378877"></A>PK_SESSION_pre_v250_switch_13_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378879"></A>Local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378881"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378883"></A>PK_SESSION_pre_v250_switch_14_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378885"></A>SP-curve production in local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378887"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378889"></A>PK_SESSION_pre_v250_switch_15_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378891"></A>Blend extension</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378893"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411383"></A>PK_SESSION_pre_v250_switch_16_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411385"></A>Blend extension</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411387"></A>V24.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378895"></A>PK_SESSION_pre_v251_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378897"></A>Imprinting curves down face normals</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378899"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378901"></A>PK_SESSION_pre_v251_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378903"></A>Spun outline generation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378905"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378907"></A>PK_SESSION_pre_v251_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378909"></A>Curve and spun outline generation</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378911"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378913"></A>PK_SESSION_pre_v251_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378915"></A>Fill hole</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378917"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378919"></A>PK_SESSION_pre_v251_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378921"></A>Isoparameter curve detection</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378923"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378925"></A>PK_SESSION_pre_v251_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378927"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378929"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378931"></A>PK_SESSION_pre_v251_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378933"></A>Identifying the end point of a cliff between tangent blends</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378935"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378937"></A>PK_SESSION_pre_v251_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378939"></A>Face-face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378941"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378943"></A>PK_SESSION_pre_v251_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378945"></A>Fill hole</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378947"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412075"></A>PK_SESSION_pre_v251_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412077"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412079"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417355"></A>PK_SESSION_pre_v251_switch_11_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417357"></A>Edge tolerance setting in boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417359"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-435479"></A>PK_SESSION_pre_v251_switch_14_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-435481"></A>Evaluating curve derivatives for foreign geometry</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-435483"></A>V25.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378949"></A>PK_SESSION_pre_v260_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378951"></A>Curve imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378953"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378955"></A>PK_SESSION_pre_v260_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378957"></A>Preventing the creation of large vertex tolerances in sheet extend operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378959"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412331"></A>PK_SESSION_pre_v260_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412333"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412335"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412154"></A>PK_SESSION_pre_v260_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412156"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412158"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418801"></A>PK_SESSION_pre_v260_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418803"></A>Face deletion</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418805"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424348"></A>PK_SESSION_pre_v260_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424350"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424352"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424870"></A>PK_SESSION_pre_v260_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424872"></A>Determining loop types</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424874"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-427562"></A>PK_SESSION_pre_v260_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-427564"></A>Boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-427566"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431137"></A>PK_SESSION_pre_v260_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431139"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431141"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431573"></A>PK_SESSION_pre_v260_switch_11_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431575"></A>Extending sheet bodies</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431577"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-442378"></A>PK_SESSION_pre_v260_switch_12_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-442380"></A>Evaluating curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-442382"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-444201"></A>PK_SESSION_pre_v260_switch_13_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-444203"></A>Imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-444205"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-452722"></A>PK_SESSION_pre_v260_switch_15_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-452724"></A>Self-intersection repair</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-452726"></A>V25.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378961"></A>PK_SESSION_pre_v261_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378963"></A>Checking the consistency of bounded curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378965"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378967"></A>PK_SESSION_pre_v261_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378969"></A>Ray firing</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378971"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378973"></A>PK_SESSION_pre_v261_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378975"></A>Boolean matching</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378977"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378979"></A>PK_SESSION_pre_v261_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378981"></A>Tolerance setting in intersection operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378983"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378985"></A>PK_SESSION_pre_v261_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378987"></A>Face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378989"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412260"></A>PK_SESSION_pre_v261_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412262"></A>Imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412264"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411560"></A>PK_SESSION_pre_v261_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411562"></A>Face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411564"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411671"></A>PK_SESSION_pre_v261_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411673"></A>Face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411675"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411986"></A>PK_SESSION_pre_v261_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411988"></A>Multi-tool booleans</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411990"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411170"></A>PK_SESSION_pre_v261_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411172"></A>Surface intersections in boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411174"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417737"></A>PK_SESSION_pre_v261_switch_11_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417739"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417741"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417751"></A>PK_SESSION_pre_v261_switch_12_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417753"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417755"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418218"></A>PK_SESSION_pre_v261_switch_13_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418220"></A>Face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418222"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418035"></A>PK_SESSION_pre_v261_switch_14_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418037"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418039"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-416120"></A>PK_SESSION_pre_v261_switch_15_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-416122"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-416124"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418875"></A>PK_SESSION_pre_v261_switch_16_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418877"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418879"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417255"></A>PK_SESSION_pre_v261_switch_17_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417257"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417259"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418962"></A>PK_SESSION_pre_v261_switch_18_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418952"></A>Edge repair in boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418954"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418973"></A>PK_SESSION_pre_v261_switch_19_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418958"></A>Edge repair in boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418960"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419055"></A>PK_SESSION_pre_v261_switch_20_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419057"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419059"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419103"></A>PK_SESSION_pre_v261_switch_21_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419105"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419107"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419109"></A>PK_SESSION_pre_v261_switch_22_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419111"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419113"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419320"></A>PK_SESSION_pre_v261_switch_23_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419322"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419324"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425128"></A>PK_SESSION_pre_v261_switch_25_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425130"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425132"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424248"></A>PK_SESSION_pre_v261_switch_26_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424250"></A>Tolerance setting in boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424252"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425021"></A>PK_SESSION_pre_v261_switch_27_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425023"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425025"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-433173"></A>PK_SESSION_pre_v261_switch_28_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-433175"></A>Checking face-face intersections after a face deletion</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-433177"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-435597"></A>PK_SESSION_pre_v261_switch_29_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-435599"></A>Surface intersection</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-435601"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-438769"></A>PK_SESSION_pre_v261_switch_30_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-438771"></A>Surface intersection</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-438773"></A>V26.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378991"></A>PK_SESSION_pre_v270_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378993"></A>Boolean face pair matching</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378995"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378997"></A>PK_SESSION_pre_v270_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-378999"></A>Tapering</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379001"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379003"></A>PK_SESSION_pre_v270_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379005"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379007"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379009"></A>PK_SESSION_pre_v270_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379011"></A>Surface-surface intersection</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379013"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379015"></A>PK_SESSION_pre_v270_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379017"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379019"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379021"></A>PK_SESSION_pre_v270_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379023"></A>Creating curves from edges</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379025"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379027"></A>PK_SESSION_pre_v270_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379029"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379031"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379033"></A>PK_SESSION_pre_v270_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379035"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379037"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405603"></A>PK_SESSION_pre_v270_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405605"></A>Curve imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405607"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405618"></A>PK_SESSION_pre_v270_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405620"></A>Curve imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405622"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405624"></A>PK_SESSION_pre_v270_switch_11_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405626"></A>Curve imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405628"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411739"></A>PK_SESSION_pre_v270_switch_12_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411741"></A>Face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411743"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411826"></A>PK_SESSION_pre_v270_switch_13_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411828"></A>Face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411830"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417504"></A>PK_SESSION_pre_v270_switch_14_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417506"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417508"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419448"></A>PK_SESSION_pre_v270_switch_15_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419450"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419452"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419454"></A>PK_SESSION_pre_v270_switch_16_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419456"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419458"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418647"></A>PK_SESSION_pre_v270_switch_17_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418649"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418651"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419374"></A>PK_SESSION_pre_v270_switch_18_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419376"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419378"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419380"></A>PK_SESSION_pre_v270_switch_19_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419382"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419384"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431307"></A>PK_SESSION_pre_v270_switch_22_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431309"></A>Handling four edge vertices during local operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431311"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-427650"></A>PK_SESSION_pre_v270_switch_23_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-427652"></A>Boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-427654"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431496"></A>PK_SESSION_pre_v270_switch_24_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431498"></A>Checking face-face intersections after a face deletion</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431500"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-435679"></A>PK_SESSION_pre_v270_switch_25_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-435681"></A>Checking</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-435683"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-440430"></A>PK_SESSION_pre_v270_switch_26_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-440432"></A>Face change operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-440434"></A>V26.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379039"></A>PK_SESSION_pre_v271_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379041"></A>Edge and face blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379043"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379045"></A>PK_SESSION_pre_v271_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379047"></A>Boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379049"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379051"></A>PK_SESSION_pre_v271_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379053"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-379055"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411904"></A>PK_SESSION_pre_v271_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411906"></A>Edge imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411908"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411470"></A>PK_SESSION_pre_v271_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411472"></A>Boolean operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411474"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412428"></A>PK_SESSION_pre_v271_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412430"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-412432"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411276"></A>PK_SESSION_pre_v271_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411278"></A>Boolean subtraction operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-411280"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418090"></A>PK_SESSION_pre_v271_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418092"></A>Face imprinting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418094"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418572"></A>PK_SESSION_pre_v271_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418574"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418576"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419227"></A>PK_SESSION_pre_v271_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419229"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419231"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424959"></A>PK_SESSION_pre_v271_switch_12_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424961"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424963"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425203"></A>PK_SESSION_pre_v271_switch_13_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425205"></A>Improvements to mid-surfacing</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425207"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425281"></A>PK_SESSION_pre_v271_switch_14_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425283"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-425285"></A>V27.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405370"></A>PK_SESSION_pre_v280_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405372"></A>SP curve generation for helical curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405374"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405799"></A>PK_SESSION_pre_v280_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405801"></A>Extrude operations</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-405803"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417857"></A>PK_SESSION_pre_v280_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417859"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417861"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417618"></A>PK_SESSION_pre_v280_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417620"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417622"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417962"></A>PK_SESSION_pre_v280_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417964"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417966"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418148"></A>PK_SESSION_pre_v280_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418150"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418152"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417669"></A>PK_SESSION_pre_v280_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417671"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417673"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418279"></A>PK_SESSION_pre_v280_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418281"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418283"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-416059"></A>PK_SESSION_pre_v280_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-416053"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-416055"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417453"></A>PK_SESSION_pre_v280_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417455"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417457"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418470"></A>PK_SESSION_pre_v280_switch_11_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418472"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418474"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419274"></A>PK_SESSION_pre_v280_switch_12_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419276"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-419278"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424793"></A>PK_SESSION_pre_v280_switch_13_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424795"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424797"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431216"></A>PK_SESSION_pre_v280_switch_14_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431218"></A>Projecting curves</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431220"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-438936"></A>PK_SESSION_pre_v280_switch_15_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-438938"></A>Fill hole</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-438940"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-449759"></A>PK_SESSION_pre_v280_switch_16_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-449761"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-449763"></A>V27.1</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418397"></A>PK_SESSION_pre_v281_switch_1_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418399"></A>Edge blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418401"></A>V28.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418464"></A>PK_SESSION_pre_v281_switch_2_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418466"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418468"></A>V28.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417306"></A>PK_SESSION_pre_v281_switch_3_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417308"></A>Patching</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-417310"></A>V28.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418524"></A>PK_SESSION_pre_v281_switch_4_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418526"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-418528"></A>V28.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424422"></A>PK_SESSION_pre_v281_switch_5_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424424"></A>Faceting</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-424426"></A>V28.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-422411"></A>PK_SESSION_pre_v281_switch_6_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-422413"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-422415"></A>V28.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-422473"></A>PK_SESSION_pre_v281_switch_7_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-422475"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-422477"></A>V28.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431418"></A>PK_SESSION_pre_v281_switch_8_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431420"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-431422"></A>V28.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-438845"></A>PK_SESSION_pre_v281_switch_9_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-438847"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-438849"></A>V28.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-448872"></A>PK_SESSION_pre_v281_switch_10_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-448874"></A>Blending</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422198_pgfId-448876"></A>V28.0</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422198_pgfId-379058"></A>	116.3.2 	<A NAME="50422198_26083"></A>Session-level switches that should be set when rebuilding features created in previous Parasolid versions </H3>
+<P>
+<A NAME="50422198_pgfId-379065"></A>Between Parasolid V25.0 and Parasolid V30.1, a session switch value with a name of the form PK_SESSION_pre_v<EM>
+XXX</EM>_switch_0_c (where <EM>
+XXX</EM> represents a Parasolid version number) is available for every version of Parasolid. </P>
+<P>
+<A NAME="50422198_pgfId-379072"></A>These session switch values are used as version switches that control the behaviour of multiple low-level algorithms, and you need to treat them differently to the session switch values described in <A HREF="fd_chap.117.html#50422198_33370">Section 116.3.1</A>.</P>
+<P>
+<A NAME="50422198_pgfId-379079"></A>When rebuilding all features where that feature has been built in a prior version of Parasolid, you should set the appropriate session switch values in order to guarantee a successful rebuild. All available switches should be set, up to and including the version switch for the version of Parasolid you are using to perform the rebuild.</P>
+<P>
+<A NAME="50422198_pgfId-379086"></A>For example, if you are rebuilding features created in Parasolid v25.1, and you are using Parasolid v26.1 to perform the rebuild, you must set PK_SESSION_pre_v260_switch_0_c and PK_SESSION_pre_v261_switch_0_c to 1.</P>
+
+
+<H3>
+<A NAME="50422198_pgfId-379091"></A>	116.3.3 	<A NAME="50422198_38381"></A>Session-level switches that can be set to enable updated behaviour when creating new features </H3>
+<P>
+<A NAME="50422198_pgfId-437444"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422198_pgfId-437670"></A>Warning: These switches should <STRONG>
+not</STRONG> be used unless explicitly advised to do so by Parasolid Support.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422198_pgfId-379095"></A>As of Parasolid V26.1, session switch values with names of the form PK_SESSION_post_v<EM>
+XXX</EM>_switch_<EM>
+n</EM>_c (where <EM>
+XXX</EM> represents a Parasolid version number, and <EM>
+n</EM> represents a switch number) may be available for versions of Parasolid.</P>
+<P>
+<A NAME="50422198_pgfId-379105"></A>These post session switches are added at patch releases after a major Parasolid release (FCS), and allow you to take advantage of improvements in Parasolid behaviour that have been made since FCS, without having to wait for the next major release. They should only be used for creating new models in the Parasolid version number for which they are named, and for subsequent update of those models. </P>
+<P>
+<A NAME="50422198_pgfId-379112"></A>If your application needs to deal with legacy data and you use post session switches, then you must record which models use which post session switches. After upgrading to a newer major version of Parasolid, you must set the same post session switches when you need to update these models, as were used when the model was created. </P>
+<P>
+<A NAME="50422198_pgfId-379119"></A>For example, consider the case where Parasolid V26.0 is integrated into your application code:</P>
+<UL>
+<LI>
+<A NAME="50422198_pgfId-379120"></A>Immediately after the V26.0 FCS release, no post session switches are available, and so new models are created with no post session switches set. </LI>
+<LI>
+<A NAME="50422198_pgfId-379121"></A>The switch PK_SESSION_post_v260_1_c is added at a given V26.0 patch release: to take advantage of behaviour improvements, you set this switch when creating new models.</LI>
+<LI>
+<A NAME="50422198_pgfId-379125"></A>You then upgrade to Parasolid V26.1. Now, some V26.0 models have been created with PK_SESSION_post_v260_1_c switched on, and others with it switched off. </LI>
+<LI>
+<A NAME="50422198_pgfId-379126"></A>When you subsequently update these models, you must ensure that PK_SESSION_post_v260_1_c is set to the same value as it was when the model was created.</LI>
+</UL>
+<P>
+<A NAME="50422198_pgfId-379133"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422198_pgfId-379132"></A>Warning: In general, for a given Parasolid version <EM>
+X</EM>, it is an error to set both PK_SESSION_post_v<EM>
+X</EM>_<EM>
+n</EM>_c and PK_SESSION_pre_v<EM>
+X</EM>_0_c, for all values of <EM>
+n</EM>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422198_pgfId-384909"></A>116.4	<A NAME="50422198_71223"></A>Debugging version control settings 
+
+
+</H1>
+<P>
+<A NAME="50422198_pgfId-387042"></A>You can use the functions <A HREF=../headers/pk_debug_behaviours_start.html>PK_DEBUG_behaviours_start</A> and <A HREF=../headers/pk_debug_behaviours_stop.html>PK_DEBUG_behaviours_stop</A> to debug your use of the version control mechanism in your application. See the documentation for these functions in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information. </P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.116.html">Session Support</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.118.html">Implementing Version Control In Applications</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,408 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Assemblies And Instances</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Assemblies And Instances</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.022.html">Transformations</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.024.html">Reading and Writing Parasolid Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294742">22.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294750">22.1.1	What is an assembly? </A>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294759">22.1.2	What is an instance? </A>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294767">22.1.3	What is a transform? </A>
+</UL>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294777">22.2	Transmit files </A>
+<UL>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294781">22.2.1	Part names </A>
+</UL>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294785">22.3	PK functions </A>
+<UL>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294795">22.3.1	Creation and modification functions </A>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294845">22.3.2	Navigation functions </A>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294879">22.3.3	PK_ENTITY functions </A>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294890">22.3.4	PK_PART functions which work on assemblies </A>
+<LI> <A HREF="fd_chap.023.html#50422092_pgfId-294900">22.3.5	PK_TOPOL functions which work on assemblies </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422092_pgfId-294742"></A>22.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422092_pgfId-294743"></A>Assemblies and instances in the PK are primarily provided to enable applications to transfer assembly information via Parasolid transmit files. It is not intended to provide complex assembly modeling capability in Parasolid. </P>
+<P>
+<A NAME="50422092_pgfId-294747"></A>See <A HREF="fd_chap.101.html#50422180_17930">Chapter 100, “Archives”</A>, for further information about Parasolid transmit files. </P>
+<P>
+<A NAME="50422092_pgfId-314841"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-314503"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422092_pgfId-314480"></A><A HREF="fd_chap.022.html#50422091_39132">Chapter 21, “Transformations”</A></LI>
+<LI>
+<A NAME="50422092_pgfId-314620"></A><A HREF="fd_chap.028.html#50422097_77993">Section 27.9, “Using mass properties in general bodies and assemblies”</A></LI>
+<LI>
+<A NAME="50422092_pgfId-314643"></A><A HREF="fd_chap.047.html#50422119_26685">Section 46.2.7, “Sewing piece parts in an assembly”</A></LI>
+<LI>
+<A NAME="50422092_pgfId-314666"></A><A HREF="fd_chap.106.html#50422186_56018">Section 105.3.22, “Suppressing hidden lines in bodies in an assembly”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422092_pgfId-294750"></A>	22.1.1 	<A NAME="50422092_marker-294748"></A><A NAME="50422092_marker-294749"></A>What is an assembly? </H3>
+<P>
+<A NAME="50422092_pgfId-294751"></A>An assembly is a collection of instances of parts (parts are bodies or assemblies):</P>
+<UL>
+<LI>
+<A NAME="50422092_pgfId-294752"></A>Assemblies may also contain construction geometry (surfaces, curves and points).</LI>
+<LI>
+<A NAME="50422092_pgfId-294753"></A>Assemblies may have attributes attached.</LI>
+<LI>
+<A NAME="50422092_pgfId-294754"></A>A group owned by an assembly may only have instances and construction geometry of the assembly as members.</LI>
+<LI>
+<A NAME="50422092_pgfId-294755"></A>An assembly graph must be acyclic, i.e. an assembly may not instance itself, directly or indirectly.</LI>
+<LI>
+<A NAME="50422092_pgfId-294756"></A>An assembly cannot instance a part in a different partition.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422092_pgfId-294759"></A>	22.1.2 	<A NAME="50422092_marker-294757"></A><A NAME="50422092_marker-294758"></A>What is an instance? </H3>
+<P>
+<A NAME="50422092_pgfId-294760"></A>An instance is a pointer to a part contained within an assembly:</P>
+<UL>
+<LI>
+<A NAME="50422092_pgfId-294761"></A>An instance refers to its owning assembly, the part it instances, and a transform.</LI>
+<LI>
+<A NAME="50422092_pgfId-294762"></A>An instance has an integer entity-id; the instances directly referenced by an assembly have distinct entity ids.</LI>
+<LI>
+<A NAME="50422092_pgfId-294763"></A>An assembly may contain any number of instances of the same part.</LI>
+<LI>
+<A NAME="50422092_pgfId-294764"></A>Instances cannot exist outside an assembly, and the part they instance must not be null.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422092_pgfId-294767"></A>	22.1.3 	<A NAME="50422092_marker-294765"></A><A NAME="50422092_marker-294766"></A>What is a transform? </H3>
+<P>
+<A NAME="50422092_pgfId-294768"></A>A transform positions a part in the coordinate frame of an assembly:</P>
+<UL>
+<LI>
+<A NAME="50422092_pgfId-294771"></A>Transforms attached to instances must be a <STRONG>
+rigid</STRONG> motion or a reflection (see <A HREF="fd_chap.015.html#50422084_15682">Section 14.2.9, “Assembly”</A>).</LI>
+<LI>
+<A NAME="50422092_pgfId-294773"></A>If the transform is null, it is treated as the identity transform.</LI>
+<LI>
+<A NAME="50422092_pgfId-294774"></A>Transforms may not be shared by instances.</LI>
+</UL>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422092_pgfId-294777"></A>22.2	<A NAME="50422092_marker-294775"></A><A NAME="50422092_marker-294776"></A>Transmit files 
+
+
+</H1>
+<P>
+<A NAME="50422092_pgfId-294778"></A>A Parasolid transmit file (part file) contains one or more non-instanced parts, together with all their sub-parts, down to the bodies at the bottom level. These assembly graphs are disjoint, i.e. they have no common parts.</P>
+
+<H3>
+<A NAME="50422092_pgfId-294781"></A>	22.2.1 	<A NAME="50422092_marker-294779"></A><A NAME="50422092_marker-294780"></A>Part names </H3>
+<P>
+<A NAME="50422092_pgfId-294782"></A>The system-defined name attribute (SDL/TYSA_NAME) may be used by applications wishing to attach a textual name to identify parts in a part file. Alternatively, the entity ids of the instances may be used to reference particular instances in a part file. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422092_pgfId-294785"></A>22.3	<A NAME="50422092_marker-294783"></A><A NAME="50422092_marker-294784"></A>PK functions 
+
+
+</H1>
+<P>
+<A NAME="50422092_pgfId-294786"></A>The following functions can be used to create, modify and request information about assemblies.</P>
+
+<H3>
+<A NAME="50422092_pgfId-294795"></A>	22.3.1 	<A NAME="50422092_marker-294787"></A><A NAME="50422092_marker-294788"></A><A NAME="50422092_marker-294789"></A><A NAME="50422092_marker-294790"></A><A NAME="50422092_marker-294791"></A><A NAME="50422092_marker-294792"></A><A NAME="50422092_marker-294793"></A><A NAME="50422092_marker-294794"></A>Creation and modification functions </H3>
+<P>
+<A NAME="50422092_pgfId-294839"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294798"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294800"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294803"></A><A NAME="50422092_marker-294802"></A><A HREF=../headers/pk_assembly_create_empty.html>PK_ASSEMBLY_create_empty</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294805"></A>creates an empty assembly</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294808"></A><A NAME="50422092_marker-294807"></A><A HREF=../headers/pk_instance_create.html>PK_INSTANCE_create</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294811"></A><A NAME="50422092_marker-294810"></A>creates an instance, given a standard form containing assembly, transform and part</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294814"></A><A NAME="50422092_marker-294813"></A><A HREF=../headers/pk_instance_change_part.html>PK_INSTANCE_change_part</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294819"></A><A NAME="50422092_marker-294816"></A><A NAME="50422092_marker-294817"></A><A NAME="50422092_marker-294818"></A>alters the instance to instance a different part</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294826"></A><A NAME="50422092_marker-294821"></A><A NAME="50422092_marker-294822"></A><A NAME="50422092_marker-294823"></A><A NAME="50422092_marker-294824"></A><A NAME="50422092_marker-294825"></A><A HREF=../headers/pk_instance_replace_transf.html>PK_INSTANCE_replace_transf</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294828"></A>replaces the transform of an instance</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294831"></A><A NAME="50422092_marker-294830"></A><A HREF=../headers/pk_assembly_transform.html>PK_ASSEMBLY_transform</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294833"></A>transforms an assembly by transforming all its instances</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294836"></A><A NAME="50422092_marker-294835"></A><A HREF=../headers/pk_instance_transform.html>PK_INSTANCE_transform</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294838"></A>transforms an instance by transforming its transform</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422092_pgfId-294841"></A><A NAME="50422092_marker-294840"></A><A HREF=../headers/pk_assembly_make_level_assembly.html>PK_ASSEMBLY_make_level_assembly</A></H4>
+<P>
+<A NAME="50422092_pgfId-294842"></A>Creates a new one-level assembly which is a flattened version of the given assembly. The new assembly contains new instances and transforms, but instances existing parts. There is one instance in the new assembly, for each path from the given assembly down to a body at the bottom level of the assembly graph.</P>
+
+
+
+<H3>
+<A NAME="50422092_pgfId-294845"></A>	22.3.2 	<A NAME="50422092_marker-294843"></A><A NAME="50422092_marker-294844"></A>Navigation functions </H3>
+<P>
+<A NAME="50422092_pgfId-294876"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294848"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294850"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294853"></A><A NAME="50422092_marker-294852"></A><A HREF=../headers/pk_assembly_ask_parts.html>PK_ASSEMBLY_ask_parts</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294855"></A>returns the parts directly instanced by an assembly, with duplicates if a part is instanced more than once</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294858"></A><A NAME="50422092_marker-294857"></A><A HREF=../headers/pk_assembly_ask_instances.html>PK_ASSEMBLY_ask_instances</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294860"></A>returns the instances directly referenced by an assembly</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294863"></A><A NAME="50422092_marker-294862"></A><A HREF=../headers/pk_assembly_ask_parts_transfs.html>PK_ASSEMBLY_ask_parts_transfs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294865"></A>returns the parts and transforms corresponding to the instances directly referenced by an assembly</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294868"></A><A NAME="50422092_marker-294867"></A><A HREF=../headers/pk_instance_ask.html>PK_INSTANCE_ask</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294870"></A>returns the standard form of an instance, which consists of its owning assembly, referenced part, and transform</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294873"></A><A NAME="50422092_marker-294872"></A><A HREF=../headers/pk_part_ask_ref_instances.html>PK_PART_ask_ref_instances</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422092_pgfId-294875"></A>returns the instances which instance the given part</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422092_pgfId-294879"></A>	22.3.3 	<A NAME="50422092_marker-294877"></A><A NAME="50422092_marker-294878"></A>PK_ENTITY functions </H3>
+<P>
+<A NAME="50422092_pgfId-294880"></A>Most PK_ENTITY functions apply to assemblies and instances. In particular:</P>
+
+<H4>
+<A NAME="50422092_pgfId-294881"></A><A HREF=../headers/pk_entity_copy_2.html>PK_ENTITY_copy_2</A></H4>
+<P>
+<A NAME="50422092_pgfId-294882"></A>This function may be used to copy an assembly, in which case its instances and transforms are copied, but not the parts it instances.</P>
+<P>
+<A NAME="50422092_pgfId-294883"></A>It may also be used to copy an instance, in which case only the instance and its transform is copied.</P>
+
+
+<H4>
+<A NAME="50422092_pgfId-294884"></A><A HREF=../headers/pk_entity_delete.html>PK_ENTITY_delete</A></H4>
+<P>
+<A NAME="50422092_pgfId-294885"></A>Deleting an assembly deletes its instances and transforms, but not the instanced parts.</P>
+<P>
+<A NAME="50422092_pgfId-294886"></A>Deleting an instance deletes its transform but not the part it instances.</P>
+
+
+
+<H3>
+<A NAME="50422092_pgfId-294890"></A>	22.3.4 	<A NAME="50422092_marker-294887"></A><A NAME="50422092_marker-294888"></A><A NAME="50422092_marker-294889"></A>PK_PART functions which work on assemblies </H3>
+<UL>
+<LI>
+<A NAME="50422092_pgfId-294891"></A><A HREF=../headers/pk_part_ask_construction_curves.html>PK_PART_ask_construction_curves</A>, <A HREF=../headers/pk_part_ask_construction_surfs.html>PK_PART_ask_construction_surfs</A>,<BR>
+<A HREF=../headers/pk_part_ask_construction_points.html>PK_PART_ask_construction_points</A>, <A HREF=../headers/pk_part_ask_geoms.html>PK_PART_ask_geoms</A></LI>
+<LI>
+<A NAME="50422092_pgfId-294892"></A><A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A>, <A HREF=../headers/pk_part_receive.html>PK_PART_receive</A>, <A HREF=../headers/pk_part_receive_version.html>PK_PART_receive_version</A></LI>
+<LI>
+<A NAME="50422092_pgfId-294893"></A><A HREF=../headers/pk_part_ask_all_attribs.html>PK_PART_ask_all_attribs</A>, <A HREF=../headers/pk_part_ask_all_attdefs.html>PK_PART_ask_all_attdefs</A>, <A HREF=../headers/pk_part_ask_attribs_cb.html>PK_PART_ask_attribs_cb</A></LI>
+<LI>
+<A NAME="50422092_pgfId-294894"></A><A HREF=../headers/pk_part_ask_groups_2.html>PK_PART_ask_groups_2</A></LI>
+<LI>
+<A NAME="50422092_pgfId-294895"></A><A HREF=../headers/pk_part_add_geoms.html>PK_PART_add_geoms</A>, <A HREF=../headers/pk_part_remove_geoms.html>PK_PART_remove_geoms</A></LI>
+<LI>
+<A NAME="50422092_pgfId-294896"></A><A HREF=../headers/pk_part_rectify_identifiers.html>PK_PART_rectify_identifiers</A></LI>
+</UL>
+
+
+<H3>
+<A NAME="50422092_pgfId-294900"></A>	22.3.5 	<A NAME="50422092_marker-294897"></A><A NAME="50422092_marker-294898"></A><A NAME="50422092_marker-294899"></A>PK_TOPOL functions which work on assemblies </H3>
+<UL>
+<LI>
+<A NAME="50422092_pgfId-294901"></A><A HREF=../headers/pk_topol_eval_mass_props.html>PK_TOPOL_eval_mass_props</A></LI>
+<LI>
+<A NAME="50422092_pgfId-294902"></A><A HREF=../headers/pk_topol_find_box_2.html>PK_TOPOL_find_box_2</A></LI>
+</UL>
+<P>
+<A NAME="50422092_pgfId-275053"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.022.html">Transformations</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.024.html">Reading and Writing Parasolid Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

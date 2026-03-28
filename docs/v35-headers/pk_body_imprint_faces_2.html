@@ -1,0 +1,140 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_imprint_faces_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_imprint_faces_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                  PK_BODY_imprint_faces_2
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                        body,        --- a target body
+int                              n_faces,     --- number of tool faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                  faces[],     --- tool faces
+const <A HREF=../headers/pk_body_imprint_faces_o_t.html>PK_BODY_imprint_faces_o_t</A> *options,     --- imprint options [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_imprint_r_t.html>PK_imprint_r_t</A>            *const results,     --- imprint results
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>        *const tracking     --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function imprints edges on the given target body and tool faces.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_tool_faces_many_bodies   tool faces are from more than
+                                      one body (MILD)
+    PK_ERROR_wire_body                target is wire body (MILD)
+    PK_ERROR_missing_geom             target or tool has incomplete geometry
+                                      (MILD)
+    PK_ERROR_same_tool_and_target     target and tool are the same body
+                                      (MILD)
+    PK_ERROR_partial_no_intersect     no imprinting on target or tool
+                                      (MILD)
+    PK_ERROR_bad_tolerance            proposed tolerance is too small (MILD)
+    PK_ERROR_bad_combination          a mixture of facet and classic geometry
+                                      has been supplied (MILD)
+    PK_ERROR_cant_complete_imprint    unable to complete the imprint
+                                      (SERIOUS)
+    PK_ERROR_ambiguous_imprint        ambiguous imprint cannot be
+                                      completed
+                                      (SERIOUS)
+    PK_ERROR_cant_do_imprint          imprint failure (SERIOUS)
+
+<A NAME="documentation"></A>
+
+Introduction
+
+The function takes the target body and tool faces and adds edges and
+vertices where the body and the faces intersect.  The corresponding
+imprinted edges and vertices are returned in matching arrays, one for target,
+one for tool, contained within the results structure.  Where the imprint is
+coincident with existing edges or vertices, new imprint topology will not be
+added and these original edges and vertices will be included in the imprint
+results.  Where an imprinted entity on the target/tool has arisen from
+imprint completion, the matched entity in the tool/target results list
+will be PK_ENTITY_null.
+Vertices are returned only where they are isolated points
+of contact between the target body and tool faces.
+
+The target and tool faces can each belong to either a solid or sheet
+body although solid bodies are not supported for all combinations of imprint
+completion, please see documentation of imprint completion options for details.
+
+See <A HREF="../chapters/fd_chap.051.html#50434412_pgfId-526689">Imprinting</A> for more information.
+
+
+Imprint Options
+
+The option structure passed to this function provides the application
+programmer with the following controls:
+
+ o Restrict imprint to the target body only
+ o Imprint boundaries of overlapping areas
+ o Extend face list on tool faces
+ o Complete partial imprints on faces
+ o Force imprinted edge direction to be consistent
+
+Refer to the <A HREF=../headers/pk_body_imprint_faces_o_t.html>PK_BODY_imprint_faces_o_t</A> documentation for more detailed
+information about the options within this structure.
+
+
+Returned Arguments
+
+Refer to the <A HREF=../headers/pk_imprint_r_t.html>PK_imprint_r_t</A> documentation for information
+about the arrays returned in the <B>'results'</B> structure.
+
+The returned <A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A> structure contains tracking records of type
+PK_TOPOL_track_create_c which track the imprint topology to those topologies
+on the original bodies that were responsible for creating the imprint.
+
+
+Error Reporting
+
+When an error occurs the function will, where possible, make extra
+information related to the error available to the application via the
+standard form of the error. This information will consist of either a
+single or a group of topological or geometric entities.
+
+This mechanism is identical to that of the PK boolean functions.
+Refer to <A HREF=../headers/pk_body_boolean.html>PK_BODY_boolean</A> for a more detailed description of
+the error reporting mechanism.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

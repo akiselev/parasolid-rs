@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_GEOM_transform_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_GEOM_transform_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>              PK_GEOM_transform_2
+(
+<I>--- received arguments ---
+</I>int                          n_geoms,     --- number of geometry entities
+const <A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A>              in_geoms[],  --- geometric entities to be
+                                          --- transformed
+<A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>                  transf,      --- transformation
+const <A HREF=../headers/pk_geom_transform_o_t.html>PK_GEOM_transform_o_t</A> *options,     --- options structure [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_geom_t.html>PK_GEOM_t</A>                    out_geoms[], --- transformed geometric entities
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>                 exact[]      --- whether result is exact
+)
+</B>
+<A NAME="description"></A>
+<I>This function transforms the array of given geometric entities by the given
+transformation.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_request_not_supported  bad combination of geometry and transf
+                                    (MILD)
+    PK_ERROR_bad_component          transformation matrix has perspective terms
+                                    (MILD)
+    PK_ERROR_is_attached            geometric entity is attached to topology
+                                    (MILD)
+    PK_ERROR_bad_sharing            sharing prevents transformation (MILD)
+
+<A NAME="documentation"></A>
+This function has two distinct modes of operation: transformations which modify
+geometric entities and transformations that create new geometric entities. The
+modify transformations will modify the geometric entities in the <B>'in_geoms'</B>
+array, whereas the new transformations will create new geometric entities in
+the <B>'out_geoms'</B> array.
+
+Some restrictions upon the use of the function are specific to the mode of
+operation. The transformation matrix must not contain perspective terms for
+both modes of operation.
+
+Modification transformations
+The function will receive an array of geometric entities to be transformed. The
+input geometric entities will be modified by the received transformation.
+If the function has successfully completed, the input array will contain
+the transformed geometric entities. The <B>'out_geoms'</B> array will by default
+contain a copy of the <B>'in_geoms'</B> array. The <B>'exact'</B> array will by default be
+set to PK_LOGICAL_true for all of its fields.
+
+The allowed transformations for this mode are translation, rotation, uniform
+scale and reflection. Transforms that are not supported will return the error
+PK_ERROR_request_not_supported. The geometry must also not be attached to any
+topology, if this is the case the error PK_ERROR_is_attached will be returned.
+All dependants of the geometry must be included in the array, if they are not
+PK_ERROR_bad_sharing will be returned.
+
+Creation transformations
+The function returns two arrays, one of transformed geometric entities
+<B>'out_geoms'</B>, the other an array of PK_LOGICAL_ts, <B>'exact'</B>, which describes
+whether each transformation was exact or not. They are both equal in length
+to the <B>'in_geoms'</B> array. The <B>'in_geoms'</B> array will contain the geometric
+entities to be transformed, and upon successful completion the <B>'out_geoms'</B>
+array will contain the transformed geometric entities.
+
+If a piece of geometry in the array <B>'in_geoms'</B> is a point or lattice then the
+corresponding geometry in the output array <B>'out_geoms'</B> is a point or lattice.
+
+For curves and surfaces in the <B>'in_geoms'</B> array, the corresponding geometry
+in the <B>'out_geoms'</B> array will satisfy the first possible of the following
+list of criteria:
+
+ 1 - be of the same class as the <B>'in_geoms'</B> geometry,
+ 2 - be exactly coincident with the transformation of the <B>'in_geoms'</B> geometry,
+ 3 - not deviate by more than the given tolerance from the transformation of
+     the <B>'in_geoms'</B> geometry.
+
+The fields of the array <B>'exact'</B> are set to  PK_LOGICAL_true if the
+corresponding geometry in the <B>'out_geoms'</B> array is either a point, a lattice,
+or criterion 1 or 2 has been satisfied.
+If the geometry in the <B>'out_geoms'</B> array only satisfies criterion 3,
+then <B>'exact'</B> array is set to  PK_LOGICAL_false for the corresponding field.
+
+If <B>'in_geoms'</B> has any geometric dependants not included in the array then new
+geometric entities will be created as transformations of these.
+
+If any geometry in the <B>'in_geoms'</B> array is a cone or a lattice, then it is
+not possible to transform it by a transformation involving non-uniform scale.
+An attempt to do this will lead to the error PK_ERROR_request_not_supported.
+
+Creation transformations are currently only supported for unit size arrays.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

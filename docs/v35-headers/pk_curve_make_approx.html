@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_make_approx</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_make_approx</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                 PK_CURVE_make_approx
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                      curve,          --- Original curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                   curve_interval, --- interval on the curve
+const <A HREF=../headers/pk_curve_make_approx_o_t.html>PK_CURVE_make_approx_o_t</A> *options,        --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>               *const new_curve,      --- new curve
+<A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>            *const new_interval,   --- new interval
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>             *const exact           --- if returned curve is exact
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a curve which is an arc length parametrised
+approximation to a supplied curve.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_bad_parameter              Supplied parameter interval
+                                        is outside curve range.
+
+<A NAME="documentation"></A>
+
+
+Description
+
+New curve with 'arclength' or 'even' parameterisation is created which
+is coincident with the given curve to within the given tolerance.
+
+Parameter value on 'arclength' parameterised curve represents the length
+along the curve. In case of the 'even' parameterisation, the ratio of
+parameter value to length along the curve is constant.
+
+Returned interval will be [0, length] for 'arclength' parameterisation.
+
+When supplied curve is a straight line then its point will be moved to
+the beginning of the supplied interval. Circle's x_axis will be
+repositioned in a similar way.
+
+Returned <B>'exact'</B> flag indicates whether the returned curve is an
+approximation or exact copy of the original.
+
+Supplied tolerance represents new curve fit tolerance through a series
+of samples on the original curve. Recommended range is 0.0001 to 0.00001.
+Smaller values may cause excessive number of vertices on the resulting
+curve.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

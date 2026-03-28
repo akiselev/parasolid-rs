@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Application Design And Architecture</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Application Design And Architecture</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.005.html">Introduction To Application Development</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.007.html">Supplying A Frustrum</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.006.html#50422074_pgfId-324646">5.1	Introduction </A>
+<LI> <A HREF="fd_chap.006.html#50422074_pgfId-294843">5.2	Downward interfaces </A>
+<UL>
+<LI> <A HREF="fd_chap.006.html#50422074_pgfId-294856">5.2.1	The frustrum </A>
+<LI> <A HREF="fd_chap.006.html#50422074_pgfId-294863">5.2.2	Graphical output </A>
+</UL>
+<LI> <A HREF="fd_chap.006.html#50422074_pgfId-306369">5.3	Calls to Parasolid functions </A>
+<UL>
+<LI> <A HREF="fd_chap.006.html#50422074_pgfId-294887">5.3.1	Managing Parasolid errors </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422074_pgfId-324646"></A>5.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422074_pgfId-294737"></A>When integrating Parasolid into your product, some of the design decisions you need to make are constrained by the requirements of Parasolid itself. Your ultimate aim is to make calls to Parasolid routines from within your own application code in order to perform solid modeling operations. In order to do this, you need to supply code that ensures that your application and Parasolid can interact correctly. This chapter gives you an overview of the code you need to supply before you can start making calls to Parasolid routines from your own code.</P>
+<P>
+<A NAME="50422074_pgfId-294741"></A><EM>
+<A HREF="fd_chap.006.html#50422074_19764"></A><EM>
+Figure 5-1</EM><EM>
+</EM></EM> shows how Parasolid interacts with a typical application:</P>
+<P>
+<A NAME="50422074_pgfId-312972"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-15.gif">
+
+<P>
+<A NAME="50422074_pgfId-294837"></A>Figure 5-1 <A NAME="50422074_19764"></A>	How Parasolid interacts with a typical application</P>
+<P>
+<A NAME="50422074_pgfId-294839"></A><A NAME="50422074_marker-294838"></A>The code that you need to supply for integration with Parasolid falls into two categories:</P>
+<UL>
+<LI>
+<A NAME="50422074_pgfId-294840"></A>Downward interface code.</LI>
+<LI>
+<A NAME="50422074_pgfId-294841"></A>Calls to Parasolid functions.</LI>
+</UL>
+<P>
+<A NAME="50422074_pgfId-323120"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422074_pgfId-322997"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422074_pgfId-323001"></A><A HREF="fd_chap.007.html#50422075_14409">Chapter 6, “Supplying A Frustrum”</A></LI>
+<LI>
+<A NAME="50422074_pgfId-323005"></A><A HREF="di_chap.05.html#42323">Chapter 4, “Graphical Output”</A> of the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual</LI>
+<LI>
+<A NAME="50422074_pgfId-323009"></A><A HREF="di_chap.08.html#18688">Appendix B, “Graphical Output Functions”</A> of the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual</LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422074_pgfId-294843"></A>5.2	<A NAME="50422074_marker-294842"></A>Downward interfaces 
+
+
+</H1>
+<P>
+<A NAME="50422074_pgfId-294844"></A>Your application controls all interaction between Parasolid and the operating system. The parts of your application that deal with this are referred to generically as <EM>
+downward interfaces</EM>. You usually need to have two parts to your downward interface:</P>
+<UL>
+<LI>
+<A NAME="50422074_pgfId-294845"></A>The frustrum</LI>
+<LI>
+<A NAME="50422074_pgfId-294847"></A><A NAME="50422074_marker-294846"></A>Graphical Output (GO) - required for displaying models</LI>
+</UL>
+<P>
+<A NAME="50422074_pgfId-294848"></A>Because Parasolid itself makes calls to routines in these downward interfaces, they need to be registered with Parasolid before your application can call any Parasolid functions. </P>
+<P>
+<A NAME="50422074_pgfId-294853"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422074_pgfId-294852"></A>Note: <A NAME="50422074_marker-294851"></A>In practice, GO functions are implemented as part of the frustrum. You can think of them as a separate downward interface to the extent that: (a) they are not needed if you do not need to deal with model display; and (b) they require use of a separate graphics library.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422074_pgfId-294856"></A>	5.2.1 	<A NAME="50422074_marker-294854"></A><A NAME="50422074_marker-294855"></A>The frustrum </H3>
+<P>
+<A NAME="50422074_pgfId-294857"></A>The <EM>
+frustrum</EM> is a suite of functions that deals with:</P>
+<UL>
+<LI>
+<A NAME="50422074_pgfId-294858"></A><STRONG>
+File handling:</STRONG> Saving and retrieving Parasolid part files and other data.</LI>
+<LI>
+<A NAME="50422074_pgfId-294859"></A><STRONG>
+Memory management:</STRONG> Allocating memory for internal calculations and data structure storage.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422074_pgfId-294863"></A>	5.2.2 	<A NAME="50422074_marker-294860"></A><A NAME="50422074_marker-294861"></A><A NAME="50422074_marker-294862"></A>Graphical output </H3>
+<P>
+<A NAME="50422074_pgfId-294864"></A>If your application needs to display models - whether by rendering them on screen, or printing them to a plotter or laser printer - you must provide GO functions for Parasolid to use. </P>
+<P>
+<A NAME="50422074_pgfId-294865"></A>Parasolid calls the GO functions whenever your application calls a Parasolid rendering function in order to draw one or more parts. The GO functions encapsulate the graphical information output by Parasolid, and pass it to a graphics library (that you also provide) in order to render the image. </P>
+<P>
+<A NAME="50422074_pgfId-306362"></A>You can write the graphics library yourself, or you can use a third party library such as <A NAME="50422074_marker-306360"></A><A NAME="50422074_marker-306361"></A>OpenGL or <A NAME="50422074_marker-306363"></A><A NAME="50422074_marker-306364"></A>DirectX. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422074_pgfId-306369"></A>5.3	<A NAME="50422074_marker-306365"></A><A NAME="50422074_marker-306366"></A><A NAME="50422074_marker-306367"></A><A NAME="50422074_marker-306368"></A>Calls to Parasolid functions 
+
+
+</H1>
+<P>
+<A NAME="50422074_pgfId-306371"></A>Parasolid is supplied as a library of functions and is designed as a toolkit of component software that you can embed into your product. The Parasolid API is called the PK. The PK contains functions for:</P>
+<UL>
+<LI>
+<A NAME="50422074_pgfId-294878"></A>Building, modifying, and combining parts</LI>
+<LI>
+<A NAME="50422074_pgfId-294879"></A>Finding out information about the properties of parts (such as mass, geometric information, or rendering information)</LI>
+<LI>
+<A NAME="50422074_pgfId-294880"></A>Functions for saving parts, and loading parts back into Parasolid</LI>
+</UL>
+<P>
+<A NAME="50422074_pgfId-294884"></A>See <A HREF="fd_chap.010.html#50422078_39528">Chapter 9, “PK Interface Programming Concepts”</A>, for an introduction to using functions in the PK.</P>
+
+<H3>
+<A NAME="50422074_pgfId-294887"></A>	5.3.1 	<A NAME="50422074_marker-294885"></A><A NAME="50422074_marker-294886"></A>Managing Parasolid errors </H3>
+<P>
+<A NAME="50422074_pgfId-294890"></A>Your application must be able to handle errors returned by PK functions. See <A HREF="fd_chap.007.html#50422075__Ref462717402">Section 6.7, “Error handling”</A>, for more details.</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.005.html">Introduction To Application Development</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.007.html">Supplying A Frustrum</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

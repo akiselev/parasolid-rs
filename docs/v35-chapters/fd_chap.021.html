@@ -1,0 +1,1077 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Lattice Geometry</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Lattice Geometry</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.020.html">Nominal Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.022.html">Transformations</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-294726">20.1	Introduction </A>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-336122">20.2	Using the graph reader </A>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-336128">20.3	Graph types </A>
+<UL>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-336130">20.3.1	Cylinder data blocks </A>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-336144">20.3.2	Cone data blocks </A>
+</UL>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-336171">20.4	Checking lattices </A>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-371760">20.5	Creating a blended lattice </A>
+<UL>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-377896">20.5.1	Blended lattices with lballs of the same blend size </A>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-377951">20.5.2	Blended lattices with lballs of various blend sizes </A>
+</UL>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-368281">20.6	Creating a lattice structure from a core lattice </A>
+<UL>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-391191">20.6.1	Deforming the pattern </A>
+</UL>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-368342">20.7	Creating a lattice-like mesh body </A>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-336173">20.8	Creating a facet body from a lattice </A>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-342952">20.9	Clipping a lattice to fit your model </A>
+<LI> <A HREF="fd_chap.021.html#50422090_pgfId-336180">20.10	Lattice specific operations </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-294726"></A>20.1	<A NAME="50422090_99370"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-275053"></A>Lattices are classified as a geometry type which can be created, enquired of, rendered and attached to parts as construction geometry. Lattices can be used to create mesh geometry as well as solid convergent bodies. Furthermore, you can create a lattice structure from a smaller core lattice. Lattices can be rendered as straight lines, or as solid spheres linked by cylindrical or conical rods (as illustrated in <A HREF="fd_chap.021.html#50422090_14304"><EM>
+Figure 20-1</EM></A>).</P>
+<P>
+<A NAME="50422090_pgfId-336019"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-167.gif">
+
+<P>
+<A NAME="50422090_pgfId-356161"></A>Figure 20-1 <A NAME="50422090_14304"></A>Lattice geometry</P>
+<P>
+<A NAME="50422090_pgfId-356162"></A>Lattices are represented as collections of lballs joined by lrods (collectively known as lattice topology or ltopols). The radii of lrods can be different where they meet at a common lball, as illustrated in <A HREF="fd_chap.021.html#50422090_32168"><EM>
+Figure 20-2</EM></A>. </P>
+<P>
+<A NAME="50422090_pgfId-356199"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-168.gif">
+
+<P>
+<A NAME="50422090_pgfId-352400"></A>Figure 20-2 <A NAME="50422090_32168"></A>Lattice with lrods of different radii meeting at a common lball</P>
+<P>
+<A NAME="50422090_pgfId-336067"></A>Parasolid provides the function <A HREF=../headers/pk_lattice_create_by_graph.html>PK_LATTICE_create_by_graph</A> to allow you to create an orphan lattice geometry from data supplied by a user-defined callback function. </P>
+<P>
+<A NAME="50422090_pgfId-336072"></A>The function receives the following arguments:</P>
+<P>
+<A NAME="50422090_pgfId-336089"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336075"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336077"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336079"></A><CODE>
+graph_reader</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336083"></A>A user-defined callback function.See <A HREF="fd_chap.021.html#50422090_71450">Section 20.2, “Using the graph reader”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336086"></A><CODE>
+context</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336088"></A>A pointer to the user supplied data input to <CODE>
+graph_reader</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422090_pgfId-336090"></A>The function has the following options: </P>
+<P>
+<A NAME="50422090_pgfId-359642"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336093"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336095"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336097"></A><CODE>
+lballs_estimate</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336099"></A>Estimated number of all lballs returned by all calls to <CODE>
+graph_reader</CODE>
+.<CODE>
+ </CODE>
+Default: (0)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336101"></A><CODE>
+lrods_estimate</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336103"></A>Estimated number of all lrods returned by all calls to <CODE>
+graph_reader</CODE>
+.<CODE>
+ </CODE>
+Default: (0)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336105"></A><CODE>
+graph_free</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336107"></A>Function to free data blocks returned by <CODE>
+graph_reader.</CODE>
+ Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336109"></A><CODE>
+thread_safe</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336111"></A>Whether the <CODE>
+graph_reader </CODE>
+callback and the <CODE>
+graph_free</CODE>
+ callback (if supplied) are thread safe. Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336113"></A><CODE>
+lball_radius</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336115"></A>The radius of the lballs in the lattice. Default: (0)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-337602"></A><CODE>
+lball_min_radius</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-337604"></A>Controls behaviour when a supplied lball radius is smaller than the radius of its largest incident lrod. This can have the following values:</P>
+<UL>
+<LI>
+<A NAME="50422090_pgfId-337858"></A><A HREF=../headers/pk_lball_min_radius_t.html>PK_LBALL_min_radius_fail_c</A> - attempting to create the lattice will fail with PK_ERROR_invalid_geometry.</LI>
+<LI>
+<A NAME="50422090_pgfId-337901"></A><A HREF=../headers/pk_lball_min_radius_t.html>PK_LBALL_min_radius_auto_c</A> - when creating the lattice the lball radius will be automatically increased to the same value as the radius of its largest incident lrod.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-371309"></A><CODE>
+lball_blend_type</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-371311"></A>Whether the lattice is blended. </P>
+<P>
+<A NAME="50422090_pgfId-403570"></A>Default: <A HREF=../headers/pk_lball_blend_t.html>PK_LBALL_blend_none_c</A></P>
+<P>
+<A NAME="50422090_pgfId-375586"></A>See <A HREF="fd_chap.021.html#50422090_70495">Section 20.5, “Creating a blended lattice”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-371335"></A><CODE>
+lball_blend_size</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-371337"></A>The size of the lball blends in the lattice. Default: 0</P>
+<P>
+<A NAME="50422090_pgfId-375662"></A>See <A HREF="fd_chap.021.html#50422090_70495">Section 20.5, “Creating a blended lattice”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336117"></A><CODE>
+lrod_shape_opts</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336119"></A>Optional controls on the shape of the lrods of the lattice.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-357102"></A><CODE>
+have_snap_tolerance<BR>
+snap_tolerance</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-357327"></A>If <CODE>
+have_snap_tolerance</CODE>
+ is PK_LOGICAL_true, <CODE>
+snap_tolerance</CODE>
+ specifies a maximum distance between lball positions, variation in lball radii, and variation in lball_lrod_radii at which multiple lballs can be snapped together into a single combined lball. This is illustrated in <A HREF="fd_chap.021.html#50422090_20532"><EM>
+Figure 20-3</EM></A> where two lballs lie within <CODE>
+snap_tolerance</CODE>
+ and are snapped together to form one lball.</P>
+<P>
+<A NAME="50422090_pgfId-357104"></A>The <CODE>
+have_snap_tolerance</CODE>
+ option should be used whenever you supply a <CODE>
+snap_tolerance</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422090_pgfId-357797"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-169.gif">
+
+<P>
+<A NAME="50422090_pgfId-336120"></A>Figure 20-3 <A NAME="50422090_20532"></A>Snapping lballs together that lie within a supplied <CODE>
+snap_tolerance</CODE>
+</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-336122"></A>20.2	<A NAME="50422090_71450"></A>Using the graph reader 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-336123"></A>This section describes how the callback function, <CODE>
+graph_reader</CODE>
+, is used to create lattice geometry from graph data. The <CODE>
+graph_reader</CODE>
+ takes a block of user supplied context information and should return a block of lattice data and a return status. The block of lattice data can be one of two types; cylinder or cone. See <A HREF="fd_chap.021.html#50422090_99339">Section 20.3, “Graph types”</A> for more information.The return status indicates the state of the operation. The <CODE>
+graph_reader</CODE>
+ is called repeatedly by <A HREF=../headers/pk_lattice_create_by_graph.html>PK_LATTICE_create_by_graph</A> until it returns the status <A HREF=../headers/pk_lattice_cb_status_t.html>PK_LATTICE_cb_status_stop_c</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-336128"></A>20.3	<A NAME="50422090_99339"></A>Graph types 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-336129"></A>This section describes the two types of data blocks (cylinder and cone) that can be returned by each call to <CODE>
+graph_reader</CODE>
+. </P>
+
+<H3>
+<A NAME="50422090_pgfId-336130"></A>	20.3.1 	Cylinder data blocks </H3>
+<P>
+<A NAME="50422090_pgfId-336131"></A>This structure contains the data block for lattices with cylindrical shaped lrods. The lballs are provided by arrays of <CODE>
+lball_positions</CODE>
+ and <CODE>
+lball_radii</CODE>
+. The <CODE>
+lrod_start_indices</CODE>
+ and <CODE>
+lrod_end_indices</CODE>
+ arrays define an array of lrods by specifying the absolute indices of the pair of lballs that each lrod joins. </P>
+<P>
+<A NAME="50422090_pgfId-379445"></A>Individual blend sizes of the lballs within the data block can be supplied via <CODE>
+lball_blend_sizes</CODE>
+. If the lattice is to be blended, these sizes together with the value of the <CODE>
+lball_blend_type </CODE>
+option determine the radii of the blends applied at each of the lballs. See <A HREF="fd_chap.021.html#50422090_87961">Section 20.5.2, “Blended lattices with lballs of various blend sizes”</A> for more information.</P>
+<P>
+<A NAME="50422090_pgfId-336132"></A>The following pseudo-code example shows the data input when using PK_LATTICE_graph_cyl_t to transmit a block of lattice data. </P>
+<P>
+<A NAME="50422090_pgfId-336143"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422090_pgfId-336135"></A><CODE>n_lball_positions = 7</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336136"></A><CODE>lball_positions = {b0,b1,b2,b3,b4,b5,b6}</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336137"></A><CODE>lball_radii = {br0,br1,br2,br3,b4r,br5,br6}</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-377374"></A>lball_blend_sizes = NULL</PRE>
+<PRE><A NAME="50422090_pgfId-336138"></A><CODE>n_lrod_indices = 12</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336139"></A><CODE>lrod_start_indices = {0,0,0,0,0,0,1,2,3,4,5,1}</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336140"></A><CODE>lrod_end_indices = {1,2,3,4,5,6,2,3,4,5,6,6}</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336141"></A>lrod_radii = {lr0,lr1,lr2,...,lr11}</PRE>
+<PRE><A NAME="50422090_pgfId-336142"></A><CODE>status = <A HREF=../headers/pk_lattice_cb_status_t.html>PK_LATTICE_cb_status_stop_c</A></CODE>
+</PRE>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422090_pgfId-336144"></A>	20.3.2 	Cone data blocks </H3>
+<P>
+<A NAME="50422090_pgfId-336145"></A>This structure contains the data block for lattices with cone-shaped lrods. The lballs are provided by arrays of <CODE>
+lball_positions</CODE>
+ and <CODE>
+lball_radii</CODE>
+.The <CODE>
+lrod_start_indices</CODE>
+ and <CODE>
+lrod_end_indices</CODE>
+ arrays define an array of lrods by specifying the absolute indices of the pair of lballs that each lrod joins. </P>
+<P>
+<A NAME="50422090_pgfId-379229"></A>Individual blend sizes of the lballs within the data block can be supplied via <CODE>
+lball_blend_sizes</CODE>
+. If the lattice is to be blended, these sizes together with the value of the <CODE>
+lball_blend_type </CODE>
+option determine the radii of the blends applied at each of the lballs. See <A HREF="fd_chap.021.html#50422090_87961">Section 20.5.2, “Blended lattices with lballs of various blend sizes”</A> for more information.</P>
+<P>
+<A NAME="50422090_pgfId-336146"></A>The following pseudo-code example shows the data input when using PK_LATTICE_graph_cone_t to transmit a block of lattice data. </P>
+<P>
+<A NAME="50422090_pgfId-336159"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422090_pgfId-336149"></A><CODE>n_lball_positions = 7</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336150"></A><CODE>lball_positions = {b0,b1,b2,b3,b4,b5,b6}</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336151"></A><CODE>lball_radii = {br0,br1,br2,br3,b4r,br5,br6}</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-377412"></A>lball_blend_sizes = NULL</PRE>
+<PRE><A NAME="50422090_pgfId-336152"></A><CODE>lball_lrod_radii = NULL</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336153"></A><CODE>n_lrod_indices = 12</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336154"></A><CODE>lrod_start_indices ={0,0,0,0,0,0,1,2,3,4,5,1}</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336155"></A><CODE>lrod_end_indices = {1,2,3,4,5,6,2,3,4,5,6,6}</CODE>
+</PRE>
+<PRE><A NAME="50422090_pgfId-336156"></A>lrod_start_radii = {lsr0,lsr1,lsr2,...,lsr11}</PRE>
+<PRE><A NAME="50422090_pgfId-336157"></A>lrod_end_radii = {ler0,ler1,ler2,...,ler11}</PRE>
+<PRE><A NAME="50422090_pgfId-336158"></A><CODE>status = <A HREF=../headers/pk_lattice_cb_status_t.html>PK_LATTICE_cb_status_stop_c</A></CODE>
+</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422090_pgfId-336163"></A><A HREF="fd_chap.021.html#50422090_27298"><EM>
+Figure 20-4</EM></A> shows an example of a lattice structure</P>
+<P>
+<A NAME="50422090_pgfId-336167"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-170.gif">
+
+<P>
+<A NAME="50422090_pgfId-336169"></A>Figure 20-4 <A NAME="50422090_27298"></A>Example of lattice structure </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-336171"></A>20.4	<A NAME="50422090_60230"></A>Checking lattices 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-336172"></A>You can use <A HREF=../headers/pk_geom_check.html>PK_GEOM_check</A> to check lattice structures for invalidities. See <A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A>, for a list of faults that may be returned.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-371760"></A>20.5	<A NAME="50422090_70495"></A>Creating a blended lattice 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-378099"></A>You can optionally choose to create a blended lattice using a number of options in <A HREF=../headers/pk_lattice_create_by_graph.html>PK_LATTICE_create_by_graph</A>. Blending a lattice allows you to increase the stiffness of the lattice thereby improving its structural strength. </P>
+<P>
+<A NAME="50422090_pgfId-378448"></A>Lattices can be blended in the following ways:</P>
+<UL>
+<LI>
+<A NAME="50422090_pgfId-377597"></A>Create a blended lattice where the blend size applies globally to all lballs in the lattice. See <A HREF="fd_chap.021.html#50422090_68243">Section 20.5.1, “Blended lattices with lballs of the same blend size”</A>, for more information. </LI>
+<LI>
+<A NAME="50422090_pgfId-377711"></A>Create a blended lattice where the blend size applies locally to lballs in the lattice. See <A HREF="fd_chap.021.html#50422090_87961">Section 20.5.2, “Blended lattices with lballs of various blend sizes”</A>, for more information.</LI>
+</UL>
+
+<H3>
+<A NAME="50422090_pgfId-377896"></A>	20.5.1 	<A NAME="50422090_68243"></A>Blended lattices with lballs of the same blend size </H3>
+<P>
+<A NAME="50422090_pgfId-377818"></A>Using the <CODE>
+lball_blend_type</CODE>
+ and the <CODE>
+lball_blend_size</CODE>
+ options, you can create a blended lattice whose lballs have the same blend size, where each lball’s blend radius is either a constant or a constant multiple of the lball’s radius. The <CODE>
+lball_blend_type</CODE>
+ option has the following values:</P>
+<P>
+<A NAME="50422090_pgfId-403990"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-372153"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-372155"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-372157"></A><A HREF=../headers/pk_lball_blend_t.html>PK_LBALL_blend_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-372159"></A>There are no blends on the lattice. Default</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-372161"></A><A HREF=../headers/pk_lball_blend_t.html>PK_LBALL_blend_absolute_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-372163"></A>The lattice has blends and each lball’s blend radius is equal to the blend size. This is illustrated in <A HREF="fd_chap.021.html#50422090_88980"><EM>
+Figure 20-5</EM></A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-372165"></A><A HREF=../headers/pk_lball_blend_t.html>PK_LBALL_blend_relative_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-372167"></A>The lattice has blends and each lball’s blend radius is the product of the lball’s radius and the blend size. This is illustrated in <A HREF="fd_chap.021.html#50422090_88980"><EM>
+Figure 20-5</EM></A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422090_pgfId-372840"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-171.gif">
+
+<P>
+<A NAME="50422090_pgfId-378391"></A>Figure 20-5 <A NAME="50422090_88980"></A>Blended lattices whose lballs have the same blend size</P>
+
+
+<H3>
+<A NAME="50422090_pgfId-377951"></A>	20.5.2 	<A NAME="50422090_87961"></A>Blended lattices with lballs of various blend sizes </H3>
+<P>
+<A NAME="50422090_pgfId-374698"></A>Alternatively you can vary the blend size of lballs within the lattice by using the <CODE>
+lball_blend_sizes</CODE>
+ option in the <CODE>
+graph_reader </CODE>
+callback. In this case, each lball’s blend radius is the corresponding value in <CODE>
+lball_blend_sizes</CODE>
+, optionally multiplied by the lball’s radius depending on the value of the <CODE>
+lball_blend_type</CODE>
+ option (see table in <A HREF="fd_chap.021.html#50422090_68243" CLASS="XRef">Section 20.5.1, “Blended lattices with lballs of the same blend size”</A> for a list of these values). <A HREF="fd_chap.021.html#50422090_40332"><EM>
+Figure 20-6</EM></A>, illustrates where the blends are applied locally with smaller blend radii applied at the larger lballs. See <A HREF="fd_chap.021.html#50422090_99339">Section 20.3, “Graph types”</A> for more information on the graph reader callback function.</P>
+<P>
+<A NAME="50422090_pgfId-379075"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-172.gif">
+
+<P>
+<A NAME="50422090_pgfId-379043"></A>Figure 20-6 <A NAME="50422090_40332"></A>Blended lattice whose lballs have different blend sizes </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-368281"></A>20.6	<A NAME="50422090_50136"></A>Creating a lattice structure from a core lattice 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-368421"></A>You can create a new lattice from patterned repetitions of a supplied core lattice using <A HREF=../headers/pk_lattice_make_patterned.html>PK_LATTICE_make_patterned</A>. </P>
+<P>
+<A NAME="50422090_pgfId-370349"></A>It has the following options:</P>
+<P>
+<A NAME="50422090_pgfId-379980"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-370403"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-370405"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-370411"></A><CODE>
+cell</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-370413"></A>Contains the standard form <A HREF=../headers/pk_skewbox_sf_t.html><A HREF=../headers/pk_skewbox_sf_t.html>PK_SKEWBOX_sf_t</A></A> which holds the data on the cell to be repeated. This structure also determines how neighbouring cell repetitions connect to each other. See <A HREF=../headers/pk_skewbox_sf_t.html><A HREF=../headers/pk_skewbox_sf_t.html>PK_SKEWBOX_sf_t</A></A> for more information on the standard form of a skewbox.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-370415"></A><CODE>
+bound</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-370417"></A>Determines the number of repetitions of the <CODE>
+cell</CODE>
+ used in each direction.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-385523"></A><CODE>
+form</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-385525"></A>Contains information about the type of pattern to be used. See <A HREF="fd_chap.021.html#50422090_80383">Section 20.6.1, “Deforming the pattern”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-385533"></A>callback</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-385535"></A>A user defined callback function used to deform the pattern. See <A HREF="fd_chap.021.html#50422090_80383">Section 20.6.1, “Deforming the pattern”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422090_pgfId-385096"></A>The <CODE>
+cell</CODE>
+, which contains the core input lattice that is to be repeated, tessellates to create a pattern of cells which come together to form a new lattice. This is illustrated in <A HREF="fd_chap.021.html#50422090_38715"><EM>
+Figure 20-7</EM></A>, with the <CODE>
+bound</CODE>
+ option set to (-2 2) in all three directions.</P>
+<P>
+<A NAME="50422090_pgfId-401556"></A>&nbsp;</P>
+<P>
+<A NAME="50422090_pgfId-388552"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-173.gif">
+
+<P>
+<A NAME="50422090_pgfId-388525"></A>Figure 20-7 <A NAME="50422090_38715"></A>Creating a new lattice from a patterned repetition of a supplied lattice</P>
+
+<H3>
+<A NAME="50422090_pgfId-391191"></A>	20.6.1 	<A NAME="50422090_80383"></A>Deforming the pattern </H3>
+<P>
+<A NAME="50422090_pgfId-390022"></A>Optionally, you can use the <CODE>
+form</CODE>
+ option and/or the <CODE>
+callback</CODE>
+ option to relocate and deform the supplied pattern. The <CODE>
+form</CODE>
+ option specifies the type of pattern supplied along with the data of the pattern. The type can be one of the following values:</P>
+<P>
+<A NAME="50422090_pgfId-397420"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-391385"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-391387"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-391389"></A><A HREF=../headers/pk_pattern_type_t.html>PK_pattern_type_rectilinear_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-391391"></A>The pattern is rectilinear</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-391393"></A><A HREF=../headers/pk_pattern_type_t.html>PK_pattern_type_original_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-391395"></A>The pattern does not deform or relocate the cell. Default</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422090_pgfId-385944"></A>The <CODE>
+callback</CODE>
+ option can be also be used to geometrically deform the supplied pattern. The option takes user supplied information to deform patterned positions. <A HREF="fd_chap.021.html#50422090_78963"><EM>
+Figure 20-8</EM></A> shows a core lattice being deformed using the <CODE>
+callback</CODE>
+ to create a patterned lattice, with the <CODE>
+bound</CODE>
+ option set to (0 4) in two directions and (0 0) in the other direction. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on the <CODE>
+callback</CODE>
+ option.</P>
+<P>
+<A NAME="50422090_pgfId-386054"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422090_pgfId-386064"></A>Note: If both a <CODE>
+pattern</CODE>
+ and a <CODE>
+callback</CODE>
+ are supplied, the callback is applied after any deformation is applied from <CODE>
+pattern</CODE>
+. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422090_pgfId-394767"></A>&nbsp;</P>
+<P>
+<A NAME="50422090_pgfId-369181"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-174.gif">
+
+<P>
+<A NAME="50422090_pgfId-369154"></A>Figure 20-8 <A NAME="50422090_78963"></A>Creating a lattice by relocating and deforming a pattern using the <CODE>
+callback</CODE>
+ option</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-368342"></A>20.7	<A NAME="50422090_73207"></A>Creating a lattice-like mesh body 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-368782"></A>You can use <A HREF=../headers/pk_body_make_patterned.html>PK_BODY_make_patterned</A> to create a lattice-like mesh body by patterning a facet body as illustrated in <A HREF="fd_chap.021.html#50422090_21433"><EM>
+Figure 20-9</EM></A> with the <CODE>
+bound</CODE>
+ option set to (-2 2) in all three directions. If you supply a sheet body then it must be open such that its laminar edges match neighbouring repetitions.This function has the same options as <A HREF=../headers/pk_lattice_make_patterned.html>PK_LATTICE_make_patterned</A>. For more information on these options, see <A HREF="fd_chap.021.html#50422090_50136">Section 20.6, “Creating a lattice structure from a core lattice”</A>.</P>
+<P>
+<A NAME="50422090_pgfId-395026"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422090_pgfId-395056"></A>Note: The input body must only contain facet geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422090_pgfId-393445"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-175.gif">
+
+<P>
+<A NAME="50422090_pgfId-370124"></A>Figure 20-9 <A NAME="50422090_21433"></A>Creating a lattice-like mesh body</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-336173"></A>20.8	Creating a facet body from a lattice 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-336174"></A>You can create a solid body from lattice geometry using <A HREF=../headers/pk_lattice_make_bodies.html>PK_LATTICE_make_bodies</A>.<A NAME="50422090_87599"></A> The solid body can have one or more closed mesh faces. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this function.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-342952"></A>20.9	Clipping a lattice to fit your model 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-343133"></A>The process of trimming or cutting down a lattice to fit a model, or a sub-set of a model, is referred to as <STRONG>
+clipping</STRONG>. You can clip a lattice with one or more clip entities using <A HREF=../headers/pk_lattice_clip.html>PK_LATTICE_clip</A>. See <A HREF="fd_chap.056.html#50421908_88599">Section 55.6, “Clipping Lattices”</A>, for more information.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422090_pgfId-336180"></A>20.10	<A NAME="50422090_46164"></A>Lattice specific operations 
+
+
+</H1>
+<P>
+<A NAME="50422090_pgfId-336184"></A>Parasolid provides the following functions for enquiring about lattices and their substructures:</P>
+<P>
+<A NAME="50422090_pgfId-336242"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336187"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336189"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336191"></A><A HREF=../headers/pk_lattice_ask_n_lballs.html>PK_LATTICE_ask_n_lballs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336193"></A>Returns the number of lballs in the given lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336195"></A><A HREF=../headers/pk_lattice_ask_n_lrods.html>PK_LATTICE_ask_n_lrods</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336197"></A>Returns the number of lrods in the given lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-338946"></A><A HREF=../headers/pk_lattice_ask_part.html>PK_LATTICE_ask_part</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-338948"></A>Returns the part that owns the given lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-342300"></A><A HREF=../headers/pk_lattice_do_for_all_lballs.html>PK_LATTICE_do_for_all_lballs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-342302"></A>Calls the given callback function for every lball in the given lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336203"></A><A HREF=../headers/pk_lattice_do_for_all_lrods.html>PK_LATTICE_do_for_all_lrods</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336205"></A>Calls the given callback function for every lrod in the given lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-347068"></A><A HREF=../headers/pk_lattice_find_box.html>PK_LATTICE_find_box</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-347070"></A>Finds the axis-aligned bounding box of the given lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-363541"></A><A HREF=../headers/pk_lattice_find_nabox.html>PK_LATTICE_find_nabox</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-363543"></A>Returns a non axis-aligned bounding box of the given lattice. See <A HREF="fd_chap.027.html#50422096_32464">Section 26.6.1.1, “Axis-aligned and non axis-aligned boxes”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-371670"></A><A HREF=../headers/pk_lball_ask_blend.html>PK_LBALL_ask_blend</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-371672"></A>Returns information about the blend on the given lball.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336207"></A><A HREF=../headers/pk_lball_ask_lballs_adj.html>PK_LBALL_ask_lballs_adj</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336209"></A>Returns the adjacent lballs of a given lball</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336211"></A><A HREF=../headers/pk_lball_ask_lrods.html>PK_LBALL_ask_lrods</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336213"></A>Queries the lrods of an lball in a lattice</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336215"></A><A HREF=../headers/pk_lball_ask_position.html>PK_LBALL_ask_position</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336217"></A>Queries the position of the given lball</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336219"></A><A HREF=../headers/pk_lball_ask_radius.html>PK_LBALL_ask_radius</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336221"></A>Returns the radius of the given lball</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336223"></A><A HREF=../headers/pk_lrod_ask_geometry.html>PK_LROD_ask_geometry</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336225"></A>Returns the geometric form of a given lrod</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336227"></A><A HREF=../headers/pk_lrod_ask_lballs.html>PK_LROD_ask_lballs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336229"></A>Queries the lballs of a given lrod</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336231"></A><A HREF=../headers/pk_ltopol_ask_box.html>PK_LTOPOL_ask_box</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336233"></A>Returns the bounding box of the given ltopols</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336235"></A><A HREF=../headers/pk_ltopol_ask_class.html>PK_LTOPOL_ask_class</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336237"></A>Returns the class of an element of lattice topology</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336239"></A><A HREF=../headers/pk_ltopol_is.html>PK_LTOPOL_is</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-336241"></A>Queries the existence of an ltopol</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-339452"></A><A HREF=../headers/pk_part_ask_con_lattices.html>PK_PART_ask_con_lattices</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422090_pgfId-339454"></A>Returns the set of lattices that are attached to the given part as construction geometry</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422090_pgfId-336243"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.020.html">Nominal Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.022.html">Transformations</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

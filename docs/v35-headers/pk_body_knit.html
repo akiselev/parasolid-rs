@@ -1,0 +1,139 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_knit</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_knit</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                    PK_BODY_knit
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                          body,        --- target body
+int                                n_topols,    --- number of topols
+const <A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                   topols[],    --- topols
+const <A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                   matches[],   --- matched topols
+<A HREF=../headers/pk_body_knit_o_t.html>PK_BODY_knit_o_t</A>                  *options,     --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>          *const tracking     --- tracking information
+)
+</B>
+<A NAME="description"></A>
+<I>This function assembles a body by merging paired topols from the <B>'topols'</B>
+and <B>'matches'</B> array.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_general_body   (MILD/SERIOUS) generalised topology not enabled
+                                           and result would be a general
+                                           body
+    PK_ERROR_missing_geom           (MILD) topol has no geometry
+    PK_ERROR_inconsistent_geom      (MILD) matching topols have inconsistent
+                                           geometry
+    PK_ERROR_duplicate_array_item   (MILD) topol is duplicated in <B>'matches'</B>
+                                           array or appears in both arrays
+    PK_ERROR_not_in_same_partition  (MILD) topols are not all in the same
+                                           Partition
+    PK_ERROR_unsuitable_topology    (MILD) matching topols are not vertex to
+                                           vertex or edge to edge
+    PK_ERROR_no_topols_from_target  (MILD) no <B>'topols'</B> or <B>'matches'</B> are from
+                                           the target body
+    PK_ERROR_contradictory_request  (MILD) the desired body type is general
+                                           and session general topology is
+                                           disabled
+
+
+
+<A NAME="documentation"></A>
+
+Introduction
+This function joins a number of bodies together by fusing coincident topology.
+This process is henceforth referred to simply as "knitting". It should be
+noted that for classic bodies it is a purely topological operation which will
+perform limited geometric checks.
+
+The only topols permitted in the <B>'topols'</B> and <B>'matches'</B> arrays are vertices
+and edges. A vertex may only be matched with a different vertex, and an edge
+may only be matched with a different edge. PK_ERROR_unsuitable_topology is
+returned if this condition is not met.
+
+For classic bodies, the distance between each matched pair of topologies must
+be within the sum of their tolerances. PK_ERROR_inconsistent_geom is returned
+if this condition is not met by supplied vertex pairs, or any vertex pairs
+indirectly provided by the supplied edges.
+
+This function supports non-manifold bodies if session general topology is
+enabled (see <A HREF=../headers/pk_session_ask_general_topology.html>PK_SESSION_ask_general_topology</A>).
+
+For facet bodies, knitted topols will be accurate. Meshes may be adjusted to
+ensure they meet at knitted topols.
+
+For mixed bodies, matched pairs of edges featuring any facet geometry must
+produce a locally manifold result.  PK_ERROR_general_body is returned if this
+condition is not met.
+
+There is a 1:1 matching between the two topol arrays such that an element
+in the <B>'topols'</B> array will be knitted to the element in the <B>'matches'</B> array
+with the same index. The two arrays should therefore be the same length defined
+by <B>'n_topols'</B>.  The <B>'matches'</B> array must not contain duplicates and a
+topol in the <B>'matches'</B> array is not allowed to also be contained in the
+<B>'topols'</B> array. Duplicate topols are permitted in the <B>'topols'</B> array e.g.
+to create non-manifold wire vertices.
+
+<B>'body'</B> is the target body the application wishes to hold the final result of
+the knitting operation. All the other body topology to be joined onto <B>'body'</B> is
+supplied indirectly in the two arrays of topols. All bodies except <B>'body'</B>
+involved in the knit will be destroyed. The topols from the <B>'topols'</B> array
+will survive the operation while those in <B>'matches'</B> will be destroyed.
+
+Tracking Information
+The returned <B>'tracking'</B> structure is for future enhancements. Currently, the
+structure will always be returned with empty arrays.
+
+Error Reporting
+When an error occurs the function will, where possible, make extra information
+related to the error available to the application via the Parasolid report
+stream.
+
+When PK_ERROR_inconsistent_geom is returned from the function a record of type
+<A HREF=../headers/pk_report_record_type_t.html>PK_REPORT_record_type_1_c</A> with a status of <A HREF=../headers/pk_report_t.html>PK_REPORT_inconsistent_geom_c</A> will
+be created for each pair of mismatched vertices. The vertices will be returned
+in the <B>'old_items'</B> list. The <B>'new_items'</B> list will be empty.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

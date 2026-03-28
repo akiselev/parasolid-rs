@@ -1,0 +1,537 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_lofted_body</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_lofted_body</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_BODY_make_lofted_body
+(
+<I>--- received arguments ---
+</I>int                                 n_profiles,      --- number of profiles
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                     profiles[],      --- profiles to loft
+const <A HREF=../headers/pk_vertex_t.html>PK_VERTEX_t</A>                   start_vertices[],--- start vertices
+const <A HREF=../headers/pk_body_make_lofted_body_o_t.html>PK_BODY_make_lofted_body_o_t</A> *options,         --- options on lofting
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_tracked_loft_r_t.html>PK_BODY_tracked_loft_r_t</A>     *const lofted_body      --- result lofted body
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a sheet or solid body based on surfaces created by
+lofting through a set of sheet, wire or minimum body profiles.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_value              Incorrect number of profiles provided
+                                    for lofting, or one of the profiles has
+                                    unsuitable geometric properties. (MILD)
+
+    PK_ERROR_bad_tolerance          The value of tolerance is invalid. (MILD)
+
+    PK_ERROR_loft_failed            PK_BODY_make_lofted_body suffered an
+                                    internal algorithmic failure. (SERIOUS)
+
+<A NAME="documentation"></A>
+
+
+Introduction
+This function receives an array of profiles and constructs a body
+through them. The shape and structure of the lofted body can be
+modified via the following controls within the option structure :
+
+    o End conditions
+    o Intermediate conditions
+    o Guide wires
+    o Vertex matching
+    o Geometry simplification
+    o Topological structure
+
+The user is informed of the result of the loft operation via a returned
+results structure which contains the resultant lofted body, tracking and
+error information.
+
+See <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-301378">Lofting</A> for more information.
+
+
+Profile Specification
+Profiles for the lofting operation may be specified as a combination of
+minimum, wire and sheet bodies.  See <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-295083">Supplying profiles</A> for more
+information. The following points need to be considered when specifying the
+different types of profiles:
+
+  Piecewise Lofting
+   o If a profile is repeated then this causes the lofting operation to be
+     performed in a piecewise manner; the lofted surface is split at the
+     repeated profile, allowing for the lofted body to be non-G1 smooth across
+     the repeated profile (note that the repeated profiles must be sequential
+     in the array of profiles). References in the documentation to distinct
+     profiles means the set of profiles not counting repeated tags.
+
+  Number of Profiles
+   o In general for a non-periodic loft, at least two distinct profiles must be
+     supplied. However if a guide wire is supplied, subject to certain
+     additional conditions being met (see Guide Wires below), this constraint
+     is relaxed to at least one profile.
+   o For a periodic loft, at least three distinct profiles must be supplied
+     unless at least one closed guide wire is supplied, in which case only one
+     profile needs to be supplied.
+  
+
+  Minimum or Degenerate Point Profiles
+    o Minimum body profiles are used to represent degenerate point profiles.
+    o Degenerate point profiles may only be specified as start and/or end
+      lofting profiles.
+    o At least one of the profiles must not be a degenerate point profile.
+  
+
+  Wire Profiles
+    o Wire profiles must be oriented (<A HREF=../headers/pk_edge_propagate_orientation.html>PK_EDGE_propagate_orientation</A> may
+      be used to achieve this).
+    o Wire profiles must only represent a single wire; disjoint wire
+      profiles are not permitted.
+    o Wire profiles must have at least one vertex.
+    o Wire profiles may be open or closed profiles :
+        o The start vertex on an open profile is assumed to be the first
+          vertex of the profile.
+        o The start for a closed profile must be specified in the
+          corresponding entry of the array passed in the <B>'start_vertices'</B>
+          argument.
+  
+
+  Sheet Profiles
+  The following restrictions are imposed on sheet profiles :
+        o The sheet profile must only have one loop of laminar edges.
+        o The normals of the faces of the sheet profile must be oriented
+          in the same direction as the loft direction. A sheet profile body
+          can be "reversed" via the function, <A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A>.
+        o A sheet profile is considered to be a closed profile.
+        o There is a limit to the number of sheet profiles that can be
+          specified for a lofting operation :
+            o For non-periodic lofts, only two sheet profiles may be
+              specified. The two sheet profiles must form the start and
+              end profiles of the loft.
+            o For periodic lofts, only one sheet profile may be
+              specified. The single sheet profile must be the first
+              profile.
+        o The laminar boundary of the sheet profile must have at least one
+          vertex.
+  
+
+  Open and Closed Profiles
+  The following restrictions apply to the open/closed nature of the input
+  profiles :
+    o In general, the profiles should be either all open or all closed.
+      However if all interior profiles are closed, then the first and/or
+      last profile may be open. In this case, the open end profile is
+      treated as a degenerate closed profile, i.e. a profile which doubles
+      back on itself. Similarly, if only two profiles are input -- one open
+      and the other closed -- the open profile is treated as a degenerate
+      closed profile. For periodic loft, it is an error to specify a
+      mixture of open and closed profiles. See <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-295083">Supplying profiles</A>
+      for more information and examples.
+    o A degenerate point profile will be considered to be open or closed
+      depending on the closure of the non-degenerate profiles in the input
+      array.
+  
+
+  Periodic Loft
+  Where the loft is intended to return periodically to the start profile
+  this will be indicated by setting the periodicity flag in the end conditions
+  rather than repeating the start profile at the end of the array of profiles.
+  If the start profile is repeated (at the start of the array of profiles) this
+  indicates that the lofted surface is to be split at the seam, allowing for
+  the lofted body to be non-G1 smooth at the seam.
+
+  Touching Profiles
+  There are several restrictions that apply if any of the supplied profiles
+  touch :
+    o Profiles may only touch at corresponding vertices that are coincident to
+      tolerance, or along corresponding edges that are entirely coincident to
+      tolerance, where tolerance is the greater of the tolerance of the
+      associated vertices or edges, and the specified lofting tolerance.
+    o A guide wire may not pass through a set of vertices that are coincident
+      to tolerance, unless one of the vertices belongs to the start or end
+      profile of a non-periodic loft.
+    o If a vector clamp is supplied for a profile that has vertices or
+      edges touching those of an adjacent profile, the <B>'deriv_mag'</B> option
+      must be set to a value other than PK_BODY_loft_deriv_mag_single_c and a
+      magnitude must be supplied for each clamped vertex in the relevant
+      <A HREF=../headers/pk_body_loft_vector_clamp_t.html>PK_BODY_loft_vector_clamp_t</A> struct.
+  
+
+
+Resultant Lofted Body
+The type of the resultant lofted body depends on the type and combination
+of profiles input to the function. The resultant body may be either a sheet
+or solid body.
+
+  Resultant Sheet Body
+  A sheet body will be created by the lofting operation in the following
+  situations :
+    o All the profiles are open wire and degenerate point profiles.
+    o All the profiles are closed wire profiles.
+    o The start profile of a periodic loft is a wire profile.
+    o The first or last profile is an open wire profile or degenerate
+      point profile and all other profiles are closed wire profiles.
+  
+  The faces of the resultant sheet body will be constructed so that the
+  outward normal is aligned with the cross product of :
+        o The tangent in the direction of the profile orientation.
+        o The loft direction.
+  
+
+  Resultant Solid Body
+  A solid body will be created by the lofting operation in the following
+  situations :
+    o The end profiles are sheet profiles, degenerate point profiles,
+      or open wire profiles and the intermediate profiles are closed
+      wire profiles.
+    o The start profile of a periodic loft is a sheet profile.
+
+In both cases, sheet and solid body, none of the received profile topology
+or geometry is incorporated into the body that is the result of the loft.
+However end profiles that are sheets will be copied, and appropriate parts
+of these copies will form part of the resultant body.
+
+
+Loft Shape Controls
+The shape of the resultant loft body can be modified via the shape controls
+within the function's option structure.
+
+ Loft End Conditions
+ The end conditions of the loft can be specified via the <B>'end_conditions'</B>
+ field within the <B>'options'</B> structure. These conditions provide constraints
+ on the derivatives of the loft surface in the loft direction. The constraints
+ are in three parts:
+ 
+    o A periodicity flag held in the <B>'periodic'</B> field which is set to
+      <A HREF=../headers/pk_param_periodic_t.html>PK_PARAM_periodic_yes_c</A> if and only if the loft is to produce
+      surfaces which are periodic at the start profile.
+ 
+    o Constraints on the derivatives at the start profile provided in
+      the <B>'start'</B> field.
+ 
+    o And, (only if the loft is not periodic and there are at least two
+      profiles supplied) constraints on the derivatives at the end profile
+      provided in the <B>'end'</B> field.
+ 
+ Details of the derivative constraints that may be applied are to be found in
+ the documentation of the <A HREF=../headers/pk_body_loft_deriv_conds_t.html>PK_BODY_loft_deriv_conds_t</A> structure. See
+ <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-295506">Specifying derivative conditions for the first or last profile</A>
+ for more information.
+
+ Intermediate Loft Conditions
+ For any profile other than the start or end, the derivative conditions may be
+ specified by a paired array. Note that, if a profile is repeated then
+ derivative conditions cannot be supplied for either occurrence of the profile.
+ 
+    o <B>'n_intermediate_derivs'</B> specifies the number of intermediate profiles
+      that are to have derivative constraints specified. Note that this may be
+      less than the total number of intermediate profiles (<B>'n_profiles'</B>-2 for
+      non-periodic lofting, or <B>'n_profiles'</B>-1 for periodic lofting).
+ 
+    o <B>'intermediate_derivs'</B> and <B>'intermediate_profiles'</B> are arrays of length
+      <B>'n_intermediate_derivs'</B>. Each entry in <B>'intermediate_derivs'</B> specifies a
+      constraint on the derivative at the profile indexed by the corresponding
+      entry in <B>'intermediate_profiles'</B> (the first intermediate profile will be
+      1, so each entry must be an int between 1 and <B>'n_profiles'</B>-2 for
+      non-periodic lofting, or <B>'n_profiles'</B>-1 for periodic lofting). Any
+      intermediate profile that is not specified in this array will have no
+      derivative constraints applied there.
+      <B>'intermediate_derivs'</B> and <B>'intermediate_profiles'</B> may be set to NULL,
+      only if <B>'n_intermediate_derivs'</B> equals 0.
+ 
+ See <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-295589">Specifying derivative conditions for intermediate profiles</A>
+ for more information.
+
+ Guide Wires
+ By specifying guide wires in the <B>'options'</B> structure, you can constrain the
+ loft geometry across profiles, resulting in a lofted body that follows the
+ shape described by the guide wires at the relevant points. See
+ <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-296263">Lofting with guide wires</A> for more information. Guide wires must be
+ G1-continuous, oriented, and must intersect every profile once only at
+ corresponding vertices. Derivative constraints may also be specified on a
+ guide wire, which constrain the derivatives across the loft surface.
+ 
+    o <B>'n_guide_wires'</B> specifies the number of guide wires.
+ 
+    o <B>'guide_wires'</B> specifies the guide wires, and must be an array of length
+      <B>'n_guide_wires'</B>. It may be set to NULL only if <B>'n_guide_wires'</B> equals 0.
+ 
+    o <B>'n_guide_derivs'</B> specifies the number of guide wires with derivative
+      constraints. It must be between 0 and <B>'n_guide_wires'</B> inclusive.
+ 
+    o <B>'guide_derivs'</B> and <B>'guide_indices'</B> are arrays of length <B>'n_guide_derivs'</B>.
+      Each entry in <B>'guide_derivs'</B> specifies a constraint on the derivative at
+      the guide wire indexed by the corresponding entry in <B>'guide_indices'</B> (so
+      each entry must be an int between 0 and <B>'n_guide_wires'</B>-1). Any guide
+      wire that is not specified in this array will have no derivative
+      constraints applied there. <B>'guide_derivs'</B> and <B>'guide_indices'</B> may be set
+      to NULL, only if <B>'n_guide_derivs'</B> equals 0. See
+      <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-296664">Specifying derivative conditions for guide wires</A> for more
+      information.
+ 
+ Guide wires do not have to be bound by their intersections with the start and
+ end profiles. If the guide wires extend beyond the intersections with the
+ start or end profiles, then the resultant lofted surface will extend beyond
+ the start or end profiles, continuing to follow the shape of the guide wires.
+ In such cases where a guide wire extends beyond the start (or end) profile,
+ the following additional conditions must be met:
+ 
+    o The start (or end) profile vertex that such guide wires pass through
+      must not be coincident to tolerance of vertices on adjacent distinct
+      profiles.
+    o The start (or end) profile must not be a degenerate point profile, and
+      must not have any degenerate sections (i.e. if matching information is
+      specified, each start (or end) vertex must not be matched to more than
+      one vertex on the adjacent profile).
+    o The start (or end) profile may not be an open wire profile if the
+      adjacent profile is a closed wire profile or sheet.
+    o The start and end profiles must be wire bodies.
+ 
+ A special case of this is where only one profile is supplied. The above
+ restrictions still apply, however.
+ 
+ Note that it is allowed to have some guide wires which extend beyond the start
+ (or end) profiles, and some which don't extend beyond the start (or end).
+ However, in such cases, a vector clamp is not allowed on the start (or end)
+ profile.
+ 
+
+ Profile Vertex Matching
+ The profiles need to be matched to their neighbouring profiles in order
+ to fully define the loft. By default, the function will attempt to match
+ the profiles.
+ 
+ If all the profiles contain the same number of vertices, the
+ vertices will be mapped one-to-one across the profiles. All the
+ start vertices will be matched with each other, then subsequent
+ vertices on each profile will be matched in order.
+ In the case of mixed closed and open profiles, this automatic
+ matching is not done -- the matching must be specified by the
+ user as described below.
+ 
+ If the profiles contain different number of vertices, then either:
+ 
+    o extra vertices must be added to some of the profiles using
+      <A HREF=../headers/pk_edge_imprint_point.html>PK_EDGE_imprint_point</A> to ensure the profiles contain the same number
+      of vertices, or
+    o a mapping between vertices across the profiles must be provided
+      using the structures provided in the 'matches' field of the
+      <A HREF=../headers/pk_body_vertex_matches_t.html>PK_BODY_vertex_matches_t</A> structure.  The mapping information is
+      specified as a collection of vertex mappings between pairs of
+      distinct neighbouring profiles.
+ 
+ If matching information is specified, then the following should be noted:
+ 
+    o All matching information must be specified. I.e. all vertices on all
+      the loft profiles must be matched.
+    o The matching information can be specified in any order.
+    o For a periodic loft, the first profile's vertices must be matched with
+      two sets of profile's vertices : the second profile and the last profile.
+    o Vertices that appear more than once are taken to indicate what amounts
+      to the insertion of a degenerate section at that vertex into the profile
+      in which they lie.
+ 
+ Details of the representation of the map can be found in the documentation on:
+ <A HREF=../headers/pk_body_vertex_matches_t.html>PK_BODY_vertex_matches_t</A>, <A HREF=../headers/pk_body_vertex_match_t.html>PK_BODY_vertex_match_t</A>, and
+ <A HREF=../headers/pk_body_one_vertex_match_t.html>PK_BODY_one_vertex_match_t</A>
+ 
+ For more information on matching profiles, see
+ <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-296139">Matching</A>.
+
+
+Lofted Body Structure Controls
+The structure of the resultant loft body can be modified via controls within
+the function's option structure.
+
+ Topological Structure of Lofted Body
+ The topological structure of the resultant loft body may be controlled via
+ the <B>'topology_form'</B> field within the option structure. The field may be set
+ to one of the following values :
+ 
+    o PK_BODY_topology_minimal_c: (default) The lofted body will have the
+      minimum number of faces possible. Profile edges which meet smoothly
+      may be lofted into a single face, or split into multiple faces if a
+      profile is repeated (see Piecewise Lofting above).
+ 
+    o PK_BODY_topology_columns_c:  The lofted body will have one column of
+      faces for each edge in the profile regardless of whether they are
+      smoothly connected. Each column of faces will consist of either a single
+      face, or multiple faces if a profile is repeated.
+ 
+    o PK_BODY_topology_grid_c:  Additional edges may be created, so that the
+      number of faces in the loft direction is equal to or greater than the
+      number produced with PK_BODY_topology_columns_c. The additional edges
+      will correspond to each distinct intermediate profile. All edges in the
+      profiles will correspond to edges on the resultant lofted body.
+ 
+ The tolerance used to determine whether profile edges meet smoothly or not is
+ controlled by the <B>'profile_smoothness'</B> field within the option structure. This
+ field may be set to one of the following values :
+ 
+    o PK_BODY_smoothness_exact_c: (default) Edges are regarded as g1 smooth
+      only if they meet at an angle less than session angle precision.
+ 
+    o PK_BODY_smoothness_relax_c:  The criterion for edges being regarded as g1
+    smooth is relaxed from the strict session angle precision to a larger angle
+    set internally within Parasolid.
+ 
+ See <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-296803">Topology form</A> for more information.
+ 
+ If <B>'create_construction_topol'</B> is set to PK_LOGICAL_true, then additional
+ edges may be created (irrespective of the value of <B>'topology_form'</B>) on the
+ resultant body. Parasolid does this in the case of a periodic loft with one or
+ two profiles, for instance.
+ 
+
+ Geometry Simplification
+ The simplification of the geometry of individual lofted faces may be
+ attempted, depending on the value of the <B>'simplify'</B> field within the
+ option structure. The field may be set to one of the following values :
+ 
+    o PK_BODY_simplify_no_c: B-spline geometry will be used to represent
+      the loft of all sections of the profiles.
+ 
+    o PK_BODY_simplify_analytic_c (default): The lofted surfaces may be
+      replaced where the combination of loft profile geometries produces an
+      analytic simplification of the loft, to within session precision. If the
+      surface of a face is simplified, the edges of the face may be simplified
+      as well.
+ 
+    o PK_BODY_simplify_swept_spun_c: This simplify option is invalid for
+      PK_BODY_make_lofted_body. The function will return status code
+      PK_BODY_loft_bad_simplify_c.
+ 
+ See <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-297101">Simplification</A> for more information.
+
+
+Nominal Geometry on the Lofted Body
+The resultant lofted body will always have nominal geometry enabled. The state
+of the nominal geometry flag on the resultant lofted body can be enquired and
+set via <A HREF=../headers/pk_body_ask_curve_nmnl_state.html>PK_BODY_ask_curve_nmnl_state</A> and <A HREF=../headers/pk_body_set_curve_nmnl_state.html>PK_BODY_set_curve_nmnl_state</A>
+respectively.
+
+The edges in the resultant loft body which are copied from the input profiles
+will have nominal geometry associated with them. The edges formed as a result
+of the lofting operation (lateral edges) may have nominal geometry associated
+with them.
+
+The nominal geometry for an edge may be acquired via the functions,
+<A HREF=../headers/pk_edge_ask_curve_nmnl.html>PK_EDGE_ask_curve_nmnl</A> and <A HREF=../headers/pk_edge_ask_geometry_nmnl.html>PK_EDGE_ask_geometry_nmnl</A>.
+
+See <A HREF="../chapters/fd_chap.041.html#50434400_pgfId-297118">Nominal geometry</A> for more information.
+
+Returned Tracking and Error Information
+The resultant lofted body is returned in <B>'lofted_body'</B> as a structure
+that packages it with associated status and tracking information.
+
+The status information, in the <B>'status'</B> field of the returned structure, is
+itself a structure that contains information on any failure to create the
+lofted body. The type of fault occurred is indicated by the <B>'fault'</B> field.
+The location of the error is given by a point and topology in the
+<B>'fault_location'</B> and <B>'fault_topol'</B> fields respectively.
+
+
+The tracking information relates topology prior to the operation, to topology
+after it. Details of the structure of this information is given in the
+documentation on <A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>.
+
+This information will relate the geometric dependency of faces in the result
+upon edges or faces in the received profiles and guides, and optionally relate
+edges in the result upon edges or vertices in the received profiles and guides.
+The tracking records contain :
+
+    o for each lateral face generated by lofting across edges :
+
+        <B>'product_topols'</B>  is an array holding just that lateral face.
+        <B>'original_topols'</B> is the set of edges in the profiles and guides that
+         if modified would alter its geometry.
+
+    o for each face in an end cap generated for a sheet profile :
+
+        <B>'product_topols'</B>  is an array holding just that end face.
+        <B>'original_topols'</B> is an array holding the single face in the original
+         profile for which it is a transformed copy.
+
+If <B>'want_edge_tracking'</B> is set to PK_LOGICAL_true, then the tracking records
+will additionally contain:
+
+    o for each edge that is in the direction of the loft :
+
+        <B>'product_topols'</B>  is an array holding just that edge.
+        <B>'original_topols'</B> is an array holding the (possibly empty) set of
+        profile vertices that it passes through, along with possibly a
+        corresponding guide edge.
+
+    o for each edge that has been taken from a profile edge :
+
+        <B>'product_topols'</B>  is an array holding just that edge.
+        <B>'original_topols'</B> is an array holding the single edge in the profile it
+        was created from.
+
+    o for each edge that lies on the start or end of an extrapolated loft
+      (i.e. the laminar edges which are not a copy of a profile edge).
+
+        <B>'product_topols'</B>  is an array holding just that edge.
+        <B>'original_topols'</B> is an array holding the edge from the start or end
+        profile from which the product edge is derived, along with a vertex
+        from the relevant end of every guide wire.
+
+If <B>'label_profiles'</B> is set to PK_LOGICAL_true, then for each edge created from
+a profile edge (including those of any construction profile), an extra entry
+of class PK_CLASS_int is returned in <B>'original_topols'</B>. Edges with the same
+value correspond to the same profile. The value gives the order that distinct
+profiles appear in, in the direction of the loft. The profile at the start of
+the loft will have a value of 0.
+
+Note that <B>'label_profiles'</B> has no effect if <B>'want_edge_tracking'</B> is set to
+PK_LOGICAL_false.
+
+Topologies involved in many topological operations may appear in several
+tracking records.
+
+Note that face-face checks are not performed on the resultant lofted body for
+performance reasons, so it is possible that even if this function returns
+success, a lofted body may have PK_FACE_state_bad_face_face_c check faults
+(if the profiles are located such that the body intersects itself).
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

@@ -1,0 +1,110 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_imprint_curves_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_imprint_curves_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_FACE_imprint_curves_2
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                           face,           --- face
+int                                 n_curves,       --- number of curves
+const <A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                    curves[],       --- curves
+const <A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                 intervals[],    --- parametric intervals
+const <A HREF=../headers/pk_face_imprint_curves_o_t.html>PK_FACE_imprint_curves_o_t</A>   *options,        --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_entity_track_r_t.html>PK_ENTITY_track_r_t</A>                *const tracking  --- imprint tracking
+)
+</B>
+<A NAME="description"></A>
+<I>This function imprints an array of curves onto a face, thereby creating new
+edges and faces.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_not_in_same_partition  (MILD)     <B>'face'</B> and a number of <B>'curves'</B>
+                                               do not lie in the same
+                                               partition
+    PK_ERROR_invalid_geometry       (MILD)     At least one of <B>'curves'</B> is
+                                               invalid
+    PK_ERROR_bad_basis_surf         (MILD)     SP curve basis surface differs
+                                               from <B>'face'</B>s surface.
+    PK_ERROR_missing_geom           (MILD)     <B>'face'</B> does not have geometry
+    PK_ERROR_not_on_surface         (MILD)     At least one of <B>'curves'</B> does
+                                               not lie on <B>'face'</B>s surface.
+    PK_ERROR_not_on_face            (MILD)     At least one of <B>'curves'</B> does
+                                               not imprint on the face.
+    PK_ERROR_cant_do_imprint        (SERIOUS)  Failed to imprint at least one
+                                               of <B>'curves'</B>.
+
+
+<A NAME="documentation"></A>
+If any of the <B>'curves'</B> do not lie on the <B>'face'</B>s surface, then the error
+PK_ERROR_not_on_surface is returned.
+
+If, for any of the <B>'curves'</B>, the portion of curve defined by the corresponding
+interval lies entirely outside the <B>'face'</B> then the MILD error,
+PK_ERROR_not_on_face, is returned.
+
+Otherwise, each part of each <B>'interval'</B> of each <B>'curve'</B> which lies within the
+<B>'face'</B> will be imprinted on the face as a new edge.
+
+The returned <A HREF=../headers/pk_entity_track_r_t.html>PK_ENTITY_track_r_t</A> structure contains tracking records of
+type PK_ENTITY_track_create_c and PK_ENTITY_track_split_c. The new
+edges created by imprinting the <B>'curves'</B> will produce records of type
+PK_ENTITY_track_create_c. The typical record will consist of a single
+<B>'original_entities'</B> and one or more <B>'product_entities'</B> that are the
+new edges uniquely defined by <B>'original_entities'</B>. In the case where
+several <B>'curves'</B> overlap in one or more common segments the record will
+have multiple <B>'original_entities'</B> and one or more <B>'product_entities'</B>.
+
+Splitting the existing <B>'face'</B> will produce a record of type
+PK_ENTITY_track_split_c with the input <B>'face'</B> as its <B>'original_entities'</B>,
+while it and all the other faces produced by the splitting will be
+<B>'product_entities'</B>.
+
+If a curve of <B>'curves'</B> is a trimmed curve then its basis curve will be
+imprinted and the trimmed curve will be deleted.
+If a curve of <B>'curves'</B> was an orphan, in the same partition as the face, then
+it will be attached to the new edge(s).  If the curve may be shared with the
+new edge(s) then it will be. Otherwise a copy of the curve will be made and
+attached to the new edge(s).
+When several new edges are created by imprinting one curve, then all of the
+edges will share the same geometry if possible.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

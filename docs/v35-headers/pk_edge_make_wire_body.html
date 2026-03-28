@@ -1,0 +1,89 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_make_wire_body</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_make_wire_body</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                   PK_EDGE_make_wire_body
+(
+<I>--- received arguments ---
+</I>int                               n_edges,  --- number of edges
+const <A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                   edges[],  --- edges
+const <A HREF=../headers/pk_edge_make_wire_body_o_t.html>PK_EDGE_make_wire_body_o_t</A> *options,  --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                  *const body,     --- created body
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>         *const tracking  --- tracking
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a wire body from a collection of existing edges. The
+edges may come from different bodies.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_edges_intersect    Supplied edges intersect or overlap.
+    PK_ERROR_disjoint           Supplied edges form disjoint body, but
+                                <B>'allow_disjoint'</B> set to PK_LOGICAL_false.
+    PK_ERROR_non_manifold       Resulting body would become general.
+    PK_ERROR_cant_make_bspline  Geometry approximation failed.
+    PK_ERROR_bad_wire           Failed to construct wire body.
+
+<A NAME="documentation"></A>
+Edges may be passed to this function in any order. They may also come
+from different parts. However they are not allowed to intersect or have
+full or partial coincidence.
+
+Vertex tolerances are used when deciding whether edges from different
+bodies are connected.
+
+A non-manifold wire body may be created if session general topology is
+enabled (see <A HREF=../headers/pk_session_ask_general_topology.html>PK_SESSION_ask_general_topology</A>). More than two edges may be
+connected at a vertex of a non-manifold wire body. General wire bodies may
+not be suitable for subsequent modelling operations.
+
+A disjoint wire body may be created if the <B>'allow_disjoint'</B> field of the
+options structure is set to PK_LOGICAL_true.
+
+Other options allow for the approximation of curves which have dependent
+geometry and for using nominal geometry.
+
+This function returns information pairing the edges and vertices of the
+new wire body with their originating edges and vertices using the
+standard data structure <A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

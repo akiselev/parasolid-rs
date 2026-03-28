@@ -1,0 +1,1421 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Archives</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Archives</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.100.html">Bulletin Board</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.102.html">Debug Functionality</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294719">100.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294734">100.1.1	Parasolid terminology </A>
+</UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-313825">100.2	Transmitting a part </A>
+<UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294760">100.2.1	Transmit format </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294804">100.2.2	Transmit version - save as earlier version </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294862">100.2.3	Transmitting indexed files </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-376451">100.2.4	Transmitting mesh data </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294885">100.2.5	Contents of a part archive </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294899">100.2.6	Identifiers </A>
+</UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294952">100.3	Receiving a part </A>
+<UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294979">100.3.1	User fields </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-294997">100.3.2	Attributes </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-295023">100.3.3	Receiving specific faces from a part </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-295063">100.3.4	Receiving compound bodies in part files </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-378249">100.3.5	Receiving mesh data </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-464739">100.3.6	Receiving parts with mixed geometry </A>
+</UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-295071">100.4	Transmitting a partition </A>
+<UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-295104">100.4.1	Transmitting partition history </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-295246">100.4.2	Contents of a partition archive </A>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-295267">100.4.3	Transmitting mesh data in a partition </A>
+</UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-295271">100.5	Receiving a partition </A>
+<UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-295332">100.5.1	Receiving a partition’s pmarks and deltas </A>
+<UL>
+<LI> <A HREF="fd_chap.101.html#50422180_pgfId-395611">100.5.1.1	Receiving mesh data and deltas in a partition </A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422180_pgfId-294719"></A>100.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422180_pgfId-294721"></A><A NAME="50422180_marker-322765"></A>Archiving is the process of saving the data in Parasolid’s internal memory to external storage. Your application can archive one or more parts, or the contents of a partition, into a single logical file or block of data.</P>
+<P>
+<A NAME="50422180_pgfId-294722"></A>Parasolid archives are intended to fit into whatever archiving system is used by your application. This could take the form of a controlled directory structure on the host computer, or some kind of database. The nature of this storage depends on your application’s frustrum.</P>
+<P>
+<A NAME="50422180_pgfId-306504"></A>Parasolid does not provide any means of deleting parts from archive, or listing keys which have been used to archive parts, either in the current session or in previous sessions. Your application must keep track of the keys used. Your application’s frustrum should also trap attempts to write new archive data to a place which already exists (i.e. re-use of keys).</P>
+<P>
+<A NAME="50422180_pgfId-306508"></A>See <A HREF="di_chap.03.html#21045">Chapter 2, “File Handling”</A>, of the Parasolid <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual for further information about the frustrum functions required to implement archiving.</P>
+<P>
+<A NAME="50422180_pgfId-294731"></A>See <A HREF="fd_chap.023.html#50422092_40142">Chapter 22, “Assemblies And Instances”</A>, for further information on the use of assemblies in archiving.</P>
+<P>
+<A NAME="50422180_pgfId-322452"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Application</CODE>
+ <CODE>
+Support\Archiving\Transmit</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422180_pgfId-337729"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-332221"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-332208"></A><A HREF="fd_chap.098.html#50422177_86443">Appendix 97.3, “Deltas”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422180_pgfId-294734"></A>	100.1.1 	Parasolid terminology </H3>
+<P>
+<A NAME="50422180_pgfId-294735"></A>To <EM>
+save</EM> or <EM>
+write</EM> data from Parasolid to an external store is referred to as <STRONG>
+transmitting</STRONG> information.</P>
+<P>
+<A NAME="50422180_pgfId-328547"></A>To <EM>
+load</EM> or <EM>
+read</EM> data from an external source into the current Parasolid session is referred to as <STRONG>
+receiving</STRONG> information.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422180_pgfId-313825"></A>100.2	<A NAME="50422180_marker-313822"></A><A NAME="50422180_marker-313823"></A><A NAME="50422180_56509"></A>Transmitting a part 
+
+
+</H1>
+<P>
+<A NAME="50422180_pgfId-313833"></A><A NAME="50422180_marker-313826"></A><A NAME="50422180_marker-313827"></A><A NAME="50422180_marker-313828"></A><A NAME="50422180_marker-313829"></A><A NAME="50422180_marker-313830"></A><A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A> and <A HREF=../headers/pk_part_transmit_u.html>PK_PART_transmit_u</A> transmit one or more parts to a logical block of data through the frustrum. You supply these functions with a <STRONG>
+key string</STRONG><A NAME="50422180_marker-313834"></A> which the frustrum can use, for example, as a filename or an index into a database. </P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-294747"></A>If the key string includes Unicode characters, use <A HREF=../headers/pk_part_transmit_u.html>PK_PART_transmit_u</A>. If the key string does not include Unicode characters, use <A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A>.</LI>
+<LI>
+<A NAME="50422180_pgfId-294748"></A>Your application is responsible for storing the key string so that the part can be retrieved in a later session.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-294752"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-294751"></A>Note: If you want to use <A HREF=../headers/pk_part_transmit_u.html>PK_PART_transmit_u</A> to transmit data regardless of whether or not the key string contains Unicode characters, you must handle this in your UCOPWR frustrum function.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-294753"></A>In addition, you can use <A HREF=../headers/pk_part_transmit_b.html>PK_PART_transmit_b</A> to transmit one or more parts to application memory.</P>
+<P>
+<A NAME="50422180_pgfId-294754"></A>For all three of transmit functions:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-294755"></A>The parts need not all be in the same partition.</LI>
+<LI>
+<A NAME="50422180_pgfId-294756"></A>A <STRONG>
+part</STRONG> is a body or assembly - subordinate entities, like edges and surfaces, cannot be saved on their own.</LI>
+</UL>
+
+<H3>
+<A NAME="50422180_pgfId-294760"></A>	100.2.1 	<A NAME="50422180_marker-294757"></A><A NAME="50422180_marker-294758"></A><A NAME="50422180_66574"></A>Transmit format </H3>
+<P>
+<A NAME="50422180_pgfId-294761"></A>There are five formats that can be used for the archive, which should be provided in your application’s frustrum as required.</P>
+<P>
+<A NAME="50422180_pgfId-294796"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294764"></A>Format</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294766"></A>Frustrum requirements</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294768"></A>text</P>
+</TD>
+<TD ROWSPAN="5" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294770"></A>These use the FFOPWR frustrum function, or the UCOPWR frustrum function if it is defined.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294772"></A>machine-dependent binary</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-382287"></A>machine-independent binary</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294776"></A>neutral binary</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294780"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294784"></A>“applio” (call application-registered functions)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294786"></A>This format uses the application frustrum functions which are registered by <A NAME="50422180_marker-294787"></A><A HREF=../headers/pk_session_register_applio_2.html>PK_SESSION_register_applio_2</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294789"></A>“indexio” (call application registered indexing functions)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294791"></A>This format uses the application frustrum functions which are registered by <A NAME="50422180_marker-294792"></A><A HREF=../headers/pk_session_register_indexio.html>PK_SESSION_register_indexio</A>. Parts transmitted in this format may be subsequently received on a “per-face” basis. See <A HREF="fd_chap.101.html#50422180_97511">Section 100.2.3, “Transmitting indexed files”</A>, for more information. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-294800"></A>For further information about transmit formats see <A HREF="di_chap.03.html#21045">Chapter 2, “File Handling”</A>, of the Parasolid <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual.</P>
+
+
+<H3>
+<A NAME="50422180_pgfId-294804"></A>	100.2.2 	<A NAME="50422180_marker-294801"></A><A NAME="50422180_marker-294802"></A><A NAME="50422180_33865"></A>Transmit version - save as earlier version </H3>
+<P>
+<A NAME="50422180_pgfId-294806"></A><A NAME="50422180_marker-294805"></A>A part may be transmitted so that it can be received by a version of Parasolid earlier than the current version (the version doing the transmitting).</P>
+<P>
+<A NAME="50422180_pgfId-294807"></A>This means that parts modeled in the current version of Parasolid can also be archived in any format from V7 onward, and thereafter received by an application using that earlier version of Parasolid.</P>
+<P>
+<A NAME="50422180_pgfId-294808"></A>You use the <CODE>
+transmit_version</CODE>
+ option in <A HREF=../headers/pk_part_transmit_o_t.html>PK_PART_transmit_o_t</A> to specify the version you want to use.</P>
+<P>
+<A NAME="50422180_pgfId-294812"></A>Parasolid provides two methods for supporting backwards compatibility in XT data:</P>
+<P>
+<A NAME="50422180_pgfId-294849"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294815"></A>Method</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294817"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294819"></A>Embedded schemas</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294824"></A>By default (<CODE>
+transmit_version</CODE>
+ = 0), data saved in Parasolid V14.0 and later is backwards compatible <EM>
+at least</EM> as far as the previous major version. Thus, any data transmitted using Parasolid V15.x can be opened in Parasolid V14.x without any loss of information. All information associated with the part is contained within the saved data, including information that may not be recognised by the earlier version.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294832"></A>Non-embedded schemas</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294834"></A>Setting <CODE>
+transmit_version</CODE>
+ explicitly to a non-zero integer saves the part using the precise format of the specified version. For example to save a data for use in Parasolid V10.1, specify a <CODE>
+transmit_version</CODE>
+ of 101. For Parasolid V9.0, use a <CODE>
+transmit_version</CODE>
+ of 90.</P>
+<P>
+<A NAME="50422180_pgfId-294841"></A>The oldest version that you can specify is 7.0. For versions before 9.0, a part file can only contain a single part. The current version of Parasolid is allowed.</P>
+<P>
+<A NAME="50422180_pgfId-294848"></A>Any information in the part that is not recognised by the earlier version of Parasolid is lost.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-294860"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-306535"></A>Note: If saving a part in a format earlier than Parasolid V12.1, the part must not contain certain non-printing characters, such as carriage return and line feed, in attribute string fields. Attempting to save a part containing such characters raises the error PK_ERROR_bad_text_conversion in the call to <A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A>.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422180_pgfId-294859"></A>Parts saved in Parasolid V12.1 format or later can contain these non-printing characters, and no error is raised.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422180_pgfId-294862"></A>	100.2.3 	<A NAME="50422180_97511"></A>Transmitting indexed files </H3>
+<P>
+<A NAME="50422180_pgfId-294863"></A>When you transmit one or more parts, you can opt to transmit the files using a format that allows specific faces to be received by subsequent Parasolid sessions, rather than an entire part. This is particularly useful if you are transmitting large parts with the expectation that users will only need access to certain information from those parts during future editing sessions.</P>
+<P>
+<A NAME="50422180_pgfId-294867"></A>In order to transmit files with the required indexing information, you need to do a number of things:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-294871"></A>You need to register a special indexed frustrum, rather than the standard Parasolid frustrum. You do this by calling <A HREF=../headers/pk_session_register_indexio.html>PK_SESSION_register_indexio</A> rather than <A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A>.</LI>
+<LI>
+<A NAME="50422180_pgfId-294872"></A>When transmitting parts using any of the transmit functions, you need to set <CODE>
+transmit_format</CODE>
+ to <A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_indexio_c</A>.</LI>
+<LI>
+<A NAME="50422180_pgfId-294873"></A>When transmitting parts using any of the transmit functions, you need to use the <CODE>
+transmit_indexed_context</CODE>
+ option to supply a pointer to indexing data stored by your application. The context is a way for your application to communicate with the functions defined in the indexed frustrum.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-294874"></A>Once you have transmitted a part as an indexed file, you can still receive the whole part into a Parasolid session as normal; the only difference is that an indexed part file is slightly larger than a non-indexed part file, and a number of received nodes will be deleted immediately after receiving the part. </P>
+<P>
+<A NAME="50422180_pgfId-294881"></A><A HREF="fd_chap.101.html#50422180_91869">Section 100.3.3, “Receiving specific faces from a part”</A>, describes how you can receive a specific face from a part that has been transmitted with indexing information. </P>
+
+
+<H3>
+<A NAME="50422180_pgfId-376451"></A>	100.2.4 	<A NAME="50422180_82147"></A>Transmitting mesh data </H3>
+<P>
+<A NAME="50422180_pgfId-376490"></A>You can transmit mesh data to separate files or embed the data within the part file using the <CODE>
+transmit_meshes</CODE>
+ option. The <CODE>
+transmit_meshes</CODE>
+ option has the following values:</P>
+<P>
+<A NAME="50422180_pgfId-382873"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-377654"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-377656"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-377658"></A><A HREF=../headers/pk_transmit_meshes_t.html>PK_transmit_meshes_separate_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-377660"></A>Transmit meshes to a separate file, which is controlled by the file handling functions in your frustrum.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-377662"></A><A HREF=../headers/pk_transmit_meshes_t.html>PK_transmit_meshes_embedded_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-377664"></A>Transmit meshes within the part file. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-377006"></A>When the <CODE>
+transmit_meshes</CODE>
+ option is set to <A HREF=../headers/pk_transmit_meshes_t.html>PK_transmit_meshes_embedded_c</A>:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-378120"></A>all mesh data is stored within the part file</LI>
+<LI>
+<A NAME="50422180_pgfId-383872"></A>data for each mesh can be optimally accessed using the <CODE>
+receive_using_seek</CODE>
+ option in <A HREF=../headers/pk_part_receive.html>PK_PART_receive</A>. See <A HREF="fd_chap.101.html#50422180_37349">Section 100.3.5, “Receiving mesh data”</A> for more information.</LI>
+<LI>
+<A NAME="50422180_pgfId-378187"></A>the <CODE>
+transmit_format</CODE>
+ option must be one of the binary formats and the frustrum seek function FFSKXT must be registered using <A HREF=../headers/pk_session_register_fru_2.html>PK_SESSION_register_fru_2</A>.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-382534"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-382604"></A>Note: The <CODE>
+transmit_meshes</CODE>
+ option is ignored in <A HREF=../headers/pk_part_transmit_b.html>PK_PART_transmit_b</A> as the meshes are always embedded within the application memory block.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422180_pgfId-294885"></A>	100.2.5 	<A NAME="50422180_marker-381941"></A><A NAME="50422180_marker-381942"></A><A NAME="50422180_marker-381943"></A>Contents of a part archive </H3>
+<P>
+<A NAME="50422180_pgfId-294887"></A><A NAME="50422180_marker-381945"></A>When a part is archived, the following items are saved:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-294888"></A>All topological and geometric entities contained in the part.</LI>
+<LI>
+<A NAME="50422180_pgfId-294889"></A>The user field of each entity (optional).</LI>
+<LI>
+<A NAME="50422180_pgfId-294890"></A>Identifiers (of all entities which have them).</LI>
+<LI>
+<A NAME="50422180_pgfId-294891"></A>Any groups belonging to the part.</LI>
+<LI>
+<A NAME="50422180_pgfId-294892"></A>Any attributes belonging to entities in the part.</LI>
+<LI>
+<A NAME="50422180_pgfId-294895"></A>Any construction geometry attached to the part (as returned by <A NAME="50422180_marker-294894"></A><A HREF=../headers/pk_part_ask_geoms.html>PK_PART_ask_geoms</A>).If the part is an assembly, all sub-assemblies (down to bodies at the bottom level) are saved with it.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-405835"></A>And optionally, in a separate place:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-398933"></A>All mesh data is stored in a separate file. See <A HREF="fd_chap.101.html#50422180_82147">Section 100.2.4, “Transmitting mesh data”</A>, for more information.</LI>
+</UL>
+
+
+<H3>
+<A NAME="50422180_pgfId-294899"></A>	100.2.6 	<A NAME="50422180_13835"></A><A NAME="50422180_marker-294897"></A><A NAME="50422180_marker-294898"></A>Identifiers </H3>
+<P>
+<A NAME="50422180_pgfId-294902"></A><A NAME="50422180_marker-294900"></A><A NAME="50422180_marker-294901"></A>Identifiers are integer values which are attached to all entities within a part, except for fins and the part itself. The identifiers within a part are distinct. Unlike tags, they are saved when a part is archived, so identifiers can be stored with a part key in an external database to keep a handle on a particular entity.</P>
+<P>
+<A NAME="50422180_pgfId-294906"></A>See <A HREF="fd_chap.003.html#50422070_68541">Section 2.4.4, “Identifiers”</A>, for more general information about identifiers.</P>
+<P>
+<A NAME="50422180_pgfId-294907"></A>There is no guarantee that the same entities have the same tags when loaded into another session. The decision as to whether your application should use identifiers depends upon whether it needs to reference specific entities within archived parts in different modeling sessions.</P>
+<P>
+<A NAME="50422180_pgfId-294908"></A>If you do need to use identifiers, then it is important that you record the identifiers for all entities that you may wish to access in a new session, prior to transmitting the part. You do this by calling <A NAME="50422180_marker-294909"></A><A HREF=../headers/pk_entity_ask_identifier.html>PK_ENTITY_ask_identifier</A> for each entity that you are interested in.</P>
+<P>
+<A NAME="50422180_pgfId-294910"></A>When receiving the part in a new session, you need to find the tags of those entities whose identifiers you previously recorded. Do this by calling <A NAME="50422180_marker-294911"></A><A HREF=../headers/pk_part_find_entity_by_ident.html>PK_PART_find_entity_by_ident</A> for all of your recorded identifiers.</P>
+<P>
+<A NAME="50422180_pgfId-294912"></A>Naturally, you need to save the list of saved identifiers between sessions, independently of the part itself. </P>
+<P>
+<A NAME="50422180_pgfId-294913"></A>The following table summarizes the differences between identifiers and tags with respect to archiving and Parasolid sessions:</P>
+<P>
+<A NAME="50422180_pgfId-294948"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294919"></A>&nbsp;</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294921"></A>Tags</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294923"></A>Identifiers</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294925"></A>Uniqueness:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294927"></A>unique during session</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294929"></A>unique within a part</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294931"></A>Result when a part is archived:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294933"></A>not archived</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294935"></A>archived with part</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294937"></A>Result when a part is changed:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294939"></A>not changed*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294941"></A>changed when entity is transferred between owning entities</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294943"></A>Effect between sessions:</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294945"></A>not maintained</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-294947"></A>maintained</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-294949"></A>* caution must be applied as a change of tag could appear to occur when an entity is replaced by a similar entity</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422180_pgfId-294952"></A>100.3	<A NAME="50422180_marker-294950"></A><A NAME="50422180_marker-294951"></A><A NAME="50422180_71710"></A>Receiving a part 
+
+
+</H1>
+<P>
+<A NAME="50422180_pgfId-294956"></A><A NAME="50422180_marker-294953"></A><A NAME="50422180_marker-294954"></A><A NAME="50422180_marker-294955"></A><A HREF=../headers/pk_part_receive.html>PK_PART_receive</A> and <A HREF=../headers/pk_part_receive_u.html>PK_PART_receive_u</A> receive one or more parts from a logical file or data block through the frustrum, using the key string given by the application. </P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-294957"></A>If the key string includes Unicode characters, use <A HREF=../headers/pk_part_receive_u.html>PK_PART_receive_u</A>. If the key string does not include Unicode characters, use <A HREF=../headers/pk_part_receive.html>PK_PART_receive</A>.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-294958"></A>It is your application’s responsibility to ensure that Parasolid can find the archive data for the part. This is mostly dependent on the frustrum. If the key cannot be found by the frustrum (for instance because it simply treats keys as filenames and has no information on which directory to look in) then <A HREF=../headers/pk_part_receive.html>PK_PART_receive</A> and <A HREF=../headers/pk_part_receive_u.html>PK_PART_receive_u</A> fail.</P>
+<P>
+<A NAME="50422180_pgfId-294962"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-294961"></A>Note: If you want to use <A HREF=../headers/pk_part_receive_u.html>PK_PART_receive_u</A> to receive data regardless of whether or not the key strings contain Unicode characters, you must handle this in your UCOPRD frustrum function.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-294963"></A>In addition, you can use <A HREF=../headers/pk_part_receive_b.html>PK_PART_receive_b</A> to receive one or more parts from application memory, provided these parts have been transmitted in the same, or an earlier, version of Parasolid. You can use <A HREF=../headers/pk_part_receive_version.html>PK_PART_receive_version</A>, <A HREF=../headers/pk_part_receive_version_b.html>PK_PART_receive_version_b</A>, or <A HREF=../headers/pk_part_receive_version_u.html>PK_PART_receive_version_u</A> to obtain the version of Parasolid used to create part transmit data. </P>
+<P>
+<A NAME="50422180_pgfId-294964"></A>For all three receive functions: </P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-294965"></A>The parts are created in the current partition.</LI>
+<LI>
+<A NAME="50422180_pgfId-294966"></A>Multiple parts are restored in the same order as they were transmitted.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-294972"></A>Parts are transmitted with a reference to a specific Parasolid <STRONG>
+schema file</STRONG><A NAME="50422180_marker-435548"></A><A NAME="50422180_marker-435549"></A><A NAME="50422180_marker-435550"></A>. Once you have updated the version of Parasolid used by your application, its frustrum must retain schema files for each version used, or else your application is unable to receive old parts. You can find out what the current schema version is using <A HREF=../headers/pk_session_ask_schema_version.html>PK_SESSION_ask_schema_version</A>.</P>
+
+<H3>
+<A NAME="50422180_pgfId-294979"></A>	100.3.1 	<A NAME="50422180_marker-435556"></A><A NAME="50422180_marker-435557"></A><A NAME="50422180_marker-435558"></A>User fields </H3>
+<P>
+<A NAME="50422180_pgfId-294982"></A><A NAME="50422180_marker-294980"></A><A NAME="50422180_marker-294981"></A>To receive user fields archived with the entities of a part, the length of the archived user fields must be the same as, or shorter than, that set for the current session by <A NAME="50422180_marker-294983"></A><A HREF=../headers/pk_session_start.html>PK_SESSION_start</A>.</P>
+<P>
+<A NAME="50422180_pgfId-294984"></A>If they are not, you can prevent <A HREF=../headers/pk_part_receive.html>PK_PART_receive</A> and <A HREF=../headers/pk_part_receive_u.html>PK_PART_receive_u</A> from trying to read them by setting the <CODE>
+receive_user_fields</CODE>
+ option to false. This makes Parasolid do the following:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-294985"></A>Ignore the user fields which were saved with the part.</LI>
+<LI>
+<A NAME="50422180_pgfId-294986"></A>Create user fields of the length required by the current session.</LI>
+<LI>
+<A NAME="50422180_pgfId-294987"></A>Set these user fields to zero.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-294993"></A>For further information see the <A HREF="fd_chap.116.html#50422197_22973">“User fields”</A> section in <A HREF="fd_chap.116.html#50422197_22901">Chapter 115, “Session Support”</A>.</P>
+
+
+<H3>
+<A NAME="50422180_pgfId-294997"></A>	100.3.2 	<A NAME="50422180_marker-294995"></A><A NAME="50422180_28558"></A>Attributes </H3>
+<P>
+<A NAME="50422180_pgfId-295000"></A><A NAME="50422180_marker-294998"></A><A NAME="50422180_marker-294999"></A>If a part has user-defined attributes attached, the attributes and their definitions are transmitted with the part. When the part is then received into a session, the kernel automatically loads the attribute definition of the attributes, if there is no definition with the same name already in the session.</P>
+<P>
+<A NAME="50422180_pgfId-295001"></A>If the attribute definition already exists in the new session, and matches the definition saved with the part, the part can be retrieved.</P>
+<P>
+<A NAME="50422180_pgfId-295002"></A>If the attribute definition already exists in the new session, but does not match the definition saved with the part, you can use the <CODE>
+attdef_mismatch</CODE>
+ option to control the behaviour. This option takes the following values:</P>
+<P>
+<A NAME="50422180_pgfId-295017"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295005"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295007"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295009"></A>PK_ATTDEF_mismatch_fail_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295011"></A>If mismatched attribute definitions are found, the receive operation fails, and returns the error PK_ERROR_attr_defn_mismatch. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295013"></A>PK_ATTDEF_mismatch_ignore_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295015"></A>If mismatched attribute definitions are found, the receive operation succeeds, but any mismatched attribute definitions and their associated attributes are stripped out before the part is received into the session. </P>
+<P>
+<A NAME="50422180_pgfId-295016"></A>No warning is given if mismatched attribute definitions are stripped out using this value. PK_ATTDEF_mismatch_ignore_c is therefore best used after an attempt to use PK_ATTDEF_mismatch_fail_c has failed. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-295021"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-295020"></A>Note: System defined attributes attached to a part are always received successfully.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422180_pgfId-295023"></A>	100.3.3 	<A NAME="50422180_91869"></A>Receiving specific faces from a part </H3>
+<P>
+<A NAME="50422180_pgfId-295024"></A>If a part has been previously transmitted with indexing information (as described in <A HREF="fd_chap.101.html#50422180_97511">Section 100.2.3, “Transmitting indexed files”</A>), then you can opt to receive specific face from the part, rather than the whole part. This can be particularly useful if the part file is very large, and you are only interested in working with some of the information it contains. </P>
+<P>
+<A NAME="50422180_pgfId-295028"></A>To do this, you need to specify the following options when receiving the part. These are all available in the <A HREF=../headers/pk_part_receive_o_t.html>PK_PART_receive_o_t</A> options structure:</P>
+<P>
+<A NAME="50422180_pgfId-295054"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295031"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295033"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-295035"></A>transmit_format</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295037"></A>When receiving specific faces, this should be set to PK_transmit_indexio_c. The received XT file must have been transmitted using this option as well. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-295039"></A>part_index</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295041"></A>For use only when receiving an XT file that contains several part files, this is an index that specifies which of the available parts the required faces should be drawn from. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-295043"></A>n_identifiers</PRE>
+<PRE><A NAME="50422180_pgfId-295044"></A>identifiers</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295046"></A>The number of identifiers, together with a list of the identifiers, of the faces that you want to receive into the session. Currently, only a single face can be received in a single call: <CODE>
+n_identifiers</CODE>
+ must be 1. See <A HREF="fd_chap.101.html#50422180_13835">Section 100.2.6, “Identifiers”</A>, for more information. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-295051"></A>receive_indexed_context</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295053"></A>A pointer to indexing data stored by your application. The context is a way for your application to communicate with the functions defined in the indexed frustrum.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-295055"></A>In addition, you can optionally use <CODE>
+key_is_partition</CODE>
+ to receive a specific face from a part stored in partition data. If this option is PK_LOGICAL_true, then the specified key is assumed to contain partition data (created as described in <A HREF="fd_chap.101.html#50422180_46263">Section 100.4, “Transmitting a partition”</A>). In this case, the ordering of the bodies used to define <CODE>
+part_index</CODE>
+ is the same as that returned by <A HREF=../headers/pk_partition_ask_bodies.html>PK_PARTITION_ask_bodies</A>.</P>
+<P>
+<A NAME="50422180_pgfId-295062"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-295061"></A>Note: You can only receive a specific face from a part if you have registered an indexed frustrum using <A HREF=../headers/pk_session_register_indexio.html>PK_SESSION_register_indexio</A></ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422180_pgfId-295063"></A>	100.3.4 	Receiving compound bodies in part files </H3>
+<P>
+<A NAME="50422180_pgfId-295064"></A>You can receive compound bodies into a session by using any of the standard receive functions: <A HREF=../headers/pk_part_receive.html>PK_PART_receive</A>, <A HREF=../headers/pk_part_receive_u.html>PK_PART_receive_u</A>, or <A HREF=../headers/pk_part_receive_b.html>PK_PART_receive_b</A>. See <A HREF="fd_chap.016.html#50422085_87335">Section 15.12.1.4, “Receiving compound bodies into a session”</A>.</P>
+
+
+<H3>
+<A NAME="50422180_pgfId-378249"></A>	100.3.5 	<A NAME="50422180_37349"></A>Receiving mesh data </H3>
+<P>
+<A NAME="50422180_pgfId-378322"></A>How mesh data is received into a session depends on whether it is embedded in the XT file or is in a separate XMM file, and can be controlled using the <CODE>
+receive_using_seek</CODE>
+ option. This takes the following values:</P>
+<P>
+<A NAME="50422180_pgfId-384475"></A>When the <CODE>
+transmit_meshes</CODE>
+ option is set to <A HREF=../headers/pk_transmit_meshes_t.html>PK_transmit_meshes_embedded_c</A>:</P>
+<P>
+<A NAME="50422180_pgfId-384071"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-378694"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-378696"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-378698"></A><A HREF=../headers/pk_receive_using_seek_t.html>PK_receive_using_seek_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-378700"></A>Mesh data for the part is loaded into the session sequentially during the PK receive operation before any of the data is needed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-378702"></A><A HREF=../headers/pk_receive_using_seek_t.html>PK_receive_using_seek_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-378704"></A>Mesh data for the part is only loaded into the session when it is needed.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-378684"></A>When the <CODE>
+transmit_meshes</CODE>
+ option is set to <A HREF=../headers/pk_transmit_meshes_t.html>PK_transmit_meshes_separate_c</A> the mesh data is in a separate XMM file therefore the <CODE>
+receive_using_seek</CODE>
+ option has no effect and mesh data will be loaded into the session when it is needed.</P>
+<P>
+<A NAME="50422180_pgfId-385561"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-383536"></A>Note: The <CODE>
+receive_using_seek</CODE>
+ option is ignored in <A HREF=../headers/pk_part_receive_b.html>PK_PART_receive_b</A> as mesh data is always received and loaded into the session immediately.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-385232"></A>If you wish to optimise the <CODE>
+receive_using_seek</CODE>
+ option, you need to register the frustrum seek function FFSKXT using <A HREF=../headers/pk_session_register_fru_2.html>PK_SESSION_register_fru_2</A>. See <A HREF="di_chap.06.html#14556">Section 5.3, “Registered frustrum”</A> in the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual for more information.</P>
+
+
+<H3>
+<A NAME="50422180_pgfId-464739"></A>	100.3.6 	<A NAME="50422180_35860"></A>Receiving parts with mixed geometry </H3>
+<P>
+<A NAME="50422180_pgfId-467089"></A>The <CODE>
+receive_mixed</CODE>
+ option allows you to control whether to receive parts containing a mixture of classic and facet geometry in your application. On receiving data into a Parasolid session, you can choose to set <CODE>
+receive_mixed</CODE>
+ to one of the following values:</P>
+<P>
+<A NAME="50422180_pgfId-469584"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-467129"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-467131"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-467133"></A><A HREF=../headers/pk_receive_mixed_t.html>PK_receive_mixed_fail_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-467135"></A>An error of PK_ERROR_mixed_geometry is returned on encountering a part with mixed geometry. Default</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-467137"></A><A HREF=../headers/pk_receive_mixed_t.html>PK_receive_mixed_allow_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-467139"></A>Allow parts containing mixed geometry to be received into your application.</P>
+<ADDRESS>
+<A NAME="50422180_pgfId-467140"></A>Note: If the part being received does not contain mixed geometry, then this value will have no effect. To receive mixed parts, facet geometry must be enabled. See <A HREF="fd_chap.083.html#50422160_81520">Chapter 82, “Overview Of Convergent Modeling”</A> for more information on enabling support for mixed geometry. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422180_pgfId-295071"></A>100.4	<A NAME="50422180_46263"></A><A NAME="50422180_marker-466255"></A><A NAME="50422180_marker-466256"></A>Transmitting a partition 
+
+
+</H1>
+<P>
+<A NAME="50422180_pgfId-295077"></A><A NAME="50422180_marker-466258"></A><A NAME="50422180_marker-466259"></A><A NAME="50422180_marker-466260"></A><A NAME="50422180_marker-466261"></A><A NAME="50422180_marker-466262"></A><A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A> and <A HREF=../headers/pk_partition_transmit_u.html>PK_PARTITION_transmit_u</A> transmit a partition as a logical block of data through the frustrum. <A HREF=../headers/pk_partition_transmit_b.html>PK_PARTITION_transmit_b</A> transmits a partition to application memory. As for part data:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295078"></A>The transmit format may be text, machine-dependent binary, machine-independent binary, neutral binary, applio (calls application-registered functions), or indexed (calls application-registered indexing functions). See <A HREF="fd_chap.101.html#50422180_66574">Section 100.2.1, “Transmit format”</A>, for details. </LI>
+<LI>
+<A NAME="50422180_pgfId-295082"></A>You can specify a <CODE>
+transmit_version</CODE>
+ so that the partition can be received by previous versions of Parasolid. In order to transmit partitions, the value of <CODE>
+transmit_version</CODE>
+ must be at least 120. See <A HREF="fd_chap.101.html#50422180_33865">Section 100.2.2, “Transmit version - save as earlier version”</A>, for details. </LI>
+<LI>
+<A NAME="50422180_pgfId-295089"></A>You can specify indexing information using <CODE>
+transmit_indexed_context</CODE>
+, so that specific faces from the partition data can be received by another Parasolid session. See <A HREF="fd_chap.101.html#50422180_97511">Section 100.2.3, “Transmitting indexed files”</A>, for details. To receive such data, see <A HREF="fd_chap.101.html#50422180_91869">Section 100.3.3, “Receiving specific faces from a part”</A>.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-295102"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-295101"></A>Note: Light partitions may not be transmitted.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422180_pgfId-295104"></A>	100.4.1 	<A NAME="50422180_28478"></A>Transmitting partition history </H3>
+<P>
+<A NAME="50422180_pgfId-295105"></A>By default, <A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A> transmits the current state of a given partition. If required, you can transmit the history of the partition as well, in terms of its pmarks and delta information. You use the <CODE>
+transmit_deltas</CODE>
+ and <CODE>
+pmarks</CODE>
+ options to do this:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295106"></A><CODE>
+transmit_deltas</CODE>
+ provides basic control for transmitting the partition history.</LI>
+<LI>
+<A NAME="50422180_pgfId-295107"></A><CODE>
+pmarks</CODE>
+ provides additional control, allowing you to transmit specific segments of the partition history, while omitting others.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-295108"></A>The <CODE>
+transmit_deltas</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422180_pgfId-295133"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295111"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295113"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295115"></A>PK_PARTITION_xmt_deltas_none_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295117"></A>Do not transmit any delta information; only the current state of the partition is transmitted. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295119"></A>PK_PARTITION_xmt_deltas_all_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295121"></A>Transmit delta information for all pmarks in the partition. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295123"></A>PK_PARTITION_xmt_deltas_main_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295125"></A>Transmit delta information for just those pmarks in the “main line”, that is, from the initial pmark to the current pmark. In <A HREF="fd_chap.101.html#50422180_58776"><EM>
+Figure 100-1</EM></A>, if P1 is the initial pmark, and P6 the current pmark, then the main line consists of P1, P2, P4, and P6. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295130"></A>PK_PARTITION_xmt_deltas_later_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295132"></A>Transmit deltas at a later time, rather than in the current function call. If you use this value, you can transmit the partition’s deltas via a later call to <A HREF=../headers/pk_partition_transmit_delta.html>PK_PARTITION_transmit_delta</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-295168"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1156.gif">
+
+<P>
+<A NAME="50422180_pgfId-295170"></A>Figure 100-1 <A NAME="50422180_58776"></A>Transmitting pmarks in the main line</P>
+<P>
+<A NAME="50422180_pgfId-295171"></A>If you use <CODE>
+transmit_deltas</CODE>
+, then:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295172"></A>The partition must be at a non-initial pmark.</LI>
+<LI>
+<A NAME="50422180_pgfId-295173"></A>The pmarks and deltas are written to a separate place, with the same key - the existing delta data is opened, read and output to the new transmit data.</LI>
+<LI>
+<A NAME="50422180_pgfId-295175"></A><A NAME="50422180_marker-295174"></A><A HREF=../headers/pk_pmark_ask_identifier.html>PK_PMARK_ask_identifier</A> returns the identifiers of pmarks so their new tags can be obtained when they are retrieved into a new session.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-295176"></A>The <CODE>
+pmarks</CODE>
+ option lets you override the deltas to transmit, by providing a specific set of pmarks. The way these pmarks are interpreted depends on the setting of <CODE>
+transmit_deltas</CODE>
+:</P>
+<P>
+<A NAME="50422180_pgfId-295198"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295179"></A>If transmit_deltas is ...</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295181"></A>then ...</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295183"></A>PK_PARTITION_xmt_deltas_none_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295185"></A><CODE>
+pmarks</CODE>
+ represents the pmarks that are transmitted with the partition. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295187"></A>PK_PARTITION_xmt_deltas_all_c </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295189"></A><CODE>
+pmarks</CODE>
+ represents the pmarks that are <EM>
+not</EM> transmitted with the partition. All pmarks not in the specified <CODE>
+pmarks</CODE>
+ are transmitted instead.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295191"></A>PK_PARTITION_xmt_deltas_main_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295193"></A><CODE>
+pmarks</CODE>
+ represents the main line pmarks that are <EM>
+not</EM> transmitted with the partition, similar to PK_PARTITION_xmt_deltas_all_c. All main line pmarks not in the specified <CODE>
+pmarks</CODE>
+ are transmitted instead. Pmarks that are not in the main line are omitted. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295195"></A>PK_PARTITION_xmt_deltas_later_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295197"></A>the function call fails with PK_ERROR_bad_option_data. Do not use <CODE>
+pmarks</CODE>
+ if <CODE>
+transmit_deltas</CODE>
+ is PK_PARTITION_xmt_deltas_later_c. Instead, use the <CODE>
+pmarks</CODE>
+ option in the subsequent call to <A HREF=../headers/pk_partition_transmit_delta.html>PK_PARTITION_transmit_delta</A>. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-295199"></A>When transmitting specific pmarks using this option, pmarks are transmitted on the fly without affecting the current session, and the deltas are merged and relinked in the transmitted data. </P>
+<P>
+<A NAME="50422180_pgfId-295203"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-295202"></A>Note: You should always transmit the initial and current pmarks. In addition, you must transmit a junction pmark if pmarks from more than one of its branches are transmitted. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-295207"></A>In <A HREF="fd_chap.101.html#50422180_84242"><EM>
+Figure 100-2</EM></A>, if you do not want to transmit P5, then the junction pmark P4 is not required. However, if you want to transmit P5 , then junction pmark P4 is required. In both cases, P1 and P6 also need to be transmitted, because they are the initial and current pmarks. </P>
+<P>
+<A NAME="50422180_pgfId-295239"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1157.gif">
+
+<P>
+<A NAME="50422180_pgfId-295241"></A>Figure 100-2 <A NAME="50422180_84242"></A>Transmitting junction pmarks</P>
+
+
+<H3>
+<A NAME="50422180_pgfId-295246"></A>	100.4.2 	<A NAME="50422180_46408"></A><A NAME="50422180_marker-295243"></A><A NAME="50422180_marker-295244"></A><A NAME="50422180_marker-295245"></A>Contents of a partition archive </H3>
+<P>
+<A NAME="50422180_pgfId-295248"></A><A NAME="50422180_marker-295247"></A>When a partition is archived, the following items are saved:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295249"></A>All parts in the partition</LI>
+<LI>
+<A NAME="50422180_pgfId-295250"></A>Any orphan geometry attached to the partition</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-295251"></A>and optionally:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295252"></A>All user fields in the partition</LI>
+<LI>
+<A NAME="50422180_pgfId-295253"></A>All attribute definitions in the session (or just those used in the partition)</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-295254"></A>and optionally, in a separate place:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295255"></A>All pmarks and deltas in the partitions, or</LI>
+<LI>
+<A NAME="50422180_pgfId-295256"></A>Just those pmarks and deltas in the “main line”</LI>
+<LI>
+<A NAME="50422180_pgfId-398796"></A>All mesh data is stored in a separate file. See <A HREF="fd_chap.101.html#50422180_82147">Section 100.2.4, “Transmitting mesh data”</A>, for more information.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-295257"></A>If the <CODE>
+transmit_all_attdefs</CODE>
+ option is left at the default value of PK_LOGICAL_true, then all attribute definitions available in the Parasolid session are transmitted. If you set <CODE>
+transmit_all_attdefs</CODE>
+ to PK_LOGICAL_false then only those attribute definitions that are actually used in the partition are transmitted. In order to minimise the size of partition files, you are advised to set <CODE>
+transmit_all_attdefs</CODE>
+ to PK_LOGICAL_false. </P>
+<P>
+<A NAME="50422180_pgfId-379862"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-295263"></A>Note: Transmitting deltas is not guaranteed to work when using the <CODE>
+transmit_version</CODE>
+ option of <A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A> or <A HREF=../headers/pk_partition_transmit_u.html>PK_PARTITION_transmit_u</A> to transmit a file using a previous Parasolid version.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422180_pgfId-295267"></A>	100.4.3 	<A NAME="50422180_32101"></A>Transmitting mesh data in a partition </H3>
+<P>
+<A NAME="50422180_pgfId-380222"></A>You can transmit mesh data into a separate file or embed it within the partition file using the <CODE>
+transmit_meshes</CODE>
+ option as described in <A HREF="fd_chap.101.html#50422180_82147">Section 100.2.4, “Transmitting mesh data”</A>.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422180_pgfId-295271"></A>100.5	<A NAME="50422180_79056"></A><A NAME="50422180_marker-295269"></A><A NAME="50422180_marker-295270"></A>Receiving a partition 
+
+
+</H1>
+<P>
+<A NAME="50422180_pgfId-295274"></A><A NAME="50422180_marker-295272"></A><A NAME="50422180_marker-295273"></A><A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A> and <A HREF=../headers/pk_partition_receive_u.html>PK_PARTITION_receive_u</A> receive a partition from a logical file through the frustrum. <A HREF=../headers/pk_partition_receive_b.html>PK_PARTITION_receive_b</A> receives a partition from application memory. </P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295275"></A>A new partition is created (the current partition is not changed).</LI>
+<LI>
+<A NAME="50422180_pgfId-295276"></A>The contents of the partition are in the same order (as returned by various enquiry functions) as when it was transmitted, so that the application can relate the received entities to the transmitted ones.</LI>
+<LI>
+<A NAME="50422180_pgfId-295277"></A>The functions <A HREF=../headers/pk_partition_receive_version.html>PK_PARTITION_receive_version</A>, <A HREF=../headers/pk_partition_receive_version_u.html>PK_PARTITION_receive_version_u</A>, and <A HREF=../headers/pk_partition_receive_version_b.html>PK_PARTITION_receive_version_b</A> return information about the Parasolid version used for the received partition. </LI>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295281"></A>If <CODE>
+build_number</CODE>
+ is 0, the partition was originally transmitted using the <CODE>
+transmit_version</CODE>
+ option. The version number returned represents the format used for the transmit file, rather than the version of Parasolid used to create it. See <A HREF="fd_chap.101.html#50422180_46263">Section 100.4</A>. </LI>
+<LI>
+<A NAME="50422180_pgfId-295288"></A>If <CODE>
+build_number</CODE>
+ is non-zero, the version number returned represents the actual version of Parasolid used to create the transmit file.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422180_pgfId-295292"></A>You can specify a number of options when receiving partitions, including the following:</P>
+<P>
+<A NAME="50422180_pgfId-295328"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295295"></A>Options</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295297"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-295299"></A>receive_deltas</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295301"></A>Specify whether to load the partition’s pmarks and deltas. This takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295302"></A>PK_PARTITION_rcv_deltas_yes_c: load the pmarks and deltas in the partition.</LI>
+<LI>
+<A NAME="50422180_pgfId-295303"></A>PK_PARTITION_rcv_deltas_no_c: do not load the pmarks and deltas in the partition.</LI>
+<LI>
+<A NAME="50422180_pgfId-295304"></A>PK_PARTITION_rcv_deltas_later_c: delay loading the pmarks and deltas in the partition. If you use this value, you can load the partition’s pmarks and deltas at a later stage using <A HREF=../headers/pk_partition_receive_deltas_2.html>PK_PARTITION_receive_deltas_2</A>.</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422180_pgfId-397918"></A>Note: If this option is set to PK_PARTITION_rcv_deltas_yes_c or PK_PARTITION_rcv_deltas_later_c and the partition contains mesh data, Parasolid will load all of the meshes in that partition immediately. For more information, see <A HREF="fd_chap.101.html#50422180_21541">Section 100.5.1.1, “Receiving mesh data and deltas in a partition”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-295306"></A>receive_all_attdefs</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295309"></A><A NAME="50422180_marker-295308"></A>Choose whether to receive all attribute definitions stored with the partition, or only those defining attributes in the partition and its deltas. This option mirrors the <A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A> option <CODE>
+transmit_all_attdefs</CODE>
+, described in <A HREF="fd_chap.101.html#50422180_46408">Section 100.4.2</A>.</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295313"></A>If PK_LOGICAL_true (the default), all attribute definitions in the received partition are integrated into the session. </LI>
+<LI>
+<A NAME="50422180_pgfId-295314"></A>If PK_LOGICAL_false, only the attribute definitions that define attributes in the partition and its deltas are integrated into the session. Attribute definitions defining attributes in the partition are available immediately, while attribute definitions defining attributes in the deltas are available once <A HREF=../headers/pk_partition_receive_deltas_2.html>PK_PARTITION_receive_deltas_2</A> has been called. </LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-295315"></A>This option only has an effect when <CODE>
+receive_deltas</CODE>
+ is PK_PARTITION_rcv_deltas_later_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-295317"></A>attdef_callback</PRE>
+<PRE><A NAME="50422180_pgfId-330552"></A>attdef_callback_on</PRE>
+<PRE><A NAME="50422180_pgfId-330555"></A>attdef_context</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295319"></A>Use these options to resolve any mismatches between existing attribute definitions and definitions in the received partition, where a received definition has the same name as an existing definition, but other parts of their standard form differ. See the documentation for <A HREF=../headers/pk_partition_receive_o_t.html>PK_PARTITION_receive_o_t</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-295321"></A>allow_missing_deltas</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-295324"></A><A NAME="50422180_marker-295323"></A>If <CODE>
+receive_deltas</CODE>
+ is PK_PARTITION_rcv_deltas_yes_c, use this option to allow <A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A> to succeed even if the delta file is not available (in other words, as if <CODE>
+receive_deltas</CODE>
+ was PK_PARTITION_rcv_deltas_no_c).</P>
+<P>
+<A NAME="50422180_pgfId-295325"></A>If you use this option and need to tell whether a delta file was present or not, you should do one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295326"></A>Use <A HREF=../headers/pk_partition_ask_pmarks_2.html>PK_PARTITION_ask_pmarks_2</A> to examine the number of pmarks in the new partition: if deltas were missing, there is one pmark, but if deltas were present, there is more than one pmark. </LI>
+<LI>
+<A NAME="50422180_pgfId-295327"></A>Use <A HREF=../headers/pk_partition_ask_pmark.html>PK_PARTITION_ask_pmark</A> and check the <CODE>
+is_at_pmark</CODE>
+ return: this is PK_LOGICAL_false if the delta file was missing, because there is only one pmark in this case, and the new partition cannot be on that pmark after receiving the partition. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-380378"></A>receive_using_seek</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-380449"></A>How mesh data in the partition is handled if it is not immediately needed. See <A HREF="fd_chap.101.html#50422180_37349">Section 100.3.5, “Receiving mesh data”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-471874"></A>receive_compound</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-471876"></A>You can receive compound bodies into a session by using any of the standard partition receive functions: <A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A>, <A HREF=../headers/pk_partition_receive_u.html>PK_PARTITION_receive_u</A>, and <A HREF=../headers/pk_partition_receive_b.html>PK_PARTITION_receive_b</A>. See <A HREF="fd_chap.016.html#50422085_87335">Section 15.12.1.4, “Receiving compound bodies into a session”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422180_pgfId-465426"></A>receive_mixed</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-465428"></A>Choose whether to receive parts containing a mixture of classic and facet geometry in your application. See <A HREF="fd_chap.101.html#50422180_35860">Section 100.3.6, “Receiving parts with mixed geometry”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422180_pgfId-295332"></A>	100.5.1 	<A NAME="50422180_marker-295329"></A><A NAME="50422180_marker-295330"></A><A NAME="50422180_23021"></A>Receiving a partition’s pmarks and deltas </H3>
+<P>
+<A NAME="50422180_pgfId-295336"></A><A NAME="50422180_marker-295333"></A><A NAME="50422180_marker-295334"></A><A NAME="50422180_marker-295335"></A><A HREF=../headers/pk_partition_receive_deltas_2.html>PK_PARTITION_receive_deltas_2</A> receives the pmark graph and deltas for a given partition from a logical file through the frustrum:</P>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-295337"></A>The key, transmit format and user-field options used are assumed to be the same as the call to <A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A> or <A HREF=../headers/pk_partition_receive_u.html>PK_PARTITION_receive_u</A> which received the given partition.</LI>
+<LI>
+<A NAME="50422180_pgfId-295341"></A>The deltas must have been transmitted in the same version of Parasolid, unless the option <CODE>
+receive_prev_version_deltas</CODE>
+ was given to <A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A> or <A HREF=../headers/pk_partition_receive_u.html>PK_PARTITION_receive_u</A>, in which case deltas transmitted from earlier compatible releases of Parasolid may be receivable. Note that transmission of deltas from previous versions is not always guaranteed. See <A HREF="fd_chap.101.html#50422180_46408">Section 100.4.2, “Contents of a partition archive”</A>, for details.</LI>
+<LI>
+<A NAME="50422180_pgfId-295345"></A>The pmarks may have different tag values to when they were transmitted - their identifiers should be used to identify them.</LI>
+</UL>
+<P>
+<A NAME="50422180_pgfId-295346"></A>Deltas can only be received for a partition if that partition was received earlier in the session, with option PK_PARTITION_rcv_deltas_later_c, and the pmark which the partition was at immediately after being received, has not been deleted. However, the partition may be modified, and pmarks created, between receiving the partition and receiving its deltas. This is illustrated in <A HREF="fd_chap.101.html#50422180_59852"><EM>
+Figure 100-3</EM></A> (current pmarks are shown in blue).</P>
+<P>
+<A NAME="50422180_pgfId-295386"></A><A NAME="50422180_NEnWp266josi"></A><A NAME="50422180_pEnWp3bdjosi"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1158.gif">
+
+<P>
+<A NAME="50422180_pgfId-295388"></A>Figure 100-3 <A NAME="50422180_59852"></A>Pmark graph as transmitted</P>
+<P>
+<A NAME="50422180_pgfId-295392"></A>If you use session marks (see <A HREF="fd_chap.098.html#50422177_40541">Section 97.4, “Session rollback”</A>, for more information) and session roll forward is switched off, you can use the <CODE>
+new_at_mark</CODE>
+ option in <A HREF=../headers/pk_partition_receive_deltas_o_t.html>PK_PARTITION_receive_deltas_o_t</A> to manage correct deletion of pmarks received via deltas when rolling the session back to a previous mark.</P>
+<P>
+<A NAME="50422180_pgfId-295393"></A>By default, when you receive pmarks into a partition via deltas, the “age” of those pmarks is denoted by the point at which the delta was received into the partition, even though the partition itself was received earlier. Pmarks received via deltas in this way are deleted when rolling the session back to a point before the delta was received, even if the partition itself had already been received at that point. </P>
+<P>
+<A NAME="50422180_pgfId-295394"></A>In order to avoid this, set <CODE>
+new_at_mark</CODE>
+ to PK_PMARK_new_with_partition_c. This ensures that pmarks received via deltas are not deleted when rolling the session back to a point before the delta was received: any pmarks received via deltas are only deleted if the session is rolled far enough back that their owning partition no longer exists. <A HREF="fd_chap.101.html#50422180_86344"><EM>
+Figure 100-4</EM></A> shows a simple example of this in use (current pmarks are shown in blue). </P>
+<P>
+<A NAME="50422180_pgfId-295432"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1159.gif">
+
+<P>
+<A NAME="50422180_pgfId-295434"></A>Figure 100-4 <A NAME="50422180_86344"></A>Controlling deletion of pmarks when rolling the session back</P>
+<P>
+<A NAME="50422180_pgfId-393999"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422180_pgfId-295437"></A>Note: If your application does not use session marks, you can ignore the <CODE>
+new_at_mark</CODE>
+ option. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50422180_pgfId-395611"></A>100.5.1.1 <A NAME="50422180_21541"></A>Receiving mesh data and deltas in a partition </H4>
+<P>
+<A NAME="50422180_pgfId-395648"></A>Parasolid’s meshes are optimised not to load their mesh data until it is needed for an operation (i.e. the meshes are lazily loaded). </P>
+<P>
+<A NAME="50422180_pgfId-397013"></A>However, if the partition received (via <A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A>) contains mesh data and the <CODE>
+receive_deltas</CODE>
+ option is set to either PK_PARTITION_rcv_deltas_yes_c or PK_PARTITION_rcv_deltas_later_c, Parasolid will load all of the meshes in that partition immediately. Any subsequent calls to the <A HREF=../headers/pk_partition_receive_meshes.html>PK_PARTITION_receive_meshes</A> function have no effect. If you are using <A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A> and you want to load meshes lazily, the <CODE>
+receive_deltas</CODE>
+ option must be set to PK_PARTITION_rcv_deltas_no_c. </P>
+<P>
+<A NAME="50422180_pgfId-396369"></A>Furthermore, if a pmark is created in a partition, Parasolid will load all meshes into the session that have not previously been loaded. Therefore you need to ensure your frustrum is capable of handling multiple calls to the relevant frustrum functions when loading a partition (or part) that contains mesh data. See <A HREF="di_chap.06.html#14556">Section 5.3, “Registered frustrum”</A> in the <EM><A HREF=../di_index.html>Downward Interfaces</A></EM> manual for more information.</P>
+<P>
+<A NAME="50422180_pgfId-486650"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422180_pgfId-396442"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422180_pgfId-396429"></A><A HREF="fd_chap.101.html#50422180_37349">Section 100.3.5, “Receiving mesh data”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422180_pgfId-396419"></A>&nbsp;</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.100.html">Bulletin Board</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.102.html">Debug Functionality</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

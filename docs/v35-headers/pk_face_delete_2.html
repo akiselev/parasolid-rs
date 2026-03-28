@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_delete_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_delete_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>           PK_FACE_delete_2
+(
+<I>--- received arguments ---
+</I>int                       n_faces,          --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>           faces[],          --- faces to delete
+const <A HREF=../headers/pk_face_delete_o_t.html>PK_FACE_delete_o_t</A> *options,          --- options structure [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A> *const tracking          --- tracking
+)
+</B>
+<A NAME="description"></A>
+<I>This function deletes the given faces from a solid or sheet body and repairs
+any resulting wounds.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_non_manifold           (SERIOUS) can't heal wound with
+                                              non-manifold boundary
+
+                                              <B>'faces'</B> do not form a manifold
+                                              set or neighbourhood of <B>'faces'</B>
+                                              is not manifold
+    PK_ERROR_cant_heal_wound        (SERIOUS) can't heal wound - impossible
+                                              geometry
+
+    PK_ERROR_wrong_entity_in_array  (MILD)    <B>'faces'</B> not all from same body
+    PK_ERROR_all_faces_in_body      (MILD)    can not delete all faces
+                                              in a body
+
+
+<A NAME="documentation"></A>
+See also <A HREF="../chapters/fd_chap.064.html#50434427_pgfId-300966">Local Ops: Deleting Faces and Healing Wounds</A> for more
+information.
+
+All of the given faces, which must belong to the same body, are deleted from
+that body.  If the resulting body does not have a complete boundary, then any
+wounds are treated as wounds which are healed as specified by the
+<B>'heal_action'</B> option.
+
+If the faces belong to a general body, then they must form a manifold
+set, and the boundaries of the faces should not be adjacent to
+non-manifold vertices or edges.
+
+The faces must not be all the faces in the body.
+
+Rubber faces can not be grown to heal other wounds.
+
+Tracking
+If the delete has resulted in the original body being split into multiple
+bodies, the resultant bodies will be returned as product topologies of the
+original body in the <A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A> structure.
+This can only happen if the <B>'allow_disjoint'</B> option is set to PK_LOGICAL_false.
+
+If the <B>'heal_action'</B> option is set to PK_FACE_heal_no_c, and <B>'track'</B> option
+is set to <A HREF=../headers/pk_delete_track_t.html>PK_delete_track_rubber_c</A>, each rubber face that is created will
+generate a tracking record of type PK_TOPOL_track_create_c consisting of the
+tags of the original faces and the new rubber face. Similarly, if the
+<B>'heal_action'</B> option is set to PK_FACE_heal_cap_c, and <B>'track'</B> option is set
+to <A HREF=../headers/pk_delete_track_t.html>PK_delete_track_cap_c</A>, each capping face that is created will generate a
+tracking record of type PK_TOPOL_track_create_c consisting of the tags of the
+original faces and the new capping face.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

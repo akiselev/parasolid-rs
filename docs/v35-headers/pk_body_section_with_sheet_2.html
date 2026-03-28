@@ -1,0 +1,237 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_section_with_sheet_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_section_with_sheet_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_BODY_section_with_sheet_2
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                      target,    --- body to be sectioned by sheet
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                      sheet,     --- sectioning sheet body
+const <A HREF=../headers/pk_body_section_o_t.html>PK_BODY_section_o_t</A>     *options,   --- sectioning options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>      *const tracking,  --- tracking information
+<A HREF=../headers/pk_section_2_r_t.html>PK_section_2_r_t</A>        *const results    --- front/back faces/bodies
+)
+</B>
+<A NAME="description"></A>
+<I>This function sections the target body with the tool sheet body.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_contradictory_request      Bad combination of options or
+                                        data for type of boolean (MILD)
+    PK_ERROR_missing_geom               Target or tool has incomplete
+                                        geometry (SERIOUS)
+    PK_ERROR_wire_body                  Tool is a wire body, or target is
+                                        a wire body and general topology
+                                        is not enabled (MILD)
+    PK_ERROR_partial_coi_found          Boolean failure due to to partial
+                                        coincidence (SERIOUS)
+    PK_ERROR_general_body               Tool is a general body, or target is
+                                        a general body and general topology
+                                        is not enabled (MILD)
+    PK_ERROR_same_tool_and_target       Tool body is also target body (MILD)
+    PK_ERROR_not_sheet                  Tool is not a sheet body (MILD)
+    PK_ERROR_instanced_tools            Instanced tool bodies (MILD)
+    PK_ERROR_boolean_failure            Inconsistent arguments, or
+                                        internal error (SERIOUS)
+
+
+<A NAME="documentation"></A>
+
+
+Introduction
+
+The given target body is sectioned with the given tool sheet body. The target
+body is modified and the sectioning sheet body is deleted.
+
+When the sectioning sheet body intersects with the target body, the body will
+be split, by the sheet faces, into two or more parts. The resulting
+bodies are split into two lists, those in front of the section sheet
+and those behind it. These bodies are returned in the <B>'front_bodies'</B> and
+<B>'back_bodies'</B> arrays of the <B>'results'</B> structure. All new faces associated
+with these bodies which lie in the sectioning sheet are returned in
+the <B>'front_faces'</B> and <B>'back_faces'</B> arrays of the <B>'results'</B> structure.
+
+The front of the section sheet is regarded as the side to which the
+face normals point.
+
+Target bodies, or disjoint components of the target body, that do not
+clash with the section sheet will be left unchanged. It is not defined
+whether they will be returned in the front_bodies or in the back_bodies
+array.
+
+The operation of the sheet sectioning function may be controlled via
+an option structure passed to the function as an input argument.
+
+This function operates similarly to the <B>'<A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>'</B> function,
+especially with regard to the phases of the boolean algorithm and rules
+concerning tag persistence. Refer to the <B>'<A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>'</B> documentation
+for information about these subjects.
+
+
+Section Options
+
+The function can be instructed, via the <B>'fence'</B> option, to :
+
+o Only calculate the bodies and faces in front of the section sheet.
+o Only calculate the bodies and faces behind the section sheet.
+o Calculate the bodies and faces in front and behind the section sheet.
+
+
+Status and Fault Reporting
+
+If the function returns an error code, PK_ERROR_not_sheet for example,
+none of the return arguments of the function will be set. This is standard
+practice for the PK interface. However, this is not the only mechanism by
+which this function may indicate that a failure has occurred. The <B>'results'</B>
+structure may return failure related information as well.
+
+Whenever the function returns <B>'PK_ERROR_no_errors'</B>, the application must
+inspect the contents of the <B>'results'</B> structure to check on the status of
+the section operation. The <B>'result'</B> field of the <B>'results'</B> structure will
+indicate the overall status of the section operation. If any bodies or
+faces are to be returned to the application, these will be contained within
+the <B>'front_bodies'</B>, <B>'back_bodies'</B>, <B>'front_faces'</B> and <B>'back_faces'</B> arrays.
+If the <B>'results'</B> field indicates a failure, the reason(s) for the failure
+will be contained within the array of report structures, referenced via the
+<B>'reports'</B> field.
+
+The meaning and implied actions of the <B>'result'</B> field is as follows :
+
+  1. <A HREF=../headers/pk_section_result_t.html>PK_section_result_ok_c</A>
+     o The section succeeded and the resultant entities are returned within
+       the appropriate arrays.
+
+  2. <A HREF=../headers/pk_section_result_t.html>PK_section_result_no_clash_c</A>
+     o The section succeeded and the resultant entities are returned within
+       the appropriate arrays. However, the target and tool entities did not
+       interact or clash in any manner.
+
+  3. <A HREF=../headers/pk_section_result_t.html>PK_section_result_fail_c</A>
+     o The section has failed.
+     o The result arrays will returned as null.
+     o The report structures must be inspected to determine the reason for the
+       failure and to identify the location of the failure.
+     o If this status is returned, the application cannot assume that the input
+       bodies are in a valid state.
+
+
+Each report structure contains a <B>'report'</B> field indicating the reason for the
+failure and, if possible, an array of entities. These entities may assist the
+application in identifying the region or entities that resulted in the failure.
+The <B>'entities'</B> array may contain topology from the target and tool bodies. The
+entities returned in the array will be members of the following classes :
+
+   o PK_CLASS_body
+   o PK_CLASS_shell
+   o PK_CLASS_face
+   o PK_CLASS_edge
+   o PK_CLASS_vertex
+
+
+Tracking Information
+
+If tracking information is requested by the <B>'tracking'</B> option, the <B>'tracking'</B>
+structure contains topology tracking information on the operation. In the
+case of this function, tracking information is returned for edges imprinted
+on the <B>'target'</B>.
+
+For any imprinted edge returned in the structure:
+    o the <B>'track'</B> field  will have the value PK_TOPOL_track_derive_c, and
+    o the <B>'product_topols'</B> array will contain the imprinted edge.
+    o For the <B>'n_original_topols'</B> entities in <B>'original_topols'</B> the entity
+      type of each of these is recorded in <B>'original_classes'</B> array. In most
+      cases this is either
+      o two original faces for which the product edge is the
+        intersection, or
+      o a face and an edge where the imprint was along a pre-existing
+        edge on one of the bodies, or
+      o two edges where the imprint was along a pre-existing edge on
+        both bodies.
+
+For any wire edge of a general target body that is sectioned the
+following records will be returned,
+    o A record with <B>'track'</B> set to PK_TOPOL_track_derive_c, <B>'original_topols'</B>
+      containing the original wire edge, and <B>'product_topols'</B> containing the
+      derived edges from the splitting of this edge.
+    o For each new vertex created: a record with <B>'track'</B> set to
+      PK_TOPOL_track_derive_c, <B>'original_topols'</B> containing the original
+      wire edge and the intersecting sheet topology, and <B>'product_topols'</B>
+      containing the new vertex.
+
+Sectioning with Generalised Topology Enabled
+
+If generalised topology is enabled, Parasolid will perform sections on a
+general target body and will allow any resultant body or bodies to be general.
+However the tool body must be manifold (it may be a disjoint manifold body).
+
+When a target face is coincident with the section sheet, its behaviour
+depends on the solidity of its neighbouring regions. If one of the face's
+neighbouring regions is solid and the other is void, then the face will
+appear only on the side of the section where its solid region lies. But if
+both of its neighbouring regions have the same solidity (i.e. they are both
+solid or both void), or if the face is surrounded on both sides by the same
+region, then the face will be copied. If the normals of the target face and
+the section sheet are parallel then the original face will appear in the
+front body and the copy will appear in the back body. Otherwise (if the
+normals of the target face and the section sheet are antiparallel) then
+the copy will appear in the front body and the original face will appear
+in the back body.
+
+If it is not possible to classify a sectioned body as "front" or "back",
+a <A HREF=../headers/pk_report_r_t.html>PK_REPORT_r_t</A> will be produced. The report record(s) will be of type
+<A HREF=../headers/pk_report_record_1_t.html>PK_REPORT_record_1_t</A>, as follows:
+  o For successful operations:
+    o <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_cut_unclassed_c</A> will be produced if any sectioned body is
+      both in front of and behind the sectioning sheet.
+    o <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_cut_no_clash_c</A> will be produced if any component of the
+      target body does not clash with the sheet.
+  o For failing operations:
+    o <A HREF=../headers/pk_report_1_t.html>PK_REPORT_1_cut_incomplete_c</A> will be produced if any component of the
+      target body is not fully sectioned by the sheet. Note: The sheet must
+      protrude from the target on all sides; exactly fitting sheets will
+      trigger this report and cause the operation to fail.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

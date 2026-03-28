@@ -18,31 +18,63 @@ use crate::*;
 ///
 /// Initialize all fields to `None` before selectively assigning callbacks.
 /// Must be registered via `PK_SESSION_register_frustrum` before `PK_SESSION_start`.
+///
+/// # Field Ordering
+///
+/// The field order follows the Parasolid Downward Interfaces manual grouping.
+/// If you encounter ABI issues with foreign geometry or rollback callbacks,
+/// verify field order against the Parasolid SDK C header (`parasolid_kernel.h`
+/// or equivalent).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_SESSION_frustrum_t {
+    // Control
     pub fstart: PK_FSTART_f_t,
-    pub fstop: PK_FSTOP_f_t,
     pub fabort: PK_FABORT_f_t,
+    pub fstop: PK_FSTOP_f_t,
+    // File test
     pub ftmkey: PK_FTMKEY_f_t,
+    // File I/O
     pub ffoprd: PK_FFOPRD_f_t,
     pub ffopwr: PK_FFOPWR_f_t,
     pub ffread: PK_FFREAD_f_t,
     pub ffwrit: PK_FFWRIT_f_t,
     pub ffclos: PK_FFCLOS_f_t,
+    // Memory
     pub fmallo: PK_FMALLO_f_t,
     pub fmfree: PK_FMFREE_f_t,
+    // Graphics
     pub goopsg: PK_GOOPSG_f_t,
     pub gosgmt: PK_GOSGMT_f_t,
     pub goclsg: PK_GOCLSG_f_t,
+    // Foreign geometry — curves
+    pub fgcrcu: PK_FGCRCU_f_t,
+    pub fgevcu: PK_FGEVCU_f_t,
+    pub fgprcu: PK_FGPRCU_f_t,
+    // Foreign geometry — surfaces
+    pub fgcrsu: PK_FGCRSU_f_t,
+    pub fgevsu: PK_FGEVSU_f_t,
+    pub fgprsu: PK_FGPRSU_f_t,
+    // Rollback file I/O (obsolete — use PK_DELTA instead)
+    pub ffoprb: PK_FFOPRB_f_t,
+    pub ffseek: PK_FFSEEK_f_t,
+    pub fftell: PK_FFTELL_f_t,
+    pub ffskxt: PK_FFSKXT_f_t,
+    // Unicode file I/O
+    pub ucoprd: PK_UCOPRD_f_t,
+    pub ucopwr: PK_UCOPWR_f_t,
+    // Shaded images (obsolete)
+    pub gooppx: PK_GOOPPX_f_t,
+    pub gopixl: PK_GOPIXL_f_t,
+    pub goclpx: PK_GOCLPX_f_t,
 }
 
 impl Default for PK_SESSION_frustrum_t {
     fn default() -> Self {
         Self {
             fstart: None,
-            fstop: None,
             fabort: None,
+            fstop: None,
             ftmkey: None,
             ffoprd: None,
             ffopwr: None,
@@ -54,6 +86,21 @@ impl Default for PK_SESSION_frustrum_t {
             goopsg: None,
             gosgmt: None,
             goclsg: None,
+            fgcrcu: None,
+            fgevcu: None,
+            fgprcu: None,
+            fgcrsu: None,
+            fgevsu: None,
+            fgprsu: None,
+            ffoprb: None,
+            ffseek: None,
+            fftell: None,
+            ffskxt: None,
+            ucoprd: None,
+            ucopwr: None,
+            gooppx: None,
+            gopixl: None,
+            goclpx: None,
         }
     }
 }

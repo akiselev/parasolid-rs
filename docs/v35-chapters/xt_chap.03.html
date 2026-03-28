@@ -1,0 +1,810 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Logical Layout</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Logical Layout</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="xt_chap.02.html">About This Manual</A></TD>
+  <TD><A HREF="../xt_index.html">Chapters</A></TD>
+  <TD><A HREF="xt_chap.04.html">Physical Layout</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-297780">2.1	Layout of the XT data</A>
+<UL>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-294665">2.1.1	Schema</A>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-311438">2.1.2	Embedded schemas</A>
+<UL>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-294709">2.1.2.1	Physical layout</A>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-294713">2.1.2.2	XT format</A>
+</UL>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-448060">2.1.3	Space compression</A>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-294762">2.1.4	Field types</A>
+<UL>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-443975">2.1.4.1	Point</A>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-448074">2.1.4.2	Pointer classes</A>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-294852">2.1.4.3	Variable-length nodes</A>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-294874">2.1.4.4	Unresolved indices</A>
+<LI> <A HREF="xt_chap.03.html#50487314_pgfId-448103">2.1.4.5	Simple example</A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50487314_pgfId-297780"></A>2.1	Layout of the XT data
+
+
+</H1>
+<P>
+<A NAME="50487314_pgfId-297784"></A>The logical layout of the XT data is as follows:</P>
+<UL>
+<LI>
+<A NAME="50487314_pgfId-447878"></A>A human-oriented text header.</LI>
+<LI>
+<A NAME="50487314_pgfId-447879"></A>The initial text header is read and written by applications' Frustrums and is not accessible to XT. Its detailed format is described in the section 'Physical layout'.</LI>
+<LI>
+<A NAME="50487314_pgfId-294630"></A>A short flag sequence describing the data format, followed by modeller identification information and user field size.</LI>
+<LI>
+<A NAME="50487314_pgfId-447884"></A>The various flag sequences (mixtures of text and numbers) are documented under “Physical layout”; the content of the modeller identification information is:</LI>
+<LI>
+<A NAME="50487314_pgfId-447888"></A>The version of the Parasolid Kernel used to write the data, as a text string of the form:				</LI>
+<UL>
+<LI>
+<A NAME="50487314_pgfId-447889"></A>TRANSMIT FILE created by modeler version 3400000. This information is used by routines such as <CODE>
+PK_PART_ask_kernel_version</CODE>
+.</LI>
+</UL>
+<LI>
+<A NAME="50487314_pgfId-447890"></A>The schema version describing the field sequences of the part nodes as a text string of the form:</LI>
+<UL>
+<LI>
+<A NAME="50487314_pgfId-447894"></A>	SCH_3400000_34000. This example denotes XT data written by the Parasolid Kernel V34.00.000 using schema number 34000: there will be a corresponding file <CODE>
+sch_34000</CODE>
+ in the Parasolid schema distribution. </LI>
+</UL>
+</UL>
+<P>
+<A NAME="50487314_pgfId-447901"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50487314_pgfId-447900"></A>Note:  Applications writing XT data using information from this version of the documentation should use version 3400000 and schema number 34000.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50487314_pgfId-442968"></A>The user field size is a simple integer.</LI>
+<LI>
+<A NAME="50487314_pgfId-294637"></A>Objects in the XT data are called nodes. Every node in the XT data is assigned an integer index from 1 upwards (some indices may not be used). Pointer fields are output as these indices, or as zero for a null pointer.</LI>
+<LI>
+<A NAME="50487314_pgfId-423334"></A>	The first node in the XT data must be the root node. The following nodes can be in an unordered sequence, followed by a terminator.</LI>
+</UL>
+<P>
+<A NAME="50487314_pgfId-447906"></A>Each node entry begins with the node type. If the node is of variable length (see below), this is followed by the length of the variable field. The index of the node is then output, followed by the fields of the node. If the XT data contains user fields, and the node is visible at the PK interface, then the fields are followed by the user field, in integers.</P>
+<P>
+<A NAME="50487314_pgfId-447907"></A>The terminator which follows the sequence of nodes is a two-byte integer with value 1, followed by an index with value 0. The index is output as ‘0’ in a text file, and as a 2-byte integer with value 1 in a binary XT data.</P>
+<P>
+<A NAME="50487314_pgfId-447908"></A>The node with index 1 is the root node of the XT data as follows:</P>
+<P>
+<A NAME="50487314_pgfId-294664"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295525"></A>Contents of XT data</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295527"></A>Type of Root Node</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295529"></A>Body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295531"></A>BODY</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295533"></A>Assembly</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295535"></A>ASSEMBLY</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295537"></A>Array of Parts</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295539"></A>PART_XMT_BLOCK (or POINTER_LIS_BLOCK for older files)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-422661"></A>Array of Meshes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-422663"></A>POINTER_LIS_BLOCK</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295541"></A>Partition</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-295543"></A>WORLD</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50487314_pgfId-294665"></A>	2.1.1 	Schema</H3>
+<P>
+<A NAME="50487314_pgfId-294666"></A>XT permanent structures are defined in a special language akin to C which generates the appropriate files for a C compiler, the runtime information used by the Parasolid Kernel, along with aschema file used during transmit and receive. For example, the schema file for version 31.0 is named sch_31000 and is distributed with the Parasolid Kernel.It is not necessary to have a copy of this file to understand the XT data format.</P>
+<P>
+<A NAME="50487314_pgfId-447928"></A>For each node type, the schema file has a node specifier of the form;</P>
+<P>
+<A NAME="50487314_pgfId-447932"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50487314_pgfId-447931"></A>&lt;nodetype&gt; &lt;nodename&gt;; &lt;description&gt;; &lt;transmit 1/0&gt; &lt;no. of fields&gt; &lt;variable 1/0&gt;</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487314_pgfId-447933"></A>e.g.</P>
+<P>
+<A NAME="50487314_pgfId-447934"></A>29 POINT; Point; 1 6 0</P>
+<P>
+<A NAME="50487314_pgfId-447935"></A>This is followed by a list of field specifiers which say what fields, and in what order, occur in the XT data.</P>
+<P>
+<A NAME="50487314_pgfId-447936"></A>Field specifiers have the format:</P>
+<P>
+<A NAME="50487314_pgfId-447940"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50487314_pgfId-447939"></A>&lt;fieldname&gt;; &lt;type&gt;; &lt;transmit 1/0&gt; &lt;node class&gt; &lt;n_elements&gt;</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487314_pgfId-447941"></A>e.g.</P>
+<P>
+<A NAME="50487314_pgfId-447942"></A>owner; p; 1 1011 1</P>
+<P>
+<A NAME="50487314_pgfId-447943"></A>Nodes and fields with a transmit flag of zero are ephemeral information not written to XT data. Only pointer fields have non-zero node class, in which case it specifies the set of node types to which this field is allowed to point. The element count is interpreted as follows:</P>
+<P>
+<A NAME="50487314_pgfId-447961"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-447946"></A>Item</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-447948"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-447950"></A>0</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-447952"></A>A scalar, a single value</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-447954"></A>1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-447956"></A>A variable length field (see below)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-447958"></A>n &gt; 1</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-447960"></A>An array of n values</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487314_pgfId-447965"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50487314_pgfId-447964"></A>Note: In the schema file, fins are referred to as ‘half edges’, and groups are referred to as ‘features’. These are internal names not used elsewhere in this document.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50487314_pgfId-311438"></A>	2.1.2 	<A NAME="50487314_44241"></A>Embedded schemas</H3>
+<P>
+<A NAME="50487314_pgfId-447973"></A>When reading XT parts, partitions, or deltas, the Parasolid Kernel converts any data that it encounters from older versions of the Parasolid Kernel to the current format using a mixture of automatic table conversion (driven by the appropriate Schemas), and explicit code for more complex algorithms.</P>
+<P>
+<A NAME="50487314_pgfId-447977"></A>However, backwards compatibility of file information - that is, reading data created by a newer version of the Parasolid Kernel into an application (such as data created by a subcontractor) - can never be guaranteed to work using this method, because the older version does not contain any special-case conversion code.</P>
+<P>
+<A NAME="50487314_pgfId-303856"></A>From Parasolid V14 onwards, XT parts, partitions and deltas can be transmitted with extra information that is intended to replace the schema normally loaded to describe the data layout. This information contains the <STRONG>
+differences</STRONG> between its schema and a defined base schema (currently V13's SCH_13006). </P>
+<P>
+<A NAME="50487314_pgfId-448007"></A>This enables XT parts, partitions, and deltas to be successfully read into older versions of Parasolid without loss of information. </P>
+<P>
+<A NAME="50487314_pgfId-448008"></A>The only fields that are included in this information are those which can be referenced in a cut-down version of the schema pertaining only to the XT part data that is transmitted. Specifically, a full schema definition can contain fields that are not relevant in the context of the transmitted data (fields relating to snapshots, for example), and these fields are excluded.</P>
+<P>
+<A NAME="50487314_pgfId-294708"></A>Fields that are included are referred to as effective fields, and are either transmittable (<CODE>
+xmt_code == 1</CODE>
+) or have variable-length (<CODE>
+n_elts == 1</CODE>
+).</P>
+
+<H4>
+<A NAME="50487314_pgfId-294709"></A>2.1.2.1 Physical layout</H4>
+<P>
+<A NAME="50487314_pgfId-294710"></A>Most of the XT data are composed of integers, logical flags, and strings, but are of restricted ranges and so transmitted specially in binary format. The binary representation is given in <STRONG>
+bold</STRONG> type, such as “integer (<STRONG>
+byte</STRONG>)”. This is only relevant to applications that attempt to read or write XT data directly rather than via a Parasolid image. Two important elements are;</P>
+<UL>
+<LI>
+<A NAME="50487314_pgfId-332003"></A>Short strings. These are transmitted as an integer length (byte) followed by the characters (without trailing zero).</LI>
+<LI>
+<A NAME="50487314_pgfId-294712"></A>Positive integers. These are transmitted similarly to the pointer indices which link individual objects together, i.e., small values 0.32766 are transmitted as a single short integer, larger ones encoded into two.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50487314_pgfId-294713"></A>2.1.2.2 XT format</H4>
+<P>
+<A NAME="50487314_pgfId-294714"></A>Presence of the new format is indicated by a change to the standard header: the archive name is extended by the number of the base schema, e.g., SCH_1400068_14000_13006, and then the maximum number of node types is inserted (<STRONG>
+short</STRONG>).</P>
+<P>
+<A NAME="50487314_pgfId-294715"></A>Transmission then continues as normal, except that when transmitting the first node of any particular type, extra information is inserted between the nodetype and the variable-length, index data as follows:</P>
+<UL>
+<LI>
+<A NAME="50487314_pgfId-294716"></A>The arrays of effective fields in the base schema node and the current schema node are assembled.</LI>
+<LI>
+<A NAME="50487314_pgfId-294717"></A>If the nodetype does not exist in the base schema then it is output as follows:</LI>
+<LI>
+<A NAME="50487314_pgfId-448041"></A>Number of fields (byte).</LI>
+<LI>
+<A NAME="50487314_pgfId-448042"></A>Name and description (short strings).</LI>
+<LI>
+<A NAME="50487314_pgfId-448043"></A>Fields one by one as follows;</LI>
+</UL>
+<P>
+<A NAME="50487314_pgfId-294752"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294723"></A>Name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294725"></A>Data Type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294727"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294729"></A><CODE>
+name</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294731"></A>Pointer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294733"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-424348"></A><CODE>
+ptr_class</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-424350"></A>Short</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-424352"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294735"></A><CODE>
+n_elts</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294737"></A>Positive Integer</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294739"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294741"></A><CODE>
+type</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294743"></A>Short String</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294745"></A>The field type. Allowed values are described in “Field types”, below. Omitted if <CODE>
+ptr_class</CODE>
+ non-zero</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294747"></A><CODE>
+xmt_code</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294749"></A>Logical (byte)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294751"></A>Omitted for fixed-length (n_elts != 1)</P>
+</TD>
+</TR>
+</TABLE>
+<UL>
+<LI>
+<A NAME="50487314_pgfId-294753"></A>If the two arrays match (equal length and all fields match in <CODE>
+name</CODE>
+, <CODE>
+xmt_code, ptr_class, n_elts</CODE>
+ and <CODE>
+type</CODE>
+) then output the flag value 255 (byte0xff). </LI>
+<LI>
+<A NAME="50487314_pgfId-294754"></A>If the two arrays do not match, output the number of effective fields in the current schema (byte), and an edit sequence as follows.</LI>
+<LI>
+<A NAME="50487314_pgfId-294755"></A>Initialize pointers to the first base field and first current field, then while there are still unprocessed base and current fields, output a sequence of Copy, Delete and Insert instructions.</LI>
+<LI>
+<A NAME="50487314_pgfId-448053"></A>If the base field matches the current field, output 'C' (char) to indicate an unchanged (Copied) field and advance to the next base and current fields; </LI>
+<LI>
+<A NAME="50487314_pgfId-448054"></A>If the base field does not match any unprocessed current field, output 'D' (char) to indicate a Deleted field and advance to the next base field; </LI>
+<LI>
+<A NAME="50487314_pgfId-448055"></A>Otherwise, output 'I' (char) to indicate an Inserted field, followed by the current field in the above format, and advance to the next current field.</LI>
+<LI>
+<A NAME="50487314_pgfId-294759"></A>If there are any unprocessed current fields, then output an Append sequence, each instruction being 'A' (char) followed by the field.</LI>
+<LI>
+<A NAME="50487314_pgfId-294760"></A>Finally, output 'Z' (char) to signal the end.</LI>
+</UL>
+
+
+
+<H3>
+<A NAME="50487314_pgfId-448060"></A>	2.1.3 	Space compression </H3>
+<P>
+<A NAME="50487314_pgfId-448061"></A>For text data in XT formats <CODE>
+<A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_text_c</A></CODE>
+ and <CODE>
+<A HREF=../headers/pk_transmit_format_t.html>PK_transmit_format_xml_c</A></CODE>
+, a new escape sequence is defined: the 2-character sequence \9 denotes a sequence of nine spaces. At V14 of the Parasolid Kernel, this applies to attribute definition names, field names, and attribute strings.</P>
+
+
+<H3>
+<A NAME="50487314_pgfId-294762"></A>	2.1.4 	Field types</H3>
+<P>
+<A NAME="50487314_pgfId-294763"></A>The XT format is not itself a binary protocol, and so does not define data sizes; the only requirement is that a runtime implementation has sufficient room for the information. The available implementations run with 8bit ASCII characters, 8bit unsigned bytes (0..255), 16bit short integers (0..65535 or -32768..32767), 32bit integers (0..4G-1, -2G..2G-1) and IEEE reals. The implementation used in a given binary XT data is specified by the &quot;PS&lt;code&gt;&quot; at the start of the file. See <A HREF="xt_chap.04.html#50487320_92653">Chapter 3, “Physical Layout”</A>, for more information.</P>
+<P>
+<A NAME="50487314_pgfId-294764"></A>The full list of field types used in XT data is as follows:</P>
+<P>
+<A NAME="50487314_pgfId-294822"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294767"></A>Item</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294769"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294771"></A>u</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294773"></A>Unassigned byte 0-255</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294775"></A>c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294777"></A>char</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294779"></A>I</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-442253"></A>Unassigned byte 0-1 (i.e. logical) </P>
+<P>
+<A NAME="50487314_pgfId-352660"></A><CODE>
+typedef char logical</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294783"></A>n</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294785"></A>Short int</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294787"></A>w</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294789"></A>Unicode character, output as short int</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294791"></A>d</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294793"></A>int</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294795"></A>p</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-442259"></A>Pointer-index. </P>
+<P>
+<A NAME="50487314_pgfId-360385"></A>Small indices (less than 32767) are treated specially in binary XT data to save space. See the section below on binary format.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294799"></A>f</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294801"></A>Double</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294803"></A>i</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294805"></A>These correspond to a region of the real line:</P>
+<P>
+<A NAME="50487314_pgfId-294806"></A><CODE>
+typedef struct { double low, high; }interval;</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294808"></A>v</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-442264"></A>Array [3] of doubles. </P>
+<P>
+<A NAME="50487314_pgfId-362134"></A>These correspond to a 3-space position or direction:</P>
+<P>
+<A NAME="50487314_pgfId-294811"></A><CODE>
+typedef struct { double x,y,z; } vector;</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294813"></A>b</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-442269"></A>Array [6] of doubles. </P>
+<P>
+<A NAME="50487314_pgfId-362137"></A>These correspond to a 3-space region:</P>
+<P>
+<A NAME="50487314_pgfId-448140"></A><CODE>
+typedef struct { interval x,y,z; } box;</CODE>
+</P>
+<P>
+<A NAME="50487314_pgfId-294817"></A>Note that the ordering is not the same as presented at Parasolid’s external PK or KI interfaces.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-294819"></A>h</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50487314_pgfId-442274"></A>Array [3] of doubles. </P>
+<P>
+<A NAME="50487314_pgfId-362141"></A>These represent points of intersection between two surfaces; only the position vector is written to XT data, as the Parasolid Kernel will recalculate other data as required. The structure is documented further in the section on intersection curves.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50487314_pgfId-443975"></A>2.1.4.1 Point</H4>
+<P>
+<A NAME="50487314_pgfId-443976"></A>As an example, consider a POINT; its formal description is as follows;</P>
+<P>
+<A NAME="50487314_pgfId-443989"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50487314_pgfId-443979"></A>struct POINT_s          // Point</PRE>
+<PRE><A NAME="50487314_pgfId-443980"></A>{</PRE>
+<PRE><A NAME="50487314_pgfId-443981"></A>int				node_id;			// $d</PRE>
+<PRE><A NAME="50487314_pgfId-443982"></A>union  ATTRIB_FEAT_u		 attributes_features;			// $p</PRE>
+<PRE><A NAME="50487314_pgfId-443983"></A>union  POINT_OWNER_u				 owner;			// $p</PRE>
+<PRE><A NAME="50487314_pgfId-443984"></A>struct POINT_s 				next;			// $p</PRE>
+<PRE><A NAME="50487314_pgfId-443985"></A>struct POINT_s				previous;			// $p</PRE>
+<PRE><A NAME="50487314_pgfId-443986"></A>vector 				pvec;			// $v</PRE>
+<PRE><A NAME="50487314_pgfId-443987"></A>};</PRE>
+<PRE><A NAME="50487314_pgfId-443988"></A>typedef struct POINT_s    	*POINT;</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487314_pgfId-443990"></A>Its corresponding schema data entry is as follows;</P>
+<P>
+<A NAME="50487314_pgfId-444000"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50487314_pgfId-443993"></A>29 POINT; Point; 1 6 0</PRE>
+<PRE><A NAME="50487314_pgfId-443994"></A>node_id; d; 1 0 0</PRE>
+<PRE><A NAME="50487314_pgfId-443995"></A>attributes_features; p; 1 1019 0</PRE>
+<PRE><A NAME="50487314_pgfId-443996"></A>owner; p; 1 1011 0</PRE>
+<PRE><A NAME="50487314_pgfId-443997"></A>next; p; 1 29 0</PRE>
+<PRE><A NAME="50487314_pgfId-443998"></A>previous; p; 1 29 0</PRE>
+<PRE><A NAME="50487314_pgfId-443999"></A>pvec; v; 1 0 0</PRE>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50487314_pgfId-448074"></A>2.1.4.2 Pointer classes</H4>
+<P>
+<A NAME="50487314_pgfId-448075"></A>In the above example, the <CODE>
+attributes_features</CODE>
+ field must be of class <CODE>
+ATTRIB_FEAT_cl</CODE>
+, the owner must be of class <CODE>
+POINT_OWNER_cl</CODE>
+, and the next and previous fields must refer to points. A full list of node types and node classes is given at the end of the document.</P>
+<P>
+<A NAME="50487314_pgfId-448076"></A>Each node class corresponds to a union of pointers given in the Schema Definition section.</P>
+
+
+<H4>
+<A NAME="50487314_pgfId-294852"></A>2.1.4.3 Variable-length nodes</H4>
+<P>
+<A NAME="50487314_pgfId-294853"></A>Variable-length nodes differ from fixed-length nodes in that their last field is of variable length, i.e. different nodes of the same type may have different lengths. In the schema the length is notionally given as 1, e.g.</P>
+<P>
+<A NAME="50487314_pgfId-448092"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50487314_pgfId-448088"></A>struct REAL_VALUES_s            // Real values</PRE>
+<PRE><A NAME="50487314_pgfId-448089"></A>{		</PRE>
+<PRE><A NAME="50487314_pgfId-448090"></A>double values[1];	// $f[]</PRE>
+<PRE><A NAME="50487314_pgfId-448091"></A>};		</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487314_pgfId-448093"></A>Its schema file entry would be as follows;</P>
+<P>
+<A NAME="50487314_pgfId-448098"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50487314_pgfId-448096"></A>83 REAL_VALUES; 	Real values; 1 1 1</PRE>
+<PRE><A NAME="50487314_pgfId-448097"></A>values; f; 1 0 1</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487314_pgfId-294869"></A>The number of entries in each such node is indicated by an integer in the XT data between its nodetype and index, so an example might be</P>
+<P>
+<A NAME="50487314_pgfId-437994"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50487314_pgfId-437993"></A>83 3 15 1 2 3</PRE>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50487314_pgfId-294874"></A>2.1.4.4 Unresolved indices</H4>
+<P>
+<A NAME="50487314_pgfId-294875"></A>In some cases a node will contain an index field which does not correspond to a node in the XT data, in this case the index is to be interpreted as zero. </P>
+
+
+<H4>
+<A NAME="50487314_pgfId-448103"></A>2.1.4.5 Simple example</H4>
+<P>
+<A NAME="50487314_pgfId-448104"></A>Here is a reformatted text example of a sheet circle with a color attribute on its single edge:</P>
+<P>
+<A NAME="50487314_pgfId-448131"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50487314_pgfId-448107"></A>**ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz************</PRE>
+<PRE><A NAME="50487314_pgfId-448108"></A>**PARASOLID !&quot;#$%&amp;&acute;()*+,-./:;&lt;=&gt;?@[\]^_`{|}~0123456789************</PRE>
+<PRE><A NAME="50487314_pgfId-448109"></A>**PART1;MC=osf65;MC_MODEL=alpha;MC_ID=sdlosf6;OS=OSF1;OS_RELEASE=V4.0;FRU=sdl_parasolid_test_osf64;APPL=unknown;SITE=sdl-cambridge-u.k.;USER=davidj;FORMAT=text;GUISE=transmit;DATE=29-mar-2000;</PRE>
+<PRE><A NAME="50487314_pgfId-448110"></A>**PART2;SCH=SCH_1200000_12006;USFLD_SIZE=0;</PRE>
+<PRE><A NAME="50487314_pgfId-448111"></A>**PART3;</PRE>
+<PRE><A NAME="50487314_pgfId-448112"></A>**END_OF_HEADER***************************************************</PRE>
+<PRE><A NAME="50487314_pgfId-448113"></A>T51 : TRANSMIT FILE created by modeller version 120000017 SCH_1200000_120060</PRE>
+<PRE><A NAME="50487314_pgfId-448114"></A>12 1 12 0 2 0 0 0 0 1e3 1e-8 0 0 0 1 0 3 1 3 4 5 0 6 7 0 body</PRE>
+<PRE><A NAME="50487314_pgfId-448115"></A>70 2 0 1 0 0 4 1 20 8 8 8 1 T                            list</PRE>
+<PRE><A NAME="50487314_pgfId-448116"></A>13 3 3 0 1 0 9 0 0 6 9                                   shell</PRE>
+<PRE><A NAME="50487314_pgfId-448117"></A>50 4 11 0 9 0 0 0 +0 0 0 0 0 1 1 0 0                     plane</PRE>
+<PRE><A NAME="50487314_pgfId-448118"></A>31 5 10 0 7 0 0 0 +0 0 0 0 0 1 1 0 0 1                   circle</PRE>
+<PRE><A NAME="50487314_pgfId-448119"></A>19 6 5 0 1 0 0 3 V                                       region</PRE>
+<PRE><A NAME="50487314_pgfId-448120"></A>16 7 6 0 ?10 0 0 5 0 0 1                                 edge</PRE>
+<PRE><A NAME="50487314_pgfId-448121"></A>17 10 0 11 10 10 0 12 7 0 0 +                            fin</PRE>
+<PRE><A NAME="50487314_pgfId-448122"></A>15 11 7 0 10 9 0                                         loop</PRE>
+<PRE><A NAME="50487314_pgfId-448123"></A>17 12 0 0 0 0 0 10 7 0 0 -                               fin (dummy)</PRE>
+<PRE><A NAME="50487314_pgfId-448124"></A>14 9 2 13 ?0 0 11 3 4 +0 0 0 0 3                         face</PRE>
+<PRE><A NAME="50487314_pgfId-448125"></A>81 1 13 12 14 9 0 0 0 0 15                               attribute (variable 1)</PRE>
+<PRE><A NAME="50487314_pgfId-448126"></A>80 1 14 0 16 8001 0 0 0 0 3 5 0 0 FFFFTFTFFFFFF2         attrib_def (variable 1)</PRE>
+<PRE><A NAME="50487314_pgfId-448127"></A>83 3 15 1 2 3                                            real_values (variable 3)</PRE>
+<PRE><A NAME="50487314_pgfId-448128"></A>79 15 16 SDL/TYSA_COLOUR                                 att_def_id (variable 15)</PRE>
+<PRE><A NAME="50487314_pgfId-448129"></A>74 20 8 1 0 13 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0     pointer_lis_block</PRE>
+<PRE><A NAME="50487314_pgfId-448130"></A>1 0 terminator</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487314_pgfId-448135"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50487314_pgfId-448134"></A>Note: The tolerance fields of the face and edge are un-set, and represented as ‘?’ in the text XT data and that the annotations in the column ‘body’ to ‘terminator’ give the node type of each line and are not part of the actual file. If the above file had no trailing spaces, it would be valid XT data (the leading spaces on some of the lines are necessary).</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50487314_pgfId-295100"></A>&nbsp;</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="xt_chap.02.html">About This Manual</A></TD>
+  <TD><A HREF="../xt_index.html">Chapters</A></TD>
+  <TD><A HREF="xt_chap.04.html">Physical Layout</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

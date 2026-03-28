@@ -1,0 +1,2870 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>How the C# Binding is Implemented</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>How the C# Binding is Implemented</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.124.html">The Mathematical Form Of B-Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.126.html">Persistent Mesh (PSM) Format</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-308573">C.1	Function pointers and delegates </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285327">C.2	Initialisation macro, _t and _v structs </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285585">C.3	Arrays </A>
+<UL>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285587">C.3.1	Arrays using the keyword “fixed” </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285635">C.3.2	Arrays as multiple values </A>
+</UL>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285684">C.4	Unions </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285732">C.5	Applio </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285876">C.6	Functions </A>
+<UL>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285878">C.6.1	Simple functions </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285911">C.6.2	Functions with array arguments </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285961">C.6.3	Functions with _v arguments </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-285998">C.6.4	Persistent callbacks </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-286145">C.6.5	Modified function signatures </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-286232">C.6.6	Functions with string arguments </A>
+<UL>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-286234">C.6.6.1	Passing Ansi and Unicode strings to Parasolid </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-308661">C.6.6.2	Receiving a .NET string from Parasolid </A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-286330">C.6.6.3	List of overloaded functions using .NET strings </A>
+</UL>
+</UL>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-274395">C.7	Functions that use tristate delegates </A>
+<UL>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-347369">C.7.1	Pointer organisation</A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-347567">C.7.2	Using tristate delegates</A>
+<LI> <A HREF="fd_chap.125.html#50422208_pgfId-347636">C.7.3	Retrieving functions via tristate delegates</A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+<P>
+<A NAME="50422208_pgfId-285261"></A>This Appendix shows how the .NET binding is constructed, using examples drawn from the binding source code. If you would like to licence the binding source in order to extend it, please contact Parasolid Support. This will require your company to sign a short licensing agreement with Siemens PLM Software specifically for the source code.</P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422208_pgfId-308573"></A>C.1	Function pointers and delegates 
+
+
+</H1>
+<P>
+<A NAME="50422208_pgfId-308574"></A>This section presents examples of how Parasolid function pointers are used via C# delegates. As a first example, the declarations of <A HREF=../headers/pk_attdef_name_cb_f_t.html>PK_ATTDEF_name_cb_f_t</A> in C and C# are:</P>
+<P>
+<A NAME="50422208_pgfId-285286"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285266"></A><STRONG>typedef const char </STRONG>*( *<A HREF=../headers/pk_attdef_name_cb_f_t.html>PK_ATTDEF_name_cb_f_t</A> )</PRE>
+<PRE><A NAME="50422208_pgfId-285267"></A>(</PRE>
+<PRE><A NAME="50422208_pgfId-285268"></A><STRONG>const</STRONG> <A HREF=../headers/pk_attdef_sf_2_t.html>PK_ATTDEF_sf_2_t</A>*, /* <EM>attribute definition standard form</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285269"></A><A HREF=../headers/pk_pointer_t.html>PK_POINTER_t</A>             /* <EM>context</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285270"></A>);</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285272"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285273"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285274"></A>  <STRONG>public unsafe partial class</STRONG> ATTDEF</PRE>
+<PRE><A NAME="50422208_pgfId-285275"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285276"></A>    [UnmanagedFunctionPointerAttribute( CallingConvention.Cdecl)]</PRE>
+<PRE><A NAME="50422208_pgfId-285277"></A>    <STRONG>public unsafe delegate byte</STRONG>* name_cb_f_t</PRE>
+<PRE><A NAME="50422208_pgfId-285278"></A>    (</PRE>
+<PRE><A NAME="50422208_pgfId-285279"></A>    PK.ATTDEF.sf_2_t* arg001,</PRE>
+<PRE><A NAME="50422208_pgfId-285280"></A>    PK.POINTER_t      arg002</PRE>
+<PRE><A NAME="50422208_pgfId-285281"></A>    );</PRE>
+<PRE><A NAME="50422208_pgfId-285282"></A>  };</PRE>
+<PRE><A NAME="50422208_pgfId-285283"></A>};</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285285"></A>Figure C-1 Declaration of <A HREF=../headers/pk_attdef_name_cb_f_t.html>PK_ATTDEF_name_cb_f_t</A> in C (above) and C# (below)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285287"></A>Similarly, for <A HREF=../headers/pk_detail_hole_cb_f_t.html>PK_detail_hole_cb_f_t</A>, the declarations are:</P>
+<P>
+<A NAME="50422208_pgfId-285315"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285290"></A><STRONG>typedef int</STRONG> ( *<A HREF=../headers/pk_detail_hole_cb_f_t.html>PK_detail_hole_cb_f_t</A> )</PRE>
+<PRE><A NAME="50422208_pgfId-285291"></A>(</PRE>
+<PRE><A NAME="50422208_pgfId-285292"></A><STRONG>int</STRONG>,                   /* <EM>number of faces in hole detail</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285293"></A><STRONG>const</STRONG> <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>[],     /* <EM>faces in hole detail</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285294"></A><A HREF=../headers/pk_detail_def_hole_t.html>PK_detail_def_hole_t</A>,  /* <EM>hole detail definition</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285295"></A><A HREF=../headers/pk_pointer_t.html>PK_POINTER_t</A>           /* <EM>context</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285296"></A>);</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285298"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285299"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285300"></A>  [UnmanagedFunctionPointerAttribute( CallingConvention.Cdecl)]</PRE>
+<PRE><A NAME="50422208_pgfId-285301"></A>  <STRONG>public unsafe delegate int</STRONG> detail_hole_cb_f_t</PRE>
+<PRE><A NAME="50422208_pgfId-285302"></A>  (</PRE>
+<PRE><A NAME="50422208_pgfId-285303"></A>  <STRONG>int</STRONG>                    arg001,</PRE>
+<PRE><A NAME="50422208_pgfId-285304"></A>  PK.FACE_t*             arg002,</PRE>
+<PRE><A NAME="50422208_pgfId-285305"></A>  PK.detail_def_hole_t   arg003,</PRE>
+<PRE><A NAME="50422208_pgfId-285306"></A>  PK.POINTER_t           arg004</PRE>
+<PRE><A NAME="50422208_pgfId-285307"></A>  );</PRE>
+<PRE><A NAME="50422208_pgfId-285308"></A> <STRONG> public unsafe partial class</STRONG> UNCLASSED</PRE>
+<PRE><A NAME="50422208_pgfId-285309"></A>   {</PRE>
+<PRE><A NAME="50422208_pgfId-345999"></A>   public static int detail_hole_cb_f_t_fn_ignore(</PRE>
+<PRE><A NAME="50422208_pgfId-346057"></A>    int                  arg001,</PRE>
+<PRE><A NAME="50422208_pgfId-346001"></A>    PK.FACE_t*           arg002,</PRE>
+<PRE><A NAME="50422208_pgfId-346002"></A>    PK.detail_def_hole_t arg003,</PRE>
+<PRE><A NAME="50422208_pgfId-346003"></A>    PK.POINTER_t         arg004</PRE>
+<PRE><A NAME="50422208_pgfId-346004"></A>   )</PRE>
+<PRE><A NAME="50422208_pgfId-346005"></A>   {</PRE>
+<PRE><A NAME="50422208_pgfId-346006"></A>    System.Console.WriteLine( </PRE>
+<PRE><A NAME="50422208_pgfId-346105"></A>            &quot;error: called detail_hole_cb_f_t_fn_ignore&quot;);</PRE>
+<PRE><A NAME="50422208_pgfId-346007"></A>    return -1;</PRE>
+<PRE><A NAME="50422208_pgfId-345991"></A>   }</PRE>
+<PRE><A NAME="50422208_pgfId-285310"></A> <STRONG>   public static readonly</STRONG>     PK.detail_hole_cb_f_t detail_hole_cb_f_t_null = null;</PRE>
+<PRE><A NAME="50422208_pgfId-346147"></A>    public static readonly </PRE>
+<PRE><A NAME="50422208_pgfId-346192"></A>    PK.detail_hole_cb_f_t detail_hole_cb_f_t_ignore = </PRE>
+<PRE><A NAME="50422208_pgfId-346135"></A>     detail_hole_cb_f_t_fn_ignore;</PRE>
+<PRE><A NAME="50422208_pgfId-285311"></A>  };</PRE>
+<PRE><A NAME="50422208_pgfId-285312"></A>};</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285314"></A>Figure C-2 Declaration of <A HREF=../headers/pk_detail_hole_cb_f_t.html>PK_detail_hole_cb_f_t</A> in C (above) and C# (below)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285316"></A>Some points to note regarding the code excerpts above:</P>
+<UL>
+<LI>
+<A NAME="50422208_pgfId-285317"></A>These C# declarations are taken from the binding source code. You don't need to write them yourself.</LI>
+<LI>
+<A NAME="50422208_pgfId-285318"></A>PK function pointer types all deal with C functions, which use the “cdecl“ calling convention.</LI>
+<LI>
+<A NAME="50422208_pgfId-285319"></A>C <CODE>
+const</CODE>
+ qualifiers are dropped, and C arrays are converted to pointers, since [] arrays mean something quite different in C#.</LI>
+<LI>
+<A NAME="50422208_pgfId-285320"></A>A null value and an ignore value are provided for each C# delegate type; for delegates that aren't part of a class, this is put in the special class UNCLASSED.</LI>
+<LI>
+<A NAME="50422208_pgfId-285321"></A>The PK declares some function pointer types within structures, without using a separate <CODE>
+typedef</CODE>
+; the .NET binding has individual <CODE>
+delegate</CODE>
+ types for these. For an example, see <A HREF="fd_chap.125.html#50422208_89062">Appendix C.5, “Applio”</A>.</LI>
+<LI>
+<A NAME="50422208_pgfId-285325"></A>All classes in the binding are declared as “partial“ classes, so that they can be extended.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422208_pgfId-285327"></A>C.2	<A NAME="50422208_63229"></A>Initialisation macro, _t and _v structs 
+
+
+</H1>
+<P>
+<A NAME="50422208_pgfId-285328"></A>Since C# does not have a general-purpose macro pre-processor, the C initialisation macros for structures used in the PK interface have to be implemented as <CODE>
+struct</CODE>
+ constructors.</P>
+<P>
+<A NAME="50422208_pgfId-285329"></A>Some PK structs contain function pointers, and the corresponding C# structs therefore contain delegates. However, it is not possible in C# to take the address of a structure that contains a delegate. Naturally, this causes problems with structures that are passed to Parasolid via pointers.</P>
+<P>
+<A NAME="50422208_pgfId-285330"></A>To overcome this, the .NET binding declares variant versions of such structures, which have the trailing “_t“ in their names replaced with “_v“. For an example, see PK.BCURVE.fit_data_t and PK.BCURVE.fit_data_v (<A HREF="fd_chap.125.html#50422208_16547" CLASS="XRef">Figure C-5</A> and <A HREF="fd_chap.125.html#50422208_45812">Figure C-6</A>, respectively). The <CODE>
+_v</CODE>
+ structures have their delegate fields replaced with IntPtr fields.</P>
+<P>
+<A NAME="50422208_pgfId-285337"></A>The C structure <A HREF=../headers/pk_bcurve_fit_data_t.html>PK_BCURVE_fit_data_t</A> is:</P>
+<P>
+<A NAME="50422208_pgfId-285352"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285340"></A><STRONG>struct</STRONG> PK_BCURVE_fit_data_s</PRE>
+<PRE><A NAME="50422208_pgfId-285341"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285342"></A>  <A HREF=../headers/pk_bcurve_fit_eval_type_t.html>PK_BCURVE_fit_eval_type_t</A>   eval_type;   /* <EM>what evaluator to use</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285343"></A>  <A HREF=../headers/pk_bcurve_fit_eval_f_t.html>PK_BCURVE_fit_eval_f_t</A>      eval_fn;     /* <EM>user evaluator (NULL)</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285344"></A>  <A HREF=../headers/pk_bcurve_fit_eval_data_t.html>PK_BCURVE_fit_eval_data_t</A>   eval_data;   /* <EM>evaluator data</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285345"></A>  <A HREF=../headers/pk_bcurve_fit_err_method_t.html>PK_BCURVE_fit_err_method_t</A>  err_method;  /* <EM>error method for B-curve</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285346"></A>  <A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>                rational;    /* <EM>if B-curve is to be rational</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285347"></A>};</PRE>
+<PRE><A NAME="50422208_pgfId-285348"></A><STRONG></STRONG>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285349"></A><STRONG>typedef struct</STRONG> PK_BCURVE_fit_data_s <A HREF=../headers/pk_bcurve_fit_data_t.html>PK_BCURVE_fit_data_t</A>;</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285351"></A>Figure C-3 The <A HREF=../headers/pk_bcurve_fit_data_t.html>PK_BCURVE_fit_data_t</A> structure in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285353"></A>It has the following initialisation macro:</P>
+<P>
+<A NAME="50422208_pgfId-285366"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285356"></A><STRONG>#define</STRONG> PK_BCURVE_fit_data_m ( fit_data )             \</PRE>
+<PRE><A NAME="50422208_pgfId-285357"></A>(                                                     \</PRE>
+<PRE><A NAME="50422208_pgfId-285358"></A>  (fit_data).eval_type = PK_BCURVE_fit_eval_chain_c,  \</PRE>
+<PRE><A NAME="50422208_pgfId-285359"></A>  (fit_data).eval_fn  = NULL,                         \</PRE>
+<PRE><A NAME="50422208_pgfId-285360"></A>  PK_BCURVE_fit_eval_data_m( (fit_data).eval_data ),  \</PRE>
+<PRE><A NAME="50422208_pgfId-285361"></A>  (fit_data).err_method = PK_BCURVE_fit_err_parm_c,   \</PRE>
+<PRE><A NAME="50422208_pgfId-285362"></A>  (fit_data).rational = PK_LOGICAL_false              \</PRE>
+<PRE><A NAME="50422208_pgfId-285363"></A>)</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285365"></A>Figure C-4 Initialisation macro for <A HREF=../headers/pk_bcurve_fit_data_t.html>PK_BCURVE_fit_data_t</A> in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285367"></A>The corresponding C# structure in the .NET binding, PK.BCURVE.fit_data_t, with its constructors, is:</P>
+<P>
+<A NAME="50422208_pgfId-285417"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285370"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285371"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285372"></A><STRONG>  public unsafe partial class</STRONG> BCURVE</PRE>
+<PRE><A NAME="50422208_pgfId-285373"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285374"></A>    [StructLayout(LayoutKind.Sequential)]</PRE>
+<PRE><A NAME="50422208_pgfId-285375"></A>  <STRONG>  public unsafe struct</STRONG> fit_data_t</PRE>
+<PRE><A NAME="50422208_pgfId-285376"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-285377"></A>      <STRONG>public</STRONG> PK.BCURVE.fit_eval_type_t  eval_type;</PRE>
+<PRE><A NAME="50422208_pgfId-285378"></A>      <STRONG>public</STRONG> PK.BCURVE.fit_eval_f_t     eval_fn;</PRE>
+<PRE><A NAME="50422208_pgfId-285379"></A>      <STRONG>public</STRONG> PK.BCURVE.fit_eval_data_t  eval_data;</PRE>
+<PRE><A NAME="50422208_pgfId-285380"></A>      <STRONG>public</STRONG> PK.BCURVE.fit_err_method_t err_method;</PRE>
+<PRE><A NAME="50422208_pgfId-285381"></A>      <STRONG>public</STRONG> PK.LOGICAL_t               rational;</PRE>
+<PRE><A NAME="50422208_pgfId-285382"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285383"></A>      // <EM>Constructor that takes all arguments</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285384"></A>      <STRONG>public</STRONG> fit_data_t</PRE>
+<PRE><A NAME="50422208_pgfId-285385"></A>      (</PRE>
+<PRE><A NAME="50422208_pgfId-285386"></A>      PK.BCURVE.fit_eval_type_t  eval_type,</PRE>
+<PRE><A NAME="50422208_pgfId-285387"></A>      PK.BCURVE.fit_eval_f_t     eval_fn,</PRE>
+<PRE><A NAME="50422208_pgfId-285388"></A>      PK.BCURVE.fit_eval_data_t  eval_data,</PRE>
+<PRE><A NAME="50422208_pgfId-285389"></A>      PK.BCURVE.fit_err_method_t err_method,</PRE>
+<PRE><A NAME="50422208_pgfId-285390"></A>      PK.LOGICAL_t               rational</PRE>
+<PRE><A NAME="50422208_pgfId-285391"></A>      )</PRE>
+<PRE><A NAME="50422208_pgfId-285392"></A>      {</PRE>
+<PRE><A NAME="50422208_pgfId-285393"></A>        this.eval_type = eval_type;</PRE>
+<PRE><A NAME="50422208_pgfId-285394"></A>        this.eval_fn = eval_fn;</PRE>
+<PRE><A NAME="50422208_pgfId-285395"></A>        this.eval_data = eval_data;</PRE>
+<PRE><A NAME="50422208_pgfId-285396"></A>        this.err_method = err_method;</PRE>
+<PRE><A NAME="50422208_pgfId-285397"></A>        this.rational = rational;</PRE>
+<PRE><A NAME="50422208_pgfId-285398"></A>      }</PRE>
+<PRE><A NAME="50422208_pgfId-285399"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285400"></A>  // <EM>Constructor that takes a bool, using values from the macro</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285401"></A>      <STRONG>public</STRONG> fit_data_t( bool dummy): </PRE>
+<PRE><A NAME="50422208_pgfId-285402"></A>      this</PRE>
+<PRE><A NAME="50422208_pgfId-285403"></A>      ( </PRE>
+<PRE><A NAME="50422208_pgfId-285404"></A>      PK.BCURVE.fit_eval_type_t.chain_c, </PRE>
+<PRE><A NAME="50422208_pgfId-285405"></A>      null, </PRE>
+<PRE><A NAME="50422208_pgfId-285406"></A>      <STRONG>new</STRONG> PK.BCURVE.fit_eval_data_t(), // <EM>See below</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285407"></A>      PK.BCURVE.fit_err_method_t.parm_c, </PRE>
+<PRE><A NAME="50422208_pgfId-285408"></A>      PK.LOGICAL_t.@false</PRE>
+<PRE><A NAME="50422208_pgfId-285409"></A>      )</PRE>
+<PRE><A NAME="50422208_pgfId-285410"></A>      {} // <EM>Empty constructor body</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285411"></A>    };   // <EM>End of struct declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285412"></A>  };     // <EM>Close partial class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285413"></A>};       // <EM>Close namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285416"></A>Figure C-5 <A NAME="50422208_16547"></A>C# structure PK.BCURVE.fit_data_t with its constructors</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285418"></A>The first constructor simply takes one argument per field of the structure; the second constructor uses the <CODE>
+this(...)</CODE>
+ syntax to call the first constructor with arguments taken from the C initialisation macro. The .NET binding, by convention, uses a constructor with a single <CODE>
+bool</CODE>
+ argument to supply values taken from a C macro; the value of the bool is ignored.</P>
+<P>
+<A NAME="50422208_pgfId-285419"></A>The third argument to the <CODE>
+this</CODE>
+ call above uses two C# features that can be confusing for C++ programmers. The <CODE>
+new</CODE>
+ operator, used this way, does not allocate memory, but simply calls a constructor and returns the initialised object into memory provided by the caller. C# also supplies a default constructor with no arguments, which initialises all fields to the default values for their type.</P>
+<P>
+<A NAME="50422208_pgfId-285420"></A>The PK.BCURVE.fit_data_v struct in the .NET binding, with its constructors, is:</P>
+<P>
+<A NAME="50422208_pgfId-285481"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285423"></A>namespace PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285424"></A>{ public unsafe partial class BCURVE</PRE>
+<PRE><A NAME="50422208_pgfId-285425"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285426"></A>    [StructLayout(LayoutKind.Sequential)]</PRE>
+<PRE><A NAME="50422208_pgfId-285427"></A>    public unsafe struct fit_data_v</PRE>
+<PRE><A NAME="50422208_pgfId-285428"></A>    { public  PK.BCURVE.fit_eval_type_t eval_type;</PRE>
+<PRE><A NAME="50422208_pgfId-285429"></A>      // This is the field that differs from the _t struct</PRE>
+<PRE><A NAME="50422208_pgfId-285430"></A>      public  IntPtr eval_fn;</PRE>
+<PRE><A NAME="50422208_pgfId-285431"></A>      public  PK.BCURVE.fit_eval_data_t eval_data;</PRE>
+<PRE><A NAME="50422208_pgfId-285432"></A>      public  PK.BCURVE.fit_err_method_t err_method;</PRE>
+<PRE><A NAME="50422208_pgfId-285433"></A>      public  PK.LOGICAL_t rational;</PRE>
+<PRE><A NAME="50422208_pgfId-285434"></A>      // Constructor that takes a _t struct</PRE>
+<PRE><A NAME="50422208_pgfId-285435"></A>      public fit_data_v( fit_data_t arg)</PRE>
+<PRE><A NAME="50422208_pgfId-285436"></A>      { this.eval_type = arg.eval_type;</PRE>
+<PRE><A NAME="50422208_pgfId-285437"></A>        // Avoid asking M.GFPFD to process NULL</PRE>
+<PRE><A NAME="50422208_pgfId-285438"></A>        this.eval_fn = ((arg.eval_fn == null) ? </PRE>
+<PRE><A NAME="50422208_pgfId-285439"></A>          (IntPtr)0 : </PRE>
+<PRE><A NAME="50422208_pgfId-285440"></A>          Marshal.GetFunctionPointerForDelegate( arg.eval_fn));</PRE>
+<PRE><A NAME="50422208_pgfId-285441"></A>        this.eval_data = arg.eval_data;</PRE>
+<PRE><A NAME="50422208_pgfId-285442"></A>        this.err_method = arg.err_method;</PRE>
+<PRE><A NAME="50422208_pgfId-285443"></A>        this.rational = arg.rational;</PRE>
+<PRE><A NAME="50422208_pgfId-285444"></A>      }</PRE>
+<PRE><A NAME="50422208_pgfId-285445"></A>      // Dummy-arg constructor for _v struct</PRE>
+<PRE><A NAME="50422208_pgfId-285446"></A>      public fit_data_v( bool dummy): </PRE>
+<PRE><A NAME="50422208_pgfId-285447"></A>        this( new fit_data_t( </PRE>
+<PRE><A NAME="50422208_pgfId-285448"></A>        PK.BCURVE.fit_eval_type_t.chain_c, </PRE>
+<PRE><A NAME="50422208_pgfId-285449"></A>        null, </PRE>
+<PRE><A NAME="50422208_pgfId-285450"></A>        new PK.BCURVE.fit_eval_data_t(true), </PRE>
+<PRE><A NAME="50422208_pgfId-285451"></A>        PK.BCURVE.fit_err_method_t.parm_c, </PRE>
+<PRE><A NAME="50422208_pgfId-285452"></A>        PK.LOGICAL_t.@false))</PRE>
+<PRE><A NAME="50422208_pgfId-285453"></A>      {} // empty constructor body</PRE>
+<PRE><A NAME="50422208_pgfId-285454"></A>      // Operator to make an _t struct from an _v struct </PRE>
+<PRE><A NAME="50422208_pgfId-285455"></A>      public static implicit operator fit_data_t( fit_data_v arg)</PRE>
+<PRE><A NAME="50422208_pgfId-285456"></A>      { fit_data_t __ret;</PRE>
+<PRE><A NAME="50422208_pgfId-285457"></A>        __ret.eval_type = arg.eval_type;</PRE>
+<PRE><A NAME="50422208_pgfId-285458"></A>        // Be careful with zeroes and nulls</PRE>
+<PRE><A NAME="50422208_pgfId-285459"></A>        if( arg.eval_fn == (IntPtr)0)</PRE>
+<PRE><A NAME="50422208_pgfId-285460"></A>          {</PRE>
+<PRE><A NAME="50422208_pgfId-285461"></A>          __ret.eval_fn = null;</PRE>
+<PRE><A NAME="50422208_pgfId-285462"></A>          }</PRE>
+<PRE><A NAME="50422208_pgfId-285463"></A>        else</PRE>
+<PRE><A NAME="50422208_pgfId-285464"></A>          {</PRE>
+<PRE><A NAME="50422208_pgfId-285465"></A>          __ret.eval_fn = null;</PRE>
+<PRE><A NAME="50422208_pgfId-285466"></A>          __ret.eval_fn = (PK.BCURVE.fit_eval_f_t)</PRE>
+<PRE><A NAME="50422208_pgfId-285467"></A>            Marshal.GetDelegateForFunctionPointer( </PRE>
+<PRE><A NAME="50422208_pgfId-285468"></A>            arg.eval_fn, __ret.eval_fn.GetType());</PRE>
+<PRE><A NAME="50422208_pgfId-285469"></A>          }</PRE>
+<PRE><A NAME="50422208_pgfId-285470"></A>        __ret.eval_data = arg.eval_data;</PRE>
+<PRE><A NAME="50422208_pgfId-285471"></A>        __ret.err_method = arg.err_method;</PRE>
+<PRE><A NAME="50422208_pgfId-285472"></A>        __ret.rational = arg.rational;</PRE>
+<PRE><A NAME="50422208_pgfId-285473"></A>        return __ret;</PRE>
+<PRE><A NAME="50422208_pgfId-285474"></A>      }  // Close constructor body</PRE>
+<PRE><A NAME="50422208_pgfId-285475"></A>    };   // Close struct declaration</PRE>
+<PRE><A NAME="50422208_pgfId-285476"></A>  };     // Close partial class</PRE>
+<PRE><A NAME="50422208_pgfId-285477"></A>};       // Close namespace</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285480"></A>Figure C-6 <A NAME="50422208_45812"></A>C# structure PK.BCURVE.fit_data_v with its constructors</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285482"></A>This _v struct is the same as PK.BCURVE.fit_data_t except that the <CODE>
+eval_fn</CODE>
+ field is an IntPtr rather than a delegate type. The first constructor takes a _t struct and makes an _v struct out of it; note that one has to avoid passing null into the Marshal function that extracts a function pointer from a delegate.</P>
+<P>
+<A NAME="50422208_pgfId-285483"></A>The second constructor makes a _t struct, using values from the C macro, and then makes a _v struct from it, using the first constructor. You may have noticed that the second constructor could have been written using the PK.BCURVE.fit_data_t(bool) constructor; this is the kind of optimisation that is much harder to do in automatically generated code than in code written by hand. </P>
+<P>
+<A NAME="50422208_pgfId-285484"></A>The third constructor makes a fit_data_t struct out of a fit_data_v struct.</P>
+<P>
+<A NAME="50422208_pgfId-285485"></A>The following structures have _v versions:</P>
+<P>
+<A NAME="50422208_pgfId-325963"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285488"></A>_t version (C)</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285490"></A>_v version (C#)</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367941"></A><A HREF=../headers/pk_attdef_callback_fns_t.html>PK_ATTDEF_callback_fns_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367943"></A>PK.ATTDEF.callback_fns_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367945"></A><A HREF=../headers/pk_bcurve_create_fitted_o_t.html>PK_BCURVE_create_fitted_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367947"></A>PK.BCURVE.create_fitted_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367949"></A><A HREF=../headers/pk_bcurve_fit_data_t.html>PK_BCURVE_fit_data_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367951"></A>PK.BCURVE.fit_data_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-375172"></A><A HREF=../headers/pk_blend_fix_propagate_t.html>PK_blend_fix_propagate_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-375170"></A>PK.blend_fix_propagate_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367953"></A><A HREF=../headers/pk_body_fix_blends_o_t.html>PK_BODY_fix_blends_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367955"></A>PK.BODY.fix_blends_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367957"></A><A HREF=../headers/pk_body_hollow_o_t.html>PK_BODY_hollow_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367959"></A>PK.BODY.hollow_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-395912"></A><A HREF=../headers/pk_body_make_patterned_o_t.html>PK_BODY_make_patterned_o_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-395914"></A>PK.BODY.make_patterened_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367961"></A><A HREF=../headers/pk_bsurf_create_fitted_o_t.html>PK_BSURF_create_fitted_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367963"></A>PK.BSURF.create_fitted_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367965"></A><A HREF=../headers/pk_curve_general_user_t.html>PK_CURVE_general_user_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367967"></A>PK.CURVE.general_user_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367969"></A><A HREF=../headers/pk_curve_general_t.html>PK_CURVE_general_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367971"></A>PK.CURVE.general_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367973"></A><A HREF=../headers/pk_error_frustrum_t.html>PK_ERROR_frustrum_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367975"></A>PK.ERROR.frustrum_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367977"></A><A HREF=../headers/pk_face_change_data_deform_t.html>PK_FACE_change_data_deform_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-367979"></A>PK.FACE.change_data_deform_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368210"></A><A HREF=../headers/pk_face_change_o_t.html>PK_FACE_change_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368212"></A>PK.FACE.change_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368206"></A><A HREF=../headers/pk_face_details_hole_o_t.html>PK_FACE_details_hole_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368208"></A>PK.FACE.details_hole_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-382559"></A><A HREF=../headers/pk_lattice_create_by_graph_o_t.html>PK_LATTICE_create_by_graph_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-382561"></A>PK.LATTICE.create_by_graph_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-395846"></A><A HREF=../headers/pk_lattice_make_patterned_o_t.html>PK_LATTICE_make_patterned_o_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-395848"></A>PK.LATTICE.make_patterned_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368202"></A><A HREF=../headers/pk_mark_frustrum_t.html>PK_MARK_frustrum_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368204"></A>PK.MARK.frustrum_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368198"></A><A HREF=../headers/pk_memory_frustrum_t.html>PK_MEMORY_frustrum_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368200"></A>PK.MEMORY.frustrum_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368194"></A><A HREF=../headers/pk_mesh_create_from_facets_o_t.html>PK_MESH_create_from_facets_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368196"></A>PK.MESH.create_from_facets_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368190"></A><A HREF=../headers/pk_mesh_imprint_vectors_o_t.html>PK_MESH_imprint_vectors_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368192"></A>PK.MESH.imprint_vectors_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368186"></A><A HREF=../headers/pk_mfacet_find_perimeters_o_t.html>PK_MFACET_find_perimeters_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368188"></A>PK.MFACET.find_perimeters_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368182"></A><A HREF=../headers/pk_mtopol_make_meshes_o_t.html>PK_MTOPOL_make_meshes_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368184"></A>PK.MTOPOL.make_meshes_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368178"></A><A HREF=../headers/pk_partition_make_pmark_o_t.html>PK_PARTITION_make_pmark_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368180"></A>PK.PARTITION.make_pmark_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368174"></A><A HREF=../headers/pk_partition_receive_deltas_o_t.html>PK_PARTITION_receive_deltas_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368176"></A>PK.PARTITION.receive_deltas_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368170"></A><A HREF=../headers/pk_partition_receive_o_t.html>PK_PARTITION_receive_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368172"></A>PK.PARTITION.receive_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368166"></A><A HREF=../headers/pk_pmark_goto_o_t.html>PK_PMARK_goto_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368168"></A>PK.PMARK.goto_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-395776"></A><A HREF=../headers/pk_pattern_callback_t.html>PK_pattern_callback_t</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-395778"></A>PK.pattern_callback_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368162"></A><A HREF=../headers/pk_session_applio_t.html>PK_SESSION_applio_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368164"></A>PK.SESSION.applio_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368158"></A><A HREF=../headers/pk_session_ask_fru_o_t.html>PK_SESSION_ask_fru_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368160"></A>PK.SESSION.ask_fru_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368154"></A><A HREF=../headers/pk_session_frustrum_t.html>PK_SESSION_frustrum_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368156"></A>PK.SESSION.frustrum_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368150"></A><A HREF=../headers/pk_session_indexio_t.html>PK_SESSION_indexio_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368152"></A>PK.SESSION.indexio_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368146"></A><A HREF=../headers/pk_session_register_fru_o_t.html>PK_SESSION_register_fru_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368148"></A>PK.SESSION.register_fru_o_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368142"></A><A HREF=../headers/pk_surf_general_user_t.html>PK_SURF_general_user_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368144"></A>PK.SURF.general_user_v</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368138"></A><A HREF=../headers/pk_topol_facet_choice_2_o_t.html>PK_TOPOL_facet_choice_2_o_t</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-368140"></A>PK.TOPOL.facet_choice_2_o_v</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422208_pgfId-285585"></A>C.3	Arrays 
+
+
+</H1>
+<P>
+<A NAME="50422208_pgfId-285586"></A>C# arrays are rather different from C arrays, which means that special measures are required to handle the arrays included in many of Parasolid’s C structs. One-dimensional, fixed-size arrays of basic C# value types (<CODE>
+byte</CODE>
+, <CODE>
+short</CODE>
+, <CODE>
+int</CODE>
+, <CODE>
+long</CODE>
+, <CODE>
+char</CODE>
+, <CODE>
+sbyte</CODE>
+, <CODE>
+ushort</CODE>
+, <CODE>
+uint</CODE>
+, <CODE>
+ulong</CODE>
+, <CODE>
+float</CODE>
+ and <CODE>
+double</CODE>
+) use the <CODE>
+fixed</CODE>
+ keyword, and references to them need special handling. All two-dimensional arrays, and arrays of non-basic types have to be expanded into several separate scalar values.</P>
+
+<H3>
+<A NAME="50422208_pgfId-285587"></A>	C.3.1 	Arrays using the keyword “fixed” </H3>
+<P>
+<A NAME="50422208_pgfId-285588"></A><A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A> provides a simple example. The C version of this struct is: </P>
+<P>
+<A NAME="50422208_pgfId-285598"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285591"></A><STRONG>struct</STRONG> PK_INTERVAL_s </PRE>
+<PRE><A NAME="50422208_pgfId-285592"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285593"></A>  <STRONG>double</STRONG> value[2];</PRE>
+<PRE><A NAME="50422208_pgfId-285594"></A>};</PRE>
+<PRE><A NAME="50422208_pgfId-285595"></A><STRONG>typedef struct</STRONG> PK_INTERVAL_s <A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>;</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285597"></A>Figure C-7 <A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A> structure in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285599"></A>The C# version, PK.INTERVAL_t, is declared in the .NET binding with its constructors as: </P>
+<P>
+<A NAME="50422208_pgfId-285633"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285602"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285603"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285604"></A>  [StructLayout(LayoutKind.Sequential)]</PRE>
+<PRE><A NAME="50422208_pgfId-285605"></A>  <STRONG>public unsafe struct</STRONG> INTERVAL_t</PRE>
+<PRE><A NAME="50422208_pgfId-285606"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285607"></A>    <STRONG>public fixed double</STRONG> value[2];</PRE>
+<PRE><A NAME="50422208_pgfId-285608"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285609"></A>    // <EM>Basic constructor, taking an array</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285610"></A>    <STRONG>public</STRONG> INTERVAL_t</PRE>
+<PRE><A NAME="50422208_pgfId-285611"></A>    (</PRE>
+<PRE><A NAME="50422208_pgfId-285612"></A>    <STRONG>double</STRONG> []value</PRE>
+<PRE><A NAME="50422208_pgfId-285613"></A>    )</PRE>
+<PRE><A NAME="50422208_pgfId-285614"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-285615"></A>      <STRONG>fixed</STRONG>( double *a = this.value) a[0] = value[0];</PRE>
+<PRE><A NAME="50422208_pgfId-285616"></A>      <STRONG>fixed</STRONG>( double *a = this.value) a[1] = value[1];</PRE>
+<PRE><A NAME="50422208_pgfId-285617"></A>    }</PRE>
+<PRE><A NAME="50422208_pgfId-285618"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285619"></A>    // <EM>Extra constructor, taking arrays as multiple values</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285620"></A>    <STRONG>public</STRONG> INTERVAL_t</PRE>
+<PRE><A NAME="50422208_pgfId-285621"></A>    (</PRE>
+<PRE><A NAME="50422208_pgfId-285622"></A>    <STRONG>double</STRONG> valueI0,</PRE>
+<PRE><A NAME="50422208_pgfId-285623"></A>    <STRONG>double</STRONG> valueI1</PRE>
+<PRE><A NAME="50422208_pgfId-285624"></A>    )</PRE>
+<PRE><A NAME="50422208_pgfId-285625"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-285626"></A>      <STRONG>fixed</STRONG>( double *a = this.value) a[0] = valueI0;</PRE>
+<PRE><A NAME="50422208_pgfId-285627"></A>      <STRONG>fixed</STRONG>( double *a = this.value) a[1] = valueI1;</PRE>
+<PRE><A NAME="50422208_pgfId-285628"></A>    }</PRE>
+<PRE><A NAME="50422208_pgfId-285629"></A>  }  // <EM>Close structure</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285630"></A>};   // <EM>Close namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285632"></A>Figure C-8 <A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A> structure with its constructors in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285634"></A>This has the same array of two doubles, called “value“, but it has the <CODE>
+fixed</CODE>
+ prefix on its declaration, and <CODE>
+fixed()</CODE>
+ statements have to be used to access its elements.</P>
+
+
+<H3>
+<A NAME="50422208_pgfId-285635"></A>	C.3.2 	Arrays as multiple values </H3>
+<P>
+<A NAME="50422208_pgfId-285636"></A>The only example of a two-dimensional array in the PK interface is PK_TRANS_sf_t. The C# version provided in the binding, PK.TRANSF_sf_t, is, with abbreviated versions of its constructor:</P>
+<P>
+<A NAME="50422208_pgfId-285682"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285639"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285640"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285641"></A>  [StructLayout(LayoutKind.Sequential)]</PRE>
+<PRE><A NAME="50422208_pgfId-285642"></A>  <STRONG>public unsafe struct</STRONG> TRANSF_sf_t</PRE>
+<PRE><A NAME="50422208_pgfId-285643"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285644"></A>    <STRONG>public double</STRONG> matrixI0J0;</PRE>
+<PRE><A NAME="50422208_pgfId-285645"></A>    <STRONG>public double</STRONG> matrixI0J1;</PRE>
+<PRE><A NAME="50422208_pgfId-285646"></A>    <STRONG>public double</STRONG> matrixI0J2;</PRE>
+<PRE><A NAME="50422208_pgfId-285647"></A>    <STRONG>public double</STRONG> matrixI0J3;</PRE>
+<PRE><A NAME="50422208_pgfId-285648"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI1J0;</PRE>
+<PRE><A NAME="50422208_pgfId-285649"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI1J1;</PRE>
+<PRE><A NAME="50422208_pgfId-285650"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI1J2;</PRE>
+<PRE><A NAME="50422208_pgfId-285651"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI1J3;</PRE>
+<PRE><A NAME="50422208_pgfId-285652"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI2J0;</PRE>
+<PRE><A NAME="50422208_pgfId-285653"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI2J1;</PRE>
+<PRE><A NAME="50422208_pgfId-285654"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI2J2;</PRE>
+<PRE><A NAME="50422208_pgfId-285655"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI2J3;</PRE>
+<PRE><A NAME="50422208_pgfId-285656"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI3J0;</PRE>
+<PRE><A NAME="50422208_pgfId-285657"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI3J1;</PRE>
+<PRE><A NAME="50422208_pgfId-285658"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI3J2;</PRE>
+<PRE><A NAME="50422208_pgfId-285659"></A>    <STRONG>public</STRONG> <STRONG>double</STRONG> matrixI3J3;</PRE>
+<PRE><A NAME="50422208_pgfId-285660"></A>    // <EM>Constructor (abbreviated)</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285661"></A>    <STRONG>public</STRONG> TRANSF_sf_t</PRE>
+<PRE><A NAME="50422208_pgfId-285662"></A>    (</PRE>
+<PRE><A NAME="50422208_pgfId-285663"></A>    <STRONG>double</STRONG> matrixI0J0,</PRE>
+<PRE><A NAME="50422208_pgfId-285664"></A>    <STRONG>double</STRONG> matrixI0J1,</PRE>
+<PRE><A NAME="50422208_pgfId-285665"></A>    <STRONG>double</STRONG> matrixI0J2,</PRE>
+<PRE><A NAME="50422208_pgfId-285666"></A>    <STRONG>double</STRONG> matrixI0J3,</PRE>
+<PRE><A NAME="50422208_pgfId-285667"></A>    <STRONG>double</STRONG> matrixI1J0,</PRE>
+<PRE><A NAME="50422208_pgfId-285668"></A>    ...</PRE>
+<PRE><A NAME="50422208_pgfId-285669"></A>    <STRONG>double</STRONG> matrixI3J3</PRE>
+<PRE><A NAME="50422208_pgfId-285670"></A>    )</PRE>
+<PRE><A NAME="50422208_pgfId-285671"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-285672"></A>      this.matrixI0J0 = matrixI0J0;</PRE>
+<PRE><A NAME="50422208_pgfId-285673"></A>      this.matrixI0J1 = matrixI0J1;</PRE>
+<PRE><A NAME="50422208_pgfId-285674"></A>      ...</PRE>
+<PRE><A NAME="50422208_pgfId-285675"></A>      this.matrixI3J2 = matrixI3J2;</PRE>
+<PRE><A NAME="50422208_pgfId-285676"></A>      this.matrixI3J3 = matrixI3J3;</PRE>
+<PRE><A NAME="50422208_pgfId-285677"></A>    }</PRE>
+<PRE><A NAME="50422208_pgfId-285678"></A>  };</PRE>
+<PRE><A NAME="50422208_pgfId-285679"></A>}; // <EM>Close namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285681"></A>Figure C-9 PK.TRANSF_sf_t structure with abbreviated versions of its constructors in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285683"></A>This struct simply has sixteen doubles in place of a 4x4 array. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422208_pgfId-285684"></A>C.4	Unions 
+
+
+</H1>
+<P>
+<A NAME="50422208_pgfId-285685"></A>The Parasolid C interface uses unions within C structs, as follows:</P>
+<P>
+<A NAME="50422208_pgfId-285701"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285688"></A><STRONG>struct</STRONG> PK_CURVE_general_s</PRE>
+<PRE><A NAME="50422208_pgfId-285689"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285690"></A>  <A HREF=../headers/pk_curve_general_type_t.html>PK_CURVE_general_type_t</A> type;</PRE>
+<PRE><A NAME="50422208_pgfId-285691"></A>  <STRONG>union</STRONG></PRE>
+<PRE><A NAME="50422208_pgfId-285692"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285693"></A>    <A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>              parasolid_curve;</PRE>
+<PRE><A NAME="50422208_pgfId-285694"></A>    <A HREF=../headers/pk_curve_general_user_t.html>PK_CURVE_general_user_t</A> user_curve;</PRE>
+<PRE><A NAME="50422208_pgfId-285695"></A>  } curve;</PRE>
+<PRE><A NAME="50422208_pgfId-285696"></A>};</PRE>
+<PRE><A NAME="50422208_pgfId-285697"></A><STRONG></STRONG>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285698"></A><STRONG>typedef struct</STRONG> PK_CURVE_general_s <A HREF=../headers/pk_curve_general_t.html>PK_CURVE_general_t</A>;</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285700"></A>Figure C-10 Example of a union within a struct in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285702"></A>The .NET binding does not support using unions within structs. Instead, it provides a separate struct, with field offset attributes, to support the same semantics: </P>
+<P>
+<A NAME="50422208_pgfId-285729"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285705"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285706"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285707"></A>  <STRONG>public unsafe partial</STRONG> class CURVE</PRE>
+<PRE><A NAME="50422208_pgfId-285708"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285709"></A>    [StructLayout(LayoutKind.Explicit)]</PRE>
+<PRE><A NAME="50422208_pgfId-285710"></A>    <STRONG>public unsafe struct</STRONG> general_subunion001_t</PRE>
+<PRE><A NAME="50422208_pgfId-285711"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-285712"></A>      [FieldOffset(0)] public PK.CURVE_t parasolid_curve;</PRE>
+<PRE><A NAME="50422208_pgfId-285713"></A>      [FieldOffset(0)] public PK.CURVE.general_user_v</PRE>
+<PRE><A NAME="50422208_pgfId-285714"></A>                                                   user_curve;</PRE>
+<PRE><A NAME="50422208_pgfId-285715"></A>      // <EM>Union constructors ...</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285716"></A>    };</PRE>
+<PRE><A NAME="50422208_pgfId-285717"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285718"></A>    [StructLayout(LayoutKind.Sequential)]</PRE>
+<PRE><A NAME="50422208_pgfId-285719"></A>    <STRONG>public unsafe struct</STRONG> general_t</PRE>
+<PRE><A NAME="50422208_pgfId-285720"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-285721"></A>      <STRONG>public</STRONG> PK.CURVE.general_type_t type;</PRE>
+<PRE><A NAME="50422208_pgfId-285722"></A>      <STRONG>public</STRONG> PK.CURVE.general_subunion001_t curve;</PRE>
+<PRE><A NAME="50422208_pgfId-285723"></A>      // <EM>Struct constructors ...</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285724"></A>    };</PRE>
+<PRE><A NAME="50422208_pgfId-285725"></A>  };</PRE>
+<PRE><A NAME="50422208_pgfId-285726"></A>};</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285728"></A>Figure C-11 Equivalent of a union within a struct in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285730"></A>The “subunion001“ suffix in the name simply indicates that this is an automatically created sub-union, and that the binding generator allows for many such sub-unions in a single C struct.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422208_pgfId-285732"></A>C.5	<A NAME="50422208_89062"></A>Applio 
+
+
+</H1>
+<P>
+<A NAME="50422208_pgfId-285733"></A>The <A HREF=../headers/pk_session_applio_t.html>PK_SESSION_applio_t</A> struct is quite complex. The C# version requires the creation of delegate types and the use of a _v struct. The C struct is:</P>
+<P>
+<A NAME="50422208_pgfId-285769"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285736"></A><STRONG>typedef struct</STRONG> PK_SESSION_applio_s</PRE>
+<PRE><A NAME="50422208_pgfId-285737"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285738"></A>  <STRONG>int</STRONG> (*open_rd)    (<STRONG>int</STRONG> keylen, <STRONG>const</STRONG> <STRONG>char</STRONG>* key, <STRONG>int</STRONG> *strid);</PRE>
+<PRE><A NAME="50422208_pgfId-285739"></A>  <STRONG>int</STRONG> (*open_wr)    (<STRONG>int</STRONG> keylen, <STRONG>const</STRONG> <STRONG>char</STRONG>* key, <STRONG>int</STRONG> *strid);</PRE>
+<PRE><A NAME="50422208_pgfId-285740"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285741"></A>  <STRONG>int</STRONG> (*rd_chars)   (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>char</STRONG> *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285742"></A>  <STRONG>int</STRONG> (*rd_bytes)   (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>unsigned</STRONG> <STRONG>char</STRONG> *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285743"></A>  <STRONG>int</STRONG> (*rd_shorts)  (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>short</STRONG> *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285744"></A>  <STRONG>int</STRONG> (*rd_ints)    (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>int</STRONG> *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285745"></A>  <STRONG>int</STRONG> (*rd_doubles) (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>double</STRONG> *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285746"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285747"></A>  <STRONG>int</STRONG> (*wr_chars)   (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>const</STRONG> <STRONG>char</STRONG> *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285748"></A>  <STRONG>int</STRONG> (*wr_bytes)   (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>const</STRONG> <STRONG>unsigned</STRONG> char</PRE>
+<PRE><A NAME="50422208_pgfId-285749"></A>                                                        *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285750"></A>  <STRONG>int</STRONG> (*wr_shorts)  (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>const</STRONG> <STRONG>short</STRONG> *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285751"></A>  <STRONG>int</STRONG> (*wr_ints)    (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>const</STRONG> <STRONG>int</STRONG> *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285752"></A>  <STRONG>int</STRONG> (*wr_doubles) (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> n, <STRONG>const</STRONG> <STRONG>double</STRONG> *data);</PRE>
+<PRE><A NAME="50422208_pgfId-285753"></A>  </PRE>
+<PRE><A NAME="50422208_pgfId-285754"></A>  <STRONG>int</STRONG> (*close)      (<STRONG>int</STRONG> strid, <STRONG>int</STRONG> abort);</PRE>
+<PRE><A NAME="50422208_pgfId-285755"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285756"></A>  <STRONG>int</STRONG> (*open_uc_rd) (<STRONG>const</STRONG> <A HREF=../headers/pk_uchar_t.html>PK_UCHAR_t</A> *key, <STRONG>int</STRONG> *strid);</PRE>
+<PRE><A NAME="50422208_pgfId-285757"></A>  <STRONG>int</STRONG> (*open_uc_wr) (<STRONG>const</STRONG> <A HREF=../headers/pk_uchar_t.html>PK_UCHAR_t</A> *key, <STRONG>int</STRONG> *strid);</PRE>
+<PRE><A NAME="50422208_pgfId-285758"></A>  <STRONG>int</STRONG> (*open_rd_2)</PRE>
+<PRE><A NAME="50422208_pgfId-285759"></A>       (<STRONG>int</STRONG> guise, <STRONG>int</STRONG> keylen, <STRONG>const</STRONG> char* key, <STRONG>int</STRONG> *strid);</PRE>
+<PRE><A NAME="50422208_pgfId-285760"></A>  <STRONG>int</STRONG> (*open_wr_2) </PRE>
+<PRE><A NAME="50422208_pgfId-285761"></A>       (<STRONG>int</STRONG> guise, <STRONG>int</STRONG> keylen, <STRONG>const</STRONG> char* key, <STRONG>int</STRONG> *strid);</PRE>
+<PRE><A NAME="50422208_pgfId-285762"></A>  <STRONG>int</STRONG> (*open_uc_rd_2)</PRE>
+<PRE><A NAME="50422208_pgfId-285763"></A>        (<STRONG>int</STRONG> guise, <STRONG>const</STRONG> <A HREF=../headers/pk_uchar_t.html>PK_UCHAR_t</A> *key, <STRONG>int</STRONG> *strid); </PRE>
+<PRE><A NAME="50422208_pgfId-285764"></A>  <STRONG>int</STRONG> (*open_uc_wr_2)</PRE>
+<PRE><A NAME="50422208_pgfId-285765"></A>        (<STRONG>int</STRONG> guise, <STRONG>const</STRONG> <A HREF=../headers/pk_uchar_t.html>PK_UCHAR_t</A> *key, <STRONG>int</STRONG> *strid); </PRE>
+<PRE><A NAME="50422208_pgfId-285766"></A>} <A HREF=../headers/pk_session_applio_t.html>PK_SESSION_applio_t</A>;</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285768"></A>Figure C-12 <A HREF=../headers/pk_session_applio_t.html>PK_SESSION_applio_t</A> structure in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285770"></A>The C# declaration of this struct, provided for your use in the binding, creates delegate types first, and then declares the struct and its _v variant: </P>
+<P>
+<A NAME="50422208_pgfId-285820"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285773"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285774"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285775"></A>  <STRONG>public unsafe partial class</STRONG> SESSION</PRE>
+<PRE><A NAME="50422208_pgfId-285776"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285777"></A>    [UnmanagedFunctionPointerAttribute( CallingConvention.Cdecl)]</PRE>
+<PRE><A NAME="50422208_pgfId-285778"></A>    <STRONG>public unsafe delegate int</STRONG> applio_open_rd_t</PRE>
+<PRE><A NAME="50422208_pgfId-285779"></A>    (</PRE>
+<PRE><A NAME="50422208_pgfId-285780"></A>    <STRONG>int</STRONG>   arg001,</PRE>
+<PRE><A NAME="50422208_pgfId-285781"></A>    <STRONG>byte</STRONG>* arg002,</PRE>
+<PRE><A NAME="50422208_pgfId-285782"></A>    <STRONG>int</STRONG>*  arg003</PRE>
+<PRE><A NAME="50422208_pgfId-285783"></A>    );</PRE>
+<PRE><A NAME="50422208_pgfId-285784"></A>    <STRONG>public static readonly</STRONG> applio_open_rd_t applio_open_rd_t_null = null;</PRE>
+<PRE><A NAME="50422208_pgfId-285785"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285786"></A>    [UnmanagedFunctionPointerAttribute( CallingConvention.Cdecl)]</PRE>
+<PRE><A NAME="50422208_pgfId-285787"></A>    <STRONG>public unsafe delegate int</STRONG> applio_open_wr_t</PRE>
+<PRE><A NAME="50422208_pgfId-285788"></A>    (</PRE>
+<PRE><A NAME="50422208_pgfId-285789"></A>    <STRONG>int</STRONG>   arg001,</PRE>
+<PRE><A NAME="50422208_pgfId-285790"></A>    <STRONG>byte</STRONG>* arg002,</PRE>
+<PRE><A NAME="50422208_pgfId-285791"></A>    <STRONG>int</STRONG>*  arg003</PRE>
+<PRE><A NAME="50422208_pgfId-285792"></A>    );</PRE>
+<PRE><A NAME="50422208_pgfId-285793"></A>    <STRONG>public static readonly</STRONG> applio_open_wr_t applio_open_wr_t_null = null;</PRE>
+<PRE><A NAME="50422208_pgfId-285794"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285795"></A>    // <EM>... Etcetera</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285796"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285797"></A>    [StructLayout(LayoutKind.Sequential)]</PRE>
+<PRE><A NAME="50422208_pgfId-285798"></A>    <STRONG>public unsafe struct</STRONG> applio_t</PRE>
+<PRE><A NAME="50422208_pgfId-285799"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-285800"></A>      <STRONG>public</STRONG> PK.SESSION.applio_open_rd_t open_rd;</PRE>
+<PRE><A NAME="50422208_pgfId-285801"></A>      <STRONG>public</STRONG> PK.SESSION.applio_open_wr_t open_wr;</PRE>
+<PRE><A NAME="50422208_pgfId-285802"></A>      <STRONG>public</STRONG> PK.SESSION.applio_rd_chars_t rd_chars;</PRE>
+<PRE><A NAME="50422208_pgfId-285803"></A>      <STRONG>public</STRONG> PK.SESSION.applio_rd_bytes_t rd_bytes;</PRE>
+<PRE><A NAME="50422208_pgfId-285804"></A>      <STRONG>public</STRONG> PK.SESSION.applio_rd_shorts_t rd_shorts;</PRE>
+<PRE><A NAME="50422208_pgfId-285805"></A>      <STRONG>public</STRONG> PK.SESSION.applio_rd_ints_t rd_ints;</PRE>
+<PRE><A NAME="50422208_pgfId-285806"></A>      <STRONG>public</STRONG> PK.SESSION.applio_rd_doubles_t rd_doubles;</PRE>
+<PRE><A NAME="50422208_pgfId-285807"></A>      <STRONG>public</STRONG> PK.SESSION.applio_wr_chars_t wr_chars;</PRE>
+<PRE><A NAME="50422208_pgfId-285808"></A>      <STRONG>public</STRONG> PK.SESSION.applio_wr_bytes_t wr_bytes;</PRE>
+<PRE><A NAME="50422208_pgfId-285809"></A>      <STRONG>public</STRONG> PK.SESSION.applio_wr_shorts_t wr_shorts;</PRE>
+<PRE><A NAME="50422208_pgfId-285810"></A>      <STRONG>public</STRONG> PK.SESSION.applio_wr_ints_t wr_ints;</PRE>
+<PRE><A NAME="50422208_pgfId-285811"></A>      <STRONG>public</STRONG> PK.SESSION.applio_wr_doubles_t wr_doubles;</PRE>
+<PRE><A NAME="50422208_pgfId-285812"></A>      <STRONG>public</STRONG> PK.SESSION.applio_close_t close;</PRE>
+<PRE><A NAME="50422208_pgfId-285813"></A>      <STRONG>public</STRONG> PK.SESSION.applio_open_uc_rd_t open_uc_rd;</PRE>
+<PRE><A NAME="50422208_pgfId-285814"></A>      <STRONG>public</STRONG> PK.SESSION.applio_open_uc_wr_t open_uc_wr;</PRE>
+<PRE><A NAME="50422208_pgfId-285815"></A>      <STRONG>public</STRONG> PK.SESSION.applio_open_rd_2_t open_rd_2;</PRE>
+<PRE><A NAME="50422208_pgfId-285816"></A>      <STRONG>public</STRONG> PK.SESSION.applio_open_wr_2_t open_wr_2;</PRE>
+<PRE><A NAME="50422208_pgfId-285817"></A>      <STRONG>public</STRONG> PK.SESSION.applio_open_uc_rd_2_t open_uc_rd_2;</PRE>
+<PRE><A NAME="50422208_pgfId-285818"></A>      <STRONG>public</STRONG> PK.SESSION.applio_open_uc_wr_2_t open_uc_wr_2;</PRE>
+<PRE><A NAME="50422208_pgfId-285819"></A>&nbsp;</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285875"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285823"></A>      // <EM>Constructor (abbreviated)</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285824"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285825"></A>      <STRONG>public</STRONG> applio_t</PRE>
+<PRE><A NAME="50422208_pgfId-285826"></A>      (</PRE>
+<PRE><A NAME="50422208_pgfId-285827"></A>      PK.SESSION.applio_open_rd_t    open_rd,</PRE>
+<PRE><A NAME="50422208_pgfId-285828"></A>      PK.SESSION.applio_open_wr_t    open_wr,</PRE>
+<PRE><A NAME="50422208_pgfId-285829"></A>      PK.SESSION.applio_rd_chars_t   rd_chars,</PRE>
+<PRE><A NAME="50422208_pgfId-285830"></A>      PK.SESSION.applio_rd_bytes_t   rd_bytes,</PRE>
+<PRE><A NAME="50422208_pgfId-285831"></A>      PK.SESSION.applio_rd_shorts_t  rd_shorts,</PRE>
+<PRE><A NAME="50422208_pgfId-285832"></A>      // ...</PRE>
+<PRE><A NAME="50422208_pgfId-285833"></A>      PK.SESSION.applio_open_uc_wr_t open_uc_wr</PRE>
+<PRE><A NAME="50422208_pgfId-285834"></A>      )</PRE>
+<PRE><A NAME="50422208_pgfId-285835"></A>      {</PRE>
+<PRE><A NAME="50422208_pgfId-285836"></A>        this.open_rd = open_rd;</PRE>
+<PRE><A NAME="50422208_pgfId-285837"></A>        this.open_wr = open_wr;</PRE>
+<PRE><A NAME="50422208_pgfId-285838"></A>        this.rd_chars = rd_chars;</PRE>
+<PRE><A NAME="50422208_pgfId-285839"></A>        this.rd_bytes = rd_bytes;</PRE>
+<PRE><A NAME="50422208_pgfId-285840"></A>        this.rd_shorts = rd_shorts;</PRE>
+<PRE><A NAME="50422208_pgfId-285841"></A>        // <EM>... etc.</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285842"></A>      } // <EM>End of constructor</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285843"></A>    }; // <EM>End of applio_t</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285844"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285845"></A>    [StructLayout(LayoutKind.Sequential)]</PRE>
+<PRE><A NAME="50422208_pgfId-285846"></A>    <STRONG>public unsafe struct</STRONG> applio_v</PRE>
+<PRE><A NAME="50422208_pgfId-285847"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-285848"></A>      <STRONG>public</STRONG> IntPtr open_rd;</PRE>
+<PRE><A NAME="50422208_pgfId-285849"></A>      <STRONG>public</STRONG> IntPtr open_wr;</PRE>
+<PRE><A NAME="50422208_pgfId-285850"></A>      <STRONG>public</STRONG> IntPtr rd_chars;</PRE>
+<PRE><A NAME="50422208_pgfId-285851"></A>      <STRONG>public</STRONG> IntPtr rd_bytes;</PRE>
+<PRE><A NAME="50422208_pgfId-285852"></A>      <STRONG>public</STRONG> IntPtr rd_shorts;</PRE>
+<PRE><A NAME="50422208_pgfId-285853"></A>      // <EM>... etc.</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285854"></A>      <STRONG>public</STRONG> IntPtr open_uc_wr;</PRE>
+<PRE><A NAME="50422208_pgfId-285855"></A>&nbsp;</PRE>
+<PRE><A NAME="50422208_pgfId-285856"></A>      // <EM>Constructor to make applio_v from applio_t (abbr’d)</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285857"></A>      <STRONG>public</STRONG> applio_v( applio_t arg )</PRE>
+<PRE><A NAME="50422208_pgfId-285858"></A>      {</PRE>
+<PRE><A NAME="50422208_pgfId-285859"></A>        // <EM>Avoid asking M.GFPFD to process NULL</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285860"></A>        this.open_rd = ((arg.open_rd == null) ? (IntPtr)0 : </PRE>
+<PRE><A NAME="50422208_pgfId-285861"></A>          Marshal.GetFunctionPointerForDelegate( arg.open_rd));</PRE>
+<PRE><A NAME="50422208_pgfId-285862"></A>        // <EM>Avoid asking M.GFPFD to process NULL</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285863"></A>        this.open_wr = ((arg.open_wr == null) ? (IntPtr)0 : </PRE>
+<PRE><A NAME="50422208_pgfId-285864"></A>          Marshal.GetFunctionPointerForDelegate( arg.open_wr));</PRE>
+<PRE><A NAME="50422208_pgfId-285865"></A>        // <EM>Avoid asking M.GFPFD to process NULL</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285866"></A>        this.rd_chars = ((arg.rd_chars == null) ? (IntPtr)0 : </PRE>
+<PRE><A NAME="50422208_pgfId-285867"></A>          Marshal.GetFunctionPointerForDelegate(arg.rd_chars));</PRE>
+<PRE><A NAME="50422208_pgfId-285868"></A>        // <EM>Etcetera</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285869"></A>      } // <EM>End of constructor</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285870"></A>    }   // <EM>End of applio_v</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285871"></A>  };    // <EM>Close class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285872"></A>};      // <EM>Close namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285874"></A>Figure C-13 <A HREF=../headers/pk_session_applio_t.html>PK_SESSION_applio_t</A> structure with _v variant in C#</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422208_pgfId-285876"></A>C.6	Functions 
+
+
+</H1>
+<P>
+<A NAME="50422208_pgfId-285877"></A>This section presents examples of how Parasolid functions are accessed by the .NET binding.</P>
+
+<H3>
+<A NAME="50422208_pgfId-285878"></A>	C.6.1 	Simple functions </H3>
+<P>
+<A NAME="50422208_pgfId-285879"></A>A standard PK function maps very simply onto a P/Invoke call. For example, <A HREF=../headers/pk_appitem_is.html>PK_APPITEM_is</A> is declared in C as:</P>
+<P>
+<A NAME="50422208_pgfId-285889"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285882"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> <A HREF=../headers/pk_appitem_is.html>PK_APPITEM_is</A></PRE>
+<PRE><A NAME="50422208_pgfId-285883"></A>(</PRE>
+<PRE><A NAME="50422208_pgfId-285884"></A><STRONG>int</STRONG>                 may_be_appitem, /*potential appitem */</PRE>
+<PRE><A NAME="50422208_pgfId-285885"></A><A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> *<STRONG>const</STRONG> is_appitem</PRE>
+<PRE><A NAME="50422208_pgfId-285886"></A>);</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285888"></A>Figure C-14 Declaration of <A HREF=../headers/pk_appitem_is.html>PK_APPITEM_is</A> in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285890"></A>The corresponding C# declaration for PK.APPITEM.@is, as provided in the binding, is:</P>
+<P>
+<A NAME="50422208_pgfId-285909"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285893"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285894"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285895"></A>  <STRONG>public unsafe partial class</STRONG> APPITEM</PRE>
+<PRE><A NAME="50422208_pgfId-285896"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285897"></A>    [DllImport(“pskernel.dll“,</PRE>
+<PRE><A NAME="50422208_pgfId-285898"></A>    CallingConvention = CallingConvention.Cdecl,</PRE>
+<PRE><A NAME="50422208_pgfId-285899"></A>    CharSet = CharSet.Ansi,</PRE>
+<PRE><A NAME="50422208_pgfId-285900"></A>    EntryPoint = “<A HREF=../headers/pk_appitem_is.html>PK_APPITEM_is</A>“)]</PRE>
+<PRE><A NAME="50422208_pgfId-285901"></A>    <STRONG>public static extern</STRONG> PK.ERROR.code_t @is(</PRE>
+<PRE><A NAME="50422208_pgfId-285902"></A>    <STRONG>int</STRONG>           may_be_appitem,</PRE>
+<PRE><A NAME="50422208_pgfId-285903"></A>    PK.LOGICAL_t *is_appitem</PRE>
+<PRE><A NAME="50422208_pgfId-285904"></A>    ); // <EM>End of function declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285905"></A>  };   // <EM>End of class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285906"></A>};     // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285908"></A>Figure C-15 Declaration of <A HREF=../headers/pk_appitem_is.html>PK_APPITEM_is</A> in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285910"></A>While this is rather longer than the C declaration, much of the extra text simply establishes the calling convention (“Cdecl“) and character set mapping (Windows ANSI) to be used. The rest connects the DLL name and entry point to the function being declared, and declares the arguments. The marshalling of C# arguments' data to C arguments is handled automatically by P/Invoke. </P>
+
+
+<H3>
+<A NAME="50422208_pgfId-285911"></A>	C.6.2 	Functions with array arguments </H3>
+<P>
+<A NAME="50422208_pgfId-285912"></A>.NET arrays are rather different from C arrays. In order to support both, functions with array arguments are overloaded: two versions are provided, one taking C-style arrays as pointers, and one taking .NET arrays. For example, <A HREF=../headers/pk_attrib_set_doubles.html>PK_ATTRIB_set_doubles</A> is declared in C as: </P>
+<P>
+<A NAME="50422208_pgfId-285924"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285915"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> <A HREF=../headers/pk_attrib_set_doubles.html>PK_ATTRIB_set_doubles</A></PRE>
+<PRE><A NAME="50422208_pgfId-285916"></A>(</PRE>
+<PRE><A NAME="50422208_pgfId-285917"></A><A HREF=../headers/pk_attrib_t.html>PK_ATTRIB_t</A>  attrib,       /* <EM>attribute</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285918"></A><STRONG>int</STRONG>          field_no,     /* <EM>field number (&gt;= 0)</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285919"></A><STRONG>int</STRONG>          n_doubles,    /* <EM>number of doubles (&gt;= 0)</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285920"></A><STRONG>const</STRONG> <STRONG>double</STRONG> doubles[]     /* <EM>doubles to set</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285921"></A>);</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285923"></A>Figure C-16 Declaration of <A HREF=../headers/pk_attrib_set_doubles.html>PK_ATTRIB_set_doubles</A> in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285925"></A>The two C# declarations provided in the .NET binding are: </P>
+<P>
+<A NAME="50422208_pgfId-285958"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285928"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285929"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285930"></A>  <STRONG>public unsafe partial class</STRONG> ATTRIB</PRE>
+<PRE><A NAME="50422208_pgfId-285931"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285932"></A>    [DllImport(“pskernel.dll“,</PRE>
+<PRE><A NAME="50422208_pgfId-285933"></A>    CallingConvention = CallingConvention.Cdecl,</PRE>
+<PRE><A NAME="50422208_pgfId-285934"></A>    CharSet = CharSet.Ansi,</PRE>
+<PRE><A NAME="50422208_pgfId-285935"></A>    EntryPoint = “<A HREF=../headers/pk_attrib_set_doubles.html>PK_ATTRIB_set_doubles</A>“)]</PRE>
+<PRE><A NAME="50422208_pgfId-285936"></A>    <STRONG>public static extern</STRONG> PK.ERROR.code_t set_doubles(</PRE>
+<PRE><A NAME="50422208_pgfId-285937"></A>    PK.ATTRIB_t attrib,</PRE>
+<PRE><A NAME="50422208_pgfId-285938"></A>    <STRONG>int</STRONG>         field_no,</PRE>
+<PRE><A NAME="50422208_pgfId-285939"></A>    <STRONG>int</STRONG>         n_doubles,</PRE>
+<PRE><A NAME="50422208_pgfId-285940"></A>    <STRONG>double</STRONG>      []doubles // <EM>Different to second declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285941"></A>    );</PRE>
+<PRE><A NAME="50422208_pgfId-285942"></A>    // <EM>Overloaded function, uses C-style instead </EM></PRE>
+<PRE><A NAME="50422208_pgfId-285943"></A><EM>    // of managed arrays</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285944"></A>    [DllImport(“pskernel.dll“,</PRE>
+<PRE><A NAME="50422208_pgfId-285945"></A>    CallingConvention = CallingConvention.Cdecl,</PRE>
+<PRE><A NAME="50422208_pgfId-285946"></A>    CharSet = CharSet.Ansi,</PRE>
+<PRE><A NAME="50422208_pgfId-285947"></A>    EntryPoint = “<A HREF=../headers/pk_attrib_set_doubles.html>PK_ATTRIB_set_doubles</A>“)]</PRE>
+<PRE><A NAME="50422208_pgfId-285948"></A>    <STRONG>public static extern</STRONG> PK.ERROR.code_t set_doubles(</PRE>
+<PRE><A NAME="50422208_pgfId-285949"></A>    PK.ATTRIB_t attrib</PRE>
+<PRE><A NAME="50422208_pgfId-285950"></A>    <STRONG>int</STRONG>         field_no,</PRE>
+<PRE><A NAME="50422208_pgfId-285951"></A>    <STRONG>int</STRONG>         n_doubles,</PRE>
+<PRE><A NAME="50422208_pgfId-285952"></A>    <STRONG>double</STRONG>      *doubles // <EM>Different to first declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285953"></A>    ); // <EM>End of function declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285954"></A>  };   // <EM>End of class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285955"></A>};     // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285957"></A>Figure C-17 Declarations of <A HREF=../headers/pk_attrib_set_doubles.html>PK_ATTRIB_set_doubles</A> in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285959"></A>The only difference between these two declarations is the last function argument, <CODE>
+doubles</CODE>
+, which is declared in one as <CODE>
+[]doubles</CODE>
+ and in the other as <CODE>
+*doubles</CODE>
+. The C# compiler selects whichever of these is appropriate for each call in your code. </P>
+<P>
+<A NAME="50422208_pgfId-285960"></A>For functions with several array arguments, the binding still only provides two versions: one with all array arguments as C-style arrays, and one with all .NET arrays. </P>
+
+
+<H3>
+<A NAME="50422208_pgfId-285961"></A>	C.6.3 	Functions with _v arguments </H3>
+<P>
+<A NAME="50422208_pgfId-285962"></A>Some functions require that their arguments are “_v” versions of structs. For example, <A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A> is declared in C as:</P>
+<P>
+<A NAME="50422208_pgfId-285973"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285965"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> <A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A></PRE>
+<PRE><A NAME="50422208_pgfId-285966"></A>(</PRE>
+<PRE><A NAME="50422208_pgfId-285967"></A>  <STRONG>const</STRONG> <A HREF=../headers/pk_bcurve_create_fitted_o_t.html>PK_BCURVE_create_fitted_o_t</A> *options,    /* <EM>options for fitting</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285968"></A>  <A HREF=../headers/pk_bcurve_t.html>PK_BCURVE_t</A>                 *<STRONG>const</STRONG> *bcurve,    /* <EM>B-curve fit to input</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285969"></A>  <A HREF=../headers/pk_bcurve_fitted_fault_t.html>PK_BCURVE_fitted_fault_t</A>    *<STRONG>const</STRONG> *fault      /* <EM>any faults found</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-285970"></A>);</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285972"></A>Figure C-18 Declaration of <A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A> in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285974"></A>The options structure <A HREF=../headers/pk_bcurve_create_fitted_o_t.html>PK_BCURVE_create_fitted_o_t</A> contains a function pointer, so the C# version of the structure must contain a delegate. That necessitates an _v version of the structure; so the C# declaration of the function, as provided in the binding, is: </P>
+<P>
+<A NAME="50422208_pgfId-285995"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-285977"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-285978"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-285979"></A>  <STRONG>public unsafe partial class</STRONG> BCURVE</PRE>
+<PRE><A NAME="50422208_pgfId-285980"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-285981"></A>    [DllImport(“pskernel.dll“,</PRE>
+<PRE><A NAME="50422208_pgfId-285982"></A>    CallingConvention = CallingConvention.Cdecl,</PRE>
+<PRE><A NAME="50422208_pgfId-285983"></A>    CharSet = CharSet.Ansi,</PRE>
+<PRE><A NAME="50422208_pgfId-285984"></A>    EntryPoint = “<A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A>“)]</PRE>
+<PRE><A NAME="50422208_pgfId-285985"></A>    <STRONG>public static extern</STRONG> PK.ERROR.code_t create_fitted(</PRE>
+<PRE><A NAME="50422208_pgfId-285986"></A>    // <EM>Note _v version of struct</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285987"></A>    PK.BCURVE.create_fitted_o_v *options,</PRE>
+<PRE><A NAME="50422208_pgfId-285988"></A>    PK.BCURVE_t                 *bcurve,</PRE>
+<PRE><A NAME="50422208_pgfId-285989"></A>    PK.BCURVE.fitted_fault_t    *fault</PRE>
+<PRE><A NAME="50422208_pgfId-285990"></A>    ); // <EM>End of function declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285991"></A>  };   // <EM>End of class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-285992"></A>};     // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-285994"></A>Figure C-19 Declaration of <A HREF=../headers/pk_bcurve_create_fitted.html>PK_BCURVE_create_fitted</A> in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-285996"></A>You must therefore create and initialise the _t structure first, create an _v structure from it, using the constructor supplied in the binding, and then take the address of that _v structure and pass it to the C# function. The C# versions of most structures can be passed by address without a problem: it is those that contain delegates that must be converted to _v versions.</P>
+
+
+<H3>
+<A NAME="50422208_pgfId-285998"></A>	C.6.4 	<A NAME="50422208_96620"></A>Persistent callbacks </H3>
+<P>
+<A NAME="50422208_pgfId-285999"></A>Parasolid can use function pointers that have been provided to it by an application (via delegates, in the .NET binding) in the following ways:</P>
+<UL>
+<LI>
+<A NAME="50422208_pgfId-286000"></A>Function pointers that will only be called during the execution of the function that provides them.</LI>
+<LI>
+<A NAME="50422208_pgfId-286001"></A>Function pointers that are “registered” with Parasolid, and may be used at any subsequent time. </LI>
+</UL>
+<P>
+<A NAME="50422208_pgfId-286002"></A>The second type can cause a problem in a .NET environment. If a delegate that provided a function pointer to Parasolid is moved or deleted by the .NET garbage collector, the function pointer that Parasolid was holding becomes invalid. Calling the function that Parasolid still thinks is available will crash your application. There is no mechanism for the garbage collector to tell Parasolid about this, so it is necessary to ensure that the delegate is never moved or deleted.</P>
+<P>
+<A NAME="50422208_pgfId-332980"></A>To ensure this, the .NET binding takes a copy of the delegate - or rather, the structure containing that delegate - and locks it against garbage collection before extracting a function pointer to be passed to Parasolid. This means that every time you call a function that passes a function pointer of the second type to Parasolid, some memory is allocated to make sure that the function pointer remains valid. This memory cannot be recovered or moved by the .NET garbage collector. It is allocated or pinned, and there is no way to de-allocate or un-pin it within your program.</P>
+<P>
+<A NAME="50422208_pgfId-334565"></A>The only way in which this memory can be recovered is to terminate the process that contains Parasolid. Stopping and starting the Parasolid session does not work because the .NET environment has no concept of the Parasolid session.</P>
+<P>
+<A NAME="50422208_pgfId-334575"></A>This is not a problem in desktop applications used by one person at a time. However, in a server-based application where many users are served by a single server process, this kind of memory leak could be a problem. One strategy for avoiding it would be to use multiple server processes, each of which will only accept a limited number of users, and will terminate itself when all of them have finished using it.</P>
+<P>
+<A NAME="50422208_pgfId-334576"></A>This kind of memory leak does not occur for function pointers of the first type. Function pointers of the second type are best registered at start-up, and left unchanged for the life of the process.</P>
+<P>
+<A NAME="50422208_pgfId-286009"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<ADDRESS>
+<A NAME="50422208_pgfId-286005"></A>Performance issue: Each time you register a function pointer (or a structure containing several of them) with Parasolid, a small memory leak occurs. This is unavoidable, and vastly preferable to unpredictable (and irreproducible) crashes.</ADDRESS><BR>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286010"></A>For example, <A HREF=../headers/pk_debug_session_watch_items.html>PK_DEBUG_SESSION_watch_items</A> is declared in C as:</P>
+<P>
+<A NAME="50422208_pgfId-334888"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-334879"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> <A HREF=../headers/pk_debug_session_watch_items.html>PK_DEBUG_SESSION_watch_items</A></PRE>
+<PRE><A NAME="50422208_pgfId-334880"></A>(</PRE>
+<PRE><A NAME="50422208_pgfId-334881"></A>  <A HREF=../headers/pk_item_array_t.html>PK_ITEM_array_t</A>                    create,    /* <EM>objects to watch</EM>*/</PRE>
+<PRE><A NAME="50422208_pgfId-334882"></A>  <A HREF=../headers/pk_debug_session_create_cb_t.html>PK_DEBUG_SESSION_create_cb_t</A>       create_fn, /* <EM>create callback</EM>*/</PRE>
+<PRE><A NAME="50422208_pgfId-334883"></A>  <A HREF=../headers/pk_item_array_t.html>PK_ITEM_array_t</A>                    destroy,   /* <EM>items to watch</EM>*/</PRE>
+<PRE><A NAME="50422208_pgfId-334884"></A>  <A HREF=../headers/pk_debug_session_destroy_cb_t.html>PK_DEBUG_SESSION_destroy_cb_t</A>      destroy_fn /* <EM>destroy callback</EM>*/</PRE>
+<PRE><A NAME="50422208_pgfId-334885"></A>);</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-334887"></A>Figure C-20 Declaration of <A HREF=../headers/pk_debug_session_watch_items.html>PK_DEBUG_SESSION_watch_items</A> in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286023"></A>Both <CODE>
+create_fn</CODE>
+ and <CODE>
+destroy_fn</CODE>
+ are <EM>
+persistent callbacks</EM>: pointers to functions that could be called at any subsequent time. The .NET binding for this function must therefore ensure that they are preserved. To do this, it needs to run some code, so it provides a function to be called by applications. This manages the persistence of the arguments, and calls a second function to make the P/Invoke call to Parasolid.</P>
+<P>
+<A NAME="50422208_pgfId-286049"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286026"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-286027"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-286028"></A>  <STRONG>public unsafe partial class</STRONG> SESSION</PRE>
+<PRE><A NAME="50422208_pgfId-286029"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-286030"></A>    // Function for user calling, manages persistence</PRE>
+<PRE><A NAME="50422208_pgfId-286031"></A>    <STRONG>public static</STRONG> PK.ERROR.code_t watch_tags</PRE>
+<PRE><A NAME="50422208_pgfId-286032"></A>    (</PRE>
+<PRE><A NAME="50422208_pgfId-286033"></A>    <STRONG>int</STRONG> n_tags,</PRE>
+<PRE><A NAME="50422208_pgfId-286034"></A>    <STRONG>int</STRONG> []tags,</PRE>
+<PRE><A NAME="50422208_pgfId-286035"></A>    PK.SESSION.watch_create_cb_t  create_fn,</PRE>
+<PRE><A NAME="50422208_pgfId-286036"></A>    PK.SESSION.watch_destroy_cb_t destroy_fn</PRE>
+<PRE><A NAME="50422208_pgfId-286037"></A>    )</PRE>
+<PRE><A NAME="50422208_pgfId-286038"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-286039"></A>      // <EM>Lock create_fn against GC - deliberate memory leak</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286040"></A>      GCHandle.Alloc( create_fn );</PRE>
+<PRE><A NAME="50422208_pgfId-286041"></A>      // <EM>Lock destroy_fn against GC - deliberate memory leak</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286042"></A>      GCHandle.Alloc( destroy_fn );</PRE>
+<PRE><A NAME="50422208_pgfId-286043"></A>      <STRONG>return</STRONG> _watch_tags( n_tags, tags, create_fn, destroy_fn);</PRE>
+<PRE><A NAME="50422208_pgfId-286044"></A>    }  // <EM>End of function body</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286045"></A>  };   // <EM>End of partial class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286046"></A>};     // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286048"></A>Figure C-21 Example showing management of persistent callbacks in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286050"></A>The P/Invoke function is standard except for the “_“ prefix on its name: </P>
+<P>
+<A NAME="50422208_pgfId-286072"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286053"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-286054"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-286055"></A>  <STRONG>public unsafe partial class</STRONG> SESSION</PRE>
+<PRE><A NAME="50422208_pgfId-286056"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-286057"></A>    [DllImport(“pskernel.dll“,</PRE>
+<PRE><A NAME="50422208_pgfId-286058"></A>    CallingConvention = CallingConvention.Cdecl,</PRE>
+<PRE><A NAME="50422208_pgfId-286059"></A>    CharSet = CharSet.Ansi,</PRE>
+<PRE><A NAME="50422208_pgfId-286060"></A>    EntryPoint = “<A HREF=../headers/pk_session_watch_tags.html>PK_SESSION_watch_tags</A>“)]</PRE>
+<PRE><A NAME="50422208_pgfId-286061"></A>    <STRONG>public static extern</STRONG> PK.ERROR.code_t _watch_tags // <EM>Note the </EM>“<EM>_</EM>“<EM> prefix</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286062"></A>    (</PRE>
+<PRE><A NAME="50422208_pgfId-286063"></A>    <STRONG>int</STRONG> n_tags,</PRE>
+<PRE><A NAME="50422208_pgfId-286064"></A>    <STRONG>int</STRONG> []tags,</PRE>
+<PRE><A NAME="50422208_pgfId-286065"></A>    PK.SESSION.watch_create_cb_t  create_fn,</PRE>
+<PRE><A NAME="50422208_pgfId-286066"></A>    PK.SESSION.watch_destroy_cb_t destroy_fn</PRE>
+<PRE><A NAME="50422208_pgfId-286067"></A>    ); // <EM>End of function declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286068"></A>  };   // <EM>End of partial class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286069"></A>};     // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286071"></A>Figure C-22 The P/Invoke function in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286073"></A>The functions (and corresponding arguments) that supply persistent callbacks to Parasolid are:</P>
+<P>
+<A NAME="50422208_pgfId-335701"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335715"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335717"></A>Argument</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335719"></A><A HREF=../headers/pk_attdef_register_callbacks.html>PK_ATTDEF_register_callbacks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335721"></A>callbacks</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335723"></A><A HREF=../headers/pk_attdef_register_cb.html>PK_ATTDEF_register_cb</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335725"></A>callbacks</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335727"></A><A HREF=../headers/pk_debug_session_watch_classes.html>PK_DEBUG_SESSION_watch_classes</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-335729"></A>create_fn</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335731"></A><A HREF=../headers/pk_debug_session_watch_classes.html>PK_DEBUG_SESSION_watch_classes</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-335733"></A>destroy_fn</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335735"></A><A HREF=../headers/pk_debug_session_watch_items.html>PK_DEBUG_SESSION_watch_items</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-335737"></A>create_fn</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335739"></A><A HREF=../headers/pk_debug_session_watch_items.html>PK_DEBUG_SESSION_watch_items</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-335741"></A>destroy_fn</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335743"></A><A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-335745"></A>frustrum</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335747"></A><A HREF=../headers/pk_error_register_callbacks.html>PK_ERROR_register_callbacks</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335749"></A>frustrum</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335751"></A><A HREF=../headers/pk_mark_start.html>PK_MARK_start</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335753"></A>frustrum</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335755"></A><A HREF=../headers/pk_memory_register_callbacks.html>PK_MEMORY_register_callbacks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335757"></A>frustrum</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335759"></A><A HREF=../headers/pk_session_register_applio.html>PK_SESSION_register_applio</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-335761"></A>new</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335763"></A><A HREF=../headers/pk_session_register_applio_2.html>PK_SESSION_register_applio_2</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335765"></A>new</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-354409"></A><A HREF=../headers/pk_session_register_fru_2.html>PK_SESSION_register_fru_2</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-354411"></A><CODE>
+options</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335767"></A><A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335769"></A>new</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335771"></A><A HREF=../headers/pk_session_register_indexio.html>PK_SESSION_register_indexio</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335773"></A>new</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335775"></A><A HREF=../headers/pk_session_watch_tags.html>PK_SESSION_watch_tags</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-335777"></A>create_fn</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-335779"></A><A HREF=../headers/pk_session_watch_tags.html>PK_SESSION_watch_tags</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-335781"></A>destroy_fn</PRE>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422208_pgfId-286145"></A>	C.6.5 	Modified function signatures </H3>
+<P>
+<A NAME="50422208_pgfId-286146"></A>For some functions that supply persistent callbacks to Parasolid, and are needed in almost every Parasolid-based application, the .NET binding modifies the function's arguments to simplify programming. The modified functions receive types by value, rather than address, make _v versions of them, and supply the address of the _v version to Parasolid. For example, <A HREF=../headers/pk_session_register_applio_2.html>PK_SESSION_register_applio_2</A> uses this method. The C declaration of the function is:</P>
+<P>
+<A NAME="50422208_pgfId-286155"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286149"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> <A HREF=../headers/pk_session_register_applio_2.html>PK_SESSION_register_applio_2</A></PRE>
+<PRE><A NAME="50422208_pgfId-286150"></A>(</PRE>
+<PRE><A NAME="50422208_pgfId-286151"></A><STRONG>const</STRONG> <A HREF=../headers/pk_session_applio_t.html>PK_SESSION_applio_t</A> *new    /* <EM>functions to register (may be NULL)</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-286152"></A>);</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286154"></A>Figure C-23 Declaration of <A HREF=../headers/pk_session_register_applio_2.html>PK_SESSION_register_applio_2</A> in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286156"></A>Like the previous example, the function to be called by the application does some processing before calling the P/Invoke function:</P>
+<P>
+<A NAME="50422208_pgfId-286178"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286159"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-286160"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-286161"></A>  <STRONG>public unsafe partial class</STRONG> SESSION</PRE>
+<PRE><A NAME="50422208_pgfId-286162"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-286163"></A>    // <EM>Function for user calling, manages persistence</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286164"></A>    <STRONG>public static</STRONG> PK.ERROR.code_t register_applio_2(</PRE>
+<PRE><A NAME="50422208_pgfId-286165"></A>    PK.SESSION.applio_t @new</PRE>
+<PRE><A NAME="50422208_pgfId-286166"></A>    )</PRE>
+<PRE><A NAME="50422208_pgfId-286167"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-286168"></A>      // <EM>Create/init new_v as a _v. </EM></PRE>
+<PRE><A NAME="50422208_pgfId-286169"></A>      PK.SESSION.applio_v new_v = <STRONG>new</STRONG> PK.SESSION.applio_v( @new );</PRE>
+<PRE><A NAME="50422208_pgfId-286170"></A>      // <EM>Lock new against GC - deliberate memory leak</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286171"></A>      GCHandle.Alloc( @new );</PRE>
+<PRE><A NAME="50422208_pgfId-286172"></A>      <STRONG>return</STRONG> _register_applio_2( &amp;new_v );</PRE>
+<PRE><A NAME="50422208_pgfId-286173"></A>    } // <EM>End of function body</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286174"></A>  };  // <EM>End of partial class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286175"></A>};    // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286177"></A>Figure C-24 Example of a modified function signature in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286179"></A>Note that the <CODE>
+_t</CODE>
+ structure, <CODE>
+@new</CODE>
+, is the one that is locked. That is needed throughout the life of the program, because it contains the delegates themselves. The <CODE>
+_v</CODE>
+ structure, <CODE>
+new_v</CODE>
+ only contains the <EM>
+addresses</EM> of the delegates.</P>
+<P>
+<A NAME="50422208_pgfId-286180"></A>The P/Invoke function is just like the one in the previous example:</P>
+<P>
+<A NAME="50422208_pgfId-286198"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286183"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-286184"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-286185"></A>  <STRONG>public unsafe partial class</STRONG> SESSION</PRE>
+<PRE><A NAME="50422208_pgfId-286186"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-286187"></A>    [DllImport(“pskernel.dll“,</PRE>
+<PRE><A NAME="50422208_pgfId-286188"></A>    CallingConvention = CallingConvention.Cdecl,</PRE>
+<PRE><A NAME="50422208_pgfId-286189"></A>    CharSet = CharSet.Ansi,</PRE>
+<PRE><A NAME="50422208_pgfId-286190"></A>    EntryPoint = “<A HREF=../headers/pk_session_register_applio_2.html>PK_SESSION_register_applio_2</A>“)]</PRE>
+<PRE><A NAME="50422208_pgfId-286191"></A>    <STRONG>public static extern</STRONG> PK.ERROR.code_t _register_applio_2(</PRE>
+<PRE><A NAME="50422208_pgfId-286192"></A>    PK.SESSION.applio_v *@new</PRE>
+<PRE><A NAME="50422208_pgfId-286193"></A>    ); // <EM>End of function declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286194"></A>  };   // <EM>End of partial class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286195"></A>};     // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286197"></A>Figure C-25 The P/Invoke function in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286199"></A>The functions and arguments that have a modified interface are:</P>
+<P>
+<A NAME="50422208_pgfId-286229"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286202"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286204"></A>Argument</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286210"></A><A HREF=../headers/pk_attdef_register_callbacks.html>PK_ATTDEF_register_callbacks</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286212"></A><CODE>
+callbacks</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-337146"></A><A HREF=../headers/pk_attdef_register_cb.html>PK_ATTDEF_register_cb</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-337148"></A><CODE>
+callbacks</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-354443"></A><A HREF=../headers/pk_session_ask_fru_2.html>PK_SESSION_ask_fru_2</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-354445"></A><CODE>
+options</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-337166"></A><A HREF=../headers/pk_session_register_applio.html>PK_SESSION_register_applio</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-337168"></A><CODE>
+new</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286218"></A><A HREF=../headers/pk_session_register_applio_2.html>PK_SESSION_register_applio_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286220"></A><CODE>
+new</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-354459"></A><A HREF=../headers/pk_session_register_fru_2.html>PK_SESSION_register_fru_2</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-354461"></A><CODE>
+options</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286222"></A><A HREF=../headers/pk_session_register_frustrum.html>PK_SESSION_register_frustrum</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286224"></A><CODE>
+new</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286226"></A><A HREF=../headers/pk_session_register_indexio.html>PK_SESSION_register_indexio</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286228"></A>new</PRE>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422208_pgfId-286232"></A>	C.6.6 	<A NAME="50422208_37198"></A>Functions with string arguments </H3>
+<P>
+<A NAME="50422208_pgfId-286233"></A>Almost all Parasolid functions that receive or return strings, including Unicode strings, have overloaded versions in the .NET binding that use .NET string types (for ease of programming). In place of the <CODE>
+char</CODE>
+* or <A HREF=../headers/pk_uchar_t.html>PK_UCHAR_t</A>* in the C interface, the overloaded version uses a <CODE>
+System.String</CODE>
+ (C# string) type.</P>
+
+<H4>
+<A NAME="50422208_pgfId-286234"></A>C.6.6.1 Passing Ansi and Unicode strings to Parasolid </H4>
+<P>
+<A NAME="50422208_pgfId-286235"></A><A HREF=../headers/pk_attrib_set_named_ustring.html>PK_ATTRIB_set_named_ustring</A> provides an example of handing both kinds of string. Its C prototype is:</P>
+<P>
+<A NAME="50422208_pgfId-286246"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286238"></A><CODE><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> <A HREF=../headers/pk_attrib_set_named_ustring.html>PK_ATTRIB_set_named_ustring</A></CODE>
+</PRE>
+<PRE><A NAME="50422208_pgfId-286239"></A>(</PRE>
+<PRE><A NAME="50422208_pgfId-286240"></A><A HREF=../headers/pk_attrib_t.html>PK_ATTRIB_t</A>       attrib,       /* <EM>attribute</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-286241"></A><STRONG>const char</STRONG>*       field_name,   /* <EM>field name</EM> */</PRE>
+<PRE><A NAME="50422208_pgfId-286242"></A><STRONG>const <A HREF=../headers/pk_uchar_t.html>PK_UCHAR_t</A></STRONG>* string    /* <EM>null-terminated string to set </EM>*/</PRE>
+<PRE><A NAME="50422208_pgfId-286243"></A>);</PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286245"></A>Figure C-1 Declaration of <A HREF=../headers/pk_attrib_set_named_ustring.html>PK_ATTRIB_set_named_ustring</A> in C</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286247"></A>This takes a <CODE>
+char</CODE>
+* for the field name and a <A HREF=../headers/pk_uchar_t.html>PK_UCHAR_t</A> * for the Unicode string to be set in the attribute. The version that uses .NET strings, below, takes C# string arguments, but uses MarshalAs to tell the C# compiler that the string to be set is a “Wide“ or Unicode string.</P>
+<P>
+<A NAME="50422208_pgfId-286268"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286250"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-286251"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-286252"></A>  <STRONG>public unsafe partial class</STRONG> ATTRIB</PRE>
+<PRE><A NAME="50422208_pgfId-286253"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-286254"></A>    // <EM>Function to take C# strings, not character pointers</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286255"></A>    [DllImport(“pskernel.dll“,</PRE>
+<PRE><A NAME="50422208_pgfId-286256"></A>    CallingConvention = CallingConvention.Cdecl,</PRE>
+<PRE><A NAME="50422208_pgfId-286257"></A>    CharSet = CharSet.Ansi,</PRE>
+<PRE><A NAME="50422208_pgfId-286258"></A>    EntryPoint = “<A HREF=../headers/pk_attrib_set_named_ustring.html>PK_ATTRIB_set_named_ustring</A>“)]</PRE>
+<PRE><A NAME="50422208_pgfId-286259"></A>    <STRONG>public static extern</STRONG> PK.ERROR.code_t set_named_ustring(</PRE>
+<PRE><A NAME="50422208_pgfId-286260"></A>    PK.ATTRIB_t attrib,</PRE>
+<PRE><A NAME="50422208_pgfId-286261"></A>    string field_name,</PRE>
+<PRE><A NAME="50422208_pgfId-286262"></A>    [MarshalAs(UnmanagedType.LPWStr)] string @string</PRE>
+<PRE><A NAME="50422208_pgfId-286263"></A>    ); // <EM>End of function declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286264"></A>  };   // <EM>End of partial class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286265"></A>};     // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286267"></A>Figure C-2 Overloaded version of <A HREF=../headers/pk_attrib_set_named_ustring.html>PK_ATTRIB_set_named_ustring</A> in C#</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422208_pgfId-308661"></A>C.6.6.2 Receiving a .NET string from Parasolid </H4>
+<P>
+<A NAME="50422208_pgfId-308662"></A>When Parasolid is asked to return a string, it allocates memory to hold the string using <A HREF=../headers/pk_memory_alloc.html>PK_MEMORY_alloc</A>. The .NET binding calls Parasolid, then Parasolid returns to the binding passing back a pointer to the string. The binding copies the string into a <CODE>
+System.String</CODE>
+, passed to the function as an “out“ parameter so that it can be changed, and frees the memory allocated by Parasolid using <A HREF=../headers/pk_memory_free.html>PK_MEMORY_free</A>. </P>
+<P>
+<A NAME="50422208_pgfId-286271"></A>As for functions with persistent arguments, the process is implemented with two functions. The first is to be called by the application; it calls a second P/Invoke function, and manages the construction of the String.</P>
+<P>
+<A NAME="50422208_pgfId-286272"></A>The P/Invoke function is much like those above. The only unusual part is its third argument, <CODE>
+char</CODE>
+ **@string. A .NET <CODE>
+char</CODE>
+ is a 16-bit Unicode character, unlike the conventional C 8-bit <CODE>
+char</CODE>
+.</P>
+<P>
+<A NAME="50422208_pgfId-286293"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286275"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-286276"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-286277"></A>  <STRONG>public unsafe partial class</STRONG> ATTRIB</PRE>
+<PRE><A NAME="50422208_pgfId-286278"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-286279"></A>    // <EM>Function to take C# strings, not character pointers</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286280"></A>    [DllImport(“pskernel.dll“,</PRE>
+<PRE><A NAME="50422208_pgfId-286281"></A>    CallingConvention = CallingConvention.Cdecl,</PRE>
+<PRE><A NAME="50422208_pgfId-286282"></A>    CharSet = CharSet.Ansi,</PRE>
+<PRE><A NAME="50422208_pgfId-286283"></A>    EntryPoint = “<A HREF=../headers/pk_attrib_ask_named_ustring.html>PK_ATTRIB_ask_named_ustring</A>“)]</PRE>
+<PRE><A NAME="50422208_pgfId-286284"></A>    <STRONG>public static extern</STRONG> PK.ERROR.code_t ask_named_ustring(</PRE>
+<PRE><A NAME="50422208_pgfId-286285"></A>    PK.ATTRIB_t attrib,</PRE>
+<PRE><A NAME="50422208_pgfId-286286"></A>    string field_name,</PRE>
+<PRE><A NAME="50422208_pgfId-286287"></A>    <STRONG>char</STRONG> **@string</PRE>
+<PRE><A NAME="50422208_pgfId-286288"></A>    ); // <EM>End of function declaration</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286289"></A>  };   // <EM>End of partial class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286290"></A>};     // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286292"></A>Figure C-1 Overloaded version of <A HREF=../headers/pk_attrib_ask_named_ustring.html>PK_ATTRIB_ask_named_ustring</A> in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286294"></A>The function provided for the application to call contains more code than most of the functions in the binding:</P>
+<P>
+<A NAME="50422208_pgfId-286327"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-286297"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-286298"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-286299"></A>  <STRONG>public unsafe partial class</STRONG> ATTRIB</PRE>
+<PRE><A NAME="50422208_pgfId-286300"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-286301"></A>    // <EM>Outer function for out strings</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286302"></A>    <STRONG>public static</STRONG> PK.ERROR.code_t ask_named_ustring</PRE>
+<PRE><A NAME="50422208_pgfId-286303"></A>    (</PRE>
+<PRE><A NAME="50422208_pgfId-286304"></A>    PK.ATTRIB_t attrib,</PRE>
+<PRE><A NAME="50422208_pgfId-286305"></A>    string      field_name,</PRE>
+<PRE><A NAME="50422208_pgfId-286306"></A>    out String  @string</PRE>
+<PRE><A NAME="50422208_pgfId-286307"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-286308"></A>      <STRONG>char</STRONG> *arg03;</PRE>
+<PRE><A NAME="50422208_pgfId-286309"></A>      @string = ““; </PRE>
+<PRE><A NAME="50422208_pgfId-286310"></A>      PK.ERROR.code_t __retval = </PRE>
+<PRE><A NAME="50422208_pgfId-286311"></A>                          _ask_named_ustring( attrib, field_name, &amp;arg03 );</PRE>
+<PRE><A NAME="50422208_pgfId-286312"></A>      <STRONG>if</STRONG> (PK.ERROR.code_t.ok == __retval)</PRE>
+<PRE><A NAME="50422208_pgfId-286313"></A>      {</PRE>
+<PRE><A NAME="50422208_pgfId-286314"></A>        @string = String( arg03);</PRE>
+<PRE><A NAME="50422208_pgfId-286315"></A>        PK.ERROR.code_t _ret_free_string = PK.MEMORY.free( arg03 );</PRE>
+<PRE><A NAME="50422208_pgfId-286316"></A>        <STRONG>if </STRONG>(PK.ERROR.code_t.ok != _ret_free_string)</PRE>
+<PRE><A NAME="50422208_pgfId-286317"></A>        {</PRE>
+<PRE><A NAME="50422208_pgfId-286318"></A>           <STRONG>return</STRONG> _ret_free_string;</PRE>
+<PRE><A NAME="50422208_pgfId-286319"></A>        }</PRE>
+<PRE><A NAME="50422208_pgfId-286320"></A>      }</PRE>
+<PRE><A NAME="50422208_pgfId-286321"></A>      <STRONG>return</STRONG> __retval;</PRE>
+<PRE><A NAME="50422208_pgfId-286322"></A>    }; // <EM>End of function definition</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286323"></A>  };   // <EM>End of partial class</EM></PRE>
+<PRE><A NAME="50422208_pgfId-286324"></A>};     // <EM>End of namespace</EM></PRE>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286326"></A>Figure C-2 P/Invoke function called by the application in C#</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-286328"></A>This function receives an “out String“ as its third argument. It declares a <CODE>
+char</CODE>
+* variable and passes its address to Parasolid, so as to get the address of the string that Parasolid will return. Note that this would be an <CODE>
+sbyte</CODE>
+* if the string the Parasolid will return was made up from 8-bit characters. Having done that, it constructs a <CODE>
+System.String</CODE>
+ from the <CODE>
+char</CODE>
+*, Finally, it needs to free the memory that Parasolid allocated. This task is normally left to the application, but that would involve passing the address back to the application in some way; it is simpler for the binding to call PK.MEMORY.free to do the job. If PK.MEMORY.free returns an error, the error is returned; note that the code does not attempt to free memory unless the PK.ATTRIB.ask_named_ustring call was successful.</P>
+<P>
+<A NAME="50422208_pgfId-286329"></A>Since constructing the String uses standard .NET constructors for String, this code could throw a .NET exception. This is unlikely in practice, unless the application is about to run out of memory or you store extremely long strings within Parasolid data.</P>
+
+
+<H4>
+<A NAME="50422208_pgfId-286330"></A>C.6.6.3 List of overloaded functions using .NET strings </H4>
+<P>
+<A NAME="50422208_pgfId-308908"></A>The Parasolid functions that have versions using String are:</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308713"></A>C name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308715"></A>C# name</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308717"></A><A HREF=../headers/pk_attdef_find.html>PK_ATTDEF_find</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308719"></A>PK.ATTDEF.find</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308721"></A><A HREF=../headers/pk_attrib_ask_named_axes.html>PK_ATTRIB_ask_named_axes</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308723"></A>PK.ATTRIB.ask_named_axes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308725"></A><A HREF=../headers/pk_attrib_ask_named_doubles.html>PK_ATTRIB_ask_named_doubles</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308727"></A>PK.ATTRIB.ask_named_doubles</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308729"></A><A HREF=../headers/pk_attrib_ask_named_ints.html>PK_ATTRIB_ask_named_ints</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308731"></A>PK.ATTRIB.ask_named_ints</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308733"></A><A HREF=../headers/pk_attrib_ask_named_pointers.html>PK_ATTRIB_ask_named_pointers</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308735"></A>PK.ATTRIB.ask_named_pointers</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308737"></A><A HREF=../headers/pk_attrib_ask_named_string.html>PK_ATTRIB_ask_named_string</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308739"></A>PK.ATTRIB.ask_named_string</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308741"></A><A HREF=../headers/pk_attrib_ask_named_ustring.html>PK_ATTRIB_ask_named_ustring</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308743"></A>PK.ATTRIB.ask_named_ustring</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308745"></A><A HREF=../headers/pk_attrib_ask_named_vectors.html>PK_ATTRIB_ask_named_vectors</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308747"></A>PK.ATTRIB.ask_named_vectors</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308749"></A><A HREF=../headers/pk_attrib_ask_string.html>PK_ATTRIB_ask_string</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308751"></A>PK.ATTRIB.ask_string</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308753"></A><A HREF=../headers/pk_attrib_ask_ustring.html>PK_ATTRIB_ask_ustring</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308755"></A>PK.ATTRIB.ask_ustring</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308757"></A><A HREF=../headers/pk_attrib_set_named_axes.html>PK_ATTRIB_set_named_axes</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308759"></A>PK.ATTRIB.set_named_axes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308761"></A><A HREF=../headers/pk_attrib_set_named_doubles.html>PK_ATTRIB_set_named_doubles</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308763"></A>PK.ATTRIB.set_named_doubles</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308765"></A><A HREF=../headers/pk_attrib_set_named_ints.html>PK_ATTRIB_set_named_ints</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308767"></A>PK.ATTRIB.set_named_ints</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308769"></A><A HREF=../headers/pk_attrib_set_named_pointers.html>PK_ATTRIB_set_named_pointers</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308771"></A>PK.ATTRIB.set_named_pointers</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308773"></A><A HREF=../headers/pk_attrib_set_named_string.html>PK_ATTRIB_set_named_string</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308775"></A>PK.ATTRIB.set_named_string</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308777"></A><A HREF=../headers/pk_attrib_set_named_ustring.html>PK_ATTRIB_set_named_ustring</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308779"></A>PK.ATTRIB.set_named_ustring</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308781"></A><A HREF=../headers/pk_attrib_set_named_vectors.html>PK_ATTRIB_set_named_vectors</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308783"></A>PK.ATTRIB.set_named_vectors</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308785"></A><A HREF=../headers/pk_attrib_set_string.html>PK_ATTRIB_set_string</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308787"></A>PK.ATTRIB.set_string</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308789"></A><A HREF=../headers/pk_attrib_set_ustring.html>PK_ATTRIB_set_ustring</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308791"></A>PK.ATTRIB.set_ustring</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308793"></A><A HREF=../headers/pk_debug_receive.html>PK_DEBUG_receive</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308795"></A>PKD.UNCLASSED.receive</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308797"></A><A HREF=../headers/pk_debug_report_comment.html>PK_DEBUG_report_comment</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308799"></A>PKD.UNCLASSED.report_comment</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308801"></A><A HREF=../headers/pk_debug_report_start.html>PK_DEBUG_report_start</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308803"></A>PKD.UNCLASSED.report_start</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308805"></A><A HREF=../headers/pk_debug_transmit.html>PK_DEBUG_transmit</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308807"></A>PKD.UNCLASSED.transmit</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308809"></A><A HREF=../headers/pk_entity_ask_description.html>PK_ENTITY_ask_description</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308811"></A>PK.ENTITY.ask_description</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308813"></A><A HREF=../headers/pk_partition_receive.html>PK_PARTITION_receive</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308815"></A>PK.PARTITION.receive</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308817"></A><A HREF=../headers/pk_partition_receive_u.html>PK_PARTITION_receive_u</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308819"></A>PK.PARTITION.receive_u</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308821"></A><A HREF=../headers/pk_partition_receive_version.html>PK_PARTITION_receive_version</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308823"></A>PK.PARTITION.receive_version</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308825"></A><A HREF=../headers/pk_partition_receive_version_u.html>PK_PARTITION_receive_version_u</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308827"></A>PK.PARTITION.receive_version_u</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308829"></A><A HREF=../headers/pk_partition_transmit.html>PK_PARTITION_transmit</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308831"></A>PK.PARTITION.transmit</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308833"></A><A HREF=../headers/pk_partition_transmit_u.html>PK_PARTITION_transmit_u</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308835"></A>PK.PARTITION.transmit_u</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308837"></A><A HREF=../headers/pk_part_receive.html>PK_PART_receive</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308839"></A>PK.PART.receive</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308841"></A><A HREF=../headers/pk_part_receive_u.html>PK_PART_receive_u</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308843"></A>PK.PART.receive_u</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308845"></A><A HREF=../headers/pk_part_receive_version.html>PK_PART_receive_version</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308847"></A>PK.PART.receive_version</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308849"></A><A HREF=../headers/pk_part_receive_version_u.html>PK_PART_receive_version_u</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308851"></A>PK.PART.receive_version_u</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308853"></A><A HREF=../headers/pk_part_transmit.html>PK_PART_transmit</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308855"></A>PK.PART.transmit</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308857"></A><A HREF=../headers/pk_part_transmit_u.html>PK_PART_transmit_u</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308859"></A>PK.PART.transmit_u</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308861"></A><A HREF=../headers/pk_report_create.html>PK_REPORT_create</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308863"></A>PK.REPORT.create</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308865"></A><A HREF=../headers/pk_report_find.html>PK_REPORT_find</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308867"></A>PK.REPORT.find</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308869"></A><A HREF=../headers/pk_report_set_function.html>PK_REPORT_set_function</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308871"></A>PK.REPORT.set_function</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308873"></A><A HREF=../headers/pk_session_ask_function.html>PK_SESSION_ask_function</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308875"></A>PK.SESSION.ask_function</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308877"></A><A HREF=../headers/pk_session_comment.html>PK_SESSION_comment</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308879"></A>PK.SESSION.comment</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308881"></A><A HREF=../headers/pk_session_receive.html>PK_SESSION_receive</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308883"></A>PK.SESSION.receive</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308885"></A><A HREF=../headers/pk_session_receive_u.html>PK_SESSION_receive_u</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308887"></A>PK.SESSION.receive_u</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308889"></A><A HREF=../headers/pk_session_receive_version.html>PK_SESSION_receive_version</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308891"></A>PK.SESSION.receive_version</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308893"></A><A HREF=../headers/pk_session_receive_version_u.html>PK_SESSION_receive_version_u</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308895"></A>PK.SESSION.receive_version_u</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308897"></A><A HREF=../headers/pk_session_transmit.html>PK_SESSION_transmit</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308899"></A>PK.SESSION.transmit</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308901"></A><A HREF=../headers/pk_session_transmit_u.html>PK_SESSION_transmit_u</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308903"></A>PK.SESSION.transmit_u</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308905"></A><A HREF=../headers/pk_thread_ask_function.html>PK_THREAD_ask_function</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-308907"></A>PK.THREAD.ask_function</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-308910"></A>The following Parasolid functions that process strings do not have overloaded versions using .NET strings:</P>
+<P>
+<A NAME="50422208_pgfId-286540"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286533"></A>C name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286535"></A>C# name</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286537"></A><A HREF=../headers/pk_debug_session_watch_fns.html>PK_DEBUG_SESSION_watch_fns</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-286539"></A>PKD.SESSION.watch_fns</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-307372"></A><A HREF=../headers/pk_function_find.html>PK_FUNCTION_find</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-307374"></A>PK.FUNCTION.find</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422208_pgfId-274395"></A>C.7	Functions that use tristate delegates 
+
+
+</H1>
+<P>
+<A NAME="50422208_pgfId-346710"></A>“Tristate” delegates are delegates whose “ignore” value is significant. They were introduced for use by functions that register function pointers, or ask Parasolid for the values of registered function pointers, via their options structures. Examples include <A HREF=../headers/pk_session_ask_fru_2.html>PK_SESSION_ask_fru_2</A> and <A HREF=../headers/pk_session_register_fru_2.html>PK_SESSION_register_fru_2</A>.</P>
+
+<H3>
+<A NAME="50422208_pgfId-347369"></A>	C.7.1 	Pointer organisation</H3>
+<P>
+<A NAME="50422208_pgfId-347406"></A><A HREF=../headers/pk_session_register_fru_o_t.html>PK_SESSION_register_fru_o_t</A> is defined in C as:</P>
+<P>
+<A NAME="50422208_pgfId-351592"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-348032"></A>struct PK_SESSION_register_fru_o_s  {  int            o_t_version;  /* version number */</PRE>
+<PRE><A NAME="50422208_pgfId-348035"></A>  <A HREF=../headers/pk_fstart_f_t.html>PK_FSTART_f_t</A> *fstart;       /* (NULL) */</PRE>
+<PRE><A NAME="50422208_pgfId-348036"></A>  <A HREF=../headers/pk_fabort_f_t.html>PK_FABORT_f_t</A> *fabort;       /* (NULL) */</PRE>
+<PRE><A NAME="50422208_pgfId-348037"></A>  <A HREF=../headers/pk_fstop_f_t.html>PK_FSTOP_f_t</A>  *fstop;        /* (NULL) */</PRE>
+<PRE><A NAME="50422208_pgfId-348170"></A>  ...</PRE>
+<PRE><A NAME="50422208_pgfId-348056"></A>   };</PRE>
+<PRE><A NAME="50422208_pgfId-348058"></A>typedef struct PK_SESSION_register_fru_o_s   <A HREF=../headers/pk_session_register_fru_o_t.html>PK_SESSION_register_fru_o_t</A>;</PRE>
+<PRE><A NAME="50422208_pgfId-351602"></A>&nbsp;</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-348001"></A>The <CODE>
+_f_t</CODE>
+ types used in the structure are function pointer types, and each element of the structure is a pointer to a function pointer. This allows the structure to convey three types of information:</P>
+<UL>
+<LI>
+<A NAME="50422208_pgfId-348468"></A>If the pointer in the structure is NULL, no attempt is being made to set this element of the frustrum.</LI>
+<LI>
+<A NAME="50422208_pgfId-348581"></A>If the pointer in the structure is not NULL, the pointer that it points to is significant:</LI>
+<UL>
+<LI>
+<A NAME="50422208_pgfId-348683"></A>If that pointer is NULL, that tells Parasolid that it has no function to call for that frustrum element.</LI>
+<LI>
+<A NAME="50422208_pgfId-348844"></A>If that pointer is not NULL, then it is the address of the function Parasolid should call for that frustrum element. </LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422208_pgfId-353036"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422208_pgfId-353046"></A>Note: This structure does not contain memory for the actual function pointers, only for the pointers to function pointers. The actual function pointers have to be stored elsewhere. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422208_pgfId-347567"></A>	C.7.2 	Using tristate delegates</H3>
+<P>
+<A NAME="50422208_pgfId-349162"></A>Tristate delegates have a third defined state in addition to the normal states of “null” and “pointing to a function” that all delegates have. The third state is the delegate’s “ignore” value.</P>
+<P>
+<A NAME="50422208_pgfId-349542"></A>For example, the C# version of <A HREF=../headers/pk_session_register_fru_o_t.html>PK_SESSION_register_fru_o_t</A> is: </P>
+<P>
+<A NAME="50422208_pgfId-351656"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422208_pgfId-349712"></A><STRONG>namespace</STRONG> PLMComponents.Parasolid.PK_.Unsafe</PRE>
+<PRE><A NAME="50422208_pgfId-349713"></A>{</PRE>
+<PRE><A NAME="50422208_pgfId-349892"></A>  <STRONG>public unsafe partial class</STRONG> SESSION</PRE>
+<PRE><A NAME="50422208_pgfId-349893"></A>  {</PRE>
+<PRE><A NAME="50422208_pgfId-349626"></A>    public unsafe struct register_fru_o_t</PRE>
+<PRE><A NAME="50422208_pgfId-349704"></A>    {</PRE>
+<PRE><A NAME="50422208_pgfId-349629"></A>    // Struct uses tri-state (tristate) pointers.</PRE>
+<PRE><A NAME="50422208_pgfId-349630"></A>    public  int           o_t_version;</PRE>
+<PRE><A NAME="50422208_pgfId-349762"></A>    public  PK.FSTART.f_t fstart;</PRE>
+<PRE><A NAME="50422208_pgfId-349632"></A>    public  PK.FABORT.f_t fabort;</PRE>
+<PRE><A NAME="50422208_pgfId-349633"></A>    public  PK.FSTOP.f_t  fstop;</PRE>
+<PRE><A NAME="50422208_pgfId-349816"></A>    ...</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-349609"></A>This uses delegate types directly. </P>
+<UL>
+<LI>
+<A NAME="50422208_pgfId-350074"></A>To register a frustrum function, initialize the corresponding delegate with the function.</LI>
+<LI>
+<A NAME="50422208_pgfId-350128"></A>To set a frustrum function to NULL, initialize the corresponding delegate with null.</LI>
+<LI>
+<A NAME="50422208_pgfId-350220"></A>To leave a frustrum function unchanged, initialize the corresponding delegate with its “ignore” value, thus:</LI>
+</UL>
+<P>
+<A NAME="50422208_pgfId-351053"></A>&nbsp;</P>
+<P>
+<A NAME="50422208_pgfId-350083"></A>fstart = PK.FSTART.f_t_ignore;</P>
+<P>
+<A NAME="50422208_pgfId-351062"></A>&nbsp;</P>
+<P>
+<A NAME="50422208_pgfId-350762"></A>The following Parasolid functions use tri-state delegates:</P>
+<P>
+<A NAME="50422208_pgfId-354512"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-350765"></A>C name</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-350767"></A>C# name</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-350769"></A><A HREF=../headers/pk_session_ask_fru_2.html>PK_SESSION_ask_fru_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-350771"></A>PK.SESSION.ask_fru_2</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-350773"></A><A HREF=../headers/pk_session_register_fru_2.html>PK_SESSION_register_fru_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-350775"></A>PK.SESSION.register_fru_2</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422208_pgfId-347636"></A>	C.7.3 	Retrieving functions via tristate delegates</H3>
+<P>
+<A NAME="50422208_pgfId-351071"></A>Supporting the C function <A HREF=../headers/pk_session_ask_fru_2.html>PK_SESSION_ask_fru_2</A> in C#, as PK.SESSION.ask_fru_2, requires its options structure to be a “ref” argument in the C# binding. This is used to make the request, and to pass the results back to your application. </P>
+<UL>
+<LI>
+<A NAME="50422208_pgfId-351784"></A>To retrieve a function pointer, initialize the corresponding delegate with null.</LI>
+<LI>
+<A NAME="50422208_pgfId-351897"></A>Otherwise, initialize the corresponding delegate with its “ignore” value, as above.</LI>
+<LI>
+<A NAME="50422208_pgfId-351992"></A>After calling PK.SESSION.ask_fru_2, the delegates you initialized with null will be initialized with the requested function pointers. </LI>
+</UL>
+<P>
+<A NAME="50422208_pgfId-351496"></A>The following Parasolid functions use ref arguments:</P>
+<P>
+<A NAME="50422208_pgfId-351510"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-351499"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-351501"></A>Argument</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-351503"></A><A HREF=../headers/pk_session_ask_fru_2.html>PK_SESSION_ask_fru_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422208_pgfId-351505"></A><CODE>
+options</CODE>
+</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422208_pgfId-352434"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.124.html">The Mathematical Form Of B-Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.126.html">Persistent Mesh (PSM) Format</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

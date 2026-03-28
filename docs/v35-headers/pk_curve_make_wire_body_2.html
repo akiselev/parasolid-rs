@@ -1,0 +1,132 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_CURVE_make_wire_body_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_CURVE_make_wire_body_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_CURVE_make_wire_body_2
+(
+<I>--- received arguments ---
+</I>int                                  n_curves,    --- number of curves (ie,
+                                                  --- length of curves and
+                                                  --- bounds arrays)
+const <A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>                     curves[],    --- curves to create a wire
+                                                  --- body out of
+const <A HREF=../headers/pk_interval_t.html>PK_INTERVAL_t</A>                  bounds[],    --- bounds of each curve
+const <A HREF=../headers/pk_curve_make_wire_body_o_t.html>PK_CURVE_make_wire_body_o_t</A>   *options,     --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                     *const body,        --- the created wire body
+int                           *const n_new_edges, --- number of new edges
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>                    **const new_edges,   --- new edges
+int                          **const edge_index   --- pos in original array
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a wire body from an array of curves and intervals. The
+curves do not need to be ordered (unless specified otherwise) or directed.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_combination        bad combination of options (MILD)
+    PK_ERROR_unsuitable_entity      unsuitable curve(s) supplied (MILD)
+    PK_ERROR_invalid_geometry       invalid geometry supplied (MILD)
+    PK_ERROR_bad_shared_dep         dependant of entity would be illegally
+                                    shared (SERIOUS)
+    PK_ERROR_not_connected          body is disjoint, and <B>'allow_disjoint'</B> set
+                                    to PK_LOGICAL_false (SERIOUS)
+    PK_ERROR_crossing_edge          two or more edges would cross, or more than
+                                    two edges would meet at a vertex when not
+                                    allowing a general result (SERIOUS)
+    PK_ERROR_bad_vertex             tolerance bubbles of two vertices clash
+                                    (SERIOUS)
+    PK_ERROR_bad_parameter          bad parameters supplied (MILD)
+    PK_ERROR_cant_extract_geom      failed to extract geometry (SERIOUS)
+
+<A NAME="documentation"></A>
+See also <A HREF="../chapters/fd_chap.045.html#50434405_pgfId-295059">Creating wire bodies from curves</A> for more information.
+
+The part of each curve required must be defined by the corresponding parametric
+interval in the array <B>'bounds'</B>. The wire may be closed. If <B>'allow_disjoint'</B> of
+the options structure is set to PK_LOGICAL_true, then disjoint bodies can be
+created.
+
+If the wire body crosses the seam of a closed curve, then the parameterisation
+of the curve must be periodic (see <A HREF="../chapters/fd_chap.124.html#50434495_pgfId-287059">Knot Vectors</A>).
+
+Orphan curves are used as the geometry of the body, otherwise a copy of each
+curve that is not an orphan is used as the geometry of the body. A copy will
+also be used for any curve that is located in a partition other than the
+current partition, and the resultant body will be created in the current
+partition.
+
+If a curve that needs to be duplicated is supplied more than once, then it is
+only duplicated once.
+
+Normally the curves do not have to be ordered, and any pair of curves may be
+used to create edges which will be connected by a common vertex in the
+resultant body. The application can indicate that only consecutive curves in
+the array should be connected to each other, along with the first and last
+curve if it is possible to form a closed body, by setting <B>'sequential'</B> in the
+options structure to PK_CURVE_sequential_yes_c. This option may only be set if
+<B>'allow_disjoint'</B> is set to PK_LOGICAL_false. This option may be useful if a
+self-intersecting wire body is desired where the ends of more than two curves
+meet at a particular position (though <B>'check'</B> must be set to PK_LOGICAL_false
+in order to create a self-intersecting body). This option will also in general
+give improved performance. Note that the curves do not have to be directed
+whether or not this option is used.
+
+The number of edges in the wire body is returned. If <B>'want_edges'</B> of the
+options structure is set to PK_LOGICAL_true, then an array of the edges of the
+new wire body will be returned in new_edges. If <B>'want_indices'</B> of the options
+structure is set to PK_LOGICAL_true, then an array of integers indicating the
+position in the array of curves and bounds that refers to the curve and bound
+used to create the corresponding edge in new_edges will be returned in
+edge_index. See <A HREF="../chapters/fd_chap.045.html#50434405_pgfId-295118">Mapping edges onto originating curves</A> for more
+information.
+
+If a curve meets another curve at a position within their specified <B>'bounds'</B>
+intervals (but not at either end of their intervals), PK_ERROR_crossing_edge
+will be returned.
+
+If more than two curves' ends meet at the same position, and the option
+<B>'allow_general'</B> is set to PK_LOGICAL_false, then the function returns
+PK_ERROR_crossing_edge. If <A HREF=../headers/pk_session_set_general_topology.html>PK_SESSION_set_general_topology</A> and the option
+<B>'allow_general'</B> are set to PK_LOGICAL_true a general body is created.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

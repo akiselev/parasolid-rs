@@ -1,0 +1,99 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_check</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_check</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>              PK_BODY_check
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                    body,         --- body to be checked
+const <A HREF=../headers/pk_body_check_o_t.html>PK_BODY_check_o_t</A>     *options,      --- options structure
+
+<I>--- returned arguments ---
+</I>int                   *const n_faults,     --- number of faults
+<A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A>     **const faults        --- faults
+)
+</B>
+<A NAME="description"></A>
+<I>This function checks the given body.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_check_error        a fault has been found when max_faults = 0
+                                (MILD)
+    PK_ERROR_child_body         <B>'body'</B> is a child body
+    PK_ERROR_check_failure      checker failure(MILD)
+    PK_ERROR_bad_option_data    max_faults &lt; 0 (MILD)
+    PK_ERROR_facet_geometry     <B>'body'</B> has facet geometry but facet geometry
+                                is not enabled in session (MILD)
+
+<A NAME="documentation"></A>
+
+This function performs a series of checks on a body, and returns information
+about the faults found, if any.
+
+Faults are returned in an array of <A HREF=../headers/pk_check_fault_t.html>PK_check_fault_t</A> structures.
+If there are no faults found, then <B>'n_faults'</B> is returned as zero.
+
+If there is more than one fault in the body then the function does not
+guarantee to return all the faults.
+
+When some types of check are omitted, a body which would fail them may
+produce misleading results or checker failures when other checks are applied.
+
+If the checking process itself suffers an internal failure then the function
+will return the error PK_ERROR_check_failure and the entity that gave problems
+will be returned in the <A HREF=../headers/pk_error_sf_t.html>PK_ERROR_sf_t</A> structure.  In such a case it has proved
+impossible for Parasolid to demonstrate the theoretical correctness or
+otherwise of the body.  However it is likely that Parasolid will have
+difficulties in performing subsequent operations on this body.
+
+Note that the tokens :
+
+  PK_FACE_state_bad_wire_fa_ed_c,
+  PK_EDGE_state_bad_face_order_c,
+  PK_SHELL_state_bad_topol_geom_c and
+  PK_SHELL_state_bad_sh_sh_c
+
+   can only occur for general bodies.
+
+For more details on fault types and how they may arise, see the chapter on
+'Checking' in the Functional Description.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

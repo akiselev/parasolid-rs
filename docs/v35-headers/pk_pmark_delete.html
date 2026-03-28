@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_PMARK_delete</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_PMARK_delete</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>    PK_PMARK_delete
+(
+<I>--- received arguments ---
+</I>int                n_pmarks,        --- number of pmarks
+const <A HREF=../headers/pk_pmark_t.html>PK_PMARK_t</A>  *pmarks,          --- pmark array
+
+<I>--- returned arguments ---
+</I>int         *const n_bad_pmarks,    --- number of bad pmarks
+<A HREF=../headers/pk_pmark_t.html>PK_PMARK_t</A> **const bad_pmarks       --- bad pmark array
+)
+</B>
+<A NAME="description"></A>
+<I>This function deletes the given partition marks. It returns an array of
+pmarks which could not be deleted.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_rollback_not_started  Partitioned rollback is not active
+    PK_ERROR_frustrum_failure      The frustrum returned an error
+    PK_ERROR_facet_geometry        (MILD) Facet geometry is present at the
+                                   preceding pmark, but facet geometry is
+                                   not enabled.
+    PK_ERROR_lattice_geometry      (MILD) Lattice(s) are present at the
+                                   preceding pmark, but facet geometry is
+                                   not enabled.
+
+<A NAME="documentation"></A>
+There are a number of restrictions on pmarks which can be deleted. It is not
+an error to call this function with such pmarks, but they will not be deleted,
+and will be indicated in the returned array.
+
+Initial pmarks, i.e. pmarks with no preceding pmark, can never be deleted.
+
+Pmarks which are used by a mark (see <A HREF=../headers/pk_pmark_is_used_by_mark.html>PK_PMARK_is_used_by_mark</A>), cannot be
+deleted until the mark is deleted.
+
+The current pmark of a partition can only be deleted if it has no following
+pmark (or if all its following pmarks, directly or indirectly, also occur
+in the 'pmarks' array).
+
+A junction pmark, i.e. a pmark with more than one immediately following pmark,
+cannot be deleted unless all or all but one of the immediately following
+pmarks are also successfully deleted in the same call to this function.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

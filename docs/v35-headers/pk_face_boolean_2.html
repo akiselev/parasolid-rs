@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_boolean_2</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_boolean_2</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                PK_FACE_boolean_2
+(
+<I>--- received arguments ---
+</I>int                            n_targets,  --- number of target faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                targets[],  --- target faces
+int                            n_tools,    --- number of tool faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                tools[],    --- tool faces
+const <A HREF=../headers/pk_face_boolean_o_t.html>PK_FACE_boolean_o_t</A>     *options,    --- boolean options [PF]
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>      *const tracking,   --- tracking information
+<A HREF=../headers/pk_boolean_r_t.html>PK_boolean_r_t</A>          *const results     --- boolean results
+)
+</B>
+<A NAME="description"></A>
+<I>This function performs a boolean operation between the list of faces
+of a target body and the list of faces of a tool body.
+
+This function offers partial support for facet geometry [PF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_contradictory_request      Bad combination of options or data for
+                                        type of boolean (MILD)
+    PK_ERROR_same_tool_and_target       Tool body is also target body (MILD)
+    PK_ERROR_missing_geom               Target or tool has incomplete
+                                        geometry (SERIOUS)
+    PK_ERROR_duplicate_tools            Duplication in list of tool faces
+                                        (MILD)
+    PK_ERROR_duplicate_targets          Duplication in list of target faces
+                                        (MILD)
+    PK_ERROR_instanced_tools            Instanced tool bodies (MILD)
+    PK_ERROR_targ_faces_many_bodies     Target faces are from more than
+                                        one body (MILD)
+    PK_ERROR_tool_faces_many_bodies     Tool faces are from more than one body
+                                        (MILD)
+    PK_ERROR_unsuitable_topology        A region selector is from boundary,
+                                        wrong body or ambiguous (MILD, SERIOUS)
+    PK_ERROR_cant_unite_solid_sheet     Attempt to unite solid and sheet
+                                        (MILD)
+    PK_ERROR_cant_intsc_solid_sheet     Cant intersect solid target with
+                                        sheet tool bodies (MILD)
+    PK_ERROR_partial_no_intersect       No imprinting in face boolean (MILD)
+    PK_ERROR_boolean_failure            Inconsistent arguments, or
+                                        internal error (SERIOUS)
+    PK_ERROR_unsupported_operation      Target or tool faces do not belong to
+                                        a sheet body when completing imprint.
+                                        (MILD)
+    PK_ERROR_cant_complete_imprint      unable to complete the imprint
+                                        (SERIOUS)
+    PK_ERROR_cant_limit_faces           The <B>'limit_target_faces'</B> and the
+                                        <B>'limit_tool_faces'</B> can only be used
+                                        with a limited set of operations
+                                        and bodies. They are not supported
+                                        for this operation.
+                                        (MILD)
+    PK_ERROR_bad_combination            A mixture of facet and classic geometry
+                                        has been supplied (MILD)
+
+<A NAME="documentation"></A>
+
+
+Introduction
+
+A boolean operation between the target faces and the tool faces is
+performed. The bodies associated with the given faces are actually
+booleaned, the faces are provided as a means to <B>'localising'</B> the
+boolean operation. The target body is modified and the tool body
+is deleted. The resulting body or bodies replace the target, and
+are returned in an array within a return structure.
+
+A boolean based on faces is faster than a boolean based on bodies as
+it involves the comparison of only the face pairs given in <B>'targets'</B>
+and <B>'tools'</B>. The drawback being that topological consistency in
+the result cannot be guaranteed.
+
+This function operates similarly to the <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> function,
+especially with regard to the phases of the boolean algorithm,
+rules concerning tag persistence, optimisation issues and status
+reporting.
+
+The effect of the <B>'fence'</B>, <B>'target_material_side'</B>, <B>'tool_material_side'</B> and
+<B>'resulting_body_type'</B> options are identical to the same options used by the
+<A HREF=../headers/pk_body_boolean_2.html><A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A></A> function. Refer to the <A HREF=../headers/pk_body_boolean_2.html><A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A></A> documentation for
+information about these subjects.
+
+
+Face Booleans
+
+In a <B>'face'</B> boolean, only the edges of intersection of the given faces are
+imprinted, unless the <B>'extend_face_list'</B> or <B>'stop_self_intersection'</B>
+options are set. The loops of imprinted edges divide the boundary of
+both bodies into facesets.
+
+For a <B>'body'</B> boolean all the facesets of the tool bodies lie
+completely inside or outside the target body. However, this is not
+necessarily the case for a <B>'face'</B> boolean, as not all faces of
+both bodies are used to compute the imprinted edges. For a <B>'face'</B> boolean,
+boundary facesets of one body are classified inside if they are locally inside
+the other body near a loop of imprinted edges, and outside if they are
+locally outside near the loop of imprinted edges.
+
+o The <B>'extend_face_list'</B> option may be set to ensure that the imprinted
+  loops are complete.
+
+o The <B>'stop_self_intersection'</B> option may be set to eliminate the
+  possibility of self intersecting results.
+
+In a <B>'face'</B> boolean unite, boundary facesets of the tool body which are
+outside the target body are glued to the target. Whilst for subtract and
+intersect operations, only boundary facesets of the tool body
+inside the target body are used.  This is modified if facesets from the target
+are selected, see <A HREF="../chapters/fd_chap.052.html#50434413_pgfId-394027">Select regions in boolean operations</A> for more
+information.
+
+
+    Select Regions
+    
+    It is also possible for a <B>'face'</B> boolean to use a subset of these
+    boundary facesets in computing the result. The subset of faces from either
+    or both the target and the tool is specified within the <B>'select_region'</B>
+    options of the boolean options. These faces can be excluded or included by
+    setting the value of the <B>'select_type'</B> option to the appropriate value.
+    
+    The following restrictions are imposed :
+    
+    o All the selected regions are either excluded or included. It is
+      not possible to exclude some faces and include other faces.
+    
+    o Each faceset must be unambiguously identified by a face, edge or
+      vertex which is interior to the faceset.
+    
+
+    Help points
+    
+    It may not always be possible to unambiguously specify a faceset
+    with a select region based on a face. This situation may be
+    avoided by being able to specify a point and a face. The point
+    specifying the region of interest within a given face.
+    
+    The help points are passed to this function via the <B>'help_points'</B>
+    array within the <B>'select_region'</B> option structure.
+    
+    The following retrictions apply to help points :
+    
+    o A help point can only be associated with a face.
+    
+    o The help point must lie on the face.
+    
+    o The face/help point combination must uniquely identify a faceset
+      otherwise a PK_ERROR_unsuitable_topology error will be returned.
+    
+
+
+Boolean Restrictions
+
+The following restrictions apply to <B>'face'</B> boolean operations :
+
+o The <B>'targets'</B> argument must contain one or more faces from a single body,
+  and <B>'tools'</B> must contain one or more faces from another body.
+
+o <B>'Face'</B> boolean operations can only be performed with generalised
+  topology disabled.
+
+o There must be at least one intersection between the given topology of
+  the target and tool (i.e. at least 1 face pair must clash). If this
+  is not the case the boolean will not be performed and the error
+  PK_ERROR_partial_no_intersect will be returned.
+
+
+Tracking Information
+
+The <B>'tracking'</B> structure contains topology tracking information on the
+operation. In the case of this function, tracking information for edges
+from <B>'target'</B> involved in the imprint is returned.
+
+For any new edge returned in the structure the <B>'track'</B> field  has the value
+PK_TOPOL_track_derive_c and the single edge in <B>'product_topols'</B>
+originated in the <B>'n_original_topols'</B> entities in <B>'original_topols'</B>.
+The entity type of each of these is recorded in <B>'original_classes'</B>
+array. In most cases this is either 2 original faces for which the
+product edge is the intersection, or a face and an edge or two edges where
+the imprint was along a pre-exisiting edge on one or other or both bodies.
+
+Imprinted edges arising from any requested imprint completion are tracked
+by the same method. The original topology associated with the body upon
+which the completion is occurring is tracked as normal. The topology upon
+the other body i.e. that which is implied to cause the imprint is handled
+slightly differently. The topology upon this body which causes the imprint
+of the vertex from which completion occurs is tracked. This topology will
+either be a pre-existing vertex upon that body or an edge of the body
+causing the imprinted vertex when imprinted upon the other body, note this
+edge will only be coincident with the imprint at the point associated with
+the completion vertex.
+
+Tracking records detailing edges which arise from use of the
+<B>'limit_target_faces'</B> or <B>'limit_tool_faces'</B> options will contain topology
+information for one body only, where the associated originating topology
+on that body will arise directly from the limited set of faces used from
+that body. The limiting of the face set having been the cause for the
+edge's creation.
+
+Option Restrictions
+
+The following options within <B>'configuration'</B> options are
+ignored by this function :
+
+    o <B>'identical_intersect'</B>
+    o <B>'one_in_all_in'</B>
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

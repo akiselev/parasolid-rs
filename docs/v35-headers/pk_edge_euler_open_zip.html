@@ -1,0 +1,88 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_EDGE_euler_open_zip</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_EDGE_euler_open_zip</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>    PK_EDGE_euler_open_zip
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>          edge,        --- Edge to split
+<A HREF=../headers/pk_fin_t.html>PK_FIN_t</A>           fin,         --- Fin at vertex to split
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_vertex_t.html>PK_VERTEX_t</A> *const new_vertex,  --- New vertex created
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A>   *const new_edge     --- New edge created
+)
+</B>
+<A NAME="description"></A>
+<I>This function splits an edge lengthwise, replacing it with two edges
+joined at one end.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_edge_not_manifold      <B>'edge'</B> not manifold (MILD)
+    PK_ERROR_edge_not_open          <B>'edge'</B> not open (MILD)
+    PK_ERROR_vertex_not_manifold    a vertex of <B>'edge'</B> is not manifold (MILD)
+    PK_ERROR_no_common_vertex       <B>'fin'</B> doesn't point to a vertex of <B>'edge'</B>
+                                    (MILD)
+    PK_ERROR_fins_not_distinct      <B>'fin'</B> and its forward fin do not define two
+                                     distinct edge groups either side of split
+                                    (MILD)
+
+<A NAME="documentation"></A>
+<B>'edge'</B> must be open, manifold and both its vertices must be manifold.  The
+forward vertex of <B>'fin'</B> must be one of the vertices of <B>'edge'</B> but <B>'fin'</B> must
+not be one of the fins of <B>'edge'</B>. Neither must the forward fin of <B>'fin'</B> as
+after the operation <B>'fin'</B> and its ( pre-operation ) forward fin will lie on
+different sides of the opened zip.
+
+After the operation the forward fin of <B>'fin'</B> is a fin of <B>'edge'</B> and the forward
+vertex of <B>'fin'</B> is an original vertex.  The new edge will have the same
+direction as the original.
+
+<B>'new_edge'</B> and <B>'new_vertex'</B> will not have any geometry attached and the
+resulting body will be invalid.  The fin of <B>'edge'</B> whose forward vertex is the
+forward vertex of <B>'fin'</B> will remain a fin of <B>'edge'</B>. The other fin of <B>'edge'</B>
+will become a fin of <B>'new_edge'</B>. If <B>'edge'</B> is tolerant both fins will retain
+their curves.
+
+The inverse of this function is <A HREF=../headers/pk_edge_euler_close_zip.html>PK_EDGE_euler_close_zip</A>.
+
+See <A HREF="../chapters/fd_chap.033.html#50434391_pgfId-295376">here</A> for an illustration.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

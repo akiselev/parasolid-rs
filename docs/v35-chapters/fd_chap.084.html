@@ -1,0 +1,765 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Facet Model Structure</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Facet Model Structure</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.083.html">Overview Of Convergent Modeling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.085.html">Converting Between Facet and Classic Geometry</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.084.html#50422161_pgfId-299366">83.1	Introduction</A>
+<LI> <A HREF="fd_chap.084.html#50422161_pgfId-379618">83.2	Facet bodies</A>
+<LI> <A HREF="fd_chap.084.html#50422161_pgfId-309047">83.3	Meshes</A>
+<LI> <A HREF="fd_chap.084.html#50422161_pgfId-420348">83.4	Polylines</A>
+<LI> <A HREF="fd_chap.084.html#50422161_pgfId-303529">83.5	Mesh topology</A>
+<UL>
+<LI> <A HREF="fd_chap.084.html#50422161_pgfId-321169">83.5.1	Mesh topology-specific operations</A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422161_pgfId-299366"></A>83.1	Introduction
+
+
+</H1>
+<P>
+<A NAME="50422161_pgfId-299662"></A>In order to facilitate the representation, creation, and manipulation of facet bodies, Parasolid defines a number of major entity classes in addition to those that are used for <STRONG>
+classic bodies</STRONG>. This chapter discusses these additional entity classes and provides an overview of their use. </P>
+<P>
+<A NAME="50422161_pgfId-299367"></A>Parasolid topology should be used in a facet model as it would be in a B-rep model. </P>
+<P>
+<A NAME="50422161_pgfId-301551"></A>When Convergent Modeling is enabled, the following types of geometric entities can be used instead of classic geometric entities:</P>
+<UL>
+<LI>
+<A NAME="50422161_pgfId-312433"></A>Meshes, which are used in facet models instead of classic surfaces.</LI>
+<LI>
+<A NAME="50422161_pgfId-312434"></A>Polylines, which are used in facet models instead of classic curves. </LI>
+</UL>
+<P>
+<A NAME="50422161_pgfId-312438"></A>These entities should be present in all facet bodies instead of classic geometric entities, and can be used in many Parasolid API functions. </P>
+<P>
+<A NAME="50422161_pgfId-309036"></A>For a complete description of the topological and geometric entities used by Parasolid, see <A HREF="fd_chap.015.html#50422084_36760">Chapter 14, “Model Structure”</A>, in the Parasolid <EM>
+<A HREF=../fd_index.html>Functional Description</A></EM>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422161_pgfId-379618"></A>83.2	Facet bodies
+
+
+</H1>
+<P>
+<A NAME="50422161_pgfId-425562"></A>A facet body is a body with Parasolid topology that references facet geometry instead of classic geometry. A body can contain all facet geometry, all classic geometry, or a combination of both classic and facet geometry. Parasolid provides its own native mesh format called <STRONG>
+Persistent Mesh (PSM) format</STRONG> for your use.When transmitting facet parts, the PSM mesh data may be embedded in the XT data or saved in a separate .xmm_bin or .xmm_txt file using the same key as the XT file. When receiving facet parts, these files will be required to load the PSM mesh data and should use the same key as the XT part being received. Parasolid will delay loading mesh data until it is required by the operations it is performing. See <A HREF="fd_chap.083.html#50422160_39874">Section 82.2, “How to make use of Convergent Modeling in Parasolid”</A> for more information on using Convergent Modeling.</P>
+<P>
+<A NAME="50422161_pgfId-452651"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1072.gif">
+
+<P>
+<A NAME="50422161_pgfId-452475"></A>Figure 83-1 Examples of facet bodies</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422161_pgfId-309047"></A>83.3	Meshes
+
+
+</H1>
+<P>
+<A NAME="50422161_pgfId-415855"></A>A mesh (PK_CLASS_mesh) is a sub-class of surface and it contains mesh data in the PSM format, which may be embedded in the XT data or stored externally in a separate .xmm file with the same key. In a facet model, meshes can be attached to rubber faces, and topology-based Parasolid operations treat that mesh as if it was a classic surface. In addition, meshes can be left unattached and geometry-based Parasolid operations (such as intersection) treat them as if they were orphan geometry. We recommend that applications treat meshes in the same manner as they would for any other surface type.</P>
+<P>
+<A NAME="50422161_pgfId-393768"></A>You can create one mesh per face and operations trim meshes to fit the faces they are attached to. When a mesh is created and attached to a body, we recommend adding topology that is appropriate for the body’s shape in order to help optimise downstream modelling operations. Mesh bodies can be split up into separate faces using, for example, <A HREF=../headers/pk_face_imprint_curves_2.html>PK_FACE_imprint_curves_2</A>. See <A HREF="fd_chap.051.html#50422124_86613">Section 50.3, “Direct imprinting”</A> for more information.</P>
+<P>
+<A NAME="50422161_pgfId-308675"></A>Parasolid has been designed to deal with large data sets. In addition, large models can be subdivided into regions by using Parasolid topology to capture significant features of the body. This allows operations to restrict the scope of editing operations and make use of boxes to avoid loading distant meshes that are not relevant to the operation. In <A HREF="fd_chap.084.html#50422161_31763"><EM>
+Figure 83-2</EM></A>, for example, only the red, green and blue meshes need to be edited as a result of subtracting the meshed cylinder from the block. Grey meshes do not need to be edited because they have not been changed by the operation. </P>
+<P>
+<A NAME="50422161_pgfId-308685"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1073.gif">
+
+<P>
+<A NAME="50422161_pgfId-308687"></A>Figure 83-2 <A NAME="50422161_31763"></A>Editing meshes for only changed faces</P>
+<P>
+<A NAME="50422161_pgfId-437289"></A>Parasolid’s meshes are optimised to not load their mesh data until it is needed for an operation. You can force Parasolid to load all PSM data for an array of parts specified or for a given partition using either <A HREF=../headers/pk_part_receive_meshes.html>PK_PART_receive_meshes</A> or <A HREF=../headers/pk_partition_receive_meshes.html>PK_PARTITION_receive_meshes</A>. See <A HREF="fd_chap.101.html#50422180_21541">Section 100.5.1.1, “Receiving mesh data and deltas in a partition”</A> for more information.</P>
+<P>
+<A NAME="50422161_pgfId-500027"></A>Parasolid supports the following mesh-specific operations:</P>
+<P>
+<A NAME="50422161_pgfId-433733"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-302488"></A>Functional area</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-302490"></A>Example functions</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-302492"></A>Convert Parasolid body to facet body</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-302494"></A><A HREF=../headers/pk_body_make_facet_body.html>PK_BODY_make_facet_body</A></P>
+<P>
+<A NAME="50422161_pgfId-456500"></A>See <A HREF="fd_chap.085.html#50422162_49311">Section 84.3, “Creating facet bodies directly from existing bodies”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-302496"></A>Create facet body from mesh data </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-302498"></A><A HREF=../headers/pk_mesh_make_bodies.html>PK_MESH_make_bodies</A></P>
+<P>
+<A NAME="50422161_pgfId-456562"></A>See <A HREF="fd_chap.085.html#50422162_58644">Section 84.4, “Manipulating facet data”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-456615"></A>Create mesh from a selection of mesh topologies from an existing mesh</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-456617"></A><A HREF=../headers/pk_mtopol_make_meshes.html>PK_MTOPOL_make_meshes</A></P>
+<P>
+<A NAME="50422161_pgfId-457752"></A>See <A HREF="fd_chap.085.html#50422162_23097">Section 84.4.2, “Creating meshes from mesh topology”</A> for more information on this function.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-302520"></A>Data structure and geometric enquiries</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-302522"></A><A HREF=../headers/pk_mfacet_parameterise_vec.html>PK_MFACET_parameterise_vec</A>, <A HREF=../headers/pk_mesh_eval_with_mtopol.html>PK_MESH_eval_with_mtopol</A>, <A HREF=../headers/pk_mvertex_set_positions.html>PK_MVERTEX_set_positions</A></P>
+<P>
+<A NAME="50422161_pgfId-369161"></A>See <A HREF="fd_chap.084.html#50422161_92046">Section 83.5.1, “Mesh topology-specific operationsDOC1914”</A> for a list of mesh topology-specific enquiry functions.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-310700"></A>Force loading of meshes</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-310702"></A><A HREF=../headers/pk_part_receive_meshes.html>PK_PART_receive_meshes</A>, <A HREF=../headers/pk_partition_receive_meshes.html>PK_PARTITION_receive_meshes</A> </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-509671"></A>Imprint an array of vectors on to a mesh</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-509673"></A><A HREF=../headers/pk_mesh_imprint_vectors.html>PK_MESH_imprint_vectors</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422161_pgfId-317795"></A>You can also find a bounding box for a mesh using <A HREF=../headers/pk_surf_find_box.html>PK_SURF_find_box</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422161_pgfId-420348"></A>83.4	<A NAME="50422161_86789"></A>Polylines
+
+
+</H1>
+<P>
+<A NAME="50422161_pgfId-300201"></A>A polyline (PK_CLASS_pline) is a type of curve that describes a connected chain of linear segments. Unlike meshes, the polyline’s data is stored in the polyline entity itself. </P>
+<P>
+<A NAME="50422161_pgfId-352186"></A>You can create a polyline using <A HREF=../headers/pk_pline_create.html>PK_PLINE_create</A>. When a polyline is attached to an edge, each point will correspond to a mesh vertex along the boundary of every adjacent mesh face. See the documentation for <A HREF=../headers/pk_pline_sf_t.html>PK_PLINE_sf_t</A> for more information on creating polylines from the standard form.</P>
+<P>
+<A NAME="50422161_pgfId-304116"></A>In a facet model, polylines can be attached to rubber edges, and topology-based Parasolid operations treat that polyline as if it was a classic curve. Polyline data can be used in the same areas of Parasolid functionality as mesh data. </P>
+<P>
+<A NAME="50422161_pgfId-304102"></A>Polylines can also be left unattached. In this case, they are treated as orphan geometry, and Parasolid supports geometrical operations (such as intersection) upon them as it would orphan geometry in a classic model.</P>
+<P>
+<A NAME="50422161_pgfId-433538"></A>You can also find a bounding box for a polyline using <A HREF=../headers/pk_curve_find_box.html>PK_CURVE_find_box</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422161_pgfId-303529"></A>83.5	Mesh topology
+
+
+</H1>
+<P>
+<A NAME="50422161_pgfId-329894"></A>Parasolid defines several classes to let you represent and manipulate the topological entities of these stored meshes in a modelling session. This section describes those entities.</P>
+<P>
+<A NAME="50422161_pgfId-322110"></A>Parasolid defines the following classes for representing mesh topology:</P>
+<P>
+<A NAME="50422161_pgfId-322026"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321907"></A>Class</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321909"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321911"></A>Mesh facet</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321913"></A>An mfacet (PK_CLASS_mfacet) represents a single triangular facet in a mesh. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321915"></A>Mesh fin</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321917"></A>An mfin (PK_CLASS_mfin) represents a fin on a facet boundary. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321919"></A>Mesh vertex</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321921"></A>An mvertex (PK_CLASS_mvertex) represents a vertex on a facet. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321923"></A>Mesh topology</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-321925"></A>An mtopol (PK_CLASS_mtopol) represents any mesh topology entity. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422161_pgfId-321897"></A>These classes are illustrated in <A HREF="fd_chap.084.html#50422161_16575"><EM>
+Figure 83-3</EM></A>, together with equivalent topological classes from a classic body. Mesh fins and mesh vertices, in particular, are distinct from Parasolid fins and vertices. </P>
+<P>
+<A NAME="50422161_pgfId-322354"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1074.gif">
+
+<P>
+<A NAME="50422161_pgfId-352219"></A>Figure 83-3 <A NAME="50422161_16575"></A>Mesh topology on a facet body</P>
+<P>
+<A NAME="50422161_pgfId-450118"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422161_pgfId-352222"></A>Note:  You can use <A HREF=../headers/pk_mtopol_null_m.html>PK_MTOPOL_null_m</A> to create a null <A HREF=../headers/pk_mtopol_t.html>PK_MTOPOL_t</A> and <A HREF=../headers/pk_mtopol_is_null_m.html>PK_MTOPOL_is_null_m</A> to check if a given mtopol is null. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422161_pgfId-448686"></A><A HREF="fd_chap.084.html#50422161_15349"><EM>
+Figure 83-4</EM></A> illustrates the relationship between mesh topologies and Parasolid entities.</P>
+<P>
+<A NAME="50422161_pgfId-448584"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1075.gif">
+
+<P>
+<A NAME="50422161_pgfId-339252"></A>Figure 83-4 <A NAME="50422161_15349"></A>Relationship between mesh topologies and Parasolid entities</P>
+
+<H3>
+<A NAME="50422161_pgfId-321169"></A>	83.5.1 	<A NAME="50422161_92046"></A>Mesh topology-specific operations</H3>
+<P>
+<A NAME="50422161_pgfId-320011"></A>Parasolid provides the following functions for enquiring about the mesh topology in a facet body:</P>
+<P>
+<A NAME="50422161_pgfId-487879"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-411598"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-411600"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-497461"></A><A HREF=../headers/pk_fin_find_mtopols.html>PK_FIN_find_mtopols</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-497463"></A>Returns the mtopology of a given fin. See <A HREF="fd_chap.089.html#50422166_25826">Section 88.5, “Finding the mtopology along a fin”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435304"></A><A HREF=../headers/pk_mesh_ask_n_mfacets.html>PK_MESH_ask_n_mfacets</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435306"></A>Returns the number of mfacets in a mesh.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435040"></A><A HREF=../headers/pk_mesh_ask_n_mvertices.html>PK_MESH_ask_n_mvertices</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435042"></A>Returns the number of mvertices in a mesh.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-443567"></A><A HREF=../headers/pk_mesh_eval_with_mtopol.html>PK_MESH_eval_with_mtopol</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-443569"></A>Returns the position, the mfacet and the mtopol at a given uv position in a mesh.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-440204"></A><A HREF=../headers/pk_mesh_find_laminar_mfins.html>PK_MESH_find_laminar_mfins</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-440206"></A>Finds and returns the laminar mfins in a mesh. See <A HREF="fd_chap.088.html#50422165_70508">Chapter 87, “Filling Holes In Facet Bodies”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-482385"></A><A HREF=../headers/pk_mesh_find_sharp_mfins.html>PK_MESH_find_sharp_mfins</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-482387"></A>Finds and returns the sharp mfins in a mesh. See <A HREF="fd_chap.089.html#50422166_11846">Section 88.3.2.3, “Finding sharp mvertices in meshes”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-482565"></A><A HREF=../headers/pk_mesh_find_sharp_mvxs.html>PK_MESH_find_sharp_mvxs</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-482567"></A>Find and returns the sharp mvertices in a mesh. See <A HREF="fd_chap.089.html#50422166_11846">Section 88.3.2.3, “Finding sharp mvertices in meshes”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-560846"></A><A HREF=../headers/pk_mesh_is_loaded.html>PK_MESH_is_loaded</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-560848"></A>Returns whether the given mesh is loaded in the current Parasolid session.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435016"></A><A HREF=../headers/pk_mfacet_ask_mfacet_adjacent.html>PK_MFACET_ask_mfacet_adjacent</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435018"></A>Returns the mfacet adjacent to the given mfacet and a specified mfin. For a laminar mfin, returns a zero identifier, indicating that there is no adjacent mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435020"></A><A HREF=../headers/pk_mfacet_ask_mfin.html>PK_MFACET_ask_mfin</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435022"></A>Returns the mfin of the mfacet with the given mfin_index.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435024"></A><A HREF=../headers/pk_mfacet_ask_mvertices.html>PK_MFACET_ask_mvertices</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435026"></A>Returns the mvertices of the given mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435028"></A><A HREF=../headers/pk_mfacet_ask_mvx_normals.html>PK_MFACET_ask_mvx_normals</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435030"></A>Returns the normals of the mvertices of the given mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435032"></A><A HREF=../headers/pk_mfacet_ask_normal.html>PK_MFACET_ask_normal</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435034"></A>Returns the normal vector of the given mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435036"></A><A HREF=../headers/pk_mfacet_ask_positions.html>PK_MFACET_ask_positions</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435038"></A>Returns the positions of the mvertices of the given mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-443613"></A><A HREF=../headers/pk_mfacet_parameterise_vec.html>PK_MFACET_parameterise_vec</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-443615"></A>Finds the mesh parameterisation of a position on a given mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435335"></A><A HREF=../headers/pk_mfin_ask_mfacet.html>PK_MFIN_ask_mfacet</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435337"></A>Returns the mfacet that contains the mfin.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434980"></A><A HREF=../headers/pk_mfin_ask_mfin_adjacent.html>PK_MFIN_ask_mfin_adjacent</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434982"></A>Returns the mfin coincident with the given mfin in the adjacent facet. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434984"></A><A HREF=../headers/pk_mfin_ask_mfin_index.html>PK_MFIN_ask_mfin_index</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434986"></A>Returns the index of the given mfin in its mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434988"></A><A HREF=../headers/pk_mfin_ask_mvertex.html>PK_MFIN_ask_mvertex</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434990"></A>Returns the mvertex pointed to by the given mfin.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-443417"></A><A HREF=../headers/pk_mfin_ask_mvx_normal.html>PK_MFIN_ask_mvx_normal</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-443419"></A>Returns the normal of the mvertex of the given mfin.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434992"></A><A HREF=../headers/pk_mfin_ask_next_in_mfacet.html>PK_MFIN_ask_next_in_mfacet</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434994"></A>Returns the next mfin in the given mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434996"></A><A HREF=../headers/pk_mfin_ask_next_of_mvertex.html>PK_MFIN_ask_next_of_mvertex</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-434998"></A>Returns the next mfin around the given mvertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435000"></A><A HREF=../headers/pk_mfin_ask_previous_in_mfacet.html>PK_MFIN_ask_previous_in_mfacet</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435002"></A>Returns the previous mfin in the given mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435004"></A><A HREF=../headers/pk_mfin_ask_previous_of_mvertex.html>PK_MFIN_ask_previous_of_mvertex</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435006"></A>Returns the previous mfin around the given mvertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435008"></A><A HREF=../headers/pk_mfin_is_laminar.html>PK_MFIN_is_laminar</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435010"></A>Indicates whether the mfin is laminar.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435012"></A><A HREF=../headers/pk_mfin_is_same_mfacet.html>PK_MFIN_is_same_mfacet</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435014"></A>Indicates whether the two mfins belong to the same mfacet.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-510122"></A><A HREF=../headers/pk_mfin_is_sharp.html>PK_MFIN_is_sharp</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-510124"></A>Indicates whether the mfin is sharp.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435156"></A><A HREF=../headers/pk_mtopol_ask_box.html>PK_MTOPOL_ask_box</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435158"></A>Returns the bounding box for the given mtopol.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-443836"></A><A HREF=../headers/pk_mtopol_ask_class.html>PK_MTOPOL_ask_class</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-443838"></A>Returns the class of an element of mesh topology.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435160"></A><A HREF=../headers/pk_mtopol_is.html>PK_MTOPOL_is</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-435162"></A>Indicates whether the given mtopol is valid mtopol element.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-460026"></A><A HREF=../headers/pk_mtopol_make_meshes.html>PK_MTOPOL_make_meshes</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-460028"></A>Create meshes from a selection of mesh topologies on existing meshes</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-474004"></A><A HREF=../headers/pk_mvertex_ask_normals.html>PK_MVERTEX_ask_normals</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-474006"></A>Returns all the unique normals of the given mvertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-411698"></A><A HREF=../headers/pk_mvertex_ask_mfacets.html>PK_MVERTEX_ask_mfacets</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-411706"></A>Returns all the mfacets that use the given mvertex as one of their mvertices.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-412840"></A><A HREF=../headers/pk_mvertex_ask_mfin.html>PK_MVERTEX_ask_mfin</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-412842"></A>Returns an mfin which points to the given mvertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-411700"></A><A HREF=../headers/pk_mvertex_ask_mvertices_ring.html>PK_MVERTEX_ask_mvertices_ring</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-411708"></A>Returns the ring of mvertices around the given mvertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-412824"></A><A HREF=../headers/pk_mvertex_ask_position.html>PK_MVERTEX_ask_position</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-412826"></A>Returns the position at the given mvertex.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-412832"></A><A HREF=../headers/pk_mvertex_is_laminar.html>PK_MVERTEX_is_laminar</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422161_pgfId-412834"></A>Returns whether the mvertex is on the laminar boundary of the mesh.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422161_pgfId-320208"></A>For examples of enquiries on mesh topologies, see the code example in the <CODE>
+C++\Code Examples\Facet</CODE>
+ <CODE>
+Examples\Mtopols</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422161_pgfId-320196"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.083.html">Overview Of Convergent Modeling</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.085.html">Converting Between Facet and Classic Geometry</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

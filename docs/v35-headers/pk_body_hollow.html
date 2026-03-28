@@ -1,0 +1,172 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_hollow</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_hollow</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>     PK_BODY_hollow
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>           body,              --- body to be hollowed
+double              offset,            --- offset distance
+double              tolerance,         --- tolerance
+<A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A>        face_face_check,   --- do face face checks
+
+<I>--- returned arguments ---
+</I>int          *const n_faces,           --- number of faces
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>   **const old_faces,         --- faces in original body (optional)
+<A HREF=../headers/pk_face_t.html>PK_FACE_t</A>   **const new_faces          --- new faces corresponding to
+                                       --- old faces              (optional)
+)
+</B>
+<A NAME="description"></A>
+<I>This function hollows a solid body by offsetting all faces of the body
+by the given offset distance
+
+NOTE: This function is deprecated and has been superseded by <A HREF=../headers/pk_body_hollow_2.html>PK_BODY_hollow_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_cant_hollow           hollowing failure
+    PK_ERROR_bad_tolerance         proposed edge tolerance is too small
+    PK_ERROR_not_sheet             body is not a sheet body
+    PK_ERROR_bad_thickness         total thickness is zero
+    PK_ERROR_cant_get_point        failed to find vertex geometry
+    PK_ERROR_cant_get_curve        failed to find edge geometry
+    PK_ERROR_cant_offset           surf failed to offset or face could not
+                                   be deleted
+    PK_ERROR_cant_get_side_surf    failed to find side surface
+    PK_ERROR_cant_get_side_curve   failed to find side curve
+
+<A NAME="documentation"></A>
+
+Introduction
+The <B>'body'</B> is hollowed. The <B>'offset'</B> argument gives the default offset of the
+hollowing - the thickness of the skin of the resulting body. A positive
+<B>'offset'</B> will offset the body outwards (i.e. in the direction of the face
+normals) and a negative value inwards.
+
+The result of hollowing a body will be to generate a body containing a void.
+
+Under some circumstances the function may need to replace exact geometry by
+tolerant geometry. For instance, a four-edge vertex in general will offset
+to two three-edge vertices and a connecting edge. If this new edge is smaller
+than the supplied tolerance then the vertex becomes tolerant and no new edge
+is introduced. In all situations where approximation is required the new
+geometry will have a tolerance less than or equal to the tolerance supplied
+through the <B>'tolerance'</B> argument.
+
+Many circumstances can give rise to changes in topology. Amongst them are :
+
+    1) Dealing with geometry which fails to offset. If it is known that the
+       offset surface of a face would be self-intersecting an attempt is made
+       to either remove the offset face or split it into faces with good
+       regions of the failing surface. For example, a blend may be removed
+       from an edge. The investigation of self-intersection is not exhaustive,
+       however, and it can occur that instances are not trapped.
+
+    2) Dealing with configurations which can be repaired. For instance,
+       an edge can offset to a point or a face can become absorbed into
+       the body.
+
+
+Checking options
+The extent to which checking is applied to the body is specified by the
+<B>'face_face_check'</B> argument. If <B>'face_face_check'</B> is true then
+face-face checks are done on the body in addition to default checks.
+For most applications setting <B>'face_face_check'</B> false will give an
+adequate level of checking.
+
+
+Old_faces and new_faces returns arguments
+The tag of a face in the original body will remain on the exterior of the
+resulting body and will retain the same sense.
+
+Each face to be offset will have a partner created in the final body which is
+an offset of the original face. The pairs of original and new faces are
+returned in the <B>'old_faces'</B> and <B>'new_faces'</B> arguments. Both <B>'old_faces'</B> and
+<B>'new_faces'</B> can contain null tags. This will occur when faces are removed for
+the reasons given above.
+
+When a face has been split, so a single face in one array corresponds to two or
+more faces in the other array, then the single face is repeated to correspond
+to each of the split faces.  If the split face is on the outside of the
+resultant body then the first face in 'old_faces' corresponding to a repeated
+face in 'new_faces' will retain the tag of the original face that was split.
+
+Error handling
+When an error occurs, the function will, where possible, make extra
+information regarding the error available to the application
+by means of a GROUP.
+This GROUP is accessible from the standard form of the error.  Note that,
+while the members of the GROUP will be objects which existed before the
+call (and so will survive rollback), the GROUP itself will be destroyed by
+rollback.  The members of the GROUP will be as follows:
+
+    PK_ERROR_cant_get_point         1 VERTEX   Failed to find new geometry for
+                                               existing vertex
+                                    n FACEs    Failed to find geometry for
+                                               new vertex.
+
+    PK_ERROR_cant_get_curve         1 EDGE     Failed to find new geometry for
+                                               existing edge
+                                    n FACEs    Failed to find geometry for
+                                               new edge
+
+    PK_ERROR_cant_get_surf          n FACEs    Unable to produce offset
+                                               surfaces for these faces.
+                                               No surface replacement is
+                                               performed.
+
+    PK_ERROR_edge_didnt_vanish      1 EDGE     An existing edge should have
+                                               disappeared
+                                    n FACEs    A transient edge should have
+                                               disappeared
+
+    PK_ERROR_face_check_fails       1 FACE     Face which failed check
+
+    PK_ERROR_face_face_check_fails  2 FACEs    Pair of faces where
+                                               inconsistency found.
+
+    PK_ERROR_cant_offset            1 FACE     Failed to offset or face could
+                                               not be deleted
+
+This function is not supported for general bodies.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

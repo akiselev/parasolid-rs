@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_replace_with_sheet</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_replace_with_sheet</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                       PK_FACE_replace_with_sheet
+(
+<I>--- received arguments ---
+</I>int                                   n_faces,   --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>                       faces[],   --- target faces to replace
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                       sheet,     --- replacement sheet
+const <A HREF=../headers/pk_face_replace_with_sheet_o_t.html>PK_FACE_replace_with_sheet_o_t</A> *options,   --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>             *const tracking,  --- tracking information
+<A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A>             *const results    --- status information
+)
+</B>
+<A NAME="description"></A>
+<I>This function replaces a set of faces on a target body with a
+set of faces from a sheet body.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_tolerance         (MILD) proposed edge tolerance is too small
+    PK_ERROR_unsuitable_entity     (MILD) body is not a sheet or solid body
+    PK_ERROR_wrong_entity_in_array (MILD) given topols are not from same body
+    PK_ERROR_not_in_same_partition (MILD) faces and sheet not in same partition
+    PK_ERROR_laminar_edge          (MILD) face to be replaced has a laminar
+                                          edge and isn't part of patch data
+    PK_ERROR_not_on_surface        (MILD) geometry of given edges is not
+                                          coincident with geometry of faces
+
+
+<A NAME="documentation"></A>
+
+INTRODUCTION
+The specified <B>'faces'</B> in the target body are replaced by faces from the
+sheet tool body, <B>'sheet'</B>.
+
+Topology in the target body which intersects the tool faces, but which is
+not explicitly identified as a target face, will be preserved.
+
+The tool body is destroyed by the replace operation.
+
+See <A HREF="../chapters/fd_chap.069.html#50434432_pgfId-312330">Replacing faces with a sheet body</A> for more information.
+
+RECALCULATING EDGE AND VERTEX GEOMETRY
+Edge and vertex geometry will be recalculated if necessary.
+
+RESTRICTIONS AND LIMITATIONS
+The following restrictions and limitations apply to this function :
+
+  o The supplied sheet body must be sufficiently large to
+    completely cover the faces being replaced without extension.
+
+  o The supplied sheet body must be sufficiently close
+    to the faces being replaced so that, if necessary, the underlying
+    geometry of the target faces may be extended to find intersections
+    without causing the faces of the target body to become
+    self-intersecting.
+
+  o The supplied sheet body must be correctly orientated such that
+    resulting face normals of the patched regions will be consistent
+    with other faces in the target body.
+
+  o The supplied faces must have no laminar edges, unless those faces form
+    part of the patch data.
+
+TRACKING INFORMATION
+The <A HREF=../headers/pk_topol_track_t.html>PK_TOPOL_track_t</A> structure contains topology tracking information on
+the operation. In the case of this function, only tracking information
+records of the type PK_TOPOL_track_create_c may be returned.
+
+
+ERROR HANDLING
+If this function returns PK_ERROR_no_errors, the result of the operation
+will be indicated by the value of the <B>'status'</B> field of the <B>'results'</B>
+structure. When this value is not <A HREF=../headers/pk_local_status_t.html>PK_local_status_ok_c</A> or
+<A HREF=../headers/pk_local_status_t.html>PK_local_status_nocheck_c</A>, it indicates an operation failure and an array
+of entities involved in this failure is returned through the field
+<B>'error_entities'</B> of the <B>'results'</B> structure, when possible.
+For more information regarding the failure status code and the error_entities,
+refer to the PK documentation of the <A HREF=../headers/pk_topol_local_r_t.html>PK_TOPOL_local_r_t</A> structure.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

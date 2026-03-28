@@ -1,0 +1,96 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_imprint_curves_vector</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_imprint_curves_vector</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>   PK_BODY_imprint_curves_vector
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>         body,         --- a body
+int               n_curves,     --- number of curves
+const <A HREF=../headers/pk_curve_t.html>PK_CURVE_t</A>  curves[],     --- curves
+double            tol,          --- tolerance
+<A HREF=../headers/pk_vector_t.html>PK_VECTOR_t</A>       direction,    --- direction to project curves in
+
+<I>--- returned arguments ---
+</I>int        *const n_edges,      --- number of edges imprinted
+<A HREF=../headers/pk_edge_t.html>PK_EDGE_t</A> **const edges         --- imprinted edges
+)
+</B>
+<A NAME="description"></A>
+<I>This function imprints the given curves on the body by projecting them in the
+given direction.
+
+NOTE: This function is deprecated and has been superseded by <A HREF=../headers/pk_curve_project.html>PK_CURVE_project</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_invalid_geometry   Invalid curve
+
+    PK_ERROR_unsuitable_entity  The target body or supplied curves are
+                                unsuitable for this operation
+
+    PK_ERROR_cant_do_imprint    Failed to perform imprint
+
+
+<A NAME="documentation"></A>
+Edges and vertices are added to the body. These are the image of the curves on
+the body under projection in the supplied direction. The edges created by this
+imprinting are returned. These may include existing edges where the curves
+project down onto existing edges.
+
+Note: Sometimes, it may be possible to imprint the <B>'curves'</B> on the
+<B>'body'</B> several times (for example, if the body is closed). In such
+cases, if the projection of the <B>'curves'</B> lies entirely within the
+boundary of the <B>'body'</B> when viewed along the supplied <B>'direction'</B>, the
+<B>'curves'</B> are only imprinted onto the nearest face. In cases where
+curves should be imprinted on several faces, call
+<A HREF=../headers/pk_face_imprint_cus_vector.html>PK_FACE_imprint_cus_vector</A> with the required faces.
+
+The tolerance supplied is used to solve any resolution problems and may also be
+used to create SP-curves on the imprinted edges.
+
+The curves supplied must be finite - only trimmed analytics and parametric
+curves are supported.
+
+This operation doesn't work on a wire body or any body whose faces have no
+attached geometry,
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

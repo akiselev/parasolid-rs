@@ -1,0 +1,91 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_attach_surfs</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_attach_surfs</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>    PK_FACE_attach_surfs
+(
+<I>--- received arguments ---
+</I>int                n_faces,     --- number of faces
+const <A HREF=../headers/pk_face_t.html>PK_FACE_t</A>    faces[],     --- faces to have surfaces attached
+const <A HREF=../headers/pk_surf_t.html>PK_SURF_t</A>    surfs[],     --- surfaces to be attached to faces
+const <A HREF=../headers/pk_logical_t.html>PK_LOGICAL_t</A> senses[]     --- face senses
+)
+</B>
+<A NAME="description"></A>
+<I>This function attaches surfaces to faces.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_has_parent          <B>'surf'</B> is already attached
+    PK_ERROR_bad_shared_dep       attempt to illegally share a dependant
+                                  of <B>'surf'</B>
+    PK_ERROR_bad_shared_entity    attempt to illegally share <B>'surf'</B>
+    PK_ERROR_geom_not_needed     <B>'face'</B> already owns geometry
+    PK_ERROR_inconsistent_geom    inconsistent geometry
+    PK_ERROR_invalid_geometry     geometry does not pass checks
+
+<A NAME="documentation"></A>
+The arrays <B>'faces'</B>, <B>'surfs'</B> and <B>'senses'</B> are all of the length <B>'n_faces'</B>.
+All the <B>'faces'</B> must belong to the same body.
+
+If `senses[i]' is PK_LOGICAL_true then the face normal will point in the
+direction of the surface normal.  If `senses[i]' is PK_LOGICAL_false then the
+face normal will point in the opposite direction to the surface normal.
+
+A surface may occur more than once in <B>'surfs'</B> and if this
+is the case then the surface will be shared, providing the sharing is
+legal.
+
+PK_FACE_attach_surfs will not copy any surfaces, thus attachments are
+further restricted by constraints on the sharing of geometry:
+
+    o No surface may belong to a different body.
+
+    o An orphan surface may be attached to a face as long as it has no
+      dependents attached to topology and it has no dependents shared with
+      any other orphan entity.
+
+The surface must be capable of passing Parasolid's geometry checking.
+
+The self intersection check is only performed if the appropriate interface
+parameter is set.
+
+See <A HREF="../chapters/fd_chap.091.html#50434457_pgfId-339254">Attaching geometry</A> for more information.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

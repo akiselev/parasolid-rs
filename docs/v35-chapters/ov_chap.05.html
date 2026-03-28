@@ -1,0 +1,496 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=ISO-8859-1">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="ISO-8859-1" TYPE="text/css">
+<TITLE>Booleans and Related Functionality</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Booleans and Related Functionality</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.04.html">Model Structure</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.06.html">Local Operations</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-293957">4.1	Introduction</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-293963">4.2	Booleans</A>
+<UL>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-293973">4.2.1	Overview of booleans</A>
+<UL>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-293983">4.2.1.1	Global booleans</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-294004">4.2.1.2	Local booleans</A>
+</UL>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-294023">4.2.2	Common options and uses</A>
+<UL>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-341743">4.2.2.1	Improving performance by matching coincident regions</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-360090">4.2.2.2	Enclosing a solid region with a sheet body</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-1131214">4.2.2.3	Punching sheets with solid bodies</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-401728">4.2.2.4	Fencing off sections of a body</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-1728382">4.2.2.5	Retaining topologies during a boolean operation</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-433709">4.2.2.6	Other options</A>
+</UL>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-294123">4.2.3	Boolean tools</A>
+</UL>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-294082">4.3	Instancing</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-294105">4.4	Patterning</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-294176">4.5	Sectioning</A>
+<UL>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-294211">4.5.1	Destructive sectioning</A>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-294229">4.5.2	Non-destructive sectioning</A>
+</UL>
+<LI> <A HREF="ov_chap.05.html#50446367_pgfId-312003">4.6	Clash detection</A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446367_pgfId-293957"></A>4.1	<A NAME="50446367_marker-494644"></A><A NAME="50446367_marker-494797"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50446367_pgfId-318286"></A>Parasolid offers unparalleled boolean capabilities, allowing you to take sets of modelling entities and compare or combine them in a wide variety of ways. This chapter describes Parasolid&#8217;s powerful boolean functionality, together with related functionality that either uses Parasolid&#8217;s boolean capabilities or is similar to it. </P>
+<UL>
+<LI>
+<A NAME="50446367_pgfId-318330"></A><A HREF="ov_chap.05.html#50446367_73918">Section 4.2, &#8220;Booleans&#8221;</A>, describes the boolean functionality that Parasolid supports, including the basic functionality, some of the operations that are possible, and the low-level tools that are available for you to implement more specialized functionality. </LI>
+<LI>
+<A NAME="50446367_pgfId-318354"></A><A HREF="ov_chap.05.html#50446367_48094">Section 4.3, &#8220;Instancing&#8221;</A>, describes functionality that uses boolean operations to provide a fast method of creating patterns on a model (for example, a pattern of bosses or a ventilation grill). </LI>
+<LI>
+<A NAME="50446367_pgfId-318367"></A><A HREF="ov_chap.05.html#50446367_13583">Section 4.4, &#8220;Patterning&#8221;</A>, describes functionality that is related to instancing, but does not itself use boolean operations to create results. Patterning provides a good complement to instancing, and may be used in situations where instancing is not the best solution.</LI>
+<LI>
+<A NAME="50446367_pgfId-318380"></A><A HREF="ov_chap.05.html#50446367_23433">Section 4.5, &#8220;Sectioning&#8221;</A>, describes Parasolid&#8217;s support for dividing a body into different sections using surfaces, faces or sheets.</LI>
+<LI>
+<A NAME="50446367_pgfId-318393"></A><A HREF="ov_chap.05.html#50446367_20276">Section 4.6, &#8220;Clash detection&#8221;</A>, describes the functionality that Parasolid provides for analysing two bodies and providing information about whether they clash with (i.e. overlap) each other. </LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446367_pgfId-293963"></A>4.2	<A NAME="50446367_73918"></A><A NAME="50446367_marker-494646"></A>Booleans
+
+
+</H1>
+<P>
+<A NAME="50446367_pgfId-318614"></A>Boolean operations are a fundamental type of operation in Parasolid. Not only is boolean functionality available to you, the programmer, but it is used extensively by Parasolid itself. This section describes the boolean functionality that Parasolid supports:</P>
+<UL>
+<LI>
+<A NAME="50446367_pgfId-318664"></A><A HREF="ov_chap.05.html#50446367_78873">Section 4.2.1, &#8220;Overview of booleans&#8221;</A>, gives you a broad overview of the boolean process, describing the operations that are possible and the different ways that you can apply them. </LI>
+<LI>
+<A NAME="50446367_pgfId-318708"></A><A HREF="ov_chap.05.html#50446367_56306">Section 4.2.2, &#8220;Common options and uses&#8221;</A>, explains some of the many options available to you when adding boolean functionality to your application, and the uses to which they can be put. </LI>
+<LI>
+<A NAME="50446367_pgfId-318713"></A><A HREF="ov_chap.05.html#50446367_48053">Section 4.2.3, &#8220;Boolean tools&#8221;</A>, describes a number of tools that let you add your own boolean functionality to your application. This functionality can be useful if you have very specialized needs, or do not want to use the more generalized tools described in earlier sections.</LI>
+</UL>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446367_pgfId-293973"></A>	4.2.1 	<A NAME="50446367_78873"></A><A NAME="50446367_marker-494819"></A>Overview of booleans</H2>
+<P>
+<A NAME="50446367_pgfId-318314"></A>Boolean operations involve the combination of two or more bodies so as to create a new result. </P>
+<P>
+<A NAME="50446367_pgfId-318533"></A>In Parasolid, boolean operations work on <STRONG>
+target</STRONG><A NAME="50446367_marker-494680"></A><A NAME="50446367_marker-494897"></A><A NAME="50446367_marker-494875"></A> bodies and <STRONG>
+tool</STRONG><A NAME="50446367_marker-495066"></A> bodies. A target is the body that you start with, the body that is modified by the operation, and the body that is returned by the operation; it is the body that persists throughout the whole of the boolean operation. The tool (or tools, since there can be several of them for some types of boolean) are the bodies that do the modifying. They are transient bodies that are destroyed at the end of the boolean operation. </P>
+<P>
+<A NAME="50446367_pgfId-318492"></A>Boolean operations in Parasolid are analogous to mathematical set operations. There are three basic boolean operations, as follows:</P>
+<UL>
+<LI>
+<A NAME="50446367_pgfId-318521"></A>A target and tool can be <STRONG>
+united</STRONG><A NAME="50446367_marker-494684"></A><A NAME="50446367_marker-494899"></A><A NAME="50446367_marker-494877"></A>, so that the result incorporates all the entities of the tool.</LI>
+<LI>
+<A NAME="50446367_pgfId-318768"></A>A tool can be <STRONG>
+subtracted</STRONG><A NAME="50446367_marker-494686"></A><A NAME="50446367_marker-494901"></A><A NAME="50446367_marker-494879"></A> from a target, so that the result consists of just that material that didn&#8217;t also form part of the tool</LI>
+<LI>
+<A NAME="50446367_pgfId-318769"></A>A target and tool can be <STRONG>
+intersected</STRONG><A NAME="50446367_marker-494688"></A><A NAME="50446367_marker-494903"></A><A NAME="50446367_marker-494881"></A>, such that the only remaining material in the result is that material which was present in both the target and the tool prior to the operation.</LI>
+</UL>
+<P>
+<A NAME="50446367_pgfId-972798"></A>Boolean operations can be performed on solid, sheet, and wire bodies (with the exception that wire bodies cannot be intersected). They can be performed using either manifold or general bodies (see <A HREF="ov_chap.04.html#50446350_87428">Section 3.7, &#8220;More about bodies&#8221;</A>), and the results may themselves be either manifold or general. </P>
+<P>
+<A NAME="50446367_pgfId-323715"></A>These operations are illustrated in <A HREF="ov_chap.05.html#50446367_86818"><EM>
+Figure 4-1</EM></A>.</P>
+<P>
+<A NAME="50446367_pgfId-1196288"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-29.gif">
+
+<P>
+<A NAME="50446367_pgfId-323936"></A>Figure 4-1 <A NAME="50446367_86818"></A>Basic boolean operations</P>
+<P>
+<A NAME="50446367_pgfId-318604"></A>There is always a single target in any boolean operation. As already mentioned, there can be many tools, in which case Parasolid unites them before the boolean operation proceeds, treating them as a single body from that point on.</P>
+<P>
+<A NAME="50446367_pgfId-334245"></A>Parasolid offers two broad categories of boolean operation: <STRONG>
+global</STRONG><A NAME="50446367_marker-494690"></A><A NAME="50446367_marker-494793"></A> booleans and <STRONG>
+local</STRONG><A NAME="50446367_marker-494692"></A><A NAME="50446367_marker-494799"></A> booleans. These are discussed in the following sections.</P>
+
+<H4>
+<A NAME="50446367_pgfId-293983"></A>4.2.1.1 <A NAME="50446367_97640"></A><A NAME="50446367_marker-494650"></A><A NAME="50446367_marker-494795"></A>Global booleans</H4>
+<P>
+<A NAME="50446367_pgfId-334272"></A>Global booleans perform boolean operations on whole bodies, taking a single target body, and multiple tool bodies, and applying the specified boolean operation to the target. Because the operation is performed at the body level (by comparing all pairs of faces in the target and tool), the resulting body is guaranteed to be topologically consistent. Global booleans, because of the nature of the face pair comparison, can be computationally very expensive. </P>
+
+
+<H4>
+<A NAME="50446367_pgfId-294004"></A>4.2.1.2 <A NAME="50446367_91626"></A><A NAME="50446367_marker-494652"></A><A NAME="50446367_marker-494801"></A>Local booleans</H4>
+<P>
+<A NAME="50446367_pgfId-334343"></A>Local booleans (sometimes known as <A NAME="50446367_marker-495112"></A>partial booleans), tend to be very quick to perform compared to global booleans. Rather than working at the body level, local booleans use a set of faces from a target body, and a set of faces from a single tool body. You specify these faces yourself, and only the faces you specify are used in the boolean operation. Restricting the scope of the boolean operation in this way can drastically improve performance. </P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446367_pgfId-294023"></A>	4.2.2 	<A NAME="50446367_56306"></A><A NAME="50446367_marker-494654"></A><A NAME="50446367_marker-494775"></A><A NAME="50446367_marker-494773"></A>Common options and uses</H2>
+<P>
+<A NAME="50446367_pgfId-334458"></A>Parasolid&#8217;s boolean functionality supports a wide range of options that you can use to create a huge number of effects. Most of these options can be used with both global and local booleans, although some only apply to one or the other. This section describes some of the most common options. </P>
+
+<H4>
+<A NAME="50446367_pgfId-341743"></A>4.2.2.1 <A NAME="50446367_marker-494656"></A><A NAME="50446367_marker-494811"></A><A NAME="50446367_marker-494809"></A><A NAME="50446367_marker-494807"></A>Improving performance by matching coincident regions</H4>
+<P>
+<A NAME="50446367_pgfId-341747"></A>Very often, there are regions on the supplied target and tools that are intended to be coincident, or <STRONG>
+matched</STRONG><A NAME="50446367_marker-494694"></A><A NAME="50446367_marker-494803"></A>. For some configurations <A NAME="50446367_marker-495140"></A>(such as slightly mis-aligned geometry and topology), it is non-trivial for Parasolid to try and evaluate matched regions itself, and the success of this cannot always be guaranteed, leading to slow performance or failed boolean operations. In order to aid or enhance the result of a boolean operation, you can tell Parasolid which regions are to be matched. This is a flexible process: you can specify faces that should be matched, or edges, or a combination of both. <A HREF="ov_chap.05.html#50446367_77690"><EM>
+Figure 4-2</EM></A> shows some examples.</P>
+<P>
+<A NAME="50446367_pgfId-1200840"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-30.gif">
+
+<P>
+<A NAME="50446367_pgfId-341931"></A>Figure 4-2 <A NAME="50446367_77690"></A>Specifying matched regions to improve boolean operations</P>
+
+
+<H4>
+<A NAME="50446367_pgfId-360090"></A>4.2.2.2 <A NAME="50446367_marker-494658"></A><A NAME="50446367_marker-494785"></A><A NAME="50446367_marker-494783"></A><A NAME="50446367_marker-494781"></A><A NAME="50446367_marker-494779"></A>Enclosing a solid region with a sheet body</H4>
+<P>
+<A NAME="50446367_pgfId-1131008"></A>You can enclose solid regions or add solid regions to a solid target by uniting it with a sheet tool. By choosing options to specify the resulting type of body, Parasolid ensures that the resulting body remains manifold.</P>
+<P>
+<A NAME="50446367_pgfId-1131395"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-31.gif">
+
+<P>
+<A NAME="50446367_pgfId-1131396"></A>Figure 4-3 Uniting solid and sheet bodies to enclose a solid region</P>
+
+
+<H4>
+<A NAME="50446367_pgfId-1131214"></A>4.2.2.3 <A NAME="50446367_marker-1131210"></A><A NAME="50446367_marker-1131211"></A><A NAME="50446367_marker-1131212"></A><A NAME="50446367_marker-1131213"></A>Punching sheets with solid bodies</H4>
+<P>
+<A NAME="50446367_pgfId-1131215"></A>By uniting a sheet target with solid tools, you can create a <STRONG>
+punched</STRONG> sheet, as shown in <A HREF="ov_chap.05.html#50446367_84541"><EM>
+Figure 4-4</EM></A>. This functionality provides a simple way for you to add sheet tooling functionality to your application.</P>
+<P>
+<A NAME="50446367_pgfId-1193882"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-32.gif">
+
+<P>
+<A NAME="50446367_pgfId-368555"></A>Figure 4-4 <A NAME="50446367_84541"></A>Punching a sheet target body with five solid tool bodies</P>
+
+
+<H4>
+<A NAME="50446367_pgfId-401728"></A>4.2.2.4 <A NAME="50446367_marker-494662"></A><A NAME="50446367_marker-494791"></A><A NAME="50446367_marker-494789"></A>Fencing off sections of a body</H4>
+<P>
+<A NAME="50446367_pgfId-401822"></A>You can divide a solid target into sections by subtracting a sheet tool. You can then use Parasolid&#8217;s <STRONG>
+fencing</STRONG> capability to choose which of these sections to retain after the boolean operation. </P>
+<P>
+<A NAME="50446367_pgfId-1201214"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-33.gif">
+
+<P>
+<A NAME="50446367_pgfId-401860"></A>Figure 4-5 Dividing a body into sections using fencing functionality</P>
+
+
+<H4>
+<A NAME="50446367_pgfId-1728382"></A>4.2.2.5 Retaining topologies during a boolean operation</H4>
+<P>
+<A NAME="50446367_pgfId-1728489"></A>You can control which topologies to retain when solid regions overlap during a general boolean operation as illustrated in <A HREF="ov_chap.05.html#50446367_98070"><EM>
+Figure 4-6</EM></A>.</P>
+<P>
+<A NAME="50446367_pgfId-1728723"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-34.gif">
+
+<P>
+<A NAME="50446367_pgfId-1728660"></A>Figure 4-6 <A NAME="50446367_98070"></A>Retaining topologies during a boolean operation</P>
+
+
+<H4>
+<A NAME="50446367_pgfId-433709"></A>4.2.2.6 <A NAME="50446367_marker-494664"></A><A NAME="50446367_marker-494815"></A><A NAME="50446367_marker-494813"></A>Other options</H4>
+<P>
+<A NAME="50446367_pgfId-433713"></A>Parasolid&#8217;s boolean functionality supports a wide variety of other options that are not discussed here. These include:</P>
+<UL>
+<LI>
+<A NAME="50446367_pgfId-433799"></A><A NAME="50446367_marker-495188"></A>Options to improve the performance and reliability of boolean operations (such as an option to specify when tools do not intersect with each other)</LI>
+<LI>
+<A NAME="50446367_pgfId-433814"></A>Options to control the resulting body (such as the ability to select regions to exclude from a boolean, and control over how edges in the result should be merged)</LI>
+<LI>
+<A NAME="50446367_pgfId-433822"></A>Options to control the way the boolean operation is performed (such as the ability to extend edges that need to be imprinted in order to perform the boolean, and the ability to treat sheets as solids and vice-versa for tools and targets).</LI>
+<LI>
+<A NAME="50446367_pgfId-717334"></A>Options that allow you to repair non-manifold edges created by booleans in which the target and tool share a common extrude direction</LI>
+</UL>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446367_pgfId-294123"></A>	4.2.3 	<A NAME="50446367_48053"></A><A NAME="50446367_marker-494666"></A><A NAME="50446367_marker-494769"></A>Boolean tools</H2>
+<P>
+<A NAME="50446367_pgfId-417769"></A>Parasolid provides a number of boolean tools so that you can create your own specialized boolean functionality, in order to include unique features not available with the standard boolean operations. You could use these tools, for instance, to add preview functionality to your boolean operations, or to remove unwanted areas of overlapping sheet bodies before sewing them.</P>
+<P>
+<A NAME="50446367_pgfId-417689"></A>Boolean tools are available to let you:</P>
+<UL>
+<LI>
+<A NAME="50446367_pgfId-417690"></A><A NAME="50446367_marker-495196"></A><A NAME="50446367_marker-495297"></A>Imprint edges on a target and tool to show where the bodies intersect. </LI>
+<LI>
+<A NAME="50446367_pgfId-417694"></A><A NAME="50446367_marker-495034"></A><A NAME="50446367_marker-495295"></A><A NAME="50446367_marker-495293"></A>Divide faces on a body (usually those created as a result of the imprinting operation) into distinct face sets so that you can decide which parts of the body to keep, and which to throw away. </LI>
+</UL>
+<P>
+<A NAME="50446367_pgfId-417698"></A>To implement your own manual boolean functionality, you could imprint edges on a target and tool, identify the distinct face sets on the target and tool, and then remove the ones you don&#8217;t want. Finally, you could use fuse the remaining face sets into a single body. <A HREF="ov_chap.05.html#50446367_19455"><EM>
+Figure 4-7</EM></A> shows how you could use boolean tools to implement your own boolean subtract functionality.</P>
+<P>
+<A NAME="50446367_pgfId-1201264"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-35.gif">
+
+<P>
+<A NAME="50446367_pgfId-417936"></A>Figure 4-7 <A NAME="50446367_19455"></A>Implementing your own subtract functionality using boolean tools</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446367_pgfId-294082"></A>4.3	<A NAME="50446367_48094"></A><A NAME="50446367_marker-494668"></A><A NAME="50446367_marker-494905"></A><A NAME="50446367_marker-494885"></A>Instancing
+
+
+</H1>
+<P>
+<A NAME="50446367_pgfId-294256"></A><STRONG>
+Instancing</STRONG> is a process that combines a single target and one or more tools with a local boolean operation and an array of transforms so as to repeat the boolean across target faces, thereby creating a set of instances of the specified tools, arranged according to the transforms you supply. It is a one-stop procedure for creating complex patterns, such as a series of holes in a plate, and offers significantly improved performance compared with creating the same effect using standard boolean operations alone. </P>
+<P>
+<A NAME="50446367_pgfId-1027349"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-36.gif">
+
+<P>
+<A NAME="50446367_pgfId-1027350"></A>Figure 4-8 Creating instances on solid and sheet bodies using single and multiple tools</P>
+<P>
+<A NAME="50446367_pgfId-311967"></A>You can use many of the same options when creating instances of a tool as you can when performing local booleans. </P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446367_pgfId-294105"></A>4.4	<A NAME="50446367_13583"></A><A NAME="50446367_marker-494670"></A><A NAME="50446367_marker-494907"></A><A NAME="50446367_marker-494889"></A>Patterning
+
+
+</H1>
+<P>
+<A NAME="50446367_pgfId-312017"></A>Parasolid also supports <STRONG>
+patterning</STRONG> functionality, which lets you create copies of a set of faces according to an array of specified transforms. Although patterning may initially appear very similar to instancing, it does not use any of Parasolid&#8217;s boolean functionality. It therefore provides you with a useful alternative to instancing for cases where instancing may be difficult or impossible. </P>
+<P>
+<A NAME="50446367_pgfId-312039"></A>When creating patterns, you specify a set of faces on the target body, rather than a separate target and tool, together with an array of transforms that describes how the patterns are to be positioned. <A HREF="ov_chap.05.html#50446367_38601"><EM>
+Figure 4-9</EM></A> shows a simple example, in which both the pocket and the boss on the body are to be patterned. A single transform is also given, resulting in the body shown. This particular example could not be performed using a single instancing operation, because it would require a boolean operation that could unite and subtract simultaneously.</P>
+<P>
+<A NAME="50446367_pgfId-1199294"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-37.gif">
+
+<P>
+<A NAME="50446367_pgfId-312161"></A>Figure 4-9 <A NAME="50446367_38601"></A>Patterning example of one transform of both a pocket and a boss</P>
+<P>
+<A NAME="50446367_pgfId-313573"></A>Patterning supports options to constrain patterned faces so that they do not overlap face edges, or do not intersect. In addition, you can create patterns that are repeated across different faces in the body. Parasolid also supports general patterning functionality, in which geometry for a set of patterned faces can be extended automatically in order to ensure the patterning is successful.</P>
+<P>
+<A NAME="50446367_pgfId-1201335"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-38.gif">
+
+<P>
+<A NAME="50446367_pgfId-716987"></A>Figure 4-10 Patterning within a face or to another face via rigid translation</P>
+<P>
+<A NAME="50446367_pgfId-716988"></A>It is also possible to create patterns in different faces where the base of the original feature is not rigidly translated to the face containing the new instance; in some cases, it may straddle two or more faces.</P>
+<P>
+<A NAME="50446367_pgfId-1198530"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-39.gif">
+
+<P>
+<A NAME="50446367_pgfId-708246"></A>Figure 4-11 Patterning to another face without rigid translation or to two faces</P>
+<P>
+<A NAME="50446367_pgfId-684781"></A>Parasolid allows you to recreate blends around patterned instances: if a pattern face is a blend within a boundary loop, you can recreate that blend during the pattern operation in order to maintain the blend characteristic of that face.</P>
+<P>
+<A NAME="50446367_pgfId-1200031"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-40.gif">
+
+<P>
+<A NAME="50446367_pgfId-676852"></A>Figure 4-12 <A NAME="50446367_54649"></A>Recreating blends on patterned faces</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446367_pgfId-294176"></A>4.5	<A NAME="50446367_23433"></A><A NAME="50446367_marker-494672"></A><A NAME="50446367_marker-494909"></A><A NAME="50446367_marker-494893"></A>Sectioning
+
+
+</H1>
+<P>
+<A NAME="50446367_pgfId-401613"></A><STRONG>
+Sectioning</STRONG> is the process of dividing a body into sections using faces, surfaces or sheets, and optionally throwing away unwanted sections. As well as providing some sectioning behaviour using the standard boolean functionality, Parasolid offers dedicated sectioning tools that work in a similar fashion to the standard boolean subtract operations (and, in particular, the fencing behaviour described in <A HREF="ov_chap.05.html#50446367_56306">Section 4.2.2</A>). Two broad categories of sectioning are supported by Parasolid: destructive sectioning and non-destructive sectioning. </P>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446367_pgfId-294211"></A>	4.5.1 	<A NAME="50446367_marker-494674"></A><A NAME="50446367_marker-494777"></A>Destructive sectioning</H2>
+<P>
+<A NAME="50446367_pgfId-401679"></A>Destructive sectioning divides a single target body using a single tool body. As with booleans, the target body is modified and returned, and the tool is discarded. There are two types of destructive sectioning: global sectioning and local sectioning, and these are analogous to their boolean equivalents. </P>
+<P>
+<A NAME="50446367_pgfId-401682"></A>In a global sectioning operation, a body is divided into sections using a tool body that is either a surface or a sheet. Like global booleans, the resulting sectioned body is guaranteed to be topologically consistent, but because of the global nature of the operation, performance might be an issue in some circumstances.</P>
+<P>
+<A NAME="50446367_pgfId-401721"></A>In a local sectioning operation, selected faces of a target are divided using selected faces from a sheet tool. Like local booleans, the restricted focus of a local sectioning operation provides excellent performance, but can result in topological inconsistencies: locally sectioned bodies may need to be checked before continuing with modelling. </P>
+<P>
+<A NAME="50446367_pgfId-401722"></A>Both global and local sectioning functions support a similar range of options to global and local booleans.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<H2>
+<A NAME="50446367_pgfId-294229"></A>	4.5.2 	<A NAME="50446367_marker-494676"></A><A NAME="50446367_marker-494817"></A>Non-destructive sectioning</H2>
+<P>
+<A NAME="50446367_pgfId-1810859"></A>Non-destructive sectioning supports a different range of options to destructive sectioning, allowing you control over details such as the type of body returned by the operation.</P>
+<P>
+<A NAME="50446367_pgfId-401676"></A>In non-destructive sectioning, nothing is deleted after the operation and, instead of modifying the target, the specified tools are altered. You can section any number of bodies using any number of tools and both surfaces and sheet bodies can be used as targets. </P>
+<P>
+<A NAME="50446367_pgfId-401796"></A>With non-destructive sectioning you can also choose to create wire body sections from a set of offsets of a single tool plane as illustrated in <A HREF="ov_chap.05.html#50446367_85338"><EM>
+Figure 4-13</EM></A>. This functionality can be useful when creating sections in additive manufacturing workflows where models are sliced in preparation for printing.</P>
+<P>
+<A NAME="50446367_pgfId-1810904"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-41.gif">
+
+<P>
+<A NAME="50446367_pgfId-1810876"></A>Figure 4-13 <A NAME="50446367_85338"></A>Sectioning a body using a tool plane</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50446367_pgfId-312003"></A>4.6	<A NAME="50446367_20276"></A><A NAME="50446367_marker-494678"></A><A NAME="50446367_marker-494873"></A><A NAME="50446367_marker-494871"></A>Clash detection
+
+
+</H1>
+<P>
+<A NAME="50446367_pgfId-334476"></A>You can analyse any combination of solid, sheet and wire bodies to find out whether or not they clash; if they do, you can discover the nature of the clashes. Parasolid is able to distinguish between the following types of clash:</P>
+<UL>
+<LI>
+<A NAME="50446367_pgfId-334530"></A><STRONG>
+Interference:</STRONG><A NAME="50446367_marker-494706"></A> bounding topologies of the entities cross with each other</LI>
+<LI>
+<A NAME="50446367_pgfId-334531"></A><STRONG>
+Abutment: </STRONG><A NAME="50446367_marker-494867"></A><A NAME="50446367_marker-494865"></A>bounding topologies of the entities touch each other</LI>
+<LI>
+<A NAME="50446367_pgfId-334532"></A><STRONG>
+Containment:</STRONG><A NAME="50446367_marker-494710"></A> one entity is entirely within the other, and their bounding topologies do not touch</LI>
+</UL>
+<P>
+<A NAME="50446367_pgfId-338143"></A>The precise nature of these types of clash depends on the types of body that you are analysing. For example <A HREF="ov_chap.05.html#50446367_87123"><EM>
+Figure 4-14</EM></A> illustrates the ways in which sheet bodies can clash.</P>
+<P>
+<A NAME="50446367_pgfId-1201443"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/ov_chap-42.gif">
+
+<P>
+<A NAME="50446367_pgfId-334600"></A>Figure 4-14 <A NAME="50446367_87123"></A>Detecting clashes in sheet bodies</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="ov_chap.04.html">Model Structure</A></TD>
+  <TD><A HREF="../ov_index.html">Chapters</A></TD>
+  <TD><A HREF="ov_chap.06.html">Local Operations</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

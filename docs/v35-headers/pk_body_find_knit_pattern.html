@@ -1,0 +1,122 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_find_knit_pattern</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_find_knit_pattern</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_BODY_find_knit_pattern
+(
+<I>--- received arguments ---
+</I>int                                  n_bodies,          --- array of
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                      bodies[],          --- bodies between
+                                                        --- which to find
+                                                        --- knitting pattern
+const <A HREF=../headers/pk_body_find_knit_pattern_o_t.html>PK_BODY_find_knit_pattern_o_t</A> *options,           --- options
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_knit_pattern_t.html>PK_BODY_knit_pattern_t</A>        *const knit_pattern,      --- knitting pattern
+int                           *const n_absent_bodies,   --- bodies not included
+<A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                    **const absent_bodies      --- in pattern
+)
+</B>
+<A NAME="description"></A>
+<I>This function constructs a knitting pattern by matching and splitting
+coincident edges, then pairing them off into corresponding entries in
+two edge arrays.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+  PK_ERROR_cant_create_pattern    failure to create knitting pattern
+  PK_ERROR_pattern_invalid        knitting would result in invalid body
+  PK_ERROR_bodies_dont_knit       no coincident edges exist
+  PK_ERROR_bad_type               body in the array is of incorrect type
+  PK_ERROR_duplicate_array_item   a body is duplicated in the body array
+  PK_ERROR_general_body           a general body is present in the array of
+                                  bodies
+
+<A NAME="documentation"></A>
+  This function creates a knitting pattern which can be used as input
+  to <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A>. The knitting pattern holds two arrays
+  of edges, and an array of bodies. Corresponding elements in the arrays
+  are coincident edges that will be fused in the resultant knitted body.
+
+  See <A HREF="../chapters/fd_chap.047.html#50434407_pgfId-692323">Knitting sheets together</A> for more information. See
+  <A HREF="../chapters/fd_chap.047.html#50434407_pgfId-297201">Finding connectivity information</A> for information specific to
+  this function.
+
+  The received body array <B>'bodies'</B> may contain either solid or sheet bodies
+  but not wires. In the case of solids, all edges which the application
+  intends to appear in the knitting pattern must have one adjacent face with
+  a surface attached and one without. The faces in the solid without surfaces
+  attached will be those which are eventually redundant when the resultant
+  solid body is created using the pattern returned by
+  PK_BODY_find_knit_pattern in a call to <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A>.
+
+  The <B>'edges'</B> and <B>'matches'</B> fields of the returned knit pattern form the
+  knitting pattern and <B>'n_edges'</B> is the length of each of these arrays.
+
+  The <B>'reversals'</B> field of the knit pattern is an array of those bodies in
+  the received <B>'bodies'</B> array that need to be reversed in orientation in
+  order for application of the knitting pattern to succeed. These required
+  reversals of orientation will by carried out by <A HREF=../headers/pk_body_apply_knit_pattern.html>PK_BODY_apply_knit_pattern</A>
+  when the pattern is passed to it.
+
+  The return argument <B>'absent_bodies'</B> is an array of those received bodies
+  which have no edges appearing anywhere in the paired edge arrays of the
+  knitting pattern.
+
+  Negating some of the received bodies may not be sufficient to produce a
+  valid knitted body. For example, knitting could result in a moebius strip.
+  Such cases will be identified and will result in the error
+  PK_ERROR_pattern_invalid.
+
+  If none of the edges in the received bodies are coincident, the error
+  PK_ERROR_bodies_dont_knit will be returned. If however a subset of bodies in
+  the received list has coincident edges, a knitting pattern will be created
+  and an error will not be invoked. The bodies with no edges in the pattern
+  will be returned in <B>'absent_bodies'</B> array.
+
+  Note that this routine may not preserve the topology of the received bodies:
+  edges may be split in order to produce a 1:1 correspondence between the
+  edges that form the pattern.
+
+  This function is not supported for general bodies.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

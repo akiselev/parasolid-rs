@@ -1,0 +1,145 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_TOPOL_make_facet_topol</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_TOPOL_make_facet_topol</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                      PK_TOPOL_make_facet_topol
+(
+<I>--- received arguments ---
+</I>int                                  n_topols,           --- Number of entities
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                           topols[],           --- Entities for which
+                                                         --- to make new facet
+                                                         --- geometry
+double                               distance_tolerance, --- Maximum permitted
+                                                         --- distance between
+                                                         --- current geometry
+                                                         --- and geometry
+                                                         --- created to replace
+                                                         --- it
+const <A HREF=../headers/pk_topol_make_facet_topol_o_t.html>PK_TOPOL_make_facet_topol_o_t</A> *options,            --- Options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_entity_track_r_t.html>PK_ENTITY_track_r_t</A>           *const tracking,           --- Tracking
+                                                         --- information
+<A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>            *const redundant_topols,   --- Topological
+                                                         --- entities which
+                                                         --- were merged out
+                                                         --- in order to
+                                                         --- accommodate the
+                                                         --- new geometry
+int                           *const n_modified_topols,  --- Number of
+                                                         --- topological
+                                                         --- entities modified
+<A HREF=../headers/pk_topol_t.html>PK_TOPOL_t</A>                   **const modified_topols     --- All topological
+                                                         --- entities modified
+                                                         --- during the
+                                                         --- operation
+)
+</B>
+<A NAME="description"></A>
+<I>This function generates facet geometry for an array of faces and edges from the
+same body; the geometry of these entities is then replaced with the newly
+created facet geometry.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+
+    PK_ERROR_failed_to_facet   Not all of the <B>'topols'</B> have had their geometry
+                               replaced.
+                               (SERIOUS)
+    PK_ERROR_not_in_same_body  The <B>'topols'</B> are not all from the same body.
+                               (MILD)
+    PK_ERROR_wrong_entity      The <B>'topols'</B> array contains an item which is
+                               neither a face nor a wireframe edge.
+                               (MILD)
+    PK_ERROR_bad_tolerance     The <B>'distance_tolerance'</B> is less than the
+                               value returned by <A HREF=../headers/pk_session_ask_precision.html>PK_SESSION_ask_precision</A>.
+                               (MILD)
+
+
+<A NAME="documentation"></A>
+
+Restrictions on received entities
+---------------------------------
+
+Each topological entity received must be a face or a wireframe edge. Entities
+may have classic or facet geometry, but must all come from the same body.
+
+Action on received entities
+---------------------------
+
+Each received entity will have its geometry removed and replaced with new facet
+geometry. Each face received will have its surface removed and replaced with a
+mesh, while each wireframe edge received will have its curve removed and
+replaced with a polyline. If the received entities already have facet
+geometry, their geometry is still replaced; the new meshes will be
+geometrically coincident with the existing ones wherever possible, but may be
+subdivided if the supplied tolerances demand it.
+
+Action on neighbouring and subordinate entities
+-----------------------------------------------
+
+Accommodation of the new geometry will often involve making changes to
+entities other than those passed to the function. When converting a face:
+
+    o It will usually be necessary to replace the meshes of all edge-adjacent
+      mesh faces in order to achieve matching mesh topology along all mesh-mesh
+      edges. Wherever possible, the new meshes will be geometrically coincident
+      with the old ones, but may be subdivided around the edges.
+
+    o Any edges which will ultimately border only faces with facet geometry
+      will be made accurate, receive new curves, and have all their existing
+      geometry replaced; this includes any nominal curves attached to edges.
+
+    o Any edges which will ultimately be adjacent to both faces with classic
+      and faces with facet geometry will be made tolerant if they are not
+      already. In this case, all the fins which will ultimately lie in mesh
+      faces will receive new (geometrically coincident) polylines. If the
+      edge is initially accurate, SP curves will also be attached to the
+      fins which will lie in classic faces. Nominal curves associated with
+      existing tolerant edges will remain in place, if consistent with a
+      valid model structure.
+
+    o Model vertices will sometimes receive new points in order to
+      facilitate better matching between mesh faces.
+
+Parasolid may change the topology of the model in order to produce a valid
+result accommodating the new geometry.
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

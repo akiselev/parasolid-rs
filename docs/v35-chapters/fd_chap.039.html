@@ -1,0 +1,3691 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Sweeping</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Sweeping</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.038.html">Creating Extruded Bodies</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.040.html">Sweeping Tool Bodies Along a Path</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-294716">38.1	Introduction </A>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-294742">38.1.1	Basics of sweeping </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-294824">38.1.2	Controlling the sweep </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-1042049">38.1.3	Sweeping with solid tool bodies</A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-1042101">38.1.4	Creating helical curves and surfaces </A>
+</UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-294996">38.2	Sweeping without guide wires </A>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-295002">38.2.1	Supplying profiles </A>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-295006">38.2.1.1	Supplying only wire profiles </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-295123">38.2.1.2	Combining wire and sheet profiles </A>
+</UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-295529">38.2.2	Supplying a path </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-295742">38.2.3	Specifying path vertices </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-295904">38.2.4	Returning profile cross-sections </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-296683">38.2.5	Controlling the profile alignment </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-296882">38.2.6	Locking the direction of normal alignment </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-296970">38.2.7	Locking the sweep to specified faces </A>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-714847">38.2.7.1	Constraints when locking the sweep to specified faces </A>
+</UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-297046">38.2.8	Specifying twist </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-297380">38.2.9	Specifying scale </A>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-297514">38.2.9.1	Specifying the type of scale </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-297713">38.2.9.2	Specifying scale laws </A>
+</UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-297720">38.2.10	Continuity of the swept surface </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-297741">38.2.11	Specifying the topological form of swept bodies </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-298055">38.2.12	Matching vertices on profiles </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-298230">38.2.13	Simplifying the final body </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-298395">38.2.14	Handling sweep tolerances </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-298418">38.2.15	Returning tracking information for edges </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-298424">38.2.16	Nominal geometry </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-298432">38.2.17	Self-intersection repair </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-298569">38.2.18	Profile clamps </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-1778754">38.2.19	Calculating derivative magnitudes </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-376909">38.2.20	Specifying corner types </A>
+</UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-298953">38.3	Sweeping with guide wires </A>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-299039">38.3.1	Supplying profiles, paths and guide wires </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-1485394">38.3.2	Controlling the behaviour of guide wires </A>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-1489228">38.3.2.1	Restrictions with guide wires </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-299056">38.3.2.2	Guide vertices </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-1592261">38.3.2.3	Using cross-section profiles with guide wires </A>
+</UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-299155">38.3.3	Controlling the behaviour of locks </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-299411">38.3.4	Supplying guide clamps </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-299976">38.3.5	Guided sweep methods </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-300309">38.3.6	Trimming swept bodies using guide wires </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-300551">38.3.7	Alignment </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-300691">38.3.8	Topology </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-300944">38.3.9	Scaling the profile </A>
+</UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-540988">38.4	Update control </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-301782">38.5	Creating helical curves and surfaces </A>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-301879">38.5.1	Common helical properties </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-301953">38.5.2	Creating general helices </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-302030">38.5.3	Using turns to create different helices </A>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-302122">38.5.4	Controlling inward taper </A>
+<UL>
+<LI> <A HREF="fd_chap.039.html#50422110_pgfId-302142">38.5.4.1	Examples </A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422110_pgfId-294716"></A>38.1	<A NAME="50422110_45750"></A>Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422110_pgfId-294720"></A>Parasolid provides a range of functionality to let you create completely new bodies by moving entities along an arbitrary path. This technique, in general, is known as <STRONG>
+sweeping</STRONG>. Parasolid includes the following sweeping functions for creating swept bodies with different characteristics and for use in different situations. </P>
+<P>
+<A NAME="50422110_pgfId-1062081"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-1062080"></A>Note: This functionality does not support facet bodies. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-689718"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294726"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294728"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294730"></A><A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294732"></A>Sweep a wire or sheet profile along a path</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294738"></A><A HREF=../headers/pk_point_make_helical_curve.html>PK_POINT_make_helical_curve</A>/<A HREF=../headers/pk_curve_make_helical_surf.html>PK_CURVE_make_helical_surf</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294740"></A>Create a helical curve or surface by sweep a point or curve about an axis. See <A HREF="fd_chap.039.html#50422110_34134">Section 38.5, “Creating helical curves and surfaces”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1047562"></A><A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1047566"></A>Sweep a solid tool body along a path. See <A HREF="fd_chap.040.html#50422111_92214">Chapter 39, “Sweeping Tool Bodies Along a Path”</A> for more information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-294741"></A>For examples of this functionality, see the code examples in the <CODE>
+C++\Code Examples\Modelling\Profiling</CODE>
+ folder, and in the <CODE>
+C#\ExampleApplication.Net\Code</CODE>
+ <CODE>
+Examples\Modelling\Sweeping</CODE>
+ folder located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422110_pgfId-897380"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-993676"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-896858"></A><A HREF="fd_chap.038.html#50422109_">Chapter 37, “Creating Extruded Bodies”</A></LI>
+<LI>
+<A NAME="50422110_pgfId-1047576"></A><A HREF="fd_chap.040.html#50422111_92214">Chapter 39, “Sweeping Tool Bodies Along a Path”</A></LI>
+<LI>
+<A NAME="50422110_pgfId-896890"></A><A HREF="fd_chap.041.html#50422112_13353">Chapter 40, “Lofting”</A></LI>
+<LI>
+<A NAME="50422110_pgfId-896907"></A><A HREF="fd_chap.045.html#50422117_30749">Chapter 44, “Wire Modeling”</A></LI>
+<LI>
+<A NAME="50422110_pgfId-896924"></A><A HREF="fd_chap.046.html#50422118_34338">Chapter 45, “Sheet Modeling”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422110_pgfId-294742"></A>	38.1.1 	Basics of sweeping </H3>
+<P>
+<A NAME="50422110_pgfId-399901"></A>When sweeping bodies, one or more profiles must be supplied in addition to a path that defines both the direction and the extent of the sweep. This path is supplied as a wire body consisting of one or more connected edges and the profiles can be supplied as a set of one or more wires or sheet bodies. If they are all wire bodies, then the resultant swept body is a sheet. If any of the profiles is a sheet body, then the resultant swept body is a solid. If the cross-sectional shape of the supplied profiles varies, then the cross-section of the resulting swept body transitions smoothly between each profile, as shown in <A HREF="fd_chap.039.html#50422110_87222"><EM>
+Figure 38-1</EM></A>.</P>
+<P>
+<A NAME="50422110_pgfId-294780"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-297.gif">
+
+<P>
+<A NAME="50422110_pgfId-294782"></A>Figure 38-1 <A NAME="50422110_87222"></A>Sweeping sheet and wire profiles along a path to produce a body</P>
+<P>
+<A NAME="50422110_pgfId-294783"></A>Swept bodies can be created with or without additional wire bodies called <STRONG>
+guide wires</STRONG>. When used in conjunction with <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A>, these guide wires provide finer control over the shape and orientation of the resultant swept body. </P>
+<P>
+<A NAME="50422110_pgfId-294822"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-298.gif">
+
+<P>
+<A NAME="50422110_pgfId-294823"></A>Figure 38-2 Sweeping a profile along a path with a guide wire</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-294824"></A>	38.1.2 	Controlling the sweep </H3>
+<P>
+<A NAME="50422110_pgfId-294825"></A>Using <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A>, you can control the sweep in a number of ways. The following table summarises these with full details of each being discussed in the rest of this chapter.</P>
+<P>
+<A NAME="50422110_pgfId-294938"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294874"></A>Options</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294876"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294881"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-299.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294883"></A><STRONG>
+Locking the direction of normal alignment</STRONG></P>
+<P>
+<A NAME="50422110_pgfId-294884"></A>You can lock the sweep to a particular direction or to a set of specified faces. Locking constrains the orientation of a profile so that a better sweep is produced. See <A HREF="fd_chap.039.html#50422110_48029">Section 38.2.6, “Locking the direction of normal alignment”</A> and <A HREF="fd_chap.039.html#50422110_24369">Section 38.2.7, “Locking the sweep to specified faces”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294895"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-300.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294897"></A><STRONG>
+Scaling </STRONG></P>
+<P>
+<A NAME="50422110_pgfId-294898"></A>You can also control the size and position of a single profile as it moves along a smooth path . See <A HREF="fd_chap.039.html#50422110_95856">Section 38.2.9, “Specifying scale”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294906"></A> &nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-301.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294908"></A><STRONG>
+Twisting</STRONG></P>
+<P>
+<A NAME="50422110_pgfId-294909"></A>You can control the rotation of a set of profiles as they move along a path. See <A HREF="fd_chap.039.html#50422110_72913">Section 38.2.8, “Specifying twist”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294917"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-302.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294919"></A><STRONG>
+Self-intersection repair</STRONG> </P>
+<P>
+<A NAME="50422110_pgfId-294920"></A>You can control the repair of self-intersecting regions. If a swept body intersects itself, Parasolid tries to repair the body and removes the intersection by splitting the faces involved. See <A HREF="fd_chap.039.html#50422110_47799">Section 38.2.17, “Self-intersection repair”</A>for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294931"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-303.gif">
+
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-294933"></A><STRONG>
+Cross-section profiles</STRONG> </P>
+<P>
+<A NAME="50422110_pgfId-294934"></A>You can create a series of profiles that represent cross-sections of a swept body. These cross-sections allow you to preview what the resultant body would look like before you commit to creating it. See <A HREF="fd_chap.039.html#50422110_85038">Section 38.2.4, “Returning profile cross-sections”</A> for more information</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-294939"></A>You can also specify the topology of a swept body and clamp the swept surface at certain profiles during a multi-profile sweep. See <A HREF="fd_chap.039.html#50422110_74766">Section 38.2, “Sweeping without guide wires”</A> for more information on these and other options.</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-1042049"></A>	38.1.3 	<A NAME="50422110_26428"></A>Sweeping with solid tool bodies</H3>
+<P>
+<A NAME="50422110_pgfId-1042050"></A>Solid bodies can be created by moving a solid tool body along a wire path using <A HREF=../headers/pk_body_make_swept_tool.html>PK_BODY_make_swept_tool</A>. This can be used to construct bodies that represent regions to be cut from a solid body using a machine tool. With this type of sweep, a tool body and path must be specified. See <A HREF="fd_chap.040.html#50422111_92214">Chapter 39, “Sweeping Tool Bodies Along a Path”</A> for more information.</P>
+<P>
+<A NAME="50422110_pgfId-1042098"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-304.gif">
+
+<P>
+<A NAME="50422110_pgfId-1042100"></A>Figure 38-3 <A NAME="50422110_98441"></A>Sweeping a solid tool profile along a path</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-1042101"></A>	38.1.4 	Creating helical curves and surfaces </H3>
+<P>
+<A NAME="50422110_pgfId-1042102"></A>Helical curves and surfaces can also be created from a starting point or curve using <A HREF=../headers/pk_point_make_helical_curve.html>PK_POINT_make_helical_curve</A> and <A HREF=../headers/pk_curve_make_helical_surf.html>PK_CURVE_make_helical_surf</A>. See <A HREF="fd_chap.039.html#50422110_34134">Section 38.5, “Creating helical curves and surfaces”</A> for more information.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422110_pgfId-294996"></A>38.2	<A NAME="50422110_74766"></A><A NAME="50422110_marker-294995"></A>Sweeping without guide wires 
+
+
+</H1>
+<P>
+<A NAME="50422110_pgfId-294997"></A>This section discusses the use of <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> when supplying a path but no guide wires.</P>
+
+<H3>
+<A NAME="50422110_pgfId-295002"></A>	38.2.1 	<A NAME="50422110_59903"></A><A NAME="50422110_marker-294999"></A><A NAME="50422110_marker-295000"></A><A NAME="50422110_marker-295001"></A>Supplying profiles </H3>
+<P>
+<A NAME="50422110_pgfId-295003"></A>Profiles are supplied as a set of one or more wire or sheet bodies. (Sheet profiles are always considered closed.)</P>
+<P>
+<A NAME="50422110_pgfId-295004"></A>If a single profile is specified, the cross-section of the resulting body will be constant along the path (unless scaling is used), and remain the same as the input profile. </P>
+<P>
+<A NAME="50422110_pgfId-295005"></A>If multiple profiles are specified, the cross-section of the resulting body is smoothly transformed between the shapes of the specified profiles. </P>
+<P>
+<A NAME="50422110_pgfId-964458"></A>In addition, if multiple profiles are specified you must not simplify the body (see <A HREF="fd_chap.039.html#50422110_44669">Section 38.2.13, “Simplifying the final body”</A>) or scale the body (see <A HREF="fd_chap.039.html#50422110_95856">Section 38.2.9, “Specifying scale”</A>). </P>
+
+<H4>
+<A NAME="50422110_pgfId-295006"></A>38.2.1.1 Supplying only wire profiles </H4>
+<P>
+<A NAME="50422110_pgfId-295007"></A>If all the profiles supplied are wire bodies, the resulting swept body is a sheet. The sheet is constructed so that the outward normal is aligned with the cross product of a tangent in the direction of the profile orientation, and the tangent along the path (taken in that order).</P>
+<P>
+<A NAME="50422110_pgfId-399823"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-305.gif">
+
+<P>
+<A NAME="50422110_pgfId-295121"></A>Figure 38-4 Sweeping open wire profiles into a sheet body</P>
+<P>
+<A NAME="50422110_pgfId-295122"></A>Each component of a wire profile must be oriented; you can use <A HREF=../headers/pk_edge_propagate_orientation.html>PK_EDGE_propagate_orientation</A> for this purpose. When supplying multiple profiles you must ensure that the directions of all the profiles are consistently oriented. </P>
+
+
+<H4>
+<A NAME="50422110_pgfId-295123"></A>38.2.1.2 Combining wire and sheet profiles </H4>
+<P>
+<A NAME="50422110_pgfId-295124"></A>If any one of the profiles supplied is a sheet body, the resulting swept body is solid. There is a limit to the number of sheet profiles that you can specify in any given sweep operation:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-295125"></A>For an open path (i.e., a non-periodic sweep), one or two sheet profiles can be used. These must be the first and last profiles in the sweep.</LI>
+<LI>
+<A NAME="50422110_pgfId-295126"></A>For a closed path (periodic sweep), only one sheet profile can be used. This must be the first profile in the sweep.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-405770"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-306.gif">
+
+<P>
+<A NAME="50422110_pgfId-295386"></A>Figure 38-5 <A NAME="50422110_31209"></A>Combining sheet and wire profiles in sweeps</P>
+<P>
+<A NAME="50422110_pgfId-295387"></A>The normals of the faces in any sheet profile must be oriented in the same direction as the sweep path. You can use <A HREF=../headers/pk_body_reverse_orientation.html>PK_BODY_reverse_orientation</A> to do this. </P>
+<P>
+<A NAME="50422110_pgfId-295388"></A>Profiles with multiple loops are allowed: sheet profiles can have multiple laminar boundaries, and wire profiles may be disjoint, as shown in <A HREF="fd_chap.039.html#50422110_51963"><EM>
+Figure 38-6</EM></A>. </P>
+<P>
+<A NAME="50422110_pgfId-295425"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-307.gif">
+
+<P>
+<A NAME="50422110_pgfId-295427"></A>Figure 38-6 <A NAME="50422110_51963"></A>Sweeping sets of profiles with multiple loops</P>
+<P>
+<A NAME="50422110_pgfId-295428"></A>Sweeping a set of profiles containing a  single profile with multiple laminar boundaries along a closed path results in a solid with an internal void, as shown in <A HREF="fd_chap.039.html#50422110_15934"><EM>
+Figure 38-7</EM></A>.</P>
+<P>
+<A NAME="50422110_pgfId-428941"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-308.gif">
+
+<P>
+<A NAME="50422110_pgfId-295507"></A>Figure 38-7 <A NAME="50422110_15934"></A>Performing a sweep using a sheet profile with two laminar boundaries</P>
+<P>
+<A NAME="50422110_pgfId-295508"></A>Note that the geometry or topology of the profile does not appear in the resulting solid. Your application should delete the profile when it is no longer required.</P>
+<P>
+<A NAME="50422110_pgfId-295512"></A><A NAME="50422110_marker-295509"></A><A NAME="50422110_marker-295510"></A><A NAME="50422110_marker-295511"></A>The result of sweeping a series of disjoint profiles is, in general, the same as the result of sweeping the connected components separately, except that the result is a single (disjoint) body. (There are, however, exceptions: see <A HREF="fd_chap.039.html#50422110_85173">Section 38.2.12, “Matching vertices on profiles”</A>, for details.)</P>
+<P>
+<A NAME="50422110_pgfId-295516"></A>If you supply disjoint profiles, it is possible that the resulting swept bodies may interfere in some way. </P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-295520"></A>If the supplied profiles contain disjoint sheets,  Parasolid checks for any interference. Any components that interfere are united before they are returned. </LI>
+<LI>
+<A NAME="50422110_pgfId-295524"></A>If the supplied profiles consist only of disjoint wires, Parasolid does not perform any interference checking. </LI>
+</UL>
+
+
+
+<H3>
+<A NAME="50422110_pgfId-295529"></A>	38.2.2 	<A NAME="50422110_marker-295525"></A><A NAME="50422110_marker-295526"></A><A NAME="50422110_marker-295527"></A><A NAME="50422110_86324"></A>Supplying a path </H3>
+<P>
+<A NAME="50422110_pgfId-295530"></A>The path you supply defines both the direction and the extent of the sweep. The path is supplied as a wire body, which must be manifold and oriented (using <A HREF=../headers/pk_edge_propagate_orientation.html>PK_EDGE_propagate_orientation</A>, if necessary). The sweep direction follows the direction of the wire, beginning at the start vertex of the path and finishing at the end vertex.</P>
+<P>
+<A NAME="50422110_pgfId-295534"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-295533"></A>Note: The path must not contain any tolerant vertices.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-295535"></A>Non-smooth (G1-discontinuous) paths are allowed; however, for sweeps that use multiple profiles, paths must be visibly G1 smooth. Sweeps that use a single profile may have paths that are not visibly G1 smooth: in such cases, any corners in the path can produce mitred corners (as shown in <A HREF="fd_chap.039.html#50422110_16825"><EM>
+Figure 38-8</EM></A>) or rounded corners in the resulting swept body using the <CODE>
+corner_type</CODE>
+ option. For more information on this option see <A HREF="fd_chap.039.html#50422110_47949">Section 38.2.20, “Specifying corner types”</A>. </P>
+<P>
+<A NAME="50422110_pgfId-406690"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-309.gif">
+
+<P>
+<A NAME="50422110_pgfId-295739"></A>Figure 38-8 <A NAME="50422110_16825"></A>Mitred corners of the body (right) are produced from corners in the path (left) that are not G1-continuous</P>
+<P>
+<A NAME="50422110_pgfId-295740"></A>None of the path’s geometry or topology appears in the resulting body. It is the application’s responsibility to delete the path when it is no longer required.</P>
+<P>
+<A NAME="50422110_pgfId-1292149"></A>Sweeping along a closed path may not result in a closed sweep if the sweep twists so that the start and end of the sweep do not align (shown in <A HREF="fd_chap.039.html#50422110_97359"><EM>
+Figure 38-9</EM></A>(a)). If this happens, the operation will fail with the failure status PK_BODY_sweep_torsion_failure_c. You can untwist this torsion to enable the sweep to succeed by supplying an appropriate law curve to the <CODE>
+twist</CODE>
+ option (shown in <A HREF="fd_chap.039.html#50422110_97359"><EM>
+Figure 38-9</EM></A>(b)). This value can be obtained from the x co-ordinate of the <CODE>
+fault_locations</CODE>
+ field of the returns argument. For more information on the <CODE>
+twist</CODE>
+ option, see <A HREF="fd_chap.039.html#50422110_72913">Section 38.2.8, “Specifying twist”</A>.</P>
+<P>
+<A NAME="50422110_pgfId-1230600"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-310.gif">
+
+<P>
+<A NAME="50422110_pgfId-1208985"></A>Figure 38-9 <A NAME="50422110_97359"></A>Untwisting torsion in a closed path to ensure a successful sweep </P>
+
+
+<H3>
+<A NAME="50422110_pgfId-295742"></A>	38.2.3 	<A NAME="50422110_93064"></A>Specifying path vertices </H3>
+<P>
+<A NAME="50422110_pgfId-295743"></A>In addition to profiles and a path, you need to specify a series of path vertices in the call to <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A>. A path vertex is required for each profile supplied, to anchor it to the path. Each path vertex given must lie on the path itself. </P>
+<P>
+<A NAME="50422110_pgfId-659668"></A>If the first path vertex specified is not the same as the start vertex of the path, the first profile is swept back to the beginning of the path. In the resulting swept body, it looks as if the first profile has been placed at both the start of the path and the first path vertex given. The same is true if the last path vertex is not the same as the end vertex of the supplied path: the last profile is swept forward to the end of the path. </P>
+<P>
+<A NAME="50422110_pgfId-654076"></A><A HREF="fd_chap.039.html#50422110_54379"><EM>
+Figure 38-10</EM></A> shows an example where the path vertex for the first (square) profile is not the same as the start vertex of the path: in the resulting swept body, the square profile has been extended back to the start of the path. </P>
+<P>
+<A NAME="50422110_pgfId-406936"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-311.gif">
+
+<P>
+<A NAME="50422110_pgfId-295902"></A>Figure 38-10 <A NAME="50422110_54379"></A>Extending the first path vertex back to the start of the path</P>
+<P>
+<A NAME="50422110_pgfId-660301"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-660311"></A>Note: If a path vertex is non-G1, then the orientation of the profile to the path is taken from the edge following the vertex (i.e the direction implied by the orientation of the edge) on the oriented path wire, where such an edge exists.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-295904"></A>	38.2.4 	<A NAME="50422110_85038"></A>Returning profile cross-sections </H3>
+<P>
+<A NAME="50422110_pgfId-295905"></A>By default, the result of sweeping one or more profiles along a path is a solid or sheet body. However, you can also use <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> to create a series of profiles that represent cross-sections of the swept body that would otherwise be created. Returning cross-sections, rather than the final swept body, is much quicker than producing the swept body itself. Sweep cross-sections are an excellent way of creating a representation of the final swept body, allowing you to provide your users with a quick preview facility that they can use before committing to creating the final swept body. </P>
+<P>
+<A NAME="50422110_pgfId-295909"></A><A HREF="fd_chap.039.html#50422110_10990"><EM>
+Figure 38-11</EM></A> shows some examples of cross-section profiles that can be generated from a path and profile, together with the equivalent swept bodies. When generating cross-section profiles, the body returned by <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> is always disjoint:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-295910"></A>The cross-section profiles themselves form wire components of the disjoint body</LI>
+<LI>
+<A NAME="50422110_pgfId-295911"></A>If any of the supplied profiles is a sheet, then:</LI>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-295912"></A>For non-periodic sweeps, the start and end cross-sections are returned as sheets.</LI>
+<LI>
+<A NAME="50422110_pgfId-295913"></A>For periodic sweeps, only the start cross-section is returned as a sheet.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422110_pgfId-407494"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-312.gif">
+
+<P>
+<A NAME="50422110_pgfId-296070"></A>Figure 38-11 <A NAME="50422110_10990"></A>Creating a series of cross-section profiles</P>
+<P>
+<A NAME="50422110_pgfId-296074"></A>Parasolid provides you with a number of options for controlling when and how cross-section profiles are created:</P>
+<P>
+<A NAME="50422110_pgfId-296101"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296077"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296079"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-296081"></A>output_xsect</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296083"></A>Whether to create a swept body, or cross-section profiles of the sweep body. This takes the following values:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-296084"></A><A HREF=../headers/pk_sweep_output_xsect_t.html>PK_sweep_output_xsect_no_c</A>. Produce a swept body rather than cross-section profiles. This is the default.</LI>
+<LI>
+<A NAME="50422110_pgfId-296085"></A><A HREF=../headers/pk_sweep_output_xsect_t.html>PK_sweep_output_xsect_yes_c</A>. Produce cross-section profiles according to the specifications given by the <CODE>
+group_xsect</CODE>
+ and <CODE>
+n_xsects</CODE>
+ options. </LI>
+<LI>
+<A NAME="50422110_pgfId-296086"></A><A HREF=../headers/pk_sweep_output_xsect_t.html>PK_sweep_output_xsect_on_fail_c</A>. Produce a swept body if possible. However, if this fails, attempt to produce cross-section profiles. Note that it may not always be possible to create cross-section profiles in the event of a failure. </LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-296087"></A>It is not possible to generate both the swept body and cross-section profiles in a single call to <A HREF=../headers/pk_body_make_swept_body_2.html><A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A></A>. Should you wish to do this, you need to call <A HREF=../headers/pk_body_make_swept_body_2.html><A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A></A> twice, using different values of this option. Creating cross-section profiles in a separate function call should not incur any significant performance overhead.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-296089"></A>group_xsect</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296091"></A>How to group the cross-sections that are produced for the sweep operation. </P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-296092"></A><A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_no_c</A>: Do not group cross-sections. Instead, create <CODE>
+n_xsects</CODE>
+ cross-sections along the entire path. </LI>
+<LI>
+<A NAME="50422110_pgfId-296093"></A><A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_edge_c</A>: Create <CODE>
+n_xsects</CODE>
+ cross-sections on each edge of the path. </LI>
+<LI>
+<A NAME="50422110_pgfId-296094"></A><A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_vx_c</A>: Produce a cross-section at each vertex along the path. </LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-296095"></A>More details about the behaviour of these values for different types of path are given in the rest of this section.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-296097"></A>n_xsects</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296099"></A>The number of cross-sections to produce when <CODE>
+group_xsect</CODE>
+ is either <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_no_c</A> or <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_edge_c</A>. </P>
+<ADDRESS>
+<A NAME="50422110_pgfId-296100"></A>Note: You should use this value only as a guide to the number of cross-sections that are produced in total. See the rest of this section for more details. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-296105"></A>Depending on the nature of the path and the value of <CODE>
+group_xsect</CODE>
+, Parasolid can sometimes produce a different number of cross-sections than you expect. </P>
+<P>
+<A NAME="50422110_pgfId-296109"></A>If <CODE>
+group_xsect</CODE>
+ is <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_no_c</A>, then Parasolid returns the number of cross-sections specified in <CODE>
+n_xsects</CODE>
+ if the path is smooth. These cross-sections are distributed evenly along the length of the path, meaning that, in general, cross-sections are not placed at vertices on the path.</P>
+<P>
+<A NAME="50422110_pgfId-296113"></A>However, if the path is non-G1 continuous, Parasolid also creates two additional cross-sections at each non-G1 vertex in the path, oriented in the direction of the path on either side of the G1 discontinuity. </P>
+<P>
+<A NAME="50422110_pgfId-296117"></A><A HREF="fd_chap.039.html#50422110_32812"><EM>
+Figure 38-12</EM></A> shows two simple examples illustrating this behaviour. </P>
+<P>
+<A NAME="50422110_pgfId-408006"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-296120"></A>Note: The path itself is not returned with any of the examples shown in this section, and is only included for clarity. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-408011"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-313.gif">
+
+<P>
+<A NAME="50422110_pgfId-296304"></A>Figure 38-12 <A NAME="50422110_32812"></A>Specifying a total number of cross-section profiles</P>
+<P>
+<A NAME="50422110_pgfId-296305"></A>If <CODE>
+group_xsect</CODE>
+ is <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_edge_c</A> then, for paths that contain smooth vertices, Parasolid produces fewer cross-sections along the path than may be expected from the value <CODE>
+n_xsects</CODE>
+: the vertices at both ends of each edge of the path are considered to belong to that edge, but cross-sections at smooth vertices are returned only once. </P>
+<P>
+<A NAME="50422110_pgfId-296312"></A>For paths that contain non-smooth vertices, however, Parasolid creates the number of cross-sections specified for each edge that contains a non-G1 vertex. </P>
+<P>
+<A NAME="50422110_pgfId-296316"></A><A HREF="fd_chap.039.html#50422110_42652"><EM>
+Figure 38-13</EM></A> shows how, by specifying 3 cross-sections per edge, a two-edge path with a smooth vertex returns 5 cross-sections, while a two-edge path with a non-smooth vertex returns 6 cross-sections. </P>
+<P>
+<A NAME="50422110_pgfId-410324"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-314.gif">
+
+<P>
+<A NAME="50422110_pgfId-296499"></A>Figure 38-13 <A NAME="50422110_42652"></A>Specifying a total number of cross-section profiles per edge</P>
+<P>
+<A NAME="50422110_pgfId-296503"></A>If <CODE>
+group_xsect</CODE>
+ is <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_vx_c</A>, Parasolid behaves in a similar way to <A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_edge_c</A>, depending on whether each vertex on the path is G1 or not.</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-296504"></A>For smooth vertices, a single cross-section profile is returned. </LI>
+<LI>
+<A NAME="50422110_pgfId-296508"></A>For non-smooth vertices, Parasolid returns two cross-section profiles.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-296512"></A><A HREF="fd_chap.039.html#50422110_43415"><EM>
+Figure 38-14</EM></A> shows the results when returning cross-section profiles at vertices for the same examples already shown. </P>
+<P>
+<A NAME="50422110_pgfId-411691"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-315.gif">
+
+<P>
+<A NAME="50422110_pgfId-296673"></A>Figure 38-14 <A NAME="50422110_43415"></A>Specifying a cross-section profile for each vertex</P>
+<P>
+<A NAME="50422110_pgfId-296677"></A>When creating cross-section profiles for every vertex, Parasolid honors any entries in the <CODE>
+ignorable_vertices</CODE>
+ array: no cross-sections are produced at ignorable vertices.</P>
+<P>
+<A NAME="50422110_pgfId-1598415"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1599008"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-1598993"></A><A HREF="fd_chap.039.html#50422110_52842">Section 38.3.2.3, “Using cross-section profiles with guide wires”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-296683"></A>	38.2.5 	<A NAME="50422110_19017"></A><A NAME="50422110_marker-1598622"></A><A NAME="50422110_marker-1598623"></A><A NAME="50422110_marker-1598624"></A><A NAME="50422110_marker-1598625"></A>Controlling the profile alignment </H3>
+<P>
+<A NAME="50422110_pgfId-296685"></A><A NAME="50422110_marker-296684"></A>The <CODE>
+alignment</CODE>
+ field of <A HREF=../headers/pk_body_make_swept_body_2_o_t.html>PK_BODY_make_swept_body_2_o_t</A> is used to control the orientation of the profiles as they move along the path. When no guide wires are present, you can choose to either keep the orientation constant, or vary the orientation along the sweep to follow the shape of the path, as shown in <A HREF="fd_chap.039.html#50422110_23527"><EM>
+Figure 38-15</EM></A>.</P>
+<P>
+<A NAME="50422110_pgfId-413046"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-316.gif">
+
+<P>
+<A NAME="50422110_pgfId-296846"></A>Figure 38-15 <A NAME="50422110_23527"></A>Sweep alignment</P>
+<P>
+<A NAME="50422110_pgfId-296848"></A><A NAME="50422110_marker-296847"></A>The <CODE>
+alignment</CODE>
+ field takes the following values:</P>
+<P>
+<A NAME="50422110_pgfId-296872"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296851"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296853"></A>Orientation</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296855"></A>PK_BODY_sweep_align_parallel_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296857"></A>Keep the orientation of the profiles constant along the extent of the sweep.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296859"></A>PK_BODY_sweep_align_normal_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296861"></A>Vary the orientation of the profiles so that they maintain a fixed relationship with the normal plane of the path. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296863"></A>PK_BODY_sweep_align_parm_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296865"></A>Vary the orientation of the profiles so that points on the path and guide wires are matched according to the proportional parameter distance of the underlying edge curve.</P>
+<P>
+<A NAME="50422110_pgfId-296866"></A><STRONG>
+Note:</STRONG> This option is only available when at least one guide wire is supplied. The path and guide wires must each have a common curve that is shared by the edges.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296868"></A>PK_BODY_sweep_align_arclength_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296870"></A>Vary the orientation of the profiles so that points on the path and guide wires are matched according to the proportional arc-length distance along the path and guide wires.</P>
+<P>
+<A NAME="50422110_pgfId-296871"></A><STRONG>
+Note:</STRONG> This option is only available when at least one guide wire is supplied.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-296873"></A>An examples of a model with guide wires that uses PK_BODY_sweep_align_parm_c and PK_BODY_sweep_align_arclength_c is given in <A HREF="fd_chap.039.html#50422110_39682"><EM>
+Figure 38-54</EM></A>.</P>
+<P>
+<A NAME="50422110_pgfId-296880"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-296879"></A>Note: If <CODE>
+alignment</CODE>
+ is specified as normal, Parasolid adjusts its frame of reference at any G2 discontinuity in the sweep path to maintain continuity of the resulting surfaces.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-296882"></A>	38.2.6 	<A NAME="50422110_48029"></A>Locking the direction of normal alignment </H3>
+<P>
+<A NAME="50422110_pgfId-296883"></A>For non-planar paths, profiles that remain at a fixed angle to the normal plane of the path may not always be desirable. In these cases, you can use the <CODE>
+lock_direction</CODE>
+ option to specify a lock direction that constrains the orientation of the profiles to give better results. The profiles then maintain a fixed relationship to the lock direction, the exact nature of which depends on the value of <CODE>
+lock_direction</CODE>
+, as described below.</P>
+<P>
+<A NAME="50422110_pgfId-296897"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296886"></A>Value of <CODE>
+lock_direction</CODE>
+</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296888"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296890"></A><A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_and_dir_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296892"></A>The sweep direction is projected into the plane perpendicular to the <CODE>
+lock_direction</CODE>
+, and the profiles of the swept body maintain a fixed relationship to both the sweep direction and the <CODE>
+lock_direction</CODE>
+. This is the default value. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296894"></A><A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_rotation_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296896"></A>The <CODE>
+lock_direction</CODE>
+ is projected into the plane perpendicular to the sweep direction. The sweep profiles maintain a fixed relationship to this direction. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-296931"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-317.gif">
+
+<P>
+<A NAME="50422110_pgfId-296933"></A>Figure 38-16 <A NAME="50422110_30439"></A>The effect of a lock direction with PK_BODY_sweep_align_normal_c.</P>
+<P>
+<A NAME="50422110_pgfId-296937"></A><A HREF="fd_chap.039.html#50422110_30439"><EM>
+Figure 38-16</EM></A> shows a path arising from the intersection of two cylinders (one vertical, and one horizontal). Without a lock direction specified, the swept body will not be aligned with the outside wall of the vertical cylinder. This can be achieved by specifying a vertical lock direction, as shown.</P>
+<P>
+<A NAME="50422110_pgfId-296942"></A>The lock direction is specified by assigning values to the following fields:</P>
+<P>
+<A NAME="50422110_pgfId-296956"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296945"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296947"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296949"></A><CODE>
+have_lock_direction</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296951"></A>Whether to use a lock direction for the sweep (PK_LOGICAL_false).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296953"></A><CODE>
+lock_direction</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296955"></A>A unit vector determining the lock direction.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-296960"></A><A HREF="fd_chap.039.html#50422110_30439"><EM>
+Figure 38-16</EM></A> also shows how you can control the exact shape of the swept body by using lock direction as a rotation lock. When you do this, the profile continues to maintain a fixed relationship to the lock direction projected into the plane perpendicular to the path tangent, while still allowing the orientation of the profile to vary as it travels along the path. You can apply a rotation lock by setting the <CODE>
+lock_type</CODE>
+ option to <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_rotation_c</A>. </P>
+<P>
+<A NAME="50422110_pgfId-296961"></A>When sweeping with guide wires, you can use the <CODE>
+lock_type</CODE>
+ option to further control the result of a sweep operation. See <A HREF="fd_chap.039.html#50422110_45592">Section 38.3.3, “Controlling the behaviour of locks”</A>, for more information.</P>
+<P>
+<A NAME="50422110_pgfId-296968"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-296967"></A>Note: When sweeping without guide wires, the <CODE>
+lock_type</CODE>
+ option should not be set to <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_c</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-296970"></A>	38.2.7 	<A NAME="50422110_24369"></A>Locking the sweep to specified faces </H3>
+<P>
+<A NAME="50422110_pgfId-296973"></A>Rather than locking a sweep operation to a particular direction (as described in <A HREF="fd_chap.039.html#50422110_48029">Section 38.2.6, “Locking the direction of normal alignment”</A>), you can lock the sweep operation to a set of faces. If you use this option, at each point along the sweep path, the sweep cross-section maintains a fixed relationship to both the direction of the sweep and the normal of whichever of the specified faces that path point is coincident with. </P>
+<P>
+<A NAME="50422110_pgfId-296975"></A>You can lock a sweep operation to a set of faces using the following options:</P>
+<P>
+<A NAME="50422110_pgfId-296988"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296978"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-296980"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-296982"></A>n_lock_faces</PRE>
+<PRE><A NAME="50422110_pgfId-296983"></A>lock_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-722086"></A>An array of faces that you want to lock the sweep to. </P>
+<P>
+<A NAME="50422110_pgfId-722155"></A>For a list of constraints that apply when using <CODE>
+lock_faces</CODE>
+, see <A HREF="fd_chap.039.html#50422110_92505">Section 38.2.7.1, “Constraints when locking the sweep to specified faces”</A>.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-296992"></A><A HREF="fd_chap.039.html#50422110_50672"><EM>
+Figure 38-17</EM></A> shows an example where a square profile is swept along a straight line that forms the laminar boundary of a lock face with an attached B-surface. The resulting swept body is locked to the normal of this face, resulting in a non-linear sweep. </P>
+<P>
+<A NAME="50422110_pgfId-297026"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-318.gif">
+
+<P>
+<A NAME="50422110_pgfId-297028"></A>Figure 38-17 <A NAME="50422110_50672"></A>Locking the orientation of the sweep to a set of faces</P>
+
+<H4>
+<A NAME="50422110_pgfId-714847"></A>38.2.7.1 <A NAME="50422110_92505"></A>Constraints when locking the sweep to specified faces </H4>
+<P>
+<A NAME="50422110_pgfId-694644"></A>The following constraints apply when using <CODE>
+lock_faces</CODE>
+:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-694645"></A>Where the path lies within the boundary of the supplied lock faces, it must be within tolerance of the supplied <CODE>
+lock_faces</CODE>
+, and be visibly G1 continuous. </LI>
+<LI>
+<A NAME="50422110_pgfId-694646"></A>The path cannot lie completely outside of the supplied lock faces. </LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-694647"></A>In cases where the path passes outside of the boundary of the supplied lock faces the following constraints apply:</P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-729529"></A>The path must continue to lie on the surface of the face where it exits the lock faces. In cases where the path runs along an edge between two lock faces at the point where it exits the lock faces, then either the faces must have identical surfaces or the path must remain within tolerance of one of the surfaces of the lock faces. <A HREF="fd_chap.039.html#50422110_41004"><EM>
+Figure 38-18</EM></A> illustrates this.</LI>
+<LI>
+<A NAME="50422110_pgfId-694648"></A>If the path exits the lock faces at one face and reenters at a different face (by crossing a hole or a gap in the lock faces) then these faces must have identical surfaces. <A HREF="fd_chap.039.html#50422110_71968"><EM>
+Figure 38-19</EM></A> illustrates this. </LI>
+</UL>
+<LI>
+<A NAME="50422110_pgfId-729460"></A>If there are non-laminar edges between the supplied faces that the imprint of the path interacts with, they must be visibly G1 smooth.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-733054"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-319.gif">
+
+<P>
+<A NAME="50422110_pgfId-732675"></A>Figure 38-18 <A NAME="50422110_41004"></A>Locking the sweep along an edge between a supplied set of faces</P>
+<P>
+<A NAME="50422110_pgfId-710016"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-320.gif">
+
+<P>
+<A NAME="50422110_pgfId-707095"></A>Figure 38-19 <A NAME="50422110_71968"></A>Locking the sweep to a supplied set of faces</P>
+<P>
+<A NAME="50422110_pgfId-297029"></A>This option cannot be used in conjunction with any of the following:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-297032"></A>A non-default lock direction (<A HREF="fd_chap.039.html#50422110_48029">Section 38.2.6, “Locking the direction of normal alignment”</A>).</LI>
+<LI>
+<A NAME="50422110_pgfId-297036"></A>A non-default profile alignment (<A HREF="fd_chap.039.html#50422110_19017">Section 38.2.5, “Controlling the profile alignment”</A>).</LI>
+<LI>
+<A NAME="50422110_pgfId-297041"></A>Guide wires (<A HREF="fd_chap.039.html#50422110_63726">Section 38.3, “Sweeping with guide wires”</A>).</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-1022779"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-1022485"></A>Note: <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> accepts faces from general bodies provided the supplied <CODE>
+lock_faces</CODE>
+ are locally manifold.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422110_pgfId-297046"></A>	38.2.8 	<A NAME="50422110_72913"></A><A NAME="50422110_marker-1021248"></A><A NAME="50422110_marker-1021249"></A><A NAME="50422110_marker-1021250"></A>Specifying twist </H3>
+<P>
+<A NAME="50422110_pgfId-297047"></A>The <CODE>
+twist</CODE>
+ option lets you control the rotation of a set of profiles as they move along the path, as shown in <A HREF="fd_chap.039.html#50422110_12239"><EM>
+Figure 38-20</EM></A>. </P>
+<P>
+<A NAME="50422110_pgfId-1211560"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-321.gif">
+
+<P>
+<A NAME="50422110_pgfId-1211829"></A>Figure 38-20 <A NAME="50422110_12239"></A>Twisting a sweep with a single profile</P>
+<P>
+<A NAME="50422110_pgfId-297054"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-297053"></A>Note: Twist can only be used when you supply a G1-continuous path.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-297055"></A>You control sweep twist by supplying one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-297056"></A>A set of radian angular values to be interpolated at each vertex on the path.</LI>
+<LI>
+<A NAME="50422110_pgfId-297057"></A>A description of the twist as a B-spline function, in the form of a <A HREF=../headers/pk_law_sf_t.html>PK_LAW_sf_t</A>, parameterised [0,1] that evaluates over this range to the values of the scalar law.</LI>
+<LI>
+<A NAME="50422110_pgfId-1836410"></A>The inverse of a 1-D twist law function as described above. This inverse function should be parameterised over the range of twist values required and should evaluate to values in the range [0,1]. </LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-1230588"></A>The twist is performed by applying a rotational transformation to the profiles as they move along the path.</P>
+<P>
+<A NAME="50422110_pgfId-297129"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-322.gif">
+
+<P>
+<A NAME="50422110_pgfId-297131"></A>Figure 38-21 <A NAME="50422110_71574"></A>Twisting sweeps with multiple profiles</P>
+<P>
+<A NAME="50422110_pgfId-297132"></A>When adding twist to a swept body that uses multiple profiles, the profiles themselves need to be transformed about the appropriate location of the path so as to pass through the swept body. Parasolid lets you choose whether to supply profiles in their transformed or untransformed orientations, using the <CODE>
+profile_law</CODE>
+ option. This takes the following values:</P>
+<P>
+<A NAME="50422110_pgfId-297155"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297138"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297140"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297142"></A><A HREF=../headers/pk_sweep_profile_law_t.html>PK_sweep_profile_law_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297144"></A>Use this value if you want to supply profiles in their untransformed orientations. Parasolid transforms the profiles at the appropriate points on the path so that the swept body passes through the transformed profiles. In general, however, the swept body will not pass through the untransformed profiles as you supplied them. This is the default. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297149"></A><A HREF=../headers/pk_sweep_profile_law_t.html>PK_sweep_profile_law_yes_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297151"></A>Use this value if you want to supply profiles in their transformed orientations. The swept body will pass through each profile as you supplied it, and Parasolid alters the resulting swept body accordingly. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-297159"></A><A HREF="fd_chap.039.html#50422110_35252"><EM>
+Figure 38-22</EM></A> illustrates the effect of the <CODE>
+profile_law</CODE>
+ option on a swept body that uses the same path and profiles as the example in <A HREF="fd_chap.039.html#50422110_71574"><EM>
+Figure 38-21</EM></A>.</P>
+<P>
+<A NAME="50422110_pgfId-297196"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-323.gif">
+
+<P>
+<A NAME="50422110_pgfId-297198"></A>Figure 38-22 <A NAME="50422110_35252"></A>Supplying profiles in untransformed and transformed orientations</P>
+<P>
+<A NAME="50422110_pgfId-297199"></A>Twist laws cause rotations of the whole profile around the path, and can sometimes produce corkscrew-like sweeps such as the one shown in <A HREF="fd_chap.039.html#50422110_41353"><EM>
+Figure 38-23</EM></A>. Parasolid also provides dedicated functionality for creating helical curves and surfaces: see <A HREF="fd_chap.039.html#50422110_34134">Section 38.5, “Creating helical curves and surfaces”</A> for full details.</P>
+<P>
+<A NAME="50422110_pgfId-297242"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-324.gif">
+
+<P>
+<A NAME="50422110_pgfId-297244"></A>Figure 38-23 <A NAME="50422110_41353"></A>Sweep with scale and twist</P>
+<P>
+<A NAME="50422110_pgfId-297246"></A><A NAME="50422110_marker-297245"></A>The direction in which the specified <CODE>
+twist</CODE>
+ is applied is modified by any <CODE>
+alignment</CODE>
+ specified for the sweep operation, as shown in <A HREF="fd_chap.039.html#50422110_75868"><EM>
+Figure 38-24</EM></A>. </P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-297250"></A>When normal alignment is used, the axis of rotation of the profile is tangent to the corresponding point on the path, and thus varies along the length of the path.</LI>
+<LI>
+<A NAME="50422110_pgfId-297251"></A>When parallel alignment is used, the direction may be specified in the following ways:</LI>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-297252"></A>By default, the axis of rotation is tangent to the first path vertex, and remains constant along the entire path. </LI>
+<LI>
+<A NAME="50422110_pgfId-297253"></A>Alternatively, you can specify a specific direction in which to apply the twist.</LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422110_pgfId-297314"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-325.gif">
+
+<P>
+<A NAME="50422110_pgfId-297316"></A>Figure 38-24 <A NAME="50422110_75868"></A>Sweep with alignment and twist</P>
+<P>
+<A NAME="50422110_pgfId-297317"></A>If you are using parallel alignment and want to specify an explicit twist direction, use the following options:</P>
+<P>
+<A NAME="50422110_pgfId-297331"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297320"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297322"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-297324"></A>have_twist_direction</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297326"></A>Whether or not a specific <CODE>
+twist_direction</CODE>
+ is supplied. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-297328"></A>twist_direction</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297330"></A>A unit vector that specifies the direction in which to apply the twist. Default: NULL.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-297335"></A><A HREF="fd_chap.039.html#50422110_87884"><EM>
+Figure 38-25</EM></A> shows the effect of applying a specific twist direction when sweeping a sheet profile along a straight path. By default, a sweep with parallel alignment results in the profile tilting with respect to the path as it moves along the path, because of the initial angle between the profile normal and the path. By applying a twist direction that is perpendicular to the plane of the profile, this effect can be removed, resulting in a swept body that twists, but does not tilt. </P>
+<P>
+<A NAME="50422110_pgfId-297369"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-326.gif">
+
+<P>
+<A NAME="50422110_pgfId-297371"></A>Figure 38-25 <A NAME="50422110_87884"></A>Specifying a twist direction when sweeping with parallel alignment</P>
+<P>
+<A NAME="50422110_pgfId-297372"></A>If a lock direction is used with normal alignment, the axis of rotation follows the tangent of the path but remains within the plane normal to the lock direction: see <A HREF="fd_chap.039.html#50422110_48029">Section 38.2.6, “Locking the direction of normal alignment”</A>.</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-297380"></A>	38.2.9 	<A NAME="50422110_95856"></A><A NAME="50422110_marker-297377"></A><A NAME="50422110_marker-297378"></A><A NAME="50422110_marker-297379"></A>Specifying scale </H3>
+<P>
+<A NAME="50422110_pgfId-297381"></A>You can control the size or position of a single profile as it moves along a smooth path using the <CODE>
+scale</CODE>
+, <CODE>
+scale_type</CODE>
+, and <CODE>
+scale_point</CODE>
+ options. </P>
+<P>
+<A NAME="50422110_pgfId-297385"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-297384"></A>Note: Scale can only be used when you supply a single profile and a G1-continuous path.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-297412"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297388"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297390"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-297392"></A>scale</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297394"></A>Describes how the size or position of the profile should vary as it moves along the path. See <A HREF="fd_chap.039.html#50422110_94466">Section 38.2.9.2, “Specifying scale laws”</A> for information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-297399"></A>scale_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297401"></A>Specifies whether the size of the profile should be changed, or its distance from the path, or both. See <A HREF="fd_chap.039.html#50422110_68291">Section 38.2.9.1, “Specifying the type of scale”</A> for information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-297406"></A>scale_point</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297408"></A>A point, used in conjunction with <CODE>
+scale_type</CODE>
+, to define the exact behaviour of the scale operation. See <A HREF="fd_chap.039.html#50422110_68291">Section 38.2.9.1, “Specifying the type of scale”</A> for information.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-395255"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-327.gif">
+
+<P>
+<A NAME="50422110_pgfId-297510"></A>Figure 38-26 Sweep with scale</P>
+
+<H4>
+<A NAME="50422110_pgfId-297514"></A>38.2.9.1 <A NAME="50422110_68291"></A><A NAME="50422110_marker-297512"></A><A NAME="50422110_marker-297513"></A>Specifying the type of scale </H4>
+<P>
+<A NAME="50422110_pgfId-297515"></A>You can specify how scaling affects the shape of the swept body using the <CODE>
+scale_type</CODE>
+ and <CODE>
+scale_point</CODE>
+ options. The <CODE>
+scale_type</CODE>
+ defines what type of scale is to be used, and the behaviour of <CODE>
+scale_point</CODE>
+ depends on the chosen <CODE>
+scale_type</CODE>
+.</P>
+<P>
+<A NAME="50422110_pgfId-297516"></A>The <CODE>
+scale_type</CODE>
+ may be one of the following:</P>
+<P>
+<A NAME="50422110_pgfId-297536"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297519"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297521"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297523"></A>PK_BODY_sweep_scale_posn_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297525"></A>Vary the position of the profile with respect to the path according to <CODE>
+scale</CODE>
+. Do not modify the size of the profile.</P>
+<P>
+<A NAME="50422110_pgfId-297526"></A>In this case, the distance between <CODE>
+scale_point</CODE>
+ and the path is modified according to <CODE>
+scale</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297528"></A>PK_BODY_sweep_scale_size_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297530"></A>Vary the size of the profile about the <CODE>
+scale_point</CODE>
+, according to <CODE>
+scale</CODE>
+. Do not modify the distance of the profile from the path.</P>
+<P>
+<A NAME="50422110_pgfId-297531"></A>In this case, the distance between <CODE>
+scale_point</CODE>
+ and the path is kept constant along the profile.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297533"></A>PK_BODY_sweep_scale_both_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297535"></A>Vary both the size of the profile and its distance from the path according to <CODE>
+scale</CODE>
+. In this case, no <CODE>
+scale_point</CODE>
+ should be supplied. This is the default.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-297540"></A><A HREF="fd_chap.039.html#50422110_80556"><EM>
+Figure 38-27</EM></A> shows the effect of different values of <CODE>
+scale_point</CODE>
+ on <CODE>
+scale_type</CODE>
+. In each case, the swept body is viewed from above for simplicity.</P>
+<P>
+<A NAME="50422110_pgfId-438186"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-328.gif">
+
+<P>
+<A NAME="50422110_pgfId-297704"></A>Figure 38-27 <A NAME="50422110_80556"></A>The effect of different values of <CODE>
+scale_point</CODE>
+ on <CODE>
+scale_type</CODE>
+</P>
+<P>
+<A NAME="50422110_pgfId-297708"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-297707"></A>Note: The <CODE>
+scale_point</CODE>
+ does not need to be on the profile itself: it can be any point in space, and the swept body will be scaled appropriately.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422110_pgfId-297713"></A>38.2.9.2 <A NAME="50422110_94466"></A><A NAME="50422110_marker-297710"></A><A NAME="50422110_marker-297711"></A><A NAME="50422110_marker-297712"></A>Specifying scale laws </H4>
+<P>
+<A NAME="50422110_pgfId-297714"></A>The supplied <CODE>
+scale</CODE>
+ should be one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-297715"></A>A set of scale values to be interpolated at each vertex on the path.</LI>
+<LI>
+<A NAME="50422110_pgfId-297716"></A>A description of the scale as a B-spline function, in the form of a <A HREF=../headers/pk_law_sf_t.html>PK_LAW_sf_t</A>, parameterised [0,1] that evaluates over this range to the values of the scalar law. The inverse of a 1-D scale law function as described above. </LI>
+<LI>
+<A NAME="50422110_pgfId-1836485"></A>This inverse function should be parameterised over the range of scaling required and should evaluate to values in the range [0,1].</LI>
+</UL>
+
+
+
+<H3>
+<A NAME="50422110_pgfId-297720"></A>	38.2.10 	<A NAME="50422110_marker-297718"></A><A NAME="50422110_19495"></A>Continuity of the swept surface </H3>
+<P>
+<A NAME="50422110_pgfId-297721"></A>The <CODE>
+preferred_continuity</CODE>
+ field sets the intended level of continuity of the sweep. The possible values are:</P>
+<P>
+<A NAME="50422110_pgfId-297735"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297724"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297726"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297728"></A><A HREF=../headers/pk_continuity_t.html>PK_continuity_c1_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297730"></A>Produce C1-continuous geometry. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297732"></A><A HREF=../headers/pk_continuity_t.html>PK_continuity_c2_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297734"></A>Produce C2-continuous geometry.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-297736"></A>Specifying a value of <A HREF=../headers/pk_continuity_t.html>PK_continuity_c2_c</A> means that the resulting surfaces are C2-continuous except where inappropriate due to the geometry of the supplied path or profiles, or where C2 continuity would result in an excessive number of B-spline vertices.</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-297741"></A>	38.2.11 	<A NAME="50422110_marker-297737"></A><A NAME="50422110_marker-297738"></A><A NAME="50422110_marker-297739"></A><A NAME="50422110_30166"></A>Specifying the topological form of swept bodies </H3>
+<P>
+<A NAME="50422110_pgfId-297742"></A>The <CODE>
+topology_form</CODE>
+ field controls how faces should divide up the resulting body. It takes the following values:.</P>
+<P>
+<A NAME="50422110_pgfId-297764"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297749"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297751"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297753"></A>PK_BODY_topology_minimal_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297755"></A>The swept body will contain the minimum number of faces. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297757"></A>PK_BODY_topology_columns_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297759"></A>The swept body will contain columns of faces, which are produced from either:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-1981425"></A>the sweep of each profile edge in a single-profile sweep;</LI>
+<LI>
+<A NAME="50422110_pgfId-1981509"></A>each set of matched edges, when multiple profiles are specified.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-1981413"></A>Resultant edges between the columns will run in the directions swept out by the profile vertices.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297761"></A>PK_BODY_topology_grid_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-297763"></A>The swept body will contain a grid of faces. The grid is produced by dividing the body into columns, then dividing at each path or guide vertex to create resultant edges representing the profile at the path or guide vertex.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-439696"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-329.gif">
+
+<P>
+<A NAME="50422110_pgfId-297911"></A>Figure 38-28 Sweeping topology form</P>
+<P>
+<A NAME="50422110_pgfId-297912"></A>The <CODE>
+ignorable_vertices</CODE>
+ option provides further control over the topology of the resulting swept body, particularly when using grid topology. You might find this option useful if, for example, you want to imprint vertices on a path to mark positions for values in discrete twist or scale laws, but you do not want to add unnecessary topological complexity to the resulting body. </P>
+<P>
+<A NAME="50422110_pgfId-297913"></A>The option takes an array of vertices, each of which represents a vertex on the path that is to be ignored when constructing the topology of the swept body. </P>
+<P>
+<A NAME="50422110_pgfId-297914"></A>Normally, if <CODE>
+topology_form</CODE>
+ is set to PK_BODY_topology_grid_c, then edges are added around the swept body at each path vertex, so as to create additional faces in the resulting body. If, however, that path vertex is included in the array of <CODE>
+ignorable_vertices</CODE>
+, no additional edges or faces are added to the swept body. </P>
+<P>
+<A NAME="50422110_pgfId-297915"></A>As a special case, you can use <CODE>
+ignorable_vertices</CODE>
+ to control the topology of swept bodies created from periodic sweep paths. Normally, edges are added to the swept body at the start (and end) point of such sweeps, as shown in <A HREF="fd_chap.039.html#50422110_20113"><EM>
+Figure 38-29</EM></A>. If you supply the start vertex of the path in <CODE>
+ignorable_vertices</CODE>
+, no such edges are added, thereby producing a periodic body with no seam. </P>
+<P>
+<A NAME="50422110_pgfId-441007"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-330.gif">
+
+<P>
+<A NAME="50422110_pgfId-298053"></A>Figure 38-29 <A NAME="50422110_20113"></A>Using <CODE>
+ignorable_vertices</CODE>
+ to create seamless sweeps</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-298055"></A>	38.2.12 	<A NAME="50422110_85173"></A>Matching vertices on profiles </H3>
+<P>
+<A NAME="50422110_pgfId-298056"></A>If you are performing a sweep that uses more than one profile, vertices on neighbouring profiles need to be matched with each other in order to fully define the sweep. In some circumstances, Parasolid can do this for you, but in other cases you need to provide additional information to successfully define the sweep. This section describes the information you need to provide in different situations.</P>
+<P>
+<A NAME="50422110_pgfId-298063"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-298062"></A>Note: If you are sweeping with only a single profile, you do not need to provide matching information. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-298064"></A>If each profile only contains a single loop, then:</P>
+<P>
+<A NAME="50422110_pgfId-298091"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298067"></A>Situation</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298069"></A>Information you need to provide</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298071"></A>All the profiles are open and contain the same number of vertices.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298076"></A>No additional matching information needs to be given; Parasolid can match vertices automatically</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298078"></A>All the profiles are closed and contain the same number of vertices.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298080"></A>Specify a single strand of vertices to connect along the sweep, one vertex for each profile, using the <CODE>
+matches</CODE>
+ option.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298082"></A>The profiles contain different numbers of vertices</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298084"></A>You need to do one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-298085"></A>Use <A HREF=../headers/pk_edge_imprint_point.html>PK_EDGE_imprint_point</A> to imprint additional vertices so that that each profile has the same number of vertices, and treat as per the appropriate situation above.</LI>
+<LI>
+<A NAME="50422110_pgfId-298086"></A>Use the <CODE>
+matches</CODE>
+ option to provide a complete mapping that describes how each vertex in a profile maps onto a vertex in the next profile.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-298090"></A>In the example shown in <A HREF="fd_chap.039.html#50422110_32665"><EM>
+Figure 38-30</EM></A>, a complete mapping could be specified as <CODE>
+[[A X], [B X], [C Z], [D Y]]</CODE>
+.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-298125"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-331.gif">
+
+<P>
+<A NAME="50422110_pgfId-298127"></A>Figure 38-30 <A NAME="50422110_32665"></A>Specifying a complete mapping of vertices</P>
+<P>
+<A NAME="50422110_pgfId-298128"></A>If any of your profiles contain several loops (i.e, wire profiles are disjoint, or sheet profiles contain more than a single laminar boundary), then you must provide matching information using the <CODE>
+matches</CODE>
+ option. </P>
+<P>
+<A NAME="50422110_pgfId-298142"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298131"></A>Situation</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298133"></A>Information you need to provide</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298135"></A>Each loop contains the same number of vertices across all the profiles.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298137"></A>For each loop, specify a strand of vertices to connect along the sweep, one vertex for each profile.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298139"></A>Different loops contain different numbers of vertices.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298141"></A>A complete mapping that describes how each vertex in a profile maps onto a vertex in the next profile, rather than a single strand for each loop</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-298143"></A>A vertex on a given loop may not be matched to multiple vertices from different loops on the adjacent profile.</P>
+<P>
+<A NAME="50422110_pgfId-298144"></A>The following illustrations show the different effects you can achieve by mapping across different loops in the supplied profiles, when the configuration permits.</P>
+<P>
+<A NAME="50422110_pgfId-298148"></A>In <A HREF="fd_chap.039.html#50422110_46864"><EM>
+Figure 38-31</EM></A>, <CODE>
+matches</CODE>
+ is specified as <CODE>
+[[A C], [B D]]</CODE>
+. This produces a disjoint result that consists of two tubes.</P>
+<P>
+<A NAME="50422110_pgfId-298182"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-332.gif">
+
+<P>
+<A NAME="50422110_pgfId-298184"></A>Figure 38-31 <A NAME="50422110_46864"></A>Mapping vertices onto different components</P>
+<P>
+<A NAME="50422110_pgfId-298188"></A>In <A HREF="fd_chap.039.html#50422110_32995"><EM>
+Figure 38-32</EM></A>, the same profiles and path are used, but, <CODE>
+matches</CODE>
+ is specified as <CODE>
+[[A D], [B C]]</CODE>
+. This produces a non-disjoint result with a self-intersection that is repaired automatically. </P>
+<P>
+<A NAME="50422110_pgfId-298222"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-333.gif">
+
+<P>
+<A NAME="50422110_pgfId-298225"></A>Figure 38-32 <A NAME="50422110_32995"></A>Mapping vertices onto different components</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-298230"></A>	38.2.13 	<A NAME="50422110_marker-298226"></A><A NAME="50422110_marker-298227"></A><A NAME="50422110_marker-298228"></A><A NAME="50422110_44669"></A>Simplifying the final body </H3>
+<P>
+<A NAME="50422110_pgfId-298231"></A>The <CODE>
+simplify</CODE>
+ option allows your application to control whether the surfaces of the resultant body should all be B-surfaces or whether they should be simplified to analytics where possible. Simplification is performed on the entire surface of each face and does not alter the topology of the resultant body.</P>
+<P>
+<A NAME="50422110_pgfId-298232"></A>You can control how the result body is simplified using the <CODE>
+simplify</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422110_pgfId-954209"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298235"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298237"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298239"></A>PK_BODY_simplify_analytic_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298241"></A>Simplify the body by replacing surfaces with analytic geometry where possible, to within Parasolid precision.(Default)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298246"></A>PK_BODY_simplify_swept_spun_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298248"></A>Where possible, simplify the body using analytic geometry as with PK_BODY_simplify_analytic_c. Where this is not possible, attempt to generate a swept or spun surface, to within Parasolid precision. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298253"></A>PK_BODY_simplify_no_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298255"></A>Do not attempt to simplify the resulting body. Always produce B-surfaces.</P>
+<P>
+<A NAME="50422110_pgfId-953897"></A><STRONG>
+Note: </STRONG>If multiple profiles are specified in a sweep, <CODE>
+simplify</CODE>
+ must be set to this value.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-298257"></A>If you want to produce the simplest possible surfaces in the result (rather than the minimal number of surfaces), you may need to set the <CODE>
+topology_form</CODE>
+ option to a non-default value. See <A HREF="fd_chap.039.html#50422110_30166">Section 38.2.11, “Specifying the topological form of swept bodies”</A>, for more details. </P>
+<P>
+<A NAME="50422110_pgfId-298264"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-298263"></A>Note: If <CODE>
+simplify</CODE>
+ is set to PK_BODY_simplify_swept_spun_c, swept and spun surfaces may be generated, even if PK_SESSION_set_swept_spun has been set to PK_LOGICAL_false.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-298395"></A>	38.2.14 	<A NAME="50422110_15033"></A><A NAME="50422110_marker-298390"></A><A NAME="50422110_marker-298391"></A><A NAME="50422110_marker-298392"></A><A NAME="50422110_marker-298393"></A><A NAME="50422110_marker-298394"></A>Handling sweep tolerances </H3>
+<P>
+<A NAME="50422110_pgfId-298396"></A>There are several options in <A HREF=../headers/pk_body_make_swept_body_2_o_t.html>PK_BODY_make_swept_body_2_o_t</A> that let you control how tolerances are used when creating swept bodies. These are as follows:</P>
+<P>
+<A NAME="50422110_pgfId-298417"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298399"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298401"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-298403"></A>tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298405"></A>The tolerance to which entities are approximated or assumed to be coincident. Default: 1.0e-5.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-298407"></A>minimise_tolerance</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298409"></A>If PK_LOGICAL_true, the tolerances applied to topology created by the sweep are minimised. Default: PK_LOGICAL_true.</P>
+<P>
+<A NAME="50422110_pgfId-298410"></A>Minimising tolerances can help downstream modelling operations, and you are recommended to set <CODE>
+minimise_tolerance</CODE>
+ to PK_LOGICAL_true whenever possible.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-298412"></A>allow_rationals</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298414"></A>If <CODE>
+minimise_tolerance</CODE>
+ is PK_LOGICAL_true, rational B-surfaces may be used in the resulting body. Setting <CODE>
+allow_rationals</CODE>
+ to PK_LOGICAL_false guarantees that no rationals are used when tolerances are minimised.</P>
+<P>
+<A NAME="50422110_pgfId-298415"></A>If <CODE>
+minimise_tolerance</CODE>
+ is PK_LOGICAL_false, rational B-surfaces are never used, regardless of the value of <CODE>
+allow_rationals</CODE>
+.</P>
+<P>
+<A NAME="50422110_pgfId-298416"></A>Default: PK_LOGICAL_true.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-298418"></A>	38.2.15 	Returning tracking information for edges </H3>
+<P>
+<A NAME="50422110_pgfId-298419"></A>You can use the <CODE>
+want_edge_tracking</CODE>
+ option to request that tracking information for edges be returned in the <CODE>
+tracking_info</CODE>
+ structure. By default, only tracking information for faces is returned.</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-298424"></A>	38.2.16 	<A NAME="50422110_marker-298420"></A><A NAME="50422110_marker-298421"></A><A NAME="50422110_marker-298422"></A><A NAME="50422110_marker-298423"></A><A NAME="50422110_44546"></A>Nominal geometry </H3>
+<P>
+<A NAME="50422110_pgfId-298425"></A>The resultant bodies produced by <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> have nominal curves enabled.</P>
+<P>
+<A NAME="50422110_pgfId-298426"></A>Edges running parallel to profiles have nominal curves on them derived from the profile geometries. The nominal curves are either copies of the (nominal) curves of the profile edges, transformed along the path, or, for edges in between the positions of two profiles, B-curves derived from the surfaces between the profiles.</P>
+<P>
+<A NAME="50422110_pgfId-298427"></A>Lateral edges, i.e. edges running in the direction of the sweep, have nominal geometry derived from the surfaces of their adjacent faces. In general they are B-curves, though analytic curves may be produced when <CODE>
+simplify</CODE>
+ is set to PK_BODY_simplify_yes_c.</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-298432"></A>	38.2.17 	<A NAME="50422110_marker-298428"></A><A NAME="50422110_marker-298429"></A><A NAME="50422110_marker-298430"></A><A NAME="50422110_47799"></A>Self-intersection repair </H3>
+<P>
+<A NAME="50422110_pgfId-298433"></A>When a sweep results in a body that intersects itself, Parasolid attempts to repair the body to produce a valid solid. This may involve splitting faces; however, the tracking information returned reflects the final state of the body. <A HREF="fd_chap.039.html#50422110_35708"><EM>
+Figure 38-33</EM></A> shows two examples of bodies that intersect themselves, that have been successfully repaired by the sweep operation.</P>
+<P>
+<A NAME="50422110_pgfId-1484203"></A>&nbsp;</P>
+<P>
+<A NAME="50422110_pgfId-1481192"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-334.gif">
+
+<P>
+<A NAME="50422110_pgfId-298477"></A>Figure 38-33 <A NAME="50422110_35708"></A>Fixing global self-intersections, where sweeping creates a self-intersecting body</P>
+<P>
+<A NAME="50422110_pgfId-298478"></A>In addition, you can use the <CODE>
+repair</CODE>
+ option to repair locally self-intersecting surfaces and clashes between adjacent faces: </P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-298479"></A>Set <CODE>
+repair</CODE>
+ to <A HREF=../headers/pk_sweep_repair_t.html>PK_sweep_repair_yes_c</A> to repair faces. </LI>
+<LI>
+<A NAME="50422110_pgfId-298480"></A>Set <CODE>
+repair</CODE>
+ to <A HREF=../headers/pk_sweep_repair_t.html>PK_sweep_repair_report_c</A> to repair faces, and return the repaired faces in the <CODE>
+fault_entities</CODE>
+ array.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-298484"></A><A HREF="fd_chap.039.html#50422110_78540"><EM>
+Figure 38-34</EM></A> shows an example where sweeping a profile along a path creates a tube with a local self-intersection. The self-intersection can be removed, and the relevant face split, by switching on the <CODE>
+repair</CODE>
+ option. By default, local self-intersections are not repaired.</P>
+<P>
+<A NAME="50422110_pgfId-496035"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-335.gif">
+
+<P>
+<A NAME="50422110_pgfId-298525"></A>Figure 38-34 <A NAME="50422110_78540"></A>Fixing local self-intersections using the <CODE>
+repair</CODE>
+ option</P>
+<P>
+<A NAME="50422110_pgfId-298529"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-298528"></A>Note: Global self-intersections are always repaired by <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A>. Local-self intersections are only repaired if the <CODE>
+repair</CODE>
+ option is switched on. If <CODE>
+repair</CODE>
+ is switched off, then a self-intersecting body may be returned, or the sweep operation may fail; <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> returns a fault status indicating self-intersection in both cases. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-298569"></A>	38.2.18 	<A NAME="50422110_44238"></A>Profile clamps </H3>
+<P>
+<A NAME="50422110_pgfId-298570"></A>When using more than one profile, you can clamp the swept surface at certain profiles. This constrains the shape of the surface at those profiles, in order to ensure a smooth solution. </P>
+<P>
+<A NAME="50422110_pgfId-298580"></A><A HREF="fd_chap.039.html#50422110_18408"><EM>
+Figure 38-35</EM></A>, <A HREF="fd_chap.039.html#50422110_38752"><EM>
+Figure 38-36</EM></A> and <A HREF="fd_chap.039.html#50422110_53974"><EM>
+Figure 38-37</EM></A> show the effects of clamping profiles during a sweep operation. The body is swept between the first and last profiles shown in <A HREF="fd_chap.039.html#50422110_18408"><EM>
+Figure 38-35</EM></A>, and then extended outwards to the ends of the path.</P>
+<P>
+<A NAME="50422110_pgfId-417550"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-336.gif">
+
+<P>
+<A NAME="50422110_pgfId-298611"></A>Figure 38-35 <A NAME="50422110_18408"></A>Path and profiles from which a body will be created</P>
+<P>
+<A NAME="50422110_pgfId-298615"></A>In <A HREF="fd_chap.039.html#50422110_38752"><EM>
+Figure 38-36</EM></A> (a), the profile is extended without any modifications made to the surface. This results in a body that is not G1-smooth at the points coincident with the first and last profiles. Diagrams (b) and (c) in <A HREF="fd_chap.039.html#50422110_38752"><EM>
+Figure 38-36</EM></A> illustrate the use of clamps at these two profiles, resulting in bodies that are G1-smooth everywhere. Note that the topology of each of these bodies (using a value of PK_BODY_topology_minimal_c for <CODE>
+topology_form</CODE>
+; see <A HREF="fd_chap.039.html#50422110_30166">Section 38.2.11, “Specifying the topological form of swept bodies”</A> for details) is simpler than that in diagram (a), with only three faces created instead of five.</P>
+<P>
+<A NAME="50422110_pgfId-418272"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-337.gif">
+
+<P>
+<A NAME="50422110_pgfId-298782"></A>Figure 38-36 <A NAME="50422110_38752"></A>Effects of clamping profiles during a sweep operation</P>
+<P>
+<A NAME="50422110_pgfId-298783"></A>You can specify at which profiles you apply clamps by using the following options in the <A HREF=../headers/pk_body_make_swept_body_2_o_t.html>PK_BODY_make_swept_body_2_o_t</A> structure:</P>
+<P>
+<A NAME="50422110_pgfId-298801"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298786"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298788"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-298790"></A>n_profile_derivs</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298792"></A>The number of profiles that have clamps applied. (Default 0.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-298794"></A>profile_derivs</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298796"></A>An array of structures specifying for each profile the details of the clamp applied. (Default NULL.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-298798"></A>profile_indices</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298800"></A>An array of indices to the profiles array: this specifies the profiles that have clamps applied, and is parallel to the profile_derivs array. (Default NULL.)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-298802"></A>Each entry in the profile_derivs array is a structure containing the following fields:</P>
+<P>
+<A NAME="50422110_pgfId-298820"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298805"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298807"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-298809"></A>clamp_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298811"></A>The type of clamps applied to the profiles. (Default PK_sweep_clamp_none_c.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-298813"></A>const_profile_clamp</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298815"></A>A structure containing a scalar that modifies the shape of the body between the supplied profiles. (Default 1.0.)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-298817"></A>face_clamp</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-298819"></A>Specifies that the tangents across the profile are constrained to meet the specified faces smoothly.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-298821"></A>The effects of varying the magnitude of the clamp (in the const_profile_clamp structure) are shown in <A HREF="fd_chap.039.html#50422110_38752"><EM>
+Figure 38-36</EM></A> and <A HREF="fd_chap.039.html#50422110_53974"><EM>
+Figure 38-37</EM></A>. This magnitude controls the extent of the clamp: the larger the magnitude, the greater the region of influence of the clamp. For both values, the body is G1-smooth at the joins (where the first and last profiles are), unlike the case where no clamps are applied.</P>
+<P>
+<A NAME="50422110_pgfId-444608"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-338.gif">
+
+<P>
+<A NAME="50422110_pgfId-298906"></A>Figure 38-37 <A NAME="50422110_53974"></A>Flat (projected) view of the bodies in <A HREF="fd_chap.039.html#50422110_38752"><EM>
+Figure 38-36</EM></A>, shown together for comparison</P>
+<P>
+<A NAME="50422110_pgfId-298910"></A><A HREF="fd_chap.039.html#50422110_77922"><EM>
+Figure 38-38</EM></A> shows the effects of using <CODE>
+face_clamp</CODE>
+ when sweeping through multiple profiles. Clamps are on the edges of both wire profiles. These constrain the sweep so that the clamped edges smoothly meet their corresponding clamping faces.</P>
+<P>
+<A NAME="50422110_pgfId-298947"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-339.gif">
+
+<P>
+<A NAME="50422110_pgfId-298949"></A>Figure 38-38 <A NAME="50422110_77922"></A>Sweeping profiles with face clamps</P>
+<P>
+<A NAME="50422110_pgfId-1778736"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-376919"></A>Note: When specifying <CODE>
+face_clamp</CODE>
+ the following should not be supplied.</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-377011"></A>Guide wires. See <A HREF="fd_chap.039.html#50422110_63726">Section 38.3, “Sweeping with guide wires”</A> for more information.</LI>
+<LI>
+<A NAME="50422110_pgfId-377062"></A>A twist law. See <A HREF="fd_chap.039.html#50422110_72913">Section 38.2.8, “Specifying twist”</A> for more information.</LI>
+<LI>
+<A NAME="50422110_pgfId-377110"></A>A scale law. See <A HREF="fd_chap.039.html#50422110_95856">Section 38.2.9, “Specifying scale”</A> for more information.</LI>
+<LI>
+<A NAME="50422110_pgfId-377163"></A>Lock faces. See <A HREF="fd_chap.039.html#50422110_24369">Section 38.2.7, “Locking the sweep to specified faces”</A> for more information.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-1778754"></A>	38.2.19 	<A NAME="50422110_43176"></A>Calculating derivative magnitudes </H3>
+<P>
+<A NAME="50422110_pgfId-1779152"></A>You can use the <CODE>
+deriv_mag</CODE>
+ option in <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> to control the algorithm that Parasolid uses to calculate derivative magnitudes when derivative conditions have been specified. This option takes two values:</P>
+<P>
+<A NAME="50422110_pgfId-1779308"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1777912"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1777914"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1777916"></A><A HREF=../headers/pk_sweep_deriv_mag_t.html>PK_sweep_deriv_mag_smooth_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1777918"></A>Vary the magnitude smoothly across all profile sections in the clamp. Default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1777920"></A><A HREF=../headers/pk_sweep_deriv_mag_t.html>PK_sweep_deriv_mag_round_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1777922"></A>Vary the magnitude smoothly across all profile sections in the clamp with an aim to produce a more rounded shape across the entire sweep.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-1779327"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-1779326"></A>Note: It is recommended that you always set this option to <A HREF=../headers/pk_sweep_deriv_mag_t.html>PK_sweep_deriv_mag_round_c</A> unless you are updating old models in which case you should set this option to the default value.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-376909"></A>	38.2.20 	<A NAME="50422110_47949"></A>Specifying corner types </H3>
+<P>
+<A NAME="50422110_pgfId-835074"></A>When the sweep path is not G1-continuous, you can choose to produce either a mitred or a rounded corner at each sharp corner on the path using the <CODE>
+corner_type</CODE>
+ option. By default, mitred corners are produced. When set to <A HREF=../headers/pk_sweep_corner_type_t.html>PK_sweep_corner_type_spin_c</A>, the profile is spun on the convex side of the path to produce rounded corners.</P>
+<P>
+<A NAME="50422110_pgfId-835123"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-340.gif">
+
+<P>
+<A NAME="50422110_pgfId-835046"></A>Figure 38-39 Producing mitred or rounded corners during a sweep operation.</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422110_pgfId-298953"></A>38.3	<A NAME="50422110_63726"></A><A NAME="50422110_marker-298951"></A><A NAME="50422110_marker-298952"></A>Sweeping with guide wires 
+
+
+</H1>
+<P>
+<A NAME="50422110_pgfId-298954"></A>This section discusses the use of <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> when supplying guide wires as well as a path. The following combinations are possible:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-298955"></A>Supplying a path and a single guide wire which must be distinct from the path.</LI>
+<LI>
+<A NAME="50422110_pgfId-298956"></A>Suppling a path and two or more guide wires. </LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-298957"></A>The path may coincide with one of the guide wires. If so, you must use the same wire body for both the path and the guide wire. It is an error to supply two separate (identical) wire bodies in this case.</P>
+<P>
+<A NAME="50422110_pgfId-298961"></A><A HREF="fd_chap.039.html#50422110_87285"><EM>
+Figure 38-40</EM></A> illustrates the difference between:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-298962"></A>Supplying a path and a single, distinct guide wire.</LI>
+<LI>
+<A NAME="50422110_pgfId-298963"></A>Supplying a path and two guide wires, one of which coincides with the path. </LI>
+<LI>
+<A NAME="50422110_pgfId-298964"></A>Supplying a path and three guide wires, one of which coincides with the path.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-298965"></A>In the one and two guide wire cases, two wire bodies are supplied. In the three guide wire case, three wire bodies are supplied. Where the path is not itself a guide wire, the resulting body does not remain in contact with the path; if the path is also a guide, however, the body does remain in contact with it.</P>
+<P>
+<A NAME="50422110_pgfId-298969"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-298968"></A>Note: Most of the functionality described in this section applies only when more than one guide wire is supplied (either as separate entities, or when one is also the path).</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-299003"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-341.gif">
+
+<P>
+<A NAME="50422110_pgfId-299005"></A>Figure 38-40 <A NAME="50422110_87285"></A>Supplying one, two, or three guide wires</P>
+<P>
+<A NAME="50422110_pgfId-1490900"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-342.gif">
+
+<P>
+<A NAME="50422110_pgfId-1490816"></A>Figure 38-41 Supplying more than three guide wires</P>
+<P>
+<A NAME="50422110_pgfId-299029"></A>This section concentrates on the features available when using more than one guide wire, although it does not describe every possible combination of options. The remaining diagrams in this section are all cases where the path is also the first guide wire, unless otherwise stated. </P>
+<P>
+<A NAME="50422110_pgfId-1594494"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-1594507"></A>Note: Most of the options for sweeping without guide wires also apply when guide wires are present, with the exception of the following:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-1594688"></A><CODE>
+twist</CODE>
+</LI>
+<LI>
+<A NAME="50422110_pgfId-1594710"></A><CODE>
+profile_law</CODE>
+</LI>
+<LI>
+<A NAME="50422110_pgfId-1594738"></A><CODE>
+scale</CODE>
+</LI>
+<LI>
+<A NAME="50422110_pgfId-1594756"></A><CODE>
+scale_type</CODE>
+</LI>
+<LI>
+<A NAME="50422110_pgfId-1594779"></A><CODE>
+scale_point</CODE>
+</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422110_pgfId-299039"></A>	38.3.1 	<A NAME="50422110_marker-1595401"></A><A NAME="50422110_marker-1595402"></A><A NAME="50422110_marker-1595403"></A><A NAME="50422110_41688"></A>Supplying profiles, paths and guide wires </H3>
+<P>
+<A NAME="50422110_pgfId-299040"></A>The rules governing paths, profiles and path vertices are unchanged from those given in <A HREF="fd_chap.039.html#50422110_59903" CLASS="XRef">Section 38.2.1, “Supplying profiles”</A>, <A HREF="fd_chap.039.html#50422110_86324">Section 38.2.2, “Supplying a path”</A> and <A HREF="fd_chap.039.html#50422110_93064">Section 38.2.3, “Specifying path vertices”</A>, with the following exception:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-299050"></A>When one or more guide wires are present, the path <EM>
+must</EM> be visibly G1-smooth</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-299051"></A>In particular, more than one profile may be swept, and the profiles do not have to be in contact with the guide wires at any point, unless the curve method is used. See <A HREF="fd_chap.039.html#50422110_88120">Section 38.3.5, “Guided sweep methods”</A> for details.</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-1485394"></A>	38.3.2 	<A NAME="50422110_88488"></A>Controlling the behaviour of guide wires </H3>
+<P>
+<A NAME="50422110_pgfId-299055"></A>Guide wires provide finer control over the shape and orientation of the resultant swept body.You can specify guide wires via the <CODE>
+n_guides</CODE>
+ and <CODE>
+guides</CODE>
+ options. The guides are supplied as wire bodies that are manifold, oriented and visibly smooth. The sweep follows the direction of the path, but is bounded by the guide wires. The path then determines the orientation of the profile (subject to the alignment options), and the guide wires control the amount of scaling and rotation that occurs. The behaviour of guide wires depends on the number of guide wires supplied and the value of the <CODE>
+guide_scope</CODE>
+ option. This option takes the following values:</P>
+<P>
+<A NAME="50422110_pgfId-1497786"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1486148"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1486150"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1486156"></A><A HREF=../headers/pk_sweep_guide_scope_t.html>PK_sweep_guide_scope_global_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1486158"></A>When set to this value, up to three guide wires can be supplied. The behaviour of these guide wires depends on whether you supply, one, two, or three guide wires. Each guide wire supplied influences the sweep. See <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> for more information on this.</P>
+<P>
+<A NAME="50422110_pgfId-1513521"></A>This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1486342"></A><A HREF=../headers/pk_sweep_guide_scope_t.html>PK_sweep_guide_scope_local_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1486344"></A>When set to this value, at least three guide wires must be supplied. Each guide wire supplied influences only the regions of the sweep between it and its neighbouring guides. See <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> for more information on this</P>
+<ADDRESS>
+<A NAME="50422110_pgfId-1506172"></A>Note: When set to this value, separate faces are produced between each pair of guide wires even if the edges between them meet smoothly.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-1486861"></A><A HREF="fd_chap.039.html#50422110_48447"><EM>
+Figure 38-42</EM></A> illustrates how the behaviour of three guide wires differs when <CODE>
+guide_scope</CODE>
+ is set to its various values. In this image, the path is not used as a guide wire.</P>
+<P>
+<A NAME="50422110_pgfId-1486748"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-343.gif">
+
+<P>
+<A NAME="50422110_pgfId-1485954"></A>Figure 38-42 <A NAME="50422110_48447"></A>The effect of <CODE>
+guide_scope</CODE>
+ when sweeping with three guide wires</P>
+
+<H4>
+<A NAME="50422110_pgfId-1489228"></A>38.3.2.1 Restrictions with guide wires </H4>
+<P>
+<A NAME="50422110_pgfId-1487656"></A>If you supply three guide wires, and the <CODE>
+guide_scope</CODE>
+ option is set to PK_sweep_guide_global_c, the following restrictions apply:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-299007"></A>You cannot specify a lock direction or lock the sweep to a set of faces, as described in <A HREF="fd_chap.039.html#50422110_45592">Section 38.3.3, “Controlling the behaviour of locks”</A> and <A HREF="fd_chap.039.html#50422110_24369">Section 38.2.7, “Locking the sweep to specified faces”</A>.</LI>
+<LI>
+<A NAME="50422110_pgfId-299016"></A>You cannot specify guide clamps, as described in <A HREF="fd_chap.039.html#50422110_30304">Section 38.3.4, “Supplying guide clamps”</A>.</LI>
+<LI>
+<A NAME="50422110_pgfId-299020"></A>You cannot trim swept bodies to guide wires, as described in <A HREF="fd_chap.039.html#50422110_46825">Section 38.3.6, “Trimming swept bodies using guide wires”</A>.</LI>
+<LI>
+<A NAME="50422110_pgfId-1488032"></A>The <CODE>
+guide_method</CODE>
+ (<A HREF="fd_chap.039.html#50422110_88120">Section 38.3.5, “Guided sweep methods”</A>), <CODE>
+guide_scale</CODE>
+ (<A HREF="fd_chap.039.html#50422110_16937">Section 38.3.9, “Scaling the profile”</A>), and <CODE>
+profile_continuity</CODE>
+ options must be left at their default values.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-1488024"></A>If the <CODE>
+guide_scope</CODE>
+ option is set to PK_sweep_guide_local_c the following restrictions apply:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-1489426"></A>You cannot specify guide clamps as described in <A HREF="fd_chap.039.html#50422110_30304">Section 38.3.4, “Supplying guide clamps”</A>.</LI>
+<LI>
+<A NAME="50422110_pgfId-1489427"></A>You must supply <CODE>
+guide_matches</CODE>
+ in <CODE>
+guide_controls</CODE>
+ as described in <A HREF="fd_chap.039.html#50422110_86960">Section 38.3.2.2, “Guide vertices”</A>.</LI>
+<LI>
+<A NAME="50422110_pgfId-1490113"></A>The <CODE>
+alignment</CODE>
+ option must be either PK_BODY_sweep_align_normal_c or PK_BODY_sweep_align_parallel_c as described in <A HREF="fd_chap.039.html#50422110_79370">Section 38.3.7, “Alignment”</A>.</LI>
+<LI>
+<A NAME="50422110_pgfId-1489431"></A>The <CODE>
+guide_method</CODE>
+ option (See <A HREF="fd_chap.039.html#50422110_88120">Section 38.3.5, “Guided sweep methods”</A>) must be PK_guide_method_point_c.</LI>
+<LI>
+<A NAME="50422110_pgfId-1489372"></A>The <CODE>
+n_profile_derivs</CODE>
+ option must be 0.</LI>
+<LI>
+<A NAME="50422110_pgfId-1489822"></A>The <CODE>
+profile_continuity</CODE>
+ option must be set to <A HREF=../headers/pk_continuity_t.html>PK_continuity_g0_c</A>.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-581033"></A>If you supply non-G1 guide wires, the following restrictions apply:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-581146"></A>You can only supply a single profile</LI>
+<LI>
+<A NAME="50422110_pgfId-581204"></A>You cannot supply any profile derivative conditions.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-590868"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-344.gif">
+
+<P>
+<A NAME="50422110_pgfId-590997"></A>Figure 38-43 Sweeping along a visibly G1-smooth path with a non-G1 guide wire</P>
+
+
+<H4>
+<A NAME="50422110_pgfId-299056"></A>38.3.2.2 <A NAME="50422110_86960"></A>Guide vertices </H4>
+<P>
+<A NAME="50422110_pgfId-299057"></A>For each guide wire, you need to specify a set of vertices that corresponds to the input profiles. These are stored in the <CODE>
+profile_matches</CODE>
+ field of the <CODE>
+guide_controls</CODE>
+ option. Each vertex marks a point on the guide wire corresponding to a particular profile; this is equivalent to specifying path vertices for the path. All vertices specified for a given guide wire must lie on that guide wire, but do not have to include the start or the end vertices.</P>
+<P>
+<A NAME="50422110_pgfId-1496814"></A>The <CODE>
+guides_controls</CODE>
+ option also contains the <CODE>
+guide_matches</CODE>
+ field. This field contains a set of vertices that correspond to the input profiles. Each vertex indicates a point on the profile that corresponds to the relevant guide vertex specified in the <CODE>
+profile_matches</CODE>
+ field. This field is only required if the <CODE>
+guide_scope</CODE>
+ option is set to <A HREF=../headers/pk_sweep_guide_scope_t.html>PK_sweep_guide_scope_local_c</A> and you are sweeping with three or more guide wires.</P>
+<P>
+<A NAME="50422110_pgfId-299061"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-299060"></A>Note: Unlike paths, guide wires are allowed to contain tolerant vertices.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-396505"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-345.gif">
+
+<P>
+<A NAME="50422110_pgfId-299153"></A>Figure 38-44 Specifying a path, a profile, one or two guide wires and their respective vertices</P>
+
+
+<H4>
+<A NAME="50422110_pgfId-1592261"></A>38.3.2.3 <A NAME="50422110_52842"></A>Using cross-section profiles with guide wires </H4>
+<P>
+<A NAME="50422110_pgfId-1593364"></A>As discussed in <A HREF="fd_chap.039.html#50422110_85038">Section 38.2.4, “Returning profile cross-sections”</A>, <A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A> can be use to create a series of profiles that represent cross-sections of the swept body that would otherwise be created. </P>
+<P>
+<A NAME="50422110_pgfId-1599172"></A>When guide wires are supplied their geometry may dictate that the extent of the resultant sweep may be shorter than the supplied path. In such cases when the output of cross-section profiles is requested the effect will be as follows:</P>
+<P>
+<A NAME="50422110_pgfId-1596586"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1596618"></A>If group_xsect is...</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1596620"></A>then...</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1596622"></A><A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1596624"></A>Cross-sections will be distributed roughly evenly along the extent of the sweep.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1596626"></A><A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_edge_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1596628"></A>Cross-sections will not be produced for path edges that lie entirely outside the extent of the sweep. Fewer than <CODE>
+n_xsects</CODE>
+ cross-sections are produced for path edges partially outside the extent of the sweep.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1596630"></A><A HREF=../headers/pk_sweep_group_xsect_t.html>PK_sweep_group_xsect_per_vx_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-1596632"></A>Cross-sections will not be produced for path vertices that lie outside the extent of the sweep.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422110_pgfId-299155"></A>	38.3.3 	<A NAME="50422110_45592"></A>Controlling the behaviour of locks </H3>
+<P>
+<A NAME="50422110_pgfId-299158"></A>In addition to setting a lock for a sweep operation (described in <A HREF="fd_chap.039.html#50422110_48029">Section 38.2.6, “Locking the direction of normal alignment”</A>), Parasolid lets you control the behaviour of that lock . If you have specified two guide wires, the lock behaviour you choose can affect the resulting swept body. </P>
+<P>
+<A NAME="50422110_pgfId-299166"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-299165"></A>Note: In most cases, you cannot change the behaviour of a lock if you have fewer than two guide wires in your sweep operation. The exception to this is rotation locks, as described below.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-299167"></A>You can control whether the profiles in the swept body are fixed relative to the <CODE>
+lock_direction</CODE>
+ using the <CODE>
+lock_type</CODE>
+ option, which can take the values described below:</P>
+<P>
+<A NAME="50422110_pgfId-299203"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299170"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299172"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299174"></A><A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_and_dir_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299176"></A>The sweep direction is projected into the plane perpendicular to the <CODE>
+lock_direction</CODE>
+, and the profiles of the swept body maintain a fixed relationship to both the sweep direction and the <CODE>
+lock_direction</CODE>
+. This is the default value. </P>
+<P>
+<A NAME="50422110_pgfId-299177"></A>If this value is used with two guide wires and <CODE>
+guide_method</CODE>
+ is either PK_sweep_guide_point_c or PK_sweep_guide_chord_c (see <A HREF="fd_chap.039.html#50422110_88120" CLASS="XRef">Section 38.3.5, “Guided sweep methods”</A>), then the sweep cross-section may tend to shear as it is swept along the path. You can see this effect in <A HREF="fd_chap.039.html#50422110_18679"><EM>
+Figure 38-46</EM></A> and <A HREF="fd_chap.039.html#50422110_24623"><EM>
+Figure 38-49</EM></A>.</P>
+<P>
+<A NAME="50422110_pgfId-1497615"></A>This value must not be used if two guide wires are supplied and <CODE>
+guide_method</CODE>
+ is set to PK_sweep_guide_curve_c.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299189"></A><A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299191"></A>The sweep direction is projected into the plane perpendicular to the <CODE>
+lock_direction</CODE>
+, but the profiles of the resulting swept body do not maintain a fixed relationship with the <CODE>
+lock_direction</CODE>
+. </P>
+<P>
+<A NAME="50422110_pgfId-299192"></A>Using this value ensures that profiles do not shear in cases where you use two guide curves and specify a lock direction. </P>
+<P>
+<A NAME="50422110_pgfId-299193"></A>This value must not be used if less than two guide wires are supplied or if <CODE>
+guide_method</CODE>
+ is set to PK_sweep_guide_project_c. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299195"></A><A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_rotation_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299197"></A>The <CODE>
+lock_direction</CODE>
+ is projected into the plane perpendicular to the sweep direction. The sweep profiles maintain a fixed relationship to this direction. </P>
+<P>
+<A NAME="50422110_pgfId-299198"></A>Unlike other values of <CODE>
+lock_type</CODE>
+, using this value has an effect on sweeps that do not use guide wires, as described in <A HREF="fd_chap.039.html#50422110_48029">Section 38.2.6, “Locking the direction of normal alignment”</A>.</P>
+<P>
+<A NAME="50422110_pgfId-299202"></A>This value must not be used if two guide wires are supplied and <CODE>
+guide_method</CODE>
+ is PK_sweep_guide_curve_c.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-299204"></A>The <CODE>
+lock_type</CODE>
+ option only has an effect on the resulting swept body if <CODE>
+have_lock_direction</CODE>
+ is PK_LOGICAL_true. It is an error to specify <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_c</A> if <CODE>
+have_lock_direction</CODE>
+ is PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422110_pgfId-299205"></A>The next few illustrations show a simple example in which a profile is swept along a path with an additional guide wire (the path itself is also used as a guide wire). </P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-299206"></A>If you do not specify a <CODE>
+lock_direction</CODE>
+, the profile tilts with respect to the path, as shown in <A HREF="fd_chap.039.html#50422110_53903"><EM>
+Figure 38-45</EM></A>. </LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-299243"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-346.gif">
+
+<P>
+<A NAME="50422110_pgfId-299245"></A>Figure 38-45 <A NAME="50422110_53903"></A>Specifying no lock direction when sweeping with guide wires</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-299246"></A>If you specify a <CODE>
+lock_direction</CODE>
+ using the default lock behaviour, the profile no longer tilts, but it does shear as it moves along the path, as shown in <A HREF="fd_chap.039.html#50422110_18679"><EM>
+Figure 38-46</EM></A>. </LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-299283"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-347.gif">
+
+<P>
+<A NAME="50422110_pgfId-299285"></A>Figure 38-46 <A NAME="50422110_18679"></A>Specifying default lock direction when sweeping with guide wires</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-299286"></A>If you specify a <CODE>
+lock_type</CODE>
+ of <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_path_c</A>, the profile still does not tilt, and in addition it no longer shears as it moves along the path, as shown in <A HREF="fd_chap.039.html#50422110_19371"><EM>
+Figure 38-47</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-299323"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-348.gif">
+
+<P>
+<A NAME="50422110_pgfId-299325"></A>Figure 38-47 <A NAME="50422110_19371"></A>Specifying path lock when sweeping with guide wires</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-299326"></A>If you specify a <CODE>
+lock_type</CODE>
+ of <A HREF=../headers/pk_sweep_lock_t.html>PK_sweep_lock_rotation_c</A>, then the profile both tilts and shears. This is shown in <A HREF="fd_chap.039.html#50422110_90320"><EM>
+Figure 38-48</EM></A>.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-299363"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-349.gif">
+
+<P>
+<A NAME="50422110_pgfId-299365"></A>Figure 38-48 <A NAME="50422110_90320"></A>Specifying rotation lock when sweeping with guide wires</P>
+<P>
+<A NAME="50422110_pgfId-299369"></A><A HREF="fd_chap.039.html#50422110_24623"><EM>
+Figure 38-49</EM></A> shows the relationship between the end profiles and the path and guide wires of this example more closely, by overlaying all four cases.</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-299370"></A>In all four cases, the end profile intersects the path at the same point. However, in both types of path lock, the end profile intersects the guide wire at a point further along the guide wire (point B) than is the case when no lock is specified, or when a rotation lock is specified (point A). </LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-299404"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-350.gif">
+
+<P>
+<A NAME="50422110_pgfId-299406"></A>Figure 38-49 <A NAME="50422110_24623"></A>Effect on end profile of different lock behaviours</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-299411"></A>	38.3.4 	<A NAME="50422110_marker-299407"></A><A NAME="50422110_marker-299408"></A><A NAME="50422110_marker-299409"></A><A NAME="50422110_30304"></A>Supplying guide clamps </H3>
+<P>
+<A NAME="50422110_pgfId-299412"></A>You can constrain the shape of the swept body by specifying a clamp direction for one or more vertices on a guide wire. This can either take the form of a specified reference direction vector (known as a <STRONG>
+direction clamp</STRONG>), or can be fixed such that the relationship between the profile and the guide wire is preserved along the entire extent of the sweep (known as a <STRONG>
+fixed clamp</STRONG>). </P>
+<P>
+<A NAME="50422110_pgfId-299416"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-299415"></A>Note: You cannot specify guide clamps if you supply three guide wires. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-299417"></A>You specify clamp directions by setting the value for the <CODE>
+clamp_type</CODE>
+ field of the <CODE>
+guide_controls</CODE>
+ option to one of the following:</P>
+<P>
+<A NAME="50422110_pgfId-299436"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299420"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299422"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299424"></A><A HREF=../headers/pk_sweep_guide_clamp_dirn_t.html>PK_sweep_guide_clamp_dirn_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299426"></A>The <CODE>
+dirn_clamp</CODE>
+ field holds the clamp directions and their corresponding guide wire vertices. If a single clamp direction is given, it will be applied to all of the vertices on the guide wire.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299428"></A>PK_sweep_guide_clamp_fixed_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-299430"></A>The profile is clamped to the guide wire such that its orientation relative to the guide wire remains constant throughout the extent of the sweep. No additional clamp direction is required.</P>
+<P>
+<A NAME="50422110_pgfId-299431"></A>If the original profile intersects the guide, the swept surface is tangent to this profile along the full extent of the sweep. </P>
+<P>
+<A NAME="50422110_pgfId-299432"></A>You must not use this option if any of the following are true:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-299433"></A>You have supplied more than one profile</LI>
+<LI>
+<A NAME="50422110_pgfId-299434"></A>You have supplied a sheet body profile</LI>
+<LI>
+<A NAME="50422110_pgfId-299435"></A>The <CODE>
+guide_method</CODE>
+ is PK_sweep_guide_curve_c</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-299437"></A>After specifying a clamp, the body is created such that the angle between the transformed profile (i.e., the cross-section of the body) and the clamp direction remains fixed relative to the guide wire. This results in a distortion of the (transformed) profile in addition to the scaling and rotation due to the guide wires, as shown in <A HREF="fd_chap.039.html#50422110_37456"><EM>
+Figure 38-50</EM></A>.</P>
+<P>
+<A NAME="50422110_pgfId-421022"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-351.gif">
+
+<P>
+<A NAME="50422110_pgfId-299640"></A>Figure 38-50 <A NAME="50422110_37456"></A>Guide wires with tangent clamp directions using <CODE>
+dirn_clamp</CODE>
+</P>
+<P>
+<A NAME="50422110_pgfId-299641"></A>You can also assign different clamp directions to different vertices on a single guide wire. This results in a smooth interpolation of the direction to be preserved. </P>
+<P>
+<A NAME="50422110_pgfId-299645"></A><A HREF="fd_chap.039.html#50422110_49378"><EM>
+Figure 38-51</EM></A> illustrates the difference between the different types of clamp. </P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-299646"></A>With no clamp, the profile rotates and scales to meet the guides.</LI>
+<LI>
+<A NAME="50422110_pgfId-299647"></A>With direction clamp, the profile is distorted to meet the supplied directions (in this case, the tangents of the profile), and the directions are rotated to follow the curving of the path. In this example, the profile is planar and the directions remain in that plane as the profile is swept along the path; in general, the profile does not have to be planar.</LI>
+<LI>
+<A NAME="50422110_pgfId-299648"></A>With fixed clamp, all directions are locally fixed at the guide, and there is no rotation due to the curvature of the path, so the profile tangents remain in exactly the same direction, causing a non-linear transformation of the profile.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-421310"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-352.gif">
+
+<P>
+<A NAME="50422110_pgfId-299971"></A>Figure 38-51 <A NAME="50422110_49378"></A>Specifying different clamp types for guide wires</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-299976"></A>	38.3.5 	<A NAME="50422110_marker-299972"></A><A NAME="50422110_marker-299973"></A><A NAME="50422110_marker-299974"></A><A NAME="50422110_88120"></A>Guided sweep methods </H3>
+<P>
+<A NAME="50422110_pgfId-299977"></A>You control the shape of the swept body by using the <CODE>
+guide_method</CODE>
+ option, as shown in <A HREF="fd_chap.039.html#50422110_39151"><EM>
+Figure 38-52</EM></A>. </P>
+<P>
+<A NAME="50422110_pgfId-299984"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-299983"></A>Note: This option can only be set to a non-default value if you supply exactly two guide wires.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-493261"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-353.gif">
+
+<P>
+<A NAME="50422110_pgfId-300277"></A>Figure 38-52 <A NAME="50422110_39151"></A>Different methods of sweeping</P>
+<P>
+<A NAME="50422110_pgfId-300278"></A>The effects of each type of method are summarised in the table below.</P>
+<P>
+<A NAME="50422110_pgfId-300306"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300281"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300283"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300285"></A>PK_sweep_guide_point_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300287"></A>The cross-section of the swept body is rotated and scaled so that the points initially coincident with the <CODE>
+profile_matches</CODE>
+ vertices always remain in contact with their respective guide wires. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300289"></A>PK_sweep_guide_chord_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300291"></A>The cross-section is rotated but not scaled. One of the points initially coincident with the <CODE>
+profile_matches</CODE>
+ vertices stays in contact with its guide wire, while the other is on the line joining the two guides.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300293"></A>PK_sweep_guide_curve_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300295"></A>The cross-section is rotated but not scaled. This option can only be used when a single profile is supplied, which intersects the guide wires at their <CODE>
+profile_matches</CODE>
+ vertices. The profile stays in contact with both guide wires, but only one of the contact points is at a fixed point on the profile; the other is free to move along the profile.</P>
+<P>
+<A NAME="50422110_pgfId-300296"></A><STRONG>
+Note:</STRONG> The profile must be large enough to span the greatest distance between the two guide wires (otherwise PK_BODY_sweep_bad_path_c is returned).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300298"></A>PK_sweep_guide_project_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300300"></A>The cross-section is rotated and scaled so that its orientation remains fixed with respect to a lock direction, and one of the points initially coincident with the <CODE>
+profile_matches</CODE>
+ vertices remains in contact with its guide wire.</P>
+<P>
+<A NAME="50422110_pgfId-300301"></A>This choice differs from PK_sweep_guide_point_c (with a lock direction) in that no shearing of the profiles is caused by the sweep transformation.</P>
+<P>
+<A NAME="50422110_pgfId-300304"></A><STRONG>
+Note:</STRONG> A lock direction must be supplied (see <A HREF="fd_chap.039.html#50422110_48029">Section 38.2.6, “Locking the direction of normal alignment”</A> for details), otherwise the error PK_ERROR_bad_combination will occur.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-300307"></A>In cases where just one of the points initially coincident with the <CODE>
+profile_matches</CODE>
+ vertices is to remain in contact with its guide wire, you specify which one via the <CODE>
+fixed_guide_index</CODE>
+ option. A value of 0 for this option specifies that the first guide wire should remain in contact, and a value of 1 specifies the second guide wire.</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-300309"></A>	38.3.6 	<A NAME="50422110_46825"></A>Trimming swept bodies using guide wires </H3>
+<P>
+<A NAME="50422110_pgfId-300313"></A>If you specify two guide wires, Parasolid can trim the resulting swept body so that only the faces that lie between the guide wires are returned. You can trim swept bodies using the following options:</P>
+<P>
+<A NAME="50422110_pgfId-300338"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300316"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300318"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-300320"></A>trim_to_guides</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300322"></A>if PK_LOGICAL_true, then the swept body is trimmed so that only the faces between the two guide wires are returned. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422110_pgfId-300324"></A>have_trim_point</PRE>
+<PRE><A NAME="50422110_pgfId-895121"></A>trim_point</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300326"></A>If you supply a closed profile, then there are two possible sets of faces that could be returned as a result of trimming the swept body. In order to specify which set to return, you must also specify a <CODE>
+trim_point</CODE>
+, and set the boolean <CODE>
+have_trim_point</CODE>
+ appropriately. Parasolid then returns the set of faces that is nearest the <CODE>
+trim_point</CODE>
+. </P>
+<P>
+<A NAME="50422110_pgfId-300333"></A>By default, Parasolid assumes that no trim point information is required. </P>
+<P>
+<A NAME="50422110_pgfId-300337"></A><A HREF="fd_chap.039.html#50422110_51024"><EM>
+Figure 38-53</EM></A> shows an example where supplying different trim points results in different sets of faces being returned. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-300342"></A><A HREF="fd_chap.039.html#50422110_51024"><EM>
+Figure 38-53</EM></A> shows the different swept bodies that can be created when sweeping a closed (circular) profile along a path (which also acts as a guide wire) together with a second guide wire. When <CODE>
+trim_to_guides</CODE>
+ is PK_LOGICAL_false, the untrimmed tube-like body is returned, but when <CODE>
+trim_to_guides</CODE>
+ is PK_LOGICAL_true, two different trimmed results are possible, depending on the position of the <CODE>
+trim_point</CODE>
+. </P>
+<P>
+<A NAME="50422110_pgfId-422694"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-354.gif">
+
+<P>
+<A NAME="50422110_pgfId-300537"></A>Figure 38-53 <A NAME="50422110_51024"></A>Trimming swept bodies using guide wires</P>
+<P>
+<A NAME="50422110_pgfId-300550"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-300540"></A>Note: To trim a swept body to specified guide wires, the following must be true:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-300541"></A>Exactly two guide curves are specified, together with the curve guide method described in <A HREF="fd_chap.039.html#50422110_88120">Section 38.3.5, “Guided sweep methods”</A>.</LI>
+<LI>
+<A NAME="50422110_pgfId-300545"></A>The profile is not disjoint</LI>
+<LI>
+<A NAME="50422110_pgfId-300548"></A>Profile cross-sections, as described in <A HREF="fd_chap.039.html#50422110_85038">Section 38.2.4, “Returning profile cross-sections”</A>, are not specified.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-300551"></A>	38.3.7 	<A NAME="50422110_79370"></A>Alignment </H3>
+<P>
+<A NAME="50422110_pgfId-300555"></A><A HREF="fd_chap.039.html#50422110_39682"><EM>
+Figure 38-54</EM></A> shows the effect of the <CODE>
+alignment</CODE>
+ option with the point method (PK_sweep_guide_point_c) on a model of a pipe of variable radius and orientation. When guide wires are present, two more types of alignment are possible: PK_BODY_sweep_align_parm_c and PK_BODY_sweep_align_arclength_c. A description of these values and their meanings is given in <A HREF="fd_chap.039.html#50422110_19017">Section 38.2.5, “Controlling the profile alignment”</A>. Note that parametric alignment coincides with arc-length alignment for this pipe model, although in general they are different.</P>
+<P>
+<A NAME="50422110_pgfId-300562"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-300561"></A>Note: For PK_BODY_sweep_align_parm_c or PK_BODY_sweep_align_arclength_c, the path and guide wires must be either all open or all closed.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-397761"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-355.gif">
+
+<P>
+<A NAME="50422110_pgfId-300690"></A>Figure 38-54 <A NAME="50422110_39682"></A>The effect of <CODE>
+alignment</CODE>
+ with the point method</P>
+<P>
+<A NAME="50422110_pgfId-1514481"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-1514492"></A>Note: If <CODE>
+guide_scope</CODE>
+ is set to <A HREF=../headers/pk_sweep_guide_scope_t.html>PK_sweep_guide_scope_local_c</A>, alignment must be set to either PK_sweep_align_normal_c or PK_sweep_align_parallel_c.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-300691"></A>	38.3.8 	Topology </H3>
+<P>
+<A NAME="50422110_pgfId-300695"></A><A HREF="fd_chap.039.html#50422110_49938"><EM>
+Figure 38-55</EM></A> shows the effect of the <CODE>
+topology_form</CODE>
+ option with the point method (PK_sweep_guide_point_c) on a model with two guide wires that are distinct from the path. When PK_BODY_topology_grid_c is used, the final body has additional edges and faces corresponding to any vertices on the guide wires, as shown in the first diagram. A description of these values and their meanings is given in <A HREF="fd_chap.039.html#50422110_30166">Section 38.2.11, “Specifying the topological form of swept bodies”</A>.</P>
+<P>
+<A NAME="50422110_pgfId-423577"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-356.gif">
+
+<P>
+<A NAME="50422110_pgfId-300939"></A>Figure 38-55 <A NAME="50422110_49938"></A>The effect of <CODE>
+topology_form</CODE>
+ with two guides and a separate path</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-300944"></A>	38.3.9 	<A NAME="50422110_marker-300940"></A><A NAME="50422110_marker-300941"></A><A NAME="50422110_marker-300942"></A><A NAME="50422110_16937"></A>Scaling the profile </H3>
+<P>
+<A NAME="50422110_pgfId-300945"></A>The effects of the <CODE>
+guide_scale</CODE>
+ option are summarised in the table below. </P>
+<P>
+<A NAME="50422110_pgfId-300949"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-300948"></A>Note: This option can only be set to a non-default value if you supply exactly two guide wires.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-300963"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300952"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300954"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300956"></A>PK_sweep_guide_uniform_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300958"></A>The sweep is scaled uniformly (in two directions). This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300960"></A>PK_sweep_guide_lateral_c</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-300962"></A>The sweep is scaled only in the direction between corresponding points on the guide wires.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-300967"></A>The bodies in <A HREF="fd_chap.039.html#50422110_39151"><EM>
+Figure 38-52</EM></A> are scaled uniformly (PK_sweep_guide_uniform_c). <A HREF="fd_chap.039.html#50422110_17981"><EM>
+Figure 38-56</EM></A> below shows the corresponding bodies using lateral scaling (PK_sweep_guide_lateral_c).</P>
+<P>
+<A NAME="50422110_pgfId-300974"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-300973"></A>Warning: PK_sweep_guide_lateral_c cannot be used if <CODE>
+guide_method</CODE>
+ is set to PK_sweep_guide_chord_c or PK_sweep_guide_curve_c, or if guide clamps are present.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-423903"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-357.gif">
+
+<P>
+<A NAME="50422110_pgfId-540984"></A>Figure 38-56 <A NAME="50422110_17981"></A>Effect of lateral scaling on the point and project methods of sweeping</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422110_pgfId-540988"></A>38.4	<A NAME="50422110_69487"></A><A NAME="50422110_marker-540986"></A><A NAME="50422110_marker-540987"></A>Update control 
+
+
+</H1>
+<P>
+<A NAME="50422110_pgfId-540992"></A>If your application relies on reproducing behaviour when updating models built using earlier versions of Parasolid, you can use the <CODE>
+update</CODE>
+ option to help eliminate differences in rebuild results. This option lets you turn off some of the enhancements to sweeping, to ensure that sweeping gives the same results in the latest version of Parasolid as in earlier versions. See <A HREF=../headers/pk_body_sweep_update_t.html>PK_BODY_sweep_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<P>
+<A NAME="50422110_pgfId-554983"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-554991"></A>Note: The default value is PK_BODY_sweep_update_default_c which uses all appropriate sweeping enhancements. Setting to a non-default value disables all appropriate sweeping enhancements.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422110_pgfId-301782"></A>38.5	<A NAME="50422110_80250"></A><A NAME="50422110_34134"></A><A NAME="50422110_marker-1001636"></A><A NAME="50422110_marker-1001637"></A><A NAME="50422110_marker-1001638"></A><A NAME="50422110_marker-1001639"></A><A NAME="50422110_marker-1001640"></A><A NAME="50422110_marker-1001641"></A>Creating helical curves and surfaces 
+
+
+</H1>
+<P>
+<A NAME="50422110_pgfId-301783"></A>You can also create helical curves and surfaces from a starting point or curve using <A HREF=../headers/pk_point_make_helical_curve.html>PK_POINT_make_helical_curve</A> and <A HREF=../headers/pk_curve_make_helical_surf.html>PK_CURVE_make_helical_surf</A>.Spirals, helices, and tapered helices are all created using the same basic principles. For each shape, a point or a curve is swept several times about an axis in a circular motion. The distance of the point or curve from the axis, together with its distance along the axis, determine the nature of the final shape, allowing shapes such as those shown in <A HREF="fd_chap.039.html#50422110_17597"><EM>
+Figure 38-57</EM></A>. Each of these shapes can be referred to as a <STRONG>
+general helix</STRONG>.</P>
+<P>
+<A NAME="50422110_pgfId-425296"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-358.gif">
+
+<P>
+<A NAME="50422110_pgfId-301876"></A>Figure 38-57 <A NAME="50422110_17597"></A>Examples of general helical curves and surfaces</P>
+
+<H3>
+<A NAME="50422110_pgfId-301879"></A>	38.5.1 	<A NAME="50422110_marker-301877"></A><A NAME="50422110_marker-301878"></A>Common helical properties </H3>
+<P>
+<A NAME="50422110_pgfId-301883"></A>All general helices have the following common properties, illustrated in <A HREF="fd_chap.039.html#50422110_11644"><EM>
+Figure 38-58</EM></A>:</P>
+<P>
+<A NAME="50422110_pgfId-301913"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301886"></A>Property</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301888"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301890"></A>Axis</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301892"></A>The line around which the helix sweeps.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301894"></A>Point</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301896"></A>A reference point for the path of the helix.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301898"></A>Direction</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301900"></A>Whether the helix is left-handed or right-handed.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301902"></A>Helical pitch</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301904"></A>The distance along the axis that the helix travels in one complete turn.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301906"></A>Spiral pitch</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301908"></A>The distance from the axis that the helix gets in one complete turn.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301910"></A>Number of turns</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301912"></A>The number of turns the helix makes. This is related to the spiral pitch, in that a helix that crosses the axis cannot be created.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-301947"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-359.gif">
+
+<P>
+<A NAME="50422110_pgfId-301949"></A>Figure 38-58 <A NAME="50422110_11644"></A>Anatomy of a general helix</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-301953"></A>	38.5.2 	<A NAME="50422110_marker-301950"></A><A NAME="50422110_marker-301951"></A><A NAME="50422110_marker-301952"></A>Creating general helices </H3>
+<P>
+<A NAME="50422110_pgfId-301954"></A>You can create a general helix using the following functions:</P>
+<P>
+<A NAME="50422110_pgfId-301968"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301957"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301959"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301961"></A><A HREF=../headers/pk_point_make_helical_curve.html>PK_POINT_make_helical_curve</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301963"></A>Sweep a point about an axis, producing a helical curve</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301965"></A><A HREF=../headers/pk_curve_make_helical_surf.html>PK_CURVE_make_helical_surf</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301967"></A>Sweep a curve about an axis, producing a helical surface</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-301969"></A>Both of these functions take a very similar set of arguments:</P>
+<P>
+<A NAME="50422110_pgfId-302024"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301972"></A>Argument</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301974"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301976"></A><CODE>
+point</CODE>
+a</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301978"></A>A reference point for a helical curve. The helix need not include the point itself.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301980"></A><CODE>
+curve</CODE>
+b</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301982"></A>A curve from which a section is used to create a helical surface</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301984"></A><CODE>
+curve_interval</CODE>
+b</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301986"></A>The section of <CODE>
+curve</CODE>
+ that is used to create a helical surface. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301988"></A><CODE>
+axis</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301990"></A>The axis around which the helix is swept.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301992"></A><CODE>
+hand</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301994"></A>The direction of the helix:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-301995"></A><A HREF=../headers/pk_hand_t.html>PK_HAND_left_c</A>: left-handed</LI>
+<LI>
+<A NAME="50422110_pgfId-301996"></A><A HREF=../headers/pk_hand_t.html>PK_HAND_right_c</A>: right-handed</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-301998"></A><CODE>
+turns</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-306270"></A>The number of turns that the helix makes, expressed as an interval. The supplied <CODE>
+point</CODE>
+ is assumed to lie at 0 on this interval, although 0 does not necessarily need to be one of the values in <CODE>
+turns</CODE>
+. See <A HREF="fd_chap.039.html#50422110_17545">Section 38.5.3, “Using turns to create different helices”</A> for details.</P>
+<P>
+<A NAME="50422110_pgfId-302004"></A>For tapered helices, <CODE>
+turns</CODE>
+ must be consistent with the spiral pitch in order to ensure that a valid helix is created. See <A HREF="fd_chap.039.html#50422110_15227">Section 38.5.4, “Controlling inward taper”</A> for details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302009"></A><CODE>
+helical_pitch</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302011"></A>The helical pitch of the helix. If this is 0, a spiral is created.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302013"></A><CODE>
+spiral_pitch</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302015"></A>The spiral pitch of the helix. If this is 0, the helix does not taper. If this is a negative number, then the helix tapers inwards; if positive, the helix tapers outwards.</P>
+<P>
+<A NAME="50422110_pgfId-302016"></A>For helices that taper inwards, the spiral pitch must be consistent with the number of turns requested, so as to ensure that the helix does not cross the axis. See <A HREF="fd_chap.039.html#50422110_15227">Section 38.5.4, “Controlling inward taper”</A> for details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302021"></A><CODE>
+tolerance</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302023"></A>A tolerance to which the curve or surface is generated.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-302025"></A>a Applies to <A HREF=../headers/pk_point_make_helical_curve.html>PK_POINT_make_helical_curve</A> only.</P>
+<P>
+<A NAME="50422110_pgfId-302026"></A>b Applies to <A HREF=../headers/pk_curve_make_helical_surf.html>PK_CURVE_make_helical_surf</A> only.</P>
+
+
+<H3>
+<A NAME="50422110_pgfId-302030"></A>	38.5.3 	<A NAME="50422110_17545"></A><A NAME="50422110_marker-302028"></A><A NAME="50422110_marker-302029"></A>Using turns to create different helices </H3>
+<P>
+<A NAME="50422110_pgfId-302031"></A>The <CODE>
+point</CODE>
+ supplied to <A HREF=../headers/pk_point_make_helical_curve.html>PK_POINT_make_helical_curve</A> and <A HREF=../headers/pk_curve_make_helical_surf.html>PK_CURVE_make_helical_surf</A> is a reference point that is used to determine the path of the resulting helix. In particular, it does <EM>
+not</EM> necessarily represent a start point or end point for the helix: indeed, the resulting helix need not pass through <CODE>
+point</CODE>
+ at all.</P>
+<P>
+<A NAME="50422110_pgfId-302032"></A>You use the <CODE>
+turns</CODE>
+ interval to express how the helix should be formed “around” <CODE>
+point</CODE>
+: <CODE>
+point</CODE>
+ is always taken to lie at 0 in <CODE>
+turns</CODE>
+, allowing you to create helices such as those described below:</P>
+<P>
+<A NAME="50422110_pgfId-302054"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302035"></A>Turns</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302037"></A>Helix created</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302039"></A>[0, X]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302041"></A>starts at point and ends at X</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302043"></A>[-X, 0]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302045"></A>starts at -X and ends at point</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302047"></A>[-X, X]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302049"></A>starts at -X and ends at X, with point in the middle of the path</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302051"></A>[x, X]</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302053"></A>starts at x and ends at X, so that point is not contained in the helix at all.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-302055"></A>The effect that different values of <CODE>
+turns</CODE>
+ have on helices created from the same reference point is illustrated in <A HREF="fd_chap.039.html#50422110_15277"><EM>
+Figure 38-59</EM></A>.</P>
+<P>
+<A NAME="50422110_pgfId-425608"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-360.gif">
+
+<P>
+<A NAME="50422110_pgfId-302112"></A>Figure 38-59 <A NAME="50422110_15277"></A>Using <CODE>
+turns</CODE>
+ to create different helices for a single reference point</P>
+<P>
+<A NAME="50422110_pgfId-302116"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422110_pgfId-302115"></A>Note: If either or both ends of the <CODE>
+turns</CODE>
+ interval are non-integers, the resulting helix may extend beyond the required number of turns at the corresponding ends, in order to optimise performance and memory usage.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422110_pgfId-302122"></A>	38.5.4 	<A NAME="50422110_15227"></A><A NAME="50422110_marker-302118"></A><A NAME="50422110_marker-302119"></A><A NAME="50422110_marker-302120"></A><A NAME="50422110_marker-302121"></A>Controlling inward taper </H3>
+<P>
+<A NAME="50422110_pgfId-302123"></A>Two combinations of values make a general helix taper inwards, as opposed to outwards:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-302124"></A>A positive <CODE>
+turns</CODE>
+ interval, combined with a negative <CODE>
+spiral_pitch</CODE>
+.</LI>
+<LI>
+<A NAME="50422110_pgfId-302125"></A>A negative <CODE>
+turns</CODE>
+ interval, combined with a positive <CODE>
+spiral_pitch</CODE>
+.</LI>
+</UL>
+<P>
+<A NAME="50422110_pgfId-302126"></A>In either case, the helix can only taper inwards as far as the axis itself: any attempt to create a helix that tapers further than this results in the error PK_ERROR_bad_parameter.</P>
+<P>
+<A NAME="50422110_pgfId-302127"></A>To ensure that an inward-tapering helix is valid, the following must both be true:</P>
+<UL>
+<UL>
+<P>
+<A NAME="50422110_pgfId-302131"></A></P>
+</UL>
+<IMG SRC="../graphics/fd_chap-361.gif">
+&nbsp;</UL>
+<UL>
+<UL>
+<P>
+<A NAME="50422110_pgfId-302135"></A></P>
+</UL>
+<IMG SRC="../graphics/fd_chap-362.gif">
+&nbsp;</UL>
+<P>
+<A NAME="50422110_pgfId-302136"></A>Where:</P>
+<UL>
+<LI>
+<A NAME="50422110_pgfId-302137"></A><STRONG>
+turn[X]</STRONG> and <STRONG>
+turn[Y]</STRONG> are the two components of <CODE>
+turn</CODE>
+</LI>
+<LI>
+<A NAME="50422110_pgfId-302138"></A><STRONG>
+sp</STRONG> is <CODE>
+spiral_pitch</CODE>
+</LI>
+<LI>
+<A NAME="50422110_pgfId-302139"></A><STRONG>
+dist</STRONG> is the distance from the starting point to the axis.</LI>
+</UL>
+
+<H4>
+<A NAME="50422110_pgfId-302142"></A>38.5.4.1 <A NAME="50422110_marker-302140"></A><A NAME="50422110_marker-302141"></A>Examples </H4>
+<P>
+<A NAME="50422110_pgfId-302143"></A>The following table shows a range of valid and invalid spirals. The invalid spirals would raise the error PK_ERROR_bad_parameter. </P>
+<P>
+<A NAME="50422110_pgfId-302165"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302146"></A>Valid spirals</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422110_pgfId-302148"></A>Invalid spirals</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422110_pgfId-302150"></A>Starting point is 5 from the axis.</LI>
+<LI>
+<A NAME="50422110_pgfId-302151"></A>Turns is [-5, 0].</LI>
+<LI>
+<A NAME="50422110_pgfId-302152"></A>Spiral pitch is 1</LI>
+</UL>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422110_pgfId-302154"></A>Starting point is 5 from the axis.</LI>
+<LI>
+<A NAME="50422110_pgfId-302155"></A>Turns is [-6, 0].</LI>
+<LI>
+<A NAME="50422110_pgfId-302156"></A>Spiral pitch is 1</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422110_pgfId-302158"></A>Starting point is 10 from the axis.</LI>
+<LI>
+<A NAME="50422110_pgfId-302159"></A>Turns is [1, 8].</LI>
+<LI>
+<A NAME="50422110_pgfId-302160"></A>Spiral pitch is -1</LI>
+</UL>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422110_pgfId-302162"></A>Starting point is 10 from the axis.</LI>
+<LI>
+<A NAME="50422110_pgfId-302163"></A>Turns is [2, 13].</LI>
+<LI>
+<A NAME="50422110_pgfId-302164"></A>Spiral pitch is -1</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422110_pgfId-275053"></A>&nbsp;</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.038.html">Creating Extruded Bodies</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.040.html">Sweeping Tool Bodies Along a Path</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

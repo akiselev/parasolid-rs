@@ -1,0 +1,4914 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Introduction to Booleans</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Introduction to Booleans</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.051.html">Imprinting and Curve Projection</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.053.html">Manifold Booleans</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-392742">51.1	Introduction </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-392782">51.2	The three basic boolean operations </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-392832">51.3	Terminology </A>
+<UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-392842">51.3.1	Target and tool </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-392901">51.3.2	Tag persistence during boolean operations </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-392910">51.3.3	Global booleans </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-392930">51.3.4	Local booleans </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-392949">51.3.5	Boundary regions </A>
+</UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-393182">51.4	Options for booleans </A>
+<UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-393957">51.4.1	Optimising local and global boolean operations </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-394027">51.4.2	Selecting regions in local booleans </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-394216">51.4.3	Selecting regions in global booleans </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-394473">51.4.4	Using region selection with material side </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-394571">51.4.5	Matched topology in local and global boolean operations </A>
+<UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-394775">51.4.5.1	Example: Performing a unite boolean with matched faces </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-394820">51.4.5.2	Example: Performing a unite boolean with matched faces and edges </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-394865">51.4.5.3	Example: Performing a unite boolean with neighbouring faces that intersect </A>
+</UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-394909">51.4.6	Overflow imprints at boundaries</A>
+<UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-394910">51.4.6.1	Dealing with overflowing imprints at laminar boundaries </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395121">51.4.6.2	Dealing with overflowing imprints at interior boundaries </A>
+</UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395241">51.4.7	Imprinting the boundaries of overlapping areas </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395331">51.4.8	Limiting the faces to delete during face trims </A>
+<UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395422">51.4.8.1	Restrictions </A>
+</UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395476">51.4.9	Extending face lists during local booleans </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395481">51.4.10	Sheet punching operations </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395534">51.4.11	Enclosing solid regions with a sheet body </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395588">51.4.12	Effect of the fence option on solid and sheet operations </A>
+<UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395590">51.4.12.1	Example 1: </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395629">51.4.12.2	Example 2: </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395667">51.4.12.3	Example 3: </A>
+</UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-466974">51.4.13	Imprint completion </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395829">51.4.14	Specifying the body type of tool and target </A>
+<UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395848">51.4.14.1	Description of material-side options </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-395898">51.4.14.2	Examples of using material-side options during boolean operations </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396124">51.4.14.3	Achieving different effects with material-side options </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396150">51.4.14.4	Creating corners </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396257">51.4.14.5	Performing sheet punching operations </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396307">51.4.14.6	Performing fence operations </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396396">51.4.14.7	Enclosing a solid region with a sheet body </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396446">51.4.14.8	Constraints </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396451">51.4.14.9	Summary </A>
+</UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396559">51.4.15	Tracking imprinted edges </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-938545">51.4.16	Tracking regions</A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396622">51.4.17	Specifying the body type of the result </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396662">51.4.18	Repairing non-manifold results using blends </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396735">51.4.19	Update control </A>
+</UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-396766">51.5	Information returned by boolean functions </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-397566">51.6	Shared geometry after a boolean operation </A>
+<UL>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-397610">51.6.1	Subtraction resulting in sharing </A>
+<LI> <A HREF="fd_chap.052.html#50422125_pgfId-397658">51.6.2	Subtraction preserving sharing </A>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422125_pgfId-392742"></A>51.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422125_pgfId-392747"></A><A NAME="50422125_marker-514933"></A>This chapter introduces you to the boolean operations available in Parasolid. </P>
+<P>
+<A NAME="50422125_pgfId-392748"></A>Boolean operations carried out when general topology is disabled in a session are referred to as <STRONG>
+manifold booleans</STRONG>. The input bodies to this type of boolean must be manifold bodies and any result bodies will also be manifold. Boolean operations on either general or manifold bodies that may result in general bodies are referred to as <STRONG>
+general booleans</STRONG>. It is assumed that you are familiar with the characteristics of the various body types, as explained in <A HREF="fd_chap.016.html#50422085_20712">Chapter 15, “Body Types”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-392758"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-392754"></A>Note: When performing boolean operations, we strongly recommend that you set local coordinate systems to be the same as the Parasolid coordinate system wherever possible.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-921582"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-921578"></A>Note: This functionality offers partial support for facet geometry. See the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-392778"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-453878"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-392765"></A><A HREF="fd_chap.053.html#50422126_20143">Chapter 52, “Manifold Booleans”</A></LI>
+<LI>
+<A NAME="50422125_pgfId-392769"></A><A HREF="fd_chap.054.html#50422127_33276">Chapter 53, “General Booleans”</A></LI>
+<LI>
+<A NAME="50422125_pgfId-392773"></A><A HREF="fd_chap.055.html#50422128_28642">Chapter 54, “Instancing And Patterning”</A></LI>
+<LI>
+<A NAME="50422125_pgfId-392777"></A><A HREF="fd_chap.056.html#50421908_18616">Chapter 55, “Sectioning”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422125_pgfId-392782"></A>51.2	<A NAME="50422125_marker-392779"></A><A NAME="50422125_marker-392780"></A><A NAME="50422125_38618"></A>The three basic boolean operations 
+
+
+</H1>
+<P>
+<A NAME="50422125_pgfId-392789"></A><A NAME="50422125_marker-392783"></A><A NAME="50422125_marker-392784"></A><A NAME="50422125_marker-392785"></A><A NAME="50422125_marker-392786"></A><A NAME="50422125_marker-392787"></A><A NAME="50422125_marker-392788"></A>The basic boolean operations are analogous to mathematical set operations:</P>
+<P>
+<A NAME="50422125_pgfId-392824"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-528.gif">
+
+<P>
+<A NAME="50422125_pgfId-392825"></A>Figure 51-1 Basic boolean operations</P>
+<P>
+<A NAME="50422125_pgfId-392826"></A>For an example of this functionality, see the code example in the <CODE>
+C#\ExampleApplication.Net\Code</CODE>
+ <CODE>
+Examples\Modelling\Booleans</CODE>
+ located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422125_pgfId-392832"></A>51.3	<A NAME="50422125_marker-392830"></A><A NAME="50422125_marker-392831"></A>Terminology 
+
+
+</H1>
+<P>
+<A NAME="50422125_pgfId-392836"></A>This section introduces you to the terminology used in Parasolid’s boolean operations.</P>
+
+<H3>
+<A NAME="50422125_pgfId-392842"></A>	51.3.1 	<A NAME="50422125_marker-392837"></A><A NAME="50422125_marker-392838"></A><A NAME="50422125_marker-392839"></A><A NAME="50422125_marker-392840"></A><A NAME="50422125_marker-392841"></A>Target and tool </H3>
+<P>
+<A NAME="50422125_pgfId-392851"></A><A NAME="50422125_marker-392843"></A><A NAME="50422125_marker-392844"></A><A NAME="50422125_marker-392845"></A><A NAME="50422125_marker-392846"></A>The<A NAME="50422125_marker-392847"></A><A NAME="50422125_marker-392848"></A> <A NAME="50422125_marker-392849"></A><A NAME="50422125_marker-392850"></A>operands of a boolean are called the <STRONG>
+target</STRONG> and the <STRONG>
+tool</STRONG>. The target of a boolean is the body you begin with, and the tool is the body you operate on it with. The target is modified by the tool, and the tool is deleted at the end of the operation. Parasolid preserves the tags of entities in the target as far as possible. </P>
+<P>
+<A NAME="50422125_pgfId-392855"></A>The following diagram shows the effect of swapping the target and tool of subtract:</P>
+<P>
+<A NAME="50422125_pgfId-392890"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-529.gif">
+
+<P>
+<A NAME="50422125_pgfId-392891"></A>Figure 51-2 Target, tool and result bodies on boolean subtraction</P>
+<P>
+<A NAME="50422125_pgfId-392892"></A>This is important when we come to consider booleans between bodies of different types.</P>
+<P>
+<A NAME="50422125_pgfId-392896"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-392895"></A>Note: If you are performing boolean operations on a single target with many tools, we recommend using a single multi-tool boolean.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422125_pgfId-392901"></A>	51.3.2 	<A NAME="50422125_marker-392897"></A><A NAME="50422125_marker-392898"></A><A NAME="50422125_marker-392899"></A><A NAME="50422125_marker-392900"></A>Tag persistence during boolean operations </H3>
+<P>
+<A NAME="50422125_pgfId-392905"></A>The rules for the persistence of tags described in <A HREF="fd_chap.003.html#50422070_21663">Section 2.4.2, “Tags”</A>, apply during boolean operations. However, tag persistence is disabled if normal attribute callbacks are registered and used. See <A HREF="fd_chap.095.html#50422174_24693">Section 94.3, “Callback functions”</A>, for more information.</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-392910"></A>	51.3.3 	<A NAME="50422125_marker-392909"></A>Global booleans </H3>
+<P>
+<A NAME="50422125_pgfId-392913"></A><A NAME="50422125_marker-392911"></A><A NAME="50422125_marker-392912"></A>A global boolean involves comparing all face pairs from the target and tool bodies. </P>
+<P>
+<A NAME="50422125_pgfId-392915"></A>Global booleans are performed using <A NAME="50422125_marker-392914"></A><A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>, which requires one target body, one or more tool bodies and an options structure. If more than one tool body is supplied, the union of overlapping tools is computed first and then the boolean between the target and the tools is performed. For intersect boolean operations, the intersection of one target and two tools is the intersection between the target and the result of uniting two tools rather than the mutual intersection between the three bodies. </P>
+<P>
+<A NAME="50422125_pgfId-392916"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Booleans\Global</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422125_pgfId-392926"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-392922"></A>Note: You can perform global booleans on any combination of manifold solid and sheet bodies, wire bodies and general bodies, so long as target and tools have no acorn vertices. For more information about performing booleans with general bodies, see <A HREF="fd_chap.054.html#50422127_33276">Chapter 53, “General Booleans”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422125_pgfId-392930"></A>	51.3.4 	<A NAME="50422125_marker-392927"></A><A NAME="50422125_marker-392928"></A><A NAME="50422125_marker-392929"></A>Local booleans </H3>
+<P>
+<A NAME="50422125_pgfId-392933"></A><A NAME="50422125_marker-392931"></A><A NAME="50422125_marker-392932"></A>A local boolean involves comparing selected face pairs in the target and tool bodies. This form of boolean operation is quicker than a global boolean but does not guarantee topological consistency on the resulting bodies. </P>
+<P>
+<A NAME="50422125_pgfId-392935"></A>Local booleans are performed using <A NAME="50422125_marker-392934"></A><A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>, which requires one or more faces from a single target and tool body and an options structure. Local booleans using general bodies are not supported.</P>
+<P>
+<A NAME="50422125_pgfId-392936"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Booleans\Local</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422125_pgfId-392946"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-392942"></A>Note: Both <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> or <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> may return a status code of <A HREF=../headers/pk_boolean_result_t.html><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_failed_c</A></A> following a failure, with a return code of PK_ERROR_no_errors from the function. In these cases, the model might be left in an invalid state. We therefore recommend that, if <A HREF=../headers/pk_boolean_result_t.html><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_failed_c</A></A> is returned from a call to either of these functions, you roll back to a valid state of the model. For more information, see <A HREF="fd_chap.121.html#50422203_60341">Section 120.3, “Failure status codes”</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422125_pgfId-392949"></A>	51.3.5 	<A NAME="50422125_marker-392947"></A><A NAME="50422125_46372"></A>Boundary regions </H3>
+<P>
+<A NAME="50422125_pgfId-392950"></A>In order to perform boolean operations, edges are imprinted on the target and tool to denote the intersecting parts of the two bodies. <A NAME="50422125_marker-392951"></A><A NAME="50422125_marker-392952"></A>These imprinted edges divide the boundaries of the bodies into boundary regions.</P>
+<P>
+<A NAME="50422125_pgfId-392956"></A>Suppose the bodies shown in <A HREF="fd_chap.052.html#50422125_26373"><EM>
+Figure 51-3</EM></A> are used to perform a global and local boolean respectively.</P>
+<P>
+<A NAME="50422125_pgfId-392991"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-530.gif">
+
+<P>
+<A NAME="50422125_pgfId-392993"></A>Figure 51-3 <A NAME="50422125_26373"></A>Bodies used in a simple union</P>
+<P>
+<A NAME="50422125_pgfId-392994"></A>For global booleans, all the boundary regions of the tool bodies lie either completely inside or completely outside of the target body, as shown in <A HREF="fd_chap.052.html#50422125_90929"><EM>
+Figure 51-4</EM></A>.</P>
+<P>
+<A NAME="50422125_pgfId-393032"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-531.gif">
+
+<P>
+<A NAME="50422125_pgfId-393034"></A>Figure 51-4 <A NAME="50422125_90929"></A>Boundary regions for global booleans</P>
+<P>
+<A NAME="50422125_pgfId-393035"></A>For local booleans, because not all faces of both bodies are used to compute the imprinted edges, boundary regions of the tool body are classified as inside if they are locally inside the target body near a loop of imprinted edges, and are classified as outside if they are locally outside near the loop of imprinted edges, as shown in <A HREF="fd_chap.052.html#50422125_32942"><EM>
+Figure 51-5</EM></A>. Options are provided for you to select which regions are to be excluded or included in a local boolean: see <A HREF="fd_chap.052.html#50422125_56451">Section 51.4.2, “Selecting regions in local booleans”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-393076"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-532.gif">
+
+<P>
+<A NAME="50422125_pgfId-393078"></A>Figure 51-5 <A NAME="50422125_32942"></A>Boundary regions for local booleans</P>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422125_pgfId-393182"></A>51.4	<A NAME="50422125_13964"></A>Options for booleans 
+
+
+</H1>
+<P>
+<A NAME="50422125_pgfId-393184"></A>You can modify <A NAME="50422125_marker-513856"></A>the behaviour of <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> (global booleans) and <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> (local booleans) using an options structure passed to each function. The options structures for these functions are different, but have a large number of identical options.The following table lists the options in these functions and indicates which ones can be used for global, local, manifold or general booleans: </P>
+<P>
+<A NAME="50422125_pgfId-514609"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512941"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512943"></A>Global</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512945"></A>Local</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512947"></A>Manifold</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512949"></A>General</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512951"></A><CODE>
+function</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512953"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512955"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512957"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512959"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512961"></A><CODE>
+configuration</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512963"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512965"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512967"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512969"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512971"></A><CODE>
+default_tol</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512973"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512975"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512977"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512979"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512981"></A><CODE>
+max_tol</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512983"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512985"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512987"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512989"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512991"></A><CODE>
+matched_region</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512993"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512995"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512997"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-512999"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513001"></A><CODE>
+selected_topolset</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513003"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513005"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513007"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513009"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513011"></A><CODE>
+select_region</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513013"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513015"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513017"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513019"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513021"></A><CODE>
+target_material_side</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513023"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513025"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513027"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513029"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513031"></A><CODE>
+tool_material_side</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513033"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513035"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513037"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513039"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513041"></A><CODE>
+imprint_complete_targ</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513043"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513045"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513047"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513049"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513051"></A><CODE>
+imprint_complete_tool</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513053"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513055"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513057"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513059"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513061"></A><CODE>
+target_face_overflow</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513063"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513065"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513067"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513069"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513071"></A><CODE>
+tool_face_overflow</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513073"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513075"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513077"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513079"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513081"></A><CODE>
+extend_face_list</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513083"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513085"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513087"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513089"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513091"></A><CODE>
+limit_target_faces</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513093"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513095"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513097"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513099"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513101"></A><CODE>
+limit_tool_faces</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513103"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513105"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513107"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513109"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513111"></A><CODE>
+imprint_overlapping</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513113"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513115"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513117"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513119"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513121"></A><CODE>
+merge_imprinted</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513123"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513125"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513127"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513129"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513131"></A><CODE>
+selective_merge</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513133"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513135"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513137"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513139"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513141"></A><CODE>
+keep_target_edges</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513143"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513145"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513147"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513149"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513151"></A><CODE>
+merge_attributes</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513153"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513155"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513157"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513159"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513161"></A><CODE>
+merge_in_solid</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513163"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513165"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513167"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513169"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513171"></A><CODE>
+merge_in_solid_dimension</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513173"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513175"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513177"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513179"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513181"></A><CODE>
+merge_in_face</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513183"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513185"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513187"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513189"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513191"></A><CODE>
+merge_in_face_dimension</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513193"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513195"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513197"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513199"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513201"></A><CODE>
+merge_in_edge</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513203"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513205"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513207"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513209"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061941"></A><CODE>
+merge_tools</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061943"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061945"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061947"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061949"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061951"></A><CODE>
+impose_bodies</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061953"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061955"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061957"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1061959"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513221"></A><CODE>
+prune_in_void </CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513223"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513225"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513227"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513229"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513231"></A><CODE>
+nm_edge_repair</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513233"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513235"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513237"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513239"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513241"></A><CODE>
+blend_radius</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513243"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513245"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513247"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513249"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513251"></A><CODE>
+stop_self_intersection</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513253"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513255"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513257"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513259"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513261"></A><CODE>
+resulting_body_type</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513263"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513265"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513267"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513269"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513271"></A><CODE>
+allow_disjoint</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513273"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513275"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513277"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513279"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513281"></A><CODE>
+tracking</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513283"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513285"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513287"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513289"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513291"></A><CODE>
+tracking_type</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513293"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513295"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513297"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513299"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-921967"></A><CODE>
+track_regions</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-921969"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-921971"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-921973"></A>&nbsp;</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-921975"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513301"></A><CODE>
+flag_no_effect</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513303"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513305"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513307"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513309"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513311"></A><CODE>
+check_fa</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513313"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513315"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513317"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513319"></A>*</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513321"></A><CODE>
+fence </CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513323"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513325"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513327"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513329"></A>&nbsp;</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513331"></A><CODE>
+update</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513333"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513335"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513337"></A>*</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-513339"></A>*</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-513340"></A>The following table provides a summary of the options found in <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> and <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>.</P>
+<P>
+<A NAME="50422125_pgfId-393462"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-439813"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-439815"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439817"></A>function</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-439819"></A>The boolean operation to be performed: union, subtraction or intersection. Default: PK_boolean_unite_c</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439821"></A>configuration</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-453912"></A>A sub-structure that describes the configuration of the target and tool bodies. </P>
+<P>
+<A NAME="50422125_pgfId-494192"></A>Default: NULL</P>
+<P>
+<A NAME="50422125_pgfId-445353"></A>See <A HREF="fd_chap.052.html#50422125_25025">Section 51.4.1, “Optimising local and global boolean operations”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439828"></A>default_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-453926"></A>The default tolerance to which the boolean operation, if it has to, may approximate entities or assume that entities are coincident.</P>
+<P>
+<A NAME="50422125_pgfId-453927"></A>When performing global booleans with wire bodies, this option has no effect. Instead, set a tolerance on the vertices, using <A HREF=../headers/pk_vertex_set_precision.html>PK_VERTEX_set_precision</A>.</P>
+<P>
+<A NAME="50422125_pgfId-445364"></A>Default: 1.0e-5</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439833"></A>max_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-439835"></A>The maximum tolerance which may be applied to any entity involved in the boolean operation.</P>
+<P>
+<A NAME="50422125_pgfId-494222"></A>Default: 0.0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491301"></A>matched_region</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491303"></A>A sub-structure that describes how matching between the target and tool bodies should be performed. See <A HREF="fd_chap.052.html#50422125_34853">Section 51.4.5, “Matched topology in local and global boolean operations”</A> for more information.</P>
+<P>
+<A NAME="50422125_pgfId-494243"></A>Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439837"></A>selected_topolset</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-439839"></A>A sub-structure for global booleans that is used to identify regions of the input bodies to be included in or excluded from the result body. See <A HREF="fd_chap.052.html#50422125_60258">Section 51.4.3, “Selecting regions in global booleans”</A>, for more information.</P>
+<P>
+<A NAME="50422125_pgfId-494270"></A>Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439844"></A>select_region</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-439846"></A>A sub-structure for local booleans that is used to identify regions of the input bodies to be included in or excluded from the result body. See <A HREF="fd_chap.052.html#50422125_56451">Section 51.4.2, “Selecting regions in local booleans”</A>, for more information.</P>
+<P>
+<A NAME="50422125_pgfId-494296"></A>Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439858"></A>target_material_side</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-453987"></A>Force the target to be treated as a solid or a sheet, or allow it to be treated according to its actual body type. </P>
+<P>
+<A NAME="50422125_pgfId-494321"></A>Default: <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_default_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-453991"></A>See <A HREF="fd_chap.052.html#50422125_74335">Section 51.4.14, “Specifying the body type of tool and target”</A>, for details.</P>
+<P>
+<A NAME="50422125_pgfId-439864"></A>Not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439869"></A>tool_material_side</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-454005"></A>Force the tool to be treated as a solid or a sheet, or allow it to be treated according to its actual body type. </P>
+<P>
+<A NAME="50422125_pgfId-494330"></A>Default: <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_default_c</A></P>
+<P>
+<A NAME="50422125_pgfId-454009"></A>See <A HREF="fd_chap.052.html#50422125_74335">Section 51.4.14, “Specifying the body type of tool and target”</A>, for details.</P>
+<P>
+<A NAME="50422125_pgfId-439875"></A>Not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491336"></A>imprint_complete_targ</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491338"></A>Turn imprint completion on and off for the target.</P>
+<P>
+<A NAME="50422125_pgfId-494347"></A>Default: <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_no_c</A></P>
+<P>
+<A NAME="50422125_pgfId-494339"></A>See <A HREF="fd_chap.052.html#50422125_21822">Section 51.4.13, “Imprint completion”</A>, for details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491343"></A>imprint_complete_tool</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491345"></A>Turn imprint completion on and off for the tool.</P>
+<P>
+<A NAME="50422125_pgfId-494389"></A>Default: <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_no_c</A></P>
+<P>
+<A NAME="50422125_pgfId-494431"></A>See <A HREF="fd_chap.052.html#50422125_21822">Section 51.4.13, “Imprint completion”</A>, for details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491374"></A>target_face_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491376"></A>How to process the overflow from a target body onto a tool body at the laminar edge of the target body. To use this option, <CODE>
+imprint_complete_tool</CODE>
+ must be set to <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_no_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-494440"></A>Default: NULL</P>
+<P>
+<A NAME="50422125_pgfId-494462"></A>See <A HREF="fd_chap.052.html#50422125_91608">Section 51.4.6, “Overflow imprints at boundaries”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491381"></A>tool_face_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491383"></A>How to process the overflow from a tool body onto a target body at the laminar edge of the tool body.To use this option, <CODE>
+imprint_complete_targ</CODE>
+ must be set to <A HREF=../headers/pk_imprint_complete_t.html>PK_imprint_complete_no_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-496329"></A>Default: NULL</P>
+<P>
+<A NAME="50422125_pgfId-494483"></A>See <A HREF="fd_chap.052.html#50422125_91608">Section 51.4.6, “Overflow imprints at boundaries”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491432"></A>extend_face_list</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491434"></A>A local boolean receives a subset of the faces of a target and/or tool body. If the imprinting phase of the boolean results in incomplete loops of imprinted edges, this option specifies whether to use additional target and/or tool faces in an attempt to complete the loop. </P>
+<P>
+<A NAME="50422125_pgfId-495787"></A>Default: <A HREF=../headers/pk_imprint_face_list_t.html>PK_imprint_face_list_no_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-494509"></A>See <A HREF="fd_chap.052.html#50422125_88410">Section 51.4.9, “Extending face lists during local booleans”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491481"></A>limit_target_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491485"></A>Limits the faces on the target body to be deleted. See <A HREF="fd_chap.052.html#50422125_71948">Section 51.4.14, “Specifying the body type of tool and target”</A> for more information. </P>
+<P>
+<A NAME="50422125_pgfId-494518"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491488"></A>limit_tool_faces</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491492"></A>Limits the faces on the tool body to be deleted. See <A HREF="fd_chap.052.html#50422125_71948">Section 51.4.14, “Specifying the body type of tool and target”</A> for more information. </P>
+<P>
+<A NAME="50422125_pgfId-494527"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491524"></A>imprint_overlapping</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491528"></A>Whether to imprint the boundaries of overlapping areas.See <A HREF="fd_chap.052.html#50422125_65586">Section 51.4.7, “Imprinting the boundaries of overlapping areas”</A> for more information. </P>
+<P>
+<A NAME="50422125_pgfId-494536"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439880"></A>merge_imprinted</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-454023"></A>Whether all mergeable imprinted edges on the result body that were imprinted by the boolean operation are merged. </P>
+<P>
+<A NAME="50422125_pgfId-494557"></A>Default: PK_LOGICAL_false. </P>
+<P>
+<A NAME="50422125_pgfId-439885"></A>See <A HREF="fd_chap.052.html#50422125_98716">Section 51.4.13, “Imprint completion”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439888"></A>selective_merge</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-454037"></A>Modify the edge merging behaviour. The merge phase avoids merging edges in the imprint that existed and were mergeable before the start of the boolean.This option should be used in conjunction with <CODE>
+merge_imprinted</CODE>
+. </P>
+<P>
+<A NAME="50422125_pgfId-494566"></A>Default: PK_LOGICAL_false. </P>
+<P>
+<A NAME="50422125_pgfId-439893"></A>See <A HREF="fd_chap.052.html#50422125_98716">Section 51.4.13, “Imprint completion”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491646"></A>keep_target_edges</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491648"></A>Specify the edge that survives when a target edge and tool edge coincide during a boolean operation. This can be one of:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-491649"></A>PK_LOGICAL_false: The older edge (with the smallest tag) survives. This is the default.</LI>
+<LI>
+<A NAME="50422125_pgfId-491650"></A>PK_LOGICAL_true: The target edge survives, unless both (a) the target edge is a new edge imprinted during the boolean, and (b) the tool edge was already present; in which case the tool edge survives.</LI>
+</UL>
+<P>
+<A NAME="50422125_pgfId-491651"></A>If both faces adjacent to the tool edge survive, then the tool edge survives, regardless of the value of this option. If generalised topology is on, the target edge always survives.</P>
+<P>
+<A NAME="50422125_pgfId-494575"></A>Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439896"></A>merge_attributes</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-439898"></A>Whether face attributes are merged during the boolean operations. </P>
+<P>
+<A NAME="50422125_pgfId-494657"></A>Default: PK_LOGICAL_false</P>
+<P>
+<A NAME="50422125_pgfId-494642"></A>See the <EM>
+PK Reference</EM> documentation for more information.</P>
+<ADDRESS>
+<A NAME="50422125_pgfId-1091162"></A>Note: This option only takes effect when general topology is disabled. Attributes on coincident faces are always merged when general topology is enabled. (General topology is disabled by default when you start your Parasolid session.)</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439900"></A>merge_in_solid</PRE>
+<PRE><A NAME="50422125_pgfId-884580"></A>merge_in_solid_dimension</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-879588"></A><CODE>
+merge_in_solid</CODE>
+ specifies whether to merge out topologies which become surrounded by solid during the boolean operation. </P>
+<P>
+<A NAME="50422125_pgfId-879589"></A>Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422125_pgfId-879590"></A>See <A HREF="fd_chap.054.html#50422127_51465">Section 53.3, “Merging redundant topology”</A> for more information.</P>
+<P>
+<A NAME="50422125_pgfId-884642"></A><CODE>
+merge_in_solid_dimension</CODE>
+ determines the highest dimension of topologies surrounded by solid to be merged out when <CODE>
+merge_in_solid</CODE>
+ is PK_LOGICAL_true. </P>
+<P>
+<A NAME="50422125_pgfId-883034"></A>Default: PK_TOPOL_dimension_any_c</P>
+<P>
+<A NAME="50422125_pgfId-883059"></A>See <A HREF="fd_chap.054.html#50422127_51465">Section 53.3, “Merging redundant topology”</A> for more information.</P>
+<ADDRESS>
+<A NAME="50422125_pgfId-879582"></A>Note:  These options are only allowed when general topology is enabled.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439918"></A>merge_in_face</PRE>
+<PRE><A NAME="50422125_pgfId-884589"></A>merge_in_face_dimension</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-454091"></A><CODE>
+merge_in_face</CODE>
+ specifies whether to merge out redundant vertices or edges within or between faces in the result body which were not redundant in the tool or target bodies. Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422125_pgfId-454095"></A>See <A HREF="fd_chap.054.html#50422127_51465">Section 53.3, “Merging redundant topology”</A> for more information.</P>
+<P>
+<A NAME="50422125_pgfId-884720"></A><CODE>
+merge_in_face_dimension</CODE>
+ determines the highest dimension of topologies imprinted within faces to be merged out when <CODE>
+merge_in_face</CODE>
+ is PK_LOGICAL_true. </P>
+<P>
+<A NAME="50422125_pgfId-883178"></A>Default: PK_TOPOL_dimension_any_c</P>
+<P>
+<A NAME="50422125_pgfId-883203"></A>See the <EM>
+PK Reference</EM> documentation for more information.</P>
+<ADDRESS>
+<A NAME="50422125_pgfId-439925"></A>Note:  These options are only allowed when general topology is enabled</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439936"></A>merge_in_edge</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-454121"></A>Whether to merge out redundant vertices between edges in the result body which were not redundant in the tool or target bodies. </P>
+<P>
+<A NAME="50422125_pgfId-454122"></A>Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422125_pgfId-454123"></A>See the <EM>
+PK Reference</EM> documentation for more information.</P>
+<ADDRESS>
+<A NAME="50422125_pgfId-439941"></A>Note:  This option is only allowed when general topology is enabled.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-1062005"></A>impose_bodies</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1062007"></A>Controls whether the target body can impose on the tool bodies or vice versa. </P>
+<P>
+<A NAME="50422125_pgfId-1063066"></A>Default: <A HREF=../headers/pk_boolean_impose_t.html>PK_boolean_impose_no_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-1062675"></A>See <A HREF="fd_chap.054.html#50422127_49078">Section 53.3.1, “Finer control over region survival and inheritance”</A> for more information.</P>
+<ADDRESS>
+<A NAME="50422125_pgfId-1062589"></A>Note: This option is only allowed when general topology is enabled.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-1063379"></A>merge_tools</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-1063381"></A>Whether to merge overlapping tools in a multi-tool boolean. </P>
+<P>
+<A NAME="50422125_pgfId-1063382"></A>Default: <A HREF=../headers/pk_merge_tools_t.html>PK_merge_tools_no_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-1063386"></A>See <A HREF="fd_chap.054.html#50422127_49078">Section 53.3.1, “Finer control over region survival and inheritance”</A> for more information.</P>
+<ADDRESS>
+<A NAME="50422125_pgfId-1063387"></A>Note: This option is only allowed when general topology is enabled.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491747"></A>prune_in_void</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491749"></A>Whether to prune all void regions in the resulting body. Any faces, edges or vertices in the result body which are completely surrounded by void regions are deleted, so long as the result body contains some pieces of a higher dimension, e.g. a sheet face is only deleted if the result body contains at least one solid region. </P>
+<P>
+<A NAME="50422125_pgfId-494741"></A>Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422125_pgfId-491750"></A>See the <EM>
+PK Reference</EM> documentation for more information.</P>
+<ADDRESS>
+<A NAME="50422125_pgfId-879761"></A>Note: This option is only allowed when general topology is enabled.</ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491808"></A>nm_edge_repair</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491810"></A>Whether to attempt to repair certain configurations of non-manifold results. Default: <A HREF=../headers/pk_nm_edge_repair_t.html>PK_nm_edge_repair_no_c</A>. </P>
+<P>
+<A NAME="50422125_pgfId-491814"></A>See <A HREF="fd_chap.052.html#50422125_43091">Section 51.4.18, “Repairing non-manifold results using blends”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-491817"></A>Not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491820"></A>blend_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491822"></A>The radius to use for the new blends constructed to repair non-manifold edges when using the <CODE>
+nm_edge_repair</CODE>
+ option. See <A HREF="fd_chap.052.html#50422125_43091">Section 51.4.18, “Repairing non-manifold results using blends”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-494752"></A>Default: 1.0e-5</P>
+<P>
+<A NAME="50422125_pgfId-491828"></A>Not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491870"></A>stop_self_intersection</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491872"></A>Whether to stop self-intersection of tool faces which survive the boolean. After imprinting, tool faces which survive the boolean are compared against all surviving faces of the target body. </P>
+<P>
+<A NAME="50422125_pgfId-495915"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-491910"></A>resulting_body_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-491912"></A>Specify the type of body that is returned by global and local boolean operations.</P>
+<P>
+<A NAME="50422125_pgfId-494776"></A>Default: <A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_original_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-491916"></A>See <A HREF="fd_chap.052.html#50422125_27105">Section 51.4.17, “Specifying the body type of the result”</A>, for details.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439964"></A>allow_disjoint</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-454173"></A>Whether to return a single disjoint body if the operation would result in more than one body.</P>
+<P>
+<A NAME="50422125_pgfId-494788"></A>Default: PK_LOGICAL_false.</P>
+<P>
+<A NAME="50422125_pgfId-439967"></A>See the <EM>
+PK Reference</EM> documentation for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-492013"></A>tracking</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-938640"></A>Whether to request additional tracking data on the boolean result. </P>
+<P>
+<A NAME="50422125_pgfId-922357"></A>Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-439976"></A>tracking_type</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-454198"></A>Allows you to specify the level of information you want the tracking records for the boolean operation to contain. </P>
+<P>
+<A NAME="50422125_pgfId-494813"></A>Default: <A HREF=../headers/pk_boolean_track_type_t.html>PK_boolean_track_type_basic_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-445590"></A>See <A HREF="fd_chap.052.html#50422125_12172">Section 51.4.15, “Tracking imprinted edges”</A> for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-922016"></A><CODE>track_regions</CODE>
+</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-938615"></A>Allows you to track regions when performing boolean operations. See <A HREF="fd_chap.052.html#50422125_84299">Section 51.4.16, “Tracking regions”</A> for more information.</P>
+<P>
+<A NAME="50422125_pgfId-938616"></A>Default: <A HREF=../headers/pk_region_t.html>PK_region_track_no_c</A></P>
+<P>
+<A NAME="50422125_pgfId-922297"></A>Not supported for manifold booleans. See <A HREF="fd_chap.053.html#50422126_59572">Section 52.1, “Introduction”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-492089"></A>flag_no_effect</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-492091"></A>Determine whether the original target body was unaffected by the tools. Default: <A HREF=../headers/pk_boolean_no_effect_t.html>PK_boolean_no_effect_basic_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-492093"></A>check_fa</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-492095"></A>Whether to check faces involved in the boolean operation. Only faces which are adjacent to imprinted edges are checked. </P>
+<P>
+<A NAME="50422125_pgfId-494830"></A>Default: <A HREF=../headers/pk_boolean_check_fa_t.html>PK_boolean_check_fa_yes_c</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-440018"></A>fence</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-454283"></A>Modify the behaviour of the subtract operation and determine which resultant bodies are returned when performing solid/ sheet (trimming) or sheet/solid (punching) boolean operations. It is recommended that you use <CODE>
+tool_material_side</CODE>
+ and <CODE>
+target_material_side</CODE>
+ when performing fencing operations. </P>
+<P>
+<A NAME="50422125_pgfId-494968"></A>Default: <A HREF=../headers/pk_boolean_fence_t.html>PK_boolean_fence_none_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-454287"></A>See <A HREF="fd_chap.052.html#50422125_74335">Section 51.4.14, “Specifying the body type of tool and target”</A>, for details.</P>
+<P>
+<A NAME="50422125_pgfId-440024"></A>Not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-440084"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-440086"></A>Update switch to maintain consistency when rebuilding models built in older versions of Parasolid. </P>
+<P>
+<A NAME="50422125_pgfId-494977"></A>Default: <A HREF=../headers/pk_boolean_update_t.html>PK_boolean_update_default_c</A>. </P>
+<P>
+<A NAME="50422125_pgfId-495002"></A>See <A HREF="fd_chap.052.html#50422125_69648">Section 51.4.19, “Update control”</A>, for more information.</P>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422125_pgfId-393957"></A>	51.4.1 	<A NAME="50422125_25025"></A>Optimising local and global boolean operations </H3>
+<P>
+<A NAME="50422125_pgfId-393960"></A><A NAME="50422125_marker-493875"></A><A NAME="50422125_marker-493876"></A>If the boolean operation involves instancing, i.e. a boolean operation which takes a single target body and a list of tool bodies, e.g. when drilling an array of holes in a body, the performance of the operation can be improved by using one of the following instancing options in the <CODE>
+configuration</CODE>
+ option sub-structure:</P>
+<P>
+<A NAME="50422125_pgfId-393974"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-393963"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-393965"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-393967"></A><CODE>
+no_tool_intersect</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-393969"></A>This option can be set when the set of tool bodies are known not to intersect each other, though they are allowed to clash with existing edges on the target (including the periphery edge). This option can also be set for subtract and intersect operations when the tool bodies do not intersect within the target region.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-393971"></A><CODE>
+no_loop_intersect</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-393973"></A>This option can be set when there is no interference between any instances and the existing edges of the target, though the tools can clash with each other</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394017"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-533.gif">
+
+<P>
+<A NAME="50422125_pgfId-394018"></A>Figure 51-6 Situations in which instancing can be optimised during boolean operations</P>
+<P>
+<A NAME="50422125_pgfId-394019"></A>For a more efficient method of instancing when only a single tool body and a single target body are involved use <A NAME="50422125_marker-394020"></A><A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> or <A HREF=../headers/pk_face_instance_bodies.html><A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A></A>. <A HREF=../headers/pk_face_instance_bodies.html><A HREF=../headers/pk_face_instance_bodies.html>PK_FACE_instance_bodies</A></A> can also be used when you are using multiple tools.</P>
+<P>
+<A NAME="50422125_pgfId-394023"></A>These options are not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-394027"></A>	51.4.2 	<A NAME="50422125_56451"></A>Selecting regions in local booleans </H3>
+<P>
+<A NAME="50422125_pgfId-394037"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-394032"></A>Note: In this section, the term “region” refers to a boundary region as described in <A HREF="fd_chap.052.html#50422125_46372">Section 51.3.5, “Boundary regions”</A>, rather than a topological region as described in <A HREF="fd_chap.015.html#50422084_36760">Chapter 14, “Model Structure”</A>. A boundary region is a face set which lies wholly inside or outside the target or tool body. Tool faces which intersect the target body are split by the local boolean, and vice versa: the resultant faces lie wholly inside or outside the target body, or tool body, respectively.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394041"></A>As described in <A HREF="fd_chap.052.html#50422125_46372">Section 51.3.5, “Boundary regions”</A>, boundary regions in the context of global booleans are always completely specified: regions that are included or excluded in the resulting body are always unambiguously defined. In local booleans, however, it can be unclear as to which regions should be included in the resulting body, and which should be excluded.</P>
+<P>
+<A NAME="50422125_pgfId-394045"></A>To address this problem, Parasolid lets you identify boundary regions in either the target or tool body that are to be included in or excluded from the result of a local boolean. You can do this using the <CODE>
+select_region</CODE>
+ structure of <A HREF=../headers/pk_face_boolean_o_t.html>PK_FACE_boolean_o_t</A>.</P>
+<P>
+<A NAME="50422125_pgfId-394046"></A>The <CODE>
+select_region</CODE>
+ structure identifies either all the regions in the result that you want to keep, all the regions you want to throw away, or a combination of both. Each region is identified by a single face, edge or vertex which is interior to it.</P>
+<P>
+<A NAME="50422125_pgfId-394047"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Booleans\Boolean</CODE>
+ <CODE>
+with</CODE>
+ <CODE>
+Selectors</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422125_pgfId-394057"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-394053"></A>Note: The <CODE>
+select_region</CODE>
+ structure is ignored by <A HREF=../headers/pk_face_instance_tools.html>PK_FACE_instance_tools</A> in cases where there is more than one instance, unless all <CODE>
+configuration</CODE>
+ options are true. See <A HREF="fd_chap.055.html#50422128_51471">Section 54.2.2, “Improving the performance of instancing operations”</A>, for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394058"></A>The structure contains the following fields:</P>
+<P>
+<A NAME="50422125_pgfId-394086"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394061"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394063"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394065"></A><CODE>
+select_type</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394067"></A>Whether to include or exclude the specified regions, or have a combination of both.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394069"></A><CODE>
+selectors</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394071"></A>An array of faces, edges, or vertices, each of which uniquely identifies a single region. Sometimes, a face may not unambiguously identify the region to be included or excluded. In this case, it can be associated with an element in the <CODE>
+help points</CODE>
+ array. You should ensure that any faces associated with help points are specified first in the array.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394073"></A><CODE>
+help_points</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394075"></A>An optional array of help points (vectors) which, when combined with the corresponding face in the <CODE>
+selectors</CODE>
+ array, unambiguously identifies a region. The first element in this array is associated with the first element in <CODE>
+selectors</CODE>
+, the second element with the second element in <CODE>
+selectors</CODE>
+, and so on. You should specify PK_ENTITY_null if you do not want to specify a help point for a corresponding element in <CODE>
+selectors</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394077"></A><CODE>
+selector_types</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394079"></A>An optional array that describes the type of each region specified in the <CODE>
+selectors</CODE>
+ array. The first element describes the type of the first region in <CODE>
+selectors</CODE>
+, the second element describes the second region, and so on. The following choices are available:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-394080"></A>Whether the region is allowed to be on or adjacent to any edges that are imprinted as a result of the boolean.</LI>
+<LI>
+<A NAME="50422125_pgfId-394081"></A>Whether to propagate the value of the <CODE>
+select_type</CODE>
+ field in cases where the region is split by any edges imprinted as a result of the boolean </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394083"></A><CODE>
+region_types</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394085"></A>An optional array that is used in conjunction with <CODE>
+select_type</CODE>
+. If <CODE>
+select_type</CODE>
+ is PK_boolean_mixed_selection_c, you can choose to include some regions on one body and exclude some regions on another body. All regions of the same body must have the same value (i.e all regions on the body are either included or excluded)</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394090"></A><A HREF="fd_chap.052.html#50422125_36831"><EM>
+Figure 51-7</EM></A> illustrates the effect of defining regions to exclude during a local boolean. Two regions have been defined for the tool body, by specifying face 1 and face 2 in the <CODE>
+selectors</CODE>
+ array. The <CODE>
+select_type</CODE>
+ field is set to PK_boolean_exclude_c to ensure that these regions are excluded from the result. No help points are required, because both face 1 and face 2 lie completely inside a region created by combining the target and tool, ensuring that the regions to exclude are defined unambiguously</P>
+<P>
+<A NAME="50422125_pgfId-394127"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-534.gif">
+
+<P>
+<A NAME="50422125_pgfId-394129"></A>Figure 51-7 <A NAME="50422125_36831"></A>Excluding regions in a local boolean</P>
+<P>
+<A NAME="50422125_pgfId-394133"></A><A HREF="fd_chap.052.html#50422125_23033"><EM>
+Figure 51-8</EM></A> illustrates the effect of defining regions to include. Here, face 1 from the tool is passed to the <CODE>
+selectors</CODE>
+ array to define a single boundary region, and <CODE>
+select_type</CODE>
+ is set to PK_boolean_include_c. Any other boundary regions in the tool are excluded from the resulting body.</P>
+<P>
+<A NAME="50422125_pgfId-394169"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-535.gif">
+
+<P>
+<A NAME="50422125_pgfId-394171"></A>Figure 51-8 <A NAME="50422125_23033"></A>Including regions in a local boolean</P>
+<P>
+<A NAME="50422125_pgfId-394175"></A><A HREF="fd_chap.052.html#50422125_44457"><EM>
+Figure 51-9</EM></A> illustrates the effect of specifying help points to unambiguously define a region. A region has been defined for the tool body, by specifying face 1 (which is also the face used for the boolean operation itself) in the <CODE>
+selectors</CODE>
+ array. The <CODE>
+select_type</CODE>
+ field is set to PK_boolean_include_c to ensure that the region is included in the result.</P>
+<P>
+<A NAME="50422125_pgfId-394176"></A>Specifying this region without help points causes the boolean to fail, because face 1 lies in several of the regions that are created by combining the target with the tool (in fact, it lies in all the possible regions). The boolean can be made to succeed by specifying a help point which lies in the region that you want to include.</P>
+<P>
+<A NAME="50422125_pgfId-394212"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-536.gif">
+
+<P>
+<A NAME="50422125_pgfId-394214"></A>Figure 51-9 <A NAME="50422125_44457"></A>Using help points to identify regions in a local boolean</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-394216"></A>	51.4.3 	<A NAME="50422125_60258"></A>Selecting regions in global booleans </H3>
+<P>
+<A NAME="50422125_pgfId-394217"></A>Using the <CODE>
+selected_topolset</CODE>
+ option, you can alter the result of a boolean operation by choosing to keep or discard topolsets in the target or tool body that would otherwise have been excluded or included in the operation. Topolsets are connected sets of solid regions and boundary regions which are bounded by the imprint (of the boolean operation) and are chosen by specifying a selector topology that lies within that topolset. Selector topologies can be solid regions, faces, edges or vertices. The <CODE>
+selected_topolset</CODE>
+ option structure contains the following options:</P>
+<P>
+<A NAME="50422125_pgfId-394251"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394220"></A>Options</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394222"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394224"></A><CODE>
+n_selectors</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394226"></A>The number of selector topologies supplied.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394228"></A><CODE>
+selectors</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394230"></A>An array that may contain a mixture of solid regions, faces, edges or vertices each of which uniquely identifies a single region. In cases where a selector does not clearly identify the region to be excluded or included, the selector can be associated with an element in <CODE>
+help_points</CODE>
+. Any selectors that are associated with <CODE>
+help_points</CODE>
+ must first be specified in the array.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394232"></A><CODE>
+n_help points</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394234"></A>The number of <CODE>
+help_points</CODE>
+ supplied. This can be any number between zero and<CODE>
+ n_selectors</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394236"></A><CODE>
+help_points</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394238"></A>An array of vectors, which when combined with an appropriate topological entity from <CODE>
+selectors</CODE>
+, clearly identify a unique topolset.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394240"></A><CODE>
+target_select</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394242"></A>Whether to exclude or include the selected topolset from the target body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394244"></A><CODE>
+tool_select</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394246"></A>Whether to exclude or include the selected topolset from the tool body.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394248"></A><CODE>
+split_action</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394250"></A>What action to take if a selector without a help point is split by the chosen boolean operation.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394252"></A>You can set <CODE>
+target_select</CODE>
+ and <CODE>
+tool_select</CODE>
+ to any of the following values:</P>
+<P>
+<A NAME="50422125_pgfId-394270"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394255"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394257"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394259"></A><A HREF=../headers/pk_selector_type_t.html>PK_selector_type_exclude_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394261"></A>Exclude selected topolsets from the boolean operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394263"></A><A HREF=../headers/pk_selector_type_t.html>PK_selector_type_include_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394265"></A>Include selected topolsets in the boolean operation.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394267"></A><A HREF=../headers/pk_selector_type_t.html>PK_selector_type_off_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394269"></A>Turn off topolset selection. This is the default value.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394271"></A>Selected topolsets from either the target or tool body have to be all excluded or all included. You cannot exclude some topolsets from a body and include others. from the same body.The exclusion or inclusion of a selected topolset holds for the duration of the chosen boolean operation. All other non-selected topolsets from the same origin are either included or excluded respectively.</P>
+<P>
+<A NAME="50422125_pgfId-394275"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-394274"></A>Note: Multiple tools can be used with the <CODE>
+selected_topolset</CODE>
+ option.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394276"></A>The topolsets that can be chosen depend on the boolean operation being performed. For unite operations, <CODE>
+selectors</CODE>
+ determines whether a topolset from either the target or tool will survive after the operation. <A HREF="fd_chap.052.html#50422125_24168"><EM>
+Figure 51-10</EM></A> shows a unite boolean between a solid target and solid tool. The face surrounded by a blue frame on the tool body is the selected topology and <CODE>
+tool_select</CODE>
+ is set to <A HREF=../headers/pk_selector_type_t.html>PK_selector_type_exclude_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-394315"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-537.gif">
+
+<P>
+<A NAME="50422125_pgfId-394317"></A>Figure 51-10 <A NAME="50422125_24168"></A>Unite boolean with <CODE>
+selected_topolset</CODE>
+ on the tool body</P>
+<P>
+<A NAME="50422125_pgfId-394321"></A><A HREF="fd_chap.052.html#50422125_49046"><EM>
+Figure 51-11</EM></A> shows the same unite boolean between a solid target and solid tool. In this case, an edge of the tool body is the selected topology and <CODE>
+tool_select</CODE>
+ is set to <A HREF=../headers/pk_selector_type_t.html>PK_selector_type_include_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-394359"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-538.gif">
+
+<P>
+<A NAME="50422125_pgfId-394361"></A>Figure 51-11 <A NAME="50422125_49046"></A>Unite boolean operation with <CODE>
+selected_topolset</CODE>
+ on the tool body</P>
+<P>
+<A NAME="50422125_pgfId-394362"></A>In cases where the boolean operation splits the selected topolset, you can either choose to propagate the selection to all topolsets on the same body using the <CODE>
+split_action</CODE>
+ option or you can provide <CODE>
+help_points</CODE>
+ to show which of the topologies resulting from the split are being specified. </P>
+<P>
+<A NAME="50422125_pgfId-394363"></A>The <CODE>
+help_points</CODE>
+ must each uniquely identify a topolset and must lie within their corresponding selector topology. <A HREF="fd_chap.052.html#50422125_89334"><EM>
+Figure 51-12</EM></A> illustrates the use of <CODE>
+help_points</CODE>
+ in a unite boolean between a solid tool and a solid target. The tool has one help point in a topolset and the <CODE>
+tool_select</CODE>
+ is set to <A HREF=../headers/pk_selector_type_t.html>PK_selector_type_exclude_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-394405"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-539.gif">
+
+<P>
+<A NAME="50422125_pgfId-394407"></A>Figure 51-12 <A NAME="50422125_89334"></A>Unite boolean using <CODE>
+help_points</CODE>
+</P>
+<P>
+<A NAME="50422125_pgfId-394408"></A>If you choose not to supply help points, the <CODE>
+split_action</CODE>
+ option can be used which takes the following values:</P>
+<P>
+<A NAME="50422125_pgfId-394422"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394411"></A>Values</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394413"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394415"></A><A HREF=../headers/pk_selector_split_t.html>PK_selector_split_fail_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394417"></A>If selectors are split, force the operation to fail.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394419"></A><A HREF=../headers/pk_selector_split_t.html>PK_selector_split_propagate_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394421"></A>Propagate the selection to all the topological entities derived from the selector after the split.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394426"></A><A HREF="fd_chap.052.html#50422125_94965"><EM>
+Figure 51-13</EM></A> shows a unite boolean with a solid tool and target. No help points have been set, the selector is from one topolset on the tool body and <CODE>
+split_action</CODE>
+ has been set to <A HREF=../headers/pk_selector_split_t.html>PK_selector_split_propagate_c</A>. The selector type has been set to <A HREF=../headers/pk_selector_type_t.html>PK_selector_type_exclude_c</A>. </P>
+<P>
+<A NAME="50422125_pgfId-394465"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-540.gif">
+
+<P>
+<A NAME="50422125_pgfId-394468"></A>Figure 51-13 <A NAME="50422125_94965"></A><A NAME="50422125_Unite"></A>Unite boolean using <CODE>
+split_action</CODE>
+</P>
+<P>
+<A NAME="50422125_pgfId-394472"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-394471"></A>Note: If <CODE>
+help_points</CODE>
+ are set for the selector, then the value of <CODE>
+split_action</CODE>
+ is ignored.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422125_pgfId-394473"></A>	51.4.4 	Using region selection with material side </H3>
+<P>
+<A NAME="50422125_pgfId-394474"></A>The <CODE>
+selected_topolset</CODE>
+ option can be used with <CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ options (referred to hereafter as the material-side options). The selector is first located on the model and then the chosen material-side option is taken into account. If the selector topology is found to be invalid due to the material-side options then an error is returned. If the selector topology remains valid, the boolean operation is then performed taking the material-side options into account.</P>
+<P>
+<A NAME="50422125_pgfId-394478"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-394477"></A>Note: When using material-side options with <CODE>
+selected_topolset</CODE>
+, only one tool body can be used. If you want to use multiple tools with <CODE>
+selected_topolset</CODE>
+, the material-side options need to be set to their default values.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394482"></A><A HREF="fd_chap.052.html#50422125_22823"><EM>
+Figure 51-14</EM></A> illustrates a unite operation with a solid tool and solid target. One face on the tool has a help point and is set to exclude the mid-face. The material-side options for the tool body are set to the default and the material-side option for the target body is set to target_material_outside.</P>
+<P>
+<A NAME="50422125_pgfId-394518"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-541.gif">
+
+<P>
+<A NAME="50422125_pgfId-394520"></A>Figure 51-14 <A NAME="50422125_22823"></A>Unite boolean with material-side options on the target body</P>
+<P>
+<A NAME="50422125_pgfId-394524"></A><A HREF="fd_chap.052.html#50422125_51763"><EM>
+Figure 51-15</EM></A> illustrates a unite operation between a solid target and solid tool. Both bodies have their respective material-side options set to <CODE>
+material_outside </CODE>
+and a help point is set on the tool body.</P>
+<P>
+<A NAME="50422125_pgfId-394560"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-542.gif">
+
+<P>
+<A NAME="50422125_pgfId-394562"></A>Figure 51-15 <A NAME="50422125_51763"></A>Unite boolean with material-side options set on both the target and tool</P>
+<P>
+<A NAME="50422125_pgfId-394569"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-394565"></A>Note: When using this option, the <CODE>
+fence</CODE>
+ option should be left at its default value of <A HREF=../headers/pk_boolean_fence_t.html>PK_boolean_fence_none_c</A>. Material-side options can be used to produce the desired fencing result. See <A HREF="fd_chap.052.html#50422125_74335">Section 51.4.14, “Specifying the body type of tool and target”</A>, for more information on material-side options.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422125_pgfId-394571"></A>	51.4.5 	<A NAME="50422125_34853"></A>Matched topology in local and global boolean operations </H3>
+<P>
+<A NAME="50422125_pgfId-394576"></A><A NAME="50422125_marker-394572"></A>When performing global and local boolean operations, Parasolid can automatically look for regions between the target and tool that are nearly coincident. These regions, known as <STRONG>
+matched regions</STRONG>, represent areas of overlap between two topological entities that are geometrically coincident to within a specified tolerance. Using matched regions can produce a better result (by ensuring the coincident regions match as closely as possible) and can also make the boolean operation faster. </P>
+<P>
+<A NAME="50422125_pgfId-394580"></A>In general, we recommend that you let Parasolid control how matched regions are identified, by following the recommendations in the note below. However, if your application already has information about matched regions, then you can optionally supply these to provide further aid to the boolean operation.</P>
+<P>
+<A NAME="50422125_pgfId-394581"></A>Matched region information is controlled using the <CODE>
+matched_region</CODE>
+ structure (<A HREF=../headers/pk_boolean_match_o_t.html>PK_boolean_match_o_t</A>) in <A HREF=../headers/pk_body_boolean_o_t.html>PK_BODY_boolean_o_t</A>, <A HREF=../headers/pk_face_boolean_o_t.html>PK_FACE_boolean_o_t</A>, <A HREF=../headers/pk_body_imprint_faces_o_t.html>PK_BODY_imprint_faces_o_t</A>, <A HREF=../headers/pk_body_imprint_o_t.html>PK_BODY_imprint_o_t</A>, <A HREF=../headers/pk_face_imprint_faces_o_t.html>PK_FACE_imprint_faces_o_t</A>, <A HREF=../headers/pk_face_imprint_o_t.html>PK_FACE_imprint_o_t</A>, <A HREF=../headers/pk_body_section_o_t.html>PK_BODY_section_o_t</A> and <A HREF=../headers/pk_face_section_o_t.html>PK_FACE_section_o_t</A>.</P>
+<P>
+<A NAME="50422125_pgfId-394585"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-394584"></A>Note: To get the best results from matched regions, we strongly recommend that you set <CODE>
+match_style</CODE>
+ to <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A> and, optionally, set a tolerance using <CODE>
+auto_match</CODE>
+ and <CODE>
+auto_match_tol</CODE>
+. If you want to supply your own matched region information, read the rest of this section.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394586"></A>The <CODE>
+matched_region</CODE>
+ structure takes the following information:</P>
+<P>
+<A NAME="50422125_pgfId-394653"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394589"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394591"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394593"></A>match_style</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394598"></A>Controls how Parasolid automatically looks for matched regions. This can have the following values:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-394599"></A><A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A> - Automatically select matched regions. We strongly recommended that you use this setting. </LI>
+<LI>
+<A NAME="50422125_pgfId-394600"></A><A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_relax_c</A> - This value is deprecated and should not be used in new code.</LI>
+<LI>
+<A NAME="50422125_pgfId-394601"></A><A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_basic_c</A> - This is the default value, but we strongly recommend that you use <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A> in any new code.</LI>
+</UL>
+<P>
+<A NAME="50422125_pgfId-394602"></A>We recommend that you always use <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A> to switch on auto-matching of topologies during these operations. See <A HREF="fd_chap.052.html#50422125_27922"><EM>
+Figure 51-18</EM></A> for an example. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394607"></A>auto_match</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394609"></A>When <CODE>
+match_style</CODE>
+ is <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A>, you can optionally choose to specify a tolerance that Parasolid uses to identify matched regions. </P>
+<P>
+<A NAME="50422125_pgfId-394613"></A>For boolean and sectioning operations, this field can be set to PK_LOGICAL_true if <CODE>
+match_style</CODE>
+ is <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A>, in which case a tolerance value must also be supplied in <CODE>
+auto_match_tol</CODE>
+. If set to PK_LOGICAL_false, <CODE>
+default_tol</CODE>
+ is used when <CODE>
+match_style</CODE>
+ is <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A>. See <A HREF="fd_chap.056.html#50421908_64079">Section 55.4, “Options for global and local sectioning”</A> for more information about using this field with section operations.</P>
+<P>
+<A NAME="50422125_pgfId-394617"></A>For imprinting operations, this field must be set to PK_LOGICAL_true if <CODE>
+match_style</CODE>
+ is <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A>. See <A HREF="fd_chap.051.html#50422124_51040">Section 50.4.1, “Imprinting”</A> for more information. </P>
+<ADDRESS>
+<A NAME="50422125_pgfId-394621"></A>Note: This field should only be set to PK_LOGICAL_true if <CODE>
+match_style</CODE>
+ is <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A>.</ADDRESS><BR>
+<P>
+<A NAME="50422125_pgfId-394622"></A>(Default: PK_LOGICAL_false).</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394624"></A>auto_match_tol</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394626"></A>An optional tolerance value to use when automatically selecting matched regions. </P>
+<ADDRESS>
+<A NAME="50422125_pgfId-394627"></A>Note: This field should only be used if <CODE>
+match_style</CODE>
+ is <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A> and <CODE>
+auto_match</CODE>
+ is PK_LOGICAL_true.  </ADDRESS><BR>
+<P>
+<A NAME="50422125_pgfId-394628"></A>(Default: 0.0)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394630"></A>n_match_regions</PRE>
+<PRE><A NAME="50422125_pgfId-394631"></A>match_regions</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394634"></A>The <CODE>
+match_regions</CODE>
+ is an array of substructures (<A HREF=../headers/pk_boolean_match_region_o_t.html>PK_boolean_match_region_o_t</A>) containing information about each pair of entities that are matched. The entities in the matched region must be in the target or tools of the boolean operation. (Default: NULL)</P>
+<P>
+<A NAME="50422125_pgfId-1226845"></A>If your application already has information about suitable matched regions, it can supply them using <CODE>
+match_regions</CODE>
+ . The <CODE>
+n_match_regions</CODE>
+ field should contain the number of matched regions supplied. (Default: 0)</P>
+<P>
+<A NAME="50422125_pgfId-1227093"></A>If <CODE>
+match_regions</CODE>
+ are supplied and your application uses facet geometry, <CODE>
+match_style</CODE>
+ must be set to <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A>.</P>
+<ADDRESS>
+<A NAME="50422125_pgfId-394635"></A>Note: You should only supply <CODE>
+match_regions</CODE>
+ if your application already has this information available. </ADDRESS><BR>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394637"></A>update</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394639"></A>If your application relies on reproducing behaviour when updating models created using old versions of Parasolid, you should use this option to preserve old behaviour and help eliminate differences in rebuild results. You can use it to disable enhancements to boolean matching that have been added at different Parasolid versions. Doing this ensures that matching gives the same results in the latest version of Parasolid as in older versions. </P>
+<P>
+<A NAME="50422125_pgfId-394651"></A>See <A HREF=../headers/pk_boolean_match_update_t.html>PK_boolean_match_update_0_c</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM>, for more information on this update option.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394654"></A>If your application already has the information, then you can supply pairs of matched entities in the <CODE>
+match_regions</CODE>
+ substructure, using the following information:</P>
+<P>
+<A NAME="50422125_pgfId-394677"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394657"></A>Field</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394659"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394661"></A><CODE>
+regions</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394663"></A>A pair of topological entities that are to be treated as matched. The following combinations of entities can be matched:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-394664"></A>Edge - Edge</LI>
+<LI>
+<A NAME="50422125_pgfId-394665"></A>Face - Edge</LI>
+<LI>
+<A NAME="50422125_pgfId-394666"></A>Face - Face</LI>
+<LI>
+<A NAME="50422125_pgfId-394667"></A>Vertex - Vertex (only for a <CODE>
+match_type</CODE>
+ of imprinted or exact)</LI>
+</UL>
+<P>
+<A NAME="50422125_pgfId-394668"></A>(Default: PK_ENTITY_null, PK_ENTITY_null)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394670"></A><CODE>
+match_type</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394672"></A>The type of match. See below for details. (Default: <A HREF=../headers/pk_boolean_match_t.html>PK_boolean_match_exact_c</A>)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394674"></A><CODE>
+tolerance</CODE>
+ </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394676"></A>The tolerance within which the matched entities are geometrically coincident. </P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394678"></A>The <CODE>
+match_type</CODE>
+ classifies the relationship between the entities:</P>
+<P>
+<A NAME="50422125_pgfId-394710"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394681"></A>Match type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394683"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394685"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394687"></A>Exact</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394689"></A><A HREF=../headers/pk_boolean_match_t.html>PK_boolean_match_exact_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394691"></A>The bounds of the topological entities match within the specified <CODE>
+tolerance</CODE>
+.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394693"></A>Contains</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394695"></A><A HREF=../headers/pk_boolean_match_t.html>PK_boolean_match_contains_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394697"></A>The bounds of the second entity lie within the bounds of the first entity.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394699"></A>Overlap</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394701"></A><A HREF=../headers/pk_boolean_match_t.html>PK_boolean_match_overlap_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394703"></A>The bounds of one entity overlap with the bounds of the second entity.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394705"></A>Imprinted</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394707"></A><A HREF=../headers/pk_boolean_match_t.html>PK_boolean_match_imprinted_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394709"></A>The bounds have been created by imprinting the topological entities.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394711"></A>The following table shows the relationship between <CODE>
+regions</CODE>
+ and <CODE>
+match_type</CODE>
+:</P>
+<P>
+<A NAME="50422125_pgfId-394773"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="2" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394714"></A>Regions</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="4">
+<P>
+<A NAME="50422125_pgfId-394716"></A>Match type</P>
+</TH>
+</TR>
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394726"></A>Exact</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394728"></A>Contains</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394730"></A>Overlap</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394732"></A>Imprinted</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394734"></A>Vertex-Vertex</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394736"></A>Vertex points coincident</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394738"></A>Invalid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394740"></A>Invalid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394742"></A>Bounds created by imprinting vertices</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394744"></A>Edge-Edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394746"></A>Edge curves and equivalent edge vertices are coincident</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394748"></A>Edge curves are coincident. Bounds of second edge lie within first.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394750"></A>Edge curves are coincident. Some overlap between edges</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394752"></A>Bounds created by imprinting edges.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394754"></A>Face-Edge</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394756"></A>Invalid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394758"></A>Edge curve is coincident with face surface. Edge is within face.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394760"></A>Edge curve is coincident with face surface. Edge overlaps face.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394762"></A>Invalid</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394764"></A>Face-Face</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394766"></A>Faces surfaces coincident. Edges must match, but not necessarily exactly.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394768"></A>Faces surfaces coincident. Second lies completely within first. Edges may be coincident.</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394770"></A>Faces surfaces are coincident and may intersect</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394772"></A>Invalid</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394774"></A>When supplying matched regions of type face-face or face-edge, it is recommended that you always use <CODE>
+match_type</CODE>
+ overlap.</P>
+
+<H4>
+<A NAME="50422125_pgfId-394775"></A>51.4.5.1 Example: Performing a unite boolean with matched faces </H4>
+<P>
+<A NAME="50422125_pgfId-394779"></A>In <A HREF="fd_chap.052.html#50422125_16447"><EM>
+Figure 51-16</EM></A> the tool body is a copy of the target body reflected about the plane of face F1.</P>
+<P>
+<A NAME="50422125_pgfId-394815"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-543.gif">
+
+<P>
+<A NAME="50422125_pgfId-394817"></A>Figure 51-16 <A NAME="50422125_16447"></A>Unite boolean with matched faces</P>
+<P>
+<A NAME="50422125_pgfId-394818"></A>Uniting the two bodies may fail due to the near coincident and tangential geometry meeting at the boundary of face F1 and F2. This is especially true if the geometry is of an approximate nature.</P>
+<P>
+<A NAME="50422125_pgfId-394819"></A>Specifying face F1 and F2 as a matched pair, with a suitable tolerance, enables the unite operation to succeed. The <CODE>
+match_type</CODE>
+ should be overlap.</P>
+
+
+<H4>
+<A NAME="50422125_pgfId-394820"></A>51.4.5.2 Example: Performing a unite boolean with matched faces and edges </H4>
+<P>
+<A NAME="50422125_pgfId-394824"></A>In <A HREF="fd_chap.052.html#50422125_11636"><EM>
+Figure 51-17</EM></A> the target and tool bodies have been created by sweeping different profiles along the same guide path.</P>
+<P>
+<A NAME="50422125_pgfId-394860"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-544.gif">
+
+<P>
+<A NAME="50422125_pgfId-394862"></A>Figure 51-17 <A NAME="50422125_11636"></A>Unite boolean with matched face and edges</P>
+<P>
+<A NAME="50422125_pgfId-394863"></A>Boolean operations have difficulty with such bodies due to the approximate nature of the geometry of face F1 and F2. The boundaries of face F1 lie within a tolerance of face F2.</P>
+<P>
+<A NAME="50422125_pgfId-394864"></A>Specifying the face, F2, and the edges, E1 and E2, as matched topology, with a suitable tolerance, enables the unite operation to succeed. The <CODE>
+match_type</CODE>
+ should be overlap.</P>
+
+
+<H4>
+<A NAME="50422125_pgfId-394865"></A>51.4.5.3 Example: Performing a unite boolean with neighbouring faces that intersect </H4>
+<P>
+<A NAME="50422125_pgfId-394869"></A>In <A HREF="fd_chap.052.html#50422125_27922"><EM>
+Figure 51-18</EM></A>, the target and tool bodies can be united at the base.</P>
+<P>
+<A NAME="50422125_pgfId-394905"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-545.gif">
+
+<P>
+<A NAME="50422125_pgfId-394907"></A>Figure 51-18 <A NAME="50422125_27922"></A>Unite boolean with intersecting neighboring faces</P>
+<P>
+<A NAME="50422125_pgfId-394908"></A>Specifying the base of the cone F1, and the base of the hemisphere, F2, as matched topology, with a suitable tolerance, lets the unite operation succeed if <CODE>
+match_style</CODE>
+ is set to <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_auto_c</A>. Because the neighbouring faces of the matched topology intersect in the united body, using the default <CODE>
+match_style</CODE>
+ of <A HREF=../headers/pk_boolean_match_style_t.html>PK_boolean_match_style_basic_c</A> would cause the unite operation to fail.</P>
+
+
+
+<H3>
+<A NAME="50422125_pgfId-394909"></A>	51.4.6 	<A NAME="50422125_91608"></A>Overflow imprints at boundaries</H3>
+
+<H4>
+<A NAME="50422125_pgfId-394910"></A>51.4.6.1 <A NAME="50422125_76915"></A>Dealing with overflowing imprints at laminar boundaries </H4>
+<P>
+<A NAME="50422125_pgfId-394911"></A>In addition to tangential imprint completion, you can also complete imprints at laminar boundaries using ruled and swept solutions, allowing you to preserve the laminar boundary in the region of the trim. Depending on the operation you want to perform, there will be some cases where the tangential solution gives the ideal result, and other cases when ruled or swept solutions are more appropriate. </P>
+<P>
+<A NAME="50422125_pgfId-394915"></A><A HREF="fd_chap.052.html#50422125_11376"><EM>
+Figure 51-19</EM></A> shows how imprint completion on a flat sheet target causes the imprinted edges to overflow onto the V-shaped tool body that created the imprints. The result that is created by completing the imprint tangentially is generally not the result that you are likely to want. Instead, you can opt to create an alternative solution by using the options described below.</P>
+<P>
+<A NAME="50422125_pgfId-394950"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-546.gif">
+
+<P>
+<A NAME="50422125_pgfId-394951"></A>Figure 51-19 <A NAME="50422125_11376"></A>How imprints on a target can overflow onto the tool</P>
+<P>
+<A NAME="50422125_pgfId-394955"></A>You can control Parasolid’s behaviour for overflows such as this using the <CODE>
+target_face_overflow</CODE>
+ and <CODE>
+tool_face_overflow</CODE>
+ options; the option you need to use depends on whether you are completing imprints on the target or the tool.</P>
+<P>
+<A NAME="50422125_pgfId-394969"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394958"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394960"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394962"></A>target_face_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394964"></A>Lets you specify what to do with imprints that overflow from the target onto the tool.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394966"></A>tool_face_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394968"></A>Lets you specify what to do with imprints that overflow from the tool onto the target.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394972"></A>These options are not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-394974"></A>Both of these options structures themselves contain the following options for specifying how to handle imprint overflow:</P>
+<P>
+<A NAME="50422125_pgfId-394995"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394977"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394979"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394981"></A>laminar_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394983"></A>How to handle imprint overflow on the tool (for <CODE>
+target_face_overflow</CODE>
+) or the target (for <CODE>
+tool_face_overflow</CODE>
+). This is one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-394984"></A>PK_FACE_overflow_tangent_c - overflow onto the body by extending the laminar overflow boundary tangentially along the normal of the boundary’s owning face. This is the default. </LI>
+<LI>
+<A NAME="50422125_pgfId-394985"></A>PK_FACE_overflow_ruled_c - overflow onto the body by intersecting the laminar overflow boundary with a ruled sheet.</LI>
+<LI>
+<A NAME="50422125_pgfId-394986"></A>PK_FACE_overflow_swept_c - overflow onto the body by intersecting the laminar overflow boundary with a swept sheet, using the specified sweep_direction. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394988"></A>sweep_direction</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394990"></A>A unit vector that specifies the sweep direction to use when extending imprint overflow by intersection with a swept sheet. This option is only used when laminar_overflow is PK_FACE_overflow_swept_c. Default: (0, 0, 1)</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-394992"></A>laminar_walled</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-394994"></A>A boolean that specifies whether or not to create a side face. Default: PK_LOGICAL_false.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-394999"></A><A HREF="fd_chap.052.html#50422125_55287"><EM>
+Figure 51-20</EM></A> shows the non-tangential results that can be obtained by specifying different <CODE>
+laminar_overflow</CODE>
+ behaviour for a given tool, where imprint completion is taking place on the tool. </P>
+<P>
+<A NAME="50422125_pgfId-395000"></A>In each case, the following options have been set:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395001"></A>The boolean <CODE>
+function</CODE>
+ is PK_boolean_unite_c.</LI>
+<LI>
+<A NAME="50422125_pgfId-395002"></A><CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ are both set to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A>.</LI>
+<LI>
+<A NAME="50422125_pgfId-395003"></A><CODE>
+target_face_overflow</CODE>
+ has been used.</LI>
+</UL>
+<P>
+<A NAME="50422125_pgfId-395004"></A>The results for each type of overflow have been obtained as follows:</P>
+<P>
+<A NAME="50422125_pgfId-395032"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395007"></A>Overflow</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395009"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395016"></A>Ruled</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395018"></A><CODE>
+laminar_overflow</CODE>
+ is set to PK_FACE_overflow_ruled_c.</LI>
+<LI>
+<A NAME="50422125_pgfId-395022"></A>Parasolid completes the imprint at the laminar edge of the target by imprinting a sheet onto the tool that is normal to the target at the laminar edge</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395024"></A>Swept</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395026"></A><CODE>
+laminar_overflow</CODE>
+ is set to PK_FACE_overflow_swept_c. </LI>
+<LI>
+<A NAME="50422125_pgfId-395030"></A>Parasolid completes the imprint at the laminar edge of the target by imprinting a sheet onto the tool at an angle to the target at the laminar edge.</LI>
+<LI>
+<A NAME="50422125_pgfId-395031"></A>The angle of this sheet is specified using <CODE>
+sweep_direction</CODE>
+. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-395033"></A>&nbsp;</P>
+<P>
+<A NAME="50422125_pgfId-395068"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-547.gif">
+
+<P>
+<A NAME="50422125_pgfId-395069"></A>Figure 51-20 <A NAME="50422125_55287"></A>Different methods for overflowing imprints at laminar boundaries</P>
+<P>
+<A NAME="50422125_pgfId-395073"></A><A HREF="fd_chap.052.html#50422125_67201"><EM>
+Figure 51-21</EM></A> shows the effect of setting the <CODE>
+laminar_walled</CODE>
+ option to PK_LOGICAL_true. In this example, to create a result body on which a side face can be built, the following options have been set:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395074"></A>The boolean <CODE>
+function</CODE>
+ is PK_boolean_unite_c.</LI>
+<LI>
+<A NAME="50422125_pgfId-395075"></A><CODE>
+laminar_overflow</CODE>
+ is set to PK_FACE_overflow_ruled_c.</LI>
+<LI>
+<A NAME="50422125_pgfId-395076"></A><CODE>
+target_material_side</CODE>
+ is <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A> and <CODE>
+tool_material_side</CODE>
+ is <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A>.</LI>
+<LI>
+<A NAME="50422125_pgfId-395077"></A><CODE>
+target_face_overflow</CODE>
+ has been used.</LI>
+</UL>
+<P>
+<A NAME="50422125_pgfId-395113"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-548.gif">
+
+<P>
+<A NAME="50422125_pgfId-395114"></A>Figure 51-21 <A NAME="50422125_67201"></A>Creating a side face for overflowing imprints at laminar boundaries</P>
+<P>
+<A NAME="50422125_pgfId-395120"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-395117"></A>Note: There are restrictions on how you can combine the use of imprint completion and overflow behaviour, as follows:</ADDRESS><BR>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395118"></A>If a non-default value of <CODE>
+imprint_complete_tool</CODE>
+ is used, <CODE>
+laminar_overflow</CODE>
+ in <CODE>
+target_face_overflow</CODE>
+ must be left at its default value. </LI>
+<LI>
+<A NAME="50422125_pgfId-395119"></A>If a non-default value of <CODE>
+imprint_complete_targ</CODE>
+ is used, <CODE>
+laminar_overflow</CODE>
+ in <CODE>
+tool_face_overflow</CODE>
+ must be left at its default value. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422125_pgfId-395121"></A>51.4.6.2 Dealing with overflowing imprints at interior boundaries </H4>
+<P>
+<A NAME="50422125_pgfId-395125"></A>As well as providing control over overflowing imprints at laminar boundaries, Parasolid lets you specify how overflowing imprints at interior boundaries should be processed. The interfaces you use to control these overflows are similar to the ones used to control overflowing imprints at laminar edges (described in <A HREF="fd_chap.052.html#50422125_76915">Section 51.4.6.1, “Dealing with overflowing imprints at laminar boundaries”</A>), though the behaviour provided is different. </P>
+<P>
+<A NAME="50422125_pgfId-395129"></A>As with overflows at laminar boundaries, you control overflows at interior boundaries using the <CODE>
+target_face_overflow</CODE>
+ and <CODE>
+tool_face_overflow</CODE>
+ options; the option you need to use depends on whether you are completing imprints on the target or the tool.</P>
+<P>
+<A NAME="50422125_pgfId-395130"></A>Unlike overflows at laminar boundaries, interior overflows are only feasible for local booleans, and should therefore only be specified in calls to <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>.</P>
+<P>
+<A NAME="50422125_pgfId-395144"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395133"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395135"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-395137"></A>target_face_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395139"></A>Lets you specify what to do with imprints that overflow from the target onto the tool.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-395141"></A>tool_face_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395143"></A>Lets you specify what to do with imprints that overflow from the tool onto the target.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-395145"></A>Both of these options structures themselves contain the following option for specifying how to handle imprint overflow:</P>
+<P>
+<A NAME="50422125_pgfId-395158"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395148"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395150"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-395152"></A>interior_overflow</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395154"></A>How to handle imprint overflow onto the tool (for <CODE>
+target_face_overflow</CODE>
+) or the target (for <CODE>
+tool_face_overflow</CODE>
+). This is one of the following:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395155"></A>PK_FACE_overflow_added_c - overflow an interior edge by including other faces from the body as faces to imprint on, as required. </LI>
+<LI>
+<A NAME="50422125_pgfId-395156"></A>PK_FACE_overflow_mixed_c - overflow an interior edge using a mixture of techniques: for concave edges, add the adjacent face to the faces to imprint on; for convex edges, extend the adjacent face. </LI>
+<LI>
+<A NAME="50422125_pgfId-395157"></A>PK_FACE_overflow_none_c - do not attempt to overflow. Instead, return the result <A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_failed_c</A> and the report <A HREF=../headers/pk_boolean_report_t.html>PK_boolean_report_imprint_fail_c</A> in the results structure returned from the operation. This is the default. </LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-395162"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-395161"></A>Note: When using PK_FACE_overflow_mixed_c, the settings for the material side options, and the boolean operation used, can both affect whether an edge is regarded as concave or convex. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-395166"></A><A HREF="fd_chap.052.html#50422125_41897"><EM>
+Figure 51-22</EM></A> shows the results obtained by specifying different <CODE>
+interior_overflow</CODE>
+ behaviour for a given tool and target, where imprint completion is taking place onto the tool. </P>
+<P>
+<A NAME="50422125_pgfId-395202"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-549.gif">
+
+<P>
+<A NAME="50422125_pgfId-395203"></A>Figure 51-22 <A NAME="50422125_41897"></A>Different methods for overflowing imprints at interior boundaries</P>
+<P>
+<A NAME="50422125_pgfId-395206"></A>In each case, the following options are set to the same values as for the example in <A HREF="fd_chap.052.html#50422125_76915">Section 51.4.6.1, “Dealing with overflowing imprints at laminar boundaries”</A>:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395208"></A>The boolean <CODE>
+function</CODE>
+ is PK_boolean_unite_c.</LI>
+<LI>
+<A NAME="50422125_pgfId-395209"></A><CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ are both set to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A>.</LI>
+<LI>
+<A NAME="50422125_pgfId-395210"></A><CODE>
+target_face_overflow</CODE>
+ has been used.</LI>
+</UL>
+<P>
+<A NAME="50422125_pgfId-395211"></A>The results for each type of overflow have been obtained as follows:</P>
+<P>
+<A NAME="50422125_pgfId-419014"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395214"></A>Overflow</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395216"></A>Notes</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395218"></A>Added</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395220"></A><CODE>
+interior_overflow</CODE>
+ is set to PK_FACE_overflow_added_c.</LI>
+<LI>
+<A NAME="50422125_pgfId-395224"></A>Parasolid completes the imprint at the interior edges of the target by adding any target faces required to the boolean operation. In this example, all the target faces are added to the operation, leading to the result shown. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395226"></A>Mixed</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395228"></A><CODE>
+interior_overflow</CODE>
+ is set to PK_FACE_overflow_mixed_c. </LI>
+<LI>
+<A NAME="50422125_pgfId-395232"></A>Parasolid completes the imprint at the interior edges of the target as follows:</LI>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395233"></A>For the concave overflowing edge, the adjacent target face is added to the boolean operation, as shown.</LI>
+<LI>
+<A NAME="50422125_pgfId-395234"></A>For the convex overflowing edge, the adjacent target face is extended to intersect the tool faces.</LI>
+</UL>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395236"></A>None (not shown)</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395238"></A><CODE>
+interior_overflow</CODE>
+ is set to PK_FACE_overflow_none_c.</LI>
+<LI>
+<A NAME="50422125_pgfId-395239"></A>No result is returned. Instead, PK_ERROR_cant_complete_imprint is returned.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422125_pgfId-395241"></A>	51.4.7 	<A NAME="50422125_65586"></A>Imprinting the boundaries of overlapping areas </H3>
+<P>
+<A NAME="50422125_pgfId-395242"></A>You can use the <CODE>
+imprint_overlapping</CODE>
+ option in <A HREF=../headers/pk_body_boolean_o_t.html>PK_BODY_boolean_o_t</A> to imprint any boundaries in overlapping areas in cases where a face from the target and a face from the tool share the same surface. This is useful if you have scribed details onto a body that you want to preserve. By default, overlapping boundaries are not imprinted on the boolean result. <A HREF="fd_chap.052.html#50422125_90810"><EM>
+Figure 51-23</EM></A> illustrates the behaviour of this option. </P>
+<P>
+<A NAME="50422125_pgfId-395280"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-550.gif">
+
+<P>
+<A NAME="50422125_pgfId-395281"></A>Figure 51-23 <A NAME="50422125_90810"></A>Imprinting overlapping boundaries</P>
+<P>
+<A NAME="50422125_pgfId-395285"></A>This option is not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-395331"></A>	51.4.8 	Limiting the faces to delete during face trims </H3>
+<P>
+<A NAME="50422125_pgfId-395332"></A>When performing local booleans using <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A>, you can use the <CODE>
+limit_target_faces</CODE>
+ and <CODE>
+limit_tool_faces</CODE>
+ options to limit the scope of the local boolean when trimming and joining sheet targets or tools. </P>
+<P>
+<A NAME="50422125_pgfId-395333"></A>When <CODE>
+limit_target_faces</CODE>
+ is PK_LOGICAL_true, the boundaries of the <CODE>
+targets</CODE>
+ passed to <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> are used in the imprint phase of the boolean to complete the imprints. Similarly, when <CODE>
+limit_tool_faces</CODE>
+ is PK_LOGICAL_true, the boundaries of the <CODE>
+tools</CODE>
+ are used in the same way.</P>
+<P>
+<A NAME="50422125_pgfId-395334"></A>This has the effect of ensuring that only the specified <CODE>
+targets</CODE>
+ or <CODE>
+tools</CODE>
+ (as appropriate) are considered as candidates for trimming: any faces from the owning body that are not explicitly passed to <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> as either <CODE>
+targets</CODE>
+ or <CODE>
+tools</CODE>
+ will not be trimmed. If either <CODE>
+limit_target_faces</CODE>
+ or <CODE>
+limit_tool_faces</CODE>
+ is PK_LOGICAL_false - the default setting - any faces in the owning body may be trimmed, even if they have not been specified as <CODE>
+targets</CODE>
+ or <CODE>
+tools</CODE>
+. </P>
+<P>
+<A NAME="50422125_pgfId-395338"></A>The effects of using <CODE>
+limit_target_faces</CODE>
+ are illustrated in <A HREF="fd_chap.052.html#50422125_29335"><EM>
+Figure 51-24</EM></A>, which shows how you can trim just the side faces of a boss in a sheet body by specifying only those side faces and setting <CODE>
+limit_target_faces</CODE>
+ to PK_LOGICAL_true.</P>
+<P>
+<A NAME="50422125_pgfId-395374"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-551.gif">
+
+<P>
+<A NAME="50422125_pgfId-395376"></A>Figure 51-24 <A NAME="50422125_29335"></A>Limiting trim faces to those specified as targets</P>
+<P>
+<A NAME="50422125_pgfId-395380"></A><A HREF="fd_chap.052.html#50422125_15543"><EM>
+Figure 51-25</EM></A> shows a more detailed view of the boss before and after the boolean operation shown in <A HREF="fd_chap.052.html#50422125_29335"><EM>
+Figure 51-24</EM></A> has been performed. </P>
+<P>
+<A NAME="50422125_pgfId-395419"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-552.gif">
+
+<P>
+<A NAME="50422125_pgfId-395421"></A>Figure 51-25 <A NAME="50422125_15543"></A>Trimming the side faces of a boss</P>
+
+<H4>
+<A NAME="50422125_pgfId-395422"></A>51.4.8.1 Restrictions </H4>
+<P>
+<A NAME="50422125_pgfId-395423"></A>The <CODE>
+limit_target_faces</CODE>
+ and <CODE>
+limit_tool_faces</CODE>
+ options can only be used if both the following are true:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395424"></A>The target or tool (as appropriate to the option used) is treated as a sheet. That is, it is either a sheet body, or it is a solid body with the <CODE>
+target_material_side</CODE>
+ option set to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_none_c</A> (see <A HREF="fd_chap.052.html#50422125_74335">Section 51.4.14</A>).</LI>
+<LI>
+<A NAME="50422125_pgfId-395428"></A>You are either:</LI>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395429"></A>Trimming the target or tool, so that only faces from the trimmed body appear in the result.</LI>
+<LI>
+<A NAME="50422125_pgfId-395433"></A>Joining portions of the target and tool, as shown in <A HREF="fd_chap.052.html#50422125_63035"><EM>
+Figure 51-26</EM></A>, in which case <CODE>
+extend_face_list</CODE>
+ must be <A HREF=../headers/pk_imprint_face_list_t.html>PK_imprint_face_list_both_c</A> (see <A HREF="fd_chap.052.html#50422125_88410">Section 51.4.9, “Extending face lists during local booleans”</A>). </LI>
+</UL>
+</UL>
+<P>
+<A NAME="50422125_pgfId-395472"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-553.gif">
+
+<P>
+<A NAME="50422125_pgfId-395474"></A>Figure 51-26 <A NAME="50422125_63035"></A>Boolean join operation</P>
+
+
+
+<H3>
+<A NAME="50422125_pgfId-395476"></A>	51.4.9 	<A NAME="50422125_88410"></A>Extending face lists during local booleans </H3>
+<P>
+<A NAME="50422125_pgfId-395477"></A>During the imprint phase of a local boolean, you can use the <CODE>
+extend_face_list</CODE>
+ option of <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> to add adjacent faces to the tool or target (or both) in an attempt to prevent incomplete loops of edges. This option is identical to the <CODE>
+extend_face_list</CODE>
+ option available for <A HREF=../headers/pk_face_imprint_faces_2.html>PK_FACE_imprint_faces_2</A>: see <A HREF="fd_chap.051.html#50422124_51040">Section 50.4.1, “Imprinting”</A>, for more details.</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-395481"></A>	51.4.10 	Sheet punching operations </H3>
+<P>
+<A NAME="50422125_pgfId-395487"></A><A NAME="50422125_marker-395482"></A><A NAME="50422125_marker-395483"></A><A HREF="fd_chap.052.html#50422125_10938"><EM>
+Figure 51-27</EM></A> illustrates the punching of a target sheet body with solid tool bodies, so that the areas of the target outside the tools, plus the areas of faces of the tools on one side of the target are the resultant sheet body.</P>
+<P>
+<A NAME="50422125_pgfId-395523"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-554.gif">
+
+<P>
+<A NAME="50422125_pgfId-395525"></A>Figure 51-27 <A NAME="50422125_10938"></A>Punching a target (sheet) body with 5 solid tool bodies</P>
+<P>
+<A NAME="50422125_pgfId-395532"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-395528"></A>Note: More generalised punching functionality is supported via the <CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ options. See <A HREF="fd_chap.052.html#50422125_74335">Section 51.4.14, “Specifying the body type of tool and target”</A>, for details.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422125_pgfId-395534"></A>	51.4.11 	<A NAME="50422125_43839"></A>Enclosing solid regions with a sheet body </H3>
+<P>
+<A NAME="50422125_pgfId-395536"></A><A NAME="50422125_marker-395535"></A>It is possible to enclose solid regions or add solid regions to an existing solid body by uniting the solid body with a sheet body as shown in <A HREF="fd_chap.052.html#50422125_12877"><EM>
+Figure 51-28</EM></A>. The sheet body must enclose a valid manifold solid region within the solid body. This operation is only valid with generalised topology disabled.</P>
+<P>
+<A NAME="50422125_pgfId-395577"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-555.gif">
+
+<P>
+<A NAME="50422125_pgfId-395579"></A>Figure 51-28 <A NAME="50422125_12877"></A>Uniting solid and sheet bodies to enclose a solid region</P>
+<P>
+<A NAME="50422125_pgfId-395586"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-395582"></A>Note: Enclosure functionality is also supported via the <CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ options. See <A HREF="fd_chap.052.html#50422125_74335">Section 51.4.14, “Specifying the body type of tool and target”</A>, for details. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422125_pgfId-395588"></A>	51.4.12 	<A NAME="50422125_73248"></A>Effect of the fence option on solid and sheet operations </H3>
+<P>
+<A NAME="50422125_pgfId-395589"></A>Use of the <CODE>
+fence</CODE>
+ option controls which regions of the sheet body are returned.</P>
+
+<H4>
+<A NAME="50422125_pgfId-395590"></A>51.4.12.1 Example 1: </H4>
+<P>
+<A NAME="50422125_pgfId-395591"></A><STRONG>
+Subtracting sheet body from solid body using the ‘none’ fence option</STRONG> </P>
+<P>
+<A NAME="50422125_pgfId-395627"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-556.gif">
+
+<P>
+<A NAME="50422125_pgfId-395628"></A>Figure 51-29 Solid sectioned by sheet, 4 bodies returned.</P>
+
+
+<H4>
+<A NAME="50422125_pgfId-395629"></A>51.4.12.2 Example 2: </H4>
+<P>
+<A NAME="50422125_pgfId-395630"></A><STRONG>
+Subtracting sheet body from solid body using the ‘front’ fence option</STRONG> </P>
+<P>
+<A NAME="50422125_pgfId-395665"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-557.gif">
+
+<P>
+<A NAME="50422125_pgfId-395666"></A>Figure 51-30 Solid sectioned by sheet - only regions in front of the sheet body are returned, 3 bodies returned.</P>
+
+
+<H4>
+<A NAME="50422125_pgfId-395667"></A>51.4.12.3 Example 3: </H4>
+<P>
+<A NAME="50422125_pgfId-395668"></A><STRONG>
+Subtracting sheet body from solid body using the ‘back’ fence option </STRONG></P>
+<P>
+<A NAME="50422125_pgfId-395703"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-558.gif">
+
+<P>
+<A NAME="50422125_pgfId-395704"></A>Figure 51-31 Solid sectioned by sheet - only regions behind the sheet body are returned, 1 body returned.</P>
+<P>
+<A NAME="50422125_pgfId-395708"></A>This option is not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-395715"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-395711"></A>Note: Fencing functionality is also supported via the <CODE>
+target_material_side</CODE>
+ and <CODE>
+tool_material_side</CODE>
+ options. We strongly recommend that you use these options when performing fencing operations. See <A HREF="fd_chap.052.html#50422125_74335">Section 51.4.14, “Specifying the body type of tool and target”</A>, for details. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422125_pgfId-466974"></A>	51.4.13 	<A NAME="50422125_marker-412549"></A><A NAME="50422125_98716"></A><A NAME="50422125_21822"></A><A NAME="50422125_marker-412552"></A><A NAME="50422125_marker-412553"></A>Imprint completion </H3>
+<P>
+<A NAME="50422125_pgfId-466978"></A>During the imprinting phase of both local and global sheet booleans, you can request that Parasolid extends any imprinted edges tangentially. When used in conjunction with the material side options (see <A HREF="fd_chap.052.html#50422125_74335" CLASS="XRef">Section 51.4.14, “Specifying the body type of tool and target”</A>), this makes it easy, for example, to split a sheet target using a sheet tool, without having to ensure that the tool is large enough to perform the operation successfully, as shown in <A HREF="fd_chap.052.html#50422125_71494"><EM>
+Figure 51-32</EM></A>.</P>
+<P>
+<A NAME="50422125_pgfId-467018"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-559.gif">
+
+<P>
+<A NAME="50422125_pgfId-467020"></A>Figure 51-32 <A NAME="50422125_71494"></A>Splitting large sheet targets using imprint completion</P>
+<P>
+<A NAME="50422125_pgfId-467021"></A>As well as completing imprints on a sheet target, you can also complete imprints on a sheet tool if you wish. You use the <CODE>
+imprint_complete_targ</CODE>
+ and <CODE>
+imprint_complete_tool</CODE>
+ options in <A HREF=../headers/pk_body_boolean_o_t.html>PK_BODY_boolean_o_t</A> and <A HREF=../headers/pk_face_boolean_o_t.html>PK_FACE_boolean_o_t</A> to switch on imprint completion in the target or tool respectively.</P>
+<P>
+<A NAME="50422125_pgfId-467022"></A>You can only complete imprints on the target from the laminar edges of the supplied tool (and vice versa when completing imprints on the tool). Thus, if the tool contains non-laminar edges that intersect the target, you cannot extend their imprinted edges from the point of intersection, as illustrated in <A HREF="fd_chap.052.html#50422125_39872"><EM>
+Figure 51-33</EM></A>. </P>
+<P>
+<A NAME="50422125_pgfId-467059"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-560.gif">
+
+<P>
+<A NAME="50422125_pgfId-467061"></A>Figure 51-33 <A NAME="50422125_39872"></A>Splitting large sheet targets using imprint completion</P>
+<P>
+<A NAME="50422125_pgfId-467065"></A>This functionality is very similar to Parasolid’s support for completing imprints created by <A HREF=../headers/pk_body_imprint_body.html>PK_BODY_imprint_body</A> and <A HREF=../headers/pk_face_imprint_faces_2.html>PK_FACE_imprint_faces_2</A>. This is described in <A HREF="fd_chap.051.html#50422124_68678">Section 50.5, “Legacy curve imprinting”</A>, and you should look there for more details on how the boolean imprint completion functionality works. </P>
+<P>
+<A NAME="50422125_pgfId-395819"></A>The only difference between the two types of imprint completion is that imprints created using boolean functions can only be completed tangentially, whereas imprints created using imprint functions can be completed tangentially or orthogonally.</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-395829"></A>	51.4.14 	<A NAME="50422125_14703"></A><A NAME="50422125_71948"></A><A NAME="50422125_52167"></A><A NAME="50422125_74335"></A><A NAME="50422125_marker-412657"></A><A NAME="50422125_marker-412658"></A><A NAME="50422125_marker-412659"></A><A NAME="50422125_marker-412660"></A><A NAME="50422125_marker-412661"></A>Specifying the body type of tool and target </H3>
+<P>
+<A NAME="50422125_pgfId-395830"></A>You can use the <CODE>
+tool_material_side</CODE>
+ and <CODE>
+target_material_side</CODE>
+ options to control how the tools and targets specified in boolean operations are interpreted with regard to their body type. This section:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395833"></A>Describes these options (referred to hereafter as the material-side options). See <A HREF="fd_chap.052.html#50422125_84376">Section 51.4.14.1, “Description of material-side options”</A>.</LI>
+<LI>
+<A NAME="50422125_pgfId-395835"></A>Provides examples of how they can be used with boolean operations to produce different end results. See <A HREF="fd_chap.052.html#50422125_14480">Section 51.4.14.3, “Achieving different effects with material-side options”</A>.</LI>
+<LI>
+<A NAME="50422125_pgfId-395841"></A>Lists the constraints involved with using these options. See <A HREF="fd_chap.052.html#50422125_63734">Section 51.4.14.8, “Constraints”</A>.</LI>
+<LI>
+<A NAME="50422125_pgfId-395845"></A>Provides a reference table that can be used as a quick guide when needed. See <A HREF="fd_chap.052.html#50422125_10380">Section 51.4.14.9, “Summary”</A>.</LI>
+</UL>
+
+<H4>
+<A NAME="50422125_pgfId-395848"></A>51.4.14.1 <A NAME="50422125_84376"></A>Description of material-side options </H4>
+<P>
+<A NAME="50422125_pgfId-395849"></A>The material-side options let you treat faces locally as if they come from a body of a different type. Faces on a sheet body can be treated as if they are part of a solid and faces from a solid body can be treated as if they are part of a sheet. Use <CODE>
+tool_material_side</CODE>
+ to control faces in tools and <CODE>
+target_material_side</CODE>
+ to control faces in targets. </P>
+<P>
+<A NAME="50422125_pgfId-395850"></A>For each of these material-side options the following settings are available:</P>
+<P>
+<A NAME="50422125_pgfId-395889"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395853"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395855"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395857"></A><A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_default_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395859"></A>Treat bodies as normal. </P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395860"></A>For a solid body, material is assumed to be present on the side of the body behind each face normal. </LI>
+<LI>
+<A NAME="50422125_pgfId-395861"></A>For a sheet body, no material is assumed to exist on either side of each face in the body. </LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395863"></A><A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395865"></A>Treat bodies as if they are solid. </P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395866"></A>For a solid body, this is no different to the default setting.</LI>
+<LI>
+<A NAME="50422125_pgfId-395870"></A>For a sheet body, Parasolid assumes that material exists on the side of the faces behind their normals, for the purposes of the boolean operation.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395872"></A><A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_outside_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395874"></A>Treat bodies as if they are solid, but with material on the side of the faces indicated by their positive normal directions.</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395875"></A>For a solid body, the body is treated as negated for the purposes of the boolean operation. The region outside the body is treated as solid and the body itself is treated as void.</LI>
+<LI>
+<A NAME="50422125_pgfId-395879"></A>For a sheet body, Parasolid assumes that material exists on the side of each face indicated by the direction of that faces normal, for the purposes of the boolean operation.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395881"></A><A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_none_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-395883"></A>Treat bodies as if they are sheets. </P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-395887"></A>For a solid body, Parasolid assumes that no material exists on either side of each face in the body, for the purposes of the boolean operation.</LI>
+<LI>
+<A NAME="50422125_pgfId-395888"></A>For a sheet body, this is no different to the default setting.</LI>
+</UL>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-395890"></A>For an example of this functionality, see the code example in the <CODE>
+C++\Code Examples\Modelling\Booleans\Boolean</CODE>
+ <CODE>
+Material</CODE>
+ <CODE>
+Side</CODE>
+ folder, <CODE>
+C#\ExampleApplication.Net\Code</CODE>
+ <CODE>
+Examples\Modelling\Booleans\Boolean Material Side</CODE>
+ located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+<P>
+<A NAME="50422125_pgfId-395896"></A>These options are not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+
+
+<H4>
+<A NAME="50422125_pgfId-395898"></A>51.4.14.2 Examples of using material-side options during boolean operations </H4>
+<P>
+<A NAME="50422125_pgfId-395899"></A>Simple usage of material-side options with boolean operations are illustrated in this section. Each image uses the same model with different combinations of material-side options applied. The model is divided into four numbered imaginary volumes, each representing a possible region in the result. <A HREF="fd_chap.052.html#50422125_34011"><EM>
+Figure 51-34</EM></A> explains what region of the model each volume represents. Each volume will be either treated as solid or void depending on the material-side options.</P>
+<P>
+<A NAME="50422125_pgfId-395938"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-561.gif">
+
+<P>
+<A NAME="50422125_pgfId-395940"></A>Figure 51-34 <A NAME="50422125_34011"></A>The regions that the volumes of the model represent</P>
+<P>
+<A NAME="50422125_pgfId-395950"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-395943"></A>Note: For some combinations of options, volume 1 should be solid after the boolean has been completed. Since this is clearly invalid, Parasolid negates all solid and void volumes (including volume 1) in these cases so as to ensure a valid result.Volumes that would have been treated as void in the end result prior to the flip are shown with their numbers crosses out in red. See <A HREF="fd_chap.052.html#50422125_10380">Section 51.4.14.9, “Summary”</A> for more information.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-395991"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-562.gif">
+
+<P>
+<A NAME="50422125_pgfId-395992"></A>Figure 51-35 Boolean operations with material-side options set to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A> for both the target and the tool (default settings)</P>
+<P>
+<A NAME="50422125_pgfId-396033"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-563.gif">
+
+<P>
+<A NAME="50422125_pgfId-396034"></A>Figure 51-36 Boolean operations with material-side options set to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A> for the target and <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_outside_c</A> for the tool.</P>
+<P>
+<A NAME="50422125_pgfId-396075"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-564.gif">
+
+<P>
+<A NAME="50422125_pgfId-396076"></A>Figure 51-37 Boolean operations with material-side options set to PK_boolean_outside_c for the target and PK_boolean_inside_c for the tool.</P>
+<P>
+<A NAME="50422125_pgfId-396117"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-565.gif">
+
+<P>
+<A NAME="50422125_pgfId-396118"></A>Figure 51-38 Boolean operations with material-side options set to PK_boolean_outside_c for both the target and the tool.</P>
+<P>
+<A NAME="50422125_pgfId-396119"></A>Material-side options can be used with boolean operations to achieve a number of different results. See <A HREF="fd_chap.052.html#50422125_14480">Section 51.4.14.3, “Achieving different effects with material-side options”</A></P>
+
+
+<H4>
+<A NAME="50422125_pgfId-396124"></A>51.4.14.3 <A NAME="50422125_14480"></A>Achieving different effects with material-side options </H4>
+<P>
+<A NAME="50422125_pgfId-396125"></A>Depending on the configuration of the tool and target bodies, the boolean operation being performed, and the values chosen for the material-side options, a variety of different effects can be achieved. In particular, you can use these options to:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-396128"></A>Boolean together two sheets in order to make a corner. See <A HREF="fd_chap.052.html#50422125_70239">Section 51.4.14.4, “Creating corners”</A> for more information.</LI>
+<LI>
+<A NAME="50422125_pgfId-396132"></A>Perform sheet punching operations. See <A HREF="fd_chap.052.html#50422125_36430">Section 51.4.14.5, “Performing sheet punching operations”</A> for more information.</LI>
+<LI>
+<A NAME="50422125_pgfId-396137"></A>Perform fence operations. See <A HREF="fd_chap.052.html#50422125_65027">Section 51.4.14.6, “Performing fence operations”</A> for more information.</LI>
+<LI>
+<A NAME="50422125_pgfId-396140"></A>Enclose a solid region with a sheet body. See <A HREF="fd_chap.052.html#50422125_81001">Section 51.4.14.7, “Enclosing a solid region with a sheet body”</A> for more information.</LI>
+</UL>
+<P>
+<A NAME="50422125_pgfId-396142"></A>This section describes each use in turn. </P>
+<P>
+<A NAME="50422125_pgfId-396146"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-396145"></A>Note: Many other effects can be created by using different combinations of material-inside options and boolean operations, many of which will fail or produce invalid results. This section only describes the most useful combinations available.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422125_pgfId-396150"></A>51.4.14.4 <A NAME="50422125_marker-396147"></A><A NAME="50422125_marker-396148"></A><A NAME="50422125_70239"></A>Creating corners </H4>
+<P>
+<A NAME="50422125_pgfId-396151"></A>You can create a simple corner by performing a boolean between two sheets and setting the material-side option for both the target and the tool to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A>. The boolean operation you perform, and the value of the material-side option chosen, determines the configuration of the resulting sheet body corner, as shown in <A HREF="fd_chap.052.html#50422125_19910"><EM>
+Figure 51-39</EM></A>. Parasolid ensures that the normals on the resulting faces are consistent, preserving the normal on the target body in the process. </P>
+<P>
+<A NAME="50422125_pgfId-396198"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-566.gif">
+
+<P>
+<A NAME="50422125_pgfId-396200"></A>Figure 51-39 <A NAME="50422125_19910"></A>Creating simple corners using different boolean operations</P>
+<P>
+<A NAME="50422125_pgfId-396204"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-396203"></A>Note: If you wish, you can use <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_outside_c</A> to create corners in this way as well.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-396208"></A>You can also use the imprint completion functionality described in <A HREF="fd_chap.052.html#50422125_21822" CLASS="XRef">Section 51.4.13</A> to create more complex corner configurations in cases where one body does not intersect the other body completely, as shown in <A HREF="fd_chap.052.html#50422125_82483"><EM>
+Figure 51-40</EM></A>. When imprint completion is turned off, Parasolid would return a failure for a boolean such as this, regardless of the material-side option settings.</P>
+<P>
+<A NAME="50422125_pgfId-396249"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-567.gif">
+
+<P>
+<A NAME="50422125_pgfId-396251"></A>Figure 51-40 <A NAME="50422125_82483"></A>Using imprint completion to create more complex corners</P>
+
+
+<H4>
+<A NAME="50422125_pgfId-396257"></A>51.4.14.5 <A NAME="50422125_marker-396252"></A><A NAME="50422125_marker-396253"></A><A NAME="50422125_marker-396254"></A><A NAME="50422125_marker-396255"></A><A NAME="50422125_36430"></A>Performing sheet punching operations </H4>
+<P>
+<A NAME="50422125_pgfId-396258"></A>You can use material-side options to punch a solid tool into a sheet target, for example by setting <CODE>
+target_material_side</CODE>
+ to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A> and performing either a subtract or a unite operation to produce a sheet body. The final shape of the punched target depends on the direction of the face normal of the target, and which operation is performed, as shown in <A HREF="fd_chap.052.html#50422125_31121"><EM>
+Figure 51-41</EM></A>.</P>
+<P>
+<A NAME="50422125_pgfId-396299"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-568.gif">
+
+<P>
+<A NAME="50422125_pgfId-396301"></A>Figure 51-41 <A NAME="50422125_31121"></A>Punching a solid tool into a sheet target</P>
+<P>
+<A NAME="50422125_pgfId-396302"></A>In addition, you can punch a sheet tool into a sheet target by setting the material-side options of both target and tool to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A>. Punching sheets in this way requires the same operation and settings as creating corners, and is actually just a more general version of the same technique.</P>
+
+
+<H4>
+<A NAME="50422125_pgfId-396307"></A>51.4.14.6 <A NAME="50422125_marker-396303"></A><A NAME="50422125_marker-396304"></A><A NAME="50422125_marker-396305"></A><A NAME="50422125_65027"></A>Performing fence operations </H4>
+<P>
+<A NAME="50422125_pgfId-396308"></A>To represent fence information when performing a boolean between a sheet tool and a solid target, set <CODE>
+tool_material_side</CODE>
+ and perform a subtract operation to produce a solid body. The direction of the fencing operation (that is, which part of the target remains), depends on the value of <CODE>
+tool_material_side</CODE>
+, as follows:</P>
+<P>
+<A NAME="50422125_pgfId-396334"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396311"></A>Fence type</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396313"></A>Boolean</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396315"></A>Value of <CODE>
+tool_material_side</CODE>
+</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396317"></A>Front</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396319"></A>Subtract</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396321"></A><A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396323"></A>Back</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396325"></A>Subtract</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396327"></A><A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_outside_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396329"></A>None</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396331"></A>Subtract</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396333"></A><A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_none_c</A>. This is the default.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-396338"></A><A HREF="fd_chap.052.html#50422125_58767"><EM>
+Figure 51-42</EM></A> shows how you can emulate “front” fence and “back” fence behaviour (as described in <A HREF="fd_chap.052.html#50422125_73248">Section 51.4.12</A>) using this technique:</P>
+<P>
+<A NAME="50422125_pgfId-396379"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-569.gif">
+
+<P>
+<A NAME="50422125_pgfId-396384"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-570.gif">
+
+<P>
+<A NAME="50422125_pgfId-396386"></A>Figure 51-42 <A NAME="50422125_58767"></A>Performing fence operations using material-side options</P>
+<P>
+<A NAME="50422125_pgfId-396390"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-396389"></A>Note: It is possible to perform fencing operations using a number of different combinations of material-side option values and boolean operations. The setting described here are the recommended ones. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422125_pgfId-396396"></A>51.4.14.7 <A NAME="50422125_marker-396391"></A><A NAME="50422125_marker-396392"></A><A NAME="50422125_marker-396393"></A><A NAME="50422125_marker-396394"></A><A NAME="50422125_81001"></A>Enclosing a solid region with a sheet body </H4>
+<P>
+<A NAME="50422125_pgfId-396397"></A>You can also use the material-side options to enclose a solid region with a sheet body (as described in <A HREF="fd_chap.052.html#50422125_43839">Section 51.4.11</A>) by uniting a solid target and a sheet tool, and setting <CODE>
+tool_material_side</CODE>
+ to <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_inside_c</A>.</P>
+<P>
+<A NAME="50422125_pgfId-396436"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-571.gif">
+
+<P>
+<A NAME="50422125_pgfId-396437"></A>Figure 51-43 Enclosing a solid region with a sheet</P>
+<P>
+<A NAME="50422125_pgfId-396444"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-396443"></A>Note: Enclosure, as described in <A HREF="fd_chap.052.html#50422125_43839">Section 51.4.11</A>, is the default behaviour when uniting a solid target and sheet tool using the default values for all boolean options. However, if you want to implement enclosure functionality using the material-side options, you should use the settings described here.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+<H4>
+<A NAME="50422125_pgfId-396446"></A>51.4.14.8 <A NAME="50422125_63734"></A>Constraints </H4>
+<P>
+<A NAME="50422125_pgfId-396447"></A>There are a few constraints when using material-side options. These are as follows:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-396448"></A>If you set <CODE>
+tool_material_side</CODE>
+ in <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> to a non-default value, there must be a single tool body.</LI>
+<LI>
+<A NAME="50422125_pgfId-396449"></A>When using wire bodies in boolean operations, <CODE>
+tool_material_side</CODE>
+ and <CODE>
+target_material_side</CODE>
+ must be either <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_default_c</A> or <A HREF=../headers/pk_boolean_material_t.html>PK_boolean_material_none_c</A>. No other values have any meaning.</LI>
+</UL>
+
+
+<H4>
+<A NAME="50422125_pgfId-396451"></A>51.4.14.9 <A NAME="50422125_10380"></A>Summary </H4>
+<P>
+<A NAME="50422125_pgfId-396452"></A>This section summarises the results of using the material-side options.</P>
+<P>
+<A NAME="50422125_pgfId-396558"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396455"></A>Boolean operation:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396457"></A>If the target volume is treated as ...</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396459"></A>If the tool volume is treated as ...</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396461"></A>Then the result volume will be ...</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="4" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396463"></A>Unite</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396465"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396467"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396469"></A>Solid</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396473"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396475"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396477"></A>Solid</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396481"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396483"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396485"></A>Solid</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396489"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396491"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396493"></A>Void</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="4" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396495"></A>Subtract</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396497"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396499"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396501"></A>Solid</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396505"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396507"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396509"></A>Void</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396513"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396515"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396517"></A>Void</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396521"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396523"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396525"></A>Void</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="4" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396527"></A>Intersect</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396529"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396531"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396533"></A>Solid</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396537"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396539"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396541"></A>Void</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396545"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396547"></A>Solid</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396549"></A>Void</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396553"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396555"></A>Void</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396557"></A>Void</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<H3>
+<A NAME="50422125_pgfId-396559"></A>	51.4.15 	<A NAME="50422125_12172"></A>Tracking imprinted edges </H3>
+<P>
+<A NAME="50422125_pgfId-396560"></A>Both <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> and <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> let you track edges that are imprinted onto the target during a boolean operation, subject to the following restriction:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-396561"></A>Only edges that are created as a result of an imprint operation or imprint completion are tracked. </LI>
+</UL>
+<P>
+<A NAME="50422125_pgfId-396562"></A>You can control the amount of tracking information that is returned using the <CODE>
+tracking_type</CODE>
+ option, which can take the following values:</P>
+<P>
+<A NAME="50422125_pgfId-396582"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396565"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396567"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396569"></A><A HREF=../headers/pk_boolean_track_type_t.html>PK_boolean_track_type_basic_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396571"></A>Return basic tracking information that associates imprinted edges with the target topology on which those edges are imprinted. This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396573"></A><A HREF=../headers/pk_boolean_track_type_t.html>PK_boolean_track_type_comp_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396575"></A>Return complete tracking information that associates imprinted edges with the following:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-396576"></A>The target topology on which the edges are imprinted (as for <A HREF=../headers/pk_boolean_track_type_t.html>PK_boolean_track_type_basic_c</A>)</LI>
+<LI>
+<A NAME="50422125_pgfId-396577"></A>The tool topology that produced the edges. </LI>
+</UL>
+<P>
+<A NAME="50422125_pgfId-396581"></A><A HREF="fd_chap.052.html#50422125_84354"><EM>
+Figure 51-44</EM></A> shows an example that illustrates the second of these.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-396618"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-572.gif">
+
+<P>
+<A NAME="50422125_pgfId-938543"></A>Figure 51-44 <A NAME="50422125_84354"></A>Tracking imprint completion back to originating tool topology</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-938545"></A>	51.4.16 	<A NAME="50422125_84299"></A>Tracking regions</H3>
+<P>
+<A NAME="50422125_pgfId-938556"></A>You can use the<CODE>
+ track_regions</CODE>
+ option to specify the level of region information to be tracked and recorded by <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>. This tracking information is returned for both new regions and original regions that have been affected by a boolean operation.The <CODE>
+track_regions</CODE>
+ option takes the following values:</P>
+<P>
+<A NAME="50422125_pgfId-938575"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-938559"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-938561"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-938563"></A><A HREF=../headers/pk_region_t.html>PK_region_track_no_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-938565"></A>No region tracking information is returned for boolean operations.</P>
+<P>
+<A NAME="50422125_pgfId-938566"></A>This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-938568"></A><A HREF=../headers/pk_region_t.html>PK_region_track_basic_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-938570"></A>Returns a set of basic region tracking records (<A HREF=../headers/pk_topol_track_record_r_t.html>PK_TOPOL_track_record_r_t</A>) as follows:</P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-938571"></A>If a solid region is derived from any solid original regions then it is tracked in a record of type PK_TOPOL_track_derive_c containing those regions.</LI>
+<LI>
+<A NAME="50422125_pgfId-938572"></A>If a void region is derived from any void original regions then it is tracked in a record of type PK_TOPOL_track_derive _c containing those regions.</LI>
+<LI>
+<A NAME="50422125_pgfId-938573"></A>If a region is only derived from regions of the opposite solidity then it is tracked in a record of type PK_TOPOL_track_create_c.</LI>
+</UL>
+<ADDRESS>
+<A NAME="50422125_pgfId-938574"></A>Note: To use region tracking you must set the <CODE>
+tracking</CODE>
+ option to PK_LOGICAL_true and have general topology enabled in the session.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-938579"></A>In <A HREF="fd_chap.052.html#50422125_15350"><EM>
+Figure 51-45</EM></A> the boolean unite result general body has three solid regions. Region (r1) is derived from the solid region of the target, region (r2) is derived from the solid regions of both the target and the tool and region (r3) is derived from the solid region of the tool. </P>
+<P>
+<A NAME="50422125_pgfId-1091109"></A>The tracking of each of these regions is returned as a record of type PK_TOPOL_track_derive_c. For more information about Regions see <A HREF="fd_chap.015.html#50422084_29858">Section 14.2.2, “Region”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-938587"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-573.gif">
+
+<P>
+<A NAME="50422125_pgfId-938589"></A>Figure 51-45 <A NAME="50422125_15350"></A>Tracking regions using the <CODE>
+track_regions</CODE>
+ option.</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-396622"></A>	51.4.17 	<A NAME="50422125_27105"></A>Specifying the body type of the result </H3>
+<P>
+<A NAME="50422125_pgfId-396623"></A>You can specify the preferred type of the resulting body for both global and local booleans using the <CODE>
+resulting_body_type</CODE>
+ option. This takes the following values:</P>
+<P>
+<A NAME="50422125_pgfId-396660"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396626"></A>Value</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396628"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396630"></A><A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_solid_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396632"></A>Returns solid result bodies if all shells in the bodies are closed, otherwise returns sheet bodies. </P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-396633"></A>If sheets are returned, the <CODE>
+result</CODE>
+ field of the <CODE>
+results</CODE>
+ return structure (<A HREF=../headers/pk_boolean_r_t.html>PK_boolean_r_t</A>) is set to <A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_not_solid_c</A>. </LI>
+<LI>
+<A NAME="50422125_pgfId-396634"></A>If the result contains several components, they are returned as separate bodies if <CODE>
+allow_disjoint</CODE>
+ is PK_LOGICAL_false.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396636"></A><A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_sheet_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396638"></A>Returns sheet bodies if possible. </P>
+<P>
+<A NAME="50422125_pgfId-396639"></A>If the result contains several components, they are returned as separate bodies if <CODE>
+allow_disjoint</CODE>
+ is PK_LOGICAL_false.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396641"></A><A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_wire_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396643"></A>Returns manifold wire bodies. This value only applies to <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396645"></A><A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_general_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396647"></A>Returns general bodies. This value only applies to <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396649"></A><A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_original_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396651"></A>Ensures that the result bodies has the same body type as the target. If this is not possible, an error is returned. You should ensure you use this value if the <CODE>
+fence</CODE>
+ option is a non-default value: see <A HREF="fd_chap.052.html#50422125_73248">Section 51.4.12, “Effect of the fence option on solid and sheet operations”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-396655"></A>This is the default.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396657"></A><A HREF=../headers/pk_boolean_prefer_t.html>PK_boolean_prefer_simplest_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396659"></A>Returns the simplest possible body type it can without making any changes to the body. This value only applies to <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A>.</P>
+<P>
+<A NAME="50422125_pgfId-1229901"></A>It is recommended to use this value instead of the default when generalised topology is enabled.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+<H3>
+<A NAME="50422125_pgfId-396662"></A>	51.4.18 	<A NAME="50422125_43091"></A>Repairing non-manifold results using blends </H3>
+<P>
+<A NAME="50422125_pgfId-396663"></A>Sometimes, boolean operations fail because the resulting bodies are non-manifold. When performing global booleans, Parasolid can automatically repair certain configurations of non-manifold edge by replacing that edge with blend faces, thereby allowing the boolean operation to succeed. You can control this behaviour using the following options:</P>
+<P>
+<A NAME="50422125_pgfId-396680"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396669"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396671"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-396673"></A>nm_edge_repair</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396675"></A>Whether to attempt to repair non-manifold edges in the resulting body. Set this to <A HREF=../headers/pk_nm_edge_repair_t.html>PK_nm_edge_repair_blend_c</A> if you want to attempt to repair non-manifold edges. Default: <A HREF=../headers/pk_nm_edge_repair_t.html>PK_nm_edge_repair_no_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422125_pgfId-396677"></A>blend_radius</PRE>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396679"></A>The radius of the blends that are created in order to repair a non-manifold edge. Default: 1.0e-5</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-396683"></A>These options are not supported for general booleans. See <A HREF="fd_chap.054.html#50422127_90458">Section 53.6, “Unsupported options”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-396688"></A><A HREF="fd_chap.052.html#50422125_90839"><EM>
+Figure 51-46</EM></A> shows an example where the non-manifold edge created by subtracting the cylinder from the cube has been successfully repaired by replacing it with two blends, thus allowing the boolean operation to succeed. </P>
+<P>
+<A NAME="50422125_pgfId-396695"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-396691"></A>Note: This option is only intended to repair non-manifold edges created by booleans in which the target and tool share a common extrude direction (the vertical axis, in <A HREF="fd_chap.052.html#50422125_90839"><EM>
+Figure 51-46</EM></A>), thereby creating non-manifold edges that lie in this same direction. More general configurations creating non-manifold edges are not guaranteed to work. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-396731"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-574.gif">
+
+<P>
+<A NAME="50422125_pgfId-396733"></A>Figure 51-46 <A NAME="50422125_90839"></A>Repairing non-manifold edges in global booleans</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-396735"></A>	51.4.19 	<A NAME="50422125_69648"></A>Update control </H3>
+<P>
+<A NAME="50422125_pgfId-396736"></A>If your application relies on reproducing behaviour when updating models built using earlier versions of Parasolid, you should use the <CODE>
+update</CODE>
+ option to preserve old behaviour and help eliminate differences in the rebuild results.The option lets you disable some boolean enhancements that have been added at different Parasolid versions. Doing this ensures that boolean operations give the same results in the latest version of Parasolid as in older versions. </P>
+<P>
+<A NAME="50422125_pgfId-396749"></A>See <A HREF=../headers/pk_boolean_update_t.html>PK_boolean_update_t</A> in the <EM>
+<A HREF=../pk_index.html>PK Interface Programming Reference</A> Manual</EM> for more information on this <CODE>
+update</CODE>
+ option.</P>
+<P>
+<A NAME="50422125_pgfId-396753"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-396752"></A>Note: The default value is <A HREF=../headers/pk_boolean_update_t.html>PK_boolean_update_default_c</A> which uses all appropriate boolean operations enhancements. Setting to a non-default value disables all appropriate boolean operations enhancements.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-396764"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-396756"></A>Note: The imprinting functions <A HREF=../headers/pk_body_imprint_body.html>PK_BODY_imprint_body</A>, <A HREF=../headers/pk_body_imprint_faces_2.html>PK_BODY_imprint_faces_2</A>, and <A HREF=../headers/pk_face_imprint_faces_2.html>PK_FACE_imprint_faces_2</A> also use the <CODE>
+update</CODE>
+ option. For these functions, update values <A HREF=../headers/pk_boolean_update_t.html>PK_boolean_update_5_c</A> and older give the same behaviour. See <A HREF="fd_chap.051.html#50422124_51040">Section 50.4.1, “Imprinting”</A>, for more information.</ADDRESS><BR>
+<ADDRESS>
+<A NAME="50422125_pgfId-396760"></A>Note: The sectioning functions <A HREF=../headers/pk_body_make_section.html>PK_BODY_make_section</A> and <A HREF=../headers/pk_body_make_section_with_surfs.html>PK_BODY_make_section_with_surfs</A> also use the <CODE>
+update</CODE>
+ option. For these functions, update values <A HREF=../headers/pk_boolean_update_t.html>PK_boolean_update_v261_c</A> and older give the same behaviour. See <A HREF="fd_chap.056.html#50421908_71633">Section 55.5, “Non-destructive sectioning”</A>, for more information. </ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422125_pgfId-396766"></A>51.5	<A NAME="50422125_44827"></A>Information returned by boolean functions 
+
+
+</H1>
+<P>
+<A NAME="50422125_pgfId-396767"></A>In addition to returning tracking information, both <A HREF=../headers/pk_body_boolean_2.html>PK_BODY_boolean_2</A> and <A HREF=../headers/pk_face_boolean_2.html>PK_FACE_boolean_2</A> have a results structure containing the result bodies, a Parasolid report, and a status code. The status code is returned in the <CODE>
+result</CODE>
+ field of the results structure and communicates information regarding the overall success or failure of the boolean operation as follows:</P>
+<P>
+<A NAME="50422125_pgfId-396801"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396770"></A>Values:</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396772"></A>Description:</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396774"></A><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_success_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396776"></A>The boolean was successful and the resultant entities are returned in the bodies array.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396778"></A><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_no_clash_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396780"></A>The boolean was successful, however the target and tool entities did not interact. When using non default-values for material-side options with this value the following applies: </P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-396781"></A>For unite cases, the tool is completely outside of the target and the resultant body is a disjoint body. </LI>
+<LI>
+<A NAME="50422125_pgfId-396782"></A>For intersect cases, both the tool and target are deleted and no body is returned.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396784"></A><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_no_effect_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396786"></A>The boolean was successful, however the tools had no effect on the target. When using non default-values for material-side options with this value the following applies: </P>
+<UL>
+<LI>
+<A NAME="50422125_pgfId-396787"></A>For unite cases, the tool is completely inside the target. </LI>
+<LI>
+<A NAME="50422125_pgfId-396788"></A>For intersect cases, the target is completely inside the tool.</LI>
+</UL>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396790"></A><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_imprint_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396792"></A>The boolean was successful, however the target body may have gained some mergeable edges or vertices</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396794"></A><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_not_solid_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396796"></A>The boolean was successful, however the resultant bodies cannot be converted into solid bodies.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-675494"></A><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_multiple_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-675496"></A>This value is deprecated and should not be used in new code. </P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396798"></A><A HREF=../headers/pk_boolean_result_t.html>PK_boolean_result_failed_c</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422125_pgfId-396800"></A>The boolean has failed.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422125_pgfId-396804"></A>For further information on material-side options, see <A HREF="fd_chap.052.html#50422125_74335">Section 51.4.14, “Specifying the body type of tool and target”</A>.</P>
+<P>
+<A NAME="50422125_pgfId-396809"></A>See <A HREF="fd_chap.121.html#50422203_89014">Section 120.3.1, “Types of failure status code returned”</A>, for more information on status codes.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422125_pgfId-397566"></A>51.6	Shared geometry after a boolean operation 
+
+
+</H1>
+<P>
+<A NAME="50422125_pgfId-397569"></A><A NAME="50422125_marker-625717"></A><A NAME="50422125_marker-625718"></A><A HREF="fd_chap.052.html#50422125_80602"><EM>
+Figure 51-47</EM></A> shows an example where a boolean operation is used to subtract a slot from a block. In this example, face ‘A’ is split creating the new face ‘B’ resulting in both the ‘A’ and ‘B’ faces sharing the original surface. Similarly this applies for edges ‘C’ and ‘D’ as they have a common direction.</P>
+<P>
+<A NAME="50422125_pgfId-397605"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-575.gif">
+
+<P>
+<A NAME="50422125_pgfId-397606"></A>Figure 51-47 <A NAME="50422125_80602"></A>Two faces sharing the same surface</P>
+<P>
+<A NAME="50422125_pgfId-647142"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422125_pgfId-647152"></A>Note: If the example illustrated in <A HREF="fd_chap.052.html#50422125_80602"><EM>
+Figure 51-47</EM></A> used facet geometry, then faces ‘A’ and ‘B’ would not share the surface but would have separate meshes. Similarly the edges ‘C’ and ‘D’ will have separate new plines.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H3>
+<A NAME="50422125_pgfId-397610"></A>	51.6.1 	<A NAME="50422125_marker-397607"></A><A NAME="50422125_marker-397608"></A><A NAME="50422125_marker-397609"></A>Subtraction resulting in sharing </H3>
+<P>
+<A NAME="50422125_pgfId-397615"></A><A NAME="50422125_marker-397611"></A>In <A HREF="fd_chap.052.html#50422125_23276"><EM>
+Figure 51-48</EM></A> face ‘E’ has the same surface as face ‘1’ and face ‘F’ has the same surface as face ‘2’. Therefore, if face ‘1’ and face ‘2’ shared the surface to begin with, then face ‘E’ and face ‘F’ share the surface in the result.</P>
+<P>
+<A NAME="50422125_pgfId-397616"></A>After the subtraction boolean faces ‘A’ and ‘B’ share the surface of the bottom of the tool, and faces ‘C’ and ‘D’ share the surface of the back of the tool since they were created from those surfaces of the tool.</P>
+<P>
+<A NAME="50422125_pgfId-397652"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-576.gif">
+
+<P>
+<A NAME="50422125_pgfId-397654"></A>Figure 51-48 <A NAME="50422125_23276"></A>Subtracting a tool from a target</P>
+
+
+<H3>
+<A NAME="50422125_pgfId-397658"></A>	51.6.2 	<A NAME="50422125_marker-397655"></A><A NAME="50422125_marker-397656"></A><A NAME="50422125_marker-397657"></A>Subtraction preserving sharing </H3>
+<P>
+<A NAME="50422125_pgfId-397663"></A><A NAME="50422125_marker-397659"></A><A HREF="fd_chap.052.html#50422125_34331"><EM>
+Figure 51-49</EM></A> is similar to the previous example except that the target and tool are reversed. In this example the sharing of the surface under faces ‘A’ and ‘B’ is determined by the sharing of the surface under faces ‘1’ and ‘2’; if ‘1’ and ‘2’ share, then so do ‘A’ and ‘B’.</P>
+<P>
+<A NAME="50422125_pgfId-397699"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-577.gif">
+
+<P>
+<A NAME="50422125_pgfId-397701"></A>Figure 51-49 <A NAME="50422125_34331"></A>Subtracting a tool from a target</P>
+<P>
+<A NAME="50422125_pgfId-412242"></A>&nbsp;</P>
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.051.html">Imprinting and Curve Projection</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.053.html">Manifold Booleans</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

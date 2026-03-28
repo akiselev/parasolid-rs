@@ -1,0 +1,594 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Creating PSM Data From Foreign Facet Data</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Creating PSM Data From Foreign Facet Data</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.085.html">Converting Between Facet and Classic Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.087.html">Checking and Repairing Mesh Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-361176">85.1	Introduction </A>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-326631">85.2	Received and returned arguments </A>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-326840">85.3	Option structure </A>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-344068">85.4	Using the facet reader </A>
+<UL>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-327026">85.4.1	Facet types </A>
+<UL>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-339498">85.4.1.1	Index mesh </A>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-339630">85.4.1.2	Strip mesh </A>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-333174">85.4.1.3	Fan mesh </A>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-334541">85.4.1.4	Vector mesh </A>
+<LI> <A HREF="fd_chap.086.html#50422163_pgfId-340416">85.4.1.5	Mixed mesh example </A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422163_pgfId-361176"></A>85.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422163_pgfId-362457"></A>Parasolid provides the function <A HREF=../headers/pk_mesh_create_from_facets.html>PK_MESH_create_from_facets</A> to allow you to import foreign facet data and create meshes using the PSM mesh format. These meshes can then be stored in <CODE>
+.xmm</CODE>
+ files alongside the <CODE>
+.xmt</CODE>
+ files used to store the model data, or embedded in the XT data itself. <A HREF=../headers/pk_mesh_create_from_facets.html>PK_MESH_create_from_facets</A> also enables you to choose whether to create facets of newly created meshes immediately, or delay their creation until they are required by a Parasolid operation.</P>
+<P>
+<A NAME="50422163_pgfId-411795"></A>When a mesh is created from foreign data an application should ensure the result is of good quality; see <A HREF="fd_chap.087.html#50422164_70778">Chapter 86, “Checking and Repairing Mesh Data”</A>, for more information.</P>
+<P>
+<A NAME="50422163_pgfId-364832"></A>This chapter covers the creation of facet bodies from foreign mesh data. For information on creating facet bodies from classic bodies see <A HREF="fd_chap.085.html#50422162_93469">Chapter 84, “Converting Between Facet and Classic Geometry”</A>.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422163_pgfId-326631"></A>85.2	Received and returned arguments 
+
+
+</H1>
+<P>
+<A NAME="50422163_pgfId-326780"></A><A HREF=../headers/pk_mesh_create_from_facets.html>PK_MESH_create_from_facets</A> receives the following arguments:</P>
+<P>
+<A NAME="50422163_pgfId-327552"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-327619"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-327621"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-327623"></A><CODE>
+facet_reader</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-327625"></A>A user-defined callback function.See <A HREF="fd_chap.086.html#50422163_30496">Section 85.4, “Using the facet reader”</A>, for more information.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-327627"></A><CODE>
+context</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-327629"></A>A pointer to the user supplied data input to <CODE>
+facet_reader</CODE>
+</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-327631"></A><CODE>
+options</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-327633"></A>These are described in more detail in <A HREF="fd_chap.086.html#50422163_10816">Section 85.3, “Option structure”</A></P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422163_pgfId-327554"></A>It creates and returns a mesh using the data from the received arguments.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422163_pgfId-326840"></A>85.3	<A NAME="50422163_63386"></A><A NAME="50422163_10816"></A>Option structure 
+
+
+</H1>
+<P>
+<A NAME="50422163_pgfId-326927"></A>This function takes the following options:</P>
+<P>
+<A NAME="50422163_pgfId-344066"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-344047"></A>Option</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-344049"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-344051"></A><CODE>
+vertices_estimate</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-344053"></A>Estimate of the total number of vertices returned by all calls to <CODE>
+facet_reader</CODE>
+. If a mesh has a large number of vertices, <CODE>
+vertices_estimate</CODE>
+ can improve efficiency by limiting the number of times the data is copied. </P>
+<P>
+<A NAME="50422163_pgfId-344471"></A>Default: 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-344055"></A><CODE>
+facet_estimate</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-344057"></A>Estimate of the total number of facets returned by all calls to <CODE>
+facet_reader</CODE>
+.</P>
+<P>
+<A NAME="50422163_pgfId-344490"></A>If a mesh has a large number of facets, <CODE>
+facet_estimate</CODE>
+ can improve efficiency by limiting the number of times the data is copied.</P>
+<P>
+<A NAME="50422163_pgfId-344482"></A>Default: 0</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-344059"></A><CODE>
+facet_free</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-344061"></A>Function to free data blocks returned by <CODE>
+facet_reader</CODE>
+. These blocks can be one of four types; index, strip, fan and vector. See <A HREF="fd_chap.086.html#50422163_74512">Section 85.4.1, “Facet types”</A>, for more informations.</P>
+<P>
+<A NAME="50422163_pgfId-344065"></A>Default: NULL</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-409464"></A><CODE>
+create</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-362457"></A>Whether the <CODE>
+facet_reader</CODE>
+ callback function is called either:</P>
+<UL>
+<LI>
+<A NAME="50422163_pgfId-417833"></A>Immediately, to create facets of a mesh (<A HREF=../headers/pk_mesh_create_t.html>PK_MESH_create_now_c</A>) or</LI>
+<LI>
+<A NAME="50422163_pgfId-418603"></A>At a later time, when the facets are required by a Parasolid operation (<A HREF=../headers/pk_mesh_create_t.html>PK_MESH_create_later_c</A>). If a mesh is created at a later time, a bounding box should be supplied.</LI>
+</UL>
+<P>
+<A NAME="50422163_pgfId-417782"></A>The facets are required by a Parasolid operation when:</P>
+<UL>
+<LI>
+<A NAME="50422163_pgfId-412159"></A>Facets are required for geometric queries on the mesh.</LI>
+<LI>
+<A NAME="50422163_pgfId-412622"></A>The part or partition that the mesh belongs to is to be transmitted. See <A HREF="fd_chap.101.html#50422180_82147">Section 100.2.4, “Transmitting mesh data”</A>, for more information on transmitting meshes.</LI>
+<LI>
+<A NAME="50422163_pgfId-409466"></A>Either <A HREF=../headers/pk_part_receive_meshes.html>PK_PART_receive_meshes</A> or <A HREF=../headers/pk_partition_receive_meshes.html>PK_PARTITION_receive_meshes</A> is called. See <A HREF="fd_chap.101.html#50422180_21541">Section 100.5.1.1, “Receiving mesh data and deltas in a partition”</A> for more information on receiving meshes.</LI>
+</UL>
+<P>
+<A NAME="50422163_pgfId-409637"></A>Default: <A HREF=../headers/pk_mesh_create_t.html>PK_MESH_create_now_c</A></P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-409468"></A><CODE>
+have_box</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-409470"></A>Whether <CODE>
+box</CODE>
+ is supplied. </P>
+<P>
+<A NAME="50422163_pgfId-410039"></A>Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-409472"></A><CODE>
+box</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-409474"></A>The bounding box of the mesh when <CODE>
+have_box</CODE>
+ is PK_LOGICAL_true.</P>
+<P>
+<A NAME="50422163_pgfId-418763"></A>If a mesh is to be created at a later time and a Parasolid operation requires the box of the mesh, the mesh will not be created and the supplied <CODE>
+box</CODE>
+ will be used.</P>
+<P>
+<A NAME="50422163_pgfId-418996"></A>When a mesh has been created the <CODE>
+box</CODE>
+ will be compared with the calculated box of the mesh. If Parasolid finds that the <CODE>
+box</CODE>
+ is not a bounding box of the mesh an error will be raised.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-409476"></A><CODE>
+thread_safe</CODE>
+</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422163_pgfId-409478"></A>Whether the <CODE>
+facet_reader</CODE>
+ callback and the <CODE>
+facet_free</CODE>
+ callback (if supplied) are thread safe.</P>
+<P>
+<A NAME="50422163_pgfId-410321"></A>Default: PK_LOGICAL_false</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422163_pgfId-344068"></A>85.4	<A NAME="50422163_30496"></A>Using the facet reader 
+
+
+</H1>
+<P>
+<A NAME="50422163_pgfId-344069"></A>This section describes how the callback function, <CODE>
+facet_reader</CODE>
+, is used to create PSM meshes from facet data. The <CODE>
+facet_reader</CODE>
+ takes a block of user supplied <CODE>
+context</CODE>
+ information and returns a block of mesh data and a return status. The block of mesh data can be one of four types; index, strip, fan, and vector or a mix of these types. See <A HREF="fd_chap.086.html#50422163_74512">Section 85.4.1, “Facet types”</A> for more information.The return status indicates the state of the operation. The <CODE>
+facet_reader</CODE>
+ is called repeatedly by <A HREF=../headers/pk_mesh_create_from_facets.html>PK_MESH_create_from_facets</A> until it returns the status <A HREF=../headers/pk_mesh_cb_status_t.html>PK_MESH_cb_status_stop_c</A>.</P>
+
+<H3>
+<A NAME="50422163_pgfId-327026"></A>	85.4.1 	<A NAME="50422163_74512"></A>Facet types </H3>
+<P>
+<A NAME="50422163_pgfId-332997"></A>This section describes the four types of data blocks (index, strip, fan, and vector) that can be returned by each call to <CODE>
+facet_reader</CODE>
+. </P>
+<P>
+<A NAME="50422163_pgfId-394457"></A>For examples of this functionality using each of the four data block types, see the code examples in the <CODE>
+C++\Code Examples\Facet Examples\Mesh Creation</CODE>
+ folder, located in <CODE>
+example_applications</CODE>
+ in your Parasolid installation folder.</P>
+
+<H4>
+<A NAME="50422163_pgfId-339498"></A>85.4.1.1 Index mesh </H4>
+<P>
+<A NAME="50422163_pgfId-339499"></A>This structure contains the data for a facet index block of mesh data. The <CODE>
+facet_indices</CODE>
+ array contains a single list of the <CODE>
+vertex_positions</CODE>
+ indices which define the vertices of facets of the mesh. This array must have a length that is a multiple of 3. </P>
+<P>
+<A NAME="50422163_pgfId-343450"></A>The following pseudo-code example shows the data input when using PK_MESH_facet_type_index_t to transmit a block of facet index data. <A HREF="fd_chap.086.html#50422163_49872"><EM>
+Figure 85-1</EM></A> illustrates this pseudo-code example. In the illustration, <EM>
+fX</EM> represents values in <CODE>
+facet_indices</CODE>
+ and <EM>
+vX</EM> represents values in <CODE>
+vertex_positions</CODE>
+.</P>
+<P>
+<A NAME="50422163_pgfId-343464"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422163_pgfId-343456"></A>is_relative_index:PK_LOGICAL_true</PRE>
+<PRE><A NAME="50422163_pgfId-343457"></A>n_vertex_positions = 7</PRE>
+<PRE><A NAME="50422163_pgfId-343458"></A>vertex_positions = {v0,v1,v2,v3,v4,v5,v6}</PRE>
+<PRE><A NAME="50422163_pgfId-343459"></A>vertex_normals = null</PRE>
+<PRE><A NAME="50422163_pgfId-343460"></A>n_facet_indices = 18</PRE>
+<PRE><A NAME="50422163_pgfId-390913"></A>facet_indices = {0,1,2,1,3,2,1,4,3,0,5,1,5,6,1,6,4,1}</PRE>
+<PRE><A NAME="50422163_pgfId-343462"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-343463"></A>status = <A HREF=../headers/pk_mesh_cb_status_t.html>PK_MESH_cb_status_stop_c</A></PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422163_pgfId-343429"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1083.gif">
+
+<P>
+<A NAME="50422163_pgfId-343389"></A>Figure 85-1 <A NAME="50422163_49872"></A>Example of an index mesh </P>
+
+
+<H4>
+<A NAME="50422163_pgfId-339630"></A>85.4.1.2 Strip mesh </H4>
+<P>
+<A NAME="50422163_pgfId-339631"></A>This mesh describes a set of connected triangles that share vertices. The data is a collection of facets described by <CODE>
+strip_indices</CODE>
+.</P>
+<P>
+<A NAME="50422163_pgfId-338257"></A>The following pseudo-code example shows the data input when using <A HREF=../headers/pk_mesh_facet_strip_t.html>PK_MESH_facet_strip_t</A> to transmit a block of facet triangle strip data. <A HREF="fd_chap.086.html#50422163_19136"><EM>
+Figure 85-2</EM></A> illustrates this pseudo-code example. In the illustration, <EM>
+vX</EM> represents values in <CODE>
+vertex_positions</CODE>
+ and the arrows represent the direction of <CODE>
+strip_indices</CODE>
+. The triangle strip returned in call zero is coloured blue and the triangle strip returned in call one is coloured red.</P>
+<P>
+<A NAME="50422163_pgfId-338422"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422163_pgfId-338414"></A>&lt;--Call zero returns--&gt;</PRE>
+<PRE><A NAME="50422163_pgfId-338497"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-339924"></A>is_relative_index:PK_LOGICAL_true</PRE>
+<PRE><A NAME="50422163_pgfId-339925"></A>n_vertex_positions = 7</PRE>
+<PRE><A NAME="50422163_pgfId-339926"></A>vertex_positions = {v0,v1,v2,v3,v4,v5,v6}</PRE>
+<PRE><A NAME="50422163_pgfId-339839"></A>vertex_normals = null</PRE>
+<PRE><A NAME="50422163_pgfId-339827"></A>n_strip_indices = 5</PRE>
+<PRE><A NAME="50422163_pgfId-338419"></A>strip_indices = {0,2,1,3,4}</PRE>
+<PRE><A NAME="50422163_pgfId-338420"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-338421"></A>status = <A HREF=../headers/pk_mesh_cb_status_t.html>PK_MESH_cb_status_continue_c</A></PRE>
+<PRE><A NAME="50422163_pgfId-338564"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-338544"></A>&lt;--Call one returns--&gt;</PRE>
+<PRE><A NAME="50422163_pgfId-338545"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-339858"></A>is_relative_index:PK_LOGICAL_false</PRE>
+<PRE><A NAME="50422163_pgfId-339859"></A>n_vertex_positions = 0</PRE>
+<PRE><A NAME="50422163_pgfId-339860"></A>vertex_positions = null</PRE>
+<PRE><A NAME="50422163_pgfId-338549"></A>vertex_normals = null</PRE>
+<PRE><A NAME="50422163_pgfId-338550"></A>n_strip_indices = 5</PRE>
+<PRE><A NAME="50422163_pgfId-338551"></A>strip_indices = {4,6,1,5,0}</PRE>
+<PRE><A NAME="50422163_pgfId-338552"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-338553"></A>status = <A HREF=../headers/pk_mesh_cb_status_t.html>PK_MESH_cb_status_stop_c</A></PRE>
+<PRE><A NAME="50422163_pgfId-338540"></A>&nbsp;</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422163_pgfId-333017"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1084.gif">
+
+<P>
+<A NAME="50422163_pgfId-333066"></A>Figure 85-2 <A NAME="50422163_19136"></A>Example of a triangle strip mesh</P>
+
+
+<H4>
+<A NAME="50422163_pgfId-333174"></A>85.4.1.3 Fan mesh </H4>
+<P>
+<A NAME="50422163_pgfId-340363"></A>This mesh describes a set of connected triangles that share one central vertex. The data is a sequence of facets described by <CODE>
+fan_indices</CODE>
+.</P>
+<P>
+<A NAME="50422163_pgfId-343009"></A>The following pseudo-code example shows the data input when using <A HREF=../headers/pk_mesh_facet_fan_t.html>PK_MESH_facet_fan_t</A> to transmit a block of facet fan data. <A HREF="fd_chap.086.html#50422163_76615"><EM>
+Figure 85-3</EM></A> illustrates this pseudo-code example. In the illustration <EM>
+vX</EM> represents values in <CODE>
+vertex_positions</CODE>
+ and the arrows represent the direction of <CODE>
+fan_indices</CODE>
+. </P>
+<P>
+<A NAME="50422163_pgfId-338970"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422163_pgfId-342856"></A>is_relative_index:PK_LOGICAL_true</PRE>
+<PRE><A NAME="50422163_pgfId-338963"></A>n_vertex_positions =7</PRE>
+<PRE><A NAME="50422163_pgfId-338964"></A>vertex_positions = {v0,v1,v2,v3,v4,v5,v6}</PRE>
+<PRE><A NAME="50422163_pgfId-338965"></A>vertex_normals = null</PRE>
+<PRE><A NAME="50422163_pgfId-338966"></A>n_fan_indices = 8</PRE>
+<PRE><A NAME="50422163_pgfId-338967"></A>fan_indices = {1,4,3,2,0,5,6,4}</PRE>
+<PRE><A NAME="50422163_pgfId-338968"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-338969"></A>status = <A HREF=../headers/pk_mesh_cb_status_t.html>PK_MESH_cb_status_stop_c</A></PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422163_pgfId-333685"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1085.gif">
+
+<P>
+<A NAME="50422163_pgfId-333704"></A>Figure 85-3 <A NAME="50422163_76615"></A>Example of a fan mesh </P>
+
+
+<H4>
+<A NAME="50422163_pgfId-334541"></A>85.4.1.4 Vector mesh </H4>
+<P>
+<A NAME="50422163_pgfId-334777"></A>This structure contains the data for an independent facet block of mesh data. It describes each facet as a triple of vertex positions.</P>
+<P>
+<A NAME="50422163_pgfId-339263"></A>The following pseudo-code example shows the data input when using <A HREF=../headers/pk_mesh_facet_vector_t.html>PK_MESH_facet_vector_t</A> to transmit a block of independent facet data. <A HREF="fd_chap.086.html#50422163_96867"><EM>
+Figure 85-4</EM></A> illustrates this pseudo-code example. In the illustration, <EM>
+fX</EM> represents values in <CODE>
+n_vertex_positions</CODE>
+ and <EM>
+vX</EM> represents values in <CODE>
+vertex_positions</CODE>
+. </P>
+<P>
+<A NAME="50422163_pgfId-339158"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422163_pgfId-342892"></A>n_vertex_positions = 18</PRE>
+<PRE><A NAME="50422163_pgfId-339154"></A>vertex_positions = {v0,v1,v2,v1,v3,v2,v1,v4,v3,v0,v5,v1,v1,v5,v6,v4,v1,v6}</PRE>
+<PRE><A NAME="50422163_pgfId-339155"></A>vertex_normals = null</PRE>
+<PRE><A NAME="50422163_pgfId-339156"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-339157"></A>status = <A HREF=../headers/pk_mesh_cb_status_t.html>PK_MESH_cb_status_stop_c</A></PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422163_pgfId-334781"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1086.gif">
+
+<P>
+<A NAME="50422163_pgfId-334537"></A>Figure 85-4 <A NAME="50422163_96867"></A>Example of a vector mesh </P>
+
+
+<H4>
+<A NAME="50422163_pgfId-340416"></A>85.4.1.5 <A NAME="50422163_86343"></A>Mixed mesh example </H4>
+<P>
+<A NAME="50422163_pgfId-340446"></A>The following pseudo-code example shows the data returned to read a mixture of data blocks from different calls to <CODE>
+facet_reader</CODE>
+. <A HREF="fd_chap.086.html#50422163_33226"><EM>
+Figure 85-5</EM></A> illustrates this pseudo-code example.</P>
+<P>
+<A NAME="50422163_pgfId-340564"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50422163_pgfId-340542"></A>&lt;--Call zero returns--&gt;</PRE>
+<PRE><A NAME="50422163_pgfId-340543"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-342720"></A>facet_type: <A HREF=../headers/pk_mesh_facet_type_t.html>PK_MESH_facet_type_strip_c</A></PRE>
+<PRE><A NAME="50422163_pgfId-340544"></A>is_relative_index:PK_LOGICAL_true</PRE>
+<PRE><A NAME="50422163_pgfId-340545"></A>n_vertex_positions = 5</PRE>
+<PRE><A NAME="50422163_pgfId-340546"></A>vertex_positions = {v0,v1,v2,v3,v4}</PRE>
+<PRE><A NAME="50422163_pgfId-340547"></A>vertex_normals = null</PRE>
+<PRE><A NAME="50422163_pgfId-340548"></A>n_strip_indices = 5</PRE>
+<PRE><A NAME="50422163_pgfId-340549"></A>strip_indices = {0,2,1,3,4}</PRE>
+<PRE><A NAME="50422163_pgfId-340550"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-341471"></A>status = <A HREF=../headers/pk_mesh_cb_status_t.html>PK_MESH_cb_status_continue_c</A></PRE>
+<PRE><A NAME="50422163_pgfId-341472"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-341473"></A>&lt;--Call one returns--&gt;</PRE>
+<PRE><A NAME="50422163_pgfId-340554"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-340556"></A>facet_type: <A HREF=../headers/pk_mesh_facet_type_t.html>PK_MESH_facet_type_vector_c</A></PRE>
+<PRE><A NAME="50422163_pgfId-342801"></A>n_vertex_positions = 9</PRE>
+<PRE><A NAME="50422163_pgfId-340582"></A>vertex_positions = {v1,v5,v6,v4,v1,v6,v0,v5,v1}</PRE>
+<PRE><A NAME="50422163_pgfId-340618"></A>vertex_normals = null</PRE>
+<PRE><A NAME="50422163_pgfId-340561"></A>&nbsp;</PRE>
+<PRE><A NAME="50422163_pgfId-340562"></A>status = <A HREF=../headers/pk_mesh_cb_status_t.html>PK_MESH_cb_status_stop_c</A></PRE>
+<PRE><A NAME="50422163_pgfId-341303"></A>&nbsp;</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422163_pgfId-341260"></A>&nbsp;</P>
+
+<IMG SRC="../graphics/fd_chap-1087.gif">
+
+<P>
+<A NAME="50422163_pgfId-340536"></A>Figure 85-5 <A NAME="50422163_33226"></A>Example of a mixed mesh</P>
+<P>
+<A NAME="50422163_pgfId-335736"></A>&nbsp;</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.085.html">Converting Between Facet and Classic Geometry</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.087.html">Checking and Repairing Mesh Data</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_THREAD_tidy</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_THREAD_tidy</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> PK_THREAD_tidy
+(
+void
+)
+</B>
+<A NAME="description"></A>
+<I>This function ensures that Parasolid is in a valid state for the calling
+thread whenever a longjump is made.
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_thread         called from an internal Parasolid thread
+    PK_ERROR_fatal_error        unable to restore thread to a valid state
+
+<A NAME="documentation"></A>
+This function must be called before further PK function calls whenever
+an error handler or memory allocator longjumps back to application code
+instead of returning control to Parasolid. This resets the state of the
+PK to its initial settings for the calling thread, and tidies up internal
+memory. Any other application threads inside Parasolid are unaffected.
+
+PK_THREAD_tidy may be called before or after the longjump.
+
+If PK_THREAD_tidy is called from an internal Parasolid thread, then it
+will return the error code PK_ERROR_bad_thread, without raising a PK error
+condition. Applications should return control to Parasolid from the error
+handler or memory allocator in this case.
+
+If PK_THREAD_tidy is unable to restore Parasolid to a valid state then it
+will return the error code PK_ERROR_fatal_error but it will not raise a PK
+error condition.
+
+PK_THREAD_tidy can be called at any time when a PK function is not active
+in the calling thread.
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

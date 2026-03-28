@@ -1,0 +1,396 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>Nominal Geometry</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>Nominal Geometry</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.019.html">B-Curves And B-Surfaces</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.021.html">Lattice Geometry</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="fd_chap.020.html#50422089_pgfId-294726">19.1	Introduction </A>
+<LI> <A HREF="fd_chap.020.html#50422089_pgfId-294740">19.2	PK identifiers for nominal geometry </A>
+<LI> <A HREF="fd_chap.020.html#50422089_pgfId-294745">19.3	Enabling nominal curves </A>
+<LI> <A HREF="fd_chap.020.html#50422089_pgfId-294754">19.4	Attaching nominal curves </A>
+<LI> <A HREF="fd_chap.020.html#50422089_pgfId-294776">19.5	Detaching nominal curves </A>
+<LI> <A HREF="fd_chap.020.html#50422089_pgfId-294786">19.6	Interrogating nominal geometry </A>
+<LI> <A HREF="fd_chap.020.html#50422089_pgfId-294812">19.7	Transmitting nominal geometry </A>
+<LI> <A HREF="fd_chap.020.html#50422089_pgfId-294818">19.8	Nominal geometry in modeling operations </A>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422089_pgfId-294726"></A>19.1	Introduction 
+
+
+</H1>
+<P>
+<A NAME="50422089_pgfId-294728"></A>Nominal Geometry is a mechanism whereby edges which have local precision may reference a notional <STRONG>
+accurate</STRONG> curve.</P>
+<P>
+<A NAME="50422089_pgfId-294729"></A>Edges which have local precision carry the geometry which defines the Parasolid body on their fins. The curves on all the fins must lie within a pipe whose diameter is the edge’s precision. An edge may also have a nominal curve, which must also lie within the <STRONG>
+precision pipe</STRONG>. It is expected that, in general, nominal curves are geometrically simpler than the SP-curves on the fins.</P>
+<P>
+<A NAME="50422089_pgfId-294730"></A>An edge with session precision has an accurate curve only for its geometry, which is also its nominal curve. An edge with local precision may optionally have a nominal curve.</P>
+<P>
+<A NAME="50422089_pgfId-294731"></A>An edge with local precision may only acquire a nominal curve when nominal curves are enabled for that edge’s body. Once an edge has acquired a nominal curve then that curve is retained - and is available to interrogations - until specifically detached, regardless of whether nominal curves are presently enabled for the edge’s body.</P>
+<P>
+<A NAME="50422089_pgfId-314111"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422089_pgfId-294734"></A>Note: Nominal curves on edges with local precision are NOT used by Parasolid to define an edge’s shape (that only comes from the geometry on the fins). However, all Parasolid operations that make topological changes to the edge perform appropriate actions on the nominal geometry.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422089_pgfId-314202"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-313934"></A>Related Topics: </P>
+<UL>
+<UL>
+<LI>
+<A NAME="50422089_pgfId-313913"></A><A HREF="fd_chap.017.html#50422086_81774">Section 16.3, “Tolerant modelling and local precision”</A></LI>
+<LI>
+<A NAME="50422089_pgfId-313957"></A><A HREF="fd_chap.018.html#50422087_94260">Chapter 17, “Geometry”</A></LI>
+</UL>
+</UL>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422089_pgfId-294740"></A>19.2	<A NAME="50422089_marker-294736"></A><A NAME="50422089_marker-294737"></A><A NAME="50422089_marker-294738"></A><A NAME="50422089_marker-294739"></A>PK identifiers for nominal geometry 
+
+
+</H1>
+<P>
+<A NAME="50422089_pgfId-294741"></A>All PK identifiers relating to Nominal Geometry use an abbreviation - <STRONG>
+nmnl</STRONG>. This is to maintain the 31 character limit on identifiers.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422089_pgfId-294745"></A>19.3	<A NAME="50422089_marker-294742"></A><A NAME="50422089_marker-294743"></A><A NAME="50422089_marker-294744"></A>Enabling nominal curves 
+
+
+</H1>
+<P>
+<A NAME="50422089_pgfId-294746"></A>Nominal curves may only be attached to edges with local precision when nominal curves are enabled for the edge’s body. When bodies are created, nominal curves are initially disabled.</P>
+<UL>
+<LI>
+<A NAME="50422089_pgfId-294748"></A>Nominal curves are enabled and disabled by <A NAME="50422089_marker-294747"></A><A HREF=../headers/pk_body_set_curve_nmnl_state.html>PK_BODY_set_curve_nmnl_state</A>.</LI>
+<LI>
+<A NAME="50422089_pgfId-294750"></A><A NAME="50422089_marker-294749"></A><A HREF=../headers/pk_body_ask_curve_nmnl_state.html>PK_BODY_ask_curve_nmnl_state</A> shows whether or not nominal curves are enabled.</LI>
+</UL>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422089_pgfId-294754"></A>19.4	<A NAME="50422089_marker-294751"></A><A NAME="50422089_marker-294752"></A><A NAME="50422089_marker-294753"></A>Attaching nominal curves 
+
+
+</H1>
+<P>
+<A NAME="50422089_pgfId-294755"></A>Nominal curves may only be attached to edges with local precision when nominal curves are enabled for the edge’s body. There are two means of attaching nominal curves:</P>
+<P>
+<A NAME="50422089_pgfId-294772"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294758"></A>Method</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294760"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294762"></A>Automatic</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294764"></A>When nominal curves are enabled for a body, whenever any of its accurate edges is given a local precision - either directly by a call to <A NAME="50422089_marker-294765"></A><A HREF=../headers/pk_edge_set_precision_2.html>PK_EDGE_set_precision_2</A>, or indirectly as a side effect of a modeling operation - then the pre-existing accurate curve of the edge is retained as its nominal curve.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294767"></A>Application</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294769"></A>An edge with local precision that does not have a nominal curve may be given one using <A NAME="50422089_marker-294770"></A><A HREF=../headers/pk_edge_attach_curve_nmnl.html>PK_EDGE_attach_curve_nmnl</A>. The given curve must lie within tolerance of the edge.</P>
+<P>
+<A NAME="50422089_pgfId-294771"></A>If the curve is supplied to <A HREF=../headers/pk_edge_attach_curve_nmnl.html>PK_EDGE_attach_curve_nmnl</A> is already attached to another edge as edge geometry, fin geometry, or nominal geometry, then it is shared if possible. Otherwise, a copy of the curve is used.</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422089_pgfId-294776"></A>19.5	<A NAME="50422089_marker-294773"></A><A NAME="50422089_marker-294774"></A><A NAME="50422089_marker-294775"></A>Detaching nominal curves 
+
+
+</H1>
+<P>
+<A NAME="50422089_pgfId-294777"></A>The nominal curve of an edge with local precision may be detached, whether or not nominal curves are enabled for the edge’s body. Nominal curves are detached using <A NAME="50422089_marker-294778"></A><A HREF=../headers/pk_edge_detach_curve_nmnl.html>PK_EDGE_detach_curve_nmnl</A>.</P>
+<P>
+<A NAME="50422089_pgfId-294782"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50422089_pgfId-294781"></A>Note: This function only detaches the nominal curve of an edge with local precision.To detach the curve of an accurate edge, or the fin curves of a tolerant edge use <A HREF=../headers/pk_topol_detach_geom.html>PK_TOPOL_detach_geom</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422089_pgfId-294786"></A>19.6	<A NAME="50422089_marker-294783"></A><A NAME="50422089_marker-294784"></A><A NAME="50422089_marker-294785"></A>Interrogating nominal geometry 
+
+
+</H1>
+<P>
+<A NAME="50422089_pgfId-294787"></A>The nominal geometry of an edge may be interrogated, whether or not nominal curves are enabled for the edge’s body. These interrogation functions return information about accurate edges and about edges with local precision and nominal curves.</P>
+<P>
+<A NAME="50422089_pgfId-294808"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294790"></A>Function</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294792"></A>Description</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294795"></A><A NAME="50422089_marker-294794"></A><A HREF=../headers/pk_edge_ask_curve_nmnl.html>PK_EDGE_ask_curve_nmnl</A></P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294797"></A>return the accurate or notionally accurate curve of an edge</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294800"></A><A NAME="50422089_marker-294799"></A><A HREF=../headers/pk_edge_ask_geometry_nmnl.html>PK_EDGE_ask_geometry_nmnl</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294802"></A>return the accurate or notionally accurate geometry of an edge</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294805"></A><A NAME="50422089_marker-294804"></A><A HREF=../headers/pk_curve_ask_edges_nmnl.html>PK_CURVE_ask_edges_nmnl</A> </P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294807"></A>return all edges of which this curve is the accurate or notionally accurate geometry</P>
+</TD>
+</TR>
+</TABLE>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422089_pgfId-294812"></A>19.7	<A NAME="50422089_marker-294809"></A><A NAME="50422089_marker-294810"></A><A NAME="50422089_marker-294811"></A>Transmitting nominal geometry 
+
+
+</H1>
+<P>
+<A NAME="50422089_pgfId-294813"></A>Nominal geometry can be transmitted by setting the <CODE>
+transmit_nmnl_geometry</CODE>
+ field of <A HREF=../headers/pk_part_transmit_o_t.html>PK_PART_transmit_o_t</A> to PK_LOGICAL_true.</P>
+
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50422089_pgfId-294818"></A>19.8	<A NAME="50422089_marker-294814"></A><A NAME="50422089_marker-294815"></A><A NAME="50422089_marker-294816"></A><A NAME="50422089_marker-294817"></A>Nominal geometry in modeling operations 
+
+
+</H1>
+<P>
+<A NAME="50422089_pgfId-294819"></A>This table shows what happens to the nominal curve of a tolerant edge during various modeling events.</P>
+<P>
+<A NAME="50422089_pgfId-304294"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294822"></A>Event</P>
+</TH>
+<TH ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294824"></A>Result</P>
+</TH>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294826"></A>Edge is split</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294828"></A>The new edge shares the nominal curve of the original edge.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294830"></A>Edges are merged</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294832"></A>If both edges have tolerantly coincident nominal curves then the nominal curve of the surviving edge survives and the nominal curve of the deleted edge is deleted. In all other cases, any nominal curves on either edge are deleted.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294834"></A>Edge is transformed</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294838"></A>If the transformation only involves <STRONG>
+rigid</STRONG> motion (see <A HREF="fd_chap.015.html#50422084_15682">Section 14.2.9, “Assembly”</A>) and/or uniform scale, then the nominal curve is transformed. For any other transformation, the nominal geometry is deleted.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294841"></A>Tolerant edge’s precision is changed</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294843"></A>The operation is only valid if all of the edge’s curves (the nominal curve and the curves on the fins) lie in the new precision pipe. In this case, the nominal curve survives.</P>
+</TD>
+</TR>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294845"></A>Edge’s precision is reset to session precision</P>
+</TD>
+<TD ROWSPAN="1" COLSPAN="1">
+<P>
+<A NAME="50422089_pgfId-294847"></A>Any nominal curve is deleted and the edge’s curve is re-evaluated to the session precision.</P>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50422089_pgfId-275053"></A>&nbsp;</P>
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="fd_chap.019.html">B-Curves And B-Surfaces</A></TD>
+  <TD><A HREF="../fd_index.html">Chapters</A></TD>
+  <TD><A HREF="fd_chap.021.html">Lattice Geometry</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

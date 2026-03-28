@@ -1,0 +1,310 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
+<META HTTP-EQUIV="Content-Style-Type" CONTENT="text/css">
+<META NAME="GENERATOR" CONTENT="Adobe FrameMaker 2015/HTML Export Filter">
+<SCRIPT LANGUAGE="JavaScript">
+<!--
+if (parent.theMenu) {
+    var entryID = parent.theMenu.findEntry(location.pathname, "url", "right", 0);
+    if (entryID >= 0) {
+        parent.theMenu.selectEntry(entryID);
+        if (parent.theMenu.setEntry(entryID, true)) {
+            parent.theMenu.refresh();
+        }
+    }
+}
+//-->
+</SCRIPT>
+<LINK REL="STYLESHEET" HREF="../ps_doc.css" CHARSET="UTF-8" TYPE="text/css">
+<TITLE>PK_DELTA Functions</TITLE></HEAD>
+<BODY BACKGROUND=../images/background.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_DELTA Functions</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.08.html">Graphical Output Functions</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.10.html">PK_MEMORY Functions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+<H1>Contents</H1>
+<UL>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-274045">C.1	Introduction</A>
+<UL>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-274049">C.1.1	Example PK_DELTA frustrum code</A>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-274057">C.1.2	Criteria of use</A>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-274069">C.1.3	Registering the rollback frustrum functions</A>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-286472">C.1.4	Delta functions that can be registered</A>
+<UL>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-285981">C.3.1.5	open_for_write</A>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-285994">C.3.1.6	open_for_read</A>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-286005">C.3.1.7	close</A>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-286016">C.3.1.8	write</A>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-286029">C.3.1.9	read</A>
+<LI> <A HREF="di_chap.09.html#50548805_pgfId-286043">C.3.1.10	delete</A>
+</UL>
+</UL>
+</UL>
+<A NAME="endofcontents"></A>
+
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<HR>
+
+<H1>
+<A NAME="50548805_pgfId-274045"></A>C.1	<A NAME="50548805_marker-274044"></A>Introduction
+
+
+</H1>
+<P>
+<A NAME="50548805_pgfId-274046"></A>This appendix contains the specifications of the Frustrum functions required for the PK partitioned rollback system.</P>
+<P>
+<A NAME="50548805_pgfId-274047"></A>Partitioned rollback requires six registered frustrum functions. Together these functions provide a virtual file system in which byte streams may be created or read. Byte streams are denoted by PK_DELTA_t values, not filenames, and are referred to as <STRONG>
+delta files</STRONG>. The delta value, which is positive, is assigned by the application Frustrum.</P>
+<P>
+<A NAME="50548805_pgfId-274048"></A>The partition rolling mechanism works by storing the changes between pmarks. These record the entities which need to be created, modified or deleted in order to move from one pmark to an adjacent one (either backwards or forwards). These deltas are written out through the Frustrum interface, stored by the application Frustrum, and read back in during a roll operation.</P>
+
+<H3>
+<A NAME="50548805_pgfId-274049"></A>	C.1.1 	Example PK_DELTA frustrum code</H3>
+<P>
+<A NAME="50548805_pgfId-274050"></A>The file <CODE>
+frustrum_delta.c</CODE>
+ in the Parasolid release area lists the code for an example PK_DELTA Frustrum, required for running the partitioned PK rollback system.</P>
+<P>
+<A NAME="50548805_pgfId-274051"></A>The example Frustrum is provided for the following purposes:</P>
+<UL>
+<LI>
+<A NAME="50548805_pgfId-274052"></A>To allow the building and running of the Parasolid installation acceptance test program.</LI>
+<LI>
+<A NAME="50548805_pgfId-274053"></A>To allow users to build and run simple prototype applications using rollback without first having to write a complete Frustrum.</LI>
+<LI>
+<A NAME="50548805_pgfId-274054"></A>To aid users in writing their own Frustrum.</LI>
+</UL>
+<P>
+<A NAME="50548805_pgfId-274055"></A>This Frustrum contains the bare minimum required to be used, in order for it to remain clear and platform independent. Normally a Frustrum is written with a particular application in mind, and may make use of system calls rather than the C run-time library for enhanced performance.</P>
+
+
+<H3>
+<A NAME="50548805_pgfId-274057"></A>	C.1.2 	<A NAME="50548805_marker-274056"></A>Criteria of use</H3>
+<UL>
+<LI>
+<A NAME="50548805_pgfId-274058"></A>Delta files are not read beyond their length. </LI>
+<LI>
+<A NAME="50548805_pgfId-274059"></A>Delta files deleted by Parasolid (via delete) are not referred to again.</LI>
+<LI>
+<A NAME="50548805_pgfId-274060"></A>The Frustrum must only delete files when told to.</LI>
+<LI>
+<A NAME="50548805_pgfId-274061"></A>There may be more than one delta file associated with a given pmark at a given time.</LI>
+<LI>
+<A NAME="50548805_pgfId-274062"></A>If a new pmark is created, and the partition is currently at a pmark, a zero-length delta is output to the Frustrum, which must be stored.</LI>
+<LI>
+<A NAME="50548805_pgfId-274063"></A>The pmark passed to the <CODE>
+open_for_write</CODE>
+ function may sometimes be PK_PMARK_null, in which case the delta does not correspond to a pmark visible to the application. The application should store this delta as usual, and it is deleted by Parasolid when no longer required.</LI>
+</UL>
+<P>
+<A NAME="50548805_pgfId-274064"></A>There is further information on the Frustrum requirements of Partitioned Rollback in <A HREF="fd_chap.096.html#36055">Chapter 95, “Partitions”</A>, of the Parasolid <A HREF=../fd_index.html>Functional Description</A> Manual.</P>
+
+<H3>
+<A NAME="50548805_pgfId-274069"></A>	C.1.3 	<A NAME="50548805_marker-274068"></A>Registering the rollback frustrum functions</H3>
+<P>
+<A NAME="50548805_pgfId-286471"></A>The partitioned rollback functions must be registered with Parasolid by calling the function <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>, before the Parasolid session is started.</P>
+
+
+<H3>
+<A NAME="50548805_pgfId-286472"></A>	C.1.4 	Delta functions that can be registered</H3>
+<P>
+<A NAME="50548805_pgfId-284223"></A>This section describes the delta functions that you can register during a Parasolid session.</P>
+<P>
+<A NAME="50548805_pgfId-286989"></A>&nbsp;</P>
+<TABLE>
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<ADDRESS>
+<A NAME="50548805_pgfId-279939"></A>Note: In the following Frustrum function definitions, the function names given are purely nominal, as the functions are registered by the call to <A HREF=../headers/pk_delta_register_callbacks.html>PK_DELTA_register_callbacks</A>.</ADDRESS><BR>
+</TD>
+</TR>
+</TABLE>
+
+<H4>
+<A NAME="50548805_pgfId-285981"></A>C.3.1.5 <A NAME="50548805_marker-284388"></A><A NAME="50548805_marker-284389"></A>open_for_write</H4>
+<P>
+<A NAME="50548805_pgfId-285989"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50548805_pgfId-285984"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> open_for_write</PRE>
+<PRE><A NAME="50548805_pgfId-285985"></A>(</PRE>
+<PRE><A NAME="50548805_pgfId-285986"></A><A HREF=../headers/pk_pmark_t.html>PK_PMARK_t</A>      pmark, /* pmark associated with delta */</PRE>
+<PRE><A NAME="50548805_pgfId-285987"></A>PK_DELTA_t      delta  /* delta file to open          */</PRE>
+<PRE><A NAME="50548805_pgfId-285988"></A>)</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548805_pgfId-285990"></A>Opens a new delta file for writing, associated with the given pmark. Returns a PK_DELTA_t value chosen by the Frustrum which Parasolid uses to identify this delta file.</P>
+<P>
+<A NAME="50548805_pgfId-285991"></A>If <CODE>
+pmark</CODE>
+ is PK_PMARK_null, the delta file is internal to Parasolid and is deleted when no longer required.</P>
+
+
+<H4>
+<A NAME="50548805_pgfId-285994"></A>C.3.1.6 <A NAME="50548805_marker-285992"></A><A NAME="50548805_marker-285993"></A>open_for_read</H4>
+<P>
+<A NAME="50548805_pgfId-286001"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50548805_pgfId-285997"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> open_for_read</PRE>
+<PRE><A NAME="50548805_pgfId-285998"></A>(</PRE>
+<PRE><A NAME="50548805_pgfId-285999"></A>PK_DELTA_t      delta /* delta file to open */</PRE>
+<PRE><A NAME="50548805_pgfId-286000"></A>)</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548805_pgfId-286002"></A>Opens an existing, closed delta file for reading.</P>
+
+
+<H4>
+<A NAME="50548805_pgfId-286005"></A>C.3.1.7 <A NAME="50548805_marker-286003"></A><A NAME="50548805_marker-286004"></A>close</H4>
+<P>
+<A NAME="50548805_pgfId-286012"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50548805_pgfId-286008"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> close</PRE>
+<PRE><A NAME="50548805_pgfId-286009"></A>(</PRE>
+<PRE><A NAME="50548805_pgfId-286010"></A>PK_DELTA_t      delta /* delta file to close */</PRE>
+<PRE><A NAME="50548805_pgfId-286011"></A>)</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548805_pgfId-286013"></A>Closes delta file <CODE>
+delta</CODE>
+, which is open. The function <CODE>
+close</CODE>
+ is provided as a courtesy to the application and is invoked as early as possible.</P>
+
+
+<H4>
+<A NAME="50548805_pgfId-286016"></A>C.3.1.8 <A NAME="50548805_marker-286014"></A><A NAME="50548805_marker-286015"></A>write</H4>
+<P>
+<A NAME="50548805_pgfId-286025"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50548805_pgfId-286019"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> write</PRE>
+<PRE><A NAME="50548805_pgfId-286020"></A>(</PRE>
+<PRE><A NAME="50548805_pgfId-286021"></A>PK_DELTA_t      delta,   /* delta file to write      */</PRE>
+<PRE><A NAME="50548805_pgfId-286022"></A>int             n_bytes, /* number of bytes to write */</PRE>
+<PRE><A NAME="50548805_pgfId-286023"></A>char           *bytes    /* bytes to write           */</PRE>
+<PRE><A NAME="50548805_pgfId-286024"></A>)</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548805_pgfId-286026"></A>Writes <CODE>
+n_bytes</CODE>
+ to the delta file <CODE>
+delta</CODE>
+ (which is open) from the array <CODE>
+bytes</CODE>
+. <CODE>
+n_bytes</CODE>
+ may often be as small as 20, so the application may wish to provide a buffering mechanism.</P>
+
+
+<H4>
+<A NAME="50548805_pgfId-286029"></A>C.3.1.9 <A NAME="50548805_marker-286027"></A><A NAME="50548805_marker-286028"></A>read</H4>
+<P>
+<A NAME="50548805_pgfId-286038"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50548805_pgfId-286032"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> read</PRE>
+<PRE><A NAME="50548805_pgfId-286033"></A>(</PRE>
+<PRE><A NAME="50548805_pgfId-286034"></A>PK_DELTA_t      delta,   /* delta file to read                 */</PRE>
+<PRE><A NAME="50548805_pgfId-286035"></A>int             n_bytes, /* number of bytes to read            */</PRE>
+<PRE><A NAME="50548805_pgfId-286036"></A>char           *bytes    /* array in which to store read bytes */</PRE>
+<PRE><A NAME="50548805_pgfId-286037"></A>)</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548805_pgfId-286039"></A>Reads <CODE>
+n_bytes</CODE>
+ from the  delta file <CODE>
+delta</CODE>
+ (which is open) to the array <CODE>
+bytes</CODE>
+. <CODE>
+n_bytes</CODE>
+ may often be as small as 20, so the application may wish to provide a buffering mechanism. Parasolid never requests more bytes (in total) than were written. Parasolid does not guarantee that the sequence of values of <CODE>
+n_bytes</CODE>
+ resembles those given to <CODE>
+write</CODE>
+.</P>
+<P>
+<A NAME="50548805_pgfId-286040"></A>If <CODE>
+bytes</CODE>
+ is NULL then no data should be written to the array, but the file position should be advanced.</P>
+
+
+<H4>
+<A NAME="50548805_pgfId-286043"></A>C.3.1.10 <A NAME="50548805_marker-286041"></A><A NAME="50548805_marker-286042"></A>delete</H4>
+<P>
+<A NAME="50548805_pgfId-286050"></A>&nbsp;</P>
+<TABLE BORDER="1">
+<TR>
+<TD ROWSPAN="1" COLSPAN="1">
+<PRE><A NAME="50548805_pgfId-286046"></A><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A> delete</PRE>
+<PRE><A NAME="50548805_pgfId-286047"></A>(</PRE>
+<PRE><A NAME="50548805_pgfId-286048"></A>PK_DELTA_t      delta /* delta file to delete */</PRE>
+<PRE><A NAME="50548805_pgfId-286049"></A>)</PRE>
+</TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="50548805_pgfId-286051"></A>The function <CODE>
+delete</CODE>
+ is used by Parasolid to indicate that the given delta (which exists and is closed) is not required again. Parasolid performs no further operations (including <CODE>
+delete</CODE>
+) on <CODE>
+delta</CODE>
+.</P>
+<P>
+<A NAME="50548805_pgfId-273605"></A>&nbsp;</P>
+
+
+
+<A NAME="endofdoc"></A>
+
+<P ALIGN=RIGHT>
+<A HREF="#topofdoc"><I>[back to top]</I></A>
+</P>
+
+<P></P><TABLE BORDER ALIGN=CENTER><TR>
+  <TD>&lt;&lt;&lt; <A HREF="di_chap.08.html">Graphical Output Functions</A></TD>
+  <TD><A HREF="../di_index.html">Chapters</A></TD>
+  <TD><A HREF="di_chap.10.html">PK_MEMORY Functions</A> &gt;&gt;&gt;</TD>
+</TR></TABLE>
+
+</BODY>
+</HTML>

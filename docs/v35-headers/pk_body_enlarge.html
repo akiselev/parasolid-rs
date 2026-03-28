@@ -1,0 +1,104 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_enlarge</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_enlarge</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>            PK_BODY_enlarge
+(
+<I>--- received arguments ---
+</I><A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                  body,            --- body to enlarge
+<A HREF=../headers/pk_scale_factor_t.html>PK_scale_factor_t</A>          factor,          --- scale factor
+<A HREF=../headers/pk_transf_t.html>PK_TRANSF_t</A>                transf,          --- transformation
+double                     tolerance,       --- tolerance
+const <A HREF=../headers/pk_body_enlarge_o_t.html>PK_BODY_enlarge_o_t</A> *options,         --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_enlarge_r_t.html>PK_BODY_enlarge_r_t</A> *const returns          --- returns
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a new body by enlarging the body by the given factor.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_unsuitable_entity     body is not a sheet or solid body (MILD)
+    PK_ERROR_bad_value             scaling factor takes body out of valid
+                                   range (MILD)
+    PK_ERROR_outside_box           the enlarged body is outside the size box or
+                                   the supplied trimming box (MILD)
+    PK_ERROR_wrong_transf          <B>'transf'</B> contains scale, shear, or
+                                   perspective component.  (MILD)
+
+<A NAME="documentation"></A>
+
+This function creates a new body copied from the supplied <B>'body'</B> whose geometry
+is derived from the original geometry by enlarging it by the given scale factor
+and then transforming it through the given transformation. The centre of
+scaling is the origin.
+
+Replacement surfaces will satisfy the first possible of the following list
+of criteria:
+
+ 1 - be of the same class as the original geometry,
+ 2 - be exactly coincident with the enlargement of the original geometry,
+ 3 - not deviate by more than the given <B>'tolerance'</B> from the enlargement of
+     the original geometry.
+
+Replacement curves will satisfy the same criteria in order of precedence
+unless the curve lies on an edge which is at the junction of faces, of which
+at least one of the attached surfaces has been approximated (criterion 3), in
+which case, the edge curve will be re-computed as the intersection of the
+faces' surfaces.
+
+Replacement points are all computed by putting the original point through the
+enlargement.
+
+The enlarged body will be trimmed to fit inside the size box or an optionally
+provided trimming box. This trimming might result in multiple result bodies or
+optionally a single disjoined body.  Where a solid region is trimmed, its
+solidity will be preserved by bounding it with additional faces from the box.
+
+Tracking information is optionally returned to map the original entities to the
+enlarged entities.
+
+If the input <B>'body'</B> has system attribute SDL/TYSA_SCALE_FACTOR attached, the
+integer value of this attribute representing the scale factor will be updated
+on the returned enlarged body(ies).
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

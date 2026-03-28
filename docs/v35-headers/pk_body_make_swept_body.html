@@ -1,0 +1,402 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_BODY_make_swept_body</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY background=../graphics/deprecated.gif link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_BODY_make_swept_body</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_BODY_make_swept_body
+(
+<I>--- received arguments ---
+</I>const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                     profile,         --- profile to sweep
+const <A HREF=../headers/pk_body_t.html>PK_BODY_t</A>                     path,            --- path of sweep
+const <A HREF=../headers/pk_vertex_t.html>PK_VERTEX_t</A>                   path_start,      --- path start vertex
+const <A HREF=../headers/pk_body_make_swept_body_o_t.html>PK_BODY_make_swept_body_o_t</A>  *options,         --- options on sweeping
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_body_tracked_sweep_r_t.html>PK_BODY_tracked_sweep_r_t</A>    *const swept_body       --- result swept body
+)
+</B>
+<A NAME="description"></A>
+<I>This function creates a sheet or solid body by sweeping a wire or sheet
+profile along a wire path.
+
+NOTE: This function is deprecated and has been superseded by
+<A HREF=../headers/pk_body_make_swept_body_2.html>PK_BODY_make_swept_body_2</A>.
+
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_bad_type               Either of the profile or path is of the
+                                    incorrect type.
+
+    PK_ERROR_bad_twist_law          The data handed in for the twist law
+                                    could not be made to represent a valid
+                                    twist law.
+
+    PK_ERROR_bad_scale_law          The data handed in for the scale law
+                                    could not be made to represent a valid
+                                    scale law.
+
+    PK_ERROR_bad_value              An unrecognised token was passed to request
+                                    the level of attempted simplification, or
+                                    the value passed to specify the alignment
+                                    of the profile with respect to the path was
+                                    not recognised.
+
+    PK_ERROR_sweep_failed           PK_BODY_make_swept_body suffered an
+                                    internal algorithmic failure.
+
+
+<A NAME="documentation"></A>
+
+
+Introduction
+This function creates sheet or solid bodies from wire or sheet profiles by
+sweeping them along a specified wire path. The wire or sheet profile is
+supplied in the <B>'profile'</B> argument and it is swept along the wire path
+specified in <B>'path'</B>.
+
+The shape and structure of the swept body can be modified via the following
+controls within the option structure :
+
+    o Twist and scale transformations
+    o Profile alignment
+    o Sweep improvement
+    o Geometry simplification
+    o Topological structure
+
+
+The user is informed of the result of the sweep operation via a returned
+results structure which contains the resultant swept body, tracking and error
+information.
+
+See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-294996">Sweeping</A> for more information.
+
+
+Profile Specification
+The type of body (sheet or solid) created by this function depends on the type
+of body (wire or sheet) used to define the profile for the sweep.
+
+
+  Wire Profiles
+  If a wire body is specified as the sweep profile, the resulting body will be
+  a sheet body. The following points need to be considered when specifying a
+  wire profile :
+  
+   o The wire profile may be disjoint (i.e. it can consist of more
+     than one component.)
+  
+   o Each component of the wire profile must be oriented
+     (<A HREF=../headers/pk_edge_propagate_orientation.html>PK_EDGE_propagate_orientation</A>  may be used to achieve this.)
+  
+   o The faces of the sheet body will be constructed so that the outward
+     normal is aligned with the cross product of :
+        o The tangent in the direction of the profile orientation.
+        o The tangent along the path in the direction of its orientation.
+  
+   o The input wire profile will not be modified or deleted by the sweep
+     operation. None of the received wire profile topology, nor its geometry,
+     is incorporated into the resultant sheet body.
+  
+
+  Sheet Profiles
+  If a sheet body is specified as the sweep profile, the resulting body will be
+  a solid body. The following points need to be considered when specifying a
+  sheet profile :
+  
+   o The sheet profile may be disjoint (i.e., it can consist of more than one
+     component.) Each component may have more than one laminar boundary
+  
+   o The input sheet profile will not be modified or deleted by the sweep
+     operation.
+     Note for the following types of sweep path :
+       o Open path : The resultant swept solid will be capped at the start
+         and end with the necessary parts of transformed copies of the
+         sheet profile body.
+       o Closed path : The resultant swept solid will not contain any of the
+         sheet profile topology or its geometry.
+  
+
+See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-295002">Supplying a profile</A> for more information.
+
+Path Specification
+The sweep path body must be a wire body. The following points need to be
+considered when specifying a wire body for the sweep path :
+
+  o The sweep path is expected to be a manifold connected wire that
+    is oriented (by use of <A HREF=../headers/pk_edge_propagate_orientation.html>PK_EDGE_propagate_orientation</A> if necessary).
+
+  o The sweep path need not be G1 continuous.  At non-G1 vertices the
+    resultant swept body will have mitered corners.
+
+  o The sweep path must not contain any tolerant vertices.
+
+  o The start of the sweep operation is determined by the vertex specified in
+    the <B>'path_start'</B> argument.  For an open path, the <B>'path_start'</B> argument
+    need not be supplied, in which case the first vertex on the wire body
+    will be taken as the sweep path's start vertex.
+
+  o It is an error to specify a wire path that is a single ring edge with
+    no vertices.
+
+See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-295529">Supplying a path</A> for more information.
+
+Sweep Shape Controls
+The shape of the resultant swept body can be modified via the shape controls
+within the function's option structure.
+
+
+ Profile Alignment
+ When sweeping the profile along the path, its orientation may either; be
+ held constant, or vary along the sweep by maintaining a fixed relationship
+ with the tangent on the sweep path.
+ 
+ The choice is made through the <B>'alignment'</B> field of the structure passed
+ to the received <B>'options'</B> argument. This field should be set to one of
+ the following values
+ 
+    o PK_BODY_sweep_alignment_parallel_c, selects constant orientation
+    o PK_BODY_sweep_alignment_normal_c, the default, selects varying
+      orientation
+ 
+ The alignment control is applied to the profile prior to any application
+ of a transformation implied by scale or twist laws ( see below ).
+ 
+ See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-296683">Controlling the profile alignment</A> for more information.
+
+
+ Sweep Improvement
+ The behaviour of the sweep along the path can be enhanced by setting the
+ <B>'fair'</B> field. Selecting the appropriate option will mean that certain
+ characteristics of the path that would lead to undesirable properties in the
+ resultant body are ignored by Parasolid. This field should be set to
+ PK_BODY_sweep_fair_default_c for the latest functionality, except where
+ previous functionality is required for updating older models.
+ 
+
+
+ Twist and Scale Controls
+ Variation from a simple sweep of a fixed profile is enabled by controlling :
+    o Angles of rotation about the path tangent at the point on the path
+     (twist) in radians.
+    o Scale magnifications
+ 
+ Twist and scale controls may only be supplied with G1 continuous paths.
+ 
+
+  Twist Control
+  Twist is specified via the <B>'twist'</B> field of the function's option
+  structure. The twist is specified as a rotation transformation of the
+  profile about the tangent lines of the path. The twist may be applied
+  by providing one of the following :
+  
+      o A set of radian angular values to be interpolated at each
+        vertex on the path. A constant or linear interpolated twist
+        between the start and end vertices can be achieved via this
+        control. See the <A HREF=../headers/pk_body_sweep_law_discrete_t.html>PK_BODY_sweep_law_discrete_t</A> documentation
+        for more details.
+  
+      o A 1-D twist law function parameterised [0,1] proportionally to the
+        arc length of the path (e.g. evaluating it at t = 0.5 should produce
+        the angle to be rotated through by the profile half way along the
+        path).
+  
+      o The inverse of a 1-D twist law function as described above.  This
+        inverse function should be parameterised over the range of twist
+        values required and should evaluate to values in the range [0,1]
+        proportionally to the arc length of the path (e.g. the parameter
+        giving rise to the value 0.5 should be the angle to be rotated
+        through by the profile half way along the path).  Each value of
+        the law must correspond to a unique parameter.  An inverse law
+        may not be provided on a closed path.
+  
+  In specifying twist controls it should be remembered that all sweeps are
+  carried out making appropriate transformations on the profile about the
+  appropriate location on the path. Twist transformations will cause rotations
+  of the whole profile around the path, producing corkscrew like sweeps where
+  the profile isn't pierced by the path.
+  
+  See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-297046">Specifying twist</A> for more information.
+
+  Scale Control
+  Scale is specified via the <B>'scale'</B>, <B>'scale_type'</B> and <B>'scale_point'</B> fields of
+  the function's options structure.
+  
+  The <B>'scale'</B> option provides the actual scale law.  It should be one of the
+  following:
+  
+      o A set of scale values to be interpolated at each vertex on the path.
+        The scale values specified via this control must always be positive.
+        A constant or linear interpolated scaling between the start and end
+        vertices can be achieved via this control. See the
+        <A HREF=../headers/pk_body_sweep_law_discrete_t.html>PK_BODY_sweep_law_discrete_t</A> documentation for more details.
+  
+      o A 1-D scale law function parameterised [0,1] proportionally to the
+        arc length of the path ( e.g. evaluating it at t = 0.5 should produce
+        the scale to be applied to the profile half way along the path ).
+        The scale law must always evaluate to positive values.
+  
+      o The inverse of a 1-D scale law function as described above.  This
+        inverse function should be parameterised over the range of scaling
+        required and should evaluate to values in the range [0,1]
+        proportionally to the arc length of the path (e.g. the parameter
+        giving rise to the value 0.5 should be the scale to be applied
+        to the profile half way along the path).  Each value of the law must
+        correspond to a unique parameter.  An inverse law may not be
+        provided on a closed path.  The parameter interval of an inverse
+        scale law must always be positive.
+  
+  The effect of a scale law upon the profile is controlled using the
+  <B>'scale_type'</B> and <B>'scale_point'</B> options.  Depending on the <B>'scale_type'</B>,
+  a supplied scale can either:
+  
+      o Change the size of the profile, keeping the distance between the
+        supplied <B>'scale_point'</B> and the path constant.
+      o Keep the size of the profile constant, changing the distance between
+        the supplied <B>'scale_point'</B> and the path.
+      o Alter both the size of the profile and the distance of the profile
+        from the path - no <B>'scale_point'</B> is required. This is the default
+        behaviour.
+  
+  See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-297380">Specifying scale</A> for more information.
+
+Swept Body Structure Controls
+The structure of the resultant swept body can be modified via controls within
+the function's option structure.
+
+
+ Topological Structure of Swept Body
+ The topological structure of the resultant swept body may be controlled via
+ the <B>'topology_form'</B> field within the option structure. Further control is
+ available via the <B>'ignorable_vertices'</B> field. <B>'topology_form'</B> may be set to
+ one of the following values :
+ 
+    o PK_BODY_topology_minimal_c: (default) The swept body will have the
+      minimum number of faces possible. Profile edges which meet smoothly
+      may be swept into a single face. For closed smooth paths, a set of edges
+      corresponding to the profile's position will be created, unless the
+      path start vertex is supplied in the <B>'ignorable_vertices'</B> array.
+ 
+    o PK_BODY_topology_columns_c:  The swept body will have one set of faces
+      for each edge in the profile regardless of whether they are smoothly
+      connected. For closed smooth paths, a set of edges corresponding to the
+      profile's position will be created, unless the path start vertex is
+      supplied in the <B>'ignorable_vertices'</B> array.
+ 
+    o PK_BODY_topology_grid_c:  The swept body will have a set of faces
+      corresponding to each profile edge. In each column of faces, an edge
+      will be made corresponding to each vertex on the path, unless that vertex
+      is supplied in the <B>'ignorable_vertices'</B> array.
+ 
+ See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-297741">Specifying final topology</A> for more information.
+
+ Geometry Simplification
+ The simplification of the geometry of individual swept faces may be
+ attempted, depending on the value of the <B>'simplify'</B> field within the
+ option structure. The field may be set to one of the following values :
+ 
+    o PK_BODY_simplify_no_c: B-spline geometry will be used to represent
+      the sweep of all sections of the profiles.
+ 
+    o PK_BODY_simplify_analytic_c (default): The swept surfaces may be replaced
+      where the combination of sweep profile and path edge geometries
+      produces an analytic simplification of the sweep. If the surface of
+      a face is simplified, the edges of the face may be simplified as well.
+ 
+    o PK_BODY_simplify_swept_spun_c: This simplify option is invalid for
+      PK_BODY_make_swept_body. The function will fail with error
+      PK_ERROR_not_implemented.
+ 
+ See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-298230">Simplifying the final body</A> for more information.
+
+Nominal Geometry on the Swept Body
+The resultant swept body will always have nominal geometry enabled. The state
+of the nominal geometry flag on the resultant swept body can be enquired and
+set via <A HREF=../headers/pk_body_ask_curve_nmnl_state.html>PK_BODY_ask_curve_nmnl_state</A> and <A HREF=../headers/pk_body_set_curve_nmnl_state.html>PK_BODY_set_curve_nmnl_state</A>
+respectively.
+
+The edges in the resultant swept body which are copied from transformed
+versions of the input profile will have nominal geometry associated with
+them. The edges formed as a result of the sweeping operation (lateral edges)
+may have nominal geometry associated with them.
+
+The nominal geometry for an edge may be acquired via the functions,
+<A HREF=../headers/pk_edge_ask_curve_nmnl.html>PK_EDGE_ask_curve_nmnl</A> and <A HREF=../headers/pk_edge_ask_geometry_nmnl.html>PK_EDGE_ask_geometry_nmnl</A>.
+
+See <A HREF="../chapters/fd_chap.039.html#50434398_pgfId-298424">Nominal geometry</A> for more information.
+
+Returned Tracking and Error Information
+The resultant swept body is returned in <B>'swept_body'</B> as a structure that
+packages it with associated status and tracking information.
+
+The status information, in the <B>'status'</B> field of the returned structure,  is
+itself a structure that contains information on any failure to create the
+swept body. The type of fault that occurred is indicated by the <B>'fault'</B>
+field. The location of the fault is given by a point and topology in the
+<B>'fault_location'</B> and <B>'fault_topol'</B> fields respectively.
+
+
+The tracking information relates topology prior to the operation, to topology
+after it. Details of the structure of this information are given in the
+documentation on <A HREF=../headers/pk_topol_track_r_t.html>PK_TOPOL_track_r_t</A>.
+
+The tracking information will relate faces in the resultant body to faces and
+edges in the received profile and path bodies. The tracking records contain :
+
+    o for a lateral face generated by sweeping an edge :
+
+        <B>'product_topols'</B>  is an array containing that lateral face
+        <B>'original_topols'</B> is the set of edges in the profile and path from
+         which it was generated.  Where the lateral face results from mitring
+         a corner the path topology will be the corresponding non-G1 vertex.
+
+    o for a face in an end cap copied from a sheet profile :
+
+        <B>'product_topols'</B>  is an array containing that end face
+        <B>'original_topols'</B> is an array holding the single face in the original
+         profile for which it is a transformed copy, and the corresponding
+         start or end vertex on the path.
+
+
+Topologies involved in many topological operations may appear in several
+tracking records.  In particular, where several product topologies arise from
+the same original topologies these products will be grouped together in a
+single track record.
+
+
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>

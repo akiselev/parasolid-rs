@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"><HTML>
+<HEAD>
+<TITLE>PK_FACE_classify_details</TITLE>
+<LINK rel="stylesheet" href="../ps_doc.css">
+</HEAD>
+<BODY bgcolor="#ffffff" link="#0F3A68" vlink="#878787" alink="#FF7600" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" background="../images/background.gif">
+<A NAME="topofdoc"></A>
+
+<TABLE cellpadding=0 cellspacing=0 border=0 width=100%>
+  <TR>
+    <TD>&nbsp;<IMG src="../graphics/psbar_l.gif" border=0></TD>
+    <TD align=RIGHT valign=CENTER>
+        <FONT face="helvetica,arial" SIZE=5 class=NS28pt>
+        <B>PK_FACE_classify_details</B></FONT></TD>
+    <TD>&nbsp;&nbsp;</TD>
+  </TR>
+</TABLE>
+
+<A NAME="endofcontents"></A>
+<PRE>
+
+<A NAME="declaration"></A><B><A HREF=../headers/pk_error_code_t.html>PK_ERROR_code_t</A>                     PK_FACE_classify_details
+(
+<I>--- received arguments ---
+</I>int                                 n_facesets,  --- number of facesets
+<A HREF=../headers/pk_face_array_t.html>PK_FACE_array_t</A>                     facesets[],  --- facesets
+<A HREF=../headers/pk_detail_t.html>PK_detail_t</A>                         details[],   --- details
+const <A HREF=../headers/pk_face_classify_details_o_t.html>PK_FACE_classify_details_o_t</A> *options,     --- options structure
+
+<I>--- returned arguments ---
+</I><A HREF=../headers/pk_face_classify_details_r_t.html>PK_FACE_classify_details_r_t</A> *const results      --- results
+)
+</B>
+<A NAME="description"></A>
+<I>This function classifies the given faceset as details of some type.
+
+This function does not support facet geometry [NF]
+</I>
+<A NAME="errors"></A>
+<B>Specific Errors:</B>
+    PK_ERROR_not_implemented       (MILD) requested option not implemented
+    PK_ERROR_not_connected         (MILD) the faces of a faceset do not form
+                                   a connected set
+    PK_ERROR_not_in_same_body      (MILD) faces not all from same body
+    PK_ERROR_duplicate_array_item  (MILD) some face appears more than once in
+                                   a faceset
+
+<A NAME="documentation"></A>
+This function attempts to recognize each of the given <B>'facesets'</B> as comprising
+a detail whose form is indicated by the corresponding entry in the <B>'details'</B>
+argument.
+
+If the faceset cannot be recognized as such a detail then the <B>'detail_type'</B> in
+the <A HREF=../headers/pk_detail_def_t.html>PK_detail_def_t</A> for this faceset will be set to <A HREF=../headers/pk_detail_type_t.html>PK_detail_type_unknown_c</A>.
+
+If the faceset can be recognized as such a detail, then the <B>'detail_type'</B> will
+be set to the appropriate type and the detail definition for that type will
+be placed in the <B>'detail'</B> field of the <A HREF=../headers/pk_detail_def_t.html>PK_detail_def_t</A>.
+
+RESTRICTIONS:
+Currently members of the <B>'details'</B> array may only take the values:
+    <A HREF=../headers/pk_detail_t.html>PK_detail_hole_cyl_c</A>
+    <A HREF=../headers/pk_detail_t.html>PK_detail_hole_cyl_through_c</A>
+    <A HREF=../headers/pk_detail_t.html>PK_detail_hole_cyl_blind_c</A>
+If the detail is set to <A HREF=../headers/pk_detail_t.html>PK_detail_hole_cyl_c</A> then both through and blind holes
+will be recognized.  If set to one of the others, then only through or blind
+holes will be recognized.
+
+RESTRICTIONS ON HOLE RECOGNITION:
+ - a hole cannot be recognized if any loop bounding the given faceset does
+   not encircle the hole axis
+ - a hole cannot be recognized if it has a blend at an open end onto more than
+   one face (ie the blend itself is composed of more than one face)
+
+</PRE>
+
+<SCRIPT type="text/JavaScript" language="JavaScript">
+<!-- 
+// Change date to a readable format
+function to_utc(date)
+{var utc = date.toUTCString();return utc;}
+
+// get last modified date of the current document.
+function date_lastmodified()
+{var mod = document.lastModified, s = "Unknown", d1;
+ if(0 != (d1=Date.parse(mod)))
+  {s = to_utc(new Date(d1));}
+ return s;}	
+// display the last modified date
+document.write("<ADDRESS>Generated on: " + date_lastmodified() + "</ADDRESS>");
+// -->
+</SCRIPT>
+</BODY>
+</HTML>
