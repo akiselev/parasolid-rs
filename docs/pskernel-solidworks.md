@@ -108,6 +108,12 @@ marked `[probed]` / `[static-observed]` / `[dynamic-observed]` in the source.
     `PK_ERROR_sf_t` (severity/n_bad_args/bad_args/entity, plus extra inline
     string fields) is still un-mapped.
 
+11. **`PK_TOPOL_find_box` had an invented `options` argument.** Both the PK
+    reference and the decompilation agree the real form is the 2-argument
+    `(PK_TOPOL_t topol, PK_BOX_t *box)` with no options (the options form is the
+    separate `PK_TOPOL_find_box_2`). Wrapped as `Body::bounding_box()` → `Aabb`;
+    the solid block box is exactly `[-5,-10,0, 5,10,30]`.
+
 ## Known remaining risks
 
 - Only the code paths exercised by `parasolid-test` are validated. Other
