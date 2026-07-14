@@ -98,7 +98,9 @@ impl Body {
         Ok(Body::from_tag(tag))
     }
 
-    /// Create a solid cylinder along the Z axis, centered at the origin.
+    /// Create a solid cylinder along the +Z axis with its base on the z=0
+    /// plane (it spans `z ∈ 0..height`, so the centroid is at `z = height/2`),
+    /// centred on the Z axis in x and y.
     pub fn create_solid_cylinder(radius: f64, height: f64) -> PsResult<Body> {
         let mut tag: PK_BODY_t = PK_ENTITY_null;
         pk_call!(PK_BODY_create_solid_cyl(radius, height, std::ptr::null(), &mut tag));

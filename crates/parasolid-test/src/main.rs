@@ -308,7 +308,11 @@ fn main() {
         let area = 2.0 * std::f64::consts::PI * r * r + 2.0 * std::f64::consts::PI * r * h;
         assert!(rel_ok(mp.amount, vol), "cyl volume {} != {}", mp.amount, vol);
         assert!(rel_ok(mp.periphery, area), "cyl area {} != {}", mp.periphery, area);
-        // Cylinder along Z centred at origin: Izz = 1/2 m r^2.
+        // Base on z=0 plane → centroid at z = h/2, centred on the Z axis.
+        let cg = mp.center_of_gravity;
+        assert!(near0(cg.x, r) && near0(cg.y, r), "cyl CoG x/y not ~0: {:?}", cg);
+        assert!((cg.z - h / 2.0).abs() < 1e-6, "cyl CoG z {} != {}", cg.z, h / 2.0);
+        // Cylinder about its axis: Izz = 1/2 m r^2.
         let izz = 0.5 * mp.mass * r * r;
         assert!(rel_ok(mp.inertia[8], izz), "cyl Izz {} != {}", mp.inertia[8], izz);
     });
@@ -335,6 +339,10 @@ fn main() {
         let area = 4.0 * std::f64::consts::PI.powi(2) * major * minor;
         assert!(rel_ok(mp.amount, vol), "torus volume {} != {}", mp.amount, vol);
         assert!(rel_ok(mp.periphery, area), "torus area {} != {}", mp.periphery, area);
+        // Centred at the origin, major axis along Z.
+        let cg = mp.center_of_gravity;
+        assert!(near0(cg.x, major) && near0(cg.y, major) && near0(cg.z, minor),
+            "torus CoG not ~origin: {:?}", cg);
     });
 
     // =========================================================================
