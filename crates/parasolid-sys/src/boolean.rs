@@ -21,10 +21,15 @@ use std::os::raw::{c_double, c_int};
 // Boolean function enum
 // =============================================================================
 
+// [static-observed] The function tokens are NOT 0/1/2. `PK_BODY_boolean_2`
+// dispatches on `function` with `function - 0x3e1e` and special-cases 0x3e1f,
+// so the enum base is 0x3e1e (15902). The unite/subtract/intersect *mapping*
+// over 0x3e1e..0x3e20 is not yet confirmed dynamically (the boolean needs its
+// nested option sub-structs built first — see the `boolean()` wrapper note).
 pub type PK_boolean_function_t = c_int;
-pub const PK_boolean_unite_c: PK_boolean_function_t = 0;
-pub const PK_boolean_subtract_c: PK_boolean_function_t = 1;
-pub const PK_boolean_intersect_c: PK_boolean_function_t = 2;
+pub const PK_boolean_unite_c: PK_boolean_function_t = 0x3e1e; // 15902 [static, order unconfirmed]
+pub const PK_boolean_subtract_c: PK_boolean_function_t = 0x3e1f; // 15903
+pub const PK_boolean_intersect_c: PK_boolean_function_t = 0x3e20; // 15904
 
 // =============================================================================
 // Boolean material side enum

@@ -230,8 +230,14 @@ models are compared, not just per-call outputs.
 Large, subtle surface (`boolean.rs` = 44 fns, `editing.rs` = 64) — audit only
 when CADabra's Boolean path needs oracling.
 
-- [ ] `PK_BODY_boolean_2` (unite/subtract/intersect) — signature + options
-      (`PK_boolean_o_t`) audit, then volume/topology checks vs known results.
+- [~] `PK_BODY_boolean_2` — signature confirmed correct; **options struct is
+      wrong and the call fails** (`o_t_version_incorrect` 5043). Probed: accepted
+      `o_t_version` 2..=19 (struct defaults to 1); the v2 user struct is ~32 B
+      `{version, function@4, config_ptr@8, default_tol@16, 3 bytes@24-26, int@28}`
+      (not the 176-B struct we model); function tokens 0x3e1e/0x3e1f/0x3e20 (not
+      0/1/2). Blocked on mapping the nested versioned sub-structs (`configuration`,
+      `local_opts`) in the migration routine `FUN_18049b860`. Wrapper marked
+      not-working; returns the kernel error rather than a wrong result.
 - [ ] `PK_FACE_imprint_*` / `PK_BODY_imprint_*` — imprint oracle for CADabra's
       imprint→arrangement stage.
 - [ ] Local ops (blends `blend.rs`, sweeps `sweep.rs`, offsets `offset.rs`,
