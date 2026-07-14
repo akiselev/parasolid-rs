@@ -1,9 +1,13 @@
 //! Surface type — geometry attached to faces.
 
+use std::os::raw::c_int;
+
 use parasolid_sys::*;
 use crate::error::PsResult;
 use crate::entity::Entity;
+use crate::curve::Curve;
 use crate::geom::{Vec3, Axis2};
+use crate::memory::PkArray;
 
 /// Concrete surface type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -179,4 +183,71 @@ impl Surf {
         pk_call!(PK_SURF_parameterise_vector(self.tag, &pos, &mut uv));
         Ok((uv[0], uv[1]))
     }
+
+    /// Intersect this surface with another (`PK_SURF_intersect_surf`).
+    ///
+    /// Both surfaces must be orphan geometry or belong to the **same** body.
+    /// Returns isolated point intersections and intersection curves (each with
+    /// its parameter bounds and raw `PK_intersect_curve_t` kind). Fully
+    /// coincident surfaces yield no intersection data.
+    pub fn intersect(&self, other: &Surf) -> PsResult<SurfIntersection> {
+        let opts = PK_SURF_intersect_surf_o_t {
+            o_t_version: 1,
+            have_box: PK_LOGICAL_false,
+            r#box: PK_BOX_t { coord: [0.0; 6] },
+        };
+        let mut n_vectors: c_int = 0;
+        let mut vectors = std::ptr::null_mut();
+        let mut n_curves: c_int = 0;
+        let mut curves = std::ptr::null_mut();
+        let mut bounds = std::ptr::null_mut();
+        let mut types = std::ptr::null_mut();
+        pk_call!(PK_SURF_intersect_surf(
+            self.tag,
+            other.tag,
+            &opts,
+            &mut n_vectors,
+            &mut vectors,
+            &mut n_curves,
+            &mut curves,
+            &mut bounds,
+            &mut types,
+        ));
+
+        let vec_arr = unsafe { PkArray::from_raw(vectors, n_vectors) };
+        let points = vec_arr.iter().map(|&v| Vec3::from_pk(v)).collect();
+
+        let curve_arr = unsafe { PkArray::from_raw(curves, n_curves) };
+        let bound_arr = unsafe { PkArray::from_raw(bounds, n_curves) };
+        let type_arr = unsafe { PkArray::from_raw(types, n_curves) };
+        let curves = (0..n_curves as usize)
+            .map(|i| IntersectionCurve {
+                curve: Curve::from_tag(curve_arr[i]),
+                bounds: (bound_arr[i].low, bound_arr[i].high),
+                kind: type_arr[i],
+            })
+            .collect();
+
+        Ok(SurfIntersection { points, curves })
+    }
+}
+
+/// One intersection curve from [`Surf::intersect`].
+#[derive(Debug, Clone, Copy)]
+pub struct IntersectionCurve {
+    /// The basis curve of the intersection.
+    pub curve: Curve,
+    /// The parameter interval `(low, high)` of the intersection along `curve`.
+    pub bounds: (f64, f64),
+    /// Raw `PK_intersect_curve_t` kind (values not yet decoded).
+    pub kind: i32,
+}
+
+/// Result of intersecting two surfaces.
+#[derive(Debug, Clone)]
+pub struct SurfIntersection {
+    /// Isolated point (tangential/degenerate) intersections.
+    pub points: Vec<Vec3>,
+    /// Intersection curves.
+    pub curves: Vec<IntersectionCurve>,
 }

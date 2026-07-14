@@ -330,6 +330,11 @@ pub struct PK_SURF_intersect_surf_o_t {
     pub r#box: PK_BOX_t,
 }
 
+/// Type of an intersection curve returned by `PK_SURF_intersect_surf`
+/// (`PK_intersect_curve_t`). Values are not published in the reference; treat
+/// the raw code as opaque until probed. [unknown]
+pub type PK_intersect_curve_t = c_int;
+
 /// Options for `PK_FACE_intersect_surf`.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -574,14 +579,25 @@ unsafe extern "C" {
     ///
     /// Both surfaces must be orphans or from the same body.
     /// Fully coincident surfaces yield no intersection data.
+    /// Intersect two surfaces.
+    ///
+    /// [documented] + [static-observed]: the real signature has **six** output
+    /// arguments in this order — point intersections first, then curves with
+    /// their parameter bounds and types. The earlier binding had only four
+    /// outputs in swapped order (`n_curves, curves, n_points, points`) and was
+    /// missing `bounds`/`types`, so the kernel wrote curve bounds/types through
+    /// uninitialised pointers. `bounds[i]` is the parameter interval of
+    /// `curves[i]`; `types[i]` is its `PK_intersect_curve_t`.
     pub fn PK_SURF_intersect_surf(
         surf_1: PK_SURF_t,
         surf_2: PK_SURF_t,
         options: *const PK_SURF_intersect_surf_o_t,
+        n_vectors: *mut c_int,
+        vectors: *mut *mut PK_VECTOR_t,
         n_curves: *mut c_int,
         curves: *mut *mut PK_CURVE_t,
-        n_points: *mut c_int,
-        points: *mut *mut PK_VECTOR_t,
+        bounds: *mut *mut PK_INTERVAL_t,
+        types: *mut *mut PK_intersect_curve_t,
     ) -> PK_ERROR_code_t;
 
     /// Find intersections between a face and a surface.

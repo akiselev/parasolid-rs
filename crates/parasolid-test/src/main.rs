@@ -451,6 +451,46 @@ fn main() {
     });
 
     // =========================================================================
+    // P4 — surface/surface intersection (SSI oracle)
+    // =========================================================================
+
+    test!("ssi_cylinder_plane_circle", {
+        let _session = Session::start(test_config())?;
+        let r = 5.0;
+        let cyl = Body::create_solid_cylinder(r, 12.0)?;
+        let side = cyl.faces()?.iter().map(|f| f.surf().unwrap())
+            .find(|s| s.surf_type().unwrap() == SurfType::Cylinder).expect("side");
+        let plane = cyl.faces()?.iter().map(|f| f.surf().unwrap())
+            .find(|s| s.surf_type().unwrap() == SurfType::Plane).expect("cap plane");
+        let isect = side.intersect(&plane)?;
+        assert_eq!(isect.points.len(), 0, "cyl∩plane point count");
+        assert_eq!(isect.curves.len(), 1, "cyl∩plane should be one circle");
+        let ic = &isect.curves[0];
+        assert_eq!(ic.curve.curve_type()?, CurveType::Circle, "intersection is a circle");
+        assert!(rel_ok(ic.curve.ask_circle()?.radius, r), "intersection circle radius");
+    });
+
+    test!("ssi_plane_plane_line", {
+        let _session = Session::start(test_config())?;
+        let blk = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let planes: Vec<_> = blk.faces()?.iter().map(|f| f.surf().unwrap()).collect();
+        // Find a non-parallel pair (adjacent faces) whose planes meet in a line.
+        let mut found_line = false;
+        'outer: for i in 0..planes.len() {
+            for j in (i + 1)..planes.len() {
+                let isect = planes[i].intersect(&planes[j])?;
+                if let Some(ic) = isect.curves.first() {
+                    if ic.curve.curve_type()? == CurveType::Line {
+                        found_line = true;
+                        break 'outer;
+                    }
+                }
+            }
+        }
+        assert!(found_line, "two adjacent block face planes should intersect in a line");
+    });
+
+    // =========================================================================
     // P3 — B-rep spine adjacency (Region/Shell/Loop/Fin) on a solid block
     // =========================================================================
 

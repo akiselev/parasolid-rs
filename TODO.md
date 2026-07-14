@@ -147,12 +147,16 @@ the oracle must expose the same adjacency so structures can be compared.
 
 This is CADabra's central algorithm; the oracle here is the payoff.
 
-- [ ] `PK_SURF_intersect_surf` — audit signature + result struct
-      (`distance.rs`), wrap safely, and build an SSI oracle:
-      for each analytic pair (plane-plane, plane-sphere, plane-cyl, plane-cone,
-      sphere-sphere, sphere-cyl, cyl-cyl, cyl-cone, cone-cone, torus-*),
-      produce the intersection curve set and compare topology + sampled points
-      against CADabra rows.
+- [~] `PK_SURF_intersect_surf` — **signature was wrong** (only 4 outputs in
+      swapped order `n_curves,curves,n_points,points`; missing `bounds`+`types`
+      → kernel wrote through uninitialised pointers). Fixed to the documented
+      6-output form `(n_vectors, vectors, n_curves, curves, bounds, types)` and
+      wrapped as `Surf::intersect()` → `SurfIntersection` { points, curves }
+      with per-curve parameter bounds + raw `PK_intersect_curve_t` kind.
+      Validated: cyl-side ∩ cap-plane = one circle (r=5, full 0..2π); two
+      adjacent block face planes = a line. **Remaining:** the full analytic pair
+      matrix (sphere-sphere, cyl-cyl, cone-*, torus-*), coincidence/overlap, and
+      decoding `PK_intersect_curve_t` kind tokens (e.g. 14651 seen).
 - [ ] `PK_CURVE_intersect_curve` and curve/surface intersection — for p-curve
       arrangement checks.
 - [ ] Coincidence/overlap detection to compare against CADabra's
