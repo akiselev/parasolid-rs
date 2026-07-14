@@ -346,6 +346,82 @@ fn main() {
     });
 
     // =========================================================================
+    // P1 — standalone analytic geometry: create -> ask round-trips
+    // =========================================================================
+
+    test!("create_ask_roundtrips", {
+        let _session = Session::start(test_config())?;
+        let zbasis = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+
+        let pl = Surf::plane(zbasis(Vec3::new(0.0, 0.0, 5.0)))?;
+        assert_eq!(pl.surf_type()?, SurfType::Plane);
+        assert!(rel_ok(pl.ask_plane()?.basis.origin.z, 5.0), "plane origin z");
+
+        let sp = Surf::sphere(zbasis(Vec3::new(1.0, 2.0, 3.0)), 4.0)?;
+        let spd = sp.ask_sphere()?;
+        assert!(rel_ok(spd.radius, 4.0), "sphere r");
+        assert!(rel_ok(spd.basis.origin.x, 1.0) && rel_ok(spd.basis.origin.y, 2.0)
+            && rel_ok(spd.basis.origin.z, 3.0), "sphere center {:?}", spd.basis.origin);
+
+        assert!(rel_ok(Surf::cylinder(zbasis(Vec3::zero()), 5.0)?.ask_cylinder()?.radius, 5.0), "cyl r");
+
+        let cod = Surf::cone(zbasis(Vec3::zero()), 3.0, 0.5)?.ask_cone()?;
+        assert!(rel_ok(cod.radius, 3.0) && rel_ok(cod.semi_angle, 0.5), "cone {:?}", (cod.radius, cod.semi_angle));
+
+        let td = Surf::torus(zbasis(Vec3::zero()), 10.0, 3.0)?.ask_torus()?;
+        assert!(rel_ok(td.major_radius, 10.0) && rel_ok(td.minor_radius, 3.0), "torus radii");
+
+        let lnd = Curve::line(Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0))?.ask_line()?;
+        assert!(rel_ok(lnd.origin.x, 1.0) && rel_ok(lnd.direction.y, 1.0), "line {:?}", (lnd.origin, lnd.direction));
+
+        assert!(rel_ok(Curve::circle(zbasis(Vec3::zero()), 7.0)?.ask_circle()?.radius, 7.0), "circle r");
+
+        let eld = Curve::ellipse(zbasis(Vec3::zero()), 6.0, 4.0)?.ask_ellipse()?;
+        assert!(rel_ok(eld.r1, 6.0) && rel_ok(eld.r2, 4.0), "ellipse radii");
+
+        let pp = Point::create(Vec3::new(9.0, 8.0, 7.0))?.position()?;
+        assert!(rel_ok(pp.x, 9.0) && rel_ok(pp.y, 8.0) && rel_ok(pp.z, 7.0), "point {:?}", pp);
+    });
+
+    // =========================================================================
+    // P4 — SSI on orphan analytic surfaces (the pair matrix)
+    // =========================================================================
+
+    test!("ssi_orphan_sphere_sphere", {
+        let _session = Session::start(test_config())?;
+        let zb = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        // Two r=5 spheres, centres 6 apart → circle of radius sqrt(25-9)=4 at x=3.
+        let s1 = Surf::sphere(zb(Vec3::zero()), 5.0)?;
+        let s2 = Surf::sphere(zb(Vec3::new(6.0, 0.0, 0.0)), 5.0)?;
+        let r = s1.intersect(&s2)?;
+        assert_eq!(r.curves.len(), 1, "sphere-sphere = one circle");
+        let cd = r.curves[0].curve.ask_circle()?;
+        assert!(rel_ok(cd.radius, 4.0), "sphere-sphere circle radius {} != 4", cd.radius);
+        assert!(rel_ok(cd.basis.origin.x, 3.0), "circle plane at x=3, got {}", cd.basis.origin.x);
+    });
+
+    test!("ssi_orphan_plane_sphere", {
+        let _session = Session::start(test_config())?;
+        let zb = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        // Plane z=3 ∩ sphere r=5 at origin → circle radius 4.
+        let plane = Surf::plane(zb(Vec3::new(0.0, 0.0, 3.0)))?;
+        let sph = Surf::sphere(zb(Vec3::zero()), 5.0)?;
+        let r = plane.intersect(&sph)?;
+        assert_eq!(r.curves.len(), 1, "plane-sphere = one circle");
+        assert!(rel_ok(r.curves[0].curve.ask_circle()?.radius, 4.0), "plane-sphere circle radius");
+    });
+
+    test!("ssi_orphan_cyl_cyl", {
+        let _session = Session::start(test_config())?;
+        // Two equal-radius cylinders with perpendicular axes intersect in the
+        // classic Steinmetz curves (4 basis-curve segments).
+        let ca = Surf::cylinder(Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0)), 3.0)?;
+        let cb = Surf::cylinder(Axis2::new(Vec3::zero(), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)), 3.0)?;
+        let r = ca.intersect(&cb)?;
+        assert!(r.curves.len() >= 1, "perpendicular equal cylinders should intersect, got {}", r.curves.len());
+    });
+
+    // =========================================================================
     // P2 — surface normal + analytic param round-trips
     // =========================================================================
 

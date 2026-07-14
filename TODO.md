@@ -84,10 +84,14 @@ the same numbers). `_sf_t` field order was wrong before — audit all.
       tan(semi_angle)`. Fixed and volume-validated against the frustum formula.
 - [x] `PK_SPHERE_sf_t`, `PK_CYL_sf_t`, `PK_TORUS_sf_t`, `PK_CIRCLE_sf_t`,
       `PK_ELLIPSE_sf_t`, `PK_CONE_sf_t` field order (basis_set first) — fixed.
-- [ ] Standalone geometry create/ask round-trips (not via a body):
-      `PK_PLANE_*`, `PK_CYL_*`, `PK_CONE_*`, `PK_SPHERE_*`, `PK_TORUS_*`,
-      `PK_LINE_*`, `PK_CIRCLE_*`, `PK_ELLIPSE_*`, `PK_POINT_*`. These are the
-      exact analytic types CADabra mirrors — each must round-trip bit-stably.
+- [x] Standalone (orphan) analytic geometry create/ask round-trips — wrapped as
+      `Surf::plane/cylinder/cone/sphere/torus`, `Curve::line/circle/ellipse`,
+      `Point::create` (new `create.rs`). All nine validated create→ask
+      (`create_ask_roundtrips`). Orphan surfaces feed the intersection oracle
+      directly, unblocking the analytic SSI pair matrix: sphere-sphere and
+      plane-sphere give the exact circle (r=4 for r=5 spheres 6 apart / plane
+      z=3 through r=5 sphere), perpendicular equal cylinders give the Steinmetz
+      curves.
 - [ ] `PK_SURF_make_sheet_body` (by-value uvbox — fixed sig, untested) and
       `PK_CURVE_make_wire_body(_2)` — needed to wrap a bare surface/curve as a
       body for oracle interrogation.

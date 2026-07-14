@@ -32,6 +32,13 @@ pub struct Axis2 {
 }
 
 impl Axis2 {
+    /// Build a placement from an `origin`, a primary `axis` (e.g. a surface
+    /// normal or an axis of revolution) and a `ref_direction` (the local X
+    /// reference, which should be perpendicular to `axis`).
+    pub fn new(origin: Vec3, axis: Vec3, ref_direction: Vec3) -> Self {
+        Self { origin, axis, ref_direction }
+    }
+
     pub(crate) fn from_pk(sf: PK_AXIS2_sf_t) -> Self {
         Self {
             origin: Vec3::from_pk(sf.location),

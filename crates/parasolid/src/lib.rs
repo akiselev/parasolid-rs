@@ -36,6 +36,7 @@ mod vertex;
 mod surf;
 mod curve;
 mod intersect;
+mod create;
 mod point;
 mod compare;
 pub mod boolean;
