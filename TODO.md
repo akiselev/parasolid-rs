@@ -101,8 +101,12 @@ points/derivatives to compare against CADabra's evaluators.
 
 - [x] `PK_SURF_eval` (position + first derivatives), `PK_CURVE_eval`.
 - [~] `PK_CURVE_eval_handed` — arg order fixed (n_derivs before hand), untested.
-- [ ] `PK_SURF_eval_with_normal` / higher-order derivative tables; verify the
-      triangular-vs-square derivative packing (`PK_SURF_eval` `triangular` flag).
+- [~] Surface normal — `Surf::eval_with_normal` (via `PK_SURF_eval` first
+      derivatives, rectangular packing) validated: on a sphere it returns a
+      unit, outward-radial normal at every sample, so the du/dv layout
+      (u @ p[1], v @ p[2]) is correct. Note `PK_SURF_eval_with_normal` itself is
+      **mesh-specific** (averages mvertex normals) — not for analytic surfaces.
+      Higher-order derivative tables / `triangular` flag still untested.
 - [ ] `PK_SURF_parameterise` / `PK_CURVE_parameterise` (point → (u,v)/t) —
       needed to compare parameterizations and for closest-point oracle.
 - [ ] `PK_SURF_ask_uvbox` / `PK_FACE_find_uvbox`, periodicity & seam data

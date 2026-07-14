@@ -346,6 +346,39 @@ fn main() {
     });
 
     // =========================================================================
+    // P2 — surface normal + analytic param round-trips
+    // =========================================================================
+
+    test!("surface_normal_sphere_outward", {
+        let _session = Session::start(test_config())?;
+        let r = 15.0;
+        let body = Body::create_solid_sphere(r)?;
+        let surf = body.faces()?[0].surf()?;
+        for (u, v) in [(0.0, 0.0), (1.0, 0.5), (2.0, -0.7)] {
+            let (p, n) = surf.eval_with_normal(u, v)?;
+            let plen = (p.x * p.x + p.y * p.y + p.z * p.z).sqrt();
+            let nlen = (n.x * n.x + n.y * n.y + n.z * n.z).sqrt();
+            let dot = (p.x * n.x + p.y * n.y + p.z * n.z) / plen; // n · outward radial
+            assert!((plen - r).abs() < 1e-6, "point off sphere: |p|={plen}");
+            assert!((nlen - 1.0).abs() < 1e-9, "normal not unit: {nlen}");
+            assert!((dot - 1.0).abs() < 1e-6, "sphere surface normal not outward radial: {dot}");
+        }
+    });
+
+    test!("cone_params_roundtrip", {
+        let _session = Session::start(test_config())?;
+        // radius (at base/basis origin) 5, height 3, semi-angle 45°.
+        let body = Body::create_solid_cone(5.0, 3.0, std::f64::consts::FRAC_PI_4)?;
+        let cone = body.faces()?.iter()
+            .map(|f| f.surf().unwrap())
+            .find(|s| s.surf_type().unwrap() == SurfType::Cone)
+            .expect("cone should have a conical face")
+            .ask_cone()?;
+        assert!(rel_ok(cone.radius, 5.0), "cone sf radius {} != 5 (radius is at basis origin)", cone.radius);
+        assert!(rel_ok(cone.semi_angle, std::f64::consts::FRAC_PI_4), "cone semi_angle {}", cone.semi_angle);
+    });
+
+    // =========================================================================
     // P3 — B-rep spine adjacency (Region/Shell/Loop/Fin) on a solid block
     // =========================================================================
 

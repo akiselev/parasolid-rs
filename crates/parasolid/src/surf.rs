@@ -26,7 +26,10 @@ pub struct PlaneData { pub basis: Axis2 }
 #[derive(Debug, Clone, Copy)]
 pub struct CylinderData { pub radius: f64, pub basis: Axis2 }
 
-/// Cone parameters: radius at apex end, half-angle in radians, and axis frame.
+/// Cone parameters: `radius` is the cone radius **at the basis frame's origin**
+/// (not at the apex), `semi_angle` is the half-angle in radians, and `basis` is
+/// the axis frame. The radius grows with distance along `+axis` as
+/// `radius + t·tan(semi_angle)`.
 #[derive(Debug, Clone, Copy)]
 pub struct ConeData { pub radius: f64, pub semi_angle: f64, pub basis: Axis2 }
 
