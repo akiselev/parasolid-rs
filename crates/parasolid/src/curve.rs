@@ -113,4 +113,14 @@ impl Curve {
         let tan = Vec3::new(p[3], p[4], p[5]);
         Ok((pos, tan))
     }
+
+    /// Invert the curve: find the parameter `t` of a position on the curve
+    /// (`PK_CURVE_parameterise_vector`). The position should be on (or very
+    /// close to) the curve.
+    pub fn parameterise(&self, position: Vec3) -> PsResult<f64> {
+        let pos = position.to_pk();
+        let mut t = 0.0f64;
+        pk_call!(PK_CURVE_parameterise_vector(self.tag, &pos, &mut t));
+        Ok(t)
+    }
 }

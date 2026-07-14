@@ -107,8 +107,11 @@ points/derivatives to compare against CADabra's evaluators.
       (u @ p[1], v @ p[2]) is correct. Note `PK_SURF_eval_with_normal` itself is
       **mesh-specific** (averages mvertex normals) — not for analytic surfaces.
       Higher-order derivative tables / `triangular` flag still untested.
-- [ ] `PK_SURF_parameterise` / `PK_CURVE_parameterise` (point → (u,v)/t) —
-      needed to compare parameterizations and for closest-point oracle.
+- [x] `PK_SURF_parameterise_vector` / `PK_CURVE_parameterise_vector` (point →
+      (u,v)/t) — wrapped as `Surf::parameterise` / `Curve::parameterise`,
+      validated by eval→parameterise→eval round-trips on sphere/circle. The
+      by-value `PK_VECTOR_t` arg is ABI-passed as a pointer (Win64), so the
+      existing `*const PK_VECTOR_t` bindings are correct.
 - [ ] `PK_SURF_ask_uvbox` / `PK_FACE_find_uvbox`, periodicity & seam data
       (`PK_SURF_ask_...` periodic flags) — CADabra's seam/pole handling needs
       the oracle's periodicity/singularity conventions pinned down exactly.
@@ -181,10 +184,13 @@ Coarse invariants that catch gross modeling errors fast.
       validated: block box is exactly `[-5,-10,0, 5,10,30]`, sphere box centred
       at origin with the right extent.
 - [ ] `PK_TOPOL_range` / `PK_ENTITY_range` (point→body distance / range).
-- [ ] `PK_ENTITY_ask_..` distance: `PK_ENTITY_range` point→body distance,
-      `PK_TOPOL_..` clash/`PK_BODY_..` point containment
-      (`PK_BODY_contains_vectors` or equivalent) — needed for
-      inside/outside classification parity.
+- [x] Point containment — `PK_BODY_contains_vector`. **Signature was wrong**
+      (invented `options` arg + single `PK_CONTAINMENT_t` output); real form is
+      `(body, PK_VECTOR_t vector, PK_enclosure_t *enclosure, PK_TOPOL_t
+      *topology)` with no options. Enclosure tokens were also wrong (0/1/2); real
+      are inside=5701, outside=5702, on=5703 (dynamic-observed). Wrapped as
+      `Body::contains_point()` → `Enclosure`; validated on block + sphere.
+- [ ] `PK_ENTITY_range` point→body distance; `PK_TOPOL_..` clash tests.
 
 ## P6 — File I/O round-trip (model interchange oracle)
 

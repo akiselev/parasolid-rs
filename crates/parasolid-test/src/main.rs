@@ -365,6 +365,37 @@ fn main() {
         }
     });
 
+    test!("surface_parameterise_roundtrip", {
+        let _session = Session::start(test_config())?;
+        // Evaluate a sphere at known (u,v), invert, and confirm eval(uv') == p.
+        let surf = Body::create_solid_sphere(15.0)?.faces()?[0].surf()?;
+        for (u, v) in [(0.4, 0.3), (2.1, -0.6)] {
+            let p = surf.eval(u, v)?;
+            let (u2, v2) = surf.parameterise(p)?;
+            let p2 = surf.eval(u2, v2)?;
+            let d = ((p2.x - p.x).powi(2) + (p2.y - p.y).powi(2) + (p2.z - p.z).powi(2)).sqrt();
+            assert!(d < 1e-6, "surf parameterise round-trip off by {d}");
+        }
+    });
+
+    test!("curve_parameterise_roundtrip", {
+        let _session = Session::start(test_config())?;
+        // A cylinder's circular edge: eval at t, invert, eval again.
+        let body = Body::create_solid_cylinder(5.0, 12.0)?;
+        let curve = body.edges()?.iter()
+            .map(|e| e.curve().unwrap())
+            .find(|c| c.curve_type().unwrap() == CurveType::Circle)
+            .expect("cylinder circular edge")
+            .clone();
+        for t in [0.5f64, 2.0, 4.0] {
+            let p = curve.eval(t)?;
+            let t2 = curve.parameterise(p)?;
+            let p2 = curve.eval(t2)?;
+            let d = ((p2.x - p.x).powi(2) + (p2.y - p.y).powi(2) + (p2.z - p.z).powi(2)).sqrt();
+            assert!(d < 1e-6, "curve parameterise round-trip off by {d}");
+        }
+    });
+
     test!("circle_extraction_cylinder", {
         let _session = Session::start(test_config())?;
         let (r, h) = (5.0, 12.0);
@@ -479,6 +510,31 @@ fn main() {
         for e in &edges {
             assert_eq!(e.fins()?.len(), 2, "manifold edge has 2 fins");
         }
+    });
+
+    // =========================================================================
+    // P5 — point containment (inside / outside / on)
+    // =========================================================================
+
+    test!("contains_point_block", {
+        let _session = Session::start(test_config())?;
+        // Block base at origin: x∈±5, y∈±10, z∈0..30.
+        let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        assert_eq!(body.contains_point(Vec3::new(0.0, 0.0, 15.0))?, Enclosure::Inside);
+        assert_eq!(body.contains_point(Vec3::new(100.0, 0.0, 0.0))?, Enclosure::Outside);
+        assert_eq!(body.contains_point(Vec3::new(0.0, 0.0, -1.0))?, Enclosure::Outside);
+        // A point on the +x face (x=5) is on the boundary.
+        assert_eq!(body.contains_point(Vec3::new(5.0, 0.0, 15.0))?, Enclosure::On);
+    });
+
+    test!("contains_point_sphere", {
+        let _session = Session::start(test_config())?;
+        let r = 15.0;
+        let body = Body::create_solid_sphere(r)?;
+        assert_eq!(body.contains_point(Vec3::zero())?, Enclosure::Inside);
+        assert_eq!(body.contains_point(Vec3::new(r * 0.9, 0.0, 0.0))?, Enclosure::Inside);
+        assert_eq!(body.contains_point(Vec3::new(r + 1.0, 0.0, 0.0))?, Enclosure::Outside);
+        assert_eq!(body.contains_point(Vec3::new(r, 0.0, 0.0))?, Enclosure::On);
     });
 
     // =========================================================================

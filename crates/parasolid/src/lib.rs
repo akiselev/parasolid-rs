@@ -50,7 +50,7 @@ pub use entity::{Entity, PkClass};
 pub use geom::{Axis2, Vec3};
 pub use body::{Body, BodyType};
 pub use mass::{MassProps, DEFAULT_MASS_ACCURACY};
-pub use range::Aabb;
+pub use range::{Aabb, Enclosure};
 pub use topology::{Fin, Loop, LoopType, Region, Shell};
 pub use face::Face;
 pub use edge::Edge;

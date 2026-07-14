@@ -59,12 +59,27 @@ pub type PK_HAND_t = c_int;
 pub const PK_HAND_left_c: PK_HAND_t = 0;
 pub const PK_HAND_right_c: PK_HAND_t = 1;
 
-// -- Containment --------------------------------------------------------------
+// -- Containment / enclosure --------------------------------------------------
 
+/// Legacy alias — the real result type is [`PK_enclosure_t`]. Kept for the
+/// `PK_*_contains_vectors` (plural) bindings that have not yet been audited.
 pub type PK_CONTAINMENT_t = c_int;
 pub const PK_CONTAINMENT_in_c: PK_CONTAINMENT_t = 0;
 pub const PK_CONTAINMENT_out_c: PK_CONTAINMENT_t = 1;
 pub const PK_CONTAINMENT_on_c: PK_CONTAINMENT_t = 2;
+
+/// Enclosure code returned by `PK_BODY_contains_vector`. [probed]
+///
+/// Token values are static-observed from `PK_BODY_contains_vector` (the
+/// enclosure output is assigned 0x1645/0x1646/0x1647) and the name mapping is
+/// dynamic-observed (a point inside / outside / on a solid block).
+pub type PK_enclosure_t = c_int;
+/// The position is inside the body. [probed — dynamic-observed]
+pub const PK_enclosure_inside_c: PK_enclosure_t = 0x1645; // 5701
+/// The position is outside the body. [probed — dynamic-observed]
+pub const PK_enclosure_outside_c: PK_enclosure_t = 0x1646; // 5702
+/// The position lies on the boundary of the body. [probed — dynamic-observed]
+pub const PK_enclosure_on_c: PK_enclosure_t = 0x1647; // 5703
 
 // -- Shell sign ---------------------------------------------------------------
 
@@ -956,11 +971,21 @@ unsafe extern "C" {
     // Spatial containment
     // =========================================================================
 
+    /// Classify a point against a body.
+    ///
+    /// [documented] + [static-observed] (decompile): the real signature is
+    /// `(body, PK_VECTOR_t vector, PK_enclosure_t *enclosure, PK_TOPOL_t
+    /// *topology)` — **no options struct**, and two outputs. The earlier
+    /// binding invented an `options` argument and a single `PK_CONTAINMENT_t`
+    /// output. `vector` is a by-value `PK_VECTOR_t` (24 bytes), which the Win64
+    /// ABI passes as a pointer, so `*const PK_VECTOR_t` is correct. `topology`
+    /// receives the entity the point coincides with when `enclosure` is
+    /// [`PK_enclosure_on_c`] (else `PK_ENTITY_null`).
     pub fn PK_BODY_contains_vector(
         body: PK_BODY_t,
-        position: *const c_double,
-        options: *const PK_BODY_contains_vector_o_t,
-        containment: *mut PK_CONTAINMENT_t,
+        vector: *const PK_VECTOR_t,
+        enclosure: *mut PK_enclosure_t,
+        topology: *mut PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_FACE_contains_vectors(

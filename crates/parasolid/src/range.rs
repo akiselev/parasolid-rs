@@ -36,7 +36,39 @@ impl Aabb {
     }
 }
 
+/// Where a point lies relative to a body.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Enclosure {
+    /// Strictly inside the material.
+    Inside,
+    /// Strictly outside.
+    Outside,
+    /// On the boundary (a face, edge, or vertex).
+    On,
+}
+
 impl Body {
+    /// Classify a point against this body (inside / outside / on the boundary).
+    ///
+    /// Wraps `PK_BODY_contains_vector`. The point must be given in the body's
+    /// own coordinate system.
+    pub fn contains_point(&self, point: Vec3) -> PsResult<Enclosure> {
+        let v = point.to_pk();
+        let mut enclosure: PK_enclosure_t = 0;
+        let mut topol: PK_TOPOL_t = PK_ENTITY_null;
+        pk_call!(PK_BODY_contains_vector(self.tag, &v, &mut enclosure, &mut topol));
+        Ok(match enclosure {
+            PK_enclosure_inside_c => Enclosure::Inside,
+            PK_enclosure_outside_c => Enclosure::Outside,
+            PK_enclosure_on_c => Enclosure::On,
+            other => {
+                return Err(crate::error::PsError::Session(format!(
+                    "unexpected PK_enclosure_t value {other}"
+                )));
+            }
+        })
+    }
+
     /// The body's axis-aligned bounding box.
     ///
     /// Note: for curved bodies Parasolid returns a guaranteed-containing box

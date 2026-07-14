@@ -169,4 +169,14 @@ impl Surf {
         let normal = Vec3::new(nx / len, ny / len, nz / len);
         Ok((pos, normal))
     }
+
+    /// Invert the surface: find the `(u, v)` parameters of a position that lies
+    /// on the surface (`PK_SURF_parameterise_vector`). The position should be on
+    /// (or very close to) the surface.
+    pub fn parameterise(&self, position: Vec3) -> PsResult<(f64, f64)> {
+        let pos = position.to_pk();
+        let mut uv: PK_UV_t = [0.0; 2];
+        pk_call!(PK_SURF_parameterise_vector(self.tag, &pos, &mut uv));
+        Ok((uv[0], uv[1]))
+    }
 }
