@@ -232,6 +232,17 @@ impl Surf {
     }
 }
 
+/// How an intersection curve meets the two surfaces.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IntersectionKind {
+    /// The surfaces cross cleanly along this curve.
+    Transversal,
+    /// The surfaces touch without crossing along this curve.
+    Tangential,
+    /// A kind code we have not decoded yet (raw value preserved).
+    Other(i32),
+}
+
 /// One intersection curve from [`Surf::intersect`].
 #[derive(Debug, Clone, Copy)]
 pub struct IntersectionCurve {
@@ -239,8 +250,19 @@ pub struct IntersectionCurve {
     pub curve: Curve,
     /// The parameter interval `(low, high)` of the intersection along `curve`.
     pub bounds: (f64, f64),
-    /// Raw `PK_intersect_curve_t` kind (values not yet decoded).
+    /// Raw `PK_intersect_curve_t` kind.
     pub kind: i32,
+}
+
+impl IntersectionCurve {
+    /// Classify the intersection as transversal / tangential (known kind codes).
+    pub fn classify(&self) -> IntersectionKind {
+        match self.kind {
+            PK_intersect_curve_simple_c => IntersectionKind::Transversal,
+            PK_intersect_curve_tangent_c => IntersectionKind::Tangential,
+            other => IntersectionKind::Other(other),
+        }
+    }
 }
 
 /// Result of intersecting two surfaces.

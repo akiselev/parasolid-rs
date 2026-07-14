@@ -421,6 +421,64 @@ fn main() {
         assert!(r.curves.len() >= 1, "perpendicular equal cylinders should intersect, got {}", r.curves.len());
     });
 
+    test!("ssi_pair_matrix", {
+        let _session = Session::start(test_config())?;
+        let zb = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let yplane = || Surf::plane(Axis2::new(Vec3::zero(), Vec3::new(0.0, 1.0, 0.0), Vec3::new(1.0, 0.0, 0.0)));
+
+        // plane through cylinder axis → 2 lines (transversal).
+        let r = yplane()?.intersect(&Surf::cylinder(zb(Vec3::zero()), 3.0)?)?;
+        assert_eq!(r.curves.iter().filter(|c| c.curve.curve_type().unwrap() == CurveType::Line).count(), 2, "plane∩cyl = 2 lines");
+
+        // sphere(5) ∩ coaxial cylinder(3) → 2 circles.
+        let r = Surf::sphere(zb(Vec3::zero()), 5.0)?.intersect(&Surf::cylinder(zb(Vec3::zero()), 3.0)?)?;
+        assert_eq!(r.curves.len(), 2, "sphere∩cyl = 2 circles, got {}", r.curves.len());
+        assert!(r.curves.iter().all(|c| c.curve.curve_type().unwrap() == CurveType::Circle));
+
+        // equatorial plane ∩ torus(10,3) → 2 circles (inner r=7, outer r=13).
+        let r = Surf::plane(zb(Vec3::zero()))?.intersect(&Surf::torus(zb(Vec3::zero()), 10.0, 3.0)?)?;
+        let mut radii: Vec<f64> = r.curves.iter().map(|c| c.curve.ask_circle().unwrap().radius).collect();
+        radii.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        assert_eq!(radii.len(), 2, "plane∩torus = 2 circles");
+        assert!(rel_ok(radii[0], 7.0) && rel_ok(radii[1], 13.0), "torus section radii {:?}", radii);
+
+        // plane through a pointed cone's apex → 2 lines.
+        let r = yplane()?.intersect(&Surf::cone(zb(Vec3::zero()), 0.0, 0.5)?)?;
+        assert_eq!(r.curves.iter().filter(|c| c.curve.curve_type().unwrap() == CurveType::Line).count(), 2, "plane∩cone thru apex = 2 lines");
+    });
+
+    test!("ssi_tangency_coincidence_disjoint", {
+        let _session = Session::start(test_config())?;
+        let zb = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let s1 = Surf::sphere(zb(Vec3::zero()), 5.0)?;
+
+        // Externally tangent spheres (centres 2r apart) → a single tangent point.
+        let tangent = s1.intersect(&Surf::sphere(zb(Vec3::new(10.0, 0.0, 0.0)), 5.0)?)?;
+        assert_eq!(tangent.points.len(), 1, "tangent spheres = 1 point");
+        assert_eq!(tangent.curves.len(), 0);
+        assert!(rel_ok(tangent.points[0].x, 5.0), "tangent point at (5,0,0)");
+
+        // Disjoint spheres → nothing.
+        let disjoint = s1.intersect(&Surf::sphere(zb(Vec3::new(20.0, 0.0, 0.0)), 5.0)?)?;
+        assert!(disjoint.points.is_empty() && disjoint.curves.is_empty(), "disjoint spheres = empty");
+
+        // Coincident planes → no intersection data (documented).
+        let a = Surf::plane(zb(Vec3::new(0.0, 0.0, 2.0)))?;
+        let b = Surf::plane(zb(Vec3::new(0.0, 0.0, 2.0)))?;
+        let coincident = a.intersect(&b)?;
+        assert!(coincident.points.is_empty() && coincident.curves.is_empty(), "coincident planes = empty");
+
+        // Plane tangent to a cylinder → a tangential line (kind classified).
+        let cyl = Surf::cylinder(zb(Vec3::zero()), 3.0)?;
+        let ptan = Surf::plane(Axis2::new(Vec3::new(3.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)))?;
+        let tan = ptan.intersect(&cyl)?;
+        assert_eq!(tan.curves.len(), 1, "tangent plane-cyl = 1 line");
+        assert_eq!(tan.curves[0].classify(), IntersectionKind::Tangential, "should be tangential");
+        // And a transversal case classifies the other way.
+        let thru = Surf::plane(Axis2::new(Vec3::zero(), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)))?.intersect(&cyl)?;
+        assert!(thru.curves.iter().all(|c| c.classify() == IntersectionKind::Transversal), "through-axis = transversal");
+    });
+
     // =========================================================================
     // P2 — surface normal + analytic param round-trips
     // =========================================================================

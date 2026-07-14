@@ -171,8 +171,12 @@ This is CADabra's central algorithm; the oracle here is the payoff.
       The whole intersection export surface (7 fns) is now covered — see the
       coverage table in `docs/pskernel-solidworks.md`. `PK_BODY_intersect_bodies`
       is a regularized boolean (reached via `Body::intersect`), not geometric SSI.
-- [ ] Coincidence/overlap detection to compare against CADabra's
-      coincident-region / indeterminate relations.
+- [x] Coincidence / tangency / disjoint behaviour — validated on orphan
+      surfaces: fully coincident planes yield **no** intersection data;
+      externally-tangent spheres yield a single tangent **point**; disjoint
+      surfaces yield nothing. Tangential vs transversal intersection curves are
+      distinguished by the kind token (14652 tangential vs 14651 transversal),
+      exposed as `IntersectionCurve::classify()` → `IntersectionKind`.
 - [ ] Represent Parasolid intersection curves (intersection curve `icurve`,
       class 3005-ish) well enough to sample — likely via edges of an imprinted
       body if direct curve eval is awkward.

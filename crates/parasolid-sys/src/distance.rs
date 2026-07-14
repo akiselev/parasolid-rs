@@ -345,6 +345,9 @@ pub type PK_intersect_curve_t = c_int;
 /// A transversal (clean, non-tangential) intersection curve. [dynamic-observed]
 /// Seen for plane∩plane (line), cyl∩plane (circle), face∩face, face∩surf.
 pub const PK_intersect_curve_simple_c: PK_intersect_curve_t = 14651; // 0x393b
+/// A tangential intersection curve (the surfaces touch without crossing).
+/// [dynamic-observed] Seen for a plane tangent to a cylinder (tangent line).
+pub const PK_intersect_curve_tangent_c: PK_intersect_curve_t = 14652; // 0x393c
 
 /// Type of a point intersection from `PK_CURVE_intersect_curve` /
 /// `PK_SURF_intersect_curve` (`PK_intersect_vector_t`).

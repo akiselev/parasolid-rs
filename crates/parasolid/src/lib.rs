@@ -58,7 +58,7 @@ pub use face::Face;
 pub use edge::Edge;
 pub use vertex::Vertex;
 pub use surf::{Surf, SurfType, PlaneData, CylinderData, ConeData, SphereData, TorusData};
-pub use surf::{SurfIntersection, IntersectionCurve};
+pub use surf::{SurfIntersection, IntersectionCurve, IntersectionKind};
 pub use intersect::{CurveCurveHit, SurfCurveHit, FaceCurveHit};
 pub use curve::{Curve, CurveType, LineData, CircleData, EllipseData};
 pub use point::Point;
