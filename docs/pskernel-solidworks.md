@@ -143,8 +143,28 @@ the specialised entry point is intentionally left unwrapped.
 Result shapes: the surf/face pair functions return points **and** curves
 (`SurfIntersection`); the three curve variants return isolated point hits with
 their parameters (`CurveCurveHit` / `SurfCurveHit` / `FaceCurveHit`, the last
-also carrying the coincident face topology). The per-result `PK_intersect_*_t`
-kind codes are preserved raw but not yet decoded (values 14611/14651/14801 seen).
+also carrying the coincident face topology).
+
+### `PK_intersect_*_t` kind tokens
+
+Each result carries a kind code from one of three families. Their **base
+transversal token** is confirmed (`dynamic-observed`); the other members
+(tangential / coincident / …) are not yet decoded:
+
+| Family (function) | transversal token | seen for |
+|---|---|---|
+| `PK_intersect_vector_t` (curve∩curve, surf∩curve) | **14611** (0x3913) | two lines crossing; line piercing a plane |
+| `PK_intersect_curve_t` (surf∩surf, face∩face, face∩surf) | **14651** (0x393b) | plane∩plane=line, cyl∩plane=circle |
+| `PK_intersect_fc_t` (face∩curve) | **14801** (0x39d1) | line piercing a planar face |
+
+A Ghidra pass to enumerate the rest is a **dead end at reasonable depth**: the
+values are not set in the public wrappers, their main worker (`FUN_1802d3cc0`),
+or the immediate geometry callees (`FUN_1805b*`/`1805c*`) — they're computed
+several layers into the shared intersection engine. The tractable route is
+dynamic: build **tangential** and **coincident** fixtures and read the codes.
+That needs orphan analytic surfaces (`PK_PLANE_create` &c.) so two surfaces can
+be placed tangent/coincident — i.e. it is gated on the P1 *standalone geometry
+creation* item, not on more decompilation.
 
 ## Known remaining risks
 

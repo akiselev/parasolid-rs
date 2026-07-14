@@ -330,18 +330,35 @@ pub struct PK_SURF_intersect_surf_o_t {
     pub r#box: PK_BOX_t,
 }
 
-/// Type of an intersection curve returned by the surf/face intersection
-/// functions (`PK_intersect_curve_t`). Values are not published in the
-/// reference; treat the raw code as opaque until probed. [unknown]
+// Intersection classification tokens. Each family has its own value range;
+// only the base "simple/transversal" token of each is confirmed so far.
+// [dynamic-observed] — the values are computed deep in the internal intersection
+// engine (not read out of the public wrapper or its immediate callees, so a
+// static enumeration would need several layers of stripped-function tracing);
+// tangential / coincident / etc. tokens need tangency & overlap fixtures, which
+// in turn need standalone-surface creation (`PK_PLANE_create` &c., not yet
+// wrapped). Treat any value other than the `*_simple_c` below as opaque.
+
+/// Type of an intersection curve from the surf/face intersection functions
+/// (`PK_intersect_curve_t`).
 pub type PK_intersect_curve_t = c_int;
+/// A transversal (clean, non-tangential) intersection curve. [dynamic-observed]
+/// Seen for plane∩plane (line), cyl∩plane (circle), face∩face, face∩surf.
+pub const PK_intersect_curve_simple_c: PK_intersect_curve_t = 14651; // 0x393b
 
-/// Type of a point intersection returned by `PK_CURVE_intersect_curve` /
-/// `PK_SURF_intersect_curve` (`PK_intersect_vector_t`). Opaque. [unknown]
+/// Type of a point intersection from `PK_CURVE_intersect_curve` /
+/// `PK_SURF_intersect_curve` (`PK_intersect_vector_t`).
 pub type PK_intersect_vector_t = c_int;
+/// A transversal point intersection. [dynamic-observed] Seen for curve∩curve
+/// (two lines crossing) and surf∩curve (line piercing a plane).
+pub const PK_intersect_vector_simple_c: PK_intersect_vector_t = 14611; // 0x3913
 
-/// Type of a face/curve point intersection returned by
-/// `PK_FACE_intersect_curve` (`PK_intersect_fc_t`). Opaque. [unknown]
+/// Type of a face/curve point intersection from `PK_FACE_intersect_curve`
+/// (`PK_intersect_fc_t`).
 pub type PK_intersect_fc_t = c_int;
+/// A transversal face/curve point intersection. [dynamic-observed] Seen for a
+/// line piercing a planar face.
+pub const PK_intersect_fc_simple_c: PK_intersect_fc_t = 14801; // 0x39d1
 
 /// Options for `PK_FACE_intersect_surf`.
 #[repr(C)]
