@@ -33,15 +33,11 @@ pub fn transmit(bodies: &[Body], key: &str) -> PsResult<()> {
     let key_cstr = CString::new(key)
         .map_err(|_| PsError::Session("transmit key contains null byte".into()))?;
 
-    // Collect unique partition tags for the supplied bodies.
-    let mut part_tags: Vec<PK_PART_t> = Vec::with_capacity(bodies.len());
-    for body in bodies {
-        let mut partition: PK_PARTITION_t = PK_ENTITY_null;
-        pk_call!(PK_ENTITY_ask_partition(body.tag(), &mut partition));
-        if !part_tags.contains(&partition) {
-            part_tags.push(partition);
-        }
-    }
+    // A body IS a part — transmit the body tags directly. (An earlier version
+    // resolved each body's partition and transmitted partition tags, which is
+    // wrong: `PK_PART_transmit` takes part tags, and `PK_ENTITY_ask_partition`
+    // failed with 5048.)
+    let part_tags: Vec<PK_PART_t> = bodies.iter().map(|b| b.tag()).collect();
 
     let opts = PK_PART_transmit_o_t::default();
 
@@ -79,18 +75,9 @@ pub fn receive(key: &str) -> PsResult<Vec<Body>> {
         &mut parts_ptr,
     ));
 
+    // The returned parts ARE the received bodies/assemblies — return them
+    // directly. (An earlier version treated them as partitions and called
+    // `PK_PARTITION_ask_bodies`.) For body parts, the part tag is the body.
     let parts = unsafe { PkArray::from_raw(parts_ptr, n_parts) };
-
-    let mut bodies: Vec<Body> = Vec::new();
-    for &part in parts.iter() {
-        let mut n_bodies: c_int = 0;
-        let mut bodies_ptr: *mut PK_BODY_t = std::ptr::null_mut();
-        pk_call!(PK_PARTITION_ask_bodies(part, &mut n_bodies, &mut bodies_ptr));
-        let body_array = unsafe { PkArray::from_raw(bodies_ptr, n_bodies) };
-        for &tag in body_array.iter() {
-            bodies.push(Body::from_tag(tag));
-        }
-    }
-
-    Ok(bodies)
+    Ok(parts.iter().map(|&tag| Body::from_tag(tag)).collect())
 }
