@@ -365,6 +365,47 @@ fn main() {
         }
     });
 
+    test!("circle_extraction_cylinder", {
+        let _session = Session::start(test_config())?;
+        let (r, h) = (5.0, 12.0);
+        let body = Body::create_solid_cylinder(r, h)?;
+        let circles: Vec<_> = body.edges()?.iter()
+            .map(|e| e.curve().unwrap())
+            .filter(|c| c.curve_type().unwrap() == CurveType::Circle)
+            .map(|c| c.ask_circle().unwrap())
+            .collect();
+        assert_eq!(circles.len(), 2, "cylinder has 2 circular edges, got {}", circles.len());
+        for cd in &circles {
+            assert!(rel_ok(cd.radius, r), "circle radius {} != {}", cd.radius, r);
+            assert!(near0(cd.basis.origin.x, r) && near0(cd.basis.origin.y, r),
+                "circle centre off Z axis: {:?}", cd.basis.origin);
+        }
+        // Centres at the two cap planes z=0 and z=h.
+        let mut zs: Vec<f64> = circles.iter().map(|c| c.basis.origin.z).collect();
+        zs.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        assert!(near0(zs[0], h) && rel_ok(zs[1], h), "circle z centres {:?}", zs);
+    });
+
+    test!("line_extraction_and_tangent", {
+        let _session = Session::start(test_config())?;
+        let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let edge = body.edges()?[0];
+        let curve = edge.curve()?;
+        assert_eq!(curve.curve_type()?, CurveType::Line);
+        let ld = curve.ask_line()?;
+        // Direction is a unit vector.
+        let dlen = (ld.direction.x.powi(2) + ld.direction.y.powi(2) + ld.direction.z.powi(2)).sqrt();
+        assert!((dlen - 1.0).abs() < 1e-9, "line direction not unit: {dlen}");
+        // eval endpoints span the edge; tangent is unit and along the chord.
+        let (t0, t1) = edge.interval()?;
+        let (p0, tan) = curve.eval_with_tangent(t0)?;
+        let p1 = curve.eval(t1)?;
+        let chord = ((p1.x - p0.x).powi(2) + (p1.y - p0.y).powi(2) + (p1.z - p0.z).powi(2)).sqrt();
+        assert!((t1 - t0 - chord).abs() < 1e-6, "arc-length param: interval {} != chord {}", t1 - t0, chord);
+        let tlen = (tan.x * tan.x + tan.y * tan.y + tan.z * tan.z).sqrt();
+        assert!((tlen - 1.0).abs() < 1e-9, "tangent not unit: {tlen}");
+    });
+
     test!("cone_params_roundtrip", {
         let _session = Session::start(test_config())?;
         // radius (at base/basis origin) 5, height 3, semi-angle 45°.

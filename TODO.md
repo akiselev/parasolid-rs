@@ -112,7 +112,12 @@ points/derivatives to compare against CADabra's evaluators.
 - [ ] `PK_SURF_ask_uvbox` / `PK_FACE_find_uvbox`, periodicity & seam data
       (`PK_SURF_ask_...` periodic flags) — CADabra's seam/pole handling needs
       the oracle's periodicity/singularity conventions pinned down exactly.
-- [ ] `PK_CURVE_ask_..` interval, closed/periodic, sense.
+- [x] Analytic curve extraction — `ask_line`/`ask_circle` validated: a
+      cylinder's 2 circular edges round-trip to radius 5 with centres on the Z
+      axis at the cap planes; a block line edge gives a unit direction, an
+      arc-length interval matching the chord, and a unit tangent from
+      `eval_with_tangent`. `curve.rs` reviewed — no bugs found.
+- [ ] `PK_CURVE_ask_..` closed/periodic, sense (interval covered above).
 
 ## P3 — Topology interrogation (B-rep spine parity)
 
