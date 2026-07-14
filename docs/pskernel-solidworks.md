@@ -1,6 +1,6 @@
 # Running parasolid-rs against the SOLIDWORKS pskernel.dll
 
-Status (2026-07-14): **all 33 integration tests pass** against the
+Status (2026-07-14): **all 37 integration tests pass** against the
 `pskernel.dll` shipped with SOLIDWORKS 2025 (Parasolid V37.01.243), with
 `PK_SESSION_set_check_arguments(true)` enabled for every test.
 `lib/pskernel.dll` in this repo is byte-identical (SHA-256) to
@@ -113,6 +113,38 @@ marked `[probed]` / `[static-observed]` / `[dynamic-observed]` in the source.
     `(PK_TOPOL_t topol, PK_BOX_t *box)` with no options (the options form is the
     separate `PK_TOPOL_find_box_2`). Wrapped as `Body::bounding_box()` → `Aabb`;
     the solid block box is exactly `[-5,-10,0, 5,10,30]`.
+
+## Intersection API surface — full coverage (2026-07-14)
+
+Every `*intersect*` export in `pskernel.dll` (7 total) is now either wrapped in
+safe code or explicitly accounted for. **All six geometric intersection
+bindings were wrong** the same way — the prior agent used a truncated,
+wrong-order output list (missing `bounds`/`types`, or the `topols`/`types`
+trailing outputs on the curve variants), so the kernel wrote results through
+uninitialised pointers. All are now fixed against the documented prototypes and
+validated under Wine.
+
+| Low-level export            | Safe API                    | Status | Validated by |
+|-----------------------------|-----------------------------|--------|--------------|
+| `PK_SURF_intersect_surf`    | `Surf::intersect`           | fixed  | cyl∩plane=circle, plane∩plane=line |
+| `PK_FACE_intersect_surf`    | `Face::intersect_surf`      | fixed  | cyl face ∩ cap surf = circle |
+| `PK_FACE_intersect_face`    | `Face::intersect_face`      | fixed  | adjacent block faces = line |
+| `PK_CURVE_intersect_curve`  | `Curve::intersect_curve`    | fixed  | two block edges = shared vertex |
+| `PK_SURF_intersect_curve`   | `Surf::intersect_curve`     | fixed  | vertical line ∩ z-plane = 1 pt |
+| `PK_FACE_intersect_curve`   | `Face::intersect_curve`     | fixed  | vertical line ∩ z-face = 1 pt |
+| `PK_BODY_intersect_bodies`  | via `Body::intersect` (bool)| n/a    | — |
+
+`PK_BODY_intersect_bodies` is **not a geometric SSI** — it is the specialised
+regularized-boolean intersection of solid/sheet bodies (returns a
+`PK_boolean_r_t`, not intersection curves). The equivalent operation is reached
+through `Body::intersect`, which uses the general `PK_BODY_boolean_2` path, so
+the specialised entry point is intentionally left unwrapped.
+
+Result shapes: the surf/face pair functions return points **and** curves
+(`SurfIntersection`); the three curve variants return isolated point hits with
+their parameters (`CurveCurveHit` / `SurfCurveHit` / `FaceCurveHit`, the last
+also carrying the coincident face topology). The per-result `PK_intersect_*_t`
+kind codes are preserved raw but not yet decoded (values 14611/14651/14801 seen).
 
 ## Known remaining risks
 

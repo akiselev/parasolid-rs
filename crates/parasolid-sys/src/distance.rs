@@ -330,10 +330,18 @@ pub struct PK_SURF_intersect_surf_o_t {
     pub r#box: PK_BOX_t,
 }
 
-/// Type of an intersection curve returned by `PK_SURF_intersect_surf`
-/// (`PK_intersect_curve_t`). Values are not published in the reference; treat
-/// the raw code as opaque until probed. [unknown]
+/// Type of an intersection curve returned by the surf/face intersection
+/// functions (`PK_intersect_curve_t`). Values are not published in the
+/// reference; treat the raw code as opaque until probed. [unknown]
 pub type PK_intersect_curve_t = c_int;
+
+/// Type of a point intersection returned by `PK_CURVE_intersect_curve` /
+/// `PK_SURF_intersect_curve` (`PK_intersect_vector_t`). Opaque. [unknown]
+pub type PK_intersect_vector_t = c_int;
+
+/// Type of a face/curve point intersection returned by
+/// `PK_FACE_intersect_curve` (`PK_intersect_fc_t`). Opaque. [unknown]
+pub type PK_intersect_fc_t = c_int;
 
 /// Options for `PK_FACE_intersect_surf`.
 #[repr(C)]
@@ -517,62 +525,76 @@ unsafe extern "C" {
     // Intersection functions (Chapter 54)
     // =========================================================================
 
-    /// Find intersections between specified regions of two curves.
+    /// Find intersections between specified regions of two curves. [documented]
     ///
-    /// Coincident intersections are returned at bounds of coincidence regions.
+    /// Outputs: `n_vectors`/`vectors` (positions), `ts_1`/`ts_2` (parameters on
+    /// each curve), and `types` (`PK_intersect_vector_t`). The earlier binding
+    /// dropped the trailing `types` output, so the kernel wrote it through an
+    /// uninitialised pointer.
     pub fn PK_CURVE_intersect_curve(
         curve_1: PK_CURVE_t,
         interval_1: PK_INTERVAL_t,
         curve_2: PK_CURVE_t,
         interval_2: PK_INTERVAL_t,
         options: *const PK_CURVE_intersect_curve_o_t,
-        n_points: *mut c_int,
-        points: *mut *mut PK_VECTOR_t,
-        params_1: *mut *mut c_double,
-        params_2: *mut *mut c_double,
+        n_vectors: *mut c_int,
+        vectors: *mut *mut PK_VECTOR_t,
+        ts_1: *mut *mut c_double,
+        ts_2: *mut *mut c_double,
+        types: *mut *mut PK_intersect_vector_t,
     ) -> PK_ERROR_code_t;
 
-    /// Find intersections between a surface and a curve.
+    /// Find intersections between a surface and a curve. [documented]
     ///
-    /// Coincident intersections are returned at bounds of coincidence regions.
+    /// Outputs: `n_vectors`/`vectors`, `uvs` (surface params), `ts` (curve
+    /// params), `types` (`PK_intersect_vector_t`). The earlier binding swapped
+    /// the `uvs`/`ts` order and dropped `types`.
     pub fn PK_SURF_intersect_curve(
         surf: PK_SURF_t,
         curve: PK_CURVE_t,
-        interval: PK_INTERVAL_t,
+        bounds: PK_INTERVAL_t,
         options: *const PK_SURF_intersect_curve_o_t,
-        n_points: *mut c_int,
-        points: *mut *mut PK_VECTOR_t,
-        params: *mut *mut c_double,
+        n_vectors: *mut c_int,
+        vectors: *mut *mut PK_VECTOR_t,
         uvs: *mut *mut PK_UV_t,
+        ts: *mut *mut c_double,
+        types: *mut *mut PK_intersect_vector_t,
     ) -> PK_ERROR_code_t;
 
     /// Find intersections between a face and the specified region of a curve.
+    /// No options structure. [documented]
     ///
-    /// Intersections are ordered along the bounded curve and classified
-    /// according to curve direction. No options structure.
+    /// Outputs: `n_vectors`/`vectors`, `uvs` (face-surface params), `ts` (curve
+    /// params), `topols` (topology hit at each point), `types`
+    /// (`PK_intersect_fc_t`). The earlier binding swapped `uvs`/`ts` and dropped
+    /// the `topols` and `types` outputs.
     pub fn PK_FACE_intersect_curve(
         face: PK_FACE_t,
         curve: PK_CURVE_t,
-        interval: PK_INTERVAL_t,
-        n_points: *mut c_int,
-        points: *mut *mut PK_VECTOR_t,
-        params: *mut *mut c_double,
+        bounds: PK_INTERVAL_t,
+        n_vectors: *mut c_int,
+        vectors: *mut *mut PK_VECTOR_t,
         uvs: *mut *mut PK_UV_t,
+        ts: *mut *mut c_double,
+        topols: *mut *mut PK_TOPOL_t,
+        types: *mut *mut PK_intersect_fc_t,
     ) -> PK_ERROR_code_t;
 
-    /// Find intersections between two faces.
+    /// Find intersections between two faces. [documented]
     ///
-    /// Same-body faces: curves created as construction geometry.
-    /// Different-body faces: curves refer to copies of face surfaces.
-    /// Fully coincident surfaces yield no intersection data.
+    /// Six outputs, point intersections first then curves, matching
+    /// `PK_SURF_intersect_surf`. The earlier binding had only four outputs in
+    /// swapped order and dropped `bounds`/`types`.
     pub fn PK_FACE_intersect_face(
         face_1: PK_FACE_t,
         face_2: PK_FACE_t,
         options: *const PK_FACE_intersect_face_o_t,
+        n_vectors: *mut c_int,
+        vectors: *mut *mut PK_VECTOR_t,
         n_curves: *mut c_int,
         curves: *mut *mut PK_CURVE_t,
-        n_points: *mut c_int,
-        points: *mut *mut PK_VECTOR_t,
+        bounds: *mut *mut PK_INTERVAL_t,
+        types: *mut *mut PK_intersect_curve_t,
     ) -> PK_ERROR_code_t;
 
     /// Find intersections between two surfaces.
@@ -600,17 +622,20 @@ unsafe extern "C" {
         types: *mut *mut PK_intersect_curve_t,
     ) -> PK_ERROR_code_t;
 
-    /// Find intersections between a face and a surface.
+    /// Find intersections between a face and a surface. [documented]
     ///
-    /// Surface must be orphan or owned by the same body as the face.
-    /// Fully coincident surfaces yield no intersection data.
+    /// Six outputs, point intersections first then curves, matching
+    /// `PK_SURF_intersect_surf`. The earlier binding had only four outputs in
+    /// swapped order and dropped `bounds`/`types`.
     pub fn PK_FACE_intersect_surf(
         face: PK_FACE_t,
         surf: PK_SURF_t,
         options: *const PK_FACE_intersect_surf_o_t,
+        n_vectors: *mut c_int,
+        vectors: *mut *mut PK_VECTOR_t,
         n_curves: *mut c_int,
         curves: *mut *mut PK_CURVE_t,
-        n_points: *mut c_int,
-        points: *mut *mut PK_VECTOR_t,
+        bounds: *mut *mut PK_INTERVAL_t,
+        types: *mut *mut PK_intersect_curve_t,
     ) -> PK_ERROR_code_t;
 }

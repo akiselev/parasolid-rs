@@ -490,6 +490,95 @@ fn main() {
         assert!(found_line, "two adjacent block face planes should intersect in a line");
     });
 
+    test!("ssi_face_face_line", {
+        let _session = Session::start(test_config())?;
+        let blk = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let faces = blk.faces()?;
+        let mut found = false;
+        'o: for i in 0..faces.len() {
+            for j in (i + 1)..faces.len() {
+                let r = faces[i].intersect_face(&faces[j])?;
+                if let Some(c) = r.curves.first() {
+                    if c.curve.curve_type()? == CurveType::Line {
+                        found = true;
+                        break 'o;
+                    }
+                }
+            }
+        }
+        assert!(found, "two adjacent block faces should intersect in a line");
+    });
+
+    test!("ssi_face_surf_circle", {
+        let _session = Session::start(test_config())?;
+        let r = 5.0;
+        let cyl = Body::create_solid_cylinder(r, 12.0)?;
+        let side = cyl.faces()?.into_iter()
+            .find(|f| f.surf().unwrap().surf_type().unwrap() == SurfType::Cylinder).unwrap();
+        let cap = cyl.faces()?.iter().map(|f| f.surf().unwrap())
+            .find(|s| s.surf_type().unwrap() == SurfType::Plane).unwrap();
+        let isect = side.intersect_surf(&cap)?;
+        assert_eq!(isect.curves.len(), 1, "cyl face ∩ cap surf = one curve");
+        assert_eq!(isect.curves[0].curve.curve_type()?, CurveType::Circle);
+        assert!(rel_ok(isect.curves[0].curve.ask_circle()?.radius, r), "circle radius");
+    });
+
+    test!("ssi_curve_curve_vertex", {
+        let _session = Session::start(test_config())?;
+        let blk = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let edges = blk.edges()?;
+        let e0 = edges[0];
+        let (l0, h0) = e0.interval()?;
+        let c0 = e0.curve()?;
+        // Vertices of e0 — an intersection with an adjacent edge is at one of them.
+        let (v0, v1) = e0.vertices()?;
+        let (p0, p1) = (v0.point()?, v1.point()?);
+        let mut found = false;
+        for k in 1..edges.len() {
+            let ek = edges[k];
+            let (lk, hk) = ek.interval()?;
+            let hits = c0.intersect_curve((l0, h0), &ek.curve()?, (lk, hk))?;
+            if let Some(h) = hits.first() {
+                let at_v0 = ((h.position.x - p0.x).powi(2) + (h.position.y - p0.y).powi(2) + (h.position.z - p0.z).powi(2)).sqrt() < 1e-6;
+                let at_v1 = ((h.position.x - p1.x).powi(2) + (h.position.y - p1.y).powi(2) + (h.position.z - p1.z).powi(2)).sqrt() < 1e-6;
+                assert!(at_v0 || at_v1, "curve-curve hit should be at a shared vertex, got {:?}", h.position);
+                found = true;
+                break;
+            }
+        }
+        assert!(found, "e0 should meet some adjacent edge");
+    });
+
+    test!("ssi_surf_and_face_intersect_curve", {
+        let _session = Session::start(test_config())?;
+        let blk = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let faces = blk.faces()?;
+        let edges = blk.edges()?;
+        // A vertical edge (endpoints differ in z) and a horizontal (z-normal) face.
+        let vedge = edges.iter().find(|e| {
+            let (a, b) = e.vertices().unwrap();
+            (a.point().unwrap().z - b.point().unwrap().z).abs() > 1.0
+        }).unwrap();
+        let (vl, vh) = vedge.interval()?;
+        let vc = vedge.curve()?;
+        let hface = faces.iter().find(|f| {
+            let s = f.surf().unwrap();
+            s.surf_type().unwrap() == SurfType::Plane && s.ask_plane().unwrap().basis.axis.z.abs() > 0.9
+        }).unwrap();
+        let hsurf = hface.surf()?;
+        // Widen so the crossing is interior to the interval.
+        let span = vh - vl;
+        let sh = hsurf.intersect_curve(&vc, (vl - span, vh + span))?;
+        assert_eq!(sh.len(), 1, "vertical line crosses horizontal plane once, got {}", sh.len());
+        let fh = hface.intersect_curve(&vc, (vl - span, vh + span))?;
+        assert_eq!(fh.len(), 1, "vertical line crosses horizontal face once, got {}", fh.len());
+        // Same crossing point from both.
+        let d = ((sh[0].position.x - fh[0].position.x).powi(2)
+            + (sh[0].position.y - fh[0].position.y).powi(2)
+            + (sh[0].position.z - fh[0].position.z).powi(2)).sqrt();
+        assert!(d < 1e-6, "surf/face curve-intersection points disagree by {d}");
+    });
+
     // =========================================================================
     // P3 — B-rep spine adjacency (Region/Shell/Loop/Fin) on a solid block
     // =========================================================================

@@ -157,8 +157,16 @@ This is CADabra's central algorithm; the oracle here is the payoff.
       adjacent block face planes = a line. **Remaining:** the full analytic pair
       matrix (sphere-sphere, cyl-cyl, cone-*, torus-*), coincidence/overlap, and
       decoding `PK_intersect_curve_t` kind tokens (e.g. 14651 seen).
-- [ ] `PK_CURVE_intersect_curve` and curve/surface intersection — for p-curve
-      arrangement checks.
+- [x] `PK_CURVE_intersect_curve`, `PK_SURF_intersect_curve`,
+      `PK_FACE_intersect_curve`, `PK_FACE_intersect_face`, `PK_FACE_intersect_surf`
+      — **all five bindings were wrong** (truncated/mis-ordered output lists,
+      dropped `bounds`/`types`/`topols` outputs → kernel wrote through
+      uninitialised pointers). Fixed against docs and wrapped as
+      `Curve::intersect_curve`, `Surf::intersect_curve`, `Face::intersect_curve`,
+      `Face::intersect_face`, `Face::intersect_surf`; each validated under Wine.
+      The whole intersection export surface (7 fns) is now covered — see the
+      coverage table in `docs/pskernel-solidworks.md`. `PK_BODY_intersect_bodies`
+      is a regularized boolean (reached via `Body::intersect`), not geometric SSI.
 - [ ] Coincidence/overlap detection to compare against CADabra's
       coincident-region / indeterminate relations.
 - [ ] Represent Parasolid intersection curves (intersection curve `icurve`,
