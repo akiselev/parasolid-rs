@@ -116,9 +116,15 @@ points/derivatives to compare against CADabra's evaluators.
       validated by eval→parameterise→eval round-trips on sphere/circle. The
       by-value `PK_VECTOR_t` arg is ABI-passed as a pointer (Win64), so the
       existing `*const PK_VECTOR_t` bindings are correct.
-- [ ] `PK_SURF_ask_uvbox` / `PK_FACE_find_uvbox`, periodicity & seam data
-      (`PK_SURF_ask_...` periodic flags) — CADabra's seam/pole handling needs
-      the oracle's periodicity/singularity conventions pinned down exactly.
+- [x] `PK_SURF_ask_uvbox` — wrapped as `Surf::uvbox()` → `UvBox`, validated:
+      cylinder u∈[0,2π] (angular seam) / v unbounded; sphere u∈[0,2π],
+      v∈[-π/2,π/2] (poles at the ends); torus u∈[0,2π], v∈[-π,π]. This pins the
+      seam/pole conventions CADabra needs.
+- [~] `PK_SURF_ask_params` periodicity flags — the period value (2π) reads out,
+      but `PK_PARAM_sf_t` is mis-modelled (raw bytes show 2 doubles then tokens
+      18000/18003/18020/18021/18040/18041, not our `{u_type,u_period,v_type,
+      v_period}`). Needs a Ghidra pass on `PK_SURF_ask_params` (bridge was down)
+      to fix the layout; the uvbox above already conveys the seam/pole ranges.
 - [x] Analytic curve extraction — `ask_line`/`ask_circle` validated: a
       cylinder's 2 circular edges round-trip to radius 5 with centres on the Z
       axis at the cap planes; a block line edge gives a unit direction, an

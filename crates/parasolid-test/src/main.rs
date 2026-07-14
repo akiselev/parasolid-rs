@@ -499,6 +499,28 @@ fn main() {
         }
     });
 
+    test!("surface_uvbox_seams_poles", {
+        let _session = Session::start(test_config())?;
+        let zb = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let tau = std::f64::consts::TAU;
+        let pi = std::f64::consts::PI;
+
+        // Cylinder: u periodic [0, 2π] (angular seam), v unbounded.
+        let cyl = Surf::cylinder(zb(Vec3::zero()), 5.0)?.uvbox()?;
+        assert!(rel_ok(cyl.u_min, 0.0) && rel_ok(cyl.u_max, tau), "cyl u ∈ [0,2π]: {:?}", cyl);
+        assert!(cyl.v_max - cyl.v_min > 1e3, "cyl v should be unbounded: {:?}", cyl);
+
+        // Sphere: u periodic [0, 2π]; v [-π/2, π/2] with poles at the ends.
+        let sph = Surf::sphere(zb(Vec3::zero()), 5.0)?.uvbox()?;
+        assert!(rel_ok(sph.u_min, 0.0) && rel_ok(sph.u_max, tau), "sphere u seam");
+        assert!(rel_ok(sph.v_min, -pi / 2.0) && rel_ok(sph.v_max, pi / 2.0), "sphere v poles: {:?}", sph);
+
+        // Torus: u periodic [0, 2π], v periodic [-π, π].
+        let tor = Surf::torus(zb(Vec3::zero()), 10.0, 3.0)?.uvbox()?;
+        assert!(rel_ok(tor.u_min, 0.0) && rel_ok(tor.u_max, tau), "torus u");
+        assert!(rel_ok(tor.v_min, -pi) && rel_ok(tor.v_max, pi), "torus v: {:?}", tor);
+    });
+
     test!("surface_parameterise_roundtrip", {
         let _session = Session::start(test_config())?;
         // Evaluate a sphere at known (u,v), invert, and confirm eval(uv') == p.

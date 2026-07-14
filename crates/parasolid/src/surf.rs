@@ -9,6 +9,22 @@ use crate::curve::Curve;
 use crate::geom::{Vec3, Axis2};
 use crate::memory::PkArray;
 
+/// A surface's parametric bounds (from [`Surf::uvbox`]).
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct UvBox {
+    pub u_min: f64,
+    pub v_min: f64,
+    pub u_max: f64,
+    pub v_max: f64,
+}
+
+impl UvBox {
+    /// The parametric width in u and v.
+    pub fn size(&self) -> (f64, f64) {
+        (self.u_max - self.u_min, self.v_max - self.v_min)
+    }
+}
+
 /// Concrete surface type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SurfType {
@@ -182,6 +198,20 @@ impl Surf {
         let mut uv: PK_UV_t = [0.0; 2];
         pk_call!(PK_SURF_parameterise_vector(self.tag, &pos, &mut uv));
         Ok((uv[0], uv[1]))
+    }
+
+    /// The surface's parametric bounds `(u_min, v_min, u_max, v_max)`
+    /// (`PK_SURF_ask_uvbox`).
+    ///
+    /// This encodes the seam/pole conventions CADabra needs: a periodic
+    /// direction spans exactly one period (e.g. a cylinder/sphere/torus have
+    /// `u ∈ [0, 2π]`, so the seam is at `u = 0 ≡ 2π`); a sphere's `v ∈
+    /// [-π/2, π/2]` with poles at the ends; a torus has `v ∈ [-π, π]`; an
+    /// unbounded direction is reported as a large finite range (±1e4).
+    pub fn uvbox(&self) -> PsResult<UvBox> {
+        let mut b = PK_UVBOX_t { param: [0.0; 4] };
+        pk_call!(PK_SURF_ask_uvbox(self.tag, &mut b));
+        Ok(UvBox { u_min: b.param[0], v_min: b.param[1], u_max: b.param[2], v_max: b.param[3] })
     }
 
     /// Intersect this surface with another (`PK_SURF_intersect_surf`).

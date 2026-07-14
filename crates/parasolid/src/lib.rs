@@ -57,7 +57,7 @@ pub use topology::{Fin, Loop, LoopType, Region, Shell};
 pub use face::Face;
 pub use edge::Edge;
 pub use vertex::Vertex;
-pub use surf::{Surf, SurfType, PlaneData, CylinderData, ConeData, SphereData, TorusData};
+pub use surf::{Surf, SurfType, UvBox, PlaneData, CylinderData, ConeData, SphereData, TorusData};
 pub use surf::{SurfIntersection, IntersectionCurve, IntersectionKind};
 pub use intersect::{CurveCurveHit, SurfCurveHit, FaceCurveHit};
 pub use curve::{Curve, CurveType, LineData, CircleData, EllipseData};
