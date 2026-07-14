@@ -119,8 +119,12 @@ the oracle must expose the same adjacency so structures can be compared.
       `PK_EDGE_ask_curve`, `PK_VERTEX_ask_point`, `PK_ENTITY_ask_class`,
       `PK_CLASS_ask_superclass`.
 - [x] `PK_EDGE_ask_geometry` (7-arg signature — fixed).
-- [~] `PK_BODY_ask_shells`, `PK_BODY_ask_regions`, `PK_FACE_ask_loops`,
-      `PK_LOOP_ask_fins` — used in probe, but not asserted in the test suite.
+- [x] `PK_BODY_ask_shells`, `PK_BODY_ask_regions`, `PK_FACE_ask_loops`,
+      `PK_LOOP_ask_fins` — wrapped as `Region`/`Shell`/`Loop`/`Fin` and asserted
+      by `brep_spine_block`: 2 regions (1 solid + void), shells round-trip to
+      regions, 6 faces × 1 outer loop × 4 fins = 24 fins = 2 × 12 edges, fin
+      4-cycles, each edge has 2 fins. Fixed `PK_LOOP_type_t` (was 0..8; real
+      tokens are 5410..5419, outer=5412/winding=5414 confirmed).
 - [ ] Full adjacency matrix test on the two-region/two-shell box (mirrors
       CADabra's target model): every Region↔Shell↔Face↔Loop↔Fin↔Edge↔Vertex
       link + fin orientation/sense, `PK_FIN_ask_..`, `PK_LOOP_ask_type`,

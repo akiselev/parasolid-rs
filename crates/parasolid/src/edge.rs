@@ -78,4 +78,14 @@ impl Edge {
         ));
         Ok((t_range.low, t_range.high))
     }
+
+    /// Return all fins (directed edge uses) of this edge. A manifold edge
+    /// shared by two faces has two fins.
+    pub fn fins(&self) -> PsResult<Vec<crate::Fin>> {
+        let mut n: c_int = 0;
+        let mut ptr = std::ptr::null_mut();
+        pk_call!(PK_EDGE_ask_fins(self.tag, &mut n, &mut ptr));
+        let array = unsafe { PkArray::from_raw(ptr, n) };
+        Ok(array.iter().map(|&tag| crate::Fin::from_tag(tag)).collect())
+    }
 }

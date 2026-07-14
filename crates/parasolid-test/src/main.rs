@@ -338,6 +338,68 @@ fn main() {
     });
 
     // =========================================================================
+    // P3 — B-rep spine adjacency (Region/Shell/Loop/Fin) on a solid block
+    // =========================================================================
+
+    test!("brep_spine_block", {
+        let _session = Session::start(test_config())?;
+        let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let faces = body.faces()?;
+        let edges = body.edges()?;
+        assert_eq!(faces.len(), 6, "block faces");
+        assert_eq!(edges.len(), 12, "block edges");
+
+        // Regions: exactly one solid, plus the surrounding void → 2 total.
+        let regions = body.regions()?;
+        assert_eq!(regions.len(), 2, "block regions (solid + void), got {}", regions.len());
+        let n_solid = regions.iter().filter(|r| r.is_solid().unwrap()).count();
+        assert_eq!(n_solid, 1, "exactly one solid region, got {}", n_solid);
+
+        // Every shell round-trips to a region of this body.
+        let region_tags: std::collections::HashSet<i32> = regions.iter().map(|r| r.tag()).collect();
+        let shells = body.shells()?;
+        assert!(!shells.is_empty(), "block should have >=1 shell");
+        for sh in &shells {
+            assert!(region_tags.contains(&sh.region()?.tag()), "shell.region not in body");
+        }
+        // The solid region's shells cover all 6 faces.
+        let solid = regions.iter().find(|r| r.is_solid().unwrap()).unwrap();
+        let mut solid_faces = std::collections::HashSet::new();
+        for sh in solid.shells()? {
+            for f in sh.faces()? {
+                solid_faces.insert(f.tag());
+            }
+        }
+        assert_eq!(solid_faces.len(), 6, "solid region should touch all 6 faces");
+
+        // Each face: exactly one outer loop of 4 fins forming a cycle.
+        let mut total_fins = 0;
+        for f in &faces {
+            let loops = f.loops()?;
+            assert_eq!(loops.len(), 1, "block face has 1 loop, got {}", loops.len());
+            let lp = loops[0];
+            assert_eq!(lp.face()?.tag(), f.tag(), "loop.face round-trip");
+            assert_eq!(lp.loop_type()?, LoopType::Outer, "block face loop should be outer");
+            let fins = lp.fins()?;
+            assert_eq!(fins.len(), 4, "rectangular face loop has 4 fins, got {}", fins.len());
+            total_fins += fins.len();
+            // Fins cycle back to the start after 4 next_in_loop steps.
+            let mut cur = fins[0];
+            for _ in 0..4 {
+                assert_eq!(cur.face()?.tag(), f.tag(), "fin.face round-trip");
+                cur = cur.next_in_loop()?;
+            }
+            assert_eq!(cur.tag(), fins[0].tag(), "loop should be a 4-cycle");
+        }
+        assert_eq!(total_fins, 24, "6 faces * 4 fins = 24");
+
+        // Each of the 12 edges is used by exactly 2 fins (manifold).
+        for e in &edges {
+            assert_eq!(e.fins()?.len(), 2, "manifold edge has 2 fins");
+        }
+    });
+
+    // =========================================================================
     // P5 — bounding-box oracle
     // =========================================================================
 

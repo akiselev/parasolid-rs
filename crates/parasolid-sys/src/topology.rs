@@ -47,15 +47,25 @@ pub const PK_BODY_config_child_c: PK_BODY_config_t = 2;
 
 pub type PK_LOOP_type_t = c_int;
 
-pub const PK_LOOP_type_outer_c: PK_LOOP_type_t = 0;
-pub const PK_LOOP_type_inner_c: PK_LOOP_type_t = 1;
-pub const PK_LOOP_type_winding_c: PK_LOOP_type_t = 2;
-pub const PK_LOOP_type_vertex_c: PK_LOOP_type_t = 3;
-pub const PK_LOOP_type_wire_c: PK_LOOP_type_t = 4;
-pub const PK_LOOP_type_likely_inner_c: PK_LOOP_type_t = 5;
-pub const PK_LOOP_type_likely_outer_c: PK_LOOP_type_t = 6;
-pub const PK_LOOP_type_unclear_c: PK_LOOP_type_t = 7;
-pub const PK_LOOP_type_inner_sing_c: PK_LOOP_type_t = 8;
+// Values recovered from pskernel.dll V37.01.243. The old 0..8 values were
+// wrong. `PK_LOOP_ask_type` selects tokens from the contiguous set 5410..=5419
+// (0x1522..=0x152b) [static-observed]. `outer_c` (5412) and `winding_c` (5414)
+// are [dynamic-observed] — a solid block's face loops are all outer, and a
+// cylinder's two periodic rim loops are winding. The remaining members follow
+// the documented Parasolid enum order across that range and are
+// [static-observed value / order-inferred] — not individually probed, so treat
+// them as provisional. `LoopType::Other(i32)` in the safe wrapper preserves any
+// unmapped value.
+pub const PK_LOOP_type_error_c: PK_LOOP_type_t = 5410;
+pub const PK_LOOP_type_general_c: PK_LOOP_type_t = 5411;
+pub const PK_LOOP_type_outer_c: PK_LOOP_type_t = 5412; // [dynamic-observed]
+pub const PK_LOOP_type_inner_c: PK_LOOP_type_t = 5413;
+pub const PK_LOOP_type_winding_c: PK_LOOP_type_t = 5414; // [dynamic-observed]
+pub const PK_LOOP_type_vertex_c: PK_LOOP_type_t = 5415;
+pub const PK_LOOP_type_wire_c: PK_LOOP_type_t = 5416;
+pub const PK_LOOP_type_likely_outer_c: PK_LOOP_type_t = 5417;
+pub const PK_LOOP_type_likely_inner_c: PK_LOOP_type_t = 5418;
+pub const PK_LOOP_type_unclear_c: PK_LOOP_type_t = 5419;
 
 // =============================================================================
 // Edge type constants — returned by PK_EDGE_ask_type

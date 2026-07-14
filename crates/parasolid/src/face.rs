@@ -67,4 +67,13 @@ impl Face {
         pk_call!(PK_FACE_ask_oriented_surf(self.tag, &mut surf, &mut orient));
         Ok(orient == PK_LOGICAL_true)
     }
+
+    /// Return all loops bounding this face.
+    pub fn loops(&self) -> PsResult<Vec<crate::Loop>> {
+        let mut n: c_int = 0;
+        let mut ptr = std::ptr::null_mut();
+        pk_call!(PK_FACE_ask_loops(self.tag, &mut n, &mut ptr));
+        let array = unsafe { PkArray::from_raw(ptr, n) };
+        Ok(array.iter().map(|&tag| crate::Loop::from_tag(tag)).collect())
+    }
 }

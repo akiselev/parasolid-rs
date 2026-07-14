@@ -1,6 +1,6 @@
 # Running parasolid-rs against the SOLIDWORKS pskernel.dll
 
-Status (2026-07-14): **all 22 integration tests pass** against the
+Status (2026-07-14): **all 23 integration tests pass** against the
 `pskernel.dll` shipped with SOLIDWORKS 2025 (Parasolid V37.01.243), with
 `PK_SESSION_set_check_arguments(true)` enabled for every test.
 `lib/pskernel.dll` in this repo is byte-identical (SHA-256) to

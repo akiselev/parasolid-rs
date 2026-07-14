@@ -70,6 +70,24 @@ impl Body {
         Ok(array.iter().map(|&tag| Vertex::from_tag(tag)).collect())
     }
 
+    /// Return all shells of this body.
+    pub fn shells(&self) -> PsResult<Vec<crate::Shell>> {
+        let mut n: c_int = 0;
+        let mut ptr = std::ptr::null_mut();
+        pk_call!(PK_BODY_ask_shells(self.tag, &mut n, &mut ptr));
+        let array = unsafe { PkArray::from_raw(ptr, n) };
+        Ok(array.iter().map(|&tag| crate::Shell::from_tag(tag)).collect())
+    }
+
+    /// Return all regions of this body (solid material and surrounding void).
+    pub fn regions(&self) -> PsResult<Vec<crate::Region>> {
+        let mut n: c_int = 0;
+        let mut ptr = std::ptr::null_mut();
+        pk_call!(PK_BODY_ask_regions(self.tag, &mut n, &mut ptr));
+        let array = unsafe { PkArray::from_raw(ptr, n) };
+        Ok(array.iter().map(|&tag| crate::Region::from_tag(tag)).collect())
+    }
+
     // --- Primitive creation ---
 
     /// Create an axis-aligned solid block whose base is centred at the origin
