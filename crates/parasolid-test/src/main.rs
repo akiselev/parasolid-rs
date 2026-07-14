@@ -338,6 +338,35 @@ fn main() {
     });
 
     // =========================================================================
+    // P5 — bounding-box oracle
+    // =========================================================================
+
+    test!("bbox_block", {
+        let _session = Session::start(test_config())?;
+        // Block base centred at origin: x in ±5, y in ±10, z in 0..30.
+        let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let bb = body.bounding_box()?;
+        assert!(rel_ok(bb.min.x, -5.0) && rel_ok(bb.max.x, 5.0), "bbox x {:?}", bb);
+        assert!(rel_ok(bb.min.y, -10.0) && rel_ok(bb.max.y, 10.0), "bbox y {:?}", bb);
+        assert!(near0(bb.min.z, 30.0) && rel_ok(bb.max.z, 30.0), "bbox z {:?}", bb);
+    });
+
+    test!("bbox_sphere", {
+        let _session = Session::start(test_config())?;
+        let r = 15.0;
+        let body = Body::create_solid_sphere(r)?;
+        let bb = body.bounding_box()?;
+        let sz = bb.size();
+        // Guaranteed-containing box: at least the true diameter, not wildly more.
+        for (got, axis) in [(sz.x, "x"), (sz.y, "y"), (sz.z, "z")] {
+            assert!(got >= 2.0 * r - 1e-6 && got <= 2.0 * r * 1.01,
+                "sphere bbox {axis} extent {got} not ~{}", 2.0 * r);
+        }
+        let c = bb.center();
+        assert!(near0(c.x, r) && near0(c.y, r) && near0(c.z, r), "sphere bbox center {:?}", c);
+    });
+
+    // =========================================================================
     // Summary
     // =========================================================================
 

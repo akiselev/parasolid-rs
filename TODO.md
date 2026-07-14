@@ -161,7 +161,13 @@ Coarse invariants that catch gross modeling errors fast.
       not the old 0/1/2/3 guesses. See `docs/pskernel-solidworks.md` finding 9.
       **Follow-up:** higher option versions (`facet_tol`, densities, `transfs`,
       `local_opts`, scale controls) still need their full layout before use.
-- [ ] `PK_TOPOL_range` / `PK_ENTITY_range` / bounding boxes.
+- [x] Bounding boxes — `PK_TOPOL_find_box`. **Signature was wrong** (had an
+      invented `options` arg); real form is `(topol, box)` with no options
+      (confirmed by the reference *and* Ghidra; the options form is
+      `PK_TOPOL_find_box_2`). Wrapped as `Body::bounding_box()` → `Aabb`,
+      validated: block box is exactly `[-5,-10,0, 5,10,30]`, sphere box centred
+      at origin with the right extent.
+- [ ] `PK_TOPOL_range` / `PK_ENTITY_range` (point→body distance / range).
 - [ ] `PK_ENTITY_ask_..` distance: `PK_ENTITY_range` point→body distance,
       `PK_TOPOL_..` clash/`PK_BODY_..` point containment
       (`PK_BODY_contains_vectors` or equivalent) — needed for

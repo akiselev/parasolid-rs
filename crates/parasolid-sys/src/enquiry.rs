@@ -860,9 +860,15 @@ unsafe extern "C" {
     // Bounding boxes
     // =========================================================================
 
+    /// Find the axis-aligned bounding box of a topological entity.
+    ///
+    /// [documented] + [static-observed] (pskernel.dll V37.01.243): this is the
+    /// 2-argument form `(topol, box)` with **no options** — an earlier draft
+    /// added an `options: *const PK_TOPOL_find_box_o_t` argument that does not
+    /// exist here (the options form is the separate `PK_TOPOL_find_box_2`).
+    /// `box` is filled `[xmin, ymin, zmin, xmax, ymax, zmax]`.
     pub fn PK_TOPOL_find_box(
         topol: PK_TOPOL_t,
-        options: *const PK_TOPOL_find_box_o_t,
         box_: *mut PK_BOX_t,
     ) -> PK_ERROR_code_t;
 
