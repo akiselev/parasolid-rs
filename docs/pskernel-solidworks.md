@@ -1,6 +1,6 @@
 # Running parasolid-rs against the SOLIDWORKS pskernel.dll
 
-Status (2026-07-14): **all 21 integration tests pass** against the
+Status (2026-07-14): **all 20 integration tests pass** against the
 `pskernel.dll` shipped with SOLIDWORKS 2025 (Parasolid V37.01.243), with
 `PK_SESSION_set_check_arguments(true)` enabled for every test.
 `lib/pskernel.dll` in this repo is byte-identical (SHA-256) to
@@ -68,8 +68,9 @@ Parasolid V35 per-symbol header docs (mirrored in
 
 ## Second pass (2026-07-14): mass props, cone, and the error path
 
-Probed empirically under Wine (no header mirror available at the time), so
-these are marked `[probed]` in the source and still want a header cross-check.
+Probed empirically under Wine and cross-checked against the `pskernel.dll`
+decompilation in the `parasolid-re` Ghidra project (read-only). Findings are
+marked `[probed]` / `[static-observed]` / `[dynamic-observed]` in the source.
 
 8. **`PK_BODY_create_solid_cone` signature was wrong.** The draft modelled a
    non-existent frustum API `(top_radius, bottom_radius, height, …)`; every
@@ -79,16 +80,22 @@ these are marked `[probed]` in the source and still want a header cross-check.
    solid **widens toward +z**: top radius = `radius + height*tan(semi_angle)`.
    Volume validated against the frustum formula.
 
-9. **`PK_TOPOL_eval_mass_props` takes an options pointer** as its 4th argument
-   (before the output pointers) — the tempting 8-arg no-options form makes the
-   kernel read `amount` as the version field → `PK_ERROR_o_t_version_unknown`
-   (5022). Accepted `o_t_version` is **1..=7**. The Rust
-   `PK_TOPOL_eval_mass_props_o_t` is **incomplete**: the real struct is larger
-   and contains an unmodelled `local_opts` field, so passing the too-small
-   struct reads past its end into stack garbage and crashes. A zeroed,
-   over-sized version-1 buffer (with `check_arguments` off) returns the correct
-   **volume/mass**; centre-of-gravity / inertia / periphery need the true field
-   offsets. Wrapped as `Body::volume()` / `Body::mass()`.
+9. **`PK_TOPOL_eval_mass_props` — full options struct recovered and validated.**
+   The function takes an options pointer as its 4th argument (before the five
+   output pointers; `documented` + `static-observed`). The tempting 8-arg
+   no-options form makes the kernel read `amount` as the version field →
+   `PK_ERROR_o_t_version_unknown` (5022). Accepted `o_t_version` is **1..=7**.
+   The option-version-migration routine (`FUN_180441cd0`) shows the **version-1
+   user struct** is just `{ o_t_version, mass, periphery, bound, single }` at
+   offsets 0/4/8/12/16 — much smaller than the drafted struct, whose extra
+   fields overran it and crashed. The enum tokens are **not** 0/1/2/3 but
+   (`dynamic-observed`, each level adding one output):
+   `PK_mass_no/mass/c_of_g/m_of_i = 0x36b1..0x36b4`,
+   `PK_mass_periphery_no/yes = 0x36b5/0x36b6`, `bound_no = 0x36b7`. With the
+   version-1 struct and these tokens, amount / mass / centre-of-gravity /
+   inertia / periphery all match closed-form for block/sphere/cylinder/cone/
+   torus, with `check_arguments` **on**. Wrapped as `Body::mass_props()` →
+   `MassProps` (plus `Body::volume()` / `Body::mass()` conveniences).
 
 10. **The error-inquiry path crashed on every PK error.** `PK_ERROR_sf_t`
     modelled `function` and `bad_arg_names` as `*const char`, but the kernel

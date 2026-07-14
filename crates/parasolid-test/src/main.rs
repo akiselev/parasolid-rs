@@ -236,73 +236,105 @@ fn main() {
     });
 
     // =========================================================================
-    // P5 — volume / measurement oracle (closed-form invariants)
+    // P5 — mass / area / inertia oracle (closed-form invariants)
     // =========================================================================
     //
-    // `Body::volume()` returns the kernel's `amount` (volume for solids) at unit
-    // density, so `mass == volume`. We assert against exact closed-form values;
-    // a wrong signature or option-version shows up immediately as an error or a
-    // garbage number. Centre-of-gravity / inertia / periphery are not yet
-    // exposed — the options struct that controls them needs a header audit
-    // (see TODO.md P5).
+    // Default body density is 1.0, so `mass == amount == volume` for solids and
+    // `periphery` is the total surface area. The option struct layout and enum
+    // tokens were recovered from the DLL (see docs/pskernel-solidworks.md) and
+    // are asserted here against exact closed-form values with check_arguments on.
 
     const MP_REL: f64 = 1e-6; // relative tolerance for analytic primitives
     fn rel_ok(got: f64, want: f64) -> bool {
         (got - want).abs() <= MP_REL * want.abs().max(1.0)
     }
+    fn near0(v: f64, scale: f64) -> bool {
+        v.abs() <= MP_REL * scale.abs().max(1.0)
+    }
 
-    test!("volume_block", {
+    test!("massprops_block", {
         let _session = Session::start(test_config())?;
         let (x, y, z) = (10.0, 20.0, 30.0);
         let body = Body::create_solid_block(x, y, z)?;
+        let mp = body.mass_props()?;
         let vol = x * y * z;
-        assert!(rel_ok(body.volume()?, vol), "block volume {} != {}", body.volume()?, vol);
-        assert!(rel_ok(body.mass()?, vol), "block mass {} != {}", body.mass()?, vol);
+        let area = 2.0 * (x * y + y * z + z * x);
+        assert!(rel_ok(mp.amount, vol), "block volume {} != {}", mp.amount, vol);
+        assert!(rel_ok(mp.mass, vol), "block mass {} != {}", mp.mass, vol);
+        assert!(rel_ok(mp.periphery, area), "block area {} != {}", mp.periphery, area);
+        // Base centred at origin, z spans 0..z → CoG = (0, 0, z/2).
+        let cg = mp.center_of_gravity;
+        assert!(near0(cg.x, x) && near0(cg.y, y), "block CoG x/y not ~0: {:?}", cg);
+        assert!((cg.z - z / 2.0).abs() < 1e-6, "block CoG z {} != {}", cg.z, z / 2.0);
+        // Solid block inertia about CoG (m=vol): Ixx=m/12(y^2+z^2), etc.
+        let (ixx, iyy, izz) = (
+            vol / 12.0 * (y * y + z * z),
+            vol / 12.0 * (x * x + z * z),
+            vol / 12.0 * (x * x + y * y),
+        );
+        assert!(rel_ok(mp.inertia[0], ixx), "block Ixx {} != {}", mp.inertia[0], ixx);
+        assert!(rel_ok(mp.inertia[4], iyy), "block Iyy {} != {}", mp.inertia[4], iyy);
+        assert!(rel_ok(mp.inertia[8], izz), "block Izz {} != {}", mp.inertia[8], izz);
+        for k in [1usize, 2, 3, 5, 6, 7] {
+            assert!(near0(mp.inertia[k], ixx), "block off-diag[{}] {} not ~0", k, mp.inertia[k]);
+        }
     });
 
-    test!("volume_sphere", {
+    test!("massprops_sphere", {
         let _session = Session::start(test_config())?;
         let r = 15.0;
         let body = Body::create_solid_sphere(r)?;
+        let mp = body.mass_props()?;
         let vol = 4.0 / 3.0 * std::f64::consts::PI * r.powi(3);
-        assert!(rel_ok(body.volume()?, vol), "sphere volume {} != {}", body.volume()?, vol);
+        let area = 4.0 * std::f64::consts::PI * r * r;
+        assert!(rel_ok(mp.amount, vol), "sphere volume {} != {}", mp.amount, vol);
+        assert!(rel_ok(mp.periphery, area), "sphere area {} != {}", mp.periphery, area);
+        let cg = mp.center_of_gravity;
+        assert!(near0(cg.x, r) && near0(cg.y, r) && near0(cg.z, r),
+            "sphere CoG not ~origin: {:?}", cg);
+        // Solid sphere inertia about CoG: I = 2/5 m r^2 on the diagonal, 0 off.
+        let i_diag = 2.0 / 5.0 * mp.mass * r * r;
+        for k in [0usize, 4, 8] {
+            assert!(rel_ok(mp.inertia[k], i_diag), "sphere I diag[{}] {} != {}", k, mp.inertia[k], i_diag);
+        }
     });
 
-    test!("volume_cylinder", {
+    test!("massprops_cylinder", {
         let _session = Session::start(test_config())?;
         let (r, h) = (5.0, 12.0);
         let body = Body::create_solid_cylinder(r, h)?;
+        let mp = body.mass_props()?;
         let vol = std::f64::consts::PI * r * r * h;
-        assert!(rel_ok(body.volume()?, vol), "cyl volume {} != {}", body.volume()?, vol);
+        let area = 2.0 * std::f64::consts::PI * r * r + 2.0 * std::f64::consts::PI * r * h;
+        assert!(rel_ok(mp.amount, vol), "cyl volume {} != {}", mp.amount, vol);
+        assert!(rel_ok(mp.periphery, area), "cyl area {} != {}", mp.periphery, area);
+        // Cylinder along Z centred at origin: Izz = 1/2 m r^2.
+        let izz = 0.5 * mp.mass * r * r;
+        assert!(rel_ok(mp.inertia[8], izz), "cyl Izz {} != {}", mp.inertia[8], izz);
     });
 
-    test!("volume_cone_truncated", {
+    test!("massprops_cone_truncated", {
         let _session = Session::start(test_config())?;
-        // Truncated cone (frustum): base radius rb at z=0, height h, semi-angle
-        // 45°. The kernel's cone WIDENS toward +z: top radius rt = rb + h*tan(a)
-        // (probed). Volume = pi*h/3*(rb^2 + rb*rt + rt^2).
+        // Frustum: base radius rb at z=0, height h, semi-angle 45° → widens to
+        // rt = rb + h*tan(a). Volume = pi*h/3*(rb^2 + rb*rt + rt^2).
         let (rb, h) = (5.0, 3.0);
-        let semi = std::f64::consts::FRAC_PI_4; // 45°, tan = 1
+        let semi = std::f64::consts::FRAC_PI_4;
         let rt = rb + h * semi.tan();
         let body = Body::create_solid_cone(rb, h, semi)?;
+        let mp = body.mass_props()?;
         let vol = std::f64::consts::PI * h / 3.0 * (rb * rb + rb * rt + rt * rt);
-        assert!(rel_ok(body.volume()?, vol), "cone volume {} != {}", body.volume()?, vol);
+        assert!(rel_ok(mp.amount, vol), "cone volume {} != {}", mp.amount, vol);
     });
 
-    test!("volume_torus", {
+    test!("massprops_torus", {
         let _session = Session::start(test_config())?;
         let (major, minor) = (10.0, 3.0);
         let body = Body::create_solid_torus(major, minor)?;
+        let mp = body.mass_props()?;
         let vol = 2.0 * std::f64::consts::PI.powi(2) * major * minor * minor;
-        assert!(rel_ok(body.volume()?, vol), "torus volume {} != {}", body.volume()?, vol);
-    });
-
-    // Argument checking is restored after each volume() call (it toggles it off
-    // internally for the incomplete options struct). Confirm it's back on.
-    test!("check_arguments_restored_after_volume", {
-        let session = Session::start(test_config())?;
-        let _ = Body::create_solid_block(1.0, 1.0, 1.0)?.volume()?;
-        assert!(session.check_arguments()?, "check_arguments should be restored to on");
+        let area = 4.0 * std::f64::consts::PI.powi(2) * major * minor;
+        assert!(rel_ok(mp.amount, vol), "torus volume {} != {}", mp.amount, vol);
+        assert!(rel_ok(mp.periphery, area), "torus area {} != {}", mp.periphery, area);
     });
 
     // =========================================================================

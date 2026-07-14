@@ -47,7 +47,7 @@ pub use partition::{Partition, Pmark, RollbackResult};
 pub use entity::{Entity, PkClass};
 pub use geom::{Axis2, Vec3};
 pub use body::{Body, BodyType};
-pub use mass::DEFAULT_MASS_ACCURACY;
+pub use mass::{MassProps, DEFAULT_MASS_ACCURACY};
 pub use face::Face;
 pub use edge::Edge;
 pub use vertex::Vertex;

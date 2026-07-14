@@ -149,23 +149,18 @@ This is CADabra's central algorithm; the oracle here is the payoff.
 
 Coarse invariants that catch gross modeling errors fast.
 
-- [~] `PK_TOPOL_eval_mass_props` — **volume/amount + mass validated**;
-      centroid / inertia / periphery blocked on a header audit.
-      Probed under Wine: the function takes an **options pointer** as its 4th
-      arg (the no-options 8-arg guess makes the kernel read `amount` as the
-      version field → `o_t_version_unknown` 5022). Accepted `o_t_version` is
-      **1..=7**. The Rust `PK_TOPOL_eval_mass_props_o_t` is **wrong/incomplete**:
-      the real struct is larger and has an unmodelled `local_opts` field, so
-      passing the too-small struct reads past it into stack garbage and crashes.
-      A zeroed, over-sized (≥128 B) version-1 buffer with `check_arguments` off
-      returns the **correct volume/mass** for all five primitives (validated
-      closed-form). The safe wrapper is `Body::volume()` / `Body::mass()` (it
-      toggles `check_arguments` off around the call and restores it).
-      **Remaining:** reverse-engineer or header-audit the option field offsets
-      for `mass` level, `periphery`, `same/lower_dim_density`, `local_opts`,
-      `n_transfs`/`transfs` so centre-of-gravity, inertia and surface area can
-      be exposed. `mass` level ≠ single i32 at offset 4/8 (probing showed no
-      CoG/periphery from any single-field setting — the fields interact).
+- [x] `PK_TOPOL_eval_mass_props` — **fully validated** (amount, mass, centre of
+      gravity, inertia tensor, periphery) against closed-form values for
+      block/sphere/cylinder/cone/torus, with `check_arguments` on. Wrapped as
+      `Body::mass_props()` → `MassProps` (+ `volume()`/`mass()` conveniences).
+      Signature + option struct recovered via the `parasolid-re` Ghidra project:
+      the function takes an **options pointer** as its 4th arg; the **version-1**
+      user struct is `{ o_t_version, mass, periphery, bound, single }` (offsets
+      0/4/8/12/16), and the enum tokens are `0x36b1..0x36b4` (mass no/mass/
+      c_of_g/m_of_i), `0x36b5/0x36b6` (periphery no/yes), `0x36b7` (bound no) —
+      not the old 0/1/2/3 guesses. See `docs/pskernel-solidworks.md` finding 9.
+      **Follow-up:** higher option versions (`facet_tol`, densities, `transfs`,
+      `local_opts`, scale controls) still need their full layout before use.
 - [ ] `PK_TOPOL_range` / `PK_ENTITY_range` / bounding boxes.
 - [ ] `PK_ENTITY_ask_..` distance: `PK_ENTITY_range` point→body distance,
       `PK_TOPOL_..` clash/`PK_BODY_..` point containment
