@@ -50,11 +50,25 @@ runtime-tested · `[ ]` unaudited / untested · `[!]` known-wrong or suspect.
 - [x] `PK_BODY_type_t` values solid/sheet/wire/minimum (probed). **Gap:**
       acorn/empty/general/compound/unspecified are `[guess]` — probe via
       multi-vertex body, empty body, and a non-manifold body.
-- [ ] **Error code values** (`error.rs`): audit the full `PK_ERROR_*` numeric
+- [~] **Error code values** (`error.rs`): audit the full `PK_ERROR_*` numeric
       table against docs; several are needed to interpret oracle failures
       (`PK_ERROR_missing_geom`, `_bad_topology`, `_not_a_*`, …).
-- [ ] `PK_SESSION_set_check_arguments(true)` on by default in tests, so the
-      kernel validates our FFI arguments and surfaces mismatches early.
+      **Fixed so far (probed under Wine):** the error-inquiry path used to
+      *crash the process on any PK error*. Two bugs: (a) `PK_ERROR_sf_t.function`
+      / `bad_arg_names` are **inline char arrays**, not `*const char` — the old
+      code dereferenced ASCII bytes as a pointer and page-faulted; (b)
+      `PK_THREAD_ask_last_error` faults inside the kernel. `query_last_error`
+      now reads a raw buffer via `PK_ERROR_ask_last` and extracts only the
+      confirmed fields: function name (inline, bytes 0..32) and code (i32 @32).
+      Confirmed codes: `field_of_wrong_type`=5014, `o_t_version_unknown`=5022.
+      **Remaining:** the real `PK_ERROR_sf_t` is larger and carries extra inline
+      string fields (error-name, bad-field name); severity / n_bad_args /
+      bad_args / entity offsets are still unknown — needs a header audit before
+      `bad_args` can be surfaced. `PK_THREAD_ask_last_error` needs a
+      signature/threading audit.
+- [x] `PK_SESSION_set_check_arguments(true)` on by default in tests, so the
+      kernel validates our FFI arguments and surfaces mismatches early. Done via
+      a `test_config()` helper used by every test.
 
 ## P1 — Primitive construction (CADabra's primitive set)
 
@@ -62,8 +76,12 @@ Verify each builder + its `_sf_t` round-trips (`create` then `ask` returns
 the same numbers). `_sf_t` field order was wrong before — audit all.
 
 - [x] Block, cylinder, sphere, torus (create + face/edge/vertex counts).
-- [~] Cone (`PK_BODY_create_solid_cone`) — bound but untested; confirm apex vs
-      truncated behavior and `PK_CONE_sf_t` (basis_set, radius, semi_angle).
+- [x] Cone (`PK_BODY_create_solid_cone`) — **signature was wrong** and always
+      failed. Real form is `(radius, height, semi_angle, basis_set, body)` — a
+      base radius + apex half-angle, matching `PK_CONE_sf_t`, **not** the
+      invented `(top_radius, bottom_radius, height)` frustum API. Base sits on
+      z=0 and the cone widens toward +z: top radius = `radius + height *
+      tan(semi_angle)`. Fixed and volume-validated against the frustum formula.
 - [x] `PK_SPHERE_sf_t`, `PK_CYL_sf_t`, `PK_TORUS_sf_t`, `PK_CIRCLE_sf_t`,
       `PK_ELLIPSE_sf_t`, `PK_CONE_sf_t` field order (basis_set first) — fixed.
 - [ ] Standalone geometry create/ask round-trips (not via a body):
@@ -131,11 +149,23 @@ This is CADabra's central algorithm; the oracle here is the payoff.
 
 Coarse invariants that catch gross modeling errors fast.
 
-- [ ] `PK_TOPOL_eval_mass_props` — audit (options: accuracy, whether volume/
-      area/CoM/inertia requested), wrap, and test against closed-form values
-      for block/sphere/cylinder/cone/torus (volume, surface area, centroid,
-      inertia tensor). This is the first oracle to stand up: it's a single
-      number comparison and immediately useful.
+- [~] `PK_TOPOL_eval_mass_props` — **volume/amount + mass validated**;
+      centroid / inertia / periphery blocked on a header audit.
+      Probed under Wine: the function takes an **options pointer** as its 4th
+      arg (the no-options 8-arg guess makes the kernel read `amount` as the
+      version field → `o_t_version_unknown` 5022). Accepted `o_t_version` is
+      **1..=7**. The Rust `PK_TOPOL_eval_mass_props_o_t` is **wrong/incomplete**:
+      the real struct is larger and has an unmodelled `local_opts` field, so
+      passing the too-small struct reads past it into stack garbage and crashes.
+      A zeroed, over-sized (≥128 B) version-1 buffer with `check_arguments` off
+      returns the **correct volume/mass** for all five primitives (validated
+      closed-form). The safe wrapper is `Body::volume()` / `Body::mass()` (it
+      toggles `check_arguments` off around the call and restores it).
+      **Remaining:** reverse-engineer or header-audit the option field offsets
+      for `mass` level, `periphery`, `same/lower_dim_density`, `local_opts`,
+      `n_transfs`/`transfs` so centre-of-gravity, inertia and surface area can
+      be exposed. `mass` level ≠ single i32 at offset 4/8 (probing showed no
+      CoG/periphery from any single-field setting — the fields interact).
 - [ ] `PK_TOPOL_range` / `PK_ENTITY_range` / bounding boxes.
 - [ ] `PK_ENTITY_ask_..` distance: `PK_ENTITY_range` point→body distance,
       `PK_TOPOL_..` clash/`PK_BODY_..` point containment

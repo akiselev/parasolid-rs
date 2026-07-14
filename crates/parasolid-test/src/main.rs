@@ -5,6 +5,12 @@
 
 use parasolid::*;
 
+/// Session config used by every test: argument checking on, so the kernel
+/// validates our FFI arguments and surfaces struct/signature mismatches early.
+fn test_config() -> SessionConfig {
+    SessionConfig::new().check_arguments(true)
+}
+
 fn main() {
     println!("=== Parasolid Integration Tests ===\n");
 
@@ -36,7 +42,7 @@ fn main() {
     // =========================================================================
 
     test!("session_start_stop", {
-        let session = Session::start(SessionConfig::new())?;
+        let session = Session::start(test_config())?;
         let (major, minor, _patch) = session.kernel_version()?;
         assert!(major >= 30, "kernel version too old: {}.{}", major, minor);
         println!("(v{}.{}) ", major, minor);
@@ -48,7 +54,7 @@ fn main() {
     // =========================================================================
 
     test!("create_solid_block", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
         assert_eq!(body.body_type()?, BodyType::Solid);
         let faces = body.faces()?;
@@ -60,7 +66,7 @@ fn main() {
     });
 
     test!("create_solid_cylinder", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_cylinder(5.0, 20.0)?;
         assert_eq!(body.body_type()?, BodyType::Solid);
         let faces = body.faces()?;
@@ -68,7 +74,7 @@ fn main() {
     });
 
     test!("create_solid_sphere", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_sphere(10.0)?;
         assert_eq!(body.body_type()?, BodyType::Solid);
         let faces = body.faces()?;
@@ -80,7 +86,7 @@ fn main() {
     // =========================================================================
 
     test!("face_edges_vertices", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 10.0, 10.0)?;
         let faces = body.faces()?;
         for face in &faces {
@@ -95,7 +101,7 @@ fn main() {
     });
 
     test!("edge_vertices", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 10.0, 10.0)?;
         let edges = body.edges()?;
         for edge in &edges {
@@ -112,7 +118,7 @@ fn main() {
     });
 
     test!("vertex_position", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
         let verts = body.vertices()?;
         // Per PK docs, the block's BASE is centred at the origin:
@@ -134,7 +140,7 @@ fn main() {
     // =========================================================================
 
     test!("block_face_surface_type", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 10.0, 10.0)?;
         for face in body.faces()? {
             let surf = face.surf()?;
@@ -143,7 +149,7 @@ fn main() {
     });
 
     test!("cylinder_face_surface_types", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_cylinder(5.0, 20.0)?;
         let mut has_cyl = false;
         let mut has_plane = false;
@@ -160,7 +166,7 @@ fn main() {
     });
 
     test!("sphere_surface_params", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_sphere(25.0)?;
         let face = &body.faces()?[0];
         let surf = face.surf()?;
@@ -169,7 +175,7 @@ fn main() {
     });
 
     test!("surface_eval", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_sphere(10.0)?;
         let face = &body.faces()?[0];
         let surf = face.surf()?;
@@ -180,7 +186,7 @@ fn main() {
     });
 
     test!("edge_curve_type", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 10.0, 10.0)?;
         for edge in body.edges()? {
             let curve = edge.curve()?;
@@ -189,7 +195,7 @@ fn main() {
     });
 
     test!("curve_eval", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 10.0, 10.0)?;
         let edge = &body.edges()?[0];
         let curve = edge.curve()?;
@@ -208,7 +214,7 @@ fn main() {
     // =========================================================================
 
     test!("extract_surface_params", {
-        let _session = Session::start(SessionConfig::new())?;
+        let _session = Session::start(test_config())?;
         let body = Body::create_solid_sphere(15.0)?;
         let surf = body.faces()?[0].surf()?;
         let params = extract_surface_params(&surf)?;
@@ -218,6 +224,85 @@ fn main() {
             }
             _ => panic!("expected sphere params"),
         }
+    });
+
+    // =========================================================================
+    // P0 — argument checking is actually on (oracle self-trust)
+    // =========================================================================
+
+    test!("check_arguments_enabled", {
+        let session = Session::start(test_config())?;
+        assert!(session.check_arguments()?, "check_arguments should be enabled");
+    });
+
+    // =========================================================================
+    // P5 — volume / measurement oracle (closed-form invariants)
+    // =========================================================================
+    //
+    // `Body::volume()` returns the kernel's `amount` (volume for solids) at unit
+    // density, so `mass == volume`. We assert against exact closed-form values;
+    // a wrong signature or option-version shows up immediately as an error or a
+    // garbage number. Centre-of-gravity / inertia / periphery are not yet
+    // exposed — the options struct that controls them needs a header audit
+    // (see TODO.md P5).
+
+    const MP_REL: f64 = 1e-6; // relative tolerance for analytic primitives
+    fn rel_ok(got: f64, want: f64) -> bool {
+        (got - want).abs() <= MP_REL * want.abs().max(1.0)
+    }
+
+    test!("volume_block", {
+        let _session = Session::start(test_config())?;
+        let (x, y, z) = (10.0, 20.0, 30.0);
+        let body = Body::create_solid_block(x, y, z)?;
+        let vol = x * y * z;
+        assert!(rel_ok(body.volume()?, vol), "block volume {} != {}", body.volume()?, vol);
+        assert!(rel_ok(body.mass()?, vol), "block mass {} != {}", body.mass()?, vol);
+    });
+
+    test!("volume_sphere", {
+        let _session = Session::start(test_config())?;
+        let r = 15.0;
+        let body = Body::create_solid_sphere(r)?;
+        let vol = 4.0 / 3.0 * std::f64::consts::PI * r.powi(3);
+        assert!(rel_ok(body.volume()?, vol), "sphere volume {} != {}", body.volume()?, vol);
+    });
+
+    test!("volume_cylinder", {
+        let _session = Session::start(test_config())?;
+        let (r, h) = (5.0, 12.0);
+        let body = Body::create_solid_cylinder(r, h)?;
+        let vol = std::f64::consts::PI * r * r * h;
+        assert!(rel_ok(body.volume()?, vol), "cyl volume {} != {}", body.volume()?, vol);
+    });
+
+    test!("volume_cone_truncated", {
+        let _session = Session::start(test_config())?;
+        // Truncated cone (frustum): base radius rb at z=0, height h, semi-angle
+        // 45°. The kernel's cone WIDENS toward +z: top radius rt = rb + h*tan(a)
+        // (probed). Volume = pi*h/3*(rb^2 + rb*rt + rt^2).
+        let (rb, h) = (5.0, 3.0);
+        let semi = std::f64::consts::FRAC_PI_4; // 45°, tan = 1
+        let rt = rb + h * semi.tan();
+        let body = Body::create_solid_cone(rb, h, semi)?;
+        let vol = std::f64::consts::PI * h / 3.0 * (rb * rb + rb * rt + rt * rt);
+        assert!(rel_ok(body.volume()?, vol), "cone volume {} != {}", body.volume()?, vol);
+    });
+
+    test!("volume_torus", {
+        let _session = Session::start(test_config())?;
+        let (major, minor) = (10.0, 3.0);
+        let body = Body::create_solid_torus(major, minor)?;
+        let vol = 2.0 * std::f64::consts::PI.powi(2) * major * minor * minor;
+        assert!(rel_ok(body.volume()?, vol), "torus volume {} != {}", body.volume()?, vol);
+    });
+
+    // Argument checking is restored after each volume() call (it toggles it off
+    // internally for the incomplete options struct). Confirm it's back on.
+    test!("check_arguments_restored_after_volume", {
+        let session = Session::start(test_config())?;
+        let _ = Body::create_solid_block(1.0, 1.0, 1.0)?.volume()?;
+        assert!(session.check_arguments()?, "check_arguments should be restored to on");
     });
 
     // =========================================================================

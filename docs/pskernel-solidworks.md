@@ -1,9 +1,13 @@
 # Running parasolid-rs against the SOLIDWORKS pskernel.dll
 
-Status (2026-07-14): **all 14 integration tests pass** against the
-`pskernel.dll` shipped with SOLIDWORKS 2025 (Parasolid V37.01.243).
+Status (2026-07-14): **all 21 integration tests pass** against the
+`pskernel.dll` shipped with SOLIDWORKS 2025 (Parasolid V37.01.243), with
+`PK_SESSION_set_check_arguments(true)` enabled for every test.
 `lib/pskernel.dll` in this repo is byte-identical (SHA-256) to
 `C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\pskernel.dll`.
+
+See `CLAUDE.md` for the Wine build/run workflow (including generating the
+`lib/libpskernel.a` import library from the DLL export list).
 
 ## Build & run (Linux host, cross-compile + wine)
 
@@ -11,7 +15,7 @@ Status (2026-07-14): **all 14 integration tests pass** against the
 rustup target add x86_64-pc-windows-gnu   # plus a mingw-w64 toolchain
 cargo build --workspace --target x86_64-pc-windows-gnu
 # copy lib/pskernel.dll next to the exe (or set WINEPATH)
-wine64 target/x86_64-pc-windows-gnu/debug/parasolid-test.exe
+wine target/x86_64-pc-windows-gnu/debug/parasolid-test.exe
 ```
 
 Notes for llvm-mingw (no libgcc): provide `libgcc.a`/`libgcc_eh.a` shims
@@ -61,6 +65,41 @@ Parasolid V35 per-symbol header docs (mirrored in
    `PK_BODY_set_type` takes an options pointer,
    `PK_BODY_create_solid_block` centres the *base* at the origin
    (z spans 0..z, not ±z/2).
+
+## Second pass (2026-07-14): mass props, cone, and the error path
+
+Probed empirically under Wine (no header mirror available at the time), so
+these are marked `[probed]` in the source and still want a header cross-check.
+
+8. **`PK_BODY_create_solid_cone` signature was wrong.** The draft modelled a
+   non-existent frustum API `(top_radius, bottom_radius, height, …)`; every
+   call failed with `PK_ERROR_general`. Real form is
+   `(radius, height, semi_angle, basis_set, body)` — base radius + apex
+   half-angle (radians), matching `PK_CONE_sf_t`. The base sits on z=0 and the
+   solid **widens toward +z**: top radius = `radius + height*tan(semi_angle)`.
+   Volume validated against the frustum formula.
+
+9. **`PK_TOPOL_eval_mass_props` takes an options pointer** as its 4th argument
+   (before the output pointers) — the tempting 8-arg no-options form makes the
+   kernel read `amount` as the version field → `PK_ERROR_o_t_version_unknown`
+   (5022). Accepted `o_t_version` is **1..=7**. The Rust
+   `PK_TOPOL_eval_mass_props_o_t` is **incomplete**: the real struct is larger
+   and contains an unmodelled `local_opts` field, so passing the too-small
+   struct reads past its end into stack garbage and crashes. A zeroed,
+   over-sized version-1 buffer (with `check_arguments` off) returns the correct
+   **volume/mass**; centre-of-gravity / inertia / periphery need the true field
+   offsets. Wrapped as `Body::volume()` / `Body::mass()`.
+
+10. **The error-inquiry path crashed on every PK error.** `PK_ERROR_sf_t`
+    modelled `function` and `bad_arg_names` as `*const char`, but the kernel
+    stores them as **inline char arrays** — the old code dereferenced the ASCII
+    bytes ("PK_TOPOL…") as a pointer and page-faulted. `PK_THREAD_ask_last_error`
+    also faults inside the kernel. `query_last_error` now reads a raw buffer via
+    `PK_ERROR_ask_last` and extracts only confirmed fields: the inline function
+    name (bytes 0..32) and code (i32 @32). Confirmed codes:
+    `field_of_wrong_type`=5014, `o_t_version_unknown`=5022. The rest of the real
+    `PK_ERROR_sf_t` (severity/n_bad_args/bad_args/entity, plus extra inline
+    string fields) is still un-mapped.
 
 ## Known remaining risks
 

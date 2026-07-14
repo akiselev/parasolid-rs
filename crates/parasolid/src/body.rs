@@ -94,13 +94,16 @@ impl Body {
         Ok(Body::from_tag(tag))
     }
 
-    /// Create a solid cone along the Z axis.
+    /// Create a solid cone along the Z axis, base on the z=0 plane.
     ///
-    /// `top_radius` is the radius at the top (tip end; set to 0.0 for a pointed cone).
-    /// `bottom_radius` is the radius at the base.
-    pub fn create_solid_cone(top_radius: f64, bottom_radius: f64, height: f64) -> PsResult<Body> {
+    /// The cone is defined by its base `radius` (at the z=0 plane), `height`,
+    /// and `semi_angle` (the half-angle, in radians). The kernel's cone widens
+    /// toward +z: the top radius at `height` is `radius + height *
+    /// tan(semi_angle)` (probed against the DLL). Pass `semi_angle = 0` for a
+    /// plain cylinder-like extrusion; a negative `semi_angle` narrows it.
+    pub fn create_solid_cone(radius: f64, height: f64, semi_angle: f64) -> PsResult<Body> {
         let mut tag: PK_BODY_t = PK_ENTITY_null;
-        pk_call!(PK_BODY_create_solid_cone(top_radius, bottom_radius, height, std::ptr::null(), &mut tag));
+        pk_call!(PK_BODY_create_solid_cone(radius, height, semi_angle, std::ptr::null(), &mut tag));
         Ok(Body::from_tag(tag))
     }
 

@@ -7,7 +7,7 @@
 //!
 //! Run under wine:
 //!   cargo build -p parasolid-test --target x86_64-pc-windows-gnu
-//!   (cd target dir; copy pskernel.dll next to exe) wine64 probe.exe
+//!   (cd target dir; copy pskernel.dll next to exe) wine probe.exe
 
 use parasolid::*;
 use parasolid_sys::*;

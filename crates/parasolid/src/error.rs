@@ -1,8 +1,6 @@
 //! Error types, severity classification, and the `pk_call!` macro.
 
-use std::ffi::CStr;
 use std::fmt;
-use std::os::raw::c_int;
 
 use parasolid_sys::*;
 
@@ -66,48 +64,6 @@ pub struct ErrorDetails {
 }
 
 impl ErrorDetails {
-    /// Build details from the raw PK error structure.
-    fn from_sf(sf: &PK_ERROR_sf_t) -> Self {
-        let function = if sf.function.is_null() {
-            String::new()
-        } else {
-            unsafe { CStr::from_ptr(sf.function) }
-                .to_string_lossy()
-                .into_owned()
-        };
-
-        let mut bad_args = Vec::new();
-        for i in 0..sf.n_bad_args.min(PK_ERROR_MAX_BAD_ARGS as c_int) {
-            let name = if sf.bad_arg_names[i as usize].is_null() {
-                None
-            } else {
-                Some(
-                    unsafe { CStr::from_ptr(sf.bad_arg_names[i as usize]) }
-                        .to_string_lossy()
-                        .into_owned(),
-                )
-            };
-            bad_args.push(BadArg {
-                index: sf.bad_args[i as usize],
-                name,
-            });
-        }
-
-        let entity = if sf.entity == PK_ENTITY_null {
-            None
-        } else {
-            Some(sf.entity)
-        };
-
-        ErrorDetails {
-            code: sf.code,
-            severity: severity_from_raw(sf.severity),
-            function,
-            bad_args,
-            entity,
-        }
-    }
-
     /// Build minimal details when PK_ERROR_ask_last is not available.
     fn simple(code: i32, severity: Severity) -> Self {
         ErrorDetails {
@@ -123,14 +79,25 @@ impl ErrorDetails {
 impl fmt::Display for ErrorDetails {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         if self.function.is_empty() {
-            write!(f, "PK error {} ({})", self.code, self.severity)
+            write!(f, "PK error {} ({})", self.code, self.severity)?;
         } else {
             write!(
                 f,
                 "PK error {} ({}) in {}",
                 self.code, self.severity, self.function
-            )
+            )?;
         }
+        if !self.bad_args.is_empty() {
+            write!(f, " [bad args:")?;
+            for a in &self.bad_args {
+                match &a.name {
+                    Some(n) => write!(f, " #{}={}", a.index, n)?,
+                    None => write!(f, " #{}", a.index)?,
+                }
+            }
+            write!(f, "]")?;
+        }
+        Ok(())
     }
 }
 
@@ -280,33 +247,56 @@ macro_rules! pk_call {
 // Internal helpers
 // =============================================================================
 
-/// Try to get error details from the PK thread-local or session-level error state.
+/// Byte offset of the `code` (i32) field in the real `PK_ERROR_sf_t`.
+///
+/// The kernel struct starts with the function name as a **32-byte inline char
+/// array**, not a `*const char` (probed against pskernel.dll V37.01.243 under
+/// Wine — the first 8 bytes read as "PK_TOPOL"). `code` follows at byte 32.
+const SF_CODE_OFFSET: usize = 32;
+/// Length of the leading inline function-name char array.
+const SF_FUNCTION_LEN: usize = SF_CODE_OFFSET;
+
+/// Try to get error details from the session-level error state.
+///
+/// Reads `PK_ERROR_ask_last` into a raw byte buffer and extracts only the two
+/// fields whose offsets are confirmed against the DLL: the inline function-name
+/// string (bytes `0..32`) and the error `code` (i32 at byte 32).
+///
+/// # Why not the typed `PK_ERROR_sf_t`
+///
+/// That binding is wrong: it models `function` (and `bad_arg_names`) as
+/// `*const c_char` pointers, but the kernel stores them as **inline char
+/// arrays**. Reading them as pointers dereferences ASCII bytes as an address
+/// and page-faults. The full struct also carries extra inline string fields
+/// (the error-name and bad-field name) not present in the typed definition, so
+/// severity / n_bad_args / bad_args are at unknown offsets and are **not**
+/// parsed here. The thread-local `PK_THREAD_ask_last_error` variant is likewise
+/// avoided — it faults inside the kernel. Both need a header audit; see
+/// `docs/pskernel-solidworks.md`.
 fn query_last_error() -> Option<ErrorDetails> {
-    // Try thread-safe error query first
-    let mut error_sf = PK_ERROR_sf_t::default();
-    let code = unsafe { PK_THREAD_ask_last_error(&mut error_sf) };
-    if code == PK_ERROR_no_errors && error_sf.code != PK_ERROR_no_errors {
-        return Some(ErrorDetails::from_sf(&error_sf));
-    }
-
-    // Fall back to session-level error query
+    // Generous buffer: the real struct is larger than the typed one and holds
+    // several inline strings.
+    let mut buf = [0u8; 2048];
     let mut was_error: PK_LOGICAL_t = PK_LOGICAL_false;
-    let mut error_sf = PK_ERROR_sf_t::default();
-    let code = unsafe { PK_ERROR_ask_last(&mut was_error, &mut error_sf) };
-    if code == PK_ERROR_no_errors && was_error == PK_LOGICAL_true {
-        return Some(ErrorDetails::from_sf(&error_sf));
+    let rc = unsafe { PK_ERROR_ask_last(&mut was_error, buf.as_mut_ptr() as *mut PK_ERROR_sf_t) };
+    if rc != PK_ERROR_no_errors || was_error != PK_LOGICAL_true {
+        return None;
     }
 
-    None
-}
+    let function = {
+        let name = &buf[..SF_FUNCTION_LEN];
+        let end = name.iter().position(|&b| b == 0).unwrap_or(SF_FUNCTION_LEN);
+        String::from_utf8_lossy(&name[..end]).into_owned()
+    };
+    let code = i32::from_le_bytes(buf[SF_CODE_OFFSET..SF_CODE_OFFSET + 4].try_into().unwrap());
 
-/// Map raw PK severity constant to `Severity`.
-fn severity_from_raw(raw: PK_ERROR_severity_t) -> Severity {
-    match raw {
-        PK_ERROR_serious => Severity::Serious,
-        PK_ERROR_fatal => Severity::Fatal,
-        _ => Severity::Mild,
-    }
+    Some(ErrorDetails {
+        code,
+        severity: default_severity(code),
+        function,
+        bad_args: Vec::new(),
+        entity: None,
+    })
 }
 
 /// Guess severity from the error code alone (when PK_ERROR_sf_t is unavailable).

@@ -809,10 +809,21 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Create a solid cone.
+    /// Create a solid cone. [probed]
+    ///
+    /// Real signature is `(radius, height, semi_angle, basis_set, body)` — the
+    /// cone is defined by its **base radius**, **height**, and **semi-angle**
+    /// (half-angle at the apex, radians), matching `PK_CONE_sf_t`. An earlier
+    /// draft modelled this as `(top_radius, bottom_radius, height, …)` (a
+    /// frustum API that does not exist); that fed the height in as `semi_angle`
+    /// and always failed with `PK_ERROR_general`. Verified under Wine against
+    /// pskernel.dll V37.01.243. The base sits on the z=0 plane and the cone
+    /// widens toward +z: the top radius at `height` is
+    /// `radius + height * tan(semi_angle)`.
     pub fn PK_BODY_create_solid_cone(
-        top_radius: c_double,
-        bottom_radius: c_double,
+        radius: c_double,
         height: c_double,
+        semi_angle: c_double,
         basis_set: *const PK_AXIS2_sf_t,
         body: *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
