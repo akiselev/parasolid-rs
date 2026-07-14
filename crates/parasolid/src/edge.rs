@@ -63,9 +63,19 @@ impl Edge {
     /// Returns `(t_min, t_max)`.
     pub fn interval(&self) -> PsResult<(f64, f64)> {
         let mut curve: PK_CURVE_t = PK_ENTITY_null;
+        let mut class: PK_CLASS_t = 0;
+        let mut ends = [PK_VECTOR_t::default(); 2];
         let mut t_range = PK_INTERVAL_t { low: 0.0, high: 0.0 };
         let mut sense: PK_LOGICAL_t = PK_LOGICAL_false;
-        pk_call!(PK_EDGE_ask_geometry(self.tag, &mut curve, &mut t_range, &mut sense));
+        pk_call!(PK_EDGE_ask_geometry(
+            self.tag,
+            PK_LOGICAL_true,
+            &mut curve,
+            &mut class,
+            ends.as_mut_ptr(),
+            &mut t_range,
+            &mut sense
+        ));
         Ok((t_range.low, t_range.high))
     }
 }

@@ -30,6 +30,9 @@ pub struct PK_AXIS1_sf_t {
 
 // =============================================================================
 // Surface standard forms
+//
+// Field order verified against Parasolid V35 header docs: basis_set always
+// comes FIRST in analytic sf structs (see solidworks-notes/headers mirror).
 // =============================================================================
 
 /// Plane standard form — defined by a basis set (location + normal + ref_direction).
@@ -43,34 +46,34 @@ pub struct PK_PLANE_sf_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_CYL_sf_t {
-    pub radius: c_double,
     pub basis_set: PK_AXIS2_sf_t,
+    pub radius: c_double,
 }
 
 /// Cone standard form — radius (at apex end), semi-angle, basis set.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_CONE_sf_t {
+    pub basis_set: PK_AXIS2_sf_t,
     pub radius: c_double,
     pub semi_angle: c_double,
-    pub basis_set: PK_AXIS2_sf_t,
 }
 
 /// Sphere standard form — radius + basis set.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_SPHERE_sf_t {
-    pub radius: c_double,
     pub basis_set: PK_AXIS2_sf_t,
+    pub radius: c_double,
 }
 
 /// Torus standard form — major radius, minor radius, basis set.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TORUS_sf_t {
+    pub basis_set: PK_AXIS2_sf_t,
     pub major_radius: c_double,
     pub minor_radius: c_double,
-    pub basis_set: PK_AXIS2_sf_t,
 }
 
 /// Spun surface standard form — profile curve revolved about an axis.
@@ -112,17 +115,17 @@ pub struct PK_LINE_sf_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_CIRCLE_sf_t {
-    pub radius: c_double,
     pub basis_set: PK_AXIS2_sf_t,
+    pub radius: c_double,
 }
 
 /// Ellipse standard form — R1 (major), R2 (minor) + basis set.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_ELLIPSE_sf_t {
+    pub basis_set: PK_AXIS2_sf_t,
     pub R1: c_double,
     pub R2: c_double,
-    pub basis_set: PK_AXIS2_sf_t,
 }
 
 /// Point standard form — just a position.

@@ -146,72 +146,91 @@ pub const PK_ERROR_not_an_entity: PK_ERROR_code_t = 504;
 
 pub type PK_CLASS_t = c_int;
 
-// Topological classes
-pub const PK_CLASS_body: PK_CLASS_t = 7;
-pub const PK_CLASS_region: PK_CLASS_t = 8;
-pub const PK_CLASS_shell: PK_CLASS_t = 9;
-pub const PK_CLASS_face: PK_CLASS_t = 10;
-pub const PK_CLASS_loop: PK_CLASS_t = 11;
-pub const PK_CLASS_fin: PK_CLASS_t = 12;
-pub const PK_CLASS_edge: PK_CLASS_t = 13;
-pub const PK_CLASS_vertex: PK_CLASS_t = 14;
+// Class token values determined EMPIRICALLY by probing pskernel.dll
+// V37.1.243 (SOLIDWORKS 2025) via PK_ENTITY_ask_class on known entities and
+// PK_CLASS_ask_superclass hierarchy enumeration (see docs/notes on the probe).
+// Tags: [probed] = directly observed; [family] = inferred from the V35 docs
+// token ordering inside a family whose neighbours were probed; [guess] =
+// plausible assignment, not yet verified — do not rely on these.
 
-// Geometric classes — surfaces
-pub const PK_CLASS_surf: PK_CLASS_t = 20;
-pub const PK_CLASS_plane: PK_CLASS_t = 21;
-pub const PK_CLASS_cyl: PK_CLASS_t = 22;
-pub const PK_CLASS_cone: PK_CLASS_t = 23;
-pub const PK_CLASS_sphere: PK_CLASS_t = 24;
-pub const PK_CLASS_torus: PK_CLASS_t = 25;
-pub const PK_CLASS_bsurf: PK_CLASS_t = 26;
-pub const PK_CLASS_offset: PK_CLASS_t = 27;
-pub const PK_CLASS_swept: PK_CLASS_t = 28;
-pub const PK_CLASS_spun: PK_CLASS_t = 29;
-pub const PK_CLASS_fsurf: PK_CLASS_t = 30;
-pub const PK_CLASS_mesh: PK_CLASS_t = 31;
-pub const PK_CLASS_blendsf: PK_CLASS_t = 32;
-pub const PK_CLASS_ssurf: PK_CLASS_t = 33;
+// Root / structural classes
+pub const PK_CLASS_class: PK_CLASS_t = 500; // [guess] root of hierarchy
+pub const PK_CLASS_primitive: PK_CLASS_t = 501; // [guess]
+pub const PK_CLASS_entity: PK_CLASS_t = 1000; // [probed]
+pub const PK_CLASS_geom: PK_CLASS_t = 1001; // [probed]
+pub const PK_CLASS_topol: PK_CLASS_t = 1002; // [probed]
+pub const PK_CLASS_item: PK_CLASS_t = 1003; // [guess] third entity subclass
 
-// Geometric classes — curves
-pub const PK_CLASS_curve: PK_CLASS_t = 40;
-pub const PK_CLASS_line: PK_CLASS_t = 41;
-pub const PK_CLASS_circle: PK_CLASS_t = 42;
-pub const PK_CLASS_ellipse: PK_CLASS_t = 43;
-pub const PK_CLASS_bcurve: PK_CLASS_t = 44;
-pub const PK_CLASS_icurve: PK_CLASS_t = 45;
-pub const PK_CLASS_fcurve: PK_CLASS_t = 46;
-pub const PK_CLASS_scurve: PK_CLASS_t = 47;
-pub const PK_CLASS_tcurve: PK_CLASS_t = 48;
-pub const PK_CLASS_cpcurve: PK_CLASS_t = 49;
-pub const PK_CLASS_pline: PK_CLASS_t = 50;
+// Geometry family roots
+pub const PK_CLASS_curve: PK_CLASS_t = 2002; // [probed]
+pub const PK_CLASS_surf: PK_CLASS_t = 2003; // [probed]
+pub const PK_CLASS_transf: PK_CLASS_t = 2004; // [guess] entity subclass
+pub const PK_CLASS_point: PK_CLASS_t = 2501; // [probed]
 
-// Other classes
-pub const PK_CLASS_point: PK_CLASS_t = 60;
-pub const PK_CLASS_transf: PK_CLASS_t = 70;
-pub const PK_CLASS_assembly: PK_CLASS_t = 80;
-pub const PK_CLASS_instance: PK_CLASS_t = 81;
-pub const PK_CLASS_attrib: PK_CLASS_t = 90;
-pub const PK_CLASS_attdef: PK_CLASS_t = 91;
-pub const PK_CLASS_group: PK_CLASS_t = 92;
-pub const PK_CLASS_partition: PK_CLASS_t = 100;
-pub const PK_CLASS_mark: PK_CLASS_t = 101;
-pub const PK_CLASS_pmark: PK_CLASS_t = 102;
-pub const PK_CLASS_delta: PK_CLASS_t = 103;
-pub const PK_CLASS_blend: PK_CLASS_t = 110;
+// Curves (3001..3009)
+pub const PK_CLASS_line: PK_CLASS_t = 3001; // [probed]
+pub const PK_CLASS_circle: PK_CLASS_t = 3002; // [probed]
+pub const PK_CLASS_ellipse: PK_CLASS_t = 3003; // [family]
+pub const PK_CLASS_bcurve: PK_CLASS_t = 3004; // [family]
+pub const PK_CLASS_icurve: PK_CLASS_t = 3005; // [family]
+pub const PK_CLASS_fcurve: PK_CLASS_t = 3006; // [family]
+pub const PK_CLASS_spcurve: PK_CLASS_t = 3007; // [family]
+pub const PK_CLASS_trcurve: PK_CLASS_t = 3008; // [family]
+pub const PK_CLASS_cpcurve: PK_CLASS_t = 3009; // [family] superclass is geom, not curve
+/// Legacy alias kept for source compatibility (docs name is `spcurve`).
+pub const PK_CLASS_scurve: PK_CLASS_t = PK_CLASS_spcurve;
+/// Legacy alias kept for source compatibility (docs name is `trcurve`).
+pub const PK_CLASS_tcurve: PK_CLASS_t = PK_CLASS_trcurve;
 
-// Mesh topology classes
-pub const PK_CLASS_mfacet: PK_CLASS_t = 120;
-pub const PK_CLASS_mfin: PK_CLASS_t = 121;
-pub const PK_CLASS_mvertex: PK_CLASS_t = 122;
-pub const PK_CLASS_mtopol: PK_CLASS_t = 123;
+// Surfaces (4001..4011)
+pub const PK_CLASS_plane: PK_CLASS_t = 4001; // [probed]
+pub const PK_CLASS_cyl: PK_CLASS_t = 4002; // [probed]
+pub const PK_CLASS_cone: PK_CLASS_t = 4003; // [family]
+pub const PK_CLASS_sphere: PK_CLASS_t = 4004; // [probed]
+pub const PK_CLASS_torus: PK_CLASS_t = 4005; // [probed]
+pub const PK_CLASS_bsurf: PK_CLASS_t = 4006; // [family]
+pub const PK_CLASS_offset: PK_CLASS_t = 4007; // [family]
+pub const PK_CLASS_fsurf: PK_CLASS_t = 4008; // [family]
+pub const PK_CLASS_swept: PK_CLASS_t = 4009; // [family]
+pub const PK_CLASS_spun: PK_CLASS_t = 4010; // [family]
+pub const PK_CLASS_blendsf: PK_CLASS_t = 4011; // [family]
+/// Not a documented V35 class token — value unknown. Kept for source compat.
+pub const PK_CLASS_ssurf: PK_CLASS_t = -1; // [unknown]
 
-// Lattice classes
-pub const PK_CLASS_lattice: PK_CLASS_t = 200;
-pub const PK_CLASS_lball: PK_CLASS_t = 201;
-pub const PK_CLASS_lrod: PK_CLASS_t = 202;
+// Topology (5001..5012)
+pub const PK_CLASS_vertex: PK_CLASS_t = 5001; // [probed]
+pub const PK_CLASS_edge: PK_CLASS_t = 5002; // [probed]
+pub const PK_CLASS_loop: PK_CLASS_t = 5003; // [probed]
+pub const PK_CLASS_face: PK_CLASS_t = 5004; // [probed]
+pub const PK_CLASS_shell: PK_CLASS_t = 5005; // [probed]
+pub const PK_CLASS_body: PK_CLASS_t = 5006; // [probed]
+pub const PK_CLASS_instance: PK_CLASS_t = 5007; // [guess] remaining topol subclass
+pub const PK_CLASS_assembly: PK_CLASS_t = 5008; // [family] other subclass of part (5012)
+pub const PK_CLASS_fin: PK_CLASS_t = 5010; // [probed]
+pub const PK_CLASS_region: PK_CLASS_t = 5011; // [probed]
+pub const PK_CLASS_part: PK_CLASS_t = 5012; // [probed] superclass of body & assembly
 
-// Frame class
-pub const PK_CLASS_frame: PK_CLASS_t = 0xe6;
+// Unverified classes — hierarchy probe shows valid classes at 6002/6003/6005
+// (entity subclasses); names below are NOT yet matched to values. Do not use
+// for dispatch until verified.
+pub const PK_CLASS_attrib: PK_CLASS_t = -2; // [unknown]
+pub const PK_CLASS_attdef: PK_CLASS_t = -3; // [unknown]
+pub const PK_CLASS_group: PK_CLASS_t = -4; // [unknown]
+pub const PK_CLASS_partition: PK_CLASS_t = -5; // [unknown]
+pub const PK_CLASS_mark: PK_CLASS_t = -6; // [unknown]
+pub const PK_CLASS_pmark: PK_CLASS_t = -7; // [unknown]
+pub const PK_CLASS_delta: PK_CLASS_t = -8; // [unknown]
+pub const PK_CLASS_blend: PK_CLASS_t = -9; // [unknown]
+pub const PK_CLASS_mesh: PK_CLASS_t = -10; // [unknown]
+pub const PK_CLASS_mfacet: PK_CLASS_t = -11; // [unknown]
+pub const PK_CLASS_mfin: PK_CLASS_t = -12; // [unknown]
+pub const PK_CLASS_mvertex: PK_CLASS_t = -13; // [unknown]
+pub const PK_CLASS_mtopol: PK_CLASS_t = -14; // [unknown]
+pub const PK_CLASS_pline: PK_CLASS_t = -15; // [unknown]
+pub const PK_CLASS_lattice: PK_CLASS_t = -16; // [unknown]
+pub const PK_CLASS_lball: PK_CLASS_t = -17; // [unknown]
+pub const PK_CLASS_lrod: PK_CLASS_t = -18; // [unknown]
+pub const PK_CLASS_frame: PK_CLASS_t = -19; // [unknown]
 
 // =============================================================================
 // Unit vector type — same representation as PK_VECTOR_t but semantically normalised

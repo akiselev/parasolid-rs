@@ -72,7 +72,8 @@ impl Body {
 
     // --- Primitive creation ---
 
-    /// Create an axis-aligned solid block centered at the origin.
+    /// Create an axis-aligned solid block whose base is centred at the origin
+    /// (x spans ±x/2, y spans ±y/2, z spans 0..z — per PK_BODY_create_solid_block docs).
     pub fn create_solid_block(x: f64, y: f64, z: f64) -> PsResult<Body> {
         let mut tag: PK_BODY_t = PK_ENTITY_null;
         pk_call!(PK_BODY_create_solid_block(x, y, z, std::ptr::null(), &mut tag));

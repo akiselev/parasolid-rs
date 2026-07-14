@@ -35,6 +35,8 @@ pub type PK_FABORT_f_t = Option<unsafe extern "C" fn(ifail: *const c_int)>;
 
 /// FTMKEY — return sample name keys for testing FFOPRD and FFOPWR (optional).
 ///
+/// NOTE: not a member of `PK_SESSION_frustrum_t` — retained for reference only.
+///
 /// - `key_type`: which key type to return (input).
 /// - `key_len`: length of returned key string (output).
 /// - `key`: buffer to receive key string (output).
@@ -50,59 +52,88 @@ pub type PK_FTMKEY_f_t = Option<
 
 /// FFOPRD — open all guises of a file (except roll-back) for reading.
 ///
-/// - `n_guises`: number of file guises to open (input).
-/// - `guises`: array of guise codes (input).
-/// - `key_len`: length of key string (input).
-/// - `key`: file key (name or database index) (input).
-/// - `ifail`: 0 on success (output).
+/// Signature verified against Parasolid V35 `PK_FFOPRD_f_t` header docs.
+///
+/// - `guise`: class of file — `FFCSNP`, `FFCJNL`, `FFCXMT`, `FFCXMO`, `FFCSCH`, `FFCLNC` (input).
+/// - `format`: format code — `FFBNRY` or `FFTEXT` (input).
+/// - `name`: key which identifies the file, not NUL-terminated (input).
+/// - `namlen`: length of `name` (input).
+/// - `skiphd`: `FFSKHD` to skip the file header (usual case) or `FFLVHD` to leave it (input).
+/// - `strid`: receives the stream id for subsequent FFREAD/FFCLOS calls (output).
+/// - `ifail`: `FR_no_errors` on success, else `FR_bad_name`/`FR_not_found`/`FR_bad_header`/`FR_open_fail` (output).
 pub type PK_FFOPRD_f_t = Option<
     unsafe extern "C" fn(
-        n_guises: *const c_int,
-        guises: *const c_int,
-        key_len: *const c_int,
-        key: *const c_char,
+        guise: *const c_int,
+        format: *const c_int,
+        name: *const c_char,
+        namlen: *const c_int,
+        skiphd: *const c_int,
+        strid: *mut c_int,
         ifail: *mut c_int,
     ),
 >;
 
 /// FFOPWR — open all guises of a file (except roll-back) for writing.
 ///
-/// Same signature as FFOPRD.
+/// Signature verified against Parasolid V35 `PK_FFOPWR_f_t` header docs.
+///
+/// - `guise`: class of file — `FFCSNP`, `FFCJNL`, `FFCXMT`, `FFCSCH`, `FFCLNC`, `FFCDBG` (input).
+/// - `format`: format code — `FFBNRY`, `FFTEXT`, `FFXML` (input).
+/// - `name`: key which identifies the file, not NUL-terminated (input).
+/// - `namlen`: length of `name` (input).
+/// - `pr2hdr`: part 2 header data (`KEYWORD1=value1;KEYWORD2=value2...`) from Parasolid,
+///   for storage in the file header, not NUL-terminated (input).
+/// - `pr2len`: length of `pr2hdr` (input).
+/// - `strid`: receives the stream id for subsequent FFWRIT/FFCLOS calls (output).
+/// - `ifail`: `FR_no_errors` on success, else `FR_bad_name`/`FR_already_exists`/`FR_open_fail`/... (output).
 pub type PK_FFOPWR_f_t = Option<
     unsafe extern "C" fn(
-        n_guises: *const c_int,
-        guises: *const c_int,
-        key_len: *const c_int,
-        key: *const c_char,
+        guise: *const c_int,
+        format: *const c_int,
+        name: *const c_char,
+        namlen: *const c_int,
+        pr2hdr: *const c_char,
+        pr2len: *const c_int,
+        strid: *mut c_int,
         ifail: *mut c_int,
     ),
 >;
 
 /// FFREAD — read from file.
 ///
-/// - `strid`: stream id (guise index) identifying which file guise to read (input).
-/// - `n_chars`: number of characters/bytes to read (input).
-/// - `buffer`: buffer to receive data (output).
-/// - `ifail`: 0 on success (output).
+/// Signature verified against Parasolid V35 `PK_FFREAD_f_t` header docs.
+///
+/// - `guise`: class of file (input).
+/// - `strid`: frustrum stream id from FFOPRD (input).
+/// - `nmax`: maximum number of chars to return (input).
+/// - `buffer`: receives the read data (output).
+/// - `nactual`: actual number of chars placed in `buffer`; equals `*nmax` except on EOF/error (output).
+/// - `ifail`: `FR_no_errors`, `FR_read_fail`, or `FR_end_of_file` (only when zero bytes read) (output).
 pub type PK_FFREAD_f_t = Option<
     unsafe extern "C" fn(
+        guise: *const c_int,
         strid: *const c_int,
-        n_chars: *const c_int,
+        nmax: *const c_int,
         buffer: *mut c_char,
+        nactual: *mut c_int,
         ifail: *mut c_int,
     ),
 >;
 
 /// FFWRIT — write to file.
 ///
-/// - `strid`: stream id (guise index) identifying which file guise to write (input).
-/// - `n_chars`: number of characters/bytes to write (input).
+/// Signature verified against Parasolid V35 `PK_FFWRIT_f_t` header docs.
+///
+/// - `guise`: class of file (input).
+/// - `strid`: frustrum stream id from FFOPWR (input).
+/// - `nchars`: number of chars/bytes to write, >= 0 (input).
 /// - `buffer`: data to write (input).
-/// - `ifail`: 0 on success (output).
+/// - `ifail`: `FR_no_errors`, `FR_write_fail`, `FR_disc_full`, or `FR_write_memory_full` (output).
 pub type PK_FFWRIT_f_t = Option<
     unsafe extern "C" fn(
+        guise: *const c_int,
         strid: *const c_int,
-        n_chars: *const c_int,
+        nchars: *const c_int,
         buffer: *const c_char,
         ifail: *mut c_int,
     ),
@@ -110,10 +141,19 @@ pub type PK_FFWRIT_f_t = Option<
 
 /// FFCLOS — close file.
 ///
-/// - `strid`: stream id (guise index) of file to close (input).
-/// - `ifail`: 0 on success (output).
+/// Signature verified against Parasolid V35 `PK_FFCLOS_f_t` header docs.
+///
+/// - `guise`: class of file (input).
+/// - `strid`: frustrum stream id of the file to close (input).
+/// - `action`: `FFNORM` (retain a newly created file) or `FFABOR` (delete it) (input).
+/// - `ifail`: `FR_no_errors`, `FR_close_fail`, or `FR_write_memory_full` (output).
 pub type PK_FFCLOS_f_t = Option<
-    unsafe extern "C" fn(strid: *const c_int, ifail: *mut c_int),
+    unsafe extern "C" fn(
+        guise: *const c_int,
+        strid: *const c_int,
+        action: *const c_int,
+        ifail: *mut c_int,
+    ),
 >;
 
 /// FMALLO — allocate virtual memory.
@@ -198,6 +238,8 @@ pub type PK_FFTELL_f_t = Option<
 >;
 
 /// FFSKXT — open file for reading XT format specifically (legacy variant of FFOPRD).
+///
+/// NOTE: not a member of `PK_SESSION_frustrum_t` — retained for reference only.
 pub type PK_FFSKXT_f_t = Option<
     unsafe extern "C" fn(
         n_guises: *const c_int,
@@ -380,16 +422,6 @@ pub type PK_FGPRSU_f_t = Option<
 >;
 
 // =============================================================================
-// PK_SESSION_frustrum_t — v1 frustrum struct
-//
-// Declared with PK_SESSION_frustrum_o_m() to zero-initialize all fields.
-// Fields are function pointers to the application-supplied frustrum callbacks.
-// =============================================================================
-
-/// Macro-equivalent initializer: zero all fields to NULL.
-///
-/// In C this is `PK_SESSION_frustrum_o_m(fru)`. In Rust, use:
-// =============================================================================
 // PK_SESSION_register_fru_o_t — v2 frustrum registration options
 //
 // Used with PK_SESSION_register_fru_2. Fields are pointers-to-function-pointers
@@ -533,26 +565,91 @@ impl Default for PK_MEMORY_frustrum_t {
 }
 
 // =============================================================================
-// File guise constants
+// Frustrum tokens and error codes
 //
-// Used in FFOPRD/FFOPWR to indicate which file type is being opened.
+// Values verified against the Parasolid Downward Interfaces manual,
+// "Frustrum Tokens and Error Codes" appendix (frustrum_tokens.h /
+// frustrum_ifails.h in the Parasolid release area).
 // =============================================================================
 
-/// File guise type for FFOPRD/FFOPWR.
-pub type PK_FFCXMT_t = c_int;
+// --- Frustrum ifail codes (FR_*) ---
 
-/// Transmit (part data) file guise — .xmt_txt / .xmt_bin / .X_T / .X_B
-pub const PK_FFCXMT_transmit: PK_FFCXMT_t = 1;
-/// Schema file guise — .sch_txt / .S_T
-pub const PK_FFCXMT_schema: PK_FFCXMT_t = 2;
-/// Journal file guise — .jnl_txt / .jnl_bin / .J_T / .J_B
-pub const PK_FFCXMT_journal: PK_FFCXMT_t = 3;
+/// Operation was successful.
+pub const FR_no_errors: c_int = 0;
+/// Bad file name.
+pub const FR_bad_name: c_int = 1;
+/// File of given name does not exist.
+pub const FR_not_found: c_int = 2;
+/// File of given name already exists.
+pub const FR_already_exists: c_int = 3;
+/// File pointer is at end of file.
+pub const FR_end_of_file: c_int = 4;
+/// Unspecified open error.
+pub const FR_open_fail: c_int = 10;
+/// No space available to extend the file.
+pub const FR_disc_full: c_int = 11;
+/// Unspecified write error.
+pub const FR_write_fail: c_int = 12;
+/// Unspecified read error.
+pub const FR_read_fail: c_int = 13;
+/// Unspecified close error.
+pub const FR_close_fail: c_int = 14;
+/// Insufficient contiguous virtual memory.
+pub const FR_memory_full: c_int = 15;
+/// Bad header found opening file for read.
+pub const FR_bad_header: c_int = 16;
+/// Rollmark operation within frustrum passed.
+pub const FR_rollmark_op_pass: c_int = 20;
+/// Rollmark operation within frustrum failed.
+pub const FR_rollmark_op_fail: c_int = 21;
+/// Unspecified error.
+pub const FR_unspecified: c_int = 99;
+
+// --- File guise tokens (FFC*) ---
+
+/// Rollback file guise.
+pub const FFCROL: c_int = 1;
 /// Snapshot file guise — .snp_txt / .snp_bin / .N_T / .N_B
-pub const PK_FFCXMT_snapshot: PK_FFCXMT_t = 4;
-/// Partition file guise — .xmp_txt / .xmp_bin / .P_T / .P_B
-pub const PK_FFCXMT_partition: PK_FFCXMT_t = 5;
+pub const FFCSNP: c_int = 2;
+/// Journal file guise — .jnl / .J_T
+pub const FFCJNL: c_int = 3;
+/// Transmit file guise (generated by Parasolid) — .xmt_txt / .xmt_bin / .X_T / .X_B
+pub const FFCXMT: c_int = 4;
+/// Transmit file guise (generated by Romulus, old format) — .xmt_txt
+pub const FFCXMO: c_int = 5;
+/// Schema file guise — .sch_txt / .S_T
+pub const FFCSCH: c_int = 6;
+/// Licence file guise — .lnc
+pub const FFCLNC: c_int = 7;
+/// Partition transmit file guise — .xmp_txt / .xmp_bin / .P_T / .P_B
+pub const FFCXMP: c_int = 8;
 /// Delta transmit file guise — .xmd_txt / .xmd_bin / .D_T / .D_B
-pub const PK_FFCXMT_delta: PK_FFCXMT_t = 6;
-/// Mesh file guise — .xmm_txt / .xmm_bin / .M_T / .M_B
-pub const PK_FFCXMT_mesh: PK_FFCXMT_t = 7;
+pub const FFCXMD: c_int = 9;
+/// Debug report file guise.
+pub const FFCDBG: c_int = 10;
 
+// --- File format tokens ---
+
+/// Binary format.
+pub const FFBNRY: c_int = 1;
+/// Text format.
+pub const FFTEXT: c_int = 2;
+/// Applio format (application I/O).
+pub const FFAPPL: c_int = 3;
+/// XML text format.
+pub const FFXML: c_int = 4;
+
+// --- File open mode tokens (FFOPRD skiphd argument) ---
+
+/// Skip header after opening file for read (usual case).
+pub const FFSKHD: c_int = 1;
+/// Leave header after opening file for read (frustrum acceptance tests).
+pub const FFLVHD: c_int = 2;
+
+// --- File close mode tokens (FFCLOS action argument) ---
+
+/// Normal: default action on file close (retain a newly created file).
+pub const FFNORM: c_int = 1;
+/// Abort: delete the newly created file.
+pub const FFABOR: c_int = 2;
+// (end of frustrum tokens)

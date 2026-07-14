@@ -14,8 +14,6 @@ use crate::*;
 
 // -- Body type ----------------------------------------------------------------
 
-pub const PK_BODY_type_minimum_c: PK_BODY_type_t = 6;
-pub const PK_BODY_type_mixed_c: PK_BODY_type_t = 7;
 
 // -- Fin type -----------------------------------------------------------------
 
@@ -726,11 +724,12 @@ unsafe extern "C" {
 
     // -- Handed evaluation (at discontinuities / periodic seams) --
 
+    /// Signature verified against Parasolid V35 docs (n_derivs precedes hand).
     pub fn PK_CURVE_eval_handed(
         curve: PK_CURVE_t,
         t: c_double,
-        hand: PK_HAND_t,
-        n_deriv: c_int,
+        n_derivs: c_int,
+        hand_direction: PK_HAND_t,
         p_and_derivs: *mut PK_VECTOR_t,
     ) -> PK_ERROR_code_t;
 

@@ -115,12 +115,17 @@ fn main() {
         let _session = Session::start(SessionConfig::new())?;
         let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
         let verts = body.vertices()?;
-        // Block centered at origin: vertices at ±5, ±10, ±15
+        // Per PK docs, the block's BASE is centred at the origin:
+        // vertices at x = ±5, y = ±10, z = 0 or 30.
         for v in &verts {
             let p = v.point()?;
             assert!((p.x.abs() - 5.0).abs() < 1e-6, "x should be ±5, got {}", p.x);
             assert!((p.y.abs() - 10.0).abs() < 1e-6, "y should be ±10, got {}", p.y);
-            assert!((p.z.abs() - 15.0).abs() < 1e-6, "z should be ±15, got {}", p.z);
+            assert!(
+                p.z.abs() < 1e-6 || (p.z - 30.0).abs() < 1e-6,
+                "z should be 0 or 30, got {}",
+                p.z
+            );
         }
     });
 

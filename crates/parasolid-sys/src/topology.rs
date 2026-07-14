@@ -15,17 +15,18 @@ use std::os::raw::{c_double, c_int};
 pub type PK_BODY_type_t = c_int;
 
 /// Body has no topology.
-pub const PK_BODY_type_empty_c: PK_BODY_type_t = 0;
-/// Body contains only isolated vertices (0D).
-pub const PK_BODY_type_acorn_c: PK_BODY_type_t = 1;
-/// Body contains only wire edges (1D).
-pub const PK_BODY_type_wire_c: PK_BODY_type_t = 2;
-/// Body contains only sheet faces (2D, open).
-pub const PK_BODY_type_sheet_c: PK_BODY_type_t = 3;
-/// Body encloses finite volume (3D).
-pub const PK_BODY_type_solid_c: PK_BODY_type_t = 4;
-/// Body has mixed-dimension topology (general body).
-pub const PK_BODY_type_general_c: PK_BODY_type_t = 5;
+// Body type token values determined EMPIRICALLY by probing pskernel.dll
+// V37.1.243 (SOLIDWORKS 2025): created bodies of each type and printed
+// PK_BODY_ask_type. [probed] = observed; [guess] = not yet verified.
+pub const PK_BODY_type_solid_c: PK_BODY_type_t = 5601; // [probed]
+pub const PK_BODY_type_sheet_c: PK_BODY_type_t = 5602; // [probed]
+pub const PK_BODY_type_minimum_c: PK_BODY_type_t = 5603; // [probed]
+pub const PK_BODY_type_wire_c: PK_BODY_type_t = 5604; // [probed]
+pub const PK_BODY_type_acorn_c: PK_BODY_type_t = 5605; // [guess]
+pub const PK_BODY_type_empty_c: PK_BODY_type_t = 5606; // [guess]
+pub const PK_BODY_type_general_c: PK_BODY_type_t = 5607; // [guess]
+pub const PK_BODY_type_compound_c: PK_BODY_type_t = 5608; // [guess]
+pub const PK_BODY_type_unspecified_c: PK_BODY_type_t = 5609; // [guess]
 
 // =============================================================================
 // Body configuration constants — returned by PK_BODY_ask_config
@@ -137,9 +138,11 @@ unsafe extern "C" {
     /// ```c
     /// PK_ERROR_code_t PK_BODY_set_type(PK_BODY_t body, PK_BODY_type_t btype);
     /// ```
+    /// Signature verified against Parasolid V35 docs (options may be NULL).
     pub fn PK_BODY_set_type(
         body: PK_BODY_t,
-        btype: PK_BODY_type_t,
+        new_type: PK_BODY_type_t,
+        options: *const core::ffi::c_void,
     ) -> PK_ERROR_code_t;
 
     /// Return the body configuration (standard/compound/child).
@@ -449,10 +452,14 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return edge geometry info.
+    /// Signature verified against Parasolid V35 `PK_EDGE_ask_geometry` docs.
     pub fn PK_EDGE_ask_geometry(
         edge: PK_EDGE_t,
+        want_interval: PK_LOGICAL_t,
         curve: *mut PK_CURVE_t,
-        t_range: *mut PK_INTERVAL_t,
+        class: *mut PK_CLASS_t,
+        ends: *mut PK_VECTOR_t,
+        t_int: *mut PK_INTERVAL_t,
         sense: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
@@ -897,8 +904,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Create a sheet body from a surface.
+    /// Signature verified against Parasolid V35 docs (uv_box passed by value).
     pub fn PK_SURF_make_sheet_body(
         surf: PK_SURF_t,
+        uv_box: PK_UVBOX_t,
         body: *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
 
