@@ -799,6 +799,144 @@ fn main() {
     });
 
     // =========================================================================
+    // P0 spine completion — region/shell/fin/face/edge/vertex extras
+    // =========================================================================
+
+    test!("region_type_and_shell_sign", {
+        let _session = Session::start(test_config())?;
+        let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let regions = body.regions()?;
+        // region_type() agrees with is_solid() for every region.
+        for r in &regions {
+            let rt = r.region_type()?;
+            if r.is_solid()? {
+                assert_eq!(rt, RegionType::Solid, "solid region type, raw differs");
+            } else {
+                assert_eq!(rt, RegionType::Void, "void region type, raw differs");
+            }
+        }
+        // The solid region is bounded by closed shells (a definite sign, not open).
+        let solid = regions.iter().find(|r| r.is_solid().unwrap()).unwrap();
+        for sh in solid.shells()? {
+            let sign = sh.sign()?;
+            assert!(
+                matches!(sign, ShellSign::Positive | ShellSign::Negative),
+                "solid shell has a closed sign, got {:?}",
+                sign
+            );
+        }
+        // make_void / make_solid flip the region's material flag and back.
+        solid.make_void()?;
+        assert!(!solid.is_solid()?, "make_void flipped region to void");
+        solid.make_solid()?;
+        assert!(solid.is_solid()?, "make_solid flipped region back to solid");
+    });
+
+    test!("fin_geometry", {
+        let _session = Session::start(test_config())?;
+        let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let f0 = body.faces()?[0];
+        let lp = f0.loops()?[0];
+        let fin = lp.fins()?[0];
+        // ask_geometry yields a real curve (the fin's underlying 3D curve) over a
+        // non-degenerate parameter interval. Its class is the curve's class.
+        let (curve, (t0, t1), _sense) = fin.geometry()?;
+        assert!(curve.tag() != 0, "fin geometry returns a curve");
+        assert!(curve.entity().is_curve()?, "fin geometry entity is a curve");
+        assert!(t1 > t0, "fin geometry interval is non-degenerate ({t0}..{t1})");
+    });
+
+    test!("face_surface_type_and_extreme", {
+        let _session = Session::start(test_config())?;
+        // Every face of a block is planar.
+        let block = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        for f in block.faces()? {
+            assert_eq!(f.surface_type()?, SurfType::Plane, "block face is planar");
+        }
+        // A cylinder has exactly one cylindrical face (+ 2 plane caps).
+        let cyl = Body::create_solid_cylinder(5.0, 20.0)?;
+        let n_side = cyl.faces()?.iter().filter(|f| f.surface_type().unwrap() == SurfType::Cylinder).count();
+        assert_eq!(n_side, 1, "cylinder has 1 cylindrical face");
+
+        // Face::extreme returns real coordinates: the topmost face point over the
+        // whole block sits at z = 30 (block base at z = 0).
+        let dirs = [Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)];
+        let zmax = block
+            .faces()?
+            .iter()
+            .map(|f| f.extreme(dirs).unwrap().0.z)
+            .fold(f64::MIN, f64::max);
+        assert!(rel_ok(zmax, 30.0), "block extreme +z is 30, got {}", zmax);
+    });
+
+    test!("face_coincidence_stacked_blocks", {
+        let _session = Session::start(test_config())?;
+        // Block A occupies z 0..30; block B is translated up so it occupies
+        // z 30..60. A's top face and B's bottom face are coincident (opposite
+        // orientation).
+        let a = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let b = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        b.transform(&Transform::translation(0.0, 0.0, 30.0)?)?;
+
+        let dirs_up = [Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)];
+        let dirs_dn = [Vec3::new(0.0, 0.0, -1.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)];
+        // A face whose whole extent is at z=30: extreme in -z still gives z=30.
+        let a_top = a.faces()?.into_iter()
+            .find(|f| rel_ok(f.extreme(dirs_dn).unwrap().0.z, 30.0)).expect("A top face");
+        let b_bot = b.faces()?.into_iter()
+            .find(|f| rel_ok(f.extreme(dirs_up).unwrap().0.z, 30.0)).expect("B bottom face");
+        let (coi, _pt) = a_top.is_coincident(b_bot, 1e-7)?;
+        assert!(coi.is_coincident(), "stacked block faces coincide, got {:?}", coi);
+
+        // A's top and bottom faces are parallel but offset — not coincident.
+        let a_bot = a.faces()?.into_iter()
+            .find(|f| rel_ok(f.extreme(dirs_up).unwrap().0.z, 0.0)).expect("A bottom face");
+        let (coi2, _) = a_top.is_coincident(a_bot, 1e-7)?;
+        assert_eq!(coi2, Coincidence::No, "offset parallel faces are not coincident");
+    });
+
+    test!("edge_find_interval_and_precision", {
+        let _session = Session::start(test_config())?;
+        let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let e = body.edges()?[0];
+        // find_interval cross-checks the ask_geometry interval.
+        let (a0, a1) = e.interval()?;
+        let (b0, b1) = e.find_interval()?;
+        assert!(rel_ok(a0, b0) && rel_ok(a1, b1), "find_interval == ask_geometry interval");
+
+        // Make the edge tolerant, then restore it.
+        let _new = e.set_precision(0.01)?;
+        assert!(e.precision()? > 1e-4, "edge became tolerant, precision {}", e.precision()?);
+        let tok = e.reset_precision()?;
+        assert!(tok == 17201 || tok == 17202, "reset_precision ok/tangent, got {}", tok);
+    });
+
+    test!("edge_make_wire_body", {
+        let _session = Session::start(test_config())?;
+        let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let e = body.edges()?[0];
+        let wire = Edge::make_wire_body(&[e])?;
+        assert_eq!(wire.body_type()?, BodyType::Wire, "made a wire body");
+        assert_eq!(wire.edges()?.len(), 1, "wire body has 1 edge");
+        assert_eq!(wire.vertices()?.len(), 2, "wire body has 2 vertices");
+    });
+
+    test!("minimum_body_acorn_vertex", {
+        let _session = Session::start(test_config())?;
+        // A minimum body is a single acorn vertex at the given point.
+        let body = Body::create_minimum(Vec3::new(1.0, 2.0, 3.0))?;
+        let verts = body.vertices()?;
+        assert_eq!(verts.len(), 1, "minimum body has exactly 1 vertex");
+        let v = verts[0];
+        let p = v.point()?;
+        assert!(rel_ok(p.x, 1.0) && rel_ok(p.y, 2.0) && rel_ok(p.z, 3.0), "acorn vertex position");
+        // Its lone shell is a vertex-only (acorn) shell.
+        assert_eq!(v.shells()?.len(), 1, "acorn vertex is in 1 shell");
+        assert_eq!(v.shells()?[0].acorn_vertex()?.map(|a| a.tag()), Some(v.tag()),
+            "the shell's acorn vertex is this vertex");
+    });
+
+    // =========================================================================
     // P5 — point containment (inside / outside / on)
     // =========================================================================
 

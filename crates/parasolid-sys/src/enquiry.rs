@@ -93,6 +93,7 @@ pub const PK_enclosure_unset_c: PK_enclosure_t = 5704;
 pub type PK_SHELL_sign_t = c_int;
 pub const PK_SHELL_sign_positive_c: PK_SHELL_sign_t = 3550;
 pub const PK_SHELL_sign_negative_c: PK_SHELL_sign_t = 3551;
+pub const PK_SHELL_sign_open_c: PK_SHELL_sign_t = 3552;
 
 // -- Measure type (for PK_CURVE_find_vectors) ---------------------------------
 

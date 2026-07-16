@@ -104,6 +104,13 @@ impl Vertex {
         pk_call!(PK_VERTEX_set_precision(self.tag, tol));
         Ok(())
     }
+
+    /// Delete this vertex, which must be an isolated (acorn) vertex — a
+    /// vertex-only shell with no edges.
+    pub fn delete_acorn(self) -> PsResult<()> {
+        pk_call!(PK_VERTEX_delete_acorn(1, &self.tag));
+        Ok(())
+    }
 }
 
 /// The classification of a vertex.

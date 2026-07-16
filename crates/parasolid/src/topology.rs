@@ -60,6 +60,36 @@ impl ShellType {
     }
 }
 
+/// The sign of a shell relative to the region it bounds.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ShellSign {
+    /// The shell bounds material on its inside (an outer/solid boundary).
+    Positive,
+    /// The shell bounds material on its outside (an inner void/cavity boundary).
+    Negative,
+    /// An open shell (does not fully bound a region).
+    Open,
+    Other(i32),
+}
+
+impl ShellSign {
+    fn from_raw(v: i32) -> Self {
+        match v {
+            PK_SHELL_sign_positive_c => ShellSign::Positive,
+            PK_SHELL_sign_negative_c => ShellSign::Negative,
+            PK_SHELL_sign_open_c => ShellSign::Open,
+            o => ShellSign::Other(o),
+        }
+    }
+}
+
+/// Whether a region is solid (material) or void (empty space).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RegionType {
+    Solid,
+    Void,
+}
+
 /// The type of a loop (outer boundary, inner hole, etc.).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum LoopType {
@@ -159,6 +189,28 @@ impl Region {
         pk_call!(PK_REGION_imprint_point(self.tag, point.tag(), &mut v));
         Ok(Vertex::from_tag(v))
     }
+
+    /// This region's type (solid = material, void = empty space).
+    ///
+    /// Derived from [`is_solid`](Self::is_solid); the raw `PK_REGION_ask_type`
+    /// entry point additionally takes an (undocumented) options struct and is not
+    /// used here.
+    pub fn region_type(&self) -> PsResult<RegionType> {
+        Ok(if self.is_solid()? { RegionType::Solid } else { RegionType::Void })
+    }
+
+    /// Mark this region as solid (fill it with material). Used by the
+    /// regularized-boolean classify/commit stage to flip a cell to solid.
+    pub fn make_solid(&self) -> PsResult<()> {
+        pk_call!(PK_REGION_make_solid(self.tag));
+        Ok(())
+    }
+
+    /// Mark this region as void (empty it of material).
+    pub fn make_void(&self) -> PsResult<()> {
+        pk_call!(PK_REGION_make_void(self.tag));
+        Ok(())
+    }
 }
 
 impl Shell {
@@ -218,6 +270,15 @@ impl Shell {
         let mut ptr = std::ptr::null_mut();
         pk_call!(PK_SHELL_ask_wireframe_edges(self.tag, &mut n, &mut ptr));
         Ok(collect(ptr, n, Edge::from_tag))
+    }
+
+    /// The shell's sign relative to the region it bounds: positive if it bounds
+    /// material on its inside (an outer boundary), negative if it bounds an
+    /// internal void (a cavity), or open.
+    pub fn sign(&self) -> PsResult<ShellSign> {
+        let mut s: c_int = 0;
+        pk_call!(PK_SHELL_find_sign(self.tag, &mut s));
+        Ok(ShellSign::from_raw(s))
     }
 }
 
@@ -352,6 +413,28 @@ impl Fin {
         let mut orient: PK_LOGICAL_t = PK_LOGICAL_false;
         pk_call!(PK_FIN_ask_oriented_curve(self.tag, &mut tag, &mut orient));
         Ok((Curve::from_tag(tag), orient == PK_LOGICAL_true))
+    }
+
+    /// The fin's curve, parametric interval, and sense in one call — the payload
+    /// the SSI-to-B-rep and arrangement oracles compare. Returns `(curve,
+    /// (t_min, t_max), sense)` where `sense` is `true` when the fin runs in the
+    /// same direction as the curve's parameterisation.
+    pub fn geometry(&self) -> PsResult<(Curve, (f64, f64), bool)> {
+        let mut curve: PK_CURVE_t = PK_ENTITY_null;
+        let mut class: PK_CLASS_t = 0;
+        let mut ends = [PK_VECTOR_t::default(); 2];
+        let mut t_int = PK_INTERVAL_t { low: 0.0, high: 0.0 };
+        let mut sense: PK_LOGICAL_t = PK_LOGICAL_false;
+        pk_call!(PK_FIN_ask_geometry(
+            self.tag,
+            PK_LOGICAL_true,
+            &mut curve,
+            &mut class,
+            ends.as_mut_ptr(),
+            &mut t_int,
+            &mut sense,
+        ));
+        Ok((Curve::from_tag(curve), (t_int.low, t_int.high), sense == PK_LOGICAL_true))
     }
 
     /// Whether the fin runs in the same direction as its edge.

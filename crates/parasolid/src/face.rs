@@ -8,7 +8,43 @@ use crate::entity::Entity;
 use crate::body::Body;
 use crate::edge::Edge;
 use crate::vertex::Vertex;
-use crate::surf::Surf;
+use crate::surf::{Surf, SurfType};
+use crate::geom::Vec3;
+
+/// The result of a face-face coincidence test ([`Face::is_coincident`]).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Coincidence {
+    /// The faces coincide with the same orientation.
+    Yes,
+    /// The faces coincide but with opposite orientation.
+    YesReversed,
+    /// The faces do not coincide (surfaces don't match at the test point, or the
+    /// overlap region falls outside one/both face boundaries).
+    No,
+    /// Any other coincidence token the kernel returns (raw value preserved).
+    Other(i32),
+}
+
+impl Coincidence {
+    fn from_raw(v: PK_FACE_coi_t) -> Self {
+        match v {
+            PK_FACE_coi_yes_c => Coincidence::Yes,
+            PK_FACE_coi_yes_reversed_c => Coincidence::YesReversed,
+            PK_FACE_coi_no_topol_c
+            | PK_FACE_coi_no_bound_1_c
+            | PK_FACE_coi_no_bound_2_c
+            | PK_FACE_coi_no_face_1_c
+            | PK_FACE_coi_no_face_2_c
+            | PK_FACE_coi_no_rubber_c => Coincidence::No,
+            o => Coincidence::Other(o),
+        }
+    }
+
+    /// Whether the faces coincide at all (in either orientation).
+    pub fn is_coincident(self) -> bool {
+        matches!(self, Coincidence::Yes | Coincidence::YesReversed)
+    }
+}
 
 /// A face in a body's topology.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -151,6 +187,47 @@ impl Face {
         let mut v: PK_VERTEX_t = PK_ENTITY_null;
         pk_call!(PK_FACE_imprint_point(self.tag, point.tag(), &mut v));
         Ok(Vertex::from_tag(v))
+    }
+
+    /// The class of this face's backing surface (plane / cylinder / cone /
+    /// sphere / torus / …). A convenience over `self.surf()?.surf_type()`;
+    /// avoids the undocumented `PK_FACE_ask_type`, whose result is the same
+    /// surface classification.
+    pub fn surface_type(&self) -> PsResult<SurfType> {
+        self.surf()?.surf_type()
+    }
+
+    /// The extreme point of this face in a lexicographic direction ordering
+    /// (`dirs[0]` primary, `dirs[1]`/`dirs[2]` tie-breakers), and the
+    /// sub-topology (face / edge / vertex) at that point — a support-function
+    /// oracle.
+    pub fn extreme(&self, dirs: [Vec3; 3]) -> PsResult<(Vec3, Entity)> {
+        let d1 = dirs[0].to_pk();
+        let d2 = dirs[1].to_pk();
+        let d3 = dirs[2].to_pk();
+        let mut ex = PK_VECTOR_t::default();
+        let mut topol: PK_TOPOL_t = PK_ENTITY_null;
+        pk_call!(PK_FACE_find_extreme(self.tag, &d1, &d2, &d3, &mut ex, &mut topol));
+        Ok((Vec3::from_pk(ex), Entity::from_tag(topol)))
+    }
+
+    /// Whether this face is coincident with `other` to within `tol`, and the
+    /// coincidence classification. When they coincide, `point` is a witness
+    /// position in the shared region. Options are defaulted (no relative
+    /// transforms). The coincidence/overlap oracle for the boolean/arrangement
+    /// path.
+    pub fn is_coincident(&self, other: Face, tol: f64) -> PsResult<(Coincidence, Vec3)> {
+        let mut result: PK_FACE_coi_t = 0;
+        let mut point = PK_VECTOR_t::default();
+        pk_call!(PK_FACE_is_coincident(
+            self.tag,
+            other.tag,
+            tol,
+            std::ptr::null_mut(),
+            &mut result,
+            &mut point,
+        ));
+        Ok((Coincidence::from_raw(result), Vec3::from_pk(point)))
     }
 
     /// The edges shared between this face and `other` (the face-face

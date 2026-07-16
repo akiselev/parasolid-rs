@@ -98,6 +98,16 @@ impl Body {
         Ok(Body::from_tag(tag))
     }
 
+    /// Create a minimum (acorn) body — a body consisting of a single isolated
+    /// vertex at `pos`. Its lone vertex is an acorn vertex (see
+    /// [`Vertex::delete_acorn`](crate::Vertex::delete_acorn)).
+    pub fn create_minimum(pos: crate::geom::Vec3) -> PsResult<Body> {
+        let point = crate::Point::create(pos)?;
+        let mut tag: PK_BODY_t = PK_ENTITY_null;
+        pk_call!(PK_POINT_make_minimum_body(point.tag(), &mut tag));
+        Ok(Body::from_tag(tag))
+    }
+
     /// Create a solid cylinder along the +Z axis with its base on the z=0
     /// plane (it spans `z ∈ 0..height`, so the centroid is at `z = height/2`),
     /// centred on the Z axis in x and y.

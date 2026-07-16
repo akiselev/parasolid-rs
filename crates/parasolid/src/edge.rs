@@ -273,4 +273,50 @@ impl Edge {
         pk_call!(PK_EDGE_find_extreme(self.tag, &d1, &d2, &d3, &mut ex, &mut topol));
         Ok((Vec3::from_pk(ex), Entity::from_tag(topol)))
     }
+
+    /// The edge's parametric interval on its curve via the dedicated
+    /// `PK_EDGE_find_interval` call — an independent cross-check of
+    /// [`interval`](Self::interval) (which derives it from `ask_geometry`).
+    pub fn find_interval(&self) -> PsResult<(f64, f64)> {
+        let mut iv = PK_INTERVAL_t { low: 0.0, high: 0.0 };
+        pk_call!(PK_EDGE_find_interval(self.tag, &mut iv));
+        Ok((iv.low, iv.high))
+    }
+
+    /// Make this edge (a tolerant / free edge) into a tolerant edge of the given
+    /// precision, splitting it if necessary. Returns any new edges created.
+    pub fn set_precision(&self, precision: f64) -> PsResult<Vec<Edge>> {
+        let mut n: c_int = 0;
+        let mut ptr = std::ptr::null_mut();
+        pk_call!(PK_EDGE_set_precision(self.tag, precision, &mut n, &mut ptr));
+        let array = unsafe { PkArray::from_raw(ptr, n) };
+        Ok(array.iter().map(|&t| Edge::from_tag(t)).collect())
+    }
+
+    /// Remove local precision from this tolerant edge, restoring exact geometry.
+    /// Returns the raw `PK_reset_prec_t` outcome token (ok = 17201, tangent =
+    /// 17202, missing_geom = 17203, failure = 17204).
+    pub fn reset_precision(&self) -> PsResult<i32> {
+        let mut result: PK_reset_prec_t = 0;
+        pk_call!(PK_EDGE_reset_precision(self.tag, &mut result));
+        Ok(result)
+    }
+
+    /// Wrap free edges as a standalone wire body for isolated interrogation.
+    /// Tracking output is freed immediately.
+    pub fn make_wire_body(edges: &[Edge]) -> PsResult<Body> {
+        let mut tags: Vec<PK_EDGE_t> = edges.iter().map(|e| e.tag).collect();
+        let mut opts = PK_EDGE_make_wire_body_o_t::default();
+        let mut body: PK_BODY_t = PK_ENTITY_null;
+        let mut tracking: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+        pk_call!(PK_EDGE_make_wire_body(
+            tags.len() as c_int,
+            tags.as_mut_ptr(),
+            &mut opts,
+            &mut body,
+            &mut tracking,
+        ));
+        unsafe { let _ = PK_TOPOL_track_r_f(&mut tracking); }
+        Ok(Body::from_tag(body))
+    }
 }
