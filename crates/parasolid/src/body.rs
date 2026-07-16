@@ -462,6 +462,31 @@ impl Body {
         crate::boolean::boolean(self, tools, crate::boolean::BooleanOp::Intersect, &crate::boolean::BooleanOptions::default())
     }
 
+    /// Split a disconnected body — for example the multi-lump result of uniting
+    /// two separated bodies — into one body per connected component. Consumes
+    /// `self`; returns every resulting body (including the lump `self` retains
+    /// when the body is already connected).
+    pub fn disjoin(self) -> PsResult<Vec<Body>> {
+        let mut n: c_int = 0;
+        let mut ptr: *mut PK_BODY_t = std::ptr::null_mut();
+        pk_call!(PK_BODY_disjoin(self.tag, &mut n, &mut ptr));
+        let new_bodies = unsafe { PkArray::from_raw(ptr, n) };
+        let mut out = vec![self];
+        for &t in new_bodies.iter() {
+            if t != self.tag {
+                out.push(Body::from_tag(t));
+            }
+        }
+        Ok(out)
+    }
+
+    // NOTE: PK_BODY_make_section_with_surfs (non-destructive section → wire
+    // bodies) returns 0 bodies with both NULL options and a computed
+    // PK_BODY_make_section_o_t — the default result_body_type discards the
+    // section. Producing output needs the option struct's exact layout
+    // (PKU_journal_BODY_make_section_o) decompiled. Deferred; section_with_surf
+    // (split-in-place) covers the section oracle meanwhile.
+
     // --- Lifecycle ---
 
     pub fn delete(self) -> PsResult<()> {

@@ -1334,6 +1334,20 @@ fn main() {
         assert!(rel_ok(half, 4000.0), "each half volume {half} != 4000");
     });
 
+    test!("body_disjoin_connected", {
+        let _session = Session::start(test_config())?;
+        // A connected solid has a single component: disjoin returns just it,
+        // topology and volume preserved. (The multi-lump split path needs a
+        // boolean run with allow_disjoint, which the minimal boolean wrapper
+        // does not yet expose.)
+        let block = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let v0 = block.volume()?;
+        let pieces = block.disjoin()?;
+        assert_eq!(pieces.len(), 1, "connected body disjoins to one component");
+        assert_eq!(pieces[0].faces()?.len(), 6, "the component is the 6-faced block");
+        assert!(rel_ok(pieces[0].volume()?, v0), "disjoin preserves volume");
+    });
+
     // =========================================================================
     // Topology queries (edge convexity / smoothness, adjacent faces).
     // =========================================================================
