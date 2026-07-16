@@ -19,6 +19,11 @@ use crate::*;
 
 pub type PK_FIN_type_t = c_int;
 
+// Real ABI tokens (3600..=3602) from the RE catalog, returned by PK_FIN_ask_type.
+pub const PK_FIN_type_wire_c: PK_FIN_type_t = 3600;
+pub const PK_FIN_type_biwire_c: PK_FIN_type_t = 3601;
+pub const PK_FIN_type_normal_c: PK_FIN_type_t = 3602;
+
 // -- Shell type ---------------------------------------------------------------
 
 // -- Vertex type --------------------------------------------------------------
@@ -30,34 +35,34 @@ pub type PK_FIN_type_t = c_int;
 // -- Edge convexity -----------------------------------------------------------
 
 pub type PK_EDGE_convexity_t = c_int;
-pub const PK_EDGE_convexity_convex_c: PK_EDGE_convexity_t = 0;
-pub const PK_EDGE_convexity_concave_c: PK_EDGE_convexity_t = 1;
-pub const PK_EDGE_convexity_variable_c: PK_EDGE_convexity_t = 2;
-pub const PK_EDGE_convexity_smooth_flat_c: PK_EDGE_convexity_t = 3;
-pub const PK_EDGE_convexity_smooth_cvx_c: PK_EDGE_convexity_t = 4;
-pub const PK_EDGE_convexity_smooth_ccv_c: PK_EDGE_convexity_t = 5;
-pub const PK_EDGE_convexity_smooth_inf_c: PK_EDGE_convexity_t = 6;
-pub const PK_EDGE_convexity_smooth_var_c: PK_EDGE_convexity_t = 7;
-pub const PK_EDGE_convexity_knife_cvx_c: PK_EDGE_convexity_t = 8;
-pub const PK_EDGE_convexity_knife_ccv_c: PK_EDGE_convexity_t = 9;
+pub const PK_EDGE_convexity_convex_c: PK_EDGE_convexity_t = 23597;
+pub const PK_EDGE_convexity_concave_c: PK_EDGE_convexity_t = 23598;
+pub const PK_EDGE_convexity_variable_c: PK_EDGE_convexity_t = 23599;
+pub const PK_EDGE_convexity_smooth_flat_c: PK_EDGE_convexity_t = 23590;
+pub const PK_EDGE_convexity_smooth_cvx_c: PK_EDGE_convexity_t = 23591;
+pub const PK_EDGE_convexity_smooth_ccv_c: PK_EDGE_convexity_t = 23592;
+pub const PK_EDGE_convexity_smooth_inf_c: PK_EDGE_convexity_t = 23593;
+pub const PK_EDGE_convexity_smooth_var_c: PK_EDGE_convexity_t = 23594;
+pub const PK_EDGE_convexity_knife_cvx_c: PK_EDGE_convexity_t = 23595;
+pub const PK_EDGE_convexity_knife_ccv_c: PK_EDGE_convexity_t = 23596;
 
 // -- Face coincidence ---------------------------------------------------------
 
 pub type PK_FACE_coi_t = c_int;
-pub const PK_FACE_coi_yes_c: PK_FACE_coi_t = 0;
-pub const PK_FACE_coi_yes_reversed_c: PK_FACE_coi_t = 1;
-pub const PK_FACE_coi_no_topol_c: PK_FACE_coi_t = 2;
-pub const PK_FACE_coi_no_bound_1_c: PK_FACE_coi_t = 3;
-pub const PK_FACE_coi_no_bound_2_c: PK_FACE_coi_t = 4;
-pub const PK_FACE_coi_no_face_1_c: PK_FACE_coi_t = 5;
-pub const PK_FACE_coi_no_face_2_c: PK_FACE_coi_t = 6;
-pub const PK_FACE_coi_no_rubber_c: PK_FACE_coi_t = 7;
+pub const PK_FACE_coi_yes_c: PK_FACE_coi_t = 21880;
+pub const PK_FACE_coi_yes_reversed_c: PK_FACE_coi_t = 21881;
+pub const PK_FACE_coi_no_topol_c: PK_FACE_coi_t = 21882;
+pub const PK_FACE_coi_no_bound_1_c: PK_FACE_coi_t = 21883;
+pub const PK_FACE_coi_no_bound_2_c: PK_FACE_coi_t = 21884;
+pub const PK_FACE_coi_no_face_1_c: PK_FACE_coi_t = 21885;
+pub const PK_FACE_coi_no_face_2_c: PK_FACE_coi_t = 21886;
+pub const PK_FACE_coi_no_rubber_c: PK_FACE_coi_t = 21887;
 
 // -- Handedness (for evaluation at discontinuities) ---------------------------
 
 pub type PK_HAND_t = c_int;
-pub const PK_HAND_left_c: PK_HAND_t = 0;
-pub const PK_HAND_right_c: PK_HAND_t = 1;
+pub const PK_HAND_left_c: PK_HAND_t = 32760;
+pub const PK_HAND_right_c: PK_HAND_t = 32761;
 
 // -- Containment / enclosure --------------------------------------------------
 
@@ -80,21 +85,23 @@ pub const PK_enclosure_inside_c: PK_enclosure_t = 0x1645; // 5701
 pub const PK_enclosure_outside_c: PK_enclosure_t = 0x1646; // 5702
 /// The position lies on the boundary of the body. [probed — dynamic-observed]
 pub const PK_enclosure_on_c: PK_enclosure_t = 0x1647; // 5703
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_enclosure_unset_c: PK_enclosure_t = 5704;
 
 // -- Shell sign ---------------------------------------------------------------
 
 pub type PK_SHELL_sign_t = c_int;
-pub const PK_SHELL_sign_positive_c: PK_SHELL_sign_t = 1;
-pub const PK_SHELL_sign_negative_c: PK_SHELL_sign_t = -1;
+pub const PK_SHELL_sign_positive_c: PK_SHELL_sign_t = 3550;
+pub const PK_SHELL_sign_negative_c: PK_SHELL_sign_t = 3551;
 
 // -- Measure type (for PK_CURVE_find_vectors) ---------------------------------
 
 pub type PK_measure_t = c_int;
-pub const PK_measure_distance_c: PK_measure_t = 0;
-pub const PK_measure_chord_c: PK_measure_t = 1;
-pub const PK_measure_distance_ratio_c: PK_measure_t = 2;
-pub const PK_measure_chord_ratio_c: PK_measure_t = 3;
-pub const PK_measure_2_chords_ratio_c: PK_measure_t = 4;
+pub const PK_measure_distance_c: PK_measure_t = 24880;
+pub const PK_measure_chord_c: PK_measure_t = 24882;
+pub const PK_measure_distance_ratio_c: PK_measure_t = 24881;
+pub const PK_measure_chord_ratio_c: PK_measure_t = 24883;
+pub const PK_measure_2_chords_ratio_c: PK_measure_t = 24884;
 
 // -- Surface vector type (for PK_SURF_find_vectors) ---------------------------
 
@@ -102,21 +109,24 @@ pub type PK_SURF_vec_t = c_int;
 pub const PK_SURF_vec_proj_c: PK_SURF_vec_t = 0;
 
 pub type PK_SURF_curve_t = c_int;
-pub const PK_SURF_curve_linear_sp_c: PK_SURF_curve_t = 0;
-pub const PK_SURF_curve_vec_proj_c: PK_SURF_curve_t = 1;
+pub const PK_SURF_curve_linear_sp_c: PK_SURF_curve_t = 26350;
+pub const PK_SURF_curve_vec_proj_c: PK_SURF_curve_t = 26351;
 
 // -- Continuity level ---------------------------------------------------------
 
-pub const PK_continuity_g1_c: PK_continuity_t = 1;
-pub const PK_continuity_g2_c: PK_continuity_t = 2;
-pub const PK_continuity_g3_c: PK_continuity_t = 3;
+pub const PK_continuity_g1_c: PK_continuity_t = 23153;
+pub const PK_continuity_g2_c: PK_continuity_t = 23154;
+pub const PK_continuity_g3_c: PK_continuity_t = 23155;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_continuity_c3_c: PK_continuity_t = 23152;
 
 // -- Self-intersection type ---------------------------------------------------
 
 pub type PK_self_int_type_t = c_int;
-pub const PK_self_int_type_general_c: PK_self_int_type_t = 0;
-pub const PK_self_int_type_singularity_c: PK_self_int_type_t = 1;
-pub const PK_self_int_type_mixed_c: PK_self_int_type_t = 2;
+pub const PK_self_int_type_general_c: PK_self_int_type_t = 23780;
+pub const PK_self_int_type_mixed_c: PK_self_int_type_t = 23782;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_self_int_type_sing_c: PK_self_int_type_t = 23781;
 
 // -- Surface degeneracy type --------------------------------------------------
 
@@ -139,17 +149,18 @@ pub const PK_CURVE_degen_surface_c: PK_CURVE_degen_type_t = 2;
 pub type PK_GEOM_category_t = c_int;
 pub const PK_GEOM_category_curve_c: PK_GEOM_category_t = 0;
 pub const PK_GEOM_category_surf_c: PK_GEOM_category_t = 1;
-pub const PK_GEOM_category_point_c: PK_GEOM_category_t = 2;
+pub const PK_GEOM_category_point_c: PK_GEOM_category_t = 25873;
 pub const PK_GEOM_category_transf_c: PK_GEOM_category_t = 3;
 
 // -- NABOX quality ------------------------------------------------------------
 
 pub type PK_NABOX_quality_t = c_int;
-pub const PK_NABOX_quality_improved_c: PK_NABOX_quality_t = 1;
+pub const PK_NABOX_quality_standard_c: PK_NABOX_quality_t = 26470;
+pub const PK_NABOX_quality_improved_c: PK_NABOX_quality_t = 26471;
 
 // -- Error on failure ---------------------------------------------------------
 
-pub const PK_ERROR_on_fail_no_c: c_int = 0;
+pub const PK_ERROR_on_fail_no_c: c_int = 24952;
 pub const PK_ERROR_not_implemented: PK_ERROR_code_t = 600;
 
 // =============================================================================
@@ -206,16 +217,44 @@ pub struct PK_FSURF_sf_t {
 // Options structs
 // =============================================================================
 
-/// Options for PK_TOPOL_find_nabox.
+/// Options for PK_TOPOL_find_nabox. 144-byte layout (decompile-reconstructed:
+/// o_t_version@0, axis1 is a 48-byte PK_AXIS1_sf_t, axis2 a 72-byte PK_AXIS2_sf_t,
+/// have_axis2@56, quality@136). Pass `have_axis*` FALSE for an unconstrained box.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_find_nabox_o_t {
-    pub have_axis1: PK_LOGICAL_t,
-    pub axis1: PK_VECTOR_t,
-    pub have_axis2: PK_LOGICAL_t,
-    pub axis2: PK_VECTOR_t,
-    pub quality: PK_NABOX_quality_t,
+    pub o_t_version: c_int,             // @0
+    pub have_axis1: PK_LOGICAL_t,       // @4
+    pub axis1: crate::PK_AXIS1_sf_t,    // @8  (48B)
+    pub have_axis2: PK_LOGICAL_t,       // @56
+    pub axis2: crate::PK_AXIS2_sf_t,    // @64 (72B)
+    pub quality: PK_NABOX_quality_t,    // @136
+} // 144 bytes
+
+impl Default for PK_TOPOL_find_nabox_o_t {
+    fn default() -> Self {
+        // Even when have_axis*=false the kernel validates axis1/axis2 as real
+        // axes (PKU_check_AXIS*_sf), so supply valid orthonormal frames. The
+        // two-axis 144-byte layout is the o_t_version=2 form (v1 in FUN_18045b090
+        // reads a different, smaller layout).
+        Self {
+            o_t_version: 2,
+            have_axis1: PK_LOGICAL_false,
+            axis1: crate::PK_AXIS1_sf_t { location: [0.0; 3], axis: [0.0, 0.0, 1.0] },
+            have_axis2: PK_LOGICAL_false,
+            axis2: crate::PK_AXIS2_sf_t {
+                location: [0.0; 3],
+                axis: [0.0, 0.0, 1.0],
+                ref_direction: [1.0, 0.0, 0.0],
+            },
+            quality: PK_NABOX_quality_standard_c,
+        }
+    }
 }
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_TOPOL_find_nabox_o_t>() == 144);
+};
 
 /// Options for PK_FACE_is_coincident.
 #[repr(C)]
@@ -490,16 +529,56 @@ pub struct PK_BODY_ask_topology_o_t { _private: [u8; 0] }
 pub struct PK_ENTITY_ask_description_o_t { _private: [u8; 0] }
 
 /// Options for `PK_ENTITY_range`.
+///
+/// Layout: `PKU_journal_ENTITY_range_o` (V37.01.243). Byte offsets in comments.
+/// `bound` is an inline 32-byte `PK_range_bound_t` @8; every `guesses_*` /
+/// `param_bounds_*` / `entities_with_scales` / `scale_factors` is a pointer
+/// paired with a preceding `n_*` count. Total size 144 bytes.
 #[repr(C)]
-pub struct PK_ENTITY_range_o_t { _private: [u8; 0] }
+#[derive(Debug, Clone, Copy)]
+pub struct PK_ENTITY_range_o_t {
+    pub o_t_version: c_int,                             // @0
+    pub bound: PK_range_bound_t,                        // @8   (32 bytes)
+    pub range_type: PK_range_type_t,                    // @40
+    pub param_entity: PK_range_param_entity_t,          // @44
+    pub n_guesses_1: c_int,                             // @48
+    pub guesses_1: *const PK_range_guess_s_t,           // @56  (elem stride 0x30)
+    pub n_guesses_2: c_int,                             // @64
+    pub guesses_2: *const PK_range_guess_s_t,           // @72
+    pub n_param_bounds_1: c_int,                        // @80
+    pub param_bounds_1: *const PK_range_param_bound_t,  // @88  (elem stride 0x28)
+    pub n_param_bounds_2: c_int,                        // @96
+    pub param_bounds_2: *const PK_range_param_bound_t,  // @104
+    pub n_entities_with_scales: c_int,                  // @112
+    pub entities_with_scales: *const PK_ENTITY_t,       // @120 (elem stride 4)
+    /// One scale per entity in `entities_with_scales` (shares that count).
+    pub scale_factors: *const c_int,                    // @128 (elem stride 4)
+    pub output_scale: c_int,                            // @136
+} // 144 bytes
 
 /// Results from `PK_ENTITY_range`.
 #[repr(C)]
 pub struct PK_ENTITY_range_r_t { _private: [u8; 0] }
 
 /// Options for `PK_ENTITY_range_vector`.
+///
+/// Layout: `PKU_journal_ENTITY_range_vector_o` (V37.01.243). Byte offsets in
+/// comments. Unlike `PK_ENTITY_range_o_t`, there is no `range_type` and only a
+/// single `guesses` list; `param_entity` precedes `n_guesses`. Total 88 bytes.
 #[repr(C)]
-pub struct PK_ENTITY_range_vector_o_t { _private: [u8; 0] }
+#[derive(Debug, Clone, Copy)]
+pub struct PK_ENTITY_range_vector_o_t {
+    pub o_t_version: c_int,                        // @0
+    pub bound: PK_range_bound_t,                   // @8   (32 bytes)
+    pub param_entity: PK_range_param_entity_t,     // @40
+    pub n_guesses: c_int,                          // @44
+    pub guesses: *const PK_range_guess_s_t,        // @48  (elem stride 0x30)
+    pub n_entities_with_scales: c_int,             // @56
+    pub entities_with_scales: *const PK_ENTITY_t,  // @64  (elem stride 4)
+    /// One scale per entity in `entities_with_scales` (shares that count).
+    pub scale_factors: *const c_int,               // @72  (elem stride 4)
+    pub output_scale: c_int,                       // @80
+} // 88 bytes
 
 /// Results from `PK_ENTITY_range_vector`.
 #[repr(C)]
@@ -516,6 +595,10 @@ pub struct PK_LOOP_offset_planar_r_t { _private: [u8; 0] }
 // =============================================================================
 // FFI function declarations
 // =============================================================================
+
+/// Options for `PK_EDGE_ask_convexity` (opaque; pass NULL for defaults).
+#[repr(C)]
+pub struct PK_EDGE_ask_convexity_o_t { _private: [u8; 0] }
 
 #[link(name = "pskernel")]
 unsafe extern "C" {
@@ -552,9 +635,18 @@ unsafe extern "C" {
     // Geometry relationship queries
     // =========================================================================
 
+    // V35 vendor form: 7 args (the old 2-arg binding was wrong). Options may be
+    // NULL (kernel defaults to version 1, want_related_topols = no). Writes ALL
+    // out-params; related_* arrays are kernel-allocated (empty unless related
+    // topols are requested) — free via PkArray.
     pub fn PK_TOPOL_categorise_geom(
-        topol: PK_TOPOL_t,
-        category: *mut PK_GEOM_category_t,
+        topology: PK_TOPOL_t,
+        options: *const PK_TOPOL_categorise_geom_o_t,
+        overall_geom_category: *mut PK_GEOM_category_t,
+        direct_geom_category: *mut PK_GEOM_category_t,
+        n_related_topols: *mut c_int,
+        related_topols: *mut *mut PK_TOPOL_t,
+        related_geom_categories: *mut *mut PK_GEOM_category_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_GEOM_ask_dependents(
@@ -571,7 +663,8 @@ unsafe extern "C" {
 
     pub fn PK_GEOM_ask_geom_category(
         geom: PK_GEOM_t,
-        category: *mut PK_GEOM_category_t,
+        options: *mut PK_GEOM_ask_geom_category_o_t,
+        geom_category: *mut PK_GEOM_category_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -582,11 +675,21 @@ unsafe extern "C" {
     ///
     /// NOTE: `PK_BODY_topology_t` is a convenience struct and is NOT the ABI type.
     /// The actual ABI returns a flat `PK_TOPOL_t` array via `topols`/`n_topols`.
+    /// Return the full topology graph of a body. V35 (9 args): the old binding
+    /// bound only 4 (through `topols`) and dropped `classes`, `n_relations`,
+    /// `parents`, `children`, `senses` — the kernel writes those to un-passed
+    /// arguments. `parents`/`children` are indices into `topols`; `senses` gives
+    /// each relation's orientation.
     pub fn PK_BODY_ask_topology(
         body: PK_BODY_t,
         options: *const PK_BODY_ask_topology_o_t,
         n_topols: *mut c_int,
         topols: *mut *mut PK_TOPOL_t,
+        classes: *mut *mut PK_CLASS_t,
+        n_relations: *mut c_int,
+        parents: *mut *mut c_int,
+        children: *mut *mut c_int,
+        senses: *mut *mut PK_TOPOL_sense_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_BODY_find_laminar_edges(
@@ -644,6 +747,7 @@ unsafe extern "C" {
 
     pub fn PK_ENTITY_ask_owning_groups_2(
         entity: PK_ENTITY_t,
+        options: *mut PK_ENTITY_ask_owning_groups_o_t,
         n_groups: *mut c_int,
         groups: *mut *mut PK_GROUP_t,
     ) -> PK_ERROR_code_t;
@@ -659,8 +763,9 @@ unsafe extern "C" {
 
     pub fn PK_FACE_find_interior_vec(
         face: PK_FACE_t,
-        position: *mut PK_VECTOR_t,
-        uv: *mut PK_UV_t,
+        options: *mut PK_FACE_find_interior_vec_o_t,
+        int_vec: *mut PK_VECTOR_t,
+        uv_params: *mut PK_UV_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -703,6 +808,7 @@ unsafe extern "C" {
 
     pub fn PK_PART_ask_groups_2(
         part: PK_PART_t,
+        options: *mut PK_PART_ask_groups_o_t,
         n_groups: *mut c_int,
         groups: *mut *mut PK_GROUP_t,
     ) -> PK_ERROR_code_t;
@@ -761,8 +867,9 @@ unsafe extern "C" {
     pub fn PK_CURVE_eval_with_tan_handed(
         curve: PK_CURVE_t,
         t: c_double,
-        hand: PK_HAND_t,
-        position: *mut PK_VECTOR_t,
+        n_derivs: c_int,
+        hand_direction: PK_HAND_t,
+        p: *mut PK_VECTOR_t,
         tangent: *mut PK_VECTOR_t,
     ) -> PK_ERROR_code_t;
 
@@ -779,25 +886,25 @@ unsafe extern "C" {
 
     pub fn PK_SURF_eval_curvature_handed(
         surf: PK_SURF_t,
-        u: c_double,
-        v: c_double,
-        u_hand: PK_HAND_t,
-        v_hand: PK_HAND_t,
-        position: *mut PK_VECTOR_t,
-        normal: *mut PK_VECTOR_t,
-        d1: *mut PK_VECTOR_t,
-        d2: *mut PK_VECTOR_t,
-        k1: *mut c_double,
-        k2: *mut c_double,
+        uv: *const PK_UV_t,
+        u_hand_dir: PK_HAND_t,
+        v_hand_dir: PK_HAND_t,
+        normal: *mut PK_VECTOR1_t,
+        principal_direction_1: *mut PK_VECTOR1_t,
+        principal_direction_2: *mut PK_VECTOR1_t,
+        principal_curvature_1: *mut c_double,
+        principal_curvature_2: *mut c_double,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_SURF_eval_with_normal_handed(
         surf: PK_SURF_t,
-        u: c_double,
-        v: c_double,
-        u_hand: PK_HAND_t,
-        v_hand: PK_HAND_t,
-        position: *mut PK_VECTOR_t,
+        uv: *const PK_UV_t,
+        n_u_derivs: c_int,
+        n_v_derivs: c_int,
+        triangular: PK_LOGICAL_t,
+        u_hand_dir: PK_HAND_t,
+        v_hand_dir: PK_HAND_t,
+        p: *mut PK_VECTOR_t,
         normal: *mut PK_VECTOR_t,
     ) -> PK_ERROR_code_t;
 
@@ -814,49 +921,57 @@ unsafe extern "C" {
 
     pub fn PK_CURVE_find_min_radius(
         curve: PK_CURVE_t,
-        options: *const PK_CURVE_find_min_radius_o_t,
+        t_int: *const PK_INTERVAL_t,
+        n_radii: *mut c_int,
         radius: *mut c_double,
-        t: *mut c_double,
+        position: *mut PK_VECTOR_t,
+        param: *mut c_double,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_SURF_find_min_radii(
         surf: PK_SURF_t,
-        options: *const PK_SURF_find_min_radii_o_t,
-        min_radius: *mut c_double,
-        u: *mut c_double,
-        v: *mut c_double,
+        uv_box: *const PK_UVBOX_t,
+        n_radii: *mut c_int,
+        radii: *mut c_double,
+        positions: *mut PK_VECTOR_t,
+        parms: *mut PK_UV_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_EDGE_is_planar(
         edge: PK_EDGE_t,
+        want_plane: PK_LOGICAL_t,
         is_planar: *mut PK_LOGICAL_t,
-        normal: *mut PK_VECTOR_t,
+        plane: *mut PK_PLANE_t,
     ) -> PK_ERROR_code_t;
 
+    /// V35: `(edge, double max_angle, PK_LOGICAL_t *is_smooth)` — the old
+    /// binding dropped the `max_angle` threshold argument.
     pub fn PK_EDGE_is_smooth(
         edge: PK_EDGE_t,
+        max_angle: c_double,
         is_smooth: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_GEOM_is_coincident(
-        geom1: PK_GEOM_t,
-        geom2: PK_GEOM_t,
-        options: *const PK_GEOM_is_coincident_o_t,
+        geom_1: PK_GEOM_t,
+        geom_2: PK_GEOM_t,
         is_coincident: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_FIN_find_curve_parameter(
         fin: PK_FIN_t,
-        u: c_double,
-        v: c_double,
+        parms: *const PK_UV_t,
+        estimate: PK_LOGICAL_t,
+        t_est: c_double,
         t: *mut c_double,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_FIN_find_surf_parameters(
         fin: PK_FIN_t,
         t: c_double,
-        u: *mut c_double,
-        v: *mut c_double,
+        estimate: PK_LOGICAL_t,
+        parms_est: *const PK_UV_t,
+        parms: *mut PK_UV_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_FACE_is_uvbox(
@@ -865,10 +980,12 @@ unsafe extern "C" {
         uvbox: *mut PK_UVBOX_t,
     ) -> PK_ERROR_code_t;
 
+    // V35 vendor form: the periodicity outputs are PK_param_periodic_t tokens
+    // (no/yes/seamed), NOT plain logicals (the old binding mistyped them).
     pub fn PK_FACE_is_periodic(
         face: PK_FACE_t,
-        u_periodic: *mut PK_LOGICAL_t,
-        v_periodic: *mut PK_LOGICAL_t,
+        u_periodic: *mut PK_PARAM_periodic_t,
+        v_periodic: *mut PK_PARAM_periodic_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -889,33 +1006,42 @@ unsafe extern "C" {
 
     pub fn PK_TOPOL_find_nabox(
         n_topols: c_int,
-        topols: *const PK_TOPOL_t,
-        options: *const PK_TOPOL_find_nabox_o_t,
+        topols: *mut PK_TOPOL_t,
+        transfs: *mut PK_TRANSF_t,
+        options: *mut PK_TOPOL_find_nabox_o_t,
         nabox: *mut PK_NABOX_sf_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_CURVE_find_non_aligned_box(
         curve: PK_CURVE_t,
-        interval: PK_INTERVAL_t,
-        nabox: *mut PK_NABOX_sf_t,
+        t_int: *const PK_INTERVAL_t,
+        centre: *mut PK_VECTOR_t,
+        axes: *mut PK_VECTOR_t,
+        widths: *mut c_double,
+        dimension: *mut c_int,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_SURF_find_non_aligned_box(
         surf: PK_SURF_t,
-        uvbox: PK_UVBOX_t,
-        nabox: *mut PK_NABOX_sf_t,
+        parms: *const PK_UVBOX_t,
+        centre: *mut PK_VECTOR_t,
+        axes: *mut PK_VECTOR_t,
+        widths: *mut c_double,
+        dimension: *mut c_int,
     ) -> PK_ERROR_code_t;
 
+    // V35 vendor form: bounds come from the options struct, not a by-value
+    // interval (the old hand-written form was skipped by the pointerness audit).
     pub fn PK_CURVE_find_box(
         curve: PK_CURVE_t,
-        interval: PK_INTERVAL_t,
-        box_: *mut PK_BOX_t,
+        options: *const PK_CURVE_find_box_o_t,
+        curve_box: *mut PK_BOX_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_SURF_find_box(
         surf: PK_SURF_t,
-        uvbox: PK_UVBOX_t,
-        box_: *mut PK_BOX_t,
+        options: *const PK_SURF_find_box_o_t,
+        surface_box: *mut PK_BOX_t,
     ) -> PK_ERROR_code_t;
 
     // -- Parameter boxes --
@@ -946,25 +1072,30 @@ unsafe extern "C" {
 
     pub fn PK_EDGE_find_extreme(
         edge: PK_EDGE_t,
-        direction: *const c_double,
-        options: *const PK_EDGE_find_extreme_o_t,
-        position: *mut c_double,
-        t: *mut c_double,
+        direction_1: *const PK_VECTOR_t,
+        direction_2: *const PK_VECTOR_t,
+        direction_3: *const PK_VECTOR_t,
+        extreme: *mut PK_VECTOR_t,
+        topol: *mut PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_FACE_find_extreme(
         face: PK_FACE_t,
-        direction: *const c_double,
-        options: *const PK_FACE_find_extreme_o_t,
-        position: *mut c_double,
+        direction_1: *const PK_VECTOR_t,
+        direction_2: *const PK_VECTOR_t,
+        direction_3: *const PK_VECTOR_t,
+        extreme: *mut PK_VECTOR_t,
+        topol: *mut PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_BODY_find_extreme(
         body: PK_BODY_t,
-        n_directions: c_int,
-        directions: *const PK_VECTOR_t,
-        options: *const PK_BODY_find_extreme_o_t,
-        extremes: *mut PK_VECTOR_t,
+        direction_1: *const PK_VECTOR_t,
+        direction_2: *const PK_VECTOR_t,
+        direction_3: *const PK_VECTOR_t,
+        options: *mut PK_BODY_find_extreme_o_t,
+        extreme: *mut PK_VECTOR_t,
+        topol: *mut PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -990,15 +1121,19 @@ unsafe extern "C" {
 
     pub fn PK_FACE_contains_vectors(
         face: PK_FACE_t,
-        n_vectors: c_int,
-        vectors: *const PK_VECTOR_t,
-        options: *const PK_FACE_contains_vectors_o_t,
-        containments: *mut PK_CONTAINMENT_t,
+        options: *mut PK_FACE_contains_vectors_o_t,
+        topologies: *mut PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
-    pub fn PK_FACE_set_approx(face: PK_FACE_t) -> PK_ERROR_code_t;
+    pub fn PK_FACE_set_approx(
+        n_faces: c_int,
+        faces: *mut PK_FACE_t,
+    ) -> PK_ERROR_code_t;
 
-    pub fn PK_FACE_unset_approx(face: PK_FACE_t) -> PK_ERROR_code_t;
+    pub fn PK_FACE_unset_approx(
+        n_faces: c_int,
+        faces: *mut PK_FACE_t,
+    ) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Vector comparison
@@ -1037,16 +1172,22 @@ unsafe extern "C" {
     pub fn PK_FACE_is_coincident(
         face1: PK_FACE_t,
         face2: PK_FACE_t,
-        options: *const PK_FACE_is_coincident_o_t,
+        tol: c_double,
+        options: *mut PK_FACE_is_coincident_o_t,
         result: *mut PK_FACE_coi_t,
+        point: *mut PK_VECTOR_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Edge convexity
     // =========================================================================
 
+    /// V35: `(edge, PK_EDGE_ask_convexity_o_t *options, PK_EDGE_convexity_t
+    /// *convexity)` — the old binding dropped `options`, so the kernel wrote
+    /// `convexity` through an un-passed argument.
     pub fn PK_EDGE_ask_convexity(
         edge: PK_EDGE_t,
+        options: *const PK_EDGE_ask_convexity_o_t,
         convexity: *mut PK_EDGE_convexity_t,
     ) -> PK_ERROR_code_t;
 
@@ -1056,9 +1197,10 @@ unsafe extern "C" {
 
     pub fn PK_CURVE_find_discontinuity(
         curve: PK_CURVE_t,
-        options: *const PK_CURVE_find_discontinuity_o_t,
+        options: *mut PK_CURVE_find_discontinuity_o_t,
         n_params: *mut c_int,
         params: *mut *mut c_double,
+        orders: *mut *mut PK_continuity_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_SURF_find_discontinuity(
@@ -1080,10 +1222,8 @@ unsafe extern "C" {
 
     pub fn PK_CURVE_find_degens(
         curve: PK_CURVE_t,
-        options: *const PK_CURVE_find_degens_o_t,
-        n_degens: *mut c_int,
-        degen_params: *mut *mut c_double,
-        degen_types: *mut *mut PK_CURVE_degen_type_t,
+        options: *mut PK_CURVE_find_degens_o_t,
+        results: *mut PK_CURVE_degens_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1094,12 +1234,13 @@ unsafe extern "C" {
     // Position vectors along curves / surfaces
     // =========================================================================
 
+    // V35 vendor form: (curve, t_int by value, tolerance, options, result struct).
     pub fn PK_CURVE_find_vectors(
         curve: PK_CURVE_t,
-        interval: PK_INTERVAL_t,
-        n_vectors: c_int,
+        t_int: PK_INTERVAL_t,
+        tolerance: c_double,
         options: *const PK_CURVE_find_vectors_o_t,
-        vectors: *mut PK_VECTOR_t,
+        found_vectors: *mut PK_CURVE_find_vectors_r_t,
     ) -> PK_ERROR_code_t;
 
     pub fn PK_SURF_find_vectors(

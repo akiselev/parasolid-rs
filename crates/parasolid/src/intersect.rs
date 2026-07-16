@@ -137,11 +137,9 @@ impl Surf {
     /// Intersect this surface with a bounded region of a curve
     /// (`PK_SURF_intersect_curve`).
     pub fn intersect_curve(&self, curve: &Curve, interval: (f64, f64)) -> PsResult<Vec<SurfCurveHit>> {
-        let opts = PK_SURF_intersect_curve_o_t {
-            o_t_version: 1,
-            have_box: PK_LOGICAL_false,
-            r#box: PK_BOX_t { coord: [0.0; 6] },
-        };
+        // Full documented v1 layout, zero-initialised (have_box = false).
+        let mut opts: PK_SURF_intersect_curve_o_t = unsafe { std::mem::zeroed() };
+        opts.o_t_version = 1;
         let iv = PK_INTERVAL_t { low: interval.0, high: interval.1 };
         let mut n: c_int = 0;
         let (mut vectors, mut uvs, mut ts, mut types) = (

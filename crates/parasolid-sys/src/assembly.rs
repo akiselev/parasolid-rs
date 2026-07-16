@@ -35,11 +35,14 @@ unsafe extern "C" {
     /// instance directly references a body (no sub-assemblies).
     pub fn PK_ASSEMBLY_make_level_assembly(
         assembly: PK_ASSEMBLY_t,
+        level_assembly: *mut PK_ASSEMBLY_t,
     ) -> PK_ERROR_code_t;
 
     /// Check an assembly for validity.
     pub fn PK_ASSEMBLY_check(
         assembly: PK_ASSEMBLY_t,
+        options: *mut PK_ASSEMBLY_check_o_t,
+        results: *mut PK_ASSEMBLY_check_r_t,
     ) -> PK_ERROR_code_t;
 
     // ---- Assembly navigation ------------------------------------------------
@@ -74,9 +77,7 @@ unsafe extern "C" {
     /// positioning transform. The transform must be a rigid motion or
     /// reflection and must not be shared with another instance.
     pub fn PK_INSTANCE_create(
-        assembly: PK_ASSEMBLY_t,
-        transf: PK_TRANSF_t,
-        part: PK_PART_t,
+        instance_sf: *mut PK_INSTANCE_sf_t,
         instance: *mut PK_INSTANCE_t,
     ) -> PK_ERROR_code_t;
 
@@ -106,9 +107,7 @@ unsafe extern "C" {
     /// part, and positioning transform.
     pub fn PK_INSTANCE_ask(
         instance: PK_INSTANCE_t,
-        assembly: *mut PK_ASSEMBLY_t,
-        part: *mut PK_PART_t,
-        transf: *mut PK_TRANSF_t,
+        instance_sf: *mut PK_INSTANCE_sf_t,
     ) -> PK_ERROR_code_t;
 
     // ---- Part reverse-lookup ------------------------------------------------

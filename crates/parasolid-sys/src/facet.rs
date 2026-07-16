@@ -26,11 +26,11 @@ use crate::*;
 pub type PK_facet_shape_t = c_int;
 
 /// All interior angles convex, no interior holes (default).
-pub const PK_facet_shape_convex_c: PK_facet_shape_t = 0;
+pub const PK_facet_shape_convex_c: PK_facet_shape_t = 20502;
 /// Concave angles permitted, no interior holes.
-pub const PK_facet_shape_cut_c: PK_facet_shape_t = 1;
+pub const PK_facet_shape_cut_c: PK_facet_shape_t = 20501;
 /// Concave angles and interior holes permitted.
-pub const PK_facet_shape_any_c: PK_facet_shape_t = 2;
+pub const PK_facet_shape_any_c: PK_facet_shape_t = 20500;
 
 // =============================================================================
 // Facet matching between adjacent face meshes
@@ -39,11 +39,11 @@ pub const PK_facet_shape_any_c: PK_facet_shape_t = 2;
 pub type PK_facet_match_t = c_int;
 
 /// Topology matching -- single mesh, shared topology at boundaries (default).
-pub const PK_facet_match_topol_c: PK_facet_match_t = 0;
+pub const PK_facet_match_topol_c: PK_facet_match_t = 20522;
 /// Geometry matching -- boundaries meet exactly but topologically disjoint.
-pub const PK_facet_match_geom_c: PK_facet_match_t = 1;
+pub const PK_facet_match_geom_c: PK_facet_match_t = 20521;
 /// Trimmed -- no matching, gaps/overlaps within tolerance.
-pub const PK_facet_match_trimmed_c: PK_facet_match_t = 2;
+pub const PK_facet_match_trimmed_c: PK_facet_match_t = 20523;
 
 // =============================================================================
 // Facet density (view-dependent)
@@ -52,13 +52,13 @@ pub const PK_facet_match_trimmed_c: PK_facet_match_t = 2;
 pub type PK_facet_density_t = c_int;
 
 /// Independent of views (default).
-pub const PK_facet_density_no_view_c: PK_facet_density_t = 0;
+pub const PK_facet_density_no_view_c: PK_facet_density_t = 20540;
 /// Increase density at silhouettes.
-pub const PK_facet_density_use_view_c: PK_facet_density_t = 1;
+pub const PK_facet_density_use_view_c: PK_facet_density_t = 20541;
 /// Increase density where normals nearly parallel to view.
-pub const PK_facet_density_parallel_c: PK_facet_density_t = 2;
-/// Both silhouettes and parallel.
-pub const PK_facet_density_both_c: PK_facet_density_t = 3;
+pub const PK_facet_density_parallel_c: PK_facet_density_t = 20542;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_facet_density_sil_and_par_c: PK_facet_density_t = 20543;
 
 // =============================================================================
 // Facet culling
@@ -67,9 +67,9 @@ pub const PK_facet_density_both_c: PK_facet_density_t = 3;
 pub type PK_facet_cull_t = c_int;
 
 /// No culling (default).
-pub const PK_facet_cull_none_c: PK_facet_cull_t = 0;
+pub const PK_facet_cull_none_c: PK_facet_cull_t = 20560;
 /// Cull back-facing facets (requires view).
-pub const PK_facet_cull_back_c: PK_facet_cull_t = 1;
+pub const PK_facet_cull_back_c: PK_facet_cull_t = 20561;
 
 // =============================================================================
 // Degeneracy handling
@@ -78,11 +78,11 @@ pub const PK_facet_cull_back_c: PK_facet_cull_t = 1;
 pub type PK_facet_degen_t = c_int;
 
 /// Unique vertex per facet at degeneracy (default).
-pub const PK_facet_degen_multiple_vxs_c: PK_facet_degen_t = 0;
+pub const PK_facet_degen_multiple_vxs_c: PK_facet_degen_t = 20580;
 /// Single shared vertex (PK_TOPOL_facet_2 only).
-pub const PK_facet_degen_single_vx_c: PK_facet_degen_t = 1;
+pub const PK_facet_degen_single_vx_c: PK_facet_degen_t = 20581;
 /// Unique vertex, averaged degenerate parameter.
-pub const PK_facet_degen_average_parms_c: PK_facet_degen_t = 2;
+pub const PK_facet_degen_average_parms_c: PK_facet_degen_t = 20582;
 
 // =============================================================================
 // Wire edges in faces
@@ -91,9 +91,9 @@ pub const PK_facet_degen_average_parms_c: PK_facet_degen_t = 2;
 pub type PK_facet_wire_edges_t = c_int;
 
 /// Ignore wire edges (default).
-pub const PK_facet_wire_edges_no_c: PK_facet_wire_edges_t = 0;
+pub const PK_facet_wire_edges_no_c: PK_facet_wire_edges_t = 22140;
 /// Respect wire edges (no facet crosses wire edge).
-pub const PK_facet_wire_edges_yes_c: PK_facet_wire_edges_t = 1;
+pub const PK_facet_wire_edges_yes_c: PK_facet_wire_edges_t = 22141;
 
 // =============================================================================
 // Ignoring small features
@@ -102,13 +102,13 @@ pub const PK_facet_wire_edges_yes_c: PK_facet_wire_edges_t = 1;
 pub type PK_facet_ignore_t = c_int;
 
 /// Facet all features (default).
-pub const PK_facet_ignore_no_c: PK_facet_ignore_t = 0;
+pub const PK_facet_ignore_no_c: PK_facet_ignore_t = 22111;
 /// Ignore features smaller than absolute value.
-pub const PK_facet_ignore_absolute_c: PK_facet_ignore_t = 1;
+pub const PK_facet_ignore_absolute_c: PK_facet_ignore_t = 22112;
 /// Ignore features smaller than ratio of overall box.
-pub const PK_facet_ignore_ratio_c: PK_facet_ignore_t = 2;
+pub const PK_facet_ignore_ratio_c: PK_facet_ignore_t = 22113;
 /// Ignore features smaller than ratio of owning body box.
-pub const PK_facet_ignore_body_ratio_c: PK_facet_ignore_t = 3;
+pub const PK_facet_ignore_body_ratio_c: PK_facet_ignore_t = 22114;
 
 // =============================================================================
 // Ignore scope for loops
@@ -117,9 +117,9 @@ pub const PK_facet_ignore_body_ratio_c: PK_facet_ignore_t = 3;
 pub type PK_facet_ignore_scope_t = c_int;
 
 /// Consider whole owning body (default).
-pub const PK_facet_ignore_scope_global_c: PK_facet_ignore_scope_t = 0;
+pub const PK_facet_ignore_scope_global_c: PK_facet_ignore_scope_t = 22131;
 /// Consider face as separate entity.
-pub const PK_facet_ignore_scope_local_c: PK_facet_ignore_scope_t = 1;
+pub const PK_facet_ignore_scope_local_c: PK_facet_ignore_scope_t = 22130;
 
 // =============================================================================
 // Incremental faceting
@@ -128,13 +128,13 @@ pub const PK_facet_ignore_scope_local_c: PK_facet_ignore_scope_t = 1;
 pub type PK_facet_incr_t = c_int;
 
 /// Off (default).
-pub const PK_facet_incr_no_c: PK_facet_incr_t = 0;
+pub const PK_facet_incr_no_c: PK_facet_incr_t = 22560;
 /// Off + delete existing incremental data.
-pub const PK_facet_incr_clear_c: PK_facet_incr_t = 1;
-/// On + delete existing data, generate new.
-pub const PK_facet_incr_refresh_no_c: PK_facet_incr_t = 2;
+pub const PK_facet_incr_clear_c: PK_facet_incr_t = 22561;
 /// On + reuse existing data.
-pub const PK_facet_incr_yes_c: PK_facet_incr_t = 3;
+pub const PK_facet_incr_yes_c: PK_facet_incr_t = 22563;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_facet_incr_refresh_c: PK_facet_incr_t = 22562;
 
 // =============================================================================
 // Incremental faceting method
@@ -143,9 +143,16 @@ pub const PK_facet_incr_yes_c: PK_facet_incr_t = 3;
 pub type PK_facet_incr_method_t = c_int;
 
 /// Store data in system attributes (default).
-pub const PK_facet_incr_method_attrib_c: PK_facet_incr_method_t = 0;
+pub const PK_facet_incr_method_attrib_c: PK_facet_incr_method_t = 25600;
 /// Parasolid auto-manages incremental data.
-pub const PK_facet_incr_method_auto_c: PK_facet_incr_method_t = 1;
+pub const PK_facet_incr_method_auto_c: PK_facet_incr_method_t = 25601;
+
+/// Incremental faceting propagation / refinement / report controls (enum tokens
+/// not yet probed — stubbed as `c_int` for the `PK_TOPOL_facet_mesh_2_o_t`
+/// layout).
+pub type PK_facet_incr_prop_t = c_int;
+pub type PK_facet_incr_refine_t = c_int;
+pub type PK_facet_incr_report_t = c_int;
 
 // =============================================================================
 // Incremental faceting transformation handling
@@ -154,11 +161,11 @@ pub const PK_facet_incr_method_auto_c: PK_facet_incr_method_t = 1;
 pub type PK_facet_incr_tf_t = c_int;
 
 /// Refacet transformed bodies (default).
-pub const PK_facet_incr_tf_no_c: PK_facet_incr_tf_t = 0;
+pub const PK_facet_incr_tf_no_c: PK_facet_incr_tf_t = 26610;
 /// Skip rigid-transformed bodies.
-pub const PK_facet_incr_tf_rigid_c: PK_facet_incr_tf_t = 1;
+pub const PK_facet_incr_tf_rigid_c: PK_facet_incr_tf_t = 26611;
 /// Skip rigid+reflection-transformed bodies.
-pub const PK_facet_incr_tf_reflection_c: PK_facet_incr_tf_t = 2;
+pub const PK_facet_incr_tf_reflection_c: PK_facet_incr_tf_t = 26612;
 
 // =============================================================================
 // Faceting around inflection points
@@ -167,9 +174,9 @@ pub const PK_facet_incr_tf_reflection_c: PK_facet_incr_tf_t = 2;
 pub type PK_facet_inflect_t = c_int;
 
 /// No special treatment (default).
-pub const PK_facet_inflect_no_c: PK_facet_inflect_t = 0;
+pub const PK_facet_inflect_no_c: PK_facet_inflect_t = 22800;
 /// Split facets near inflection points.
-pub const PK_facet_inflect_split_near_c: PK_facet_inflect_t = 1;
+pub const PK_facet_inflect_split_near_c: PK_facet_inflect_t = 22801;
 
 // =============================================================================
 // Facet quality
@@ -178,9 +185,9 @@ pub const PK_facet_inflect_split_near_c: PK_facet_inflect_t = 1;
 pub type PK_facet_quality_t = c_int;
 
 /// No extra checks (default).
-pub const PK_facet_quality_standard_c: PK_facet_quality_t = 0;
+pub const PK_facet_quality_standard_c: PK_facet_quality_t = 23050;
 /// Extra quality checks (slower).
-pub const PK_facet_quality_improved_c: PK_facet_quality_t = 1;
+pub const PK_facet_quality_improved_c: PK_facet_quality_t = 23051;
 
 // =============================================================================
 // Facet topology at singularities
@@ -189,9 +196,9 @@ pub const PK_facet_quality_improved_c: PK_facet_quality_t = 1;
 pub type PK_facet_sing_topol_t = c_int;
 
 /// Single shared vertex at singularity (default).
-pub const PK_facet_sing_topol_default_c: PK_facet_sing_topol_t = 0;
+pub const PK_facet_sing_topol_default_c: PK_facet_sing_topol_t = 23360;
 /// Degenerate facets separate adjacent facets at singularity.
-pub const PK_facet_sing_topol_degen_c: PK_facet_sing_topol_t = 1;
+pub const PK_facet_sing_topol_degen_c: PK_facet_sing_topol_t = 23361;
 
 // =============================================================================
 // Offset face handling
@@ -200,9 +207,9 @@ pub const PK_facet_sing_topol_degen_c: PK_facet_sing_topol_t = 1;
 pub type PK_facet_respect_t = c_int;
 
 /// Ignore offset relationships (default).
-pub const PK_facet_respect_no_c: PK_facet_respect_t = 0;
+pub const PK_facet_respect_no_c: PK_facet_respect_t = 25400;
 /// Reduce facet clashing on offset faces.
-pub const PK_facet_respect_yes_c: PK_facet_respect_t = 1;
+pub const PK_facet_respect_yes_c: PK_facet_respect_t = 25401;
 
 // =============================================================================
 // GO output control enums (PK_TOPOL_render_facet)
@@ -211,48 +218,48 @@ pub const PK_facet_respect_yes_c: PK_facet_respect_t = 1;
 pub type PK_facet_go_normals_t = c_int;
 
 /// Do not output surface normals (default).
-pub const PK_facet_go_normals_no_c: PK_facet_go_normals_t = 0;
+pub const PK_facet_go_normals_no_c: PK_facet_go_normals_t = 20600;
 /// Output surface normals at facet vertices.
-pub const PK_facet_go_normals_yes_c: PK_facet_go_normals_t = 1;
+pub const PK_facet_go_normals_yes_c: PK_facet_go_normals_t = 20601;
 
 pub type PK_facet_go_parameters_t = c_int;
 
 /// Do not output parameters (default).
-pub const PK_facet_go_parameters_no_c: PK_facet_go_parameters_t = 0;
+pub const PK_facet_go_parameters_no_c: PK_facet_go_parameters_t = 20620;
 /// Output surface parameters at vertices.
-pub const PK_facet_go_parameters_d0_c: PK_facet_go_parameters_t = 1;
+pub const PK_facet_go_parameters_d0_c: PK_facet_go_parameters_t = 20621;
 /// Output parameters + first derivatives.
-pub const PK_facet_go_parameters_d1_c: PK_facet_go_parameters_t = 2;
+pub const PK_facet_go_parameters_d1_c: PK_facet_go_parameters_t = 20622;
 /// Output parameters + first and second derivatives.
-pub const PK_facet_go_parameters_d2_c: PK_facet_go_parameters_t = 3;
+pub const PK_facet_go_parameters_d2_c: PK_facet_go_parameters_t = 20623;
 
 pub type PK_facet_go_curvatures_t = c_int;
 
 /// Do not output curvatures (default).
-pub const PK_facet_go_curvatures_no_c: PK_facet_go_curvatures_t = 0;
+pub const PK_facet_go_curvatures_no_c: PK_facet_go_curvatures_t = 26180;
 /// Output principal directions and curvatures at vertices.
-pub const PK_facet_go_curvatures_yes_c: PK_facet_go_curvatures_t = 1;
+pub const PK_facet_go_curvatures_yes_c: PK_facet_go_curvatures_t = 26181;
 
 pub type PK_facet_go_edges_t = c_int;
 
 /// Do not output edge data (default).
-pub const PK_facet_go_edges_no_c: PK_facet_go_edges_t = 0;
+pub const PK_facet_go_edges_no_c: PK_facet_go_edges_t = 20640;
 /// Output edge entities at facet boundary edges.
-pub const PK_facet_go_edges_yes_c: PK_facet_go_edges_t = 1;
+pub const PK_facet_go_edges_yes_c: PK_facet_go_edges_t = 20641;
 
 pub type PK_facet_go_strips_t = c_int;
 
 /// Individual facet output (default).
-pub const PK_facet_go_strips_no_c: PK_facet_go_strips_t = 0;
+pub const PK_facet_go_strips_no_c: PK_facet_go_strips_t = 20660;
 /// Output as facet strips (always triangular).
-pub const PK_facet_go_strips_yes_c: PK_facet_go_strips_t = 1;
+pub const PK_facet_go_strips_yes_c: PK_facet_go_strips_t = 20661;
 
 pub type PK_facet_go_interleaved_t = c_int;
 
 /// Output body-by-body (default).
-pub const PK_facet_go_interleaved_no_c: PK_facet_go_interleaved_t = 0;
+pub const PK_facet_go_interleaved_no_c: PK_facet_go_interleaved_t = 20680;
 /// Interleave faces from different bodies (enables multi-thread GO).
-pub const PK_facet_go_interleaved_yes_c: PK_facet_go_interleaved_t = 1;
+pub const PK_facet_go_interleaved_yes_c: PK_facet_go_interleaved_t = 20681;
 
 // =============================================================================
 // Tabular output enums (PK_TOPOL_facet_2)
@@ -261,27 +268,27 @@ pub const PK_facet_go_interleaved_yes_c: PK_facet_go_interleaved_t = 1;
 pub type PK_facet_smp_t = c_int;
 
 /// No SMP (default).
-pub const PK_facet_smp_no_c: PK_facet_smp_t = 0;
+pub const PK_facet_smp_no_c: PK_facet_smp_t = 24110;
 /// Facet different bodies simultaneously.
-pub const PK_facet_smp_body_c: PK_facet_smp_t = 1;
+pub const PK_facet_smp_body_c: PK_facet_smp_t = 24111;
 
 pub type PK_facet_consistent_parms_t = c_int;
 
 /// No consistent parameterization (default).
-pub const PK_facet_consistent_parms_no_c: PK_facet_consistent_parms_t = 0;
+pub const PK_facet_consistent_parms_no_c: PK_facet_consistent_parms_t = 22510;
 /// Consistent params using face UV box.
-pub const PK_facet_consistent_parms_fa_c: PK_facet_consistent_parms_t = 1;
+pub const PK_facet_consistent_parms_fa_c: PK_facet_consistent_parms_t = 22512;
 /// Legacy: consistent within half-period.
-pub const PK_facet_consistent_parms_su_c: PK_facet_consistent_parms_t = 2;
+pub const PK_facet_consistent_parms_su_c: PK_facet_consistent_parms_t = 22511;
 
 pub type PK_facet_pt_report_t = c_int;
 
 /// No report (default).
-pub const PK_facet_pt_report_no_c: PK_facet_pt_report_t = 0;
+pub const PK_facet_pt_report_no_c: PK_facet_pt_report_t = 24570;
 /// Report points off model edges.
-pub const PK_facet_pt_report_off_eds_c: PK_facet_pt_report_t = 1;
+pub const PK_facet_pt_report_off_eds_c: PK_facet_pt_report_t = 24571;
 /// Report points off edges + internal points off faces.
-pub const PK_facet_pt_report_off_tpl_c: PK_facet_pt_report_t = 2;
+pub const PK_facet_pt_report_off_tpl_c: PK_facet_pt_report_t = 24572;
 
 /// Faceting error token type — used in error_object table.
 pub type PK_facet_fault_t = c_int;
@@ -295,295 +302,303 @@ pub type PK_facet_fault_t = c_int;
 pub type PK_render_edge_t = c_int;
 
 /// Render edges (default).
-pub const PK_render_edge_yes_c: PK_render_edge_t = 0;
+pub const PK_render_edge_yes_c: PK_render_edge_t = 20101;
 /// Do not render edges.
-pub const PK_render_edge_no_c: PK_render_edge_t = 1;
+pub const PK_render_edge_no_c: PK_render_edge_t = 20100;
 
 // --- Silhouette rendering ---
 
 pub type PK_render_silhouette_t = c_int;
 
 /// No silhouettes (default).
-pub const PK_render_silhouette_no_c: PK_render_silhouette_t = 0;
+pub const PK_render_silhouette_no_c: PK_render_silhouette_t = 20120;
 /// Render silhouettes.
-pub const PK_render_silhouette_yes_c: PK_render_silhouette_t = 1;
+pub const PK_render_silhouette_yes_c: PK_render_silhouette_t = 20122;
 /// Render silhouettes, detect near-circular as arcs (drafting, slow).
-pub const PK_render_silhouette_arcs_c: PK_render_silhouette_t = 2;
+pub const PK_render_silhouette_arcs_c: PK_render_silhouette_t = 20121;
 
 // --- Mesh normal field for silhouettes ---
 
 pub type PK_MESH_normal_field_t = c_int;
 
 /// Use mvertex normals (default, smoother).
-pub const PK_MESH_normal_field_mvertex_c: PK_MESH_normal_field_t = 0;
+pub const PK_MESH_normal_field_mvertex_c: PK_MESH_normal_field_t = 26260;
 /// Use mfacet normals (follows facet boundaries).
-pub const PK_MESH_normal_field_mfacet_c: PK_MESH_normal_field_t = 1;
+pub const PK_MESH_normal_field_mfacet_c: PK_MESH_normal_field_t = 26261;
 
 // --- Sharp mfins rendering ---
 
 pub type PK_render_sharp_mfins_t = c_int;
 
 /// Do not render sharp mfins (default).
-pub const PK_render_sharp_mfins_no_c: PK_render_sharp_mfins_t = 0;
+pub const PK_render_sharp_mfins_no_c: PK_render_sharp_mfins_t = 20260;
 /// Render sharp mfins.
-pub const PK_render_sharp_mfins_yes_c: PK_render_sharp_mfins_t = 1;
+pub const PK_render_sharp_mfins_yes_c: PK_render_sharp_mfins_t = 20261;
 
 // --- Visibility ---
 
 pub type PK_render_vis_t = c_int;
 
 /// No visibility evaluation, all lines visible (default / wireframe).
-pub const PK_render_vis_no_c: PK_render_vis_t = 0;
+pub const PK_render_vis_no_c: PK_render_vis_t = 20300;
 /// Hidden lines not returned.
-pub const PK_render_vis_hid_c: PK_render_vis_t = 1;
+pub const PK_render_vis_hid_c: PK_render_vis_t = 20301;
 /// Hidden lines returned, marked invisible.
-pub const PK_render_vis_inv_c: PK_render_vis_t = 2;
+pub const PK_render_vis_inv_c: PK_render_vis_t = 20302;
 /// Hidden lines returned, distinguish edge-hidden vs face-hidden.
-pub const PK_render_vis_inv_draft_c: PK_render_vis_t = 3;
+pub const PK_render_vis_inv_draft_c: PK_render_vis_t = 20304;
 /// Enable `invisible`, `drafting`, `self_hidden` sub-options.
-pub const PK_render_vis_extended_c: PK_render_vis_t = 4;
+pub const PK_render_vis_extended_c: PK_render_vis_t = 20305;
 
 // --- Extended visibility sub-options ---
 
 pub type PK_render_invisible_t = c_int;
 
 /// Do not output invisible lines (default).
-pub const PK_render_invisible_no_c: PK_render_invisible_t = 0;
+pub const PK_render_invisible_no_c: PK_render_invisible_t = 20440;
 /// Output invisible lines.
-pub const PK_render_invisible_yes_c: PK_render_invisible_t = 1;
+pub const PK_render_invisible_yes_c: PK_render_invisible_t = 20441;
 
 pub type PK_render_drafting_t = c_int;
 
 /// No distinction line-hidden vs face-hidden (default).
-pub const PK_render_drafting_no_c: PK_render_drafting_t = 0;
+pub const PK_render_drafting_no_c: PK_render_drafting_t = 20450;
 /// Distinguish line-hidden vs face-hidden.
-pub const PK_render_drafting_yes_c: PK_render_drafting_t = 1;
+pub const PK_render_drafting_yes_c: PK_render_drafting_t = 20451;
 
 pub type PK_render_self_hidden_t = c_int;
 
 /// No distinction self-hidden vs other invisible (default).
-pub const PK_render_self_hidden_no_c: PK_render_self_hidden_t = 0;
+pub const PK_render_self_hidden_no_c: PK_render_self_hidden_t = 20460;
 /// Distinguish self-hidden lines.
-pub const PK_render_self_hidden_yes_c: PK_render_self_hidden_t = 1;
+pub const PK_render_self_hidden_yes_c: PK_render_self_hidden_t = 20461;
 
 // --- Smoothness ---
 
 pub type PK_render_smooth_t = c_int;
 
 /// Don't indicate smoothness (default).
-pub const PK_render_smooth_no_c: PK_render_smooth_t = 0;
+pub const PK_render_smooth_no_c: PK_render_smooth_t = 20320;
 /// Indicate smooth edges.
-pub const PK_render_smooth_yes_c: PK_render_smooth_t = 1;
+pub const PK_render_smooth_yes_c: PK_render_smooth_t = 20321;
 /// Indicate smoothness + coincidence with other lines.
-pub const PK_render_smooth_draft_c: PK_render_smooth_t = 2;
+pub const PK_render_smooth_draft_c: PK_render_smooth_t = 20322;
 
 // --- Internal edges ---
 
 pub type PK_render_internal_t = c_int;
 
 /// Don't indicate internal edges (default).
-pub const PK_render_internal_no_c: PK_render_internal_t = 0;
+pub const PK_render_internal_no_c: PK_render_internal_t = 20340;
 /// Indicate internal edges.
-pub const PK_render_internal_yes_c: PK_render_internal_t = 1;
+pub const PK_render_internal_yes_c: PK_render_internal_t = 20341;
 
 // --- Sketching missing geometry ---
 
 pub type PK_render_ske_missing_t = c_int;
 
 /// Error on missing geometry (default).
-pub const PK_render_ske_missing_no_c: PK_render_ske_missing_t = 0;
+pub const PK_render_ske_missing_no_c: PK_render_ske_missing_t = 23750;
 /// Skip entities with missing geometry.
-pub const PK_render_ske_missing_yes_c: PK_render_ske_missing_t = 1;
+pub const PK_render_ske_missing_yes_c: PK_render_ske_missing_t = 23751;
 
 // --- Ignore small features (render) ---
 
 pub type PK_render_ignore_t = c_int;
 
 /// No features ignored (default).
-pub const PK_render_ignore_no_c: PK_render_ignore_t = 0;
+pub const PK_render_ignore_no_c: PK_render_ignore_t = 21820;
 /// Absolute size threshold.
-pub const PK_render_ignore_absolute_c: PK_render_ignore_t = 1;
+pub const PK_render_ignore_absolute_c: PK_render_ignore_t = 21821;
 /// Ratio of feature box to model box.
-pub const PK_render_ignore_ratio_c: PK_render_ignore_t = 2;
+pub const PK_render_ignore_ratio_c: PK_render_ignore_t = 21822;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_render_ignore_body_ratio_c: PK_render_ignore_t = 21823;
 
 // --- Hierarchical output ---
 
 pub type PK_render_hierarch_t = c_int;
 
 /// No hierarchical output (default).
-pub const PK_render_hierarch_no_c: PK_render_hierarch_t = 0;
+pub const PK_render_hierarch_no_c: PK_render_hierarch_t = 20380;
 /// Visibility segments only (geometry from prior call).
-pub const PK_render_hierarch_no_geom_c: PK_render_hierarch_t = 1;
+pub const PK_render_hierarch_no_geom_c: PK_render_hierarch_t = 20381;
 /// Geometry + visibility segments.
-pub const PK_render_hierarch_yes_c: PK_render_hierarch_t = 2;
+pub const PK_render_hierarch_yes_c: PK_render_hierarch_t = 20382;
 /// Geometry + visibility segments + polyline parameterization.
-pub const PK_render_hierarch_param_c: PK_render_hierarch_t = 3;
+pub const PK_render_hierarch_param_c: PK_render_hierarch_t = 20383;
 
 // --- B-curve output format ---
 
 pub type PK_render_bcurve_t = c_int;
 
 /// Output B-curves as polylines (default).
-pub const PK_render_bcurve_polyline_c: PK_render_bcurve_t = 0;
+pub const PK_render_bcurve_polyline_c: PK_render_bcurve_t = 20400;
 /// Output B-curves in Bezier form.
-pub const PK_render_bcurve_bezier_c: PK_render_bcurve_t = 1;
+pub const PK_render_bcurve_bezier_c: PK_render_bcurve_t = 20401;
 /// Output B-curves in NURBS form.
-pub const PK_render_bcurve_nurbs_c: PK_render_bcurve_t = 2;
+pub const PK_render_bcurve_nurbs_c: PK_render_bcurve_t = 20402;
 
 // --- Memory target ---
 
 pub type PK_render_memory_target_t = c_int;
 
 /// No memory limit (default).
-pub const PK_render_memory_target_no_c: PK_render_memory_target_t = 0;
+pub const PK_render_memory_target_no_c: PK_render_memory_target_t = 22160;
 /// Attempt to keep within memory_target_value bytes.
-pub const PK_render_memory_target_yes_c: PK_render_memory_target_t = 1;
+pub const PK_render_memory_target_yes_c: PK_render_memory_target_t = 22161;
 
 // --- Report lines ---
 
 pub type PK_render_report_line_t = c_int;
 
 /// Report nothing (default).
-pub const PK_render_report_line_no_c: PK_render_report_line_t = 0;
+pub const PK_render_report_line_no_c: PK_render_report_line_t = 25550;
 /// Report failed line fits.
-pub const PK_render_report_line_fail_c: PK_render_report_line_t = 1;
+pub const PK_render_report_line_fail_c: PK_render_report_line_t = 25551;
 /// Report loose-tolerance fits.
-pub const PK_render_report_line_loose_c: PK_render_report_line_t = 2;
+pub const PK_render_report_line_loose_c: PK_render_report_line_t = 25552;
 /// Report both failed and loose.
-pub const PK_render_report_line_all_c: PK_render_report_line_t = 3;
+pub const PK_render_report_line_all_c: PK_render_report_line_t = 25553;
 
 // --- Boundary rendering (PK_GEOM_render) ---
 
 pub type PK_render_boundary_t = c_int;
 
 /// Render surface boundaries (default).
-pub const PK_render_boundary_yes_c: PK_render_boundary_t = 0;
+pub const PK_render_boundary_yes_c: PK_render_boundary_t = 20221;
 /// Don't render surface boundaries.
-pub const PK_render_boundary_no_c: PK_render_boundary_t = 1;
+pub const PK_render_boundary_no_c: PK_render_boundary_t = 20220;
 
 // --- Parametric hatching ---
 
 pub type PK_render_param_t = c_int;
 
 /// No parametric hatching (default).
-pub const PK_render_param_no_c: PK_render_param_t = 0;
+pub const PK_render_param_no_c: PK_render_param_t = 20180;
 /// Hatch faces with hatch attribute.
-pub const PK_render_param_attrib_c: PK_render_param_t = 1;
-/// Hatch using `param_u` / `param_v` from options.
-pub const PK_render_param_yes_c: PK_render_param_t = 2;
-/// Hatch using `param_u` / `param_v` (Parasolid picks start).
-pub const PK_render_param_free_c: PK_render_param_t = 3;
+pub const PK_render_param_attrib_c: PK_render_param_t = 20181;
+// [re-abi] appended 3 missing member(s) from pk-enums.h
+pub const PK_render_param_spaced_c: PK_render_param_t = 20182;
+pub const PK_render_param_spaced_free_c: PK_render_param_t = 20183;
+pub const PK_render_param_number_free_c: PK_render_param_t = 20184;
 
 // --- Lattice rendering ---
 
 pub type PK_render_lattice_t = c_int;
 
 /// Rods as straight lines (default).
-pub const PK_render_lattice_line_c: PK_render_lattice_t = 0;
+pub const PK_render_lattice_line_c: PK_render_lattice_t = 20270;
 /// Balls as spheres, rods as cylinders/cones.
-pub const PK_render_lattice_solid_c: PK_render_lattice_t = 1;
+pub const PK_render_lattice_solid_c: PK_render_lattice_t = 20271;
 /// Balls as spheres, rods as lines.
-pub const PK_render_lattice_composite_c: PK_render_lattice_t = 2;
+pub const PK_render_lattice_composite_c: PK_render_lattice_t = 20272;
 
 // --- Planar hatching ---
 
 pub type PK_render_planar_t = c_int;
 
 /// No planar hatching (default).
-pub const PK_render_planar_no_c: PK_render_planar_t = 0;
+pub const PK_render_planar_no_c: PK_render_planar_t = 20140;
 /// Hatch planar faces with hatch attribute.
-pub const PK_render_planar_attrib_c: PK_render_planar_t = 1;
+pub const PK_render_planar_attrib_c: PK_render_planar_t = 20141;
 /// Hatch all planar faces, Parasolid picks start.
-pub const PK_render_planar_free_c: PK_render_planar_t = 2;
+pub const PK_render_planar_free_c: PK_render_planar_t = 20142;
 /// Hatch all planar faces with specified axis + location.
-pub const PK_render_planar_yes_c: PK_render_planar_t = 3;
+pub const PK_render_planar_yes_c: PK_render_planar_t = 20143;
 
 // --- Radial hatching ---
 
 pub type PK_render_radial_t = c_int;
 
 /// No radial hatching (default).
-pub const PK_render_radial_no_c: PK_render_radial_t = 0;
+pub const PK_render_radial_no_c: PK_render_radial_t = 20160;
 /// Hatch radial faces with hatch attribute.
-pub const PK_render_radial_attrib_c: PK_render_radial_t = 1;
+pub const PK_render_radial_attrib_c: PK_render_radial_t = 20161;
 /// Hatch all radial faces, Parasolid picks start.
-pub const PK_render_radial_free_c: PK_render_radial_t = 2;
+pub const PK_render_radial_free_c: PK_render_radial_t = 20163;
 /// Hatch all radial faces with specified start values.
-pub const PK_render_radial_yes_c: PK_render_radial_t = 3;
+pub const PK_render_radial_yes_c: PK_render_radial_t = 20162;
 
 // --- Unfixed blends ---
 
 pub type PK_render_unfix_t = c_int;
 
 /// No unfixed blend rendering (default).
-pub const PK_render_unfix_no_c: PK_render_unfix_t = 0;
+pub const PK_render_unfix_no_c: PK_render_unfix_t = 20200;
 /// Render using blend attribute values.
-pub const PK_render_unfix_attrib_c: PK_render_unfix_t = 1;
+pub const PK_render_unfix_attrib_c: PK_render_unfix_t = 20201;
 /// Render all unfixed blends.
-pub const PK_render_unfix_yes_c: PK_render_unfix_t = 2;
+pub const PK_render_unfix_yes_c: PK_render_unfix_t = 20202;
 
 // --- Overlapping bodies ---
 
 pub type PK_render_overlap_t = c_int;
 
 /// Assume no overlap (default).
-pub const PK_render_overlap_no_c: PK_render_overlap_t = 0;
+pub const PK_render_overlap_no_c: PK_render_overlap_t = 21871;
 /// Detect overlaps, split lines, no new curves.
-pub const PK_render_overlap_yes_c: PK_render_overlap_t = 1;
+pub const PK_render_overlap_yes_c: PK_render_overlap_t = 21872;
 /// Detect overlaps + generate intersection curves (all vs all).
-pub const PK_render_overlap_intsec_all_c: PK_render_overlap_t = 2;
+pub const PK_render_overlap_intsec_all_c: PK_render_overlap_t = 21874;
 /// Detect overlaps + generate intersection curves (pairwise).
-pub const PK_render_overlap_intsec_pair_c: PK_render_overlap_t = 3;
+pub const PK_render_overlap_intsec_pair_c: PK_render_overlap_t = 21875;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_render_overlap_intersect_c: PK_render_overlap_t = 21873;
 
 // --- Transparency ---
 
 pub type PK_render_transparent_t = c_int;
 
 /// All bodies opaque (default).
-pub const PK_render_transparent_no_c: PK_render_transparent_t = 0;
+pub const PK_render_transparent_no_c: PK_render_transparent_t = 20240;
 /// Transparent if SDL/TYSA_TRANSPARENCY attribute with non-zero coefficient.
-pub const PK_render_transparent_yes_c: PK_render_transparent_t = 1;
+pub const PK_render_transparent_yes_c: PK_render_transparent_t = 20241;
 /// Transparent by `transparent_indices` array.
-pub const PK_render_transparent_index_c: PK_render_transparent_t = 2;
+pub const PK_render_transparent_index_c: PK_render_transparent_t = 20242;
 
 pub type PK_render_transp_hid_t = c_int;
 
 /// Transparent bodies opaque to themselves, transparent to others.
-pub const PK_render_transp_hid_yes_c: PK_render_transp_hid_t = 1;
+pub const PK_render_transp_hid_yes_c: PK_render_transp_hid_t = 20244;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_render_transp_hid_no_c: PK_render_transp_hid_t = 20243;
 
 // --- Viewport ---
 
 pub type PK_render_viewport_t = c_int;
 
 /// No viewport (default).
-pub const PK_render_viewport_no_c: PK_render_viewport_t = 0;
+pub const PK_render_viewport_no_c: PK_render_viewport_t = 20420;
 /// Single viewport.
-pub const PK_render_viewport_yes_c: PK_render_viewport_t = 1;
+pub const PK_render_viewport_yes_c: PK_render_viewport_t = 20421;
 /// Multiple viewports.
-pub const PK_render_viewport_array_c: PK_render_viewport_t = 2;
+pub const PK_render_viewport_array_c: PK_render_viewport_t = 20422;
 
 pub type PK_render_viewport_type_t = c_int;
 
 /// 3D cuboid viewport (default).
-pub const PK_render_viewport_type_3D_c: PK_render_viewport_type_t = 0;
+pub const PK_render_viewport_type_3D_c: PK_render_viewport_type_t = 20480;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_render_viewport_type_2D_c: PK_render_viewport_type_t = 20481;
 
 pub type PK_render_viewport_clip_t = c_int;
 
 /// No clipping (default).
-pub const PK_render_viewport_clip_no_c: PK_render_viewport_clip_t = 0;
+pub const PK_render_viewport_clip_no_c: PK_render_viewport_clip_t = 20470;
 /// Clip rendering to viewport boundary.
-pub const PK_render_viewport_clip_yes_c: PK_render_viewport_clip_t = 1;
+pub const PK_render_viewport_clip_yes_c: PK_render_viewport_clip_t = 20471;
 
 // --- Regional data ---
 
 pub type PK_render_region_t = c_int;
 
 /// No regional data (default).
-pub const PK_render_region_no_c: PK_render_region_t = 0;
+pub const PK_render_region_no_c: PK_render_region_t = 20360;
 /// Regional data for faces with SDL/TYSA_REGION attribute.
-pub const PK_render_region_attrib_c: PK_render_region_t = 1;
+pub const PK_render_region_attrib_c: PK_render_region_t = 20361;
 /// Regional data for all boundary lines.
-pub const PK_render_region_yes_c: PK_render_region_t = 2;
+pub const PK_render_region_yes_c: PK_render_region_t = 20362;
 
 // =============================================================================
 // Picking enums
@@ -592,20 +607,20 @@ pub const PK_render_region_yes_c: PK_render_region_t = 2;
 pub type PK_BODY_pick_method_t = c_int;
 
 /// Order by position along ray (default).
-pub const PK_BODY_pick_axial_c: PK_BODY_pick_method_t = 0;
+pub const PK_BODY_pick_axial_c: PK_BODY_pick_method_t = 20901;
 /// Order by absolute distance from ray location.
-pub const PK_BODY_pick_axial_location_c: PK_BODY_pick_method_t = 1;
+pub const PK_BODY_pick_axial_location_c: PK_BODY_pick_method_t = 20903;
 /// Order by radial distance from ray (edges/vertices only).
-pub const PK_BODY_pick_radial_c: PK_BODY_pick_method_t = 2;
+pub const PK_BODY_pick_radial_c: PK_BODY_pick_method_t = 20900;
 /// Combined axial+radial (controlled by `ratio` option).
-pub const PK_BODY_pick_ratio_c: PK_BODY_pick_method_t = 3;
+pub const PK_BODY_pick_ratio_c: PK_BODY_pick_method_t = 20902;
 
 pub type PK_pick_approximate_t = c_int;
 
 /// Use approximate curve representations (default).
-pub const PK_pick_approximate_yes_c: PK_pick_approximate_t = 0;
+pub const PK_pick_approximate_yes_c: PK_pick_approximate_t = 22181;
 /// Use accurate geometry.
-pub const PK_pick_approximate_no_c: PK_pick_approximate_t = 1;
+pub const PK_pick_approximate_no_c: PK_pick_approximate_t = 22180;
 
 // =============================================================================
 // Convergent modeling enums
@@ -614,52 +629,62 @@ pub const PK_pick_approximate_no_c: PK_pick_approximate_t = 1;
 pub type PK_facet_geometry_t = c_int;
 
 /// Facet geometry disabled (default).
-pub const PK_facet_geometry_no_c: PK_facet_geometry_t = 0;
+pub const PK_facet_geometry_no_c: PK_facet_geometry_t = 25830;
 /// Facet geometry enabled.
-pub const PK_facet_geometry_all_c: PK_facet_geometry_t = 1;
+pub const PK_facet_geometry_all_c: PK_facet_geometry_t = 25831;
 
 pub type PK_receive_mixed_t = c_int;
 
 /// Error on encountering mixed geometry (default).
-pub const PK_receive_mixed_fail_c: PK_receive_mixed_t = 0;
+pub const PK_receive_mixed_fail_c: PK_receive_mixed_t = 26490;
 /// Allow receiving mixed parts.
-pub const PK_receive_mixed_allow_c: PK_receive_mixed_t = 1;
+pub const PK_receive_mixed_allow_c: PK_receive_mixed_t = 26492;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_receive_mixed_make_facet_c: PK_receive_mixed_t = 26491;
 
 pub type PK_related_topols_t = c_int;
 
 /// Return top-level component parts.
-pub const PK_related_topols_top_c: PK_related_topols_t = 0;
+pub const PK_related_topols_top_c: PK_related_topols_t = 25880;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_related_topols_no_c: PK_related_topols_t = 25881;
 
 /// Geometry category returned by PK_GEOM_ask_geom_category.
 pub type PK_geom_category_t = c_int;
+// [re-abi] appended 5 missing member(s) from pk-enums.h
+pub const PK_GEOM_category_classic_c: PK_geom_category_t = 25870;
+pub const PK_GEOM_category_facet_c: PK_geom_category_t = 25871;
+pub const PK_GEOM_category_none_c: PK_geom_category_t = 25872;
+pub const PK_GEOM_category_mixed_c: PK_geom_category_t = 25874;
+pub const PK_GEOM_category_lattice_c: PK_geom_category_t = 25875;
 
 // =============================================================================
 // Facet body conversion enums
 // =============================================================================
 
 /// Only track laminar and wire edges.
-pub const PK_track_edges_laminar_wire_c: PK_track_edges_t = 2;
+pub const PK_track_edges_laminar_wire_c: PK_track_edges_t = 23982;
 
 pub type PK_MFACET_map_t = c_int;
 
 /// Do not map mfacets (default).
-pub const PK_MFACET_map_no_c: PK_MFACET_map_t = 0;
+pub const PK_MFACET_map_no_c: PK_MFACET_map_t = 26441;
 /// Map mfacets to source.
-pub const PK_MFACET_map_yes_c: PK_MFACET_map_t = 1;
+pub const PK_MFACET_map_yes_c: PK_MFACET_map_t = 26440;
 
 pub type PK_MVERTEX_map_t = c_int;
 
 /// Do not map mvertices (default).
-pub const PK_MVERTEX_map_no_c: PK_MVERTEX_map_t = 0;
+pub const PK_MVERTEX_map_no_c: PK_MVERTEX_map_t = 26541;
 /// Map mvertices to source.
-pub const PK_MVERTEX_map_yes_c: PK_MVERTEX_map_t = 1;
+pub const PK_MVERTEX_map_yes_c: PK_MVERTEX_map_t = 26540;
 
 pub type PK_BODY_keep_as_facet_t = c_int;
 
 /// Preserve facet geometry (default, legacy).
-pub const PK_BODY_keep_as_facet_yes_c: PK_BODY_keep_as_facet_t = 0;
+pub const PK_BODY_keep_as_facet_yes_c: PK_BODY_keep_as_facet_t = 26620;
 /// Allow mixed geometry result.
-pub const PK_BODY_keep_as_facet_no_c: PK_BODY_keep_as_facet_t = 1;
+pub const PK_BODY_keep_as_facet_no_c: PK_BODY_keep_as_facet_t = 26621;
 
 // =============================================================================
 // PSM import enums
@@ -668,23 +693,30 @@ pub const PK_BODY_keep_as_facet_no_c: PK_BODY_keep_as_facet_t = 1;
 pub type PK_MESH_create_t = c_int;
 
 /// Create facets immediately (default).
-pub const PK_MESH_create_now_c: PK_MESH_create_t = 0;
+pub const PK_MESH_create_now_c: PK_MESH_create_t = 26500;
 /// Delay creation until needed by operation.
-pub const PK_MESH_create_later_c: PK_MESH_create_t = 1;
+pub const PK_MESH_create_later_c: PK_MESH_create_t = 26501;
 
 pub type PK_MESH_cb_status_t = c_int;
 
 /// Stop reading (last block).
-pub const PK_MESH_cb_status_stop_c: PK_MESH_cb_status_t = 0;
+pub const PK_MESH_cb_status_stop_c: PK_MESH_cb_status_t = 100262;
 /// Continue reading (more blocks follow).
-pub const PK_MESH_cb_status_continue_c: PK_MESH_cb_status_t = 1;
+pub const PK_MESH_cb_status_continue_c: PK_MESH_cb_status_t = 100260;
 
 pub type PK_MESH_facet_type_t = c_int;
 
 /// Triangle strip data block.
-pub const PK_MESH_facet_type_strip_c: PK_MESH_facet_type_t = 0;
+pub const PK_MESH_facet_type_strip_c: PK_MESH_facet_type_t = 100752;
 /// Independent facet (vector) data block.
-pub const PK_MESH_facet_type_vector_c: PK_MESH_facet_type_t = 1;
+pub const PK_MESH_facet_type_vector_c: PK_MESH_facet_type_t = 100755;
+
+/// Internal facet-type dispatch code written into the reader's descriptor for a
+/// **vector** block, as read by `FUN_1813f30a0` (V37.01.243). The public
+/// `PK_MESH_facet_type_vector_c` token (100755) is illustrative in the docs; the
+/// actual descriptor the callback fills carries this small internal code. Other
+/// codes (1..6) select strip/index/fan variants; only vector (6) is wired up.
+pub const PK_MESH_facet_type_vector_internal_c: PK_MESH_facet_type_t = 6;
 
 // =============================================================================
 // Mesh defect enums
@@ -693,39 +725,39 @@ pub const PK_MESH_facet_type_vector_c: PK_MESH_facet_type_t = 1;
 pub type PK_MESH_defect_t = c_int;
 
 /// Mesh has disjoint components.
-pub const PK_MESH_defect_disjoint_c: PK_MESH_defect_t = 0;
+pub const PK_MESH_defect_disjoint_c: PK_MESH_defect_t = 26009;
 /// Mesh has foldover.
-pub const PK_MESH_defect_foldover_c: PK_MESH_defect_t = 1;
+pub const PK_MESH_defect_foldover_c: PK_MESH_defect_t = 26008;
 /// Mfacet of zero area.
-pub const PK_MESH_defect_flat_mfacet_c: PK_MESH_defect_t = 2;
+pub const PK_MESH_defect_flat_mfacet_c: PK_MESH_defect_t = 26005;
 /// Mfacet with at least one mfin shorter than precision.
-pub const PK_MESH_defect_degen_mfacet_c: PK_MESH_defect_t = 3;
+pub const PK_MESH_defect_degen_mfacet_c: PK_MESH_defect_t = 26004;
 /// Laminar mfacets occupying same position.
-pub const PK_MESH_defect_slit_c: PK_MESH_defect_t = 4;
+pub const PK_MESH_defect_slit_c: PK_MESH_defect_t = 26007;
 /// Mesh contains self-intersecting mfacets.
-pub const PK_MESH_defect_self_int_c: PK_MESH_defect_t = 5;
+pub const PK_MESH_defect_self_int_c: PK_MESH_defect_t = 26006;
 /// Mesh is non-manifold.
-pub const PK_MESH_defect_non_manifold_c: PK_MESH_defect_t = 6;
+pub const PK_MESH_defect_non_manifold_c: PK_MESH_defect_t = 26002;
 /// Mvertex has incorrect normal direction.
-pub const PK_MESH_defect_mvertex_normal_c: PK_MESH_defect_t = 7;
+pub const PK_MESH_defect_mvertex_normal_c: PK_MESH_defect_t = 26003;
 /// Mesh data structure is corrupt.
-pub const PK_MESH_defect_corrupt_c: PK_MESH_defect_t = 8;
+pub const PK_MESH_defect_corrupt_c: PK_MESH_defect_t = 26001;
 
 pub type PK_check_mesh_t = c_int;
 
 /// Do not perform mesh invalidity checks.
-pub const PK_check_mesh_no_c: PK_check_mesh_t = 0;
+pub const PK_check_mesh_no_c: PK_check_mesh_t = 25940;
 /// Basic checks (non-manifold, degenerate, flat, bad normals, disjoint-on-face, boundary matching).
-pub const PK_check_mesh_basic_c: PK_check_mesh_t = 1;
+pub const PK_check_mesh_basic_c: PK_check_mesh_t = 25941;
 /// Full checks (basic + slits + self-intersection) (default).
-pub const PK_check_mesh_yes_c: PK_check_mesh_t = 2;
+pub const PK_check_mesh_yes_c: PK_check_mesh_t = 25942;
 
 pub type PK_MESH_replace_normal_t = c_int;
 
 /// Replace normals for specific mtopols.
-pub const PK_MESH_replace_normal_mtopol_c: PK_MESH_replace_normal_t = 0;
+pub const PK_MESH_replace_normal_mtopol_c: PK_MESH_replace_normal_t = 25891;
 /// Replace all normals in mesh.
-pub const PK_MESH_replace_normal_all_c: PK_MESH_replace_normal_t = 1;
+pub const PK_MESH_replace_normal_all_c: PK_MESH_replace_normal_t = 25890;
 
 /// Normal type enum for PK_MESH_ask_normal_type.
 pub type PK_MESH_normal_type_t = c_int;
@@ -847,16 +879,23 @@ pub struct PK_TOPOL_render_facet_o_t {
 // Facet mesh generation options (tabular: PK_TOPOL_facet_2)
 // =============================================================================
 
-/// Mesh generation options for PK_TOPOL_facet_2.
-/// Similar to PK_TOPOL_facet_mesh_o_t but with additional cull_transfs.
+/// Mesh generation control options for `PK_TOPOL_facet_2`.
+///
+/// Field order and types match the authoritative RE catalog layout
+/// (`PK_topol_facet_mesh_2_o_t`, 59 fields). `#[repr(C)]` reproduces the x64
+/// offsets (the catalog's absolute offsets model 32-bit pointers in some
+/// structs, but the field *order* is authoritative). The previous definition
+/// was MISSING the leading `o_t_version` (shifting every field by 4 bytes) and
+/// diverged in field order — never runtime-validated, so the bug survived.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_facet_mesh_2_o_t {
+    pub o_t_version: c_int,
     pub shape: PK_facet_shape_t,
     pub match_: PK_facet_match_t,
     pub density: PK_facet_density_t,
     pub n_view_directions: c_int,
-    pub view_directions: *const PK_VECTOR_t,
+    pub view_directions: *const PK_VECTOR1_t,
     pub cull: PK_facet_cull_t,
     pub n_cull_transfs: c_int,
     pub cull_transfs: *const PK_TRANSF_t,
@@ -877,6 +916,10 @@ pub struct PK_TOPOL_facet_mesh_2_o_t {
     pub surface_plane_tol: c_double,
     pub is_surface_plane_ang: PK_LOGICAL_t,
     pub surface_plane_ang: c_double,
+    pub is_facet_plane_tol: PK_LOGICAL_t,
+    pub facet_plane_tol: c_double,
+    pub is_facet_plane_ang: PK_LOGICAL_t,
+    pub facet_plane_ang: c_double,
     pub is_local_density_tol: PK_LOGICAL_t,
     pub local_density_tol: c_double,
     pub is_local_density_ang: PK_LOGICAL_t,
@@ -886,23 +929,26 @@ pub struct PK_TOPOL_facet_mesh_2_o_t {
     pub n_topols_with_local_tols: c_int,
     pub topols_with_local_tols: *const PK_TOPOL_t,
     pub local_tols_for_topols: *const c_int,
-    pub degen: PK_facet_degen_t,
-    pub is_facet_plane_tol: PK_LOGICAL_t,
-    pub facet_plane_tol: c_double,
-    pub is_facet_plane_ang: PK_LOGICAL_t,
-    pub facet_plane_ang: c_double,
-    pub wire_edges: PK_facet_wire_edges_t,
     pub ignore: PK_facet_ignore_t,
     pub ignore_value: c_double,
     pub ignore_scope: PK_facet_ignore_scope_t,
+    pub wire_edges: PK_facet_wire_edges_t,
     pub incremental_facetting: PK_facet_incr_t,
     pub incremental_method: PK_facet_incr_method_t,
+    pub incremental_propagation: PK_facet_incr_prop_t,
     pub incremental_transformation: PK_facet_incr_tf_t,
+    pub incremental_refinement: PK_facet_incr_refine_t,
+    pub incremental_report: PK_facet_incr_report_t,
     pub inflect: PK_facet_inflect_t,
     pub quality: PK_facet_quality_t,
     pub vertices_on_planar: PK_LOGICAL_t,
     pub sing_topol: PK_facet_sing_topol_t,
     pub respect_offset: PK_facet_respect_t,
+    pub n_bodies_with_scales: c_int,
+    pub bodies_with_scales: *const PK_BODY_t,
+    pub scale_factors: *const PK_scale_factor_t,
+    pub n_viewports: c_int,
+    pub viewports: *const PK_NABOX_sf_t,
 }
 
 // =============================================================================
@@ -931,21 +977,54 @@ pub type PK_TOPOL_facet_tables_cb_t = Option<
 // Tabular output choice options for PK_TOPOL_facet_2
 // =============================================================================
 
-/// Controls which data tables are returned by PK_TOPOL_facet_2.
+/// Controls which data tables are returned by `PK_TOPOL_facet_2`.
+///
+/// Field order matches the authoritative RE catalog (`PK_topol_facet_choice_2_o_t`,
+/// 32 fields). Setting a `PK_LOGICAL_true` on one of the table flags (e.g.
+/// `facet_fin`, `point_vec`, `data_point_idx`) requests that table in the
+/// returned `PK_TOPOL_facet_table_t`. The previous definition was missing
+/// `o_t_version` and ALL 23 table-selection flags — you could not request any
+/// output. `#[repr(C)]` computes the x64 offsets (8-byte pointers) from this
+/// order; the catalog's absolute offsets model 32-bit pointers here.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_facet_choice_2_o_t {
-    pub smp: PK_facet_smp_t,
+    pub o_t_version: c_int,
     pub max_facets_per_strip: c_int,
     pub split_strips: PK_LOGICAL_t,
     pub consistent_parms: PK_facet_consistent_parms_t,
-    pub report_pts_off_topol: PK_facet_pt_report_t,
+    pub smp: PK_facet_smp_t,
     /// Callback receiving tables per body instance. NULL for monolithic return.
     pub facet_tables_cb: PK_TOPOL_facet_tables_cb_t,
     /// Context data for callback.
-    pub facet_tables_context: *mut c_void,
+    pub facet_tables_context: PK_POINTER_t,
     /// Whether callback is thread-safe.
     pub thread_safe: PK_LOGICAL_t,
+    pub report_pts_off_topol: PK_facet_pt_report_t,
+    // --- Table-selection flags: PK_LOGICAL_true requests the table ---
+    pub facet_fin: PK_LOGICAL_t,
+    pub strip_boundary: PK_LOGICAL_t,
+    pub strip_zigzag: PK_LOGICAL_t,
+    pub fin_fin: PK_LOGICAL_t,
+    pub fin_data: PK_LOGICAL_t,
+    pub data_point_idx: PK_LOGICAL_t,
+    pub data_normal_idx: PK_LOGICAL_t,
+    pub data_param_idx: PK_LOGICAL_t,
+    pub data_deriv_idx: PK_LOGICAL_t,
+    pub data_curv_idx: PK_LOGICAL_t,
+    pub point_vec: PK_LOGICAL_t,
+    pub normal_vec: PK_LOGICAL_t,
+    pub param_uv: PK_LOGICAL_t,
+    pub deriv_dp: PK_LOGICAL_t,
+    pub deriv_d2p: PK_LOGICAL_t,
+    pub curv_dirs: PK_LOGICAL_t,
+    pub facet_face: PK_LOGICAL_t,
+    pub strip_face: PK_LOGICAL_t,
+    pub fin_edge: PK_LOGICAL_t,
+    pub point_topol: PK_LOGICAL_t,
+    pub fin_topol: PK_LOGICAL_t,
+    pub error_object: PK_LOGICAL_t,
+    pub incr_faces: PK_LOGICAL_t,
 }
 
 // =============================================================================
@@ -1347,24 +1426,59 @@ pub struct PK_MESH_facet_fan_t {
     pub is_relative_index: PK_LOGICAL_t,
 }
 
-/// Facet data block — independent facet vectors. vertex_positions as triples.
+/// Facet data block — independent facet vectors (each triangle = 3 consecutive
+/// vertex triples in `vertex_positions`).
+///
+/// **Decompile-corrected layout** (V37.01.243, `FUN_1813f30a0` vector branch,
+/// internal facet-type code 6): the first field is read as the **facet count**
+/// (`n_facets`) — the consumer loops `for f in 0..n_facets` and reads 3 vertices
+/// each at stride `0x18` (3 f64). It is NOT `n_vertex_positions`; passing the
+/// vertex count (3× too large) over-reads the buffer and the operation fails
+/// with a deferred error surfaced as PK error 900. There is no `n_vertex_normals`
+/// field: `vertex_normals` sits at offset 16 and, when non-null, is parallel to
+/// `vertex_positions`.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_MESH_facet_vector_t {
-    pub n_vertex_positions: c_int,
-    pub vertex_positions: *const c_double,
-    pub n_vertex_normals: c_int,
-    pub vertex_normals: *const c_double,
+    /// Number of facets (triangles) in this block. `vertex_positions` must hold
+    /// `3 * n_facets` triples (`9 * n_facets` doubles).
+    pub n_facets: c_int,
+    // @4 implicit padding
+    pub vertex_positions: *const c_double, // @8
+    pub vertex_normals: *const c_double,   // @16
+}
+
+/// Descriptor the facet reader fills in (the 2nd callback argument).
+///
+/// **Decompile-confirmed** (V37.01.243, `FUN_1813f30a0`): the invoker passes a
+/// pointer to this 16-byte struct as arg2. The reader writes the internal
+/// facet-type dispatch code at offset 0 (see
+/// [`PK_MESH_facet_type_vector_internal_c`]) and a pointer to the type-specific
+/// block (e.g. [`PK_MESH_facet_vector_t`]) at offset 8. The consumer then reads
+/// `*(descriptor+0)` for the code and dereferences `*(descriptor+8)` as the block.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_MESH_facet_descriptor_t {
+    pub facet_type: PK_MESH_facet_type_t, // @0  internal dispatch code (1..6)
+    pub _pad_4: c_int,                    // @4
+    pub facet_data: *mut c_void,          // @8  -> type-specific block struct
 }
 
 /// Callback type for facet reader (PK_MESH_create_from_facets).
 ///
-/// Called repeatedly to supply facet data blocks. Returns PK_MESH_cb_status_t.
+/// Called repeatedly to supply facet data blocks. **Decompile-confirmed ABI**
+/// (V37.01.243, `FUN_1813f30a0`): `(*reader)(context, descriptor, status)` —
+/// THREE args (RCX=context, RDX=`descriptor*`, R8=`status*`); R9 is unused (a
+/// 4-arg signature crashed on the NULL R9). The reader fills the
+/// [`PK_MESH_facet_descriptor_t`] (facet-type code + block pointer) and writes
+/// the continue/stop token through `status`. The **return value is ignored** by
+/// the consumer — the docs' "returns the status" describes the `status` out-param,
+/// not the C return. The facet-type written to the descriptor is the internal
+/// dispatch code (e.g. 6 = vector), not the public `PK_MESH_facet_type_*_c` token.
 pub type PK_MESH_facet_reader_t = Option<
     unsafe extern "C" fn(
         context: *mut c_void,
-        facet_type: *mut PK_MESH_facet_type_t,
-        facet_data: *mut *mut c_void,
+        descriptor: *mut PK_MESH_facet_descriptor_t,
         status: *mut PK_MESH_cb_status_t,
     ) -> PK_ERROR_code_t,
 >;
@@ -1378,16 +1492,21 @@ pub type PK_MESH_facet_free_t = Option<
 >;
 
 /// Options for PK_MESH_create_from_facets.
+///
+/// Decompile-confirmed layout: `o_t_version`@0 (was missing → kernel read
+/// `vertices_estimate` as the version and raised 5022), then vertices/facet
+/// estimates, facet_free@16, create@24, have_box@28, box@32, thread_safe@80.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_MESH_create_from_facets_o_t {
-    pub vertices_estimate: c_int,
-    pub facet_estimate: c_int,
-    pub facet_free: PK_MESH_facet_free_t,
-    pub create: PK_MESH_create_t,
-    pub have_box: PK_LOGICAL_t,
-    pub box_: PK_BOX_t,
-    pub thread_safe: PK_LOGICAL_t,
+    pub o_t_version: c_int,        // @0
+    pub vertices_estimate: c_int,  // @4
+    pub facet_estimate: c_int,     // @8
+    pub facet_free: PK_MESH_facet_free_t, // @16
+    pub create: PK_MESH_create_t,  // @24
+    pub have_box: PK_LOGICAL_t,    // @28
+    pub box_: PK_BOX_t,            // @32
+    pub thread_safe: PK_LOGICAL_t, // @80
 }
 
 // =============================================================================
@@ -1527,6 +1646,7 @@ pub struct PK_PARTITION_ask_facet_geom_o_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_categorise_geom_o_t {
+    pub o_t_version: c_int,
     pub want_related_topols: PK_related_topols_t,
 }
 
@@ -1571,11 +1691,10 @@ unsafe extern "C" {
     /// geometric data (points, normals, parameters, curvatures) in tables.
     pub fn PK_TOPOL_facet_2(
         n_topols: c_int,
-        topols: *const PK_TOPOL_t,
-        n_transfs: c_int,
-        transfs: *const PK_TRANSF_t,
-        options: *const PK_TOPOL_facet_2_o_t,
-        result: *mut PK_TOPOL_facet_2_r_t,
+        topols: *mut PK_TOPOL_t,
+        topol_transfs: *mut PK_TRANSF_t,
+        options: *mut PK_TOPOL_facet_2_o_t,
+        tables: *mut PK_TOPOL_facet_2_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Free memory for returned facet tables from PK_TOPOL_facet_2.
@@ -1584,13 +1703,14 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Facet topology (legacy version).
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_TOPOL_facet(
         n_topols: c_int,
-        topols: *const PK_TOPOL_t,
-        n_transfs: c_int,
-        transfs: *const PK_TRANSF_t,
-        options: *const c_void,
-        result: *mut c_void,
+        topols: *mut PK_TOPOL_t,
+        topol_transfs: *mut PK_TRANSF_t,
+        view_transf: PK_TRANSF_t,
+        options: *mut PK_TOPOL_facet_o_t,
+        tables: *mut PK_TOPOL_facet_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Free memory for returned facet tables from PK_TOPOL_facet.
@@ -1601,12 +1721,13 @@ unsafe extern "C" {
     /// Facet topology with output through GO (Graphical Output) interface.
     ///
     /// Outputs facets as closed polygons through registered GO callbacks.
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_TOPOL_render_facet(
         n_topols: c_int,
-        topols: *const PK_TOPOL_t,
-        n_transfs: c_int,
-        transfs: *const PK_TRANSF_t,
-        options: *const PK_TOPOL_render_facet_o_t,
+        topols: *mut PK_TOPOL_t,
+        topol_transfs: *mut PK_TRANSF_t,
+        view_transf: PK_TRANSF_t,
+        options: *mut PK_TOPOL_render_facet_o_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1619,11 +1740,10 @@ unsafe extern "C" {
     /// view-dependent silhouettes, and hidden-line removal.
     pub fn PK_TOPOL_render_line(
         n_topols: c_int,
-        topols: *const PK_TOPOL_t,
-        n_transfs: c_int,
-        transfs: *const PK_TRANSF_t,
+        topols: *mut PK_TOPOL_t,
+        topol_transfs: *mut PK_TRANSF_t,
         view_transf: PK_TRANSF_t,
-        options: *const PK_TOPOL_render_line_o_t,
+        options: *mut PK_TOPOL_render_line_o_t,
     ) -> PK_ERROR_code_t;
 
     /// Render geometry (B-curves, B-surfaces, foreign geometry).
@@ -1631,15 +1751,17 @@ unsafe extern "C" {
     /// Wire-mesh form output via GO interface.
     pub fn PK_GEOM_render(
         n_geoms: c_int,
-        geoms: *const PK_GEOM_t,
-        options: *const PK_GEOM_render_o_t,
+        geoms: *mut PK_GEOM_t,
+        transfs: *mut PK_TRANSF_t,
+        options: *mut PK_GEOM_render_o_t,
     ) -> PK_ERROR_code_t;
 
     /// Render a line representation of geometry.
     pub fn PK_GEOM_render_line(
         n_geoms: c_int,
-        geoms: *const PK_GEOM_t,
-        options: *const c_void,
+        geoms: *mut PK_GEOM_t,
+        geom_transfs: *mut PK_TRANSF_t,
+        options: *mut PK_GEOM_render_line_o_t,
     ) -> PK_ERROR_code_t;
 
     /// Render volume (hatching).
@@ -1662,13 +1784,14 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Select faces/edges/vertices from bodies via ray intersection/proximity.
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_BODY_pick_topols(
         n_bodies: c_int,
-        bodies: *const PK_BODY_t,
-        n_transfs: c_int,
-        transfs: *const PK_TRANSF_t,
-        options: *const PK_BODY_pick_topols_o_t,
-        result: *mut PK_BODY_pick_topols_r_t,
+        bodies: *mut PK_PART_t,
+        body_transfs: *mut PK_TRANSF_t,
+        ray: *mut PK_AXIS1_sf_t,
+        options: *mut PK_BODY_pick_topols_o_t,
+        picked: *mut PK_BODY_pick_topols_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Free result from PK_BODY_pick_topols.
@@ -1693,8 +1816,11 @@ unsafe extern "C" {
     /// Returns a copy with facet geometry; original is untouched.
     pub fn PK_BODY_make_facet_body(
         body: PK_BODY_t,
-        options: *const PK_BODY_make_facet_body_o_t,
-        facet_body: *mut PK_BODY_t,
+        transf: PK_TRANSF_t,
+        options: *mut PK_BODY_make_facet_body_o_t,
+        body_copy: *mut PK_BODY_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        redundant_topol: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Create facet body from mesh data.
@@ -1755,7 +1881,8 @@ unsafe extern "C" {
     /// Fill holes in mesh.
     pub fn PK_MESH_fill_holes(
         mesh: PK_MESH_t,
-        options: *const PK_MESH_fill_holes_o_t,
+        options: *mut PK_MESH_fill_holes_o_t,
+        filled_mesh: *mut PK_MESH_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1765,8 +1892,9 @@ unsafe extern "C" {
     /// Examine mesh for defects.
     pub fn PK_MESH_find_defects(
         mesh: PK_MESH_t,
-        options: *const PK_MESH_find_defects_o_t,
-        details: *mut PK_MESH_defect_details_t,
+        options: *mut PK_MESH_find_defects_o_t,
+        n_defects: *mut c_int,
+        defects: *mut *mut PK_MESH_defect_details_t,
     ) -> PK_ERROR_code_t;
 
     /// Examine mesh, attempt to fix defects.
@@ -1774,10 +1902,11 @@ unsafe extern "C" {
     /// Returns new repaired meshes and remaining (unfixed) defect details.
     pub fn PK_MESH_fix_defects(
         mesh: PK_MESH_t,
-        options: *const PK_MESH_fix_defects_o_t,
-        n_meshes: *mut c_int,
-        meshes: *mut *mut PK_MESH_t,
-        details: *mut PK_MESH_defect_details_t,
+        options: *mut PK_MESH_fix_defects_o_t,
+        result: *mut PK_MESH_fix_result_t,
+        n_resultant_meshes: *mut c_int,
+        resultant_meshes: *mut *mut PK_MESH_t,
+        defect_array: *mut *mut PK_MESH_defect_array_t,
     ) -> PK_ERROR_code_t;
 
     /// Free defect array from PK_MESH_find_defects/PK_MESH_fix_defects.
@@ -1797,13 +1926,15 @@ unsafe extern "C" {
     /// Query whether mesh has stored normals or uses dynamic calculation.
     pub fn PK_MESH_ask_normal_type(
         mesh: PK_MESH_t,
+        options: *mut PK_MESH_ask_normal_type_o_t,
         normal_type: *mut PK_MESH_normal_type_t,
     ) -> PK_ERROR_code_t;
 
     /// Whether all mvertices share a single normal.
     pub fn PK_MESH_has_unique_normals(
         mesh: PK_MESH_t,
-        has_unique: *mut PK_LOGICAL_t,
+        options: *mut PK_MESH_has_unique_normals_o_t,
+        has_unique_normals: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     /// Store/modify normals on mesh.
@@ -1815,6 +1946,7 @@ unsafe extern "C" {
     /// Discard stored normals (revert to dynamic calculation).
     pub fn PK_MESH_discard_normals(
         mesh: PK_MESH_t,
+        options: *mut PK_MESH_discard_normals_o_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1837,6 +1969,7 @@ unsafe extern "C" {
     pub fn PK_MESH_eval_with_mtopol(
         mesh: PK_MESH_t,
         uv: *const PK_UV_t,
+        options: *mut PK_MESH_eval_with_mtopol_o_t,
         position: *mut PK_VECTOR_t,
         mfacet: *mut PK_MFACET_t,
         mtopol: *mut PK_MTOPOL_t,
@@ -1851,8 +1984,7 @@ unsafe extern "C" {
 
     /// Free result from PK_MESH_find_laminar_mfins.
     pub fn PK_MESH_find_laminar_mfins_r_f(
-        n_mfins: c_int,
-        mfins: *mut PK_MFIN_t,
+        result: *mut PK_MESH_find_laminar_mfins_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Find sharp mfins (non-laminar, adjacent mfacets don't share normal).
@@ -1888,7 +2020,8 @@ unsafe extern "C" {
     /// Whether mesh data is loaded.
     pub fn PK_MESH_is_loaded(
         mesh: PK_MESH_t,
-        is_loaded: *mut PK_LOGICAL_t,
+        options: *mut PK_MESH_is_loaded_o_t,
+        results: *mut PK_MESH_is_loaded_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Free result from PK_MESH_is_loaded.
@@ -1900,16 +2033,16 @@ unsafe extern "C" {
     pub fn PK_MESH_imprint_vectors(
         mesh: PK_MESH_t,
         n_vectors: c_int,
-        vectors: *const c_double,
-        options: *const PK_MESH_imprint_vectors_o_t,
-        n_mvertices: *mut c_int,
-        mvertices: *mut *mut PK_MVERTEX_t,
+        vectors: *mut PK_VECTOR_t,
+        options: *mut PK_MESH_imprint_vectors_o_t,
+        resultant_mesh: *mut PK_MESH_t,
+        mvertices: *mut PK_MVERTEX_t,
+        results: *mut PK_MESH_imprint_vectors_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Free result from PK_MESH_imprint_vectors.
     pub fn PK_MESH_imprint_vectors_r_f(
-        n_mvertices: c_int,
-        mvertices: *mut PK_MVERTEX_t,
+        result: *mut PK_MESH_imprint_vectors_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1939,7 +2072,8 @@ unsafe extern "C" {
     /// Returns normals of mvertices of mfacet.
     pub fn PK_MFACET_ask_mvx_normals(
         mfacet: PK_MFACET_t,
-        normals: *mut [PK_VECTOR_t; 3],
+        options: *mut PK_MFACET_ask_mvx_normals_o_t,
+        mvx_normals: *mut PK_VECTOR1_t,
     ) -> PK_ERROR_code_t;
 
     /// Returns normal vector of mfacet.
@@ -1958,22 +2092,21 @@ unsafe extern "C" {
     pub fn PK_MFACET_parameterise_vec(
         mfacet: PK_MFACET_t,
         position: *const PK_VECTOR_t,
+        options: *mut PK_MFACET_parameterise_vec_o_t,
         uv: *mut PK_UV_t,
     ) -> PK_ERROR_code_t;
 
     /// Find perimeters (mloops) around supplied set of mfacets.
     pub fn PK_MFACET_find_perimeters(
         n_mfacets: c_int,
-        mfacets: *const PK_MFACET_t,
-        options: *const PK_MFACET_find_perimeters_o_t,
-        n_perimeters: *mut c_int,
-        perimeters: *mut *mut c_void,
+        mfacets: *mut PK_MFACET_t,
+        options: *mut PK_MFACET_find_perimeters_o_t,
+        results: *mut PK_MFACET_find_perimeters_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Free result from PK_MFACET_find_perimeters.
     pub fn PK_MFACET_find_perimeters_r_f(
-        n_perimeters: c_int,
-        perimeters: *mut c_void,
+        result: *mut PK_MFACET_find_perimeters_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -2007,13 +2140,19 @@ unsafe extern "C" {
     /// Returns normal at mvertex of given mfin (per-mfin normal if multiple exist).
     pub fn PK_MFIN_ask_mvx_normal(
         mfin: PK_MFIN_t,
-        normal: *mut PK_VECTOR_t,
+        options: *mut PK_MFIN_ask_mvx_normal_o_t,
+        mvx_normal: *mut PK_VECTOR1_t,
     ) -> PK_ERROR_code_t;
 
     /// Returns curvature at mvertex of given mfin.
     pub fn PK_MFIN_ask_mvx_curvature(
         mfin: PK_MFIN_t,
-        curvature: *mut c_double,
+        options: *mut PK_MFIN_ask_mvx_curvature_o_t,
+        mvx_normal: *mut PK_VECTOR1_t,
+        principal_direction_1: *mut PK_VECTOR1_t,
+        principal_direction_2: *mut PK_VECTOR1_t,
+        principal_curvature_1: *mut c_double,
+        principal_curvature_2: *mut c_double,
     ) -> PK_ERROR_code_t;
 
     /// Returns next mfin in mfacet.
@@ -2056,6 +2195,7 @@ unsafe extern "C" {
     /// Whether mfin is sharp.
     pub fn PK_MFIN_is_sharp(
         mfin: PK_MFIN_t,
+        options: *mut PK_MFIN_is_sharp_o_t,
         is_sharp: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
@@ -2066,8 +2206,9 @@ unsafe extern "C" {
     /// Returns all unique normals of mvertex.
     pub fn PK_MVERTEX_ask_normals(
         mvertex: PK_MVERTEX_t,
+        options: *mut PK_MVERTEX_ask_normals_o_t,
         n_normals: *mut c_int,
-        normals: *mut *mut c_double,
+        normals: *mut *mut PK_VECTOR1_t,
     ) -> PK_ERROR_code_t;
 
     /// Returns all mfacets using mvertex.
@@ -2105,8 +2246,9 @@ unsafe extern "C" {
     /// Set positions of mvertices.
     pub fn PK_MVERTEX_set_positions(
         n_mvertices: c_int,
-        mvertices: *const PK_MVERTEX_t,
-        positions: *const PK_VECTOR_t,
+        mvertices: *mut PK_MVERTEX_t,
+        positions: *mut PK_VECTOR_t,
+        options: *mut PK_MVERTEX_set_positions_o_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -2137,12 +2279,13 @@ unsafe extern "C" {
 
     /// Returns mtopology of a given fin (mvertices and/or mfins along a fin).
     pub fn PK_FIN_find_mtopols(
-        fin_: PK_FIN_t,
-        options: *const PK_FIN_find_mtopols_o_t,
+        fin: PK_FIN_t,
+        options: *mut PK_FIN_find_mtopols_o_t,
         n_mvertices: *mut c_int,
         mvertices: *mut *mut PK_MVERTEX_t,
         n_mfins: *mut c_int,
         mfins: *mut *mut PK_MFIN_t,
+        sense: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -2167,3 +2310,38 @@ unsafe extern "C" {
     pub fn PK_MTOPOL_ask_box_r_f(results: *mut PK_BOX_t) -> PK_ERROR_code_t;
 
 }
+
+// =============================================================================
+// Compile-time ABI layout checks for the PK_TOPOL_facet_2 option sub-structs.
+//
+// Offsets/sizes are asserted against the authoritative RE catalog
+// (`pk-option-structs.tsv`). These lock the x64 layout so a future field
+// edit that shifts an offset fails to compile rather than corrupting the
+// kernel call. (The catalog models 32-bit pointers for the choice struct's
+// two pointer fields, so only the mesh struct's absolute offsets are asserted;
+// the choice struct is checked structurally by field count + leading layout.)
+// =============================================================================
+const _: () = {
+    use core::mem::{offset_of, size_of};
+    // --- PK_TOPOL_facet_mesh_2_o_t: 384 bytes, x64 offsets from the catalog ---
+    assert!(size_of::<PK_TOPOL_facet_mesh_2_o_t>() == 384);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, o_t_version) == 0);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, shape) == 4);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, n_view_directions) == 16);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, view_directions) == 24);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, cull) == 32);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, cull_transfs) == 40);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, loops) == 56);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, min_facet_width) == 72);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, ignore) == 280);
+    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, viewports) == 376);
+    // --- PK_TOPOL_facet_choice_2_o_t: leading layout + full field set (x64) ---
+    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, o_t_version) == 0);
+    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, smp) == 16);
+    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, facet_tables_cb) == 24);
+    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, facet_tables_context) == 32);
+    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, thread_safe) == 40);
+    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, facet_fin) == 48);
+    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, incr_faces) == 136);
+    assert!(size_of::<PK_TOPOL_facet_choice_2_o_t>() == 144);
+};

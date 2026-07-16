@@ -96,17 +96,23 @@ unsafe extern "C" {
 
     /// Delete an entity from the session.
     ///
-    /// ```c
-    /// PK_ERROR_code_t PK_ENTITY_delete(PK_ENTITY_t entity);
-    /// ```
-    pub fn PK_ENTITY_delete(entity: PK_ENTITY_t) -> PK_ERROR_code_t;
+    /// V35: `(int n_entities, const PK_ENTITY_t entities[])` — deletes an ARRAY.
+    /// The old single-`entity` binding passed the tag as `n_entities` (a count).
+    pub fn PK_ENTITY_delete(
+        n_entities: c_int,
+        entities: *const PK_ENTITY_t,
+    ) -> PK_ERROR_code_t;
 
     /// Delete all attributes attached to an entity.
     ///
     /// ```c
     /// PK_ERROR_code_t PK_ENTITY_delete_attribs(PK_ENTITY_t entity);
     /// ```
-    pub fn PK_ENTITY_delete_attribs(entity: PK_ENTITY_t) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_delete_attribs(
+        entity: PK_ENTITY_t,
+        attdef: PK_ATTDEF_t,
+        n_deleted: *mut c_int,
+    ) -> PK_ERROR_code_t;
 
     /// Copy an entity (legacy version).
     ///
@@ -159,8 +165,7 @@ unsafe extern "C" {
     /// );
     /// ```
     pub fn PK_MEMORY_register_callbacks(
-        alloc_fn: PK_MEMORY_alloc_f_t,
-        free_fn: PK_MEMORY_free_f_t,
+        frustrum: PK_MEMORY_frustrum_t,
     ) -> PK_ERROR_code_t;
 
     /// Query the currently registered memory callbacks.
@@ -172,8 +177,7 @@ unsafe extern "C" {
     /// );
     /// ```
     pub fn PK_MEMORY_ask_callbacks(
-        alloc_fn: *mut PK_MEMORY_alloc_f_t,
-        free_fn: *mut PK_MEMORY_free_f_t,
+        frustrum: *mut PK_MEMORY_frustrum_t,
     ) -> PK_ERROR_code_t;
 
     /// Allocate memory through the registered Parasolid allocator.
@@ -182,7 +186,6 @@ unsafe extern "C" {
     /// PK_ERROR_code_t PK_MEMORY_alloc(int size, void **pointer);
     /// ```
     pub fn PK_MEMORY_alloc(
-        size: c_int,
         pointer: *mut *mut c_void,
     ) -> PK_ERROR_code_t;
 

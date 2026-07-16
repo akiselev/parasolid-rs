@@ -66,4 +66,68 @@ impl Vertex {
         let array = unsafe { PkArray::from_raw(ptr, n) };
         Ok(array.iter().map(|&tag| Face::from_tag(tag)).collect())
     }
+
+    /// The vertex classification (isolated / spur / wire / normal).
+    pub fn vertex_type(&self) -> PsResult<VertexType> {
+        let mut t: PK_VERTEX_type_t = 0;
+        pk_call!(PK_VERTEX_ask_type(self.tag, &mut t));
+        Ok(VertexType::from_raw(t))
+    }
+
+    /// The shells that reference this vertex.
+    pub fn shells(&self) -> PsResult<Vec<crate::Shell>> {
+        let mut n: c_int = 0;
+        let mut ptr = std::ptr::null_mut();
+        pk_call!(PK_VERTEX_ask_shells(self.tag, &mut n, &mut ptr));
+        let array = unsafe { PkArray::from_raw(ptr, n) };
+        Ok(array.iter().map(|&tag| crate::Shell::from_tag(tag)).collect())
+    }
+
+    /// The vertex-only loops where this vertex is the sole content.
+    pub fn isolated_loops(&self) -> PsResult<Vec<crate::Loop>> {
+        let mut n: c_int = 0;
+        let mut ptr = std::ptr::null_mut();
+        pk_call!(PK_VERTEX_ask_isolated_loops(self.tag, &mut n, &mut ptr));
+        let array = unsafe { PkArray::from_raw(ptr, n) };
+        Ok(array.iter().map(|&tag| crate::Loop::from_tag(tag)).collect())
+    }
+
+    /// The tolerant-vertex precision (the geometric tolerance band of the vertex).
+    pub fn precision(&self) -> PsResult<f64> {
+        let mut p = 0.0f64;
+        pk_call!(PK_VERTEX_ask_precision(self.tag, &mut p));
+        Ok(p)
+    }
+
+    /// Set this vertex's precision, making it a tolerant vertex.
+    pub fn set_precision(&self, tol: f64) -> PsResult<()> {
+        pk_call!(PK_VERTEX_set_precision(self.tag, tol));
+        Ok(())
+    }
+}
+
+/// The classification of a vertex.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum VertexType {
+    /// A free point not on any edge.
+    Isolated,
+    /// The end of a dangling (spur) edge.
+    Spur,
+    /// A vertex on wireframe edges only.
+    Wire,
+    /// A normal vertex on the solid/sheet boundary.
+    Normal,
+    Other(i32),
+}
+
+impl VertexType {
+    fn from_raw(v: PK_VERTEX_type_t) -> Self {
+        match v {
+            PK_VERTEX_type_isolated_c => VertexType::Isolated,
+            PK_VERTEX_type_spur_c => VertexType::Spur,
+            PK_VERTEX_type_wire_c => VertexType::Wire,
+            PK_VERTEX_type_normal_c => VertexType::Normal,
+            o => VertexType::Other(o),
+        }
+    }
 }

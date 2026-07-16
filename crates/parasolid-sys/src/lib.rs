@@ -19,6 +19,8 @@
 #![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 
 // Core primitive types used throughout the API
+mod generated_stubs;
+pub use generated_stubs::*;
 mod types;
 pub use types::*;
 

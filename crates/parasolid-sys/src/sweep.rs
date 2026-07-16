@@ -47,17 +47,18 @@ pub struct PK_TOPOL_tracking_t {
 
 pub type PK_PARAM_consistent_t = c_int;
 /// Default (inconsistent).
-pub const PK_PARAM_consistent_unset_c: PK_PARAM_consistent_t = 0;
+pub const PK_PARAM_consistent_unset_c: PK_PARAM_consistent_t = 25691;
 /// Align v-parameter with sweep direction.
-pub const PK_PARAM_consistent_set_c: PK_PARAM_consistent_t = 1;
+pub const PK_PARAM_consistent_set_c: PK_PARAM_consistent_t = 25690;
 
 // =============================================================================
 // Periodicity
 // =============================================================================
 
 pub type PK_PARAM_periodic_t = c_int;
-pub const PK_PARAM_periodic_no_c: PK_PARAM_periodic_t = 0;
-pub const PK_PARAM_periodic_yes_c: PK_PARAM_periodic_t = 1;
+pub const PK_PARAM_periodic_no_c: PK_PARAM_periodic_t = 18020;
+pub const PK_PARAM_periodic_yes_c: PK_PARAM_periodic_t = 18021;
+pub const PK_PARAM_periodic_seamed_c: PK_PARAM_periodic_t = 18022;
 
 // =============================================================================
 // Ch. 34 — Profiling: Outline projection modes
@@ -65,13 +66,13 @@ pub const PK_PARAM_periodic_yes_c: PK_PARAM_periodic_t = 1;
 
 pub type PK_outline_project_t = c_int;
 /// Output 3D curves (default).
-pub const PK_outline_project_no_c: PK_outline_project_t = 0;
+pub const PK_outline_project_no_c: PK_outline_project_t = 22170;
 /// Project onto plane.
-pub const PK_outline_project_plane_c: PK_outline_project_t = 1;
+pub const PK_outline_project_plane_c: PK_outline_project_t = 22171;
 /// Project onto sphere.
-pub const PK_outline_project_sphere_c: PK_outline_project_t = 2;
+pub const PK_outline_project_sphere_c: PK_outline_project_t = 22172;
 /// Project onto cylinder.
-pub const PK_outline_project_cylinder_c: PK_outline_project_t = 3;
+pub const PK_outline_project_cylinder_c: PK_outline_project_t = 22173;
 
 // =============================================================================
 // Edge-on handling (curves_outline only)
@@ -79,18 +80,31 @@ pub const PK_outline_project_cylinder_c: PK_outline_project_t = 3;
 
 pub type PK_outline_edge_on_t = c_int;
 /// Do not create outlines (default).
-pub const PK_outline_edge_on_none_c: PK_outline_edge_on_t = 0;
+pub const PK_outline_edge_on_none_c: PK_outline_edge_on_t = 25440;
 /// Create outlines if all input bodies are wire/edge-on sheet.
-pub const PK_outline_edge_on_all_c: PK_outline_edge_on_t = 1;
+pub const PK_outline_edge_on_all_c: PK_outline_edge_on_t = 25441;
 /// Create outlines from all components, trimmed.
-pub const PK_outline_edge_on_both_c: PK_outline_edge_on_t = 2;
+pub const PK_outline_edge_on_both_c: PK_outline_edge_on_t = 25442;
 
 // =============================================================================
 // Outline update control
 // =============================================================================
 
 /// Use all enhancements (default).
-pub const PK_outline_update_default_c: PK_outline_update_t = 0;
+pub const PK_outline_update_default_c: PK_outline_update_t = 24531;
+// [re-abi] appended 12 missing member(s) from pk-enums.h
+pub const PK_outline_update_0_c: PK_outline_update_t = 24530;
+pub const PK_outline_update_1_c: PK_outline_update_t = 24532;
+pub const PK_outline_update_2_c: PK_outline_update_t = 24533;
+pub const PK_outline_update_3_c: PK_outline_update_t = 24534;
+pub const PK_outline_update_4_c: PK_outline_update_t = 24535;
+pub const PK_outline_update_5_c: PK_outline_update_t = 24536;
+pub const PK_outline_update_6_c: PK_outline_update_t = 24537;
+pub const PK_outline_update_7_c: PK_outline_update_t = 24538;
+pub const PK_outline_update_v261_c: PK_outline_update_t = 24539;
+pub const PK_outline_update_v270_c: PK_outline_update_t = 25610;
+pub const PK_outline_update_v271_c: PK_outline_update_t = 25611;
+pub const PK_outline_update_v280_c: PK_outline_update_t = 25612;
 
 // =============================================================================
 // Outline keep_as_facet control
@@ -106,17 +120,17 @@ pub const PK_outline_keep_as_facet_yes_c: PK_outline_keep_as_facet_t = 1;
 
 pub type PK_persp_clipping_t = c_int;
 /// No clipping (default).
-pub const PK_persp_clipping_no_c: PK_persp_clipping_t = 0;
+pub const PK_persp_clipping_no_c: PK_persp_clipping_t = 26420;
 /// Clip to cone.
-pub const PK_persp_clipping_cone_c: PK_persp_clipping_t = 1;
+pub const PK_persp_clipping_cone_c: PK_persp_clipping_t = 26421;
 /// Clip to spherical sector.
-pub const PK_persp_clipping_sector_c: PK_persp_clipping_t = 2;
+pub const PK_persp_clipping_sector_c: PK_persp_clipping_t = 26422;
 /// Clip to wedge.
-pub const PK_persp_clipping_wedge_c: PK_persp_clipping_t = 3;
+pub const PK_persp_clipping_wedge_c: PK_persp_clipping_t = 26423;
 /// Clip to spherical pyramid.
-pub const PK_persp_clipping_pyramid_c: PK_persp_clipping_t = 4;
+pub const PK_persp_clipping_pyramid_c: PK_persp_clipping_t = 26424;
 /// Clip to body outline cone.
-pub const PK_persp_clipping_body_c: PK_persp_clipping_t = 5;
+pub const PK_persp_clipping_body_c: PK_persp_clipping_t = 26425;
 
 // =============================================================================
 // Ch. 34 — Options structures for outline functions
@@ -190,17 +204,17 @@ pub struct PK_BODY_make_persp_outline_r_t {
 
 pub type PK_bound_t = c_int;
 /// Bound by distance from profile (default).
-pub const PK_bound_distance_c: PK_bound_t = 0;
+pub const PK_bound_distance_c: PK_bound_t = 21850;
 /// Bound by surface intersection.
-pub const PK_bound_surf_c: PK_bound_t = 1;
+pub const PK_bound_surf_c: PK_bound_t = 21852;
 /// Bound by face intersection.
-pub const PK_bound_face_c: PK_bound_t = 2;
+pub const PK_bound_face_c: PK_bound_t = 21853;
 /// Bound by body intersection.
-pub const PK_bound_body_c: PK_bound_t = 3;
+pub const PK_bound_body_c: PK_bound_t = 21854;
 /// Bound by sheet body (sheet is destroyed).
-pub const PK_bound_sheet_c: PK_bound_t = 4;
+pub const PK_bound_sheet_c: PK_bound_t = 21851;
 /// No bound (only with extruded_body).
-pub const PK_bound_none_c: PK_bound_t = 5;
+pub const PK_bound_none_c: PK_bound_t = 21855;
 
 // =============================================================================
 // Extrusion: Bound side
@@ -208,11 +222,11 @@ pub const PK_bound_none_c: PK_bound_t = 5;
 
 pub type PK_bound_side_t = c_int;
 /// Inside of bounding entity in first division.
-pub const PK_bound_side_in_c: PK_bound_side_t = 0;
+pub const PK_bound_side_in_c: PK_bound_side_t = 22982;
 /// Outside of bounding entity in first division.
-pub const PK_bound_side_out_c: PK_bound_side_t = 1;
+pub const PK_bound_side_out_c: PK_bound_side_t = 22981;
 /// Both sides in first division.
-pub const PK_bound_side_both_c: PK_bound_side_t = 2;
+pub const PK_bound_side_both_c: PK_bound_side_t = 22980;
 
 // =============================================================================
 // Extrusion: keep_as_facet for extrusion
@@ -243,6 +257,9 @@ pub struct PK_BODY_extrude_bound_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_BODY_extrude_o_t {
+    /// Structure version (@0). The old struct omitted this — every field was
+    /// shifted and the kernel read `start_bound` as the version.
+    pub o_t_version: c_int,
     pub start_bound: PK_BODY_extrude_bound_t,
     pub end_bound: PK_BODY_extrude_bound_t,
     pub extruded_body: PK_BODY_t,
@@ -259,13 +276,13 @@ pub struct PK_BODY_extrude_o_t {
 
 pub type PK_BODY_sweep_align_t = c_int;
 /// Follow path normal (default).
-pub const PK_BODY_sweep_align_normal_c: PK_BODY_sweep_align_t = 0;
+pub const PK_BODY_sweep_align_normal_c: PK_BODY_sweep_align_t = 21560;
 /// Constant orientation.
-pub const PK_BODY_sweep_align_parallel_c: PK_BODY_sweep_align_t = 1;
+pub const PK_BODY_sweep_align_parallel_c: PK_BODY_sweep_align_t = 21561;
 /// Match by parametric distance (guide wires only).
-pub const PK_BODY_sweep_align_parm_c: PK_BODY_sweep_align_t = 2;
+pub const PK_BODY_sweep_align_parm_c: PK_BODY_sweep_align_t = 21562;
 /// Match by arc-length (guide wires only).
-pub const PK_BODY_sweep_align_arclength_c: PK_BODY_sweep_align_t = 3;
+pub const PK_BODY_sweep_align_arclength_c: PK_BODY_sweep_align_t = 21563;
 
 // =============================================================================
 // Sweeping: Lock type
@@ -273,11 +290,11 @@ pub const PK_BODY_sweep_align_arclength_c: PK_BODY_sweep_align_t = 3;
 
 pub type PK_sweep_lock_t = c_int;
 /// Fix to both path and lock direction (default).
-pub const PK_sweep_lock_path_and_dir_c: PK_sweep_lock_t = 0;
+pub const PK_sweep_lock_path_and_dir_c: PK_sweep_lock_t = 23600;
 /// Fix to path only.
-pub const PK_sweep_lock_path_c: PK_sweep_lock_t = 1;
+pub const PK_sweep_lock_path_c: PK_sweep_lock_t = 23601;
 /// Rotation lock.
-pub const PK_sweep_lock_rotation_c: PK_sweep_lock_t = 2;
+pub const PK_sweep_lock_rotation_c: PK_sweep_lock_t = 23602;
 
 // =============================================================================
 // Sweeping: Profile law
@@ -285,9 +302,9 @@ pub const PK_sweep_lock_rotation_c: PK_sweep_lock_t = 2;
 
 pub type PK_sweep_profile_law_t = c_int;
 /// Profiles untransformed (default).
-pub const PK_sweep_profile_law_no_c: PK_sweep_profile_law_t = 0;
+pub const PK_sweep_profile_law_no_c: PK_sweep_profile_law_t = 24310;
 /// Profiles pre-transformed.
-pub const PK_sweep_profile_law_yes_c: PK_sweep_profile_law_t = 1;
+pub const PK_sweep_profile_law_yes_c: PK_sweep_profile_law_t = 24311;
 
 // =============================================================================
 // Sweeping: Scale type
@@ -295,11 +312,11 @@ pub const PK_sweep_profile_law_yes_c: PK_sweep_profile_law_t = 1;
 
 pub type PK_BODY_sweep_scale_t = c_int;
 /// Vary both position and size (default).
-pub const PK_BODY_sweep_scale_both_c: PK_BODY_sweep_scale_t = 0;
+pub const PK_BODY_sweep_scale_both_c: PK_BODY_sweep_scale_t = 22542;
 /// Vary position only.
-pub const PK_BODY_sweep_scale_posn_c: PK_BODY_sweep_scale_t = 1;
+pub const PK_BODY_sweep_scale_posn_c: PK_BODY_sweep_scale_t = 22540;
 /// Vary size only.
-pub const PK_BODY_sweep_scale_size_c: PK_BODY_sweep_scale_t = 2;
+pub const PK_BODY_sweep_scale_size_c: PK_BODY_sweep_scale_t = 22541;
 
 // =============================================================================
 // Sweeping: Cross-section output
@@ -307,11 +324,11 @@ pub const PK_BODY_sweep_scale_size_c: PK_BODY_sweep_scale_t = 2;
 
 pub type PK_sweep_output_xsect_t = c_int;
 /// Produce body (default).
-pub const PK_sweep_output_xsect_no_c: PK_sweep_output_xsect_t = 0;
+pub const PK_sweep_output_xsect_no_c: PK_sweep_output_xsect_t = 23700;
 /// Produce cross-sections.
-pub const PK_sweep_output_xsect_yes_c: PK_sweep_output_xsect_t = 1;
+pub const PK_sweep_output_xsect_yes_c: PK_sweep_output_xsect_t = 23701;
 /// Body first, cross-sections on failure.
-pub const PK_sweep_output_xsect_on_fail_c: PK_sweep_output_xsect_t = 2;
+pub const PK_sweep_output_xsect_on_fail_c: PK_sweep_output_xsect_t = 23702;
 
 // =============================================================================
 // Sweeping: Cross-section grouping
@@ -319,11 +336,11 @@ pub const PK_sweep_output_xsect_on_fail_c: PK_sweep_output_xsect_t = 2;
 
 pub type PK_sweep_group_xsect_t = c_int;
 /// n_xsects along entire path.
-pub const PK_sweep_group_xsect_no_c: PK_sweep_group_xsect_t = 0;
+pub const PK_sweep_group_xsect_no_c: PK_sweep_group_xsect_t = 23712;
 /// n_xsects per path edge.
-pub const PK_sweep_group_xsect_per_edge_c: PK_sweep_group_xsect_t = 1;
+pub const PK_sweep_group_xsect_per_edge_c: PK_sweep_group_xsect_t = 23711;
 /// One per path vertex.
-pub const PK_sweep_group_xsect_per_vx_c: PK_sweep_group_xsect_t = 2;
+pub const PK_sweep_group_xsect_per_vx_c: PK_sweep_group_xsect_t = 23710;
 
 // =============================================================================
 // Sweeping/Lofting shared: Topology form
@@ -333,11 +350,11 @@ pub const PK_sweep_group_xsect_per_vx_c: PK_sweep_group_xsect_t = 2;
 pub type PK_sweep_topology_form_t = c_int;
 
 /// Minimum faces.
-pub const PK_BODY_topology_minimal_c: PK_sweep_topology_form_t = 0;
+pub const PK_BODY_topology_minimal_c: PK_sweep_topology_form_t = 21830;
 /// Columnar topology.
-pub const PK_BODY_topology_columns_c: PK_sweep_topology_form_t = 1;
+pub const PK_BODY_topology_columns_c: PK_sweep_topology_form_t = 21831;
 /// Grid topology.
-pub const PK_BODY_topology_grid_c: PK_sweep_topology_form_t = 2;
+pub const PK_BODY_topology_grid_c: PK_sweep_topology_form_t = 21832;
 
 // =============================================================================
 // Sweeping/Lofting shared: Simplification
@@ -345,11 +362,11 @@ pub const PK_BODY_topology_grid_c: PK_sweep_topology_form_t = 2;
 
 pub type PK_BODY_simplify_t = c_int;
 /// Simplify to analytics (default).
-pub const PK_BODY_simplify_analytic_c: PK_BODY_simplify_t = 0;
+pub const PK_BODY_simplify_analytic_c: PK_BODY_simplify_t = 21520;
 /// Also try swept/spun surfaces.
-pub const PK_BODY_simplify_swept_spun_c: PK_BODY_simplify_t = 1;
+pub const PK_BODY_simplify_swept_spun_c: PK_BODY_simplify_t = 21522;
 /// No simplification.
-pub const PK_BODY_simplify_no_c: PK_BODY_simplify_t = 2;
+pub const PK_BODY_simplify_no_c: PK_BODY_simplify_t = 21521;
 
 // =============================================================================
 // Sweeping: Corner type
@@ -357,9 +374,9 @@ pub const PK_BODY_simplify_no_c: PK_BODY_simplify_t = 2;
 
 pub type PK_sweep_corner_type_t = c_int;
 /// Mitred corners (default for sweep).
-pub const PK_sweep_corner_type_mitre_c: PK_sweep_corner_type_t = 0;
+pub const PK_sweep_corner_type_mitre_c: PK_sweep_corner_type_t = 25700;
 /// Rounded corners (default for swept tool).
-pub const PK_sweep_corner_type_spin_c: PK_sweep_corner_type_t = 1;
+pub const PK_sweep_corner_type_spin_c: PK_sweep_corner_type_t = 25701;
 
 // =============================================================================
 // Sweeping: Self-intersection repair
@@ -367,11 +384,11 @@ pub const PK_sweep_corner_type_spin_c: PK_sweep_corner_type_t = 1;
 
 pub type PK_sweep_repair_t = c_int;
 /// No repair (default).
-pub const PK_sweep_repair_no_c: PK_sweep_repair_t = 0;
+pub const PK_sweep_repair_no_c: PK_sweep_repair_t = 23970;
 /// Repair local self-intersections.
-pub const PK_sweep_repair_yes_c: PK_sweep_repair_t = 1;
+pub const PK_sweep_repair_yes_c: PK_sweep_repair_t = 23971;
 /// Repair and report repaired faces.
-pub const PK_sweep_repair_report_c: PK_sweep_repair_t = 2;
+pub const PK_sweep_repair_report_c: PK_sweep_repair_t = 23972;
 
 // =============================================================================
 // Sweeping: Derivative magnitude
@@ -379,9 +396,9 @@ pub const PK_sweep_repair_report_c: PK_sweep_repair_t = 2;
 
 pub type PK_sweep_deriv_mag_t = c_int;
 /// Smooth magnitude variation (default).
-pub const PK_sweep_deriv_mag_smooth_c: PK_sweep_deriv_mag_t = 0;
+pub const PK_sweep_deriv_mag_smooth_c: PK_sweep_deriv_mag_t = 26760;
 /// Rounded magnitude variation.
-pub const PK_sweep_deriv_mag_round_c: PK_sweep_deriv_mag_t = 1;
+pub const PK_sweep_deriv_mag_round_c: PK_sweep_deriv_mag_t = 26761;
 
 // =============================================================================
 // Sweeping: Profile clamp type
@@ -389,7 +406,7 @@ pub const PK_sweep_deriv_mag_round_c: PK_sweep_deriv_mag_t = 1;
 
 pub type PK_sweep_clamp_t = c_int;
 /// No clamp (default).
-pub const PK_sweep_clamp_none_c: PK_sweep_clamp_t = 0;
+pub const PK_sweep_clamp_none_c: PK_sweep_clamp_t = 23300;
 
 // =============================================================================
 // Sweeping: Guide scope
@@ -397,9 +414,9 @@ pub const PK_sweep_clamp_none_c: PK_sweep_clamp_t = 0;
 
 pub type PK_sweep_guide_scope_t = c_int;
 /// Each guide influences whole sweep (default, max 3 guides).
-pub const PK_sweep_guide_scope_global_c: PK_sweep_guide_scope_t = 0;
+pub const PK_sweep_guide_scope_global_c: PK_sweep_guide_scope_t = 26400;
 /// Each guide influences only neighbor region (3+ guides).
-pub const PK_sweep_guide_scope_local_c: PK_sweep_guide_scope_t = 1;
+pub const PK_sweep_guide_scope_local_c: PK_sweep_guide_scope_t = 26401;
 
 // =============================================================================
 // Sweeping: Guide method
@@ -407,13 +424,13 @@ pub const PK_sweep_guide_scope_local_c: PK_sweep_guide_scope_t = 1;
 
 pub type PK_sweep_guide_method_t = c_int;
 /// Rotate and scale to contact guides (default).
-pub const PK_sweep_guide_point_c: PK_sweep_guide_method_t = 0;
+pub const PK_sweep_guide_point_c: PK_sweep_guide_method_t = 23250;
 /// Rotate only, one point on guide line.
-pub const PK_sweep_guide_chord_c: PK_sweep_guide_method_t = 1;
+pub const PK_sweep_guide_chord_c: PK_sweep_guide_method_t = 23251;
 /// Rotate only, profile slides along guide.
-pub const PK_sweep_guide_curve_c: PK_sweep_guide_method_t = 2;
+pub const PK_sweep_guide_curve_c: PK_sweep_guide_method_t = 23252;
 /// Rotate and scale, fixed orientation to lock direction.
-pub const PK_sweep_guide_project_c: PK_sweep_guide_method_t = 3;
+pub const PK_sweep_guide_project_c: PK_sweep_guide_method_t = 23253;
 
 // =============================================================================
 // Sweeping: Guide scale
@@ -421,9 +438,9 @@ pub const PK_sweep_guide_project_c: PK_sweep_guide_method_t = 3;
 
 pub type PK_sweep_guide_scale_t = c_int;
 /// Uniform 2D scaling (default).
-pub const PK_sweep_guide_uniform_c: PK_sweep_guide_scale_t = 0;
+pub const PK_sweep_guide_uniform_c: PK_sweep_guide_scale_t = 23290;
 /// Scale only between guide points.
-pub const PK_sweep_guide_lateral_c: PK_sweep_guide_scale_t = 1;
+pub const PK_sweep_guide_lateral_c: PK_sweep_guide_scale_t = 23291;
 
 // =============================================================================
 // Sweeping: Guide clamp type
@@ -431,9 +448,9 @@ pub const PK_sweep_guide_lateral_c: PK_sweep_guide_scale_t = 1;
 
 pub type PK_sweep_guide_clamp_t = c_int;
 /// Direction clamp.
-pub const PK_sweep_guide_clamp_dirn_c: PK_sweep_guide_clamp_t = 0;
+pub const PK_sweep_guide_clamp_dirn_c: PK_sweep_guide_clamp_t = 23261;
 /// Fixed clamp (preserve profile-guide relationship).
-pub const PK_sweep_guide_clamp_fixed_c: PK_sweep_guide_clamp_t = 1;
+pub const PK_sweep_guide_clamp_fixed_c: PK_sweep_guide_clamp_t = 23262;
 
 // =============================================================================
 // Sweeping: Fault status
@@ -441,9 +458,9 @@ pub const PK_sweep_guide_clamp_fixed_c: PK_sweep_guide_clamp_t = 1;
 
 pub type PK_BODY_sweep_fault_t = c_int;
 /// Closed path sweep fails due to torsion mismatch.
-pub const PK_BODY_sweep_torsion_failure_c: PK_BODY_sweep_fault_t = 1;
+pub const PK_BODY_sweep_torsion_failure_c: PK_BODY_sweep_fault_t = 26160;
 /// Profile too small to span guide wires.
-pub const PK_BODY_sweep_bad_path_c: PK_BODY_sweep_fault_t = 2;
+pub const PK_BODY_sweep_bad_path_c: PK_BODY_sweep_fault_t = 21582;
 
 // =============================================================================
 // Sweeping: Update control
@@ -451,7 +468,7 @@ pub const PK_BODY_sweep_bad_path_c: PK_BODY_sweep_fault_t = 2;
 
 pub type PK_BODY_sweep_update_t = c_int;
 /// Use all enhancements (default).
-pub const PK_BODY_sweep_update_default_c: PK_BODY_sweep_update_t = 0;
+pub const PK_BODY_sweep_update_default_c: PK_BODY_sweep_update_t = 24451;
 
 // =============================================================================
 // Sweeping: Law specification (twist/scale)
@@ -612,19 +629,19 @@ pub struct PK_BODY_make_swept_body_2_r_t {
 
 pub type PK_sweep_boolean_t = c_int;
 /// No boolean (default).
-pub const PK_sweep_boolean_none_c: PK_sweep_boolean_t = 0;
+pub const PK_sweep_boolean_none_c: PK_sweep_boolean_t = 25820;
 /// Subtract swept tool from target.
-pub const PK_sweep_boolean_subtract_c: PK_sweep_boolean_t = 1;
+pub const PK_sweep_boolean_subtract_c: PK_sweep_boolean_t = 25821;
 /// Intersect swept tool with target.
-pub const PK_sweep_boolean_intersect_c: PK_sweep_boolean_t = 2;
+pub const PK_sweep_boolean_intersect_c: PK_sweep_boolean_t = 25822;
 
 // =============================================================================
 // Swept tool: Cap face report types
 // =============================================================================
 
 pub type PK_REPORT_3_sweep_tool_cap_t = c_int;
-pub const PK_sweep_tool_cap_enclose_c: PK_REPORT_3_sweep_tool_cap_t = 0;
-pub const PK_sweep_tool_cap_undercut_c: PK_REPORT_3_sweep_tool_cap_t = 1;
+pub const PK_sweep_tool_cap_enclose_c: PK_REPORT_3_sweep_tool_cap_t = 25620;
+pub const PK_sweep_tool_cap_undercut_c: PK_REPORT_3_sweep_tool_cap_t = 25621;
 
 // =============================================================================
 // Swept tool: Update control
@@ -632,7 +649,14 @@ pub const PK_sweep_tool_cap_undercut_c: PK_REPORT_3_sweep_tool_cap_t = 1;
 
 pub type PK_swept_tool_update_t = c_int;
 /// Use all enhancements (default).
-pub const PK_swept_tool_update_default_c: PK_swept_tool_update_t = 0;
+pub const PK_swept_tool_update_default_c: PK_swept_tool_update_t = 25280;
+// [re-abi] appended 6 missing member(s) from pk-enums.h
+pub const PK_swept_tool_update_0_c: PK_swept_tool_update_t = 25281;
+pub const PK_swept_tool_update_1_c: PK_swept_tool_update_t = 25282;
+pub const PK_swept_tool_update_v261_c: PK_swept_tool_update_t = 25283;
+pub const PK_swept_tool_update_v270_c: PK_swept_tool_update_t = 25284;
+pub const PK_swept_tool_update_v271_c: PK_swept_tool_update_t = 25285;
+pub const PK_swept_tool_update_v280_c: PK_swept_tool_update_t = 25286;
 
 // =============================================================================
 // Ch. 37 — Swept tool options and return structures
@@ -674,26 +698,26 @@ pub struct PK_BODY_make_swept_tool_r_t {
 // Curvature condition
 pub type PK_BODY_loft_curvature_t = c_int;
 /// No curvature constraint (default, recommended).
-pub const PK_BODY_loft_unconstrained_c: PK_BODY_loft_curvature_t = 0;
+pub const PK_BODY_loft_unconstrained_c: PK_BODY_loft_curvature_t = 21531;
 /// Zero curvature (start/end only, no clamps/guides).
-pub const PK_BODY_loft_natural_c: PK_BODY_loft_curvature_t = 1;
+pub const PK_BODY_loft_natural_c: PK_BODY_loft_curvature_t = 21530;
 /// Constrain curvature per face clamp (G2-continuous).
-pub const PK_BODY_loft_clamped_c: PK_BODY_loft_curvature_t = 2;
+pub const PK_BODY_loft_clamped_c: PK_BODY_loft_curvature_t = 21532;
 
 // Clamp type
 pub type PK_BODY_loft_clamp_t = c_int;
 /// No clamp.
 pub const PK_BODY_loft_clamp_none_c: PK_BODY_loft_clamp_t = 0;
 /// Vector clamp.
-pub const PK_BODY_loft_clamp_vector_c: PK_BODY_loft_clamp_t = 1;
+pub const PK_BODY_loft_clamp_vector_c: PK_BODY_loft_clamp_t = 21541;
 /// Face clamp.
-pub const PK_BODY_loft_clamp_face_c: PK_BODY_loft_clamp_t = 2;
+pub const PK_BODY_loft_clamp_face_c: PK_BODY_loft_clamp_t = 21542;
 /// Planar clamp.
-pub const PK_BODY_loft_clamp_planar_c: PK_BODY_loft_clamp_t = 3;
+pub const PK_BODY_loft_clamp_planar_c: PK_BODY_loft_clamp_t = 21543;
 /// Composite: vector + face.
-pub const PK_BODY_loft_clamp_vec_face_c: PK_BODY_loft_clamp_t = 4;
+pub const PK_BODY_loft_clamp_vec_face_c: PK_BODY_loft_clamp_t = 21544;
 /// Composite: vector + planar.
-pub const PK_BODY_loft_clamp_vec_planar_c: PK_BODY_loft_clamp_t = 5;
+pub const PK_BODY_loft_clamp_vec_planar_c: PK_BODY_loft_clamp_t = 21545;
 
 // =============================================================================
 // Lofting: Derivative magnitude
@@ -701,11 +725,11 @@ pub const PK_BODY_loft_clamp_vec_planar_c: PK_BODY_loft_clamp_t = 5;
 
 pub type PK_BODY_loft_deriv_mag_t = c_int;
 /// Single magnitude across smooth sections (default).
-pub const PK_BODY_loft_deriv_mag_single_c: PK_BODY_loft_deriv_mag_t = 0;
+pub const PK_BODY_loft_deriv_mag_single_c: PK_BODY_loft_deriv_mag_t = 22770;
 /// Vary smoothly across sections.
-pub const PK_BODY_loft_deriv_mag_smooth_c: PK_BODY_loft_deriv_mag_t = 1;
+pub const PK_BODY_loft_deriv_mag_smooth_c: PK_BODY_loft_deriv_mag_t = 22771;
 /// Vary smoothly for rounded shape (recommended).
-pub const PK_BODY_loft_deriv_mag_round_c: PK_BODY_loft_deriv_mag_t = 2;
+pub const PK_BODY_loft_deriv_mag_round_c: PK_BODY_loft_deriv_mag_t = 22772;
 
 // =============================================================================
 // Lofting: Profile smoothness
@@ -713,9 +737,9 @@ pub const PK_BODY_loft_deriv_mag_round_c: PK_BODY_loft_deriv_mag_t = 2;
 
 pub type PK_BODY_smoothness_t = c_int;
 /// G1 only if within session angle precision.
-pub const PK_BODY_smoothness_exact_c: PK_BODY_smoothness_t = 0;
+pub const PK_BODY_smoothness_exact_c: PK_BODY_smoothness_t = 23020;
 /// G1 if within relaxed (visually smooth) angle.
-pub const PK_BODY_smoothness_relax_c: PK_BODY_smoothness_t = 1;
+pub const PK_BODY_smoothness_relax_c: PK_BODY_smoothness_t = 23021;
 
 // =============================================================================
 // Lofting: Update control
@@ -723,7 +747,7 @@ pub const PK_BODY_smoothness_relax_c: PK_BODY_smoothness_t = 1;
 
 pub type PK_BODY_loft_update_t = c_int;
 /// Use all enhancements (default).
-pub const PK_BODY_loft_update_default_c: PK_BODY_loft_update_t = 0;
+pub const PK_BODY_loft_update_default_c: PK_BODY_loft_update_t = 22523;
 
 // =============================================================================
 // Lofting: Vector clamp specification
@@ -854,9 +878,9 @@ pub struct PK_BODY_make_lofted_body_r_t {
 
 pub type PK_shadow_check_fa_t = c_int;
 /// No checks (default, legacy behavior).
-pub const PK_shadow_check_fa_no_c: PK_shadow_check_fa_t = 0;
+pub const PK_shadow_check_fa_no_c: PK_shadow_check_fa_t = 25510;
 /// Check faces local to imprint (recommended).
-pub const PK_shadow_check_fa_yes_c: PK_shadow_check_fa_t = 1;
+pub const PK_shadow_check_fa_yes_c: PK_shadow_check_fa_t = 25511;
 
 // =============================================================================
 // Ch. 39 — Shadow curve options
@@ -877,11 +901,11 @@ pub struct PK_BODY_imprint_cus_shadow_o_t {
 
 pub type PK_emboss_convexity_t = c_int;
 /// Create both pads and pockets (default).
-pub const PK_emboss_convexity_both_c: PK_emboss_convexity_t = 0;
+pub const PK_emboss_convexity_both_c: PK_emboss_convexity_t = 22950;
 /// Create pads only.
-pub const PK_emboss_convexity_pad_c: PK_emboss_convexity_t = 1;
+pub const PK_emboss_convexity_pad_c: PK_emboss_convexity_t = 22951;
 /// Create pockets only.
-pub const PK_emboss_convexity_pocket_c: PK_emboss_convexity_t = 2;
+pub const PK_emboss_convexity_pocket_c: PK_emboss_convexity_t = 22952;
 
 // =============================================================================
 // Emboss: Profile location
@@ -889,7 +913,10 @@ pub const PK_emboss_convexity_pocket_c: PK_emboss_convexity_t = 2;
 
 pub type PK_emboss_profile_on_t = c_int;
 /// Profile can be anywhere (default).
-pub const PK_emboss_profile_on_any_c: PK_emboss_profile_on_t = 0;
+pub const PK_emboss_profile_on_any_c: PK_emboss_profile_on_t = 22942;
+// [re-abi] appended 2 missing member(s) from pk-enums.h
+pub const PK_emboss_profile_on_endcap_c: PK_emboss_profile_on_t = 22940;
+pub const PK_emboss_profile_on_target_c: PK_emboss_profile_on_t = 22941;
 
 // =============================================================================
 // Emboss: Sidewall type
@@ -897,13 +924,13 @@ pub const PK_emboss_profile_on_any_c: PK_emboss_profile_on_t = 0;
 
 pub type PK_emboss_sidewall_t = c_int;
 /// Tapered sidewalls (draw direction + taper angle).
-pub const PK_emboss_sidewall_tapered_c: PK_emboss_sidewall_t = 0;
+pub const PK_emboss_sidewall_tapered_c: PK_emboss_sidewall_t = 22930;
 /// Ruled sidewalls (along profile face normals).
-pub const PK_emboss_sidewall_ruled_c: PK_emboss_sidewall_t = 1;
+pub const PK_emboss_sidewall_ruled_c: PK_emboss_sidewall_t = 22931;
 /// Swept sidewalls (along draw direction).
-pub const PK_emboss_sidewall_swept_c: PK_emboss_sidewall_t = 2;
+pub const PK_emboss_sidewall_swept_c: PK_emboss_sidewall_t = 22932;
 /// User-supplied sidewall body.
-pub const PK_emboss_sidewall_supplied_c: PK_emboss_sidewall_t = 3;
+pub const PK_emboss_sidewall_supplied_c: PK_emboss_sidewall_t = 22933;
 
 // =============================================================================
 // Emboss: Taper method
@@ -911,13 +938,13 @@ pub const PK_emboss_sidewall_supplied_c: PK_emboss_sidewall_t = 3;
 
 pub type PK_taper_method_t = c_int;
 /// Isocline taper (default).
-pub const PK_taper_method_isocline_c: PK_taper_method_t = 0;
+pub const PK_taper_method_isocline_c: PK_taper_method_t = 21847;
 /// Normal taper (relative to profile face normals).
-pub const PK_taper_method_normal_c: PK_taper_method_t = 1;
+pub const PK_taper_method_normal_c: PK_taper_method_t = 21849;
 /// Offset taper.
-pub const PK_taper_method_offset_c: PK_taper_method_t = 2;
+pub const PK_taper_method_offset_c: PK_taper_method_t = 21848;
 /// Curve taper.
-pub const PK_taper_method_curve_c: PK_taper_method_t = 3;
+pub const PK_taper_method_curve_c: PK_taper_method_t = 21845;
 
 // =============================================================================
 // Emboss: Overflow
@@ -925,17 +952,17 @@ pub const PK_taper_method_curve_c: PK_taper_method_t = 3;
 
 pub type PK_emboss_overflow_t = c_int;
 /// Extend emboss to include additional faces (default interior).
-pub const PK_emboss_overflow_added_c: PK_emboss_overflow_t = 0;
+pub const PK_emboss_overflow_added_c: PK_emboss_overflow_t = 23060;
 /// Trim at concave, extend at convex edges.
-pub const PK_emboss_overflow_mixed_c: PK_emboss_overflow_t = 1;
+pub const PK_emboss_overflow_mixed_c: PK_emboss_overflow_t = 23061;
 /// Fail if overflow detected.
-pub const PK_emboss_overflow_none_c: PK_emboss_overflow_t = 2;
+pub const PK_emboss_overflow_none_c: PK_emboss_overflow_t = 23064;
 /// Treat interior overflow as laminar (only with unite=no).
-pub const PK_emboss_overflow_laminar_c: PK_emboss_overflow_t = 3;
+pub const PK_emboss_overflow_laminar_c: PK_emboss_overflow_t = 23065;
 /// Trim with ruled surfaces at laminar edges.
-pub const PK_emboss_overflow_ruled_c: PK_emboss_overflow_t = 4;
+pub const PK_emboss_overflow_ruled_c: PK_emboss_overflow_t = 23062;
 /// Trim with swept surfaces at laminar edges (default laminar).
-pub const PK_emboss_overflow_swept_c: PK_emboss_overflow_t = 5;
+pub const PK_emboss_overflow_swept_c: PK_emboss_overflow_t = 23063;
 
 // =============================================================================
 // Emboss: Unite control
@@ -943,9 +970,9 @@ pub const PK_emboss_overflow_swept_c: PK_emboss_overflow_t = 5;
 
 pub type PK_emboss_unite_t = c_int;
 /// Attach emboss to target (default).
-pub const PK_emboss_unite_sidewall_yes_c: PK_emboss_unite_t = 0;
+pub const PK_emboss_unite_sidewall_yes_c: PK_emboss_unite_t = 23530;
 /// Return emboss separately; target unmodified.
-pub const PK_emboss_unite_sidewall_no_c: PK_emboss_unite_t = 1;
+pub const PK_emboss_unite_sidewall_no_c: PK_emboss_unite_t = 23531;
 
 // =============================================================================
 // Emboss: Local ops update control
@@ -1090,11 +1117,19 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Creates a body by linear extrusion of a profile body.
+    /// Linear extrusion of a profile. V35:
+    /// `(PK_BODY_t profile, PK_VECTOR1_t path, const PK_BODY_extrude_o_t *options,
+    ///  PK_BODY_t *body, PK_TOPOL_track_r_t *tracking, PK_TOPOL_local_r_t *results)`.
+    /// The old binding was missing the OUTPUT `body` and `results` args (so it
+    /// could never return the extruded body). `path` is `PK_VECTOR1_t` — a
+    /// `double[3]` typedef, which decays to a pointer as a C parameter.
     pub fn PK_BODY_extrude(
         profile: PK_BODY_t,
-        path: *const c_double,
+        path: *const PK_VECTOR1_t,
         options: *const PK_BODY_extrude_o_t,
-        tracking: *mut PK_TOPOL_tracking_t,
+        body: *mut PK_BODY_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1104,43 +1139,40 @@ unsafe extern "C" {
     /// Primary sweep: sweeps profiles along a path to create sheet or solid bodies.
     pub fn PK_BODY_make_swept_body_2(
         n_profiles: c_int,
-        profiles: *const PK_BODY_t,
+        profiles: *mut PK_BODY_t,
         path: PK_BODY_t,
-        n_path_vertices: c_int,
-        path_vertices: *const PK_VERTEX_t,
-        options: *const PK_BODY_make_swept_body_2_o_t,
-        returns: *mut PK_BODY_make_swept_body_2_r_t,
+        path_vertices: *mut PK_VERTEX_t,
+        options: *mut PK_BODY_make_swept_body_2_o_t,
+        swept_body: *mut PK_BODY_tracked_sweep_2_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Legacy sweep (v1 API, retained for backwards compatibility).
     pub fn PK_BODY_make_swept_body(
-        n_profiles: c_int,
-        profiles: *const PK_BODY_t,
+        profile: PK_BODY_t,
         path: PK_BODY_t,
-        n_path_vertices: c_int,
-        path_vertices: *const PK_VERTEX_t,
-        options: *const PK_BODY_make_swept_body_2_o_t,
-        returns: *mut PK_BODY_make_swept_body_2_r_t,
+        path_start: PK_VERTEX_t,
+        options: *mut PK_BODY_make_swept_body_o_t,
+        swept_body: *mut PK_BODY_tracked_sweep_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Creates a helical curve by sweeping a point about an axis.
     pub fn PK_POINT_make_helical_curve(
-        point: *const c_double,
-        axis: PK_AXIS1_sf_t,
+        point: PK_POINT_t,
+        axis: *mut PK_AXIS1_sf_t,
         hand: PK_HAND_t,
-        turns: PK_INTERVAL_t,
+        turns: *const PK_INTERVAL_t,
         helical_pitch: c_double,
         spiral_pitch: c_double,
         tolerance: c_double,
         curve: *mut PK_CURVE_t,
-        interval: *mut PK_INTERVAL_t,
     ) -> PK_ERROR_code_t;
 
     /// Creates a helical surface by sweeping a curve about an axis.
     pub fn PK_CURVE_make_helical_surf(
         curve: PK_CURVE_t,
         curve_interval: PK_INTERVAL_t,
-        axis: PK_AXIS1_sf_t,
+        // V35 vendor form: axis is passed by pointer, not by value.
+        axis: *const PK_AXIS1_sf_t,
         hand: PK_HAND_t,
         turns: PK_INTERVAL_t,
         helical_pitch: c_double,
@@ -1156,7 +1188,8 @@ unsafe extern "C" {
     /// Sweeps a solid convex tool body along a path (CAM workflow).
     pub fn PK_BODY_make_swept_tool(
         tool: PK_BODY_t,
-        tool_axis: PK_AXIS1_sf_t,
+        // V35 vendor form: axis by pointer (matches PK_CURVE_make_helical_surf).
+        tool_axis: *const PK_AXIS1_sf_t,
         path: PK_BODY_t,
         options: *const PK_BODY_make_swept_tool_o_t,
         tracking: *mut PK_TOPOL_tracking_t,
@@ -1206,19 +1239,21 @@ unsafe extern "C" {
     pub fn PK_BODY_emboss(
         target: PK_BODY_t,
         profile: PK_BODY_t,
-        end_cap: PK_BODY_t,
-        options: *const PK_BODY_emboss_o_t,
-        tracking: *mut PK_TOPOL_tracking_t,
+        endcap: PK_BODY_t,
+        options: *mut PK_BODY_emboss_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Local emboss: adds emboss features to selected faces within a body.
     pub fn PK_FACE_emboss(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
+        faces: *mut PK_FACE_t,
         profile: PK_BODY_t,
-        end_cap: PK_BODY_t,
-        options: *const PK_FACE_emboss_o_t,
-        tracking: *mut PK_TOPOL_tracking_t,
+        endcap: PK_BODY_t,
+        options: *mut PK_FACE_emboss_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================

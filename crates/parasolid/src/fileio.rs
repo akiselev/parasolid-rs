@@ -39,7 +39,10 @@ pub fn transmit(bodies: &[Body], key: &str) -> PsResult<()> {
     // failed with 5048.)
     let part_tags: Vec<PK_PART_t> = bodies.iter().map(|b| b.tag()).collect();
 
-    let opts = PK_PART_transmit_o_t::default();
+    // Text Parasolid Transmit (`.xmt_txt`). `0` is not a valid format token
+    // (the enum starts at 18220), so it must be set explicitly.
+    let mut opts = PK_PART_transmit_o_t::default();
+    opts.transmit_format = PK_transmit_format_text_c;
 
     pk_call!(PK_PART_transmit(
         part_tags.len() as c_int,
@@ -64,7 +67,8 @@ pub fn receive(key: &str) -> PsResult<Vec<Body>> {
     let key_cstr = CString::new(key)
         .map_err(|_| PsError::Session("receive key contains null byte".into()))?;
 
-    let opts = PK_PART_receive_o_t::default();
+    let mut opts = PK_PART_receive_o_t::default();
+    opts.transmit_format = PK_transmit_format_text_c;
     let mut n_parts: c_int = 0;
     let mut parts_ptr: *mut PK_PART_t = std::ptr::null_mut();
 

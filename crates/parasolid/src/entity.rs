@@ -9,6 +9,64 @@ use std::fmt;
 use parasolid_sys::*;
 
 use crate::error::PsResult;
+use crate::geom::Vec3;
+use crate::memory::PkArray;
+
+/// Result of a minimum-distance query: the gap and the closest points on each
+/// side (`point_1` on this entity, `point_2` on the other entity or the query
+/// point).
+#[derive(Debug, Clone, Copy)]
+pub struct RangeResult {
+    pub distance: f64,
+    pub point_1: Vec3,
+    pub point_2: Vec3,
+}
+
+/// Oriented (non-axis-aligned) bounding box: three orthonormal basis axes plus
+/// the min/max extents expressed in that frame.
+#[derive(Debug, Clone, Copy)]
+pub struct Obb {
+    pub basis: [Vec3; 3],
+    pub min: Vec3,
+    pub max: Vec3,
+}
+
+impl Obb {
+    /// Extents (max − min) along the three basis axes.
+    pub fn extents(&self) -> [f64; 3] {
+        [self.max.x - self.min.x, self.max.y - self.min.y, self.max.z - self.min.z]
+    }
+}
+
+/// Category of the geometry attached to a topology (`PK_GEOM_category_t`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum GeomCategory {
+    /// Analytic + spline (planes, cylinders, B-surfaces, …).
+    Classic,
+    /// Facet / mesh geometry.
+    Facet,
+    /// No geometry attached.
+    None,
+    Point,
+    /// Mixed classic + facet.
+    Mixed,
+    Lattice,
+    Other(i32),
+}
+
+impl GeomCategory {
+    fn from_raw(v: i32) -> Self {
+        match v {
+            25870 => GeomCategory::Classic,
+            25871 => GeomCategory::Facet,
+            25872 => GeomCategory::None,
+            25873 => GeomCategory::Point,
+            25874 => GeomCategory::Mixed,
+            25875 => GeomCategory::Lattice,
+            other => GeomCategory::Other(other),
+        }
+    }
+}
 
 // =============================================================================
 // PkClass
@@ -437,7 +495,7 @@ impl Entity {
     ///
     /// After deletion, the tag becomes invalid and should not be used.
     pub fn delete(self) -> PsResult<()> {
-        pk_call!(PK_ENTITY_delete(self.tag));
+        pk_call!(PK_ENTITY_delete(1, &self.tag));
         Ok(())
     }
 
@@ -446,6 +504,122 @@ impl Entity {
         let mut copy_tag: PK_ENTITY_t = PK_ENTITY_null;
         pk_call!(PK_ENTITY_copy(self.tag, &mut copy_tag));
         Ok(Entity::from_tag(copy_tag))
+    }
+
+    /// Minimum distance between this (topological) entity and `other`, with the
+    /// closest point on each. Wraps `PK_TOPOL_range` (options defaulted).
+    pub fn distance_to(&self, other: Entity) -> PsResult<RangeResult> {
+        let mut opts = PK_TOPOL_range_o_t::default();
+        let mut status: PK_range_result_t = 0;
+        let mut r: PK_range_2_r_t = unsafe { std::mem::zeroed() };
+        pk_call!(PK_TOPOL_range(
+            self.tag,
+            other.tag,
+            &mut opts,
+            &mut status,
+            &mut r,
+        ));
+        Ok(RangeResult {
+            distance: r.distance,
+            point_1: Vec3::from_pk(r.end_1.position),
+            point_2: Vec3::from_pk(r.end_2.position),
+        })
+    }
+
+    /// Minimum distance from this entity to a point, with the closest point on
+    /// the entity. Wraps `PK_TOPOL_range_vector` (position by pointer).
+    pub fn distance_to_point(&self, point: Vec3) -> PsResult<RangeResult> {
+        let v: PK_VECTOR_t = point.to_pk();
+        let mut opts = PK_TOPOL_range_vector_o_t::default();
+        let mut status: PK_range_result_t = 0;
+        let mut r: PK_range_1_r_t = unsafe { std::mem::zeroed() };
+        pk_call!(PK_TOPOL_range_vector(
+            self.tag,
+            &v,
+            &mut opts,
+            &mut status,
+            &mut r,
+        ));
+        Ok(RangeResult {
+            distance: r.distance,
+            point_1: Vec3::from_pk(r.end.position),
+            point_2: point,
+        })
+    }
+
+    /// The category of the geometry attached to this topology (analytic/classic
+    /// vs facet vs point/lattice). Wraps `PK_TOPOL_categorise_geom` with default
+    /// options.
+    pub fn geom_category(&self) -> PsResult<GeomCategory> {
+        let mut overall: PK_GEOM_category_t = 0;
+        let mut direct: PK_GEOM_category_t = 0;
+        let mut n_related: std::os::raw::c_int = 0;
+        let mut related_topols: *mut PK_TOPOL_t = std::ptr::null_mut();
+        let mut related_cats: *mut PK_GEOM_category_t = std::ptr::null_mut();
+        pk_call!(PK_TOPOL_categorise_geom(
+            self.tag,
+            std::ptr::null(),
+            &mut overall,
+            &mut direct,
+            &mut n_related,
+            &mut related_topols,
+            &mut related_cats,
+        ));
+        unsafe {
+            if !related_topols.is_null() {
+                let _ = PkArray::from_raw(related_topols, n_related);
+            }
+            if !related_cats.is_null() {
+                let _ = PkArray::from_raw(related_cats, n_related);
+            }
+        }
+        Ok(GeomCategory::from_raw(overall))
+    }
+
+    /// The optimal oriented (non-axis-aligned) bounding box of this entity.
+    /// Wraps `PK_TOPOL_find_nabox` (no axis constraints, standard quality).
+    pub fn oriented_bounding_box(&self) -> PsResult<Obb> {
+        let mut tag = self.tag;
+        let mut opts = PK_TOPOL_find_nabox_o_t::default();
+        let mut sf: PK_NABOX_sf_t = unsafe { std::mem::zeroed() };
+        pk_call!(PK_TOPOL_find_nabox(1, &mut tag, std::ptr::null_mut(), &mut opts, &mut sf));
+        Ok(Obb {
+            basis: [
+                Vec3::from_pk(sf.basis_set[0]),
+                Vec3::from_pk(sf.basis_set[1]),
+                Vec3::from_pk(sf.basis_set[2]),
+            ],
+            min: Vec3::new(sf.coord[0], sf.coord[1], sf.coord[2]),
+            max: Vec3::new(sf.coord[3], sf.coord[4], sf.coord[5]),
+        })
+    }
+
+    /// The stable per-entity identifier (`PK_ENTITY_ask_identifier`). May be 0.
+    pub fn identifier(&self) -> PsResult<i32> {
+        let mut id: std::os::raw::c_int = 0;
+        pk_call!(PK_ENTITY_ask_identifier(self.tag, &mut id));
+        Ok(id)
+    }
+
+    /// Read this entity's user field. The returned vector has length equal to the
+    /// session's user-field length; it is empty when the session was started with
+    /// `user_field_len = 0`.
+    pub fn user_field(&self) -> PsResult<Vec<i32>> {
+        let mut len: std::os::raw::c_int = 0;
+        pk_call!(PK_SESSION_ask_user_field_len(&mut len));
+        let n = len.max(0) as usize;
+        let mut buf = vec![0i32; n];
+        if n > 0 {
+            pk_call!(PK_ENTITY_ask_user_field(self.tag, buf.as_mut_ptr()));
+        }
+        Ok(buf)
+    }
+
+    /// Set this entity's user field (`data` must hold at least the session's
+    /// user-field length ints).
+    pub fn set_user_field(&self, data: &[i32]) -> PsResult<()> {
+        pk_call!(PK_ENTITY_set_user_field(self.tag, data.as_ptr()));
+        Ok(())
     }
 }
 

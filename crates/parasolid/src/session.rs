@@ -25,8 +25,13 @@ static SESSION_ACTIVE: AtomicBool = AtomicBool::new(false);
 // =============================================================================
 
 /// Controls which version of Parasolid behaviour to use.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Behaviour {
+    /// The initial default: behaviour has not been explicitly set, so the kernel
+    /// uses the original system switches (`PK_SESSION_behave_as_unset_c`). This
+    /// is what a freshly started session reports until [`SessionConfig::behaviour`]
+    /// is applied.
+    Unset,
     /// Use the latest behaviour for the current kernel version.
     Latest,
     /// Use behaviour from a specific patch release.
@@ -193,6 +198,9 @@ pub struct SessionConfig {
     // Start options
     pub(crate) journal_file: Option<String>,
     pub(crate) user_field_len: Option<i32>,
+    /// Enable partitioned rollback (registers an in-memory delta frustrum via
+    /// `PK_DELTA_register_callbacks` before `PK_SESSION_start`).
+    pub(crate) rollback: bool,
 
     // Session parameters (applied after start)
     pub(crate) check_continuity: Option<i32>,
@@ -214,6 +222,7 @@ impl SessionConfig {
             frustrum_config: FrustrumConfig::new(),
             journal_file: None,
             user_field_len: None,
+            rollback: false,
             check_continuity: None,
             check_self_int: None,
             general_topology: None,
@@ -242,6 +251,15 @@ impl SessionConfig {
     /// Set the user-field byte length attached to every entity (0 = none).
     pub fn user_field_len(mut self, len: i32) -> Self {
         self.user_field_len = Some(len);
+        self
+    }
+
+    /// Enable **partitioned rollback** (pmarks). Registers an in-memory delta
+    /// frustrum via `PK_DELTA_register_callbacks` before the session starts, so
+    /// `Partition::create`, `make_pmark`, and `Pmark::goto` work. Deltas are held
+    /// in process memory for the lifetime of the session.
+    pub fn rollback(mut self, enable: bool) -> Self {
+        self.rollback = enable;
         self
     }
 
@@ -388,6 +406,19 @@ impl Session {
             // guard dropped → SESSION_ACTIVE = false
         }
 
+        // Register the partitioned-rollback (delta) frustrum. Must happen after
+        // the main frustrum and BEFORE PK_SESSION_start (the kernel switches on
+        // partitioned rollback at registration time).
+        if config.rollback {
+            crate::rollback::reset_store();
+            let delta_cbs = crate::rollback::delta_callbacks();
+            let code = unsafe { PK_DELTA_register_callbacks(&delta_cbs) };
+            if code != PK_ERROR_no_errors {
+                return Err(PsError::from_code(code));
+                // guard dropped → SESSION_ACTIVE = false
+            }
+        }
+
         // Build start options
         let start_opts = PK_SESSION_start_o_t {
             o_t_version: 1,
@@ -437,6 +468,10 @@ impl Session {
         }
         if let Some(b) = config.behaviour {
             let beh = match b {
+                Behaviour::Unset => PK_SESSION_behaviour_t {
+                    behaviour_type: PK_SESSION_behave_as_unset_c,
+                    behaviour_value: 0,
+                },
                 Behaviour::Latest => PK_SESSION_behaviour_t {
                     behaviour_type: PK_SESSION_behave_as_latest_c,
                     behaviour_value: 0,
@@ -446,7 +481,18 @@ impl Session {
                     behaviour_value: v,
                 },
             };
-            pk_call!(PK_SESSION_set_behaviour(&beh));
+            // Parasolid writes all three returned arguments unconditionally, so
+            // pass real buffers rather than NULL (a NULL out-param faults).
+            let mut behaviour_set = PK_SESSION_behaviour_t::default();
+            let mut behaviour_previous = PK_SESSION_behaviour_t::default();
+            let mut status: PK_behaviour_status_t = 0;
+            pk_call!(PK_SESSION_set_behaviour(
+                beh,
+                std::ptr::null(),
+                &mut behaviour_set,
+                &mut behaviour_previous,
+                &mut status,
+            ));
         }
         if let Some(p) = config.precision {
             pk_call!(PK_SESSION_set_precision(p));
@@ -455,10 +501,21 @@ impl Session {
             pk_call!(PK_SESSION_set_angle_precision(p));
         }
         if let Some(v) = config.err_reports {
-            pk_call!(PK_SESSION_set_err_reports(to_logical(v)));
+            let reports = if v {
+                PK_ERROR_reports_on_c
+            } else {
+                PK_ERROR_reports_off_c
+            };
+            pk_call!(PK_SESSION_set_err_reports(reports, std::ptr::null()));
         }
         if let Some(n) = config.smp_threads {
-            pk_call!(PK_SESSION_set_smp(n));
+            // An explicit thread count means "absolute" thread format.
+            let smp_opts = PK_SESSION_smp_o_t {
+                thread_format: PK_thread_absolute_c,
+                n_threads: n,
+                ..Default::default()
+            };
+            pk_call!(PK_SESSION_set_smp(&smp_opts));
         }
         Ok(())
     }
@@ -467,15 +524,11 @@ impl Session {
     // Query methods
     // =========================================================================
 
-    /// Returns the Parasolid kernel version as `(major, minor, patch)`.
+    /// Returns the Parasolid kernel version as `(major, minor, build)`.
     pub fn kernel_version(&self) -> PsResult<(i32, i32, i32)> {
-        let mut major = 0;
-        let mut minor = 0;
-        let mut patch = 0;
-        pk_call!(PK_SESSION_ask_kernel_version(
-            &mut major, &mut minor, &mut patch
-        ));
-        Ok((major, minor, patch))
+        let mut info = PK_SESSION_kernel_version_t::default();
+        pk_call!(PK_SESSION_ask_kernel_version(&mut info));
+        Ok((info.major, info.minor, info.build))
     }
 
     /// Returns the Parasolid schema version.
@@ -530,8 +583,9 @@ impl Session {
     /// Returns the current session behaviour.
     pub fn behaviour(&self) -> PsResult<Behaviour> {
         let mut beh = PK_SESSION_behaviour_t::default();
-        pk_call!(PK_SESSION_ask_behaviour(&mut beh));
+        pk_call!(PK_SESSION_ask_behaviour(std::ptr::null(), &mut beh));
         match beh.behaviour_type {
+            PK_SESSION_behave_as_unset_c => Ok(Behaviour::Unset),
             PK_SESSION_behave_as_latest_c => Ok(Behaviour::Latest),
             PK_SESSION_behave_as_value_c => Ok(Behaviour::Version(beh.behaviour_value)),
             other => Err(PsError::Session(format!(
@@ -580,6 +634,7 @@ impl Session {
         let mut beh = PK_SESSION_behaviour_t::default();
         pk_call!(PK_SESSION_ask_latest_behaviour(&mut beh));
         match beh.behaviour_type {
+            PK_SESSION_behave_as_unset_c => Ok(Behaviour::Unset),
             PK_SESSION_behave_as_latest_c => Ok(Behaviour::Latest),
             PK_SESSION_behave_as_value_c => Ok(Behaviour::Version(beh.behaviour_value)),
             other => Err(PsError::Session(format!(
@@ -590,18 +645,12 @@ impl Session {
 
     /// Returns the SMP configuration.
     pub fn smp(&self) -> PsResult<SmpInfo> {
-        let mut thread_format = 0;
-        let mut n_threads = 0;
-        let mut n_processors = 0;
-        pk_call!(PK_SESSION_ask_smp(
-            &mut thread_format,
-            &mut n_threads,
-            &mut n_processors
-        ));
+        let mut r = PK_SESSION_smp_r_t::default();
+        pk_call!(PK_SESSION_ask_smp(&mut r));
         Ok(SmpInfo {
-            thread_format,
-            n_threads,
-            n_processors,
+            thread_format: r.thread_format,
+            n_threads: r.n_threads,
+            n_processors: r.n_processors,
         })
     }
 
@@ -616,11 +665,13 @@ impl Session {
         Ok(Mark::from_tag(tag))
     }
 
-    /// Return the current session mark.
-    pub fn current_mark(&self) -> PsResult<Mark> {
+    /// Return the current session mark and whether the modeller is at it.
+    /// The mark tag is 0 if no mark has been set yet.
+    pub fn current_mark(&self) -> PsResult<(Mark, bool)> {
         let mut tag: PK_MARK_t = 0;
-        pk_call!(PK_SESSION_ask_mark(&mut tag));
-        Ok(Mark::from_tag(tag))
+        let mut at_mark: PK_LOGICAL_t = PK_LOGICAL_false;
+        pk_call!(PK_SESSION_ask_mark(&mut tag, &mut at_mark));
+        Ok((Mark::from_tag(tag), at_mark == PK_LOGICAL_true))
     }
 
     // =========================================================================

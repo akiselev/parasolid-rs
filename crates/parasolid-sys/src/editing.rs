@@ -24,34 +24,48 @@ use crate::*;
 pub type PK_local_ops_update_t = c_int;
 
 /// Default update value — uses all appropriate local operations enhancements.
-pub const PK_local_ops_update_default_c: PK_local_ops_update_t = 0;
+pub const PK_local_ops_update_default_c: PK_local_ops_update_t = 24330;
+// [re-abi] appended 15 missing member(s) from pk-enums.h
+pub const PK_local_ops_update_2_c: PK_local_ops_update_t = 23720;
+pub const PK_local_ops_update_3_c: PK_local_ops_update_t = 24331;
+pub const PK_local_ops_update_4_c: PK_local_ops_update_t = 24332;
+pub const PK_local_ops_update_5_c: PK_local_ops_update_t = 24333;
+pub const PK_local_ops_update_6_c: PK_local_ops_update_t = 24334;
+pub const PK_local_ops_update_7_c: PK_local_ops_update_t = 24335;
+pub const PK_local_ops_update_8_c: PK_local_ops_update_t = 24336;
+pub const PK_local_ops_update_9_c: PK_local_ops_update_t = 24337;
+pub const PK_local_ops_update_10_c: PK_local_ops_update_t = 24338;
+pub const PK_local_ops_update_11_c: PK_local_ops_update_t = 24339;
+pub const PK_local_ops_update_12_c: PK_local_ops_update_t = 25540;
+pub const PK_local_ops_update_v261_c: PK_local_ops_update_t = 25591;
+pub const PK_local_ops_update_v270_c: PK_local_ops_update_t = 25592;
+pub const PK_local_ops_update_v271_c: PK_local_ops_update_t = 25593;
+pub const PK_local_ops_update_v280_c: PK_local_ops_update_t = 25594;
 
-/// Self-shadowing status (PK_BODY_taper).
-pub const PK_local_status_self_shadowng_c: PK_local_status_t = 1;
 
 /// Report status: face-face repair performed.
-pub const PK_REPORT_1_fa_fa_repair_c: c_int = 1;
+pub const PK_REPORT_1_fa_fa_repair_c: c_int = 23907;
 /// Report status: deform surface partially created.
-pub const PK_REPORT_1_deform_surf_c: c_int = 2;
+pub const PK_REPORT_1_deform_surf_c: c_int = 23910;
 /// Report status: vertex geometry cannot be located.
-pub const PK_REPORT_1_cant_get_pt_c: c_int = 3;
+pub const PK_REPORT_1_cant_get_pt_c: c_int = 23873;
 
 /// Report type 3: distance error in cover.
-pub const PK_REPORT_3_distance_err_c: c_int = 1;
+pub const PK_REPORT_3_distance_err_c: c_int = 24406;
 /// Report type 3: worse curvature in cover.
-pub const PK_REPORT_3_worse_curvature_c: c_int = 2;
+pub const PK_REPORT_3_worse_curvature_c: c_int = 24407;
 /// Report type 3: cover B-surface constructed before failure.
-pub const PK_REPORT_3_cover_surf_c: c_int = 3;
+pub const PK_REPORT_3_cover_surf_c: c_int = 24408;
 /// Report type 3: edges not visibly G1 smooth.
-pub const PK_REPORT_3_sharp_eds_c: c_int = 4;
+pub const PK_REPORT_3_sharp_eds_c: c_int = 24409;
 /// Report type 3: radius of curvature too tight.
-pub const PK_REPORT_3_tight_curvature_c: c_int = 5;
+pub const PK_REPORT_3_tight_curvature_c: c_int = 24410;
 /// Report type 3: surface extended during operation.
-pub const PK_REPORT_3_surf_extended_c: c_int = 6;
+pub const PK_REPORT_3_surf_extended_c: c_int = 24401;
 /// Report type 3: fill hole boundary not G1.
-pub const PK_REPORT_3_fill_hole_non_g1_c: c_int = 7;
+pub const PK_REPORT_3_fill_hole_non_g1_c: c_int = 25635;
 /// Report type 3: fill hole boundary not G2.
-pub const PK_REPORT_3_fill_hole_non_g2_c: c_int = 8;
+pub const PK_REPORT_3_fill_hole_non_g2_c: c_int = 24416;
 
 // =============================================================================
 // Healing constants (PK_FACE_heal_t)
@@ -61,23 +75,23 @@ pub const PK_REPORT_3_fill_hole_non_g2_c: c_int = 8;
 pub type PK_FACE_heal_t = c_int;
 
 /// Cap wound with a surface containing all wound edges.
-pub const PK_FACE_heal_cap_c: PK_FACE_heal_t = 0;
+pub const PK_FACE_heal_cap_c: PK_FACE_heal_t = 18081;
 /// Allow adjacent faces to shrink/grow to heal.
-pub const PK_FACE_heal_shrink_c: PK_FACE_heal_t = 1;
+pub const PK_FACE_heal_shrink_c: PK_FACE_heal_t = 18084;
 /// Grow adjacent faces from parent to fill gap left by deleted face.
-pub const PK_FACE_heal_grow_from_parent_c: PK_FACE_heal_t = 2;
+pub const PK_FACE_heal_grow_from_parent_c: PK_FACE_heal_t = 18083;
 /// Extend faces around hole.
-pub const PK_FACE_heal_grow_from_child_c: PK_FACE_heal_t = 3;
+pub const PK_FACE_heal_grow_from_child_c: PK_FACE_heal_t = 18082;
 /// Leave wound as rubber face (no geometry).
-pub const PK_FACE_heal_no_c: PK_FACE_heal_t = 4;
+pub const PK_FACE_heal_no_c: PK_FACE_heal_t = 18080;
 /// Attempt healing using any available method.
-pub const PK_FACE_heal_yes_c: PK_FACE_heal_t = 5;
+pub const PK_FACE_heal_yes_c: PK_FACE_heal_t = 18085;
 
 /// Healing loops method.
 pub type PK_FACE_heal_loops_t = c_int;
 
 /// Let Parasolid decide healing method (recommended).
-pub const PK_FACE_heal_loops_auto_c: PK_FACE_heal_loops_t = 0;
+pub const PK_FACE_heal_loops_auto_c: PK_FACE_heal_loops_t = 2;
 /// Heal loops separately.
 pub const PK_FACE_heal_loops_separate_c: PK_FACE_heal_loops_t = 1;
 
@@ -86,16 +100,16 @@ pub const PK_FACE_heal_loops_separate_c: PK_FACE_heal_loops_t = 1;
 // =============================================================================
 
 pub type PK_repair_fa_fa_t = c_int;
-pub const PK_repair_fa_fa_no_c: PK_repair_fa_fa_t = 0;
-pub const PK_repair_fa_fa_yes_c: PK_repair_fa_fa_t = 1;
+pub const PK_repair_fa_fa_no_c: PK_repair_fa_fa_t = 24360;
+pub const PK_repair_fa_fa_yes_c: PK_repair_fa_fa_t = 24361;
 
 pub type PK_repair_fa_t = c_int;
-pub const PK_repair_fa_yes_c: PK_repair_fa_t = 0;
-pub const PK_repair_fa_local_c: PK_repair_fa_t = 1;
+pub const PK_repair_fa_yes_c: PK_repair_fa_t = 25490;
+pub const PK_repair_fa_local_c: PK_repair_fa_t = 25491;
 
 pub type PK_check_fa_fa_t = c_int;
-pub const PK_check_fa_fa_yes_c: PK_check_fa_fa_t = 0;
-pub const PK_check_fa_fa_no_c: PK_check_fa_fa_t = 1;
+pub const PK_check_fa_fa_yes_c: PK_check_fa_fa_t = 18341;
+pub const PK_check_fa_fa_no_c: PK_check_fa_fa_t = 18340;
 
 // =============================================================================
 // Delete tracking constants
@@ -103,11 +117,11 @@ pub const PK_check_fa_fa_no_c: PK_check_fa_fa_t = 1;
 
 pub type PK_delete_track_t = c_int;
 /// No tracking (default).
-pub const PK_delete_track_no_c: PK_delete_track_t = 0;
+pub const PK_delete_track_no_c: PK_delete_track_t = 26340;
 /// Track capping faces.
-pub const PK_delete_track_cap_c: PK_delete_track_t = 1;
+pub const PK_delete_track_cap_c: PK_delete_track_t = 26342;
 /// Track rubber faces.
-pub const PK_delete_track_rubber_c: PK_delete_track_t = 2;
+pub const PK_delete_track_rubber_c: PK_delete_track_t = 26341;
 
 // =============================================================================
 // PK_FACE_delete_2 options
@@ -144,13 +158,13 @@ pub struct PK_EDGE_delete_o_t {
 
 /// Detail type identifier.
 pub type PK_detail_t = c_int;
-pub const PK_detail_any_c: PK_detail_t = 0;
-pub const PK_detail_rubber_c: PK_detail_t = 1;
-pub const PK_detail_hole_cyl_c: PK_detail_t = 2;
-pub const PK_detail_hole_cyl_through_c: PK_detail_t = 3;
-pub const PK_detail_hole_cyl_blind_c: PK_detail_t = 4;
-pub const PK_detail_hole_cyl_closed_c: PK_detail_t = 5;
-pub const PK_detail_blend_rb_const_r_c: PK_detail_t = 6;
+pub const PK_detail_any_c: PK_detail_t = 22250;
+pub const PK_detail_rubber_c: PK_detail_t = 22251;
+pub const PK_detail_hole_cyl_c: PK_detail_t = 22252;
+pub const PK_detail_hole_cyl_through_c: PK_detail_t = 22253;
+pub const PK_detail_hole_cyl_blind_c: PK_detail_t = 22254;
+pub const PK_detail_hole_cyl_closed_c: PK_detail_t = 22255;
+pub const PK_detail_blend_rb_const_r_c: PK_detail_t = 22256;
 
 /// Options for `PK_FACE_delete_facesets`.
 #[repr(C)]
@@ -171,25 +185,27 @@ pub struct PK_FACE_delete_facesets_o_t {
 
 pub type PK_FACE_simplify_t = c_int;
 /// Simplify vertex-adjacent blend surfaces.
-pub const PK_FACE_simplify_adj_blends_c: PK_FACE_simplify_t = 0;
+pub const PK_FACE_simplify_adj_blends_c: PK_FACE_simplify_t = 22360;
 /// Do not simplify.
-pub const PK_FACE_simplify_no_c: PK_FACE_simplify_t = 1;
+pub const PK_FACE_simplify_no_c: PK_FACE_simplify_t = 22361;
 
 pub type PK_blend_delete_cap_t = c_int;
 /// Create planar cap faces to heal wounds.
-pub const PK_blend_delete_cap_planar_c: PK_blend_delete_cap_t = 1;
+pub const PK_blend_delete_cap_planar_c: PK_blend_delete_cap_t = 24109;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_blend_delete_cap_no_c: PK_blend_delete_cap_t = 24100;
 
 pub type PK_blend_cap_type_t = c_int;
 /// Delete to within 10% of blend end.
-pub const PK_blend_cap_type_within_c: PK_blend_cap_type_t = 0;
+pub const PK_blend_cap_type_within_c: PK_blend_cap_type_t = 25310;
 /// Delete beyond the blend.
-pub const PK_blend_cap_type_beyond_c: PK_blend_cap_type_t = 1;
+pub const PK_blend_cap_type_beyond_c: PK_blend_cap_type_t = 25311;
 /// Delete at the edge (cap may not be planar).
-pub const PK_blend_cap_type_at_edge_c: PK_blend_cap_type_t = 2;
+pub const PK_blend_cap_type_at_edge_c: PK_blend_cap_type_t = 25312;
 
 pub type PK_blend_delete_keep_t = c_int;
-pub const PK_blend_delete_keep_yes_c: PK_blend_delete_keep_t = 0;
-pub const PK_blend_delete_keep_no_c: PK_blend_delete_keep_t = 1;
+pub const PK_blend_delete_keep_yes_c: PK_blend_delete_keep_t = 24251;
+pub const PK_blend_delete_keep_no_c: PK_blend_delete_keep_t = 24250;
 
 /// Sub-structure for specifying underlying entities when deleting blends.
 #[repr(C)]
@@ -250,7 +266,7 @@ pub struct PK_FACE_simplify_geom_o_t {
 // =============================================================================
 
 pub type PK_boolean_selector_t = c_int;
-pub const PK_boolean_off_c: PK_boolean_selector_t = 0;
+pub const PK_boolean_off_c: PK_boolean_selector_t = 15949;
 
 /// Options for `PK_BODY_find_facesets`.
 #[repr(C)]
@@ -289,39 +305,41 @@ pub struct PK_double_constraint_t {
 }
 
 pub type PK_comparison_t = c_int;
-pub const PK_comparison_always_c: PK_comparison_t = 0;
-pub const PK_comparison_less_c: PK_comparison_t = 1;
-pub const PK_comparison_equal_c: PK_comparison_t = 2;
-pub const PK_comparison_greater_c: PK_comparison_t = 3;
-pub const PK_comparison_between_c: PK_comparison_t = 4;
-pub const PK_comparison_outside_c: PK_comparison_t = 5;
-pub const PK_comparison_never_c: PK_comparison_t = 6;
+pub const PK_comparison_always_c: PK_comparison_t = 22220;
+pub const PK_comparison_less_c: PK_comparison_t = 22221;
+pub const PK_comparison_equal_c: PK_comparison_t = 22222;
+pub const PK_comparison_greater_c: PK_comparison_t = 22223;
+pub const PK_comparison_between_c: PK_comparison_t = 22224;
+pub const PK_comparison_outside_c: PK_comparison_t = 22225;
+pub const PK_comparison_never_c: PK_comparison_t = 22226;
 
 pub type PK_hole_blended_t = c_int;
-pub const PK_hole_blended_no_c: PK_hole_blended_t = 0;
-pub const PK_hole_blended_in_c: PK_hole_blended_t = 1;
-pub const PK_hole_blended_out_c: PK_hole_blended_t = 2;
-pub const PK_hole_blended_trimmed_in_c: PK_hole_blended_t = 3;
-pub const PK_hole_blended_trimmed_out_c: PK_hole_blended_t = 4;
+pub const PK_hole_blended_no_c: PK_hole_blended_t = 22390;
+pub const PK_hole_blended_in_c: PK_hole_blended_t = 22391;
+pub const PK_hole_blended_out_c: PK_hole_blended_t = 22392;
+pub const PK_hole_blended_trimmed_in_c: PK_hole_blended_t = 22393;
+pub const PK_hole_blended_trimmed_out_c: PK_hole_blended_t = 22394;
 
 pub type PK_hole_ortho_t = c_int;
-pub const PK_hole_ortho_no_c: PK_hole_ortho_t = 0;
-pub const PK_hole_ortho_yes_c: PK_hole_ortho_t = 1;
+pub const PK_hole_ortho_no_c: PK_hole_ortho_t = 22600;
+pub const PK_hole_ortho_yes_c: PK_hole_ortho_t = 22601;
 
 pub type PK_hole_const_rad_t = c_int;
-pub const PK_hole_const_rad_no_c: PK_hole_const_rad_t = 0;
-pub const PK_hole_const_rad_yes_c: PK_hole_const_rad_t = 1;
+pub const PK_hole_const_rad_no_c: PK_hole_const_rad_t = 22590;
+pub const PK_hole_const_rad_yes_c: PK_hole_const_rad_t = 22591;
 
 pub type PK_detail_perforated_t = c_int;
-pub const PK_detail_perforated_no_c: PK_detail_perforated_t = 0;
-pub const PK_detail_perforated_yes_c: PK_detail_perforated_t = 1;
+pub const PK_detail_perforated_no_c: PK_detail_perforated_t = 23370;
+pub const PK_detail_perforated_yes_c: PK_detail_perforated_t = 23371;
 
 pub type PK_detail_open_t = c_int;
-pub const PK_detail_open_no_c: PK_detail_open_t = 0;
-pub const PK_detail_open_yes_c: PK_detail_open_t = 1;
+pub const PK_detail_open_no_c: PK_detail_open_t = 23380;
+pub const PK_detail_open_yes_c: PK_detail_open_t = 23381;
 
 pub type PK_hole_update_t = c_int;
-pub const PK_hole_update_default_c: PK_hole_update_t = 0;
+pub const PK_hole_update_default_c: PK_hole_update_t = 22441;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_hole_update_0_c: PK_hole_update_t = 22440;
 
 pub type PK_proj_update_t = c_int;
 
@@ -362,36 +380,36 @@ pub struct PK_identify_details_r_t {
 
 pub type PK_blend_identify_t = c_int;
 /// Only chains contained in supplied faces.
-pub const PK_blend_identify_within_c: PK_blend_identify_t = 0;
+pub const PK_blend_identify_within_c: PK_blend_identify_t = 22240;
 /// Minimal chain, excluding external branch faces.
-pub const PK_blend_identify_exc_chain_c: PK_blend_identify_t = 1;
+pub const PK_blend_identify_exc_chain_c: PK_blend_identify_t = 22241;
 /// Minimal chain, including external branch faces.
-pub const PK_blend_identify_inc_chain_c: PK_blend_identify_t = 2;
+pub const PK_blend_identify_inc_chain_c: PK_blend_identify_t = 22242;
 /// Maximal chain (as long as possible).
-pub const PK_blend_identify_max_chain_c: PK_blend_identify_t = 3;
+pub const PK_blend_identify_max_chain_c: PK_blend_identify_t = 22243;
 /// Chains dependent on supplied faces (recursive).
-pub const PK_blend_identify_dependent_c: PK_blend_identify_t = 4;
+pub const PK_blend_identify_dependent_c: PK_blend_identify_t = 22244;
 
 pub type PK_blend_convexity_t = c_int;
-pub const PK_blend_convexity_any_c: PK_blend_convexity_t = 0;
-pub const PK_blend_convexity_concave_c: PK_blend_convexity_t = 1;
-pub const PK_blend_convexity_convex_c: PK_blend_convexity_t = 2;
+pub const PK_blend_convexity_any_c: PK_blend_convexity_t = 8600;
+pub const PK_blend_convexity_concave_c: PK_blend_convexity_t = 8603;
+pub const PK_blend_convexity_convex_c: PK_blend_convexity_t = 8602;
 
 pub type PK_blend_follow_branch_t = c_int;
-pub const PK_blend_follow_branch_yes_c: PK_blend_follow_branch_t = 0;
-pub const PK_blend_follow_branch_no_c: PK_blend_follow_branch_t = 1;
+pub const PK_blend_follow_branch_yes_c: PK_blend_follow_branch_t = 24160;
+pub const PK_blend_follow_branch_no_c: PK_blend_follow_branch_t = 24161;
 
 pub type PK_blend_distant_unders_t = c_int;
-pub const PK_blend_distant_unders_no_c: PK_blend_distant_unders_t = 0;
-pub const PK_blend_distant_unders_yes_c: PK_blend_distant_unders_t = 1;
+pub const PK_blend_distant_unders_no_c: PK_blend_distant_unders_t = 25481;
+pub const PK_blend_distant_unders_yes_c: PK_blend_distant_unders_t = 25480;
 
 pub type PK_blend_report_blends_t = c_int;
-pub const PK_blend_report_blends_no_c: PK_blend_report_blends_t = 0;
-pub const PK_blend_report_blends_yes_c: PK_blend_report_blends_t = 1;
+pub const PK_blend_report_blends_no_c: PK_blend_report_blends_t = 25471;
+pub const PK_blend_report_blends_yes_c: PK_blend_report_blends_t = 25470;
 
 pub type PK_chain_optimise_t = c_int;
-pub const PK_chain_optimise_none_c: PK_chain_optimise_t = 0;
-pub const PK_chain_optimise_for_reblend_c: PK_chain_optimise_t = 1;
+pub const PK_chain_optimise_none_c: PK_chain_optimise_t = 25270;
+pub const PK_chain_optimise_for_reblend_c: PK_chain_optimise_t = 25271;
 
 /// Options for `PK_FACE_identify_blends`.
 #[repr(C)]
@@ -463,17 +481,19 @@ pub struct PK_hole_comp_t {
 // =============================================================================
 
 pub type PK_replace_merge_t = c_int;
-pub const PK_replace_merge_no_c: PK_replace_merge_t = 0;
-pub const PK_replace_merge_in_c: PK_replace_merge_t = 1;
-pub const PK_replace_merge_out_c: PK_replace_merge_t = 2;
+pub const PK_replace_merge_no_c: PK_replace_merge_t = 22300;
+pub const PK_replace_merge_in_c: PK_replace_merge_t = 22301;
+pub const PK_replace_merge_out_c: PK_replace_merge_t = 22302;
 
 pub type PK_replace_use_t = c_int;
-pub const PK_replace_use_attempt_c: PK_replace_use_t = 0;
-pub const PK_replace_use_yes_c: PK_replace_use_t = 1;
-pub const PK_replace_use_existing_c: PK_replace_use_t = 2;
+pub const PK_replace_use_attempt_c: PK_replace_use_t = 22660;
+pub const PK_replace_use_yes_c: PK_replace_use_t = 22661;
+pub const PK_replace_use_existing_c: PK_replace_use_t = 22662;
 
 pub type PK_replace_variation_t = c_int;
-pub const PK_replace_variation_no_c: PK_replace_variation_t = 0;
+pub const PK_replace_variation_no_c: PK_replace_variation_t = 23280;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_replace_variation_yes_c: PK_replace_variation_t = 23281;
 
 /// Edge replacement data for surface replacement.
 #[repr(C)]
@@ -495,39 +515,63 @@ pub struct PK_replace_variation_data_t {
     pub variation_faces: *const PK_FACE_t,
 }
 
-/// Options for `PK_FACE_replace_surfs_3`.
+/// Vertex replacement data for surface replacement (32 bytes).
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_replace_vertex_data_t {
+    pub n_vertices: c_int,             // @0x00
+    pub vertices: *const PK_VERTEX_t,  // @0x08
+    pub positions: *const PK_VECTOR_t, // @0x10
+    pub tolerances: *const c_double,   // @0x18
+}
+
+// (`edge_help` / `vertex_help` use the existing `PK_replace_help_points_t`,
+// defined later in this module — 24 bytes, matching the journal.)
+
+/// Options for `PK_FACE_replace_surfs_2` / `_3`.
+///
+/// layout: PKU_journal_FACE_replace_surfs_o (V37.01.243). The prior definition
+/// (transcribed from the V35 manual prose order) mis-ordered these fields and
+/// omitted check_fa_fa/vertex_data/edge_help/vertex_help; the decompiled journal
+/// is authoritative. Total size 0xA0.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_FACE_replace_surfs_o_t {
-    pub o_t_version: c_int,
-    pub merge: PK_replace_merge_t,
-    pub variation_data: PK_replace_variation_data_t,
-    pub edge_data: PK_replace_edge_data_t,
-    pub adjust: PK_LOGICAL_t,
-    pub update: PK_local_ops_update_t,
+    pub o_t_version: c_int,                     // @0x00
+    pub check_fa_fa: PK_check_fa_fa_t,          // @0x04
+    pub edge_data: PK_replace_edge_data_t,      // @0x08 (40 bytes)
+    pub vertex_data: PK_replace_vertex_data_t,  // @0x30 (32 bytes)
+    pub edge_help: PK_replace_help_points_t,    // @0x50 (24 bytes)
+    pub vertex_help: PK_replace_help_points_t,  // @0x68 (24 bytes)
+    pub merge: PK_replace_merge_t,              // @0x80
+    pub adjust: PK_LOGICAL_t,                   // @0x84
+    pub update: PK_local_ops_update_t,          // @0x88 (pad @0x8c)
+    pub variation_data: PK_replace_variation_data_t, // @0x90 (16 bytes)
 }
 
 // =============================================================================
 // Taper constants and options (Ch. 64, 65)
 // =============================================================================
 
-pub const PK_taper_method_surface_c: PK_taper_method_t = 2;
+pub const PK_taper_method_surface_c: PK_taper_method_t = 21846;
 
 pub type PK_taper_smooth_step_t = c_int;
-pub const PK_taper_smooth_step_no_c: PK_taper_smooth_step_t = 0;
+pub const PK_taper_smooth_step_no_c: PK_taper_smooth_step_t = 22431;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_taper_smooth_step_yes_c: PK_taper_smooth_step_t = 22430;
 
 pub type PK_taper_step_face_t = c_int;
-pub const PK_taper_step_face_no_c: PK_taper_step_face_t = 0;
-pub const PK_taper_step_face_yes_c: PK_taper_step_face_t = 1;
-pub const PK_taper_preserve_smooth_c: PK_taper_step_face_t = 2;
+pub const PK_taper_step_face_no_c: PK_taper_step_face_t = 23041;
+pub const PK_taper_step_face_yes_c: PK_taper_step_face_t = 23040;
+pub const PK_taper_preserve_smooth_c: PK_taper_step_face_t = 23042;
 
 pub type PK_taper_laminar_edge_t = c_int;
-pub const PK_taper_laminar_edge_normal_c: PK_taper_laminar_edge_t = 0;
-pub const PK_taper_laminar_edge_draw_c: PK_taper_laminar_edge_t = 1;
+pub const PK_taper_laminar_edge_normal_c: PK_taper_laminar_edge_t = 23170;
+pub const PK_taper_laminar_edge_draw_c: PK_taper_laminar_edge_t = 23171;
 
-pub const PK_FACE_grow_auto_c: PK_FACE_grow_t = 3;
-pub const PK_FACE_grow_update_c: PK_FACE_grow_t = 4;
-pub const PK_FACE_grow_fail_c: PK_FACE_grow_t = 5;
+pub const PK_FACE_grow_auto_c: PK_FACE_grow_t = 24121;
+pub const PK_FACE_grow_update_c: PK_FACE_grow_t = 24120;
+pub const PK_FACE_grow_fail_c: PK_FACE_grow_t = 24125;
 
 /// Options for `PK_FACE_taper`.
 #[repr(C)]
@@ -563,24 +607,26 @@ pub const PK_taper_miter_on_ref_c: PK_taper_miter_t = 0;
 pub const PK_taper_miter_to_face_c: PK_taper_miter_t = 1;
 
 pub type PK_taper_corner_t = c_int;
-pub const PK_taper_corner_extend_c: PK_taper_corner_t = 0;
-pub const PK_taper_corner_plane_c: PK_taper_corner_t = 1;
+pub const PK_taper_corner_extend_c: PK_taper_corner_t = 22400;
+pub const PK_taper_corner_plane_c: PK_taper_corner_t = 22401;
 
 pub type PK_taper_undercut_ref_t = c_int;
-pub const PK_taper_undercut_ref_no_c: PK_taper_undercut_ref_t = 0;
-pub const PK_taper_undercut_ref_yes_c: PK_taper_undercut_ref_t = 1;
+pub const PK_taper_undercut_ref_no_c: PK_taper_undercut_ref_t = 22860;
+pub const PK_taper_undercut_ref_yes_c: PK_taper_undercut_ref_t = 22861;
 
 pub type PK_taper_concave_t = c_int;
-pub const PK_taper_concave_none_c: PK_taper_concave_t = 0;
-pub const PK_taper_concave_radius_c: PK_taper_concave_t = 1;
-pub const PK_taper_concave_mix_c: PK_taper_concave_t = 2;
+pub const PK_taper_concave_none_c: PK_taper_concave_t = 23010;
+pub const PK_taper_concave_radius_c: PK_taper_concave_t = 23011;
+pub const PK_taper_concave_mix_c: PK_taper_concave_t = 23013;
 
 pub type PK_taper_keep_material_t = c_int;
-pub const PK_taper_keep_material_no_c: PK_taper_keep_material_t = 0;
-pub const PK_taper_keep_material_yes_c: PK_taper_keep_material_t = 1;
+pub const PK_taper_keep_material_no_c: PK_taper_keep_material_t = 23520;
+pub const PK_taper_keep_material_yes_c: PK_taper_keep_material_t = 23521;
 
 pub type PK_isocline_split_t = c_int;
-pub const PK_isocline_split_convexity_c: PK_isocline_split_t = 0;
+pub const PK_isocline_split_convexity_c: PK_isocline_split_t = 26231;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_isocline_split_no_c: PK_isocline_split_t = 26230;
 
 /// Options for `PK_BODY_taper`.
 #[repr(C)]
@@ -619,8 +665,8 @@ pub struct PK_BODY_taper_o_t {
 // =============================================================================
 
 pub type PK_replace_patch_t = c_int;
-pub const PK_replace_patch_no_c: PK_replace_patch_t = 0;
-pub const PK_replace_patch_yes_c: PK_replace_patch_t = 1;
+pub const PK_replace_patch_no_c: PK_replace_patch_t = 23350;
+pub const PK_replace_patch_yes_c: PK_replace_patch_t = 23351;
 
 /// Patch data for `PK_FACE_replace_with_sheet`.
 #[repr(C)]
@@ -647,11 +693,11 @@ pub struct PK_FACE_replace_with_sheet_o_t {
 // --- PK_FACE_cover (Ch. 66) ---
 
 pub type PK_FACE_cover_smooth_t = c_int;
-pub const PK_FACE_cover_smooth_no_c: PK_FACE_cover_smooth_t = 0;
+pub const PK_FACE_cover_smooth_no_c: PK_FACE_cover_smooth_t = 25071;
 
 pub type PK_cover_param_prefer_t = c_int;
-pub const PK_cover_param_prefer_any_c: PK_cover_param_prefer_t = 0;
-pub const PK_cover_param_prefer_uvbox_c: PK_cover_param_prefer_t = 1;
+pub const PK_cover_param_prefer_any_c: PK_cover_param_prefer_t = 25680;
+pub const PK_cover_param_prefer_uvbox_c: PK_cover_param_prefer_t = 25681;
 
 /// Options for `PK_FACE_cover`.
 #[repr(C)]
@@ -671,57 +717,92 @@ pub struct PK_FACE_cover_o_t {
 // =============================================================================
 
 pub type PK_fill_hole_method_t = c_int;
-pub const PK_fill_hole_create_patch_c: PK_fill_hole_method_t = 0;
-pub const PK_fill_hole_trim_to_hole_c: PK_fill_hole_method_t = 1;
-pub const PK_fill_hole_trim_to_sheet_c: PK_fill_hole_method_t = 2;
-pub const PK_fill_hole_extend_adjacent_c: PK_fill_hole_method_t = 3;
+pub const PK_fill_hole_create_patch_c: PK_fill_hole_method_t = 22102;
+pub const PK_fill_hole_trim_to_hole_c: PK_fill_hole_method_t = 22100;
+pub const PK_fill_hole_trim_to_sheet_c: PK_fill_hole_method_t = 22101;
+pub const PK_fill_hole_extend_adjacent_c: PK_fill_hole_method_t = 22103;
 
 pub type PK_fill_hole_topol_t = c_int;
-pub const PK_fill_hole_topol_multiple_c: PK_fill_hole_topol_t = 0;
-pub const PK_fill_hole_topol_single_c: PK_fill_hole_topol_t = 1;
-pub const PK_fill_hole_topol_minimal_c: PK_fill_hole_topol_t = 2;
+pub const PK_fill_hole_topol_multiple_c: PK_fill_hole_topol_t = 22740;
+pub const PK_fill_hole_topol_single_c: PK_fill_hole_topol_t = 22742;
+pub const PK_fill_hole_topol_minimal_c: PK_fill_hole_topol_t = 22741;
 
 pub type PK_fill_hole_pref_t = c_int;
-pub const PK_fill_hole_smooth_c: PK_fill_hole_pref_t = 0;
-pub const PK_fill_hole_non_smooth_c: PK_fill_hole_pref_t = 1;
-pub const PK_fill_hole_plane_only_c: PK_fill_hole_pref_t = 2;
-pub const PK_fill_hole_prefer_plane_c: PK_fill_hole_pref_t = 3;
+pub const PK_fill_hole_smooth_c: PK_fill_hole_pref_t = 22370;
+pub const PK_fill_hole_non_smooth_c: PK_fill_hole_pref_t = 22373;
+pub const PK_fill_hole_plane_only_c: PK_fill_hole_pref_t = 22372;
+pub const PK_fill_hole_prefer_plane_c: PK_fill_hole_pref_t = 22371;
 
 pub type PK_fill_hole_non_smooth_t = c_int;
-pub const PK_fill_hole_non_smooth_fail_c: PK_fill_hole_non_smooth_t = 0;
-pub const PK_fill_hole_non_smooth_allow_c: PK_fill_hole_non_smooth_t = 1;
+pub const PK_fill_hole_non_smooth_fail_c: PK_fill_hole_non_smooth_t = 25540;
+pub const PK_fill_hole_non_smooth_allow_c: PK_fill_hole_non_smooth_t = 25541;
 
 pub type PK_fill_hole_patch_eds_t = c_int;
-pub const PK_fill_hole_patch_eds_sharp_c: PK_fill_hole_patch_eds_t = 0;
-pub const PK_fill_hole_patch_eds_smooth_c: PK_fill_hole_patch_eds_t = 1;
+pub const PK_fill_hole_patch_eds_sharp_c: PK_fill_hole_patch_eds_t = 24910;
+pub const PK_fill_hole_patch_eds_smooth_c: PK_fill_hole_patch_eds_t = 24911;
 
 pub type PK_fill_hole_imprint_t = c_int;
-pub const PK_fill_hole_imprint_sharp_c: PK_fill_hole_imprint_t = 0;
-pub const PK_fill_hole_imprint_yes_c: PK_fill_hole_imprint_t = 1;
+pub const PK_fill_hole_imprint_sharp_c: PK_fill_hole_imprint_t = 24980;
+pub const PK_fill_hole_imprint_yes_c: PK_fill_hole_imprint_t = 24981;
 
 pub type PK_fill_hole_clamp_type_t = c_int;
-pub const PK_fill_hole_clamp_no_c: PK_fill_hole_clamp_type_t = 0;
-pub const PK_fill_hole_clamp_planar_c: PK_fill_hole_clamp_type_t = 1;
+pub const PK_fill_hole_clamp_no_c: PK_fill_hole_clamp_type_t = 25110;
+pub const PK_fill_hole_clamp_planar_c: PK_fill_hole_clamp_type_t = 25111;
 
 pub type PK_fill_hole_opt_t = c_int;
-pub const PK_fill_hole_opt_quality_c: PK_fill_hole_opt_t = 0;
-pub const PK_fill_hole_opt_performance_c: PK_fill_hole_opt_t = 1;
+pub const PK_fill_hole_opt_quality_c: PK_fill_hole_opt_t = 24961;
+pub const PK_fill_hole_opt_performance_c: PK_fill_hole_opt_t = 24960;
 
 pub type PK_fill_hole_body_type_t = c_int;
-pub const PK_fill_hole_body_type_orig_c: PK_fill_hole_body_type_t = 0;
-pub const PK_fill_hole_body_type_sheet_c: PK_fill_hole_body_type_t = 1;
-pub const PK_fill_hole_body_type_solid_c: PK_fill_hole_body_type_t = 2;
+pub const PK_fill_hole_body_type_orig_c: PK_fill_hole_body_type_t = 24510;
+pub const PK_fill_hole_body_type_sheet_c: PK_fill_hole_body_type_t = 24511;
+pub const PK_fill_hole_body_type_solid_c: PK_fill_hole_body_type_t = 24512;
 
 pub type PK_fill_hole_track_t = c_int;
-pub const PK_fill_hole_track_default_c: PK_fill_hole_track_t = 0;
-pub const PK_fill_hole_track_bdry_edges_c: PK_fill_hole_track_t = 1;
+pub const PK_fill_hole_track_default_c: PK_fill_hole_track_t = 26580;
+pub const PK_fill_hole_track_bdry_edges_c: PK_fill_hole_track_t = 26581;
 
 pub type PK_fill_hole_update_t = c_int;
-pub const PK_fill_hole_update_default_c: PK_fill_hole_update_t = 0;
+pub const PK_fill_hole_update_default_c: PK_fill_hole_update_t = 22615;
+// [re-abi] appended 16 missing member(s) from pk-enums.h
+pub const PK_fill_hole_update_0_c: PK_fill_hole_update_t = 22610;
+pub const PK_fill_hole_update_1_c: PK_fill_hole_update_t = 22611;
+pub const PK_fill_hole_update_2_c: PK_fill_hole_update_t = 22612;
+pub const PK_fill_hole_update_3_c: PK_fill_hole_update_t = 22613;
+pub const PK_fill_hole_update_4_c: PK_fill_hole_update_t = 22614;
+pub const PK_fill_hole_update_5_c: PK_fill_hole_update_t = 22616;
+pub const PK_fill_hole_update_6_c: PK_fill_hole_update_t = 22617;
+pub const PK_fill_hole_update_7_c: PK_fill_hole_update_t = 22618;
+pub const PK_fill_hole_update_8_c: PK_fill_hole_update_t = 22619;
+pub const PK_fill_hole_update_9_c: PK_fill_hole_update_t = 25330;
+pub const PK_fill_hole_update_10_c: PK_fill_hole_update_t = 25331;
+pub const PK_fill_hole_update_11_c: PK_fill_hole_update_t = 25332;
+pub const PK_fill_hole_update_v261_c: PK_fill_hole_update_t = 25333;
+pub const PK_fill_hole_update_v270_c: PK_fill_hole_update_t = 25334;
+pub const PK_fill_hole_update_v271_c: PK_fill_hole_update_t = 25335;
+pub const PK_fill_hole_update_v280_c: PK_fill_hole_update_t = 25336;
 
 pub type PK_fill_hole_fault_t = c_int;
 /// Hole too complex to fill.
-pub const PK_fill_hole_too_complex_c: PK_fill_hole_fault_t = 1;
+pub const PK_fill_hole_too_complex_c: PK_fill_hole_fault_t = 22094;
+// [re-abi] appended 17 missing member(s) from pk-enums.h
+pub const PK_fill_hole_ok_c: PK_fill_hole_fault_t = 22080;
+pub const PK_fill_hole_bad_edge_c: PK_fill_hole_fault_t = 22081;
+pub const PK_fill_hole_duplicate_c: PK_fill_hole_fault_t = 22082;
+pub const PK_fill_hole_vertex_c: PK_fill_hole_fault_t = 22083;
+pub const PK_fill_hole_too_many_loops_c: PK_fill_hole_fault_t = 22084;
+pub const PK_fill_hole_gap_c: PK_fill_hole_fault_t = 22085;
+pub const PK_fill_hole_no_edge_on_target_c: PK_fill_hole_fault_t = 22086;
+pub const PK_fill_hole_cant_match_body_c: PK_fill_hole_fault_t = 22087;
+pub const PK_fill_hole_cant_match_edge_c: PK_fill_hole_fault_t = 22088;
+pub const PK_fill_hole_too_small_c: PK_fill_hole_fault_t = 22089;
+pub const PK_fill_hole_unknown_c: PK_fill_hole_fault_t = 22090;
+pub const PK_fill_hole_face_c: PK_fill_hole_fault_t = 22091;
+pub const PK_fill_hole_face_face_c: PK_fill_hole_fault_t = 22092;
+pub const PK_fill_hole_not_smooth_c: PK_fill_hole_fault_t = 22093;
+pub const PK_fill_hole_didnt_converge_c: PK_fill_hole_fault_t = 22095;
+pub const PK_fill_hole_supp_not_smooth_c: PK_fill_hole_fault_t = 22096;
+pub const PK_fill_hole_bdry_general_c: PK_fill_hole_fault_t = 22097;
 
 /// Clamp specification for fill hole with acorn supporting bodies.
 #[repr(C)]
@@ -769,8 +850,8 @@ pub struct PK_BODY_fill_hole_o_t {
 
 /// Face adjacency preference.
 pub type PK_FACE_prefer_adj_t = c_int;
-pub const PK_FACE_prefer_adj_keep_c: PK_FACE_prefer_adj_t = 0;
-pub const PK_FACE_prefer_adj_change_c: PK_FACE_prefer_adj_t = 1;
+pub const PK_FACE_prefer_adj_keep_c: PK_FACE_prefer_adj_t = 23840;
+pub const PK_FACE_prefer_adj_change_c: PK_FACE_prefer_adj_t = 23841;
 
 /// Options for `PK_FACE_transform_2`.
 #[repr(C)]
@@ -786,8 +867,8 @@ pub struct PK_FACE_transform_2_o_t {
 // =============================================================================
 
 pub type PK_track_bodies_t = c_int;
-pub const PK_track_bodies_no_c: PK_track_bodies_t = 0;
-pub const PK_track_bodies_yes_c: PK_track_bodies_t = 1;
+pub const PK_track_bodies_no_c: PK_track_bodies_t = 25431;
+pub const PK_track_bodies_yes_c: PK_track_bodies_t = 25430;
 
 /// Options for `PK_EDGE_remove_to_bodies`.
 #[repr(C)]
@@ -804,22 +885,22 @@ pub struct PK_EDGE_remove_to_bodies_o_t {
 
 /// Operation type for `PK_FACE_change`.
 pub type PK_FACE_change_type_t = c_int;
-pub const PK_FACE_change_type_none_c: PK_FACE_change_type_t = 0;
-pub const PK_FACE_change_type_offset_c: PK_FACE_change_type_t = 1;
-pub const PK_FACE_change_type_taper_c: PK_FACE_change_type_t = 2;
-pub const PK_FACE_change_type_transform_c: PK_FACE_change_type_t = 3;
-pub const PK_FACE_change_type_replace_c: PK_FACE_change_type_t = 4;
-pub const PK_FACE_change_type_blend_c: PK_FACE_change_type_t = 5;
-pub const PK_FACE_change_type_bend_c: PK_FACE_change_type_t = 6;
-pub const PK_FACE_change_type_patch_c: PK_FACE_change_type_t = 7;
-pub const PK_FACE_change_type_deform_c: PK_FACE_change_type_t = 8;
-pub const PK_FACE_change_type_radiate_c: PK_FACE_change_type_t = 9;
+pub const PK_FACE_change_type_none_c: PK_FACE_change_type_t = 22060;
+pub const PK_FACE_change_type_offset_c: PK_FACE_change_type_t = 22061;
+pub const PK_FACE_change_type_taper_c: PK_FACE_change_type_t = 22062;
+pub const PK_FACE_change_type_transform_c: PK_FACE_change_type_t = 22063;
+pub const PK_FACE_change_type_replace_c: PK_FACE_change_type_t = 22064;
+pub const PK_FACE_change_type_blend_c: PK_FACE_change_type_t = 22065;
+pub const PK_FACE_change_type_bend_c: PK_FACE_change_type_t = 22066;
+pub const PK_FACE_change_type_patch_c: PK_FACE_change_type_t = 22067;
+pub const PK_FACE_change_type_deform_c: PK_FACE_change_type_t = 22068;
+pub const PK_FACE_change_type_radiate_c: PK_FACE_change_type_t = 22069;
 
 // --- Offset operation types ---
 
 pub type PK_ref_alignment_t = c_int;
-pub const PK_ref_alignment_opposed_c: PK_ref_alignment_t = 0;
-pub const PK_ref_alignment_aligned_c: PK_ref_alignment_t = 1;
+pub const PK_ref_alignment_opposed_c: PK_ref_alignment_t = 25190;
+pub const PK_ref_alignment_aligned_c: PK_ref_alignment_t = 25191;
 
 /// Offset operation data.
 #[repr(C)]
@@ -870,16 +951,16 @@ pub struct PK_FACE_change_taper_o_t {
 // --- Transform operation data ---
 
 pub type PK_transform_step_t = c_int;
-pub const PK_transform_step_no_c: PK_transform_step_t = 0;
-pub const PK_transform_step_smooth_c: PK_transform_step_t = 1;
-pub const PK_transform_step_smooth_site_c: PK_transform_step_t = 2;
-pub const PK_transform_step_not_coi_c: PK_transform_step_t = 3;
-pub const PK_transform_step_all_c: PK_transform_step_t = 4;
+pub const PK_transform_step_no_c: PK_transform_step_t = 24080;
+pub const PK_transform_step_smooth_c: PK_transform_step_t = 24081;
+pub const PK_transform_step_smooth_site_c: PK_transform_step_t = 24084;
+pub const PK_transform_step_not_coi_c: PK_transform_step_t = 24083;
+pub const PK_transform_step_all_c: PK_transform_step_t = 24082;
 
 pub type PK_transform_intent_t = c_int;
-pub const PK_transform_intent_minimal_c: PK_transform_intent_t = 0;
-pub const PK_transform_intent_grow_c: PK_transform_intent_t = 1;
-pub const PK_transform_intent_trim_c: PK_transform_intent_t = 2;
+pub const PK_transform_intent_minimal_c: PK_transform_intent_t = 26280;
+pub const PK_transform_intent_grow_c: PK_transform_intent_t = 26281;
+pub const PK_transform_intent_trim_c: PK_transform_intent_t = 26282;
 
 /// Transform operation data.
 #[repr(C)]
@@ -961,8 +1042,8 @@ pub struct PK_FACE_change_data_patch_t {
 }
 
 pub type PK_patch_mobility_t = c_int;
-pub const PK_patch_mobility_fixed_c: PK_patch_mobility_t = 0;
-pub const PK_patch_mobility_moving_c: PK_patch_mobility_t = 1;
+pub const PK_patch_mobility_fixed_c: PK_patch_mobility_t = 24430;
+pub const PK_patch_mobility_moving_c: PK_patch_mobility_t = 24431;
 
 /// Patch operation options within PK_FACE_change.
 #[repr(C)]
@@ -995,8 +1076,10 @@ pub struct PK_FACE_change_data_deform_t {
 }
 
 pub type PK_deform_uv_t = c_int;
-pub const PK_deform_uv_face_box_c: PK_deform_uv_t = 0;
-pub const PK_deform_uv_all_c: PK_deform_uv_t = 1;
+pub const PK_deform_uv_face_box_c: PK_deform_uv_t = 24440;
+pub const PK_deform_uv_all_c: PK_deform_uv_t = 24441;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_deform_uv_on_face_c: PK_deform_uv_t = 24442;
 
 /// Deform operation options within PK_FACE_change.
 #[repr(C)]
@@ -1018,11 +1101,11 @@ pub struct PK_FACE_change_data_radiate_t {
 }
 
 pub type PK_radiate_step_t = c_int;
-pub const PK_radiate_step_no_c: PK_radiate_step_t = 0;
-pub const PK_radiate_step_smooth_c: PK_radiate_step_t = 1;
-pub const PK_radiate_step_smooth_site_c: PK_radiate_step_t = 2;
-pub const PK_radiate_step_not_coi_c: PK_radiate_step_t = 3;
-pub const PK_radiate_step_all_c: PK_radiate_step_t = 4;
+pub const PK_radiate_step_no_c: PK_radiate_step_t = 26730;
+pub const PK_radiate_step_smooth_c: PK_radiate_step_t = 26731;
+pub const PK_radiate_step_smooth_site_c: PK_radiate_step_t = 26732;
+pub const PK_radiate_step_not_coi_c: PK_radiate_step_t = 26733;
+pub const PK_radiate_step_all_c: PK_radiate_step_t = 26734;
 
 /// Axis definition for radiate operations.
 #[repr(C)]
@@ -1045,16 +1128,16 @@ pub struct PK_FACE_change_radiate_o_t {
 // --- Edge geometry data for PK_FACE_change ---
 
 pub type PK_change_edge_method_t = c_int;
-pub const PK_change_edge_method_entity_c: PK_change_edge_method_t = 0;
-pub const PK_change_edge_method_swept_c: PK_change_edge_method_t = 1;
-pub const PK_change_edge_method_ruled_c: PK_change_edge_method_t = 2;
-pub const PK_change_edge_method_proj_c: PK_change_edge_method_t = 3;
+pub const PK_change_edge_method_entity_c: PK_change_edge_method_t = 25720;
+pub const PK_change_edge_method_swept_c: PK_change_edge_method_t = 25721;
+pub const PK_change_edge_method_ruled_c: PK_change_edge_method_t = 25722;
+pub const PK_change_edge_method_proj_c: PK_change_edge_method_t = 25723;
 
 pub type PK_EDGE_step_t = c_int;
-pub const PK_EDGE_step_default_c: PK_EDGE_step_t = 0;
-pub const PK_EDGE_step_no_c: PK_EDGE_step_t = 1;
-pub const PK_EDGE_step_auto_c: PK_EDGE_step_t = 2;
-pub const PK_EDGE_step_method_c: PK_EDGE_step_t = 3;
+pub const PK_EDGE_step_default_c: PK_EDGE_step_t = 26410;
+pub const PK_EDGE_step_no_c: PK_EDGE_step_t = 26413;
+pub const PK_EDGE_step_auto_c: PK_EDGE_step_t = 26411;
+pub const PK_EDGE_step_method_c: PK_EDGE_step_t = 26412;
 
 /// Edge geometry control data for PK_FACE_change.
 #[repr(C)]
@@ -1095,16 +1178,16 @@ pub struct PK_replace_help_points_t {
 // --- Change track edges ---
 
 pub type PK_change_track_edges_t = c_int;
-pub const PK_change_track_edges_no_c: PK_change_track_edges_t = 0;
-pub const PK_change_track_edges_laminar_c: PK_change_track_edges_t = 1;
+pub const PK_change_track_edges_no_c: PK_change_track_edges_t = 24820;
+pub const PK_change_track_edges_laminar_c: PK_change_track_edges_t = 24821;
 
 // --- Results output ---
 
 // --- Grow callback ---
 
 pub type PK_FACE_grow_cb_t = c_int;
-pub const PK_FACE_grow_cb_auto_c: PK_FACE_grow_cb_t = 0;
-pub const PK_FACE_grow_cb_default_c: PK_FACE_grow_cb_t = 1;
+pub const PK_FACE_grow_cb_auto_c: PK_FACE_grow_cb_t = 24291;
+pub const PK_FACE_grow_cb_default_c: PK_FACE_grow_cb_t = 24290;
 
 /// Grow callback function pointer.
 pub type PK_FACE_grow_cb_f_t = Option<
@@ -1218,8 +1301,20 @@ pub const PK_ERROR_failed_to_change: PK_ERROR_code_t = 603;
 // =============================================================================
 
 /// Options for `PK_BODY_create_implicit`.
+///
+/// layout: PK_BODY_create_implicit journal replay (V37.01.243). Total size 0x38.
+/// `implicit_surf` is a 16-byte SURF_implicit descriptor ({kind: c_int, pad,
+/// data: pointer}); its internal fields are not further modelled here.
 #[repr(C)]
-pub struct PK_BODY_create_implicit_o_t { _private: [u8; 0] }
+#[derive(Debug, Clone, Copy)]
+pub struct PK_BODY_create_implicit_o_t {
+    pub o_t_version: c_int,       // @0x00
+    pub implicit_surf: [u64; 2],  // @0x08 (16-byte SURF_implicit descriptor)
+    pub tolerance: c_double,      // @0x18
+    pub front_offset: c_double,   // @0x20
+    pub back_offset: c_double,    // @0x28
+    pub offset_method: c_int,     // @0x30 (0x6acc/0x6acd)
+}
 
 /// Results from `PK_BODY_create_implicit`.
 #[repr(C)]
@@ -1234,8 +1329,15 @@ pub struct PK_BODY_is_cellular_o_t { _private: [u8; 0] }
 pub struct PK_BODY_is_cellular_r_t { _private: [u8; 0] }
 
 /// Options for `PK_BODY_is_disjoint`.
+///
+/// layout: PK_BODY_is_disjoint journal replay (V37.01.243). Total size 0x0C.
 #[repr(C)]
-pub struct PK_BODY_is_disjoint_o_t { _private: [u8; 0] }
+#[derive(Debug, Clone, Copy)]
+pub struct PK_BODY_is_disjoint_o_t {
+    pub o_t_version: c_int,       // @0x00
+    pub topol_class: c_int,       // @0x04 (0x1389/0x138a/0x138c/500)
+    pub want_types: PK_LOGICAL_t, // @0x08
+}
 
 /// Results from `PK_BODY_is_disjoint`.
 #[repr(C)]
@@ -1250,16 +1352,49 @@ pub struct PK_BODY_enlarge_o_t { _private: [u8; 0] }
 pub struct PK_BODY_enlarge_r_t { _private: [u8; 0] }
 
 /// Options for `PK_BODY_slice`.
+///
+/// layout: PK_BODY_slice journal replay (V37.01.243). Total size 0x40.
+/// The `want_*` flags are packed as single bytes (0x20..0x23) in this struct.
+/// `slice_cb` is a `PK_BODY_slice_cb_f_t` callback pointer.
 #[repr(C)]
-pub struct PK_BODY_slice_o_t { _private: [u8; 0] }
+#[derive(Debug, Clone, Copy)]
+pub struct PK_BODY_slice_o_t {
+    pub o_t_version: c_int,            // @0x00
+    pub tolerance: c_double,           // @0x08
+    pub n_tool_offsets: c_int,         // @0x10
+    pub tool_offsets: *const c_double, // @0x18
+    pub want_positions: u8,            // @0x20 (PK_LOGICAL, byte)
+    pub want_curves: u8,               // @0x21 (PK_LOGICAL, byte)
+    pub want_intervals: u8,            // @0x22 (PK_LOGICAL, byte)
+    pub slice_cb: *mut c_void,         // @0x28 (PK_BODY_slice_cb_f_t)
+    pub context_data: *mut c_void,     // @0x30
+    pub max_n_layers: c_int,           // @0x38
+    pub have_callback: PK_LOGICAL_t,   // @0x3c (unnamed logical in journal)
+}
 
 /// Results from `PK_BODY_slice`.
 #[repr(C)]
 pub struct PK_BODY_slice_r_t { _private: [u8; 0] }
 
 /// Options for `PK_BODY_make_patterned`.
+///
+/// layout: PK_BODY_make_patterned journal replay (V37.01.243). Total size 0x130.
+/// The `pattern_descriptor`, `bound`, `form` and `callback` regions are nested
+/// sub-structs (journaled by FUN_180b6fa80 / PKU_journal_pattern_{bound,form,
+/// callback}); their internal fields are not further modelled here, but their
+/// byte sizes are exact so that `edge_matching`/`pattern_topology` land at the
+/// correct offsets. `[u64; N]` keeps 8-byte alignment (these blocks hold pointers).
 #[repr(C)]
-pub struct PK_BODY_make_patterned_o_t { _private: [u8; 0] }
+#[derive(Debug, Clone, Copy)]
+pub struct PK_BODY_make_patterned_o_t {
+    pub o_t_version: c_int,            // @0x000
+    pub pattern_descriptor: [u64; 18], // @0x008 (144 bytes, opaque)
+    pub bound: [u64; 13],              // @0x098 (104 bytes, opaque)
+    pub form: [u64; 2],                // @0x100 (16 bytes, opaque)
+    pub callback: [u64; 3],            // @0x110 (24 bytes, opaque)
+    pub edge_matching: c_int,          // @0x128
+    pub pattern_topology: c_int,       // @0x12c
+}
 
 /// Results from `PK_BODY_make_patterned`.
 #[repr(C)]
@@ -1290,8 +1425,18 @@ pub struct PK_FACE_fix_mesh_defects_r_t { _private: [u8; 0] }
 pub struct PK_ENTITY_track_r_t { _private: [u8; 0] }
 
 /// Options for `PK_REGION_embed_body`.
+///
+/// layout: PK_REGION_embed_body journal replay (V37.01.243). Total size 0x20.
 #[repr(C)]
-pub struct PK_REGION_embed_body_o_t { _private: [u8; 0] }
+#[derive(Debug, Clone, Copy)]
+pub struct PK_REGION_embed_body_o_t {
+    pub o_t_version: c_int,            // @0x00
+    pub merge_into_adj_regions: c_int, // @0x04 (0x6aea..0x6aed)
+    pub active_merge_regions: c_int,   // @0x08 (0x6af4..0x6af6)
+    pub match_tol: c_double,           // @0x10
+    pub track_regions: c_int,          // @0x18 (0x6810/0x6811)
+    pub track_faces: c_int,            // @0x1c (0x69aa/0x69ab)
+}
 
 /// Results from `PK_REGION_embed_body`.
 #[repr(C)]
@@ -1323,9 +1468,8 @@ unsafe extern "C" {
     /// Delete face sets from a body (typically identified by blend/detail functions).
     pub fn PK_FACE_delete_facesets(
         n_facesets: c_int,
-        facesets: *const *const PK_FACE_t,
-        faceset_sizes: *const c_int,
-        options: *const PK_FACE_delete_facesets_o_t,
+        facesets: *mut PK_FACE_array_t,
+        options: *mut PK_FACE_delete_facesets_o_t,
         n_bodies: *mut c_int,
         bodies: *mut *mut PK_BODY_t,
         n_failed_facesets: *mut c_int,
@@ -1334,8 +1478,7 @@ unsafe extern "C" {
 
     /// Remove faces from a sheet body (alternate entry point).
     pub fn PK_FACE_delete_from_sheet_body(
-        n_faces: c_int,
-        faces: *const PK_FACE_t,
+        face: PK_FACE_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1345,8 +1488,10 @@ unsafe extern "C" {
     /// Remove trimmed boundary features (laminar/wire edges).
     pub fn PK_EDGE_delete(
         n_edges: c_int,
-        edges: *const PK_EDGE_t,
-        options: *const PK_EDGE_delete_o_t,
+        edges: *mut PK_EDGE_t,
+        options: *mut PK_EDGE_delete_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1389,19 +1534,15 @@ unsafe extern "C" {
     /// Classify facesets by detail type.
     pub fn PK_FACE_classify_details(
         n_facesets: c_int,
-        facesets: *const *const PK_FACE_t,
-        faceset_sizes: *const c_int,
-        n_details: c_int,
-        details: *const PK_detail_t,
-        options: *const PK_FACE_classify_details_o_t,
-        n_results: *mut c_int,
-        results: *mut *mut c_void,
+        facesets: *mut PK_FACE_array_t,
+        details: *mut PK_detail_t,
+        options: *mut PK_FACE_classify_details_o_t,
+        results: *mut PK_FACE_classify_details_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Free results from PK_FACE_classify_details.
     pub fn PK_FACE_classify_details_r_f(
-        n_results: c_int,
-        results: *mut c_void,
+        results: *mut PK_FACE_classify_details_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1411,15 +1552,23 @@ unsafe extern "C" {
     /// Replace the surface of specified faces (version 2).
     pub fn PK_FACE_replace_surfs_2(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        surfaces: *const PK_SURF_t,
+        faces: *mut PK_FACE_t,
+        surfs: *mut PK_SURF_t,
+        senses: *mut PK_LOGICAL_t,
+        tolerance: c_double,
+        options: *mut PK_FACE_replace_surfs_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_FACE_replace_surfs_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Replace the surface of specified faces (version 1).
     pub fn PK_FACE_replace_surfs(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        surfaces: *const PK_SURF_t,
+        faces: *mut PK_FACE_t,
+        surfs: *mut PK_SURF_t,
+        tolerance: c_double,
+        local_check: PK_LOGICAL_t,
+        check_result: *mut PK_local_check_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1429,12 +1578,14 @@ unsafe extern "C" {
     /// Taper (draft) specific faces in a body.
     pub fn PK_FACE_taper(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        references: *const PK_ENTITY_t,
-        direction: *const c_double,
+        faces: *mut PK_FACE_t,
+        references: *mut PK_ENTITY_t,
+        direction: *const PK_VECTOR1_t,
         angle: c_double,
         tolerance: c_double,
-        options: *const PK_FACE_taper_o_t,
+        options: *mut PK_FACE_taper_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Imprint isocline curves on faces.
@@ -1475,10 +1626,12 @@ unsafe extern "C" {
 
     /// Replace target faces with tool faces from a sheet body.
     pub fn PK_FACE_replace_with_sheet(
-        n_target_faces: c_int,
-        target_faces: *const PK_FACE_t,
-        tool: PK_BODY_t,
-        options: *const PK_FACE_replace_with_sheet_o_t,
+        n_faces: c_int,
+        faces: *mut PK_FACE_t,
+        sheet: PK_BODY_t,
+        options: *mut PK_FACE_replace_with_sheet_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Replace smoothly connected faces with a single B-surface face.
@@ -1513,24 +1666,34 @@ unsafe extern "C" {
     /// Transform faces in a body (version 1).
     pub fn PK_FACE_transform(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        transform: PK_TRANSF_t,
+        faces: *mut PK_FACE_t,
+        transfs: *mut PK_TRANSF_t,
+        tolerance: c_double,
+        local_check: PK_LOGICAL_t,
+        n_replaces: *mut c_int,
+        replaces: *mut *mut PK_GEOM_t,
+        exact: *mut *mut PK_LOGICAL_t,
+        check_result: *mut PK_local_check_t,
     ) -> PK_ERROR_code_t;
 
     /// Offset faces by a specified distance (version 1).
     pub fn PK_FACE_offset(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        distance: c_double,
+        faces: *mut PK_FACE_t,
+        offsets: *mut c_double,
+        tolerance: c_double,
+        face_face_check: PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     /// Imprint a curve on a face.
     pub fn PK_FACE_imprint_curve(
         face: PK_FACE_t,
         curve: PK_CURVE_t,
-        interval: *const PK_INTERVAL_t,
+        bounds: *const PK_INTERVAL_t,
         n_new_edges: *mut c_int,
         new_edges: *mut *mut PK_EDGE_t,
+        n_new_faces: *mut c_int,
+        new_faces: *mut *mut PK_FACE_t,
     ) -> PK_ERROR_code_t;
 
     /// Imprint isocline curves on faces.
@@ -1551,83 +1714,92 @@ unsafe extern "C" {
     /// Spin a body around an axis.
     pub fn PK_BODY_spin(
         body: PK_BODY_t,
-        axis_position: *const c_double,
-        axis_direction: *const c_double,
+        axis: *mut PK_AXIS1_sf_t,
         angle: c_double,
-        new_body: *mut PK_BODY_t,
+        local_check: PK_LOGICAL_t,
+        n_laterals: *mut c_int,
+        laterals: *mut *mut PK_TOPOL_t,
+        bases: *mut *mut PK_TOPOL_t,
+        check_result: *mut PK_local_check_t,
     ) -> PK_ERROR_code_t;
 
     /// Sweep a body along a direction.
     pub fn PK_BODY_sweep(
         body: PK_BODY_t,
-        direction: *const c_double,
-        distance: c_double,
-        new_body: *mut PK_BODY_t,
+        path: *const PK_VECTOR_t,
+        local_check: PK_LOGICAL_t,
+        n_laterals: *mut c_int,
+        laterals: *mut *mut PK_TOPOL_t,
+        bases: *mut *mut PK_TOPOL_t,
+        check_result: *mut PK_local_check_t,
     ) -> PK_ERROR_code_t;
 
     /// Spin a curve to create a surface (version 2).
     pub fn PK_CURVE_spin_2(
         curve: PK_CURVE_t,
-        interval: *const PK_INTERVAL_t,
-        axis_position: *const c_double,
-        axis_direction: *const c_double,
-        angle: c_double,
-        surface: *mut PK_SURF_t,
+        axis: *mut PK_AXIS1_sf_t,
+        options: *mut PK_CURVE_spin_o_t,
+        surf: *mut PK_SURF_t,
     ) -> PK_ERROR_code_t;
 
     /// Spin a curve to create a surface (version 1).
     pub fn PK_CURVE_spin(
         curve: PK_CURVE_t,
-        interval: *const PK_INTERVAL_t,
-        axis_position: *const c_double,
-        axis_direction: *const c_double,
-        angle: c_double,
-        surface: *mut PK_SURF_t,
+        axis: *mut PK_AXIS1_sf_t,
+        surf: *mut PK_SURF_t,
     ) -> PK_ERROR_code_t;
 
     /// Sweep a curve to create a surface.
     pub fn PK_CURVE_sweep(
         curve: PK_CURVE_t,
-        interval: *const PK_INTERVAL_t,
-        direction: *const c_double,
-        distance: c_double,
-        surface: *mut PK_SURF_t,
+        direction: *const PK_VECTOR1_t,
+        surf: *mut PK_SURF_t,
     ) -> PK_ERROR_code_t;
 
     /// Spin faces of a body.
     pub fn PK_FACE_spin(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        axis_position: *const c_double,
-        axis_direction: *const c_double,
+        faces: *mut PK_FACE_t,
+        axis: *mut PK_AXIS1_sf_t,
         angle: c_double,
-        new_body: *mut PK_BODY_t,
+        local_check: PK_LOGICAL_t,
+        n_laterals: *mut c_int,
+        laterals: *mut *mut PK_FACE_t,
+        bases: *mut *mut PK_EDGE_t,
+        check_result: *mut PK_local_check_t,
     ) -> PK_ERROR_code_t;
 
     /// Sweep faces of a body.
     pub fn PK_FACE_sweep(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        direction: *const c_double,
-        distance: c_double,
-        new_body: *mut PK_BODY_t,
+        faces: *mut PK_FACE_t,
+        path: *const PK_VECTOR_t,
+        local_check: PK_LOGICAL_t,
+        n_laterals: *mut c_int,
+        laterals: *mut *mut PK_FACE_t,
+        bases: *mut *mut PK_EDGE_t,
+        check_result: *mut PK_local_check_t,
     ) -> PK_ERROR_code_t;
 
     /// Spin an end vertex of a wire body.
     pub fn PK_VERTEX_spin(
         vertex: PK_VERTEX_t,
-        axis_position: *const c_double,
-        axis_direction: *const c_double,
+        axis: *mut PK_AXIS1_sf_t,
         angle: c_double,
-        new_body: *mut PK_BODY_t,
+        local_check: PK_LOGICAL_t,
+        lateral: *mut PK_EDGE_t,
+        base: *mut PK_VERTEX_t,
+        check_result: *mut PK_local_check_t,
     ) -> PK_ERROR_code_t;
 
     /// Sweep an end vertex of a wire body.
     pub fn PK_VERTEX_sweep(
         vertex: PK_VERTEX_t,
-        direction: *const c_double,
-        distance: c_double,
-        new_body: *mut PK_BODY_t,
+        path: *const PK_VECTOR_t,
+        local_check: PK_LOGICAL_t,
+        lateral: *mut PK_EDGE_t,
+        base: *mut PK_VERTEX_t,
+        check_result: *mut PK_local_check_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -1686,26 +1858,30 @@ unsafe extern "C" {
     pub fn PK_BODY_imprint_curve(
         body: PK_BODY_t,
         curve: PK_CURVE_t,
-        interval: *const PK_INTERVAL_t,
+        bounds: *const PK_INTERVAL_t,
         n_new_edges: *mut c_int,
         new_edges: *mut *mut PK_EDGE_t,
+        n_new_faces: *mut c_int,
+        new_faces: *mut *mut PK_FACE_t,
     ) -> PK_ERROR_code_t;
 
     /// Imprint a plane onto a body.
     pub fn PK_BODY_imprint_plane(
         body: PK_BODY_t,
         plane: PK_PLANE_t,
-        n_new_edges: *mut c_int,
-        new_edges: *mut *mut PK_EDGE_t,
+        tol: c_double,
+        n_edges: *mut c_int,
+        edges: *mut *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     /// Imprint faces onto a body.
     pub fn PK_BODY_imprint_faces(
-        target: PK_BODY_t,
+        body: PK_BODY_t,
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        n_new_edges: *mut c_int,
-        new_edges: *mut *mut PK_EDGE_t,
+        faces: *mut PK_FACE_t,
+        tol: c_double,
+        n_edges: *mut c_int,
+        edges: *mut *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================

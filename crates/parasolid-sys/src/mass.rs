@@ -53,27 +53,27 @@ pub const PK_mass_bound_interval_c: PK_mass_bound_t = 0x36b9; // 14009
 /// version-1 struct this crate uses for [`Body::mass_props`].
 pub type PK_mass_local_density_t = c_int;
 /// Local density added to body density. [guess]
-pub const PK_mass_local_density_additive_c: PK_mass_local_density_t = 0;
+pub const PK_mass_local_density_additive_c: PK_mass_local_density_t = 25081;
 /// Ignore local densities. [guess]
-pub const PK_mass_local_density_ignore_c: PK_mass_local_density_t = 1;
+pub const PK_mass_local_density_ignore_c: PK_mass_local_density_t = 25082;
 /// Not specified (default). [guess]
-pub const PK_mass_local_density_unset_c: PK_mass_local_density_t = 2;
+pub const PK_mass_local_density_unset_c: PK_mass_local_density_t = 25083;
 /// Local density overrides body density (same_dim_density only). [guess]
-pub const PK_mass_local_density_override_c: PK_mass_local_density_t = 3;
+pub const PK_mass_local_density_override_c: PK_mass_local_density_t = 25080;
 
 /// Behaviour when mass equals zero. [guess — only present in later versions]
 pub type PK_mass_eq_0_t = c_int;
 /// Stop and return error on zero mass (default). [guess]
-pub const PK_mass_eq_0_fail_c: PK_mass_eq_0_t = 0;
+pub const PK_mass_eq_0_fail_c: PK_mass_eq_0_t = 26570;
 /// Continue, report zero-mass topologies via report stream. [guess]
-pub const PK_mass_eq_0_report_c: PK_mass_eq_0_t = 1;
+pub const PK_mass_eq_0_report_c: PK_mass_eq_0_t = 26571;
 
 // Report constants for zero-mass reporting.
 pub type PK_REPORT_record_type_t = c_int;
 /// Report record type for mass_eq_0 reports.
-pub const PK_REPORT_record_type_3_c: PK_REPORT_record_type_t = 3;
+pub const PK_REPORT_record_type_3_c: PK_REPORT_record_type_t = 23852;
 /// Status code for zero mass.
-pub const PK_REPORT_3_mass_eq_0_c: c_int = 1;
+pub const PK_REPORT_3_mass_eq_0_c: c_int = 25636;
 
 // =============================================================================
 // Options structure

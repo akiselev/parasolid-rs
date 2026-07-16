@@ -14,21 +14,21 @@ use crate::*;
 // =============================================================================
 
 pub type PK_FACE_cover_update_t = c_int;
-pub const PK_FACE_cover_update_default_c: PK_FACE_cover_update_t = 0;
+pub const PK_FACE_cover_update_default_c: PK_FACE_cover_update_t = 25570;
 
 // =============================================================================
 // Wire modeling — enums and constants (Chapter 42)
 // =============================================================================
 
 /// Natural curve extensions.
-pub const PK_VERTEX_gap_fill_natural_c: PK_VERTEX_gap_fill_t = 2;
+pub const PK_VERTEX_gap_fill_natural_c: PK_VERTEX_gap_fill_t = 21222;
 
 /// Whether curves are supplied in connection sequence.
 pub type PK_CURVE_sequential_t = c_int;
 /// Curves not in connection sequence (default).
-pub const PK_CURVE_sequential_no_c: PK_CURVE_sequential_t = 0;
+pub const PK_CURVE_sequential_no_c: PK_CURVE_sequential_t = 23460;
 /// Curves in connection sequence.
-pub const PK_CURVE_sequential_yes_c: PK_CURVE_sequential_t = 1;
+pub const PK_CURVE_sequential_yes_c: PK_CURVE_sequential_t = 23461;
 
 // =============================================================================
 // Sheet modeling — enums and constants (Chapter 43)
@@ -37,28 +37,28 @@ pub const PK_CURVE_sequential_yes_c: PK_CURVE_sequential_t = 1;
 /// Whether to make sheet from copies or originals.
 pub type PK_BODY_make_from_t = c_int;
 /// Make sheet from copies of input faces (default).
-pub const PK_BODY_make_from_copy_c: PK_BODY_make_from_t = 0;
+pub const PK_BODY_make_from_copy_c: PK_BODY_make_from_t = 26510;
 /// Make sheet from original faces; originals removed from source body.
-pub const PK_BODY_make_from_original_c: PK_BODY_make_from_t = 1;
+pub const PK_BODY_make_from_original_c: PK_BODY_make_from_t = 26511;
 
 /// Whether to track edges in tracking output.
 pub type PK_track_edges_t = c_int;
 /// Do not return edges in tracking (default).
-pub const PK_track_edges_no_c: PK_track_edges_t = 0;
+pub const PK_track_edges_no_c: PK_track_edges_t = 23981;
 /// Return edges in tracking.
-pub const PK_track_edges_yes_c: PK_track_edges_t = 1;
+pub const PK_track_edges_yes_c: PK_track_edges_t = 23980;
 
 /// Whether to track vertices in tracking output.
 pub type PK_track_vertices_t = c_int;
 /// Do not return vertices in tracking (default).
-pub const PK_track_vertices_no_c: PK_track_vertices_t = 0;
+pub const PK_track_vertices_no_c: PK_track_vertices_t = 23991;
 /// Return vertices in tracking.
-pub const PK_track_vertices_yes_c: PK_track_vertices_t = 1;
+pub const PK_track_vertices_yes_c: PK_track_vertices_t = 23990;
 
 /// Group transfer mode when creating sheet bodies.
 pub type PK_GROUP_transfer_t = c_int;
 /// Transfer owning groups (default).
-pub const PK_GROUP_transfer_owning_c: PK_GROUP_transfer_t = 0;
+pub const PK_GROUP_transfer_owning_c: PK_GROUP_transfer_t = 26551;
 
 // =============================================================================
 // Sewing and knitting — enums and constants (Chapter 44)
@@ -67,72 +67,72 @@ pub const PK_GROUP_transfer_owning_c: PK_GROUP_transfer_t = 0;
 /// Preferred body type for sewing result.
 pub type PK_BODY_sewing_t = c_int;
 /// Prefer solid if no laminar/non-manifold edges.
-pub const PK_BODY_sewing_solid_c: PK_BODY_sewing_t = 0;
+pub const PK_BODY_sewing_solid_c: PK_BODY_sewing_t = 18070;
 /// Prefer sheet.
-pub const PK_BODY_sewing_sheet_c: PK_BODY_sewing_t = 1;
+pub const PK_BODY_sewing_sheet_c: PK_BODY_sewing_t = 18071;
 /// All results as general bodies.
-pub const PK_BODY_sewing_general_c: PK_BODY_sewing_t = 2;
+pub const PK_BODY_sewing_general_c: PK_BODY_sewing_t = 18072;
 /// No preference; pick most specific type (default).
-pub const PK_BODY_sewing_any_c: PK_BODY_sewing_t = 3;
+pub const PK_BODY_sewing_any_c: PK_BODY_sewing_t = 18073;
 
 /// Duplicate sheet removal strategy during sewing.
 pub type PK_BODY_sewing_remove_t = c_int;
 /// No duplicate removal (default).
-pub const PK_BODY_sewing_remove_none_c: PK_BODY_sewing_remove_t = 0;
+pub const PK_BODY_sewing_remove_none_c: PK_BODY_sewing_remove_t = 18076;
 /// Remove possible duplicates (Parasolid precision).
-pub const PK_BODY_sewing_remove_poss_c: PK_BODY_sewing_remove_t = 1;
+pub const PK_BODY_sewing_remove_poss_c: PK_BODY_sewing_remove_t = 18077;
 /// Remove certain duplicates (gap_width_bound tolerance).
-pub const PK_BODY_sewing_remove_cert_c: PK_BODY_sewing_remove_t = 2;
+pub const PK_BODY_sewing_remove_cert_c: PK_BODY_sewing_remove_t = 18078;
 
 /// Whether to sew edges in the same inner loop.
 pub type PK_LOOP_sew_up_t = c_int;
 /// Sew edges in same inner loop (default).
-pub const PK_LOOP_sew_up_loop_c: PK_LOOP_sew_up_t = 0;
+pub const PK_LOOP_sew_up_loop_c: PK_LOOP_sew_up_t = 25500;
 /// Do not sew edges in same inner loop.
-pub const PK_LOOP_sew_up_no_c: PK_LOOP_sew_up_t = 1;
+pub const PK_LOOP_sew_up_no_c: PK_LOOP_sew_up_t = 25501;
 
 /// Whether to attempt edge tolerance reduction after sewing.
 pub type PK_EDGE_reduce_tol_t = c_int;
 /// No tolerance reduction (default).
-pub const PK_EDGE_reduce_tol_no_c: PK_EDGE_reduce_tol_t = 0;
+pub const PK_EDGE_reduce_tol_no_c: PK_EDGE_reduce_tol_t = 26450;
 /// Attempt to reduce edge tolerance.
-pub const PK_EDGE_reduce_tol_yes_c: PK_EDGE_reduce_tol_t = 1;
+pub const PK_EDGE_reduce_tol_yes_c: PK_EDGE_reduce_tol_t = 26451;
 
 /// Assembly sewing method.
 pub type PK_BODY_sewing_assy_t = c_int;
 /// Use face orientation to determine piece parts.
-pub const PK_BODY_sewing_assy_orient_c: PK_BODY_sewing_assy_t = 0;
+pub const PK_BODY_sewing_assy_orient_c: PK_BODY_sewing_assy_t = 24191;
 /// Also examine shared laminar edges.
-pub const PK_BODY_sewing_assy_extend_c: PK_BODY_sewing_assy_t = 1;
+pub const PK_BODY_sewing_assy_extend_c: PK_BODY_sewing_assy_t = 24192;
 
 /// General topology sewing mode.
 pub type PK_BODY_sewing_gen_t = c_int;
 /// Fail on general topology input (default).
-pub const PK_BODY_sewing_gen_no_c: PK_BODY_sewing_gen_t = 0;
+pub const PK_BODY_sewing_gen_no_c: PK_BODY_sewing_gen_t = 24240;
 /// Sew general bodies at locally manifold boundaries.
-pub const PK_BODY_sewing_gen_loc_manf_c: PK_BODY_sewing_gen_t = 1;
+pub const PK_BODY_sewing_gen_loc_manf_c: PK_BODY_sewing_gen_t = 24241;
 
 /// Problem group tokens from sewing operations.
 pub type PK_BODY_sewing_problem_t = c_int;
 /// 3+ sheets meet, no distinct pair found.
-pub const PK_BODY_sewing_non_manifold_c: PK_BODY_sewing_problem_t = 0;
+pub const PK_BODY_sewing_non_manifold_c: PK_BODY_sewing_problem_t = 18061;
 /// Sheet meets itself after half-twist.
-pub const PK_BODY_sewing_non_oriented_c: PK_BODY_sewing_problem_t = 1;
+pub const PK_BODY_sewing_non_oriented_c: PK_BODY_sewing_problem_t = 18062;
 /// Internal algorithmic failure.
-pub const PK_BODY_sewing_unspecified_c: PK_BODY_sewing_problem_t = 2;
+pub const PK_BODY_sewing_unspecified_c: PK_BODY_sewing_problem_t = 18063;
 /// Overlapping sheets (not currently returned).
-pub const PK_BODY_sewing_overlapping_c: PK_BODY_sewing_problem_t = 3;
+pub const PK_BODY_sewing_overlapping_c: PK_BODY_sewing_problem_t = 18060;
 
 /// Preferred body type for knitting.
 pub type PK_BODY_type_prefer_t = c_int;
 /// Prefer solid body.
-pub const PK_BODY_type_prefer_solid_c: PK_BODY_type_prefer_t = 0;
+pub const PK_BODY_type_prefer_solid_c: PK_BODY_type_prefer_t = 26530;
 /// Prefer sheet body.
-pub const PK_BODY_type_prefer_sheet_c: PK_BODY_type_prefer_t = 1;
+pub const PK_BODY_type_prefer_sheet_c: PK_BODY_type_prefer_t = 26531;
 /// Prefer general body.
-pub const PK_BODY_type_prefer_general_c: PK_BODY_type_prefer_t = 2;
+pub const PK_BODY_type_prefer_general_c: PK_BODY_type_prefer_t = 26532;
 /// Prefer original body type.
-pub const PK_BODY_type_prefer_original_c: PK_BODY_type_prefer_t = 3;
+pub const PK_BODY_type_prefer_original_c: PK_BODY_type_prefer_t = 26533;
 
 // =============================================================================
 // Mid-surface — enums and constants (Chapter 45)
@@ -141,18 +141,18 @@ pub const PK_BODY_type_prefer_original_c: PK_BODY_type_prefer_t = 3;
 /// Face overlap detection for neutral sheet creation.
 pub type PK_neutral_face_overlap_t = c_int;
 /// Face overlaps not considered (default).
-pub const PK_neutral_face_overlap_no_c: PK_neutral_face_overlap_t = 0;
+pub const PK_neutral_face_overlap_no_c: PK_neutral_face_overlap_t = 25390;
 /// Face overlaps considered; reject non-overlapping pairs.
-pub const PK_neutral_face_overlap_yes_c: PK_neutral_face_overlap_t = 1;
+pub const PK_neutral_face_overlap_yes_c: PK_neutral_face_overlap_t = 25391;
 
 /// Neutral sheet construction method.
 pub type PK_neutral_method_t = c_int;
 /// Verify faces are offsets; create sheet between them (default).
-pub const PK_neutral_method_mid_offset_c: PK_neutral_method_t = 0;
+pub const PK_neutral_method_mid_offset_c: PK_neutral_method_t = 25020;
 /// Offset from left faces toward right faces.
-pub const PK_neutral_method_offset_left_c: PK_neutral_method_t = 1;
+pub const PK_neutral_method_offset_left_c: PK_neutral_method_t = 25021;
 /// Average mid-surface (no offset requirement).
-pub const PK_neutral_method_medial_c: PK_neutral_method_t = 2;
+pub const PK_neutral_method_medial_c: PK_neutral_method_t = 25022;
 
 /// Whether to ignore small faces during neutral sheet trimming.
 pub type PK_neutral_ignore_fa_t = c_int;
@@ -164,66 +164,70 @@ pub const PK_neutral_ignore_fa_no_c: PK_neutral_ignore_fa_t = 1;
 /// Overlap handling during neutral sheet trimming.
 pub type PK_neutral_overlap_t = c_int;
 /// Ignore overlapping faces (default).
-pub const PK_neutral_overlap_no_c: PK_neutral_overlap_t = 0;
+pub const PK_neutral_overlap_no_c: PK_neutral_overlap_t = 24540;
 /// Detect and report overlapping faces.
-pub const PK_neutral_overlap_report_c: PK_neutral_overlap_t = 1;
+pub const PK_neutral_overlap_report_c: PK_neutral_overlap_t = 24541;
 /// Repair overlapping faces (delete one set).
-pub const PK_neutral_overlap_repair_c: PK_neutral_overlap_t = 2;
+pub const PK_neutral_overlap_repair_c: PK_neutral_overlap_t = 24542;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_REPORT_1_fa_overlap_c: PK_neutral_overlap_t = 23900;
 
 /// Neutral sheet trim method.
 pub type PK_neutral_trim_method_t = c_int;
 /// Trim only against other neutral sheets (default).
-pub const PK_neutral_trim_method_sheets_c: PK_neutral_trim_method_t = 0;
+pub const PK_neutral_trim_method_sheets_c: PK_neutral_trim_method_t = 24500;
 /// Also trim against side faces of original body.
-pub const PK_neutral_trim_method_sides_c: PK_neutral_trim_method_t = 1;
+pub const PK_neutral_trim_method_sides_c: PK_neutral_trim_method_t = 24501;
 
 // =============================================================================
 // Extending sheets and surfaces — enums and constants (Chapter 46)
 // =============================================================================
 
 /// C2-continuous, mirrors existing geometry.
-pub const PK_extension_shape_reflective_c: PK_extension_shape_t = 2;
+pub const PK_extension_shape_reflective_c: PK_extension_shape_t = 22752;
 /// Constant radii of curvature, circular arc cross-section, G2 match (PK_SURF_extend only).
-pub const PK_extension_shape_arc_c: PK_extension_shape_t = 3;
+pub const PK_extension_shape_arc_c: PK_extension_shape_t = 22754;
 /// Continues surface shape, C-infinity at boundary (PK_SURF_extend only).
-pub const PK_extension_shape_natural_c: PK_extension_shape_t = 4;
+pub const PK_extension_shape_natural_c: PK_extension_shape_t = 22753;
 
 /// Target limit for extend-to-target operations.
 pub type PK_extension_limit_t = c_int;
 /// Minimum distance to intersect target (default).
-pub const PK_extension_limit_minimal_c: PK_extension_limit_t = 0;
+pub const PK_extension_limit_minimal_c: PK_extension_limit_t = 23800;
 /// Extend until reaching inside of target.
-pub const PK_extension_limit_inside_c: PK_extension_limit_t = 1;
+pub const PK_extension_limit_inside_c: PK_extension_limit_t = 23801;
 /// Extend until reaching outside of target.
-pub const PK_extension_limit_outside_c: PK_extension_limit_t = 2;
+pub const PK_extension_limit_outside_c: PK_extension_limit_t = 23802;
 
 /// Smoothness preservation across internal edges.
 pub type PK_extension_smoothness_t = c_int;
 /// Preserve G1 smoothness across internal edges.
-pub const PK_extension_smoothness_g1_c: PK_extension_smoothness_t = 0;
+pub const PK_extension_smoothness_g1_c: PK_extension_smoothness_t = 22911;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_extension_smoothness_g0_c: PK_extension_smoothness_t = 22910;
 
 /// How new topology is created during extension.
 pub type PK_extend_create_t = c_int;
 /// New topology without original attributes (default).
-pub const PK_extend_create_new_c: PK_extend_create_t = 0;
+pub const PK_extend_create_new_c: PK_extend_create_t = 24150;
 /// Split from original topology (attributes follow split rules).
-pub const PK_extend_create_split_c: PK_extend_create_t = 1;
+pub const PK_extend_create_split_c: PK_extend_create_t = 24151;
 
 /// Extension boundary precision.
 pub type PK_extension_boundary_t = c_int;
 /// Precise boundary (default).
-pub const PK_extension_boundary_precise_c: PK_extension_boundary_t = 0;
+pub const PK_extension_boundary_precise_c: PK_extension_boundary_t = 24270;
 /// Rough boundary (better performance, no detailed tracking).
-pub const PK_extension_boundary_loose_c: PK_extension_boundary_t = 1;
+pub const PK_extension_boundary_loose_c: PK_extension_boundary_t = 24271;
 
 /// Side edge construction method for body extension.
 pub type PK_extend_side_t = c_int;
 /// Parasolid decides (default).
-pub const PK_extend_side_default_c: PK_extend_side_t = 0;
+pub const PK_extend_side_default_c: PK_extend_side_t = 24730;
 /// Follow adjacent edges/extensions.
-pub const PK_extend_side_follow_adj_c: PK_extend_side_t = 1;
+pub const PK_extend_side_follow_adj_c: PK_extend_side_t = 24731;
 /// Orthogonal to base edge.
-pub const PK_extend_side_ortho_base_c: PK_extend_side_t = 2;
+pub const PK_extend_side_ortho_base_c: PK_extend_side_t = 24732;
 
 /// Tracking detail for new laminar side edges during extension.
 pub type PK_extend_track_laminar_t = c_int;
@@ -235,35 +239,35 @@ pub const PK_extend_track_laminar_edges_c: PK_extend_track_laminar_t = 1;
 /// Whether to track non-laminar side edges during extension.
 pub type PK_extend_track_internal_t = c_int;
 /// Only track laminar side edges (default).
-pub const PK_extend_track_internal_no_c: PK_extend_track_internal_t = 0;
+pub const PK_extend_track_internal_no_c: PK_extend_track_internal_t = 23580;
 /// Also track non-laminar side edges.
-pub const PK_extend_track_internal_yes_c: PK_extend_track_internal_t = 1;
+pub const PK_extend_track_internal_yes_c: PK_extend_track_internal_t = 23581;
 
 /// Surface extension type.
 pub type PK_SURF_extension_t = c_int;
 /// No extension (default).
-pub const PK_SURF_extension_none_c: PK_SURF_extension_t = 0;
+pub const PK_SURF_extension_none_c: PK_SURF_extension_t = 22030;
 /// Extend to a point.
-pub const PK_SURF_extension_point_c: PK_SURF_extension_t = 1;
+pub const PK_SURF_extension_point_c: PK_SURF_extension_t = 22031;
 /// Extend to a bounding box.
-pub const PK_SURF_extension_box_c: PK_SURF_extension_t = 2;
+pub const PK_SURF_extension_box_c: PK_SURF_extension_t = 22032;
 /// Extend to a parameter-space box.
-pub const PK_SURF_extension_uvbox_c: PK_SURF_extension_t = 3;
+pub const PK_SURF_extension_uvbox_c: PK_SURF_extension_t = 22033;
 /// Extend by parameter boundary ratios.
-pub const PK_SURF_extension_ratio_c: PK_SURF_extension_t = 4;
+pub const PK_SURF_extension_ratio_c: PK_SURF_extension_t = 22034;
 
 /// Status return from PK_SURF_extend.
 pub type PK_SURF_extend_status_t = c_int;
 /// Extension succeeded.
-pub const PK_SURF_extend_ok_c: PK_SURF_extend_status_t = 0;
+pub const PK_SURF_extend_ok_c: PK_SURF_extend_status_t = 22010;
 /// No extension necessary (e.g. extending a plane).
-pub const PK_SURF_extend_unextended_c: PK_SURF_extend_status_t = 1;
+pub const PK_SURF_extend_unextended_c: PK_SURF_extend_status_t = 22011;
 /// Partial extension performed.
-pub const PK_SURF_extend_partial_c: PK_SURF_extend_status_t = 2;
+pub const PK_SURF_extend_partial_c: PK_SURF_extend_status_t = 22012;
 /// Extension would create invalid surface.
-pub const PK_SURF_extend_invalid_c: PK_SURF_extend_status_t = 3;
+pub const PK_SURF_extend_invalid_c: PK_SURF_extend_status_t = 22013;
 /// Internal algorithm failure.
-pub const PK_SURF_extend_failure_c: PK_SURF_extend_status_t = 4;
+pub const PK_SURF_extend_failure_c: PK_SURF_extend_status_t = 22014;
 
 /// Use all enhancements (default).
 pub const PK_surf_extend_update_default_c: PK_surf_extend_update_t = 0;
@@ -766,10 +770,13 @@ unsafe extern "C" {
     /// * `new_body` - (out) New offset wire body.
     /// * `tracking` - (out) Tracking information.
     pub fn PK_BODY_offset_planar_wire(
-        body: PK_BODY_t,
-        distance: c_double,
-        options: *const PK_BODY_offset_planar_wire_o_t,
-        new_body: *mut PK_BODY_t,
+        wire_body: PK_BODY_t,
+        offset: c_double,
+        normal: *const PK_VECTOR1_t,
+        r#ref: PK_EDGE_t,
+        options: *mut PK_BODY_offset_planar_wire_o_t,
+        n_new_wires: *mut c_int,
+        new_wires: *mut *mut PK_BODY_t,
         tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
@@ -777,7 +784,9 @@ unsafe extern "C" {
     ///
     /// Supports wire, sheet, solid, and general bodies.
     pub fn PK_EDGE_reverse_2(
-        edge: PK_EDGE_t,
+        n_edges: c_int,
+        edges: *mut PK_EDGE_t,
+        options: *mut PK_EDGE_reverse_2_o_t,
     ) -> PK_ERROR_code_t;
 
     /// Orientates all edges of a wire body in the same direction as a given edge.
@@ -851,6 +860,9 @@ unsafe extern "C" {
     pub fn PK_BODY_embed_in_surf(
         body: PK_BODY_t,
         surf: PK_SURF_t,
+        tolerance: c_double,
+        n_edges: *mut c_int,
+        edges: *mut *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -872,10 +884,8 @@ unsafe extern "C" {
     pub fn PK_EDGE_find_deviation_2(
         edge1: PK_EDGE_t,
         edge2: PK_EDGE_t,
-        n_samples: c_int,
-        max_deviation: *mut c_double,
-        n_deviations: *mut c_int,
-        deviations: *mut *mut c_double,
+        options: *mut PK_EDGE_find_deviation_o_t,
+        result: *mut PK_EDGE_find_deviation_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Joins bodies using 1:1 matching of supplied topologies (edges or vertices).
@@ -917,13 +927,12 @@ unsafe extern "C" {
     /// * `bodies` - (out) Array of neutral sheet body tags.
     pub fn PK_FACE_make_neutral_sheet_2(
         n_left_faces: c_int,
-        left_faces: *const PK_FACE_t,
+        left_faces: *mut PK_FACE_t,
         n_right_faces: c_int,
-        right_faces: *const PK_FACE_t,
+        right_faces: *mut PK_FACE_t,
         placement: c_double,
-        options: *const PK_FACE_make_neutral_sheet_o_t,
-        n_bodies: *mut c_int,
-        bodies: *mut *mut PK_BODY_t,
+        options: *mut PK_FACE_make_neutral_sheet_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Trims neutral sheets using the original solid body and face set pair info.
@@ -942,15 +951,16 @@ unsafe extern "C" {
     /// * `right_faces` - Array of right face tags.
     /// * `options` - Options structure.
     /// * `tracking` - (out) Tracking information.
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_BODY_trim_neutral_sheets_2(
         body: PK_BODY_t,
-        n_neutral_bodies: c_int,
-        neutral_bodies: *const PK_BODY_t,
-        n_left_faces: c_int,
-        left_faces: *const PK_FACE_t,
-        n_right_faces: c_int,
-        right_faces: *const PK_FACE_t,
-        options: *const PK_BODY_trim_neutral_sheets_o_t,
+        n_pairs: c_int,
+        pairs: *mut PK_FACE_set_pair_t,
+        tol: c_double,
+        options: *mut PK_BODY_trim_neutral_sheets_o_t,
+        neutral_sheets: *mut PK_BODY_t,
+        errors: *mut PK_neutral_error_t,
+        causes: *mut PK_FACE_neutral_causes_array_t,
         tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
@@ -972,9 +982,10 @@ unsafe extern "C" {
     pub fn PK_BODY_extend(
         body: PK_BODY_t,
         n_boundary_edges: c_int,
-        boundary_edges: *const PK_EDGE_t,
-        options: *const PK_BODY_extend_o_t,
+        boundary_edges: *mut PK_EDGE_t,
+        options: *mut PK_BODY_extend_o_t,
         tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Extends surfaces of any class (except foreign geometry).

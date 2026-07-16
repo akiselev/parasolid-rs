@@ -21,13 +21,13 @@ use crate::*;
 pub type PK_SESSION_behave_as_t = c_int;
 
 /// Use the latest behaviour for the current Parasolid version.
-pub const PK_SESSION_behave_as_latest_c: PK_SESSION_behave_as_t = 0;
+pub const PK_SESSION_behave_as_latest_c: PK_SESSION_behave_as_t = 25841;
 
 /// Use behaviour from a specific patch release. `behaviour_value` format: MMmmpp.
-pub const PK_SESSION_behave_as_value_c: PK_SESSION_behave_as_t = 1;
+pub const PK_SESSION_behave_as_value_c: PK_SESSION_behave_as_t = 25842;
 
 /// Use original system (session switches + update switches). Initial default.
-pub const PK_SESSION_behave_as_unset_c: PK_SESSION_behave_as_t = 2;
+pub const PK_SESSION_behave_as_unset_c: PK_SESSION_behave_as_t = 25840;
 
 /// Session behaviour descriptor.
 ///
@@ -56,10 +56,10 @@ impl Default for PK_SESSION_behaviour_t {
 pub type PK_behaviour_status_t = c_int;
 
 /// Behaviour was set as requested.
-pub const PK_behaviour_status_ok_c: PK_behaviour_status_t = 0;
+pub const PK_behaviour_status_ok_c: PK_behaviour_status_t = 25910;
 
 /// Requested behaviour not known; Parasolid set closest match before the requested value.
-pub const PK_behaviour_status_unknown_c: PK_behaviour_status_t = 1;
+pub const PK_behaviour_status_unknown_c: PK_behaviour_status_t = 25911;
 
 // =============================================================================
 // Session-level switch constants (original system, PK_SESSION_software_option_t fields)
@@ -74,59 +74,59 @@ pub type PK_SESSION_sw_t = c_int;
 
 // Restricted switches (set only with Parasolid Support advice)
 /// Swept surface coincidence — emulates V9.0.
-pub const PK_SESSION_SURF_coincide_c: PK_SESSION_sw_t = 1;
+pub const PK_SESSION_SURF_coincide_c: PK_SESSION_sw_t = 4201;
 /// Isoline curve creation — emulates V10.0.
-pub const PK_SESSION_old_isoclines_c: PK_SESSION_sw_t = 2;
+pub const PK_SESSION_old_isoclines_c: PK_SESSION_sw_t = 4202;
 /// Tag persistence — emulates V12.0.
-pub const PK_SESSION_ENTITY_persist_alt_c: PK_SESSION_sw_t = 3;
+pub const PK_SESSION_ENTITY_persist_alt_c: PK_SESSION_sw_t = 4206;
 /// Smooth intersection curve edge generation along blends — emulates V12.1.
-pub const PK_SESSION_old_blend_bounds_c: PK_SESSION_sw_t = 4;
+pub const PK_SESSION_old_blend_bounds_c: PK_SESSION_sw_t = 4203;
 /// Merging planes — emulates V12.1.
-pub const PK_SESSION_PLANE_exact_coi_c: PK_SESSION_sw_t = 5;
+pub const PK_SESSION_PLANE_exact_coi_c: PK_SESSION_sw_t = 4204;
 /// PK_FACE_find_uvbox — emulates V13.0.
-pub const PK_SESSION_FACE_old_uvbox_c: PK_SESSION_sw_t = 6;
+pub const PK_SESSION_FACE_old_uvbox_c: PK_SESSION_sw_t = 4205;
 /// Local operations — emulates V13.0.
-pub const PK_SESSION_local_ops_pre_v132_c: PK_SESSION_sw_t = 7;
+pub const PK_SESSION_local_ops_pre_v132_c: PK_SESSION_sw_t = 4212;
 /// Point contacts between surfaces — emulates V13.0.
-pub const PK_SESSION_point_int_pre_v132_c: PK_SESSION_sw_t = 8;
+pub const PK_SESSION_point_int_pre_v132_c: PK_SESSION_sw_t = 4213;
 /// Checker ignores ruled boundary degeneracies — emulates V13.2.
-pub const PK_SESSION_check_pre_v140_c: PK_SESSION_sw_t = 9;
+pub const PK_SESSION_check_pre_v140_c: PK_SESSION_sw_t = 4207;
 /// Boolean operations — emulates V14.0.
 pub const PK_SESSION_booleans_pre_v141_c: PK_SESSION_sw_t = 10;
 /// Offset surface checking — emulates V14.0.
-pub const PK_SESSION_check_pre_v141_c: PK_SESSION_sw_t = 11;
+pub const PK_SESSION_check_pre_v141_c: PK_SESSION_sw_t = 4209;
 /// Helix creation — emulates V14.0.
-pub const PK_SESSION_old_helix_c: PK_SESSION_sw_t = 12;
+pub const PK_SESSION_old_helix_c: PK_SESSION_sw_t = 4210;
 /// Min radius of curvature on swept/spun surfaces — emulates V14.0.
-pub const PK_SESSION_SURF_old_min_radii_c: PK_SESSION_sw_t = 13;
+pub const PK_SESSION_SURF_old_min_radii_c: PK_SESSION_sw_t = 4208;
 /// Check partitions during transmit (added V14.0).
-pub const PK_SESSION_check_transmit_c: PK_SESSION_sw_t = 14;
+pub const PK_SESSION_check_transmit_c: PK_SESSION_sw_t = 4217;
 /// Hidden line rendering — emulates V31.0.
 pub const PK_SESSION_old_hir_wire_c: PK_SESSION_sw_t = 15;
 /// Edge merging during local operations — emulates V14.1.
-pub const PK_SESSION_pre_v150_switch_1_c: PK_SESSION_sw_t = 16;
+pub const PK_SESSION_pre_v150_switch_1_c: PK_SESSION_sw_t = 4215;
 /// Self-intersection checking in B-spline surfaces — emulates V14.1.
-pub const PK_SESSION_pre_v150_switch_2_c: PK_SESSION_sw_t = 17;
+pub const PK_SESSION_pre_v150_switch_2_c: PK_SESSION_sw_t = 4216;
 /// Some local operations — emulates V14.1.
-pub const PK_SESSION_pre_v150_switch_3_c: PK_SESSION_sw_t = 18;
+pub const PK_SESSION_pre_v150_switch_3_c: PK_SESSION_sw_t = 4219;
 /// Region tag persistence, attribute/group handling — emulates V14.1.
-pub const PK_SESSION_region_gt_pre_v150_c: PK_SESSION_sw_t = 19;
+pub const PK_SESSION_region_gt_pre_v150_c: PK_SESSION_sw_t = 4214;
 /// Curve imprinting on faces — emulates V15.0.
-pub const PK_SESSION_pre_v151_switch_1_c: PK_SESSION_sw_t = 20;
+pub const PK_SESSION_pre_v151_switch_1_c: PK_SESSION_sw_t = 4218;
 /// Miscellaneous — emulates V15.1.
-pub const PK_SESSION_pre_v160_switch_1_c: PK_SESSION_sw_t = 21;
+pub const PK_SESSION_pre_v160_switch_1_c: PK_SESSION_sw_t = 4220;
 /// Edge blend capping — emulates V16.0.
-pub const PK_SESSION_pre_v161_switch_1_c: PK_SESSION_sw_t = 22;
+pub const PK_SESSION_pre_v161_switch_1_c: PK_SESSION_sw_t = 4222;
 /// Edge blending — emulates V16.0.
-pub const PK_SESSION_pre_v161_switch_2_c: PK_SESSION_sw_t = 23;
+pub const PK_SESSION_pre_v161_switch_2_c: PK_SESSION_sw_t = 4224;
 /// Faceting — emulates V16.0.
-pub const PK_SESSION_pre_v161_switch_3_c: PK_SESSION_sw_t = 24;
+pub const PK_SESSION_pre_v161_switch_3_c: PK_SESSION_sw_t = 4226;
 /// Capping during taper operations — emulates V16.0.
-pub const PK_SESSION_pre_v161_switch_4_c: PK_SESSION_sw_t = 25;
+pub const PK_SESSION_pre_v161_switch_4_c: PK_SESSION_sw_t = 4229;
 /// Conversion of blend surfaces to B-surfaces — emulates V16.0.
-pub const PK_SESSION_pre_v161_switch_5_c: PK_SESSION_sw_t = 26;
+pub const PK_SESSION_pre_v161_switch_5_c: PK_SESSION_sw_t = 4280;
 /// Local operations — emulates V16.0.
-pub const PK_SESSION_pre_v161_switch_6_c: PK_SESSION_sw_t = 27;
+pub const PK_SESSION_pre_v161_switch_6_c: PK_SESSION_sw_t = 4281;
 
 // =============================================================================
 // PK_SESSION_software_option_t — structure holding all session-level switches
@@ -404,7 +404,9 @@ unsafe extern "C" {
 
     /// Check validity of the whole session or specific partitions.
     pub fn PK_DEBUG_SESSION_check(
-        options: *const PK_DEBUG_SESSION_check_o_t,
+        options: *mut PK_DEBUG_SESSION_check_o_t,
+        n_faults: *mut c_int,
+        faults: *mut *mut PK_DEBUG_check_fault_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -412,7 +414,9 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Start debugging version control mechanisms. Highlights specified fault classes.
-    pub fn PK_DEBUG_behaviours_start() -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_behaviours_start(
+        options: *mut PK_DEBUG_behaviours_start_o_t,
+    ) -> PK_ERROR_code_t;
 
     /// Stop debugging version control mechanisms.
     pub fn PK_DEBUG_behaviours_stop() -> PK_ERROR_code_t;
@@ -422,7 +426,9 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Start shuffling return array arguments to test order-independence.
-    pub fn PK_DEBUG_shuffle_start() -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_shuffle_start(
+        options: *mut PK_DEBUG_shuffle_start_o_t,
+    ) -> PK_ERROR_code_t;
 
     /// Stop shuffling return array arguments.
     pub fn PK_DEBUG_shuffle_stop() -> PK_ERROR_code_t;
@@ -435,7 +441,9 @@ unsafe extern "C" {
     /// from within Parasolid. `PK_SESSION_abort` can be called from the
     /// error-generating function.
     pub fn PK_DEBUG_try_error_handler(
-        options: *const PK_DEBUG_try_error_handler_o_t,
+        function: PK_DEBUG_try_error_handler_f_t,
+        context: PK_POINTER_t,
+        options: *mut PK_DEBUG_try_error_handler_o_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -443,21 +451,32 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Register `PK_CLASS_t` tokens to watch via creation/destruction callbacks.
+    /// V35: `(PK_CLASS_array_t create_classes, create_fn, PK_CLASS_array_t destroy_classes, destroy_fn)`.
     pub fn PK_DEBUG_SESSION_watch_classes(
-        n_classes: c_int,
-        classes: *const PK_CLASS_t,
+        create_classes: PK_CLASS_array_t,
+        create_fn: PK_DEBUG_SESSION_create_cb_t,
+        destroy_classes: PK_CLASS_array_t,
+        destroy_fn: PK_DEBUG_SESSION_destroy_cb_t,
     ) -> PK_ERROR_code_t;
 
     /// Register PK functions to watch via entry/exit callbacks.
+    /// V35: `(int n_fns, char **fns, PK_POINTER_t entry_context, PK_POINTER_t exit_context, entry_fn, exit_fn)`.
     pub fn PK_DEBUG_SESSION_watch_fns(
         n_fns: c_int,
-        fn_names: *const *const c_char,
+        fns: *mut *mut c_char,
+        entry_context: PK_POINTER_t,
+        exit_context: PK_POINTER_t,
+        entry_fn: PK_DEBUG_SESSION_entry_cb_t,
+        exit_fn: PK_DEBUG_SESSION_exit_cb_t,
     ) -> PK_ERROR_code_t;
 
     /// Register tagged items to watch via creation/destruction callbacks.
+    /// V35: `(PK_ITEM_array_t create, create_fn, PK_ITEM_array_t destroy, destroy_fn)`.
     pub fn PK_DEBUG_SESSION_watch_items(
-        n_items: c_int,
-        items: *const PK_ENTITY_t,
+        create: PK_ITEM_array_t,
+        create_fn: PK_DEBUG_SESSION_create_cb_t,
+        destroy: PK_ITEM_array_t,
+        destroy_fn: PK_DEBUG_SESSION_destroy_cb_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -486,6 +505,7 @@ unsafe extern "C" {
     /// Extract debug data from the session.
     pub fn PK_DEBUG_BODY_extract_data(
         body: PK_BODY_t,
+        data: *mut PK_DEBUG_data_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -498,7 +518,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Start recording debug info from PK functions.
-    pub fn PK_DEBUG_report_start() -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_report_start(
+        key: *mut c_char,
+        options: *mut PK_DEBUG_report_start_o_t,
+    ) -> PK_ERROR_code_t;
 
     /// Stop recording debug info from PK functions.
     pub fn PK_DEBUG_report_stop() -> PK_ERROR_code_t;
@@ -508,11 +531,21 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Transmit debug data.
-    pub fn PK_DEBUG_transmit() -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_transmit(
+        key: *mut c_char,
+        data: *mut PK_DEBUG_data_t,
+        options: *mut PK_PART_transmit_o_t,
+    ) -> PK_ERROR_code_t;
 
     /// Receive debug data.
-    pub fn PK_DEBUG_receive() -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_receive(
+        key: *mut c_char,
+        options: *mut PK_PART_receive_o_t,
+        data: *mut PK_DEBUG_data_t,
+    ) -> PK_ERROR_code_t;
 
     /// Debug data callback registrar.
-    pub fn PK_DEBUG_data_f() -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_data_f(
+        data: *mut PK_DEBUG_data_t,
+    ) -> PK_ERROR_code_t;
 }

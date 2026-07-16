@@ -22,23 +22,23 @@ pub type PK_POINTER_t = *mut c_void;
 pub type PK_ATTRIB_field_t = c_int;
 
 /// Real (double) field.
-pub const PK_ATTRIB_field_real_c: PK_ATTRIB_field_t = 0;
+pub const PK_ATTRIB_field_real_c: PK_ATTRIB_field_t = 5902;
 /// Integer field.
-pub const PK_ATTRIB_field_integer_c: PK_ATTRIB_field_t = 1;
+pub const PK_ATTRIB_field_integer_c: PK_ATTRIB_field_t = 5901;
 /// ASCII string field.
-pub const PK_ATTRIB_field_string_c: PK_ATTRIB_field_t = 2;
+pub const PK_ATTRIB_field_string_c: PK_ATTRIB_field_t = 5903;
 /// Unicode string field.
-pub const PK_ATTRIB_field_ustring_c: PK_ATTRIB_field_t = 3;
+pub const PK_ATTRIB_field_ustring_c: PK_ATTRIB_field_t = 5910;
 /// Vector (displacement) field.
-pub const PK_ATTRIB_field_vector_c: PK_ATTRIB_field_t = 4;
+pub const PK_ATTRIB_field_vector_c: PK_ATTRIB_field_t = 5904;
 /// Coordinate (position) field.
-pub const PK_ATTRIB_field_coordinate_c: PK_ATTRIB_field_t = 5;
+pub const PK_ATTRIB_field_coordinate_c: PK_ATTRIB_field_t = 5905;
 /// Direction (unit length) field.
-pub const PK_ATTRIB_field_direction_c: PK_ATTRIB_field_t = 6;
+pub const PK_ATTRIB_field_direction_c: PK_ATTRIB_field_t = 5906;
 /// Axis (coordinate + direction) field.
-pub const PK_ATTRIB_field_axis_c: PK_ATTRIB_field_t = 7;
+pub const PK_ATTRIB_field_axis_c: PK_ATTRIB_field_t = 5907;
 /// Pointer field (not transmitted).
-pub const PK_ATTRIB_field_pointer_c: PK_ATTRIB_field_t = 8;
+pub const PK_ATTRIB_field_pointer_c: PK_ATTRIB_field_t = 5909;
 
 // =============================================================================
 // Attribute definition class constants
@@ -47,19 +47,19 @@ pub const PK_ATTRIB_field_pointer_c: PK_ATTRIB_field_t = 8;
 pub type PK_ATTDEF_class_t = c_int;
 
 /// Class 1 -- independent of entity position and size.
-pub const PK_ATTDEF_class_01_c: PK_ATTDEF_class_t = 1;
+pub const PK_ATTDEF_class_01_c: PK_ATTDEF_class_t = 5801;
 /// Class 2.
-pub const PK_ATTDEF_class_02_c: PK_ATTDEF_class_t = 2;
+pub const PK_ATTDEF_class_02_c: PK_ATTDEF_class_t = 5802;
 /// Class 3.
-pub const PK_ATTDEF_class_03_c: PK_ATTDEF_class_t = 3;
+pub const PK_ATTDEF_class_03_c: PK_ATTDEF_class_t = 5803;
 /// Class 4.
-pub const PK_ATTDEF_class_04_c: PK_ATTDEF_class_t = 4;
+pub const PK_ATTDEF_class_04_c: PK_ATTDEF_class_t = 5804;
 /// Class 5.
-pub const PK_ATTDEF_class_05_c: PK_ATTDEF_class_t = 5;
+pub const PK_ATTDEF_class_05_c: PK_ATTDEF_class_t = 5805;
 /// Class 6 -- like class 1 but supports multiple values.
-pub const PK_ATTDEF_class_06_c: PK_ATTDEF_class_t = 6;
+pub const PK_ATTDEF_class_06_c: PK_ATTDEF_class_t = 5806;
 /// Class 7.
-pub const PK_ATTDEF_class_07_c: PK_ATTDEF_class_t = 7;
+pub const PK_ATTDEF_class_07_c: PK_ATTDEF_class_t = 5807;
 
 // =============================================================================
 // Attribute definition callback type constants
@@ -68,9 +68,9 @@ pub const PK_ATTDEF_class_07_c: PK_ATTDEF_class_t = 7;
 pub type PK_ATTDEF_callback_t = c_int;
 
 /// Normal callback (replaces Parasolid processing).
-pub const PK_ATTDEF_callback_normal_c: PK_ATTDEF_callback_t = 0;
+pub const PK_ATTDEF_callback_normal_c: PK_ATTDEF_callback_t = 22050;
 /// Read-only callback (supplements Parasolid processing).
-pub const PK_ATTDEF_callback_read_only_c: PK_ATTDEF_callback_t = 1;
+pub const PK_ATTDEF_callback_read_only_c: PK_ATTDEF_callback_t = 22051;
 
 // =============================================================================
 // No-roll attribute constants
@@ -88,30 +88,30 @@ pub const PK_ATTRIB_no_roll_diff_report_c: PK_ATTRIB_no_roll_t = 1;
 pub type PK_GROUP_dependants_t = c_int;
 
 /// Do not delete member groups on group deletion (default).
-pub const PK_GROUP_dependants_keep_c: PK_GROUP_dependants_t = 0;
+pub const PK_GROUP_dependants_keep_c: PK_GROUP_dependants_t = 25670;
 /// Consider deleting member groups not in other groups.
-pub const PK_GROUP_dependants_delete_c: PK_GROUP_dependants_t = 1;
+pub const PK_GROUP_dependants_delete_c: PK_GROUP_dependants_t = 25671;
 
 pub type PK_GROUP_membership_t = c_int;
 
 /// Merged entity always in group (default).
-pub const PK_GROUP_membership_inclusive_c: PK_GROUP_membership_t = 0;
+pub const PK_GROUP_membership_inclusive_c: PK_GROUP_membership_t = 25650;
 /// Merged entity in group only if both originals were.
-pub const PK_GROUP_membership_exclusive_c: PK_GROUP_membership_t = 1;
+pub const PK_GROUP_membership_exclusive_c: PK_GROUP_membership_t = 25651;
 
 pub type PK_GROUP_merge_t = c_int;
 
 /// Do not merge identical groups (default).
-pub const PK_GROUP_merge_no_c: PK_GROUP_merge_t = 0;
+pub const PK_GROUP_merge_no_c: PK_GROUP_merge_t = 24790;
 /// Merge identical groups.
-pub const PK_GROUP_merge_identical_c: PK_GROUP_merge_t = 1;
+pub const PK_GROUP_merge_identical_c: PK_GROUP_merge_t = 24791;
 
 pub type PK_GROUP_split_t = c_int;
 
 /// Empty group stays in original part on body split (default).
-pub const PK_GROUP_split_never_c: PK_GROUP_split_t = 0;
+pub const PK_GROUP_split_never_c: PK_GROUP_split_t = 24780;
 /// Empty group stays + copy created in split part.
-pub const PK_GROUP_split_always_c: PK_GROUP_split_t = 1;
+pub const PK_GROUP_split_always_c: PK_GROUP_split_t = 24781;
 
 // System attribute group split/merge constants (from SDL/TYSA_GROUP_CONTROL).
 
@@ -136,18 +136,18 @@ pub const PK_GROUP_merge_empty_yes_c: PK_GROUP_merge_empty_t = 1;
 pub type PK_BB_status_t = c_int;
 
 /// Switch BB on to record entities.
-pub const PK_BB_status_on_c: PK_BB_status_t = 1;
+pub const PK_BB_status_on_c: PK_BB_status_t = 14502;
 /// Switch BB off and clear contents.
-pub const PK_BB_status_off_c: PK_BB_status_t = 0;
+pub const PK_BB_status_off_c: PK_BB_status_t = 14501;
 /// Switch BB on to record entities and user fields.
-pub const PK_BB_status_user_field_c: PK_BB_status_t = 2;
+pub const PK_BB_status_user_field_c: PK_BB_status_t = 14503;
 
 pub type PK_BB_event_t = c_int;
 
 /// Creation event.
-pub const PK_BB_event_create_c: PK_BB_event_t = 0;
+pub const PK_BB_event_create_c: PK_BB_event_t = 14401;
 /// Copy event.
-pub const PK_BB_event_copy_c: PK_BB_event_t = 1;
+pub const PK_BB_event_copy_c: PK_BB_event_t = 14407;
 
 // =============================================================================
 // Attribute definition standard form structures
@@ -280,9 +280,8 @@ unsafe extern "C" {
     /// Create appitems referring to application data indicated by given pointers.
     pub fn PK_APPITEM_create(
         n_pointers: c_int,
-        pointers: *const PK_POINTER_t,
-        n_appitems: *mut c_int,
-        appitems: *mut *mut PK_APPITEM_t,
+        pointers: *mut PK_POINTER_t,
+        appitems: *mut PK_APPITEM_t,
     ) -> PK_ERROR_code_t;
 
     /// Delete the given appitems.
@@ -294,17 +293,15 @@ unsafe extern "C" {
     /// Return the pointers for the given appitems.
     pub fn PK_APPITEM_ask(
         n_appitems: c_int,
-        appitems: *const PK_APPITEM_t,
-        n_pointers: *mut c_int,
-        pointers: *mut *mut PK_POINTER_t,
+        appitems: *mut PK_APPITEM_t,
+        pointers: *mut PK_POINTER_t,
     ) -> PK_ERROR_code_t;
 
     /// Overwrite the pointers in supplied appitems with replacement pointers.
     pub fn PK_APPITEM_reset_pointers(
         n_appitems: c_int,
-        appitems: *const PK_APPITEM_t,
-        n_pointers: c_int,
-        pointers: *const PK_POINTER_t,
+        appitems: *mut PK_APPITEM_t,
+        pointers: *mut PK_POINTER_t,
     ) -> PK_ERROR_code_t;
 
     /// Test whether the given argument is an appitem.
@@ -319,24 +316,13 @@ unsafe extern "C" {
 
     /// Create an attribute definition (numbered fields).
     pub fn PK_ATTDEF_create(
-        name: *const c_char,
-        attdef_class: PK_ATTDEF_class_t,
-        n_owner_classes: c_int,
-        owner_classes: *const PK_CLASS_t,
-        n_fields: c_int,
-        field_types: *const PK_ATTRIB_field_t,
+        attsf: *mut PK_ATTDEF_sf_t,
         attdef: *mut PK_ATTDEF_t,
     ) -> PK_ERROR_code_t;
 
     /// Create an attribute definition with named fields.
     pub fn PK_ATTDEF_create_2(
-        name: *const c_char,
-        attdef_class: PK_ATTDEF_class_t,
-        n_owner_classes: c_int,
-        owner_classes: *const PK_CLASS_t,
-        n_fields: c_int,
-        field_types: *const PK_ATTRIB_field_t,
-        field_names: *const *const c_char,
+        attsf: *mut PK_ATTDEF_sf_2_t,
         attdef: *mut PK_ATTDEF_t,
     ) -> PK_ERROR_code_t;
 
@@ -361,12 +347,14 @@ unsafe extern "C" {
     /// Ask whether the given attdef is a group closing attribute definition.
     pub fn PK_ATTDEF_is_group_closing(
         attdef: PK_ATTDEF_t,
-        is_closing: *mut PK_LOGICAL_t,
+        options: *mut PK_ATTDEF_is_group_closing_o_t,
+        group_closing: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     /// Sets the given attdef to be group closing.
     pub fn PK_ATTDEF_set_group_closing(
         attdef: PK_ATTDEF_t,
+        options: *mut PK_ATTDEF_set_group_closing_o_t,
     ) -> PK_ERROR_code_t;
 
     /// Register pointers to callback functions for attribute processing.
@@ -379,21 +367,20 @@ unsafe extern "C" {
     /// Register callbacks for attribute processing (alternate form).
     pub fn PK_ATTDEF_register_callbacks(
         attdef: PK_ATTDEF_t,
-        callback_type: PK_ATTDEF_callback_t,
-        callback: *const c_void,
+        callbacks: *mut PK_ATTDEF_callback_fns_t,
     ) -> PK_ERROR_code_t;
 
     /// Return registered callback pointers.
     pub fn PK_ATTDEF_ask_callbacks(
         attdef: PK_ATTDEF_t,
-        callback_type: *mut PK_ATTDEF_callback_t,
-        callback: *mut *const c_void,
+        callbacks: *mut PK_ATTDEF_callback_fns_t,
     ) -> PK_ERROR_code_t;
 
     /// Set callback on/off flags for attribute definition events.
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_ATTDEF_set_callback_flags(
         attdef: PK_ATTDEF_t,
-        flags: c_int,
+        flags: *mut PK_ATTDEF_callback_flags_t,
     ) -> PK_ERROR_code_t;
 
     /// Return callback on/off flags.
@@ -482,9 +469,8 @@ unsafe extern "C" {
     /// Write Unicode string to numbered field.
     pub fn PK_ATTRIB_set_ustring(
         attrib: PK_ATTRIB_t,
-        field: c_int,
-        n_chars: c_int,
-        ustring: *const c_int,
+        field_no: c_int,
+        string: *mut PK_UCHAR_t,
     ) -> PK_ERROR_code_t;
 
     /// Write vectors to numbered field.
@@ -539,9 +525,8 @@ unsafe extern "C" {
     /// Read Unicode string from numbered field.
     pub fn PK_ATTRIB_ask_ustring(
         attrib: PK_ATTRIB_t,
-        field: c_int,
-        n_chars: *mut c_int,
-        ustring: *mut *mut c_int,
+        field_no: c_int,
+        string: *mut *mut PK_UCHAR_t,
     ) -> PK_ERROR_code_t;
 
     /// Read all vectors from numbered field.
@@ -638,9 +623,8 @@ unsafe extern "C" {
     /// Write Unicode string to named field.
     pub fn PK_ATTRIB_set_named_ustring(
         attrib: PK_ATTRIB_t,
-        field_name: *const c_char,
-        n_chars: c_int,
-        ustring: *const c_int,
+        field_name: *mut c_char,
+        string: *mut PK_UCHAR_t,
     ) -> PK_ERROR_code_t;
 
     /// Write vectors to named field.
@@ -695,9 +679,8 @@ unsafe extern "C" {
     /// Read Unicode string from named field.
     pub fn PK_ATTRIB_ask_named_ustring(
         attrib: PK_ATTRIB_t,
-        field_name: *const c_char,
-        n_chars: *mut c_int,
-        ustring: *mut *mut c_int,
+        field_name: *mut c_char,
+        string: *mut *mut PK_UCHAR_t,
     ) -> PK_ERROR_code_t;
 
     /// Read all vectors from named field.
@@ -720,14 +703,17 @@ unsafe extern "C" {
 
     /// Set attribute as no-roll (field values survive rollback).
     pub fn PK_ATTRIB_set_no_roll(
-        attrib: PK_ATTRIB_t,
-        no_roll: PK_LOGICAL_t,
+        n_attribs: c_int,
+        attribs: *mut PK_ATTRIB_t,
+        options: *mut PK_ATTRIB_set_no_roll_o_t,
     ) -> PK_ERROR_code_t;
 
     /// Check if attribute is a no-roll attribute.
     pub fn PK_ATTRIB_ask_no_roll(
-        attrib: PK_ATTRIB_t,
-        no_roll: *mut PK_LOGICAL_t,
+        n_attribs: c_int,
+        attribs: *mut PK_ATTRIB_t,
+        options: *mut PK_ATTRIB_ask_no_roll_o_t,
+        roll_status: *mut PK_ATTRIB_no_roll_t,
     ) -> PK_ERROR_code_t;
 
     // --- Deleting attributes ---
@@ -736,8 +722,9 @@ unsafe extern "C" {
     pub fn PK_PART_delete_attribs(
         part: PK_PART_t,
         n_attdefs: c_int,
-        attdefs: *const PK_ATTDEF_t,
-        eclass: PK_CLASS_t,
+        attdefs: *mut PK_ATTDEF_t,
+        options: *mut PK_PART_delete_attribs_o_t,
+        n_deleted: *mut c_int,
     ) -> PK_ERROR_code_t;
 
     // --- Querying attributes ---
@@ -745,6 +732,7 @@ unsafe extern "C" {
     /// Retrieve all attributes on an entity.
     pub fn PK_ENTITY_ask_attribs(
         entity: PK_ENTITY_t,
+        attdef: PK_ATTDEF_t,
         n_attribs: *mut c_int,
         attribs: *mut *mut PK_ATTRIB_t,
     ) -> PK_ERROR_code_t;
@@ -759,6 +747,7 @@ unsafe extern "C" {
     /// Get all attributes anywhere in the part.
     pub fn PK_PART_ask_all_attribs(
         part: PK_PART_t,
+        attdef: PK_ATTDEF_t,
         n_attribs: *mut c_int,
         attribs: *mut *mut PK_ATTRIB_t,
     ) -> PK_ERROR_code_t;
@@ -766,10 +755,12 @@ unsafe extern "C" {
     /// Return selected attributes via callback function.
     pub fn PK_PART_ask_attribs_cb(
         part: PK_PART_t,
-        n_attdefs: c_int,
-        attdefs: *const PK_ATTDEF_t,
-        callback: PK_PART_ask_attribs_cb_fn_t,
+        callback: PK_ATTRIB_cb_f_t,
         context: PK_POINTER_t,
+        options: *mut PK_PART_ask_attribs_cb_o_t,
+        n_attribs: *mut c_int,
+        attribs: *mut *mut PK_ATTRIB_t,
+        owners: *mut *mut PK_ENTITY_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -781,7 +772,8 @@ unsafe extern "C" {
         part: PK_PART_t,
         entity_class: PK_CLASS_t,
         n_entities: c_int,
-        entities: *const PK_ENTITY_t,
+        entities: *mut PK_ENTITY_t,
+        options: *mut PK_GROUP_create_from_ents_o_t,
         group: *mut PK_GROUP_t,
     ) -> PK_ERROR_code_t;
 
@@ -805,14 +797,16 @@ unsafe extern "C" {
     pub fn PK_GROUP_merge_entities(
         group: PK_GROUP_t,
         n_entities: c_int,
-        entities: *const PK_ENTITY_t,
+        entities: *mut PK_ENTITY_t,
+        n_added: *mut c_int,
     ) -> PK_ERROR_code_t;
 
     /// Remove entities from a group.
     pub fn PK_GROUP_remove_entities(
         group: PK_GROUP_t,
         n_entities: c_int,
-        entities: *const PK_ENTITY_t,
+        entities: *mut PK_ENTITY_t,
+        n_removed: *mut c_int,
     ) -> PK_ERROR_code_t;
 
     /// Return entities in the group.
@@ -850,9 +844,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return entities in group, optionally filtered by label.
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_GROUP_find_entities(
         group: PK_GROUP_t,
-        label: c_int,
+        options: *mut PK_GROUP_find_entities_o_t,
         n_entities: *mut c_int,
         entities: *mut *mut PK_ENTITY_t,
     ) -> PK_ERROR_code_t;
@@ -860,13 +855,17 @@ unsafe extern "C" {
     /// Return the controls of the given group.
     pub fn PK_GROUP_ask_controls(
         group: PK_GROUP_t,
-        controls: *mut c_void,
+        options: *mut PK_GROUP_ask_controls_o_t,
+        controls_r: *mut PK_GROUP_ask_controls_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Ask whether group is a closed group.
     pub fn PK_GROUP_ask_closure(
         group: PK_GROUP_t,
-        is_closed: *mut PK_LOGICAL_t,
+        options: *mut PK_GROUP_ask_closure_o_t,
+        closure: *mut PK_GROUP_closure_t,
+        n_attribs: *mut c_int,
+        attribs: *mut *mut PK_ATTRIB_t,
     ) -> PK_ERROR_code_t;
 
     /// Find groups that an entity is member of (legacy).
@@ -929,11 +928,12 @@ unsafe extern "C" {
     pub fn PK_BB_output_events(
         bb: PK_BB_t,
         empty: PK_LOGICAL_t,
-        n_events: *mut c_int,
+        n_entities: *mut c_int,
         events: *mut *mut c_int,
         entities: *mut *mut PK_ENTITY_t,
         event_types: *mut *mut PK_BB_event_t,
         classes: *mut *mut PK_CLASS_t,
+        user_fields: *mut *mut c_int,
     ) -> PK_ERROR_code_t;
 
     /// Ensure no duplicate/invalid identifiers.

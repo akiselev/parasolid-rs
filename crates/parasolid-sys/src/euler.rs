@@ -23,47 +23,47 @@ use std::os::raw::{c_double, c_int};
 pub type PK_redundant_merge_t = c_int;
 
 /// Minimal scope: only remove topologies internal to specified topols.
-pub const PK_redundant_merge_in_c: PK_redundant_merge_t = 0;
+pub const PK_redundant_merge_in_c: PK_redundant_merge_t = 24350;
 
 /// Default: remove internal + boundary redundancies, but don't merge topols
 /// with unspecified neighbors.
-pub const PK_redundant_merge_on_c: PK_redundant_merge_t = 1;
+pub const PK_redundant_merge_on_c: PK_redundant_merge_t = 24351;
 
 /// Maximal scope: remove all redundancies even if it merges topols with
 /// unspecified neighbors.
-pub const PK_redundant_merge_out_c: PK_redundant_merge_t = 2;
+pub const PK_redundant_merge_out_c: PK_redundant_merge_t = 24352;
 
 /// Dimension filter for redundant topology identification.
 pub type PK_TOPOL_dimension_t = c_int;
 
 /// Vertices only.
-pub const PK_TOPOL_dimension_0_c: PK_TOPOL_dimension_t = 0;
+pub const PK_TOPOL_dimension_0_c: PK_TOPOL_dimension_t = 24340;
 
 /// All dimensions (default).
-pub const PK_TOPOL_dimension_any_c: PK_TOPOL_dimension_t = -1;
+pub const PK_TOPOL_dimension_any_c: PK_TOPOL_dimension_t = 24343;
 
 /// G0 continuity: all manifold non-laminar edges between mesh faces considered
 /// redundant. Removes nearly all topology from facet bodies.
-pub const PK_continuity_g0_c: PK_continuity_t = 0;
+pub const PK_continuity_g0_c: PK_continuity_t = 23156;
 
 /// Redundancy propagation control.
 pub type PK_redundant_propagate_t = c_int;
 
 /// Don't identify dependent redundant topologies (default).
-pub const PK_redundant_propagate_no_c: PK_redundant_propagate_t = 0;
+pub const PK_redundant_propagate_no_c: PK_redundant_propagate_t = 24390;
 
 /// Identify topologies that would become redundant if other redundancies removed.
-pub const PK_redundant_propagate_yes_c: PK_redundant_propagate_t = 1;
+pub const PK_redundant_propagate_yes_c: PK_redundant_propagate_t = 24391;
 
 // =============================================================================
 // Constants — Splitting topology
 // =============================================================================
 
 /// Split along U parameter line.
-pub const PK_PARAM_direction_u_c: PK_PARAM_direction_t = 0;
+pub const PK_PARAM_direction_u_c: PK_PARAM_direction_t = 22070;
 
 /// Split along V parameter line.
-pub const PK_PARAM_direction_v_c: PK_PARAM_direction_t = 1;
+pub const PK_PARAM_direction_v_c: PK_PARAM_direction_t = 22071;
 
 // =============================================================================
 // Options structs — Redundant topology
@@ -134,6 +134,7 @@ unsafe extern "C" {
     pub fn PK_EDGE_euler_slit(
         edge: PK_EDGE_t,
         on_left: PK_LOGICAL_t,
+        new_face: *mut PK_FACE_t,
         new_edge: *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
@@ -142,9 +143,10 @@ unsafe extern "C" {
     ///
     /// - `slit_face`: the slit face to remove
     /// - `surviving_edge`: receives the surviving edge tag
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_FACE_euler_unslit(
-        slit_face: PK_FACE_t,
-        surviving_edge: *mut PK_EDGE_t,
+        face: PK_FACE_t,
+        surviving: PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------
@@ -168,9 +170,10 @@ unsafe extern "C" {
     ///
     /// - `vertex`: vertex to delete
     /// - `edge`: receives the surviving edge
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_VERTEX_euler_merge_edges(
         vertex: PK_VERTEX_t,
-        edge: *mut PK_EDGE_t,
+        edge: PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------
@@ -183,18 +186,20 @@ unsafe extern "C" {
     /// - `new_edge`: receives new edge
     /// - `new_vertex`: receives new vertex
     pub fn PK_LOOP_euler_make_edge(
+        r#loop: PK_LOOP_t,
         fin: PK_FIN_t,
-        new_edge: *mut PK_EDGE_t,
         new_vertex: *mut PK_VERTEX_t,
+        new_edge: *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     /// Create an edge in a loop (alternative edge creation function).
     ///
     /// Present in exports as `PK_LOOP_euler_create_edge`.
     pub fn PK_LOOP_euler_create_edge(
+        r#loop: PK_LOOP_t,
         fin: PK_FIN_t,
-        new_edge: *mut PK_EDGE_t,
         new_vertex: *mut PK_VERTEX_t,
+        new_edge: *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     /// Delete a vertex and its single attached edge.
@@ -210,10 +215,11 @@ unsafe extern "C" {
     /// - `new_edge`: receives the new intervening edge
     /// - `new_vertex`: receives the new vertex
     pub fn PK_VERTEX_euler_split(
+        vertex: PK_VERTEX_t,
         fin1: PK_FIN_t,
         fin2: PK_FIN_t,
-        new_edge: *mut PK_EDGE_t,
         new_vertex: *mut PK_VERTEX_t,
+        new_edge: *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     /// Merge two vertices by deleting the intervening edge.
@@ -263,7 +269,6 @@ unsafe extern "C" {
     pub fn PK_FACE_euler_make_loop(
         face: PK_FACE_t,
         new_loop: *mut PK_LOOP_t,
-        new_vertex: *mut PK_VERTEX_t,
     ) -> PK_ERROR_code_t;
 
     /// Delete an isolated vertex and loop from a face.
@@ -309,10 +314,11 @@ unsafe extern "C" {
     /// - `new_edge`: receives the new edge
     /// - `new_face`: receives the new face (on right side)
     pub fn PK_LOOP_euler_make_edge_face(
+        r#loop: PK_LOOP_t,
         fin1: PK_FIN_t,
         fin2: PK_FIN_t,
-        new_edge: *mut PK_EDGE_t,
         new_face: *mut PK_FACE_t,
+        new_edge: *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     /// Delete an edge, merging two faces and their loops.
@@ -333,16 +339,18 @@ unsafe extern "C" {
     /// - `fin1`, `fin2`: attachment fins
     /// - `new_edge`: receives the new edge
     /// - `new_loop`: receives the new loop
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_LOOP_euler_make_edge_loop(
+        r#loop: PK_LOOP_t,
         fin1: PK_FIN_t,
         fin2: PK_FIN_t,
-        new_edge: *mut PK_EDGE_t,
         new_loop: *mut PK_LOOP_t,
     ) -> PK_ERROR_code_t;
 
     /// Delete an edge, merging two loops from the same face.
     pub fn PK_EDGE_euler_delete_with_loop(
         edge: PK_EDGE_t,
+        on_left: PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------
@@ -356,7 +364,6 @@ unsafe extern "C" {
     /// - `new_face`: receives the new face (on right side)
     pub fn PK_FACE_euler_make_ring_face(
         face: PK_FACE_t,
-        new_edge: *mut PK_EDGE_t,
         new_face: *mut PK_FACE_t,
     ) -> PK_ERROR_code_t;
 
@@ -376,7 +383,6 @@ unsafe extern "C" {
     /// - `new_loop`: receives the new loop
     pub fn PK_FACE_euler_make_ring_loop(
         face: PK_FACE_t,
-        new_edge: *mut PK_EDGE_t,
         new_loop: *mut PK_LOOP_t,
     ) -> PK_ERROR_code_t;
 
@@ -409,8 +415,9 @@ unsafe extern "C" {
     /// NOTE: The curve of the deleted edge is NOT deleted (exception to the
     /// general Euler rule that deleted topology has geometry removed first).
     pub fn PK_FIN_euler_glue(
-        fin1: PK_FIN_t,
-        fin2: PK_FIN_t,
+        n_fins: c_int,
+        fins: *mut PK_FIN_t,
+        same_dir: PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -423,8 +430,7 @@ unsafe extern "C" {
     /// - `n_topols`: number of input topologies
     /// - `topols`: array of topologies to process
     pub fn PK_TOPOL_delete_redundant(
-        n_topols: c_int,
-        topols: *const PK_TOPOL_t,
+        topol: PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
     /// Identify redundant topological entities without deleting them.
@@ -455,7 +461,8 @@ unsafe extern "C" {
     /// - `edges`: receives array of edge tags in chain
     pub fn PK_EDGE_find_g1_edges(
         edge: PK_EDGE_t,
-        angular_tolerance: c_double,
+        tolerance: c_double,
+        convexity: PK_LOGICAL_t,
         n_edges: *mut c_int,
         edges: *mut *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
@@ -497,6 +504,7 @@ unsafe extern "C" {
         face: PK_FACE_t,
         param: c_double,
         param_dir: PK_PARAM_direction_t,
+        options: *mut PK_FACE_split_at_param_o_t,
         n_new_edges: *mut c_int,
         new_edges: *mut *mut PK_EDGE_t,
         n_new_faces: *mut c_int,

@@ -9,6 +9,48 @@ use crate::curve::Curve;
 use crate::geom::{Vec3, Axis2};
 use crate::memory::PkArray;
 
+/// Surface curvature at a `(u,v)` point (from [`Surf::eval_curvature`]).
+#[derive(Debug, Clone, Copy)]
+pub struct SurfCurvature {
+    pub normal: Vec3,
+    pub principal_direction_1: Vec3,
+    pub principal_direction_2: Vec3,
+    /// First principal curvature (signed, relative to `normal`).
+    pub principal_curvature_1: f64,
+    /// Second principal curvature (signed, relative to `normal`).
+    pub principal_curvature_2: f64,
+}
+
+/// Per-direction parameterisation of a surface (from [`Surf::params`]).
+#[derive(Debug, Clone, Copy)]
+pub struct SurfDirParam {
+    pub range: (f64, f64),
+    pub periodic: crate::curve::Periodicity,
+    pub closed: bool,
+}
+
+/// Spun (surface of revolution) parameters (from [`Surf::ask_spun`]).
+#[derive(Debug, Clone, Copy)]
+pub struct SpunData {
+    pub profile: Curve,
+    pub axis_location: Vec3,
+    pub axis_direction: Vec3,
+}
+
+/// Swept (extruded) surface parameters (from [`Surf::ask_swept`]).
+#[derive(Debug, Clone, Copy)]
+pub struct SweptData {
+    pub profile: Curve,
+    pub path: Vec3,
+}
+
+/// Offset surface parameters (from [`Surf::ask_offset`]).
+#[derive(Debug, Clone, Copy)]
+pub struct OffsetData {
+    pub basis_surf: Surf,
+    pub distance: f64,
+}
+
 /// A surface's parametric bounds (from [`Surf::uvbox`]).
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct UvBox {
@@ -214,6 +256,151 @@ impl Surf {
         Ok(UvBox { u_min: b.param[0], v_min: b.param[1], u_max: b.param[2], v_max: b.param[3] })
     }
 
+    /// Create a bounded **sheet body** from this surface over the given UV box.
+    ///
+    /// Wraps `PK_SURF_make_sheet_body`, which takes `PK_UVBOX_t` **by value**
+    /// (a 32-byte `[f64; 4]` struct, passed indirectly on the Win64 ABI). For a
+    /// plane, the resulting sheet's area is the uvbox's u-extent × v-extent.
+    pub fn make_sheet_body(&self, uvbox: UvBox) -> PsResult<crate::body::Body> {
+        let uv = PK_UVBOX_t {
+            param: [uvbox.u_min, uvbox.v_min, uvbox.u_max, uvbox.v_max],
+        };
+        let mut tag: PK_BODY_t = PK_ENTITY_null;
+        pk_call!(PK_SURF_make_sheet_body(self.tag, uv, &mut tag));
+        Ok(crate::body::Body::from_tag(tag))
+    }
+
+    /// Evaluate principal curvatures and directions at `(u, v)` via
+    /// `PK_SURF_eval_curvature` — the curvature primitive SSI tangency
+    /// classification builds on (after position/normal).
+    pub fn eval_curvature(&self, u: f64, v: f64) -> PsResult<SurfCurvature> {
+        let uv: PK_UV_t = [u, v];
+        let mut normal: PK_VECTOR1_t = [0.0; 3];
+        let mut d1: PK_VECTOR1_t = [0.0; 3];
+        let mut d2: PK_VECTOR1_t = [0.0; 3];
+        let mut k1 = 0.0f64;
+        let mut k2 = 0.0f64;
+        pk_call!(PK_SURF_eval_curvature(self.tag, &uv, &mut normal, &mut d1, &mut d2, &mut k1, &mut k2));
+        Ok(SurfCurvature {
+            normal: Vec3::from_pk(normal),
+            principal_direction_1: Vec3::from_pk(d1),
+            principal_direction_2: Vec3::from_pk(d2),
+            principal_curvature_1: k1,
+            principal_curvature_2: k2,
+        })
+    }
+
+    /// Parameterisation in U and V (`PK_SURF_ask_params`). Returns `(u, v)`.
+    pub fn params(&self) -> PsResult<(SurfDirParam, SurfDirParam)> {
+        let mut sf: [PK_PARAM_sf_t; 2] = unsafe { std::mem::zeroed() };
+        pk_call!(PK_SURF_ask_params(self.tag, sf.as_mut_ptr()));
+        let mk = |p: &PK_PARAM_sf_t| SurfDirParam {
+            range: (p.range.low, p.range.high),
+            periodic: crate::curve::Periodicity::from_token(p.periodic),
+            closed: (p.closed & 0xff) != 0,
+        };
+        Ok((mk(&sf[0]), mk(&sf[1])))
+    }
+
+    /// Create an orphan **spun** surface: revolve `profile` about the axis
+    /// through `axis_location` with direction `axis_direction`.
+    pub fn spun(profile: &Curve, axis_location: Vec3, axis_direction: Vec3) -> PsResult<Surf> {
+        let sf = PK_SPUN_sf_t {
+            profile: profile.tag,
+            axis: PK_AXIS1_sf_t { location: axis_location.to_pk(), axis: axis_direction.to_pk() },
+        };
+        let mut tag: PK_SPUN_t = PK_ENTITY_null;
+        pk_call!(PK_SPUN_create(&sf, &mut tag));
+        Ok(Surf::from_tag(tag))
+    }
+
+    /// Read back spun-surface parameters (`PK_SPUN_ask`).
+    pub fn ask_spun(&self) -> PsResult<SpunData> {
+        let mut sf = unsafe { std::mem::zeroed::<PK_SPUN_sf_t>() };
+        pk_call!(PK_SPUN_ask(self.tag, &mut sf));
+        Ok(SpunData {
+            profile: Curve::from_tag(sf.profile),
+            axis_location: Vec3::from_pk(sf.axis.location),
+            axis_direction: Vec3::from_pk(sf.axis.axis),
+        })
+    }
+
+    /// Create an orphan **swept** surface: sweep `profile` along `path`.
+    pub fn swept(profile: &Curve, path: Vec3) -> PsResult<Surf> {
+        let sf = PK_SWEPT_sf_t { profile: profile.tag, path: path.to_pk() };
+        let mut tag: PK_SWEPT_t = PK_ENTITY_null;
+        pk_call!(PK_SWEPT_create(&sf, &mut tag));
+        Ok(Surf::from_tag(tag))
+    }
+
+    /// Read back swept-surface parameters (`PK_SWEPT_ask`).
+    pub fn ask_swept(&self) -> PsResult<SweptData> {
+        let mut sf = unsafe { std::mem::zeroed::<PK_SWEPT_sf_t>() };
+        pk_call!(PK_SWEPT_ask(self.tag, &mut sf));
+        Ok(SweptData { profile: Curve::from_tag(sf.profile), path: Vec3::from_pk(sf.path) })
+    }
+
+    /// Create an orphan **offset** surface: offset `base` by signed `distance`
+    /// along its normal.
+    pub fn offset_surface(base: &Surf, distance: f64) -> PsResult<Surf> {
+        let sf = PK_OFFSET_sf_t { basis_surf: base.tag, distance };
+        let mut tag: PK_OFFSET_t = PK_ENTITY_null;
+        pk_call!(PK_OFFSET_create(&sf, &mut tag));
+        Ok(Surf::from_tag(tag))
+    }
+
+    /// Read back offset-surface parameters (`PK_OFFSET_ask`).
+    pub fn ask_offset(&self) -> PsResult<OffsetData> {
+        let mut sf = unsafe { std::mem::zeroed::<PK_OFFSET_sf_t>() };
+        pk_call!(PK_OFFSET_ask(self.tag, &mut sf));
+        Ok(OffsetData { basis_surf: Surf::from_tag(sf.basis_surf), distance: sf.distance })
+    }
+
+    /// Create a non-rational **B-surface** (NURBS surface) from its per-direction
+    /// degrees, control-point grid (row-major, `n_u × n_v`), and per-direction
+    /// **distinct** knots with multiplicities (Parasolid's form).
+    #[allow(clippy::too_many_arguments)]
+    pub fn bsurf(
+        u_degree: i32,
+        v_degree: i32,
+        n_u: i32,
+        n_v: i32,
+        control_points: &[Vec3],
+        u_knots: &[f64],
+        u_mults: &[i32],
+        v_knots: &[f64],
+        v_mults: &[i32],
+    ) -> PsResult<Surf> {
+        let verts: Vec<f64> = control_points.iter().flat_map(|p| [p.x, p.y, p.z]).collect();
+        let sf = PK_BSURF_sf_t {
+            u_degree,
+            v_degree,
+            n_u_vertices: n_u,
+            n_v_vertices: n_v,
+            vertex_dim: 3,
+            is_rational: PK_LOGICAL_false,
+            vertices: verts.as_ptr(),
+            _reserved_32: 0,
+            n_u_knots: u_knots.len() as c_int,
+            n_v_knots: v_knots.len() as c_int,
+            u_knot_mult: u_mults.as_ptr(),
+            v_knot_mult: v_mults.as_ptr(),
+            u_knots: u_knots.as_ptr(),
+            v_knots: v_knots.as_ptr(),
+            u_knot_type: PK_knot_non_uniform_c,
+            v_knot_type: PK_knot_non_uniform_c,
+            is_u_periodic: 0,
+            is_v_periodic: 0,
+            is_u_closed: 0,
+            is_v_closed: 0,
+            self_intersecting: 0,
+            convexity: 0,
+        };
+        let mut tag: PK_BSURF_t = PK_ENTITY_null;
+        pk_call!(PK_BSURF_create(&sf, &mut tag));
+        Ok(Surf::from_tag(tag))
+    }
+
     /// Intersect this surface with another (`PK_SURF_intersect_surf`).
     ///
     /// Both surfaces must be orphan geometry or belong to the **same** body.
@@ -221,11 +408,11 @@ impl Surf {
     /// its parameter bounds and raw `PK_intersect_curve_t` kind). Fully
     /// coincident surfaces yield no intersection data.
     pub fn intersect(&self, other: &Surf) -> PsResult<SurfIntersection> {
-        let opts = PK_SURF_intersect_surf_o_t {
-            o_t_version: 1,
-            have_box: PK_LOGICAL_false,
-            r#box: PK_BOX_t { coord: [0.0; 6] },
-        };
+        // Full documented v1 layout (192 bytes), zero-initialised so every
+        // `have_*` flag is false — the kernel reads the whole v1 struct, so a
+        // truncated struct would make it read past the allocation.
+        let mut opts: PK_SURF_intersect_surf_o_t = unsafe { std::mem::zeroed() };
+        opts.o_t_version = 1;
         let mut n_vectors: c_int = 0;
         let mut vectors = std::ptr::null_mut();
         let mut n_curves: c_int = 0;

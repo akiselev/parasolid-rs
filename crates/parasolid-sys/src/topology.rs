@@ -22,11 +22,11 @@ pub const PK_BODY_type_solid_c: PK_BODY_type_t = 5601; // [probed]
 pub const PK_BODY_type_sheet_c: PK_BODY_type_t = 5602; // [probed]
 pub const PK_BODY_type_minimum_c: PK_BODY_type_t = 5603; // [probed]
 pub const PK_BODY_type_wire_c: PK_BODY_type_t = 5604; // [probed]
-pub const PK_BODY_type_acorn_c: PK_BODY_type_t = 5605; // [guess]
-pub const PK_BODY_type_empty_c: PK_BODY_type_t = 5606; // [guess]
-pub const PK_BODY_type_general_c: PK_BODY_type_t = 5607; // [guess]
-pub const PK_BODY_type_compound_c: PK_BODY_type_t = 5608; // [guess]
-pub const PK_BODY_type_unspecified_c: PK_BODY_type_t = 5609; // [guess]
+pub const PK_BODY_type_acorn_c: PK_BODY_type_t = 5606; // [guess]
+pub const PK_BODY_type_empty_c: PK_BODY_type_t = 5608; // [guess]
+pub const PK_BODY_type_general_c: PK_BODY_type_t = 5605; // [guess]
+pub const PK_BODY_type_compound_c: PK_BODY_type_t = 5609; // [guess]
+pub const PK_BODY_type_unspecified_c: PK_BODY_type_t = 5607; // [guess]
 
 // =============================================================================
 // Body configuration constants — returned by PK_BODY_ask_config
@@ -35,11 +35,11 @@ pub const PK_BODY_type_unspecified_c: PK_BODY_type_t = 5609; // [guess]
 pub type PK_BODY_config_t = c_int;
 
 /// Standard (non-compound) body.
-pub const PK_BODY_config_standard_c: PK_BODY_config_t = 0;
+pub const PK_BODY_config_standard_c: PK_BODY_config_t = 25200;
 /// Compound body (container for child bodies).
-pub const PK_BODY_config_compound_c: PK_BODY_config_t = 1;
+pub const PK_BODY_config_compound_c: PK_BODY_config_t = 25201;
 /// Child body within a compound.
-pub const PK_BODY_config_child_c: PK_BODY_config_t = 2;
+pub const PK_BODY_config_child_c: PK_BODY_config_t = 25202;
 
 // =============================================================================
 // Loop type constants — returned by PK_LOOP_ask_type
@@ -56,16 +56,18 @@ pub type PK_LOOP_type_t = c_int;
 // [static-observed value / order-inferred] — not individually probed, so treat
 // them as provisional. `LoopType::Other(i32)` in the safe wrapper preserves any
 // unmapped value.
-pub const PK_LOOP_type_error_c: PK_LOOP_type_t = 5410;
-pub const PK_LOOP_type_general_c: PK_LOOP_type_t = 5411;
+pub const PK_LOOP_type_vertex_c: PK_LOOP_type_t = 5410;
+pub const PK_LOOP_type_wire_c: PK_LOOP_type_t = 5411;
 pub const PK_LOOP_type_outer_c: PK_LOOP_type_t = 5412; // [dynamic-observed]
 pub const PK_LOOP_type_inner_c: PK_LOOP_type_t = 5413;
 pub const PK_LOOP_type_winding_c: PK_LOOP_type_t = 5414; // [dynamic-observed]
-pub const PK_LOOP_type_vertex_c: PK_LOOP_type_t = 5415;
-pub const PK_LOOP_type_wire_c: PK_LOOP_type_t = 5416;
-pub const PK_LOOP_type_likely_outer_c: PK_LOOP_type_t = 5417;
-pub const PK_LOOP_type_likely_inner_c: PK_LOOP_type_t = 5418;
-pub const PK_LOOP_type_unclear_c: PK_LOOP_type_t = 5419;
+pub const PK_LOOP_type_inner_sing_c: PK_LOOP_type_t = 5415;
+pub const PK_LOOP_type_likely_outer_c: PK_LOOP_type_t = 5416;
+pub const PK_LOOP_type_likely_inner_c: PK_LOOP_type_t = 5417;
+pub const PK_LOOP_type_unclear_c: PK_LOOP_type_t = 5418;
+pub const PK_LOOP_type_error_c: PK_LOOP_type_t = 5419;
+// NOTE: there is no `PK_LOOP_type_general_c` in the real ABI — the old
+// placeholder (5411) collided with `wire_c`. Removed.
 
 // =============================================================================
 // Edge type constants — returned by PK_EDGE_ask_type
@@ -73,14 +75,24 @@ pub const PK_LOOP_type_unclear_c: PK_LOOP_type_t = 5419;
 
 pub type PK_EDGE_type_t = c_int;
 
+// Edge vertex-topology (what PK_EDGE_ask_type actually returns): open (distinct
+// end vertices, e.g. a block edge), closed (one shared vertex, e.g. a full
+// circle), ring (no vertices).
+/// Open edge — distinct start/end vertices.
+pub const PK_EDGE_type_open_c: PK_EDGE_type_t = 3650;
+/// Closed edge — one vertex (start == end).
+pub const PK_EDGE_type_closed_c: PK_EDGE_type_t = 3651;
+/// Ring edge — no vertices.
+pub const PK_EDGE_type_ring_c: PK_EDGE_type_t = 3652;
+
 /// Wireframe edge (0 fins).
-pub const PK_EDGE_type_wireframe_c: PK_EDGE_type_t = 0;
+pub const PK_EDGE_type_wireframe_c: PK_EDGE_type_t = 3700;
 /// Laminar edge (1 fin).
-pub const PK_EDGE_type_laminar_c: PK_EDGE_type_t = 1;
+pub const PK_EDGE_type_laminar_c: PK_EDGE_type_t = 3701;
 /// Normal manifold edge (2 fins, opposite sense).
-pub const PK_EDGE_type_normal_c: PK_EDGE_type_t = 2;
+pub const PK_EDGE_type_normal_c: PK_EDGE_type_t = 3702;
 /// General non-manifold edge (2 fins, same sense).
-pub const PK_EDGE_type_general_c: PK_EDGE_type_t = 3;
+pub const PK_EDGE_type_general_c: PK_EDGE_type_t = 3703;
 
 // =============================================================================
 // Shell type constants — returned by PK_SHELL_ask_type
@@ -88,9 +100,11 @@ pub const PK_EDGE_type_general_c: PK_EDGE_type_t = 3;
 
 pub type PK_SHELL_type_t = c_int;
 
-pub const PK_SHELL_type_face_c: PK_SHELL_type_t = 0;
-pub const PK_SHELL_type_wire_c: PK_SHELL_type_t = 1;
-pub const PK_SHELL_type_acorn_c: PK_SHELL_type_t = 2;
+// Real ABI tokens (3500..=3503); the old face/wire=0/1 were invented placeholders.
+pub const PK_SHELL_type_acorn_c: PK_SHELL_type_t = 3500;
+pub const PK_SHELL_type_wireframe_c: PK_SHELL_type_t = 3501;
+pub const PK_SHELL_type_wireframe_free_c: PK_SHELL_type_t = 3502;
+pub const PK_SHELL_type_mixed_c: PK_SHELL_type_t = 3503;
 
 // =============================================================================
 // Vertex type constants — returned by PK_VERTEX_ask_type
@@ -98,17 +112,26 @@ pub const PK_SHELL_type_acorn_c: PK_SHELL_type_t = 2;
 
 pub type PK_VERTEX_type_t = c_int;
 
-pub const PK_VERTEX_type_standard_c: PK_VERTEX_type_t = 0;
-pub const PK_VERTEX_type_tolerant_c: PK_VERTEX_type_t = 1;
+// Real ABI tokens (5101..=5104); the old standard/tolerant=0/1 were invented
+// placeholders (vertex *type* is isolated/spur/wire/normal — tolerance is a
+// separate property queried via PK_VERTEX_ask_tolerance).
+pub const PK_VERTEX_type_isolated_c: PK_VERTEX_type_t = 5101;
+pub const PK_VERTEX_type_spur_c: PK_VERTEX_type_t = 5102;
+pub const PK_VERTEX_type_wire_c: PK_VERTEX_type_t = 5103;
+pub const PK_VERTEX_type_normal_c: PK_VERTEX_type_t = 5104;
 
 // =============================================================================
-// Region type constants
+// Region "type" — NOT a real Parasolid ABI enum. Parasolid has no
+// PK_REGION_type_t; region solidity is queried via
+// `PK_REGION_is_solid(region, PK_LOGICAL_t *is_solid)`. This is a
+// wrapper-side convenience whose values mirror that logical (solid=TRUE=1,
+// void=FALSE=0) so it can never be mistaken for a kernel token.
 // =============================================================================
 
 pub type PK_REGION_type_t = c_int;
 
-pub const PK_REGION_type_solid_c: PK_REGION_type_t = 0;
-pub const PK_REGION_type_void_c: PK_REGION_type_t = 1;
+pub const PK_REGION_type_void_c: PK_REGION_type_t = 0; // PK_LOGICAL_t FALSE
+pub const PK_REGION_type_solid_c: PK_REGION_type_t = 1; // PK_LOGICAL_t TRUE
 
 // =============================================================================
 // Local coordinate system structure
@@ -125,6 +148,10 @@ pub struct PK_BODY_create_topology_o_t { _private: [u8; 0] }
 // =============================================================================
 // Extern functions
 // =============================================================================
+
+/// Options for `PK_FACE_ask_faces_adjacent` (opaque; pass NULL for defaults).
+#[repr(C)]
+pub struct PK_FACE_ask_faces_adjacent_o_t { _private: [u8; 0] }
 
 #[link(name = "pskernel")]
 unsafe extern "C" {
@@ -192,14 +219,23 @@ unsafe extern "C" {
     /// ```c
     /// PK_ERROR_code_t PK_BODY_check(PK_BODY_t body);
     /// ```
-    pub fn PK_BODY_check(body: PK_BODY_t) -> PK_ERROR_code_t;
+    pub fn PK_BODY_check(
+        body: PK_BODY_t,
+        options: *mut PK_BODY_check_o_t,
+        n_faults: *mut c_int,
+        faults: *mut *mut PK_check_fault_t,
+    ) -> PK_ERROR_code_t;
 
     /// Identify general characteristics of a body.
     ///
     /// ```c
     /// PK_ERROR_code_t PK_BODY_identify_general(PK_BODY_t body, ...);
     /// ```
-    pub fn PK_BODY_identify_general(body: PK_BODY_t) -> PK_ERROR_code_t;
+    pub fn PK_BODY_identify_general(
+        body: PK_BODY_t,
+        options: *mut PK_BODY_identify_general_o_t,
+        results: *mut PK_identify_general_r_t,
+    ) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Body topological navigation
@@ -301,7 +337,9 @@ unsafe extern "C" {
     /// ```
     pub fn PK_BODY_copy_topology(
         body: PK_BODY_t,
-        copy: *mut PK_BODY_t,
+        options: *mut PK_BODY_copy_topology_o_t,
+        body_copy: *mut PK_BODY_t,
+        tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -341,10 +379,15 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return faces adjacent to a given face.
+    /// V35: `(int n_faces, const PK_FACE_t faces[], options, int
+    /// *n_faces_adjacent, PK_FACE_t **faces_adjacent)` — takes an ARRAY of faces
+    /// (the old binding took a single face and dropped the options).
     pub fn PK_FACE_ask_faces_adjacent(
-        face: PK_FACE_t,
-        n_faces: *mut c_int,
-        faces: *mut *mut PK_FACE_t,
+        n_faces: c_int,
+        faces: *const PK_FACE_t,
+        options: *const PK_FACE_ask_faces_adjacent_o_t,
+        n_faces_adjacent: *mut c_int,
+        faces_adjacent: *mut *mut PK_FACE_t,
     ) -> PK_ERROR_code_t;
 
     /// Return all vertices of a face.
@@ -357,8 +400,7 @@ unsafe extern "C" {
     /// Return the shells that reference a face.
     pub fn PK_FACE_ask_shells(
         face: PK_FACE_t,
-        n_shells: *mut c_int,
-        shells: *mut *mut PK_SHELL_t,
+        shells: *mut PK_SHELL_t,
     ) -> PK_ERROR_code_t;
 
     /// Return the oriented surface of a face (surface tag + orientation flag).
@@ -379,11 +421,16 @@ unsafe extern "C" {
     /// Find the parametric outer loop of a face.
     pub fn PK_FACE_find_outer_loop(
         face: PK_FACE_t,
-        loop_: *mut PK_LOOP_t,
+        options: *mut PK_FACE_find_outer_loop_o_t,
+        outer_loop: *mut PK_LOOP_t,
     ) -> PK_ERROR_code_t;
 
     /// Reverse a face normal in a general body.
-    pub fn PK_FACE_reverse(face: PK_FACE_t) -> PK_ERROR_code_t;
+    pub fn PK_FACE_reverse(
+        n_faces: c_int,
+        faces: *mut PK_FACE_t,
+        options: *mut PK_FACE_reverse_o_t,
+    ) -> PK_ERROR_code_t;
 
     /// Return common edges between two faces.
     pub fn PK_FACE_find_edges_common(
@@ -541,8 +588,11 @@ unsafe extern "C" {
     /// Return fin geometry info.
     pub fn PK_FIN_ask_geometry(
         fin: PK_FIN_t,
+        want_interval: PK_LOGICAL_t,
         curve: *mut PK_CURVE_t,
-        t_range: *mut PK_INTERVAL_t,
+        class: *mut PK_CLASS_t,
+        ends: *mut PK_VECTOR_t,
+        t_int: *mut PK_INTERVAL_t,
         sense: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
@@ -780,7 +830,9 @@ unsafe extern "C" {
     /// Delete redundant topology from entities (version 2).
     pub fn PK_TOPOL_delete_redundant_2(
         n_topols: c_int,
-        topols: *const PK_TOPOL_t,
+        topols: *mut PK_TOPOL_t,
+        options: *mut PK_TOPOL_delete_redundant_2_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Detach geometry from topology.
@@ -791,8 +843,9 @@ unsafe extern "C" {
     /// Copy topology subset into a new general body.
     pub fn PK_TOPOL_make_general_body(
         n_topols: c_int,
-        topols: *const PK_TOPOL_t,
+        topols: *mut PK_TOPOL_t,
         body: *mut PK_BODY_t,
+        copy_topols: *mut PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -894,11 +947,9 @@ unsafe extern "C" {
 
     /// Create a planar sheet body with irregular polygon boundary and optional holes.
     pub fn PK_BODY_create_sheet_planar(
-        n_points: c_int,
-        points: *const PK_VECTOR_t,
-        n_holes: c_int,
-        n_hole_points: *const c_int,
-        hole_points: *const PK_VECTOR_t,
+        n_vectors: c_int,
+        vectors: *mut PK_VECTOR_t,
+        options: *mut PK_BODY_create_sheet_planar_o_t,
         body: *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
 
@@ -913,11 +964,12 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Create a wire body from a curve (version 2).
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_CURVE_make_wire_body_2(
         n_curves: c_int,
-        curves: *const PK_CURVE_t,
-        n_intervals: c_int,
-        intervals: *const PK_INTERVAL_t,
+        curves: *mut PK_CURVE_t,
+        bounds: *mut PK_INTERVAL_t,
+        options: *mut PK_CURVE_make_wire_body_o_t,
         body: *mut PK_BODY_t,
         n_new_edges: *mut c_int,
         new_edges: *mut *mut PK_EDGE_t,
@@ -935,12 +987,16 @@ unsafe extern "C" {
     /// Create a solid body from a cone surface.
     pub fn PK_CONE_make_solid_body(
         cone: PK_CONE_t,
+        range: *const PK_INTERVAL_t,
         body: *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
 
     /// Create a solid body from a cylinder surface.
+    /// V35: `(PK_CYL_t cyl, PK_INTERVAL_t range, PK_BODY_t *body)` — the old
+    /// binding dropped the `range` interval.
     pub fn PK_CYL_make_solid_body(
         cyl: PK_CYLL_t,
+        range: *const PK_INTERVAL_t,
         body: *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
 
@@ -963,17 +1019,22 @@ unsafe extern "C" {
     /// Create sheet bodies from faces.
     pub fn PK_FACE_make_sheet_bodies(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
+        faces: *mut PK_FACE_t,
+        options: *mut PK_FACE_make_sheet_bodies_o_t,
         n_bodies: *mut c_int,
         bodies: *mut *mut PK_BODY_t,
+        tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Create solid bodies from faces (capping open regions).
     pub fn PK_FACE_make_solid_bodies(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
+        faces: *mut PK_FACE_t,
+        heal_action: PK_FACE_heal_t,
+        local_check: PK_LOGICAL_t,
         n_bodies: *mut c_int,
         bodies: *mut *mut PK_BODY_t,
+        check_results: *mut *mut PK_local_check_t,
     ) -> PK_ERROR_code_t;
 
     /// Extract manifold components from a general body.
@@ -997,26 +1058,30 @@ unsafe extern "C" {
     /// Create a compound body from an array of bodies.
     pub fn PK_BODY_make_compound(
         n_bodies: c_int,
-        bodies: *const PK_BODY_t,
+        bodies: *mut PK_BODY_t,
+        options: *mut PK_BODY_make_compound_o_t,
         compound: *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
 
     /// Add bodies to an existing compound body.
     pub fn PK_BODY_add_to_compound(
-        compound: PK_BODY_t,
         n_bodies: c_int,
-        bodies: *const PK_BODY_t,
+        bodies: *mut PK_BODY_t,
+        compound: PK_BODY_t,
+        options: *mut PK_BODY_add_to_compound_o_t,
     ) -> PK_ERROR_code_t;
 
     /// Extract child bodies from a compound (make them standalone).
     pub fn PK_BODY_remove_from_parents(
-        n_bodies: c_int,
-        bodies: *const PK_BODY_t,
+        n_children: c_int,
+        children: *mut PK_BODY_t,
+        options: *mut PK_BODY_remove_from_parents_o_t,
     ) -> PK_ERROR_code_t;
 
     /// Return child bodies of a compound body.
     pub fn PK_BODY_ask_children(
         body: PK_BODY_t,
+        options: *mut PK_BODY_ask_children_o_t,
         n_children: *mut c_int,
         children: *mut *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
@@ -1024,6 +1089,7 @@ unsafe extern "C" {
     /// Return the parent compound body of a child body.
     pub fn PK_BODY_ask_parent(
         body: PK_BODY_t,
+        options: *mut PK_BODY_ask_parent_o_t,
         parent: *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
 
@@ -1034,14 +1100,19 @@ unsafe extern "C" {
     /// Attach rubber faces to closed wire loops (wire -> sheet conversion).
     pub fn PK_EDGE_make_faces_from_wire(
         n_edges: c_int,
-        edges: *const PK_EDGE_t,
-        n_new_faces: *mut c_int,
-        new_faces: *mut *mut PK_FACE_t,
+        edges: *mut PK_EDGE_t,
+        senses: *mut PK_LOGICAL_t,
+        shared_loop: *mut c_int,
+        new_faces: *mut PK_FACE_t,
     ) -> PK_ERROR_code_t;
 
     /// Delete a face from a sheet body (pierce the sheet).
     pub fn PK_FACE_delete_from_sheet(
-        face: PK_FACE_t,
+        n_faces: c_int,
+        faces: *mut PK_FACE_t,
+        options: *mut PK_FACE_delete_from_sheet_o_t,
+        n_bodies: *mut c_int,
+        bodies: *mut *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
 
     /// Delete wireframe edges from a body.
@@ -1064,8 +1135,11 @@ unsafe extern "C" {
 
     /// Make a wire body from an edge (for tolerant edges).
     pub fn PK_EDGE_make_wire_body(
-        edge: PK_EDGE_t,
+        n_edges: c_int,
+        edges: *mut PK_EDGE_t,
+        options: *mut PK_EDGE_make_wire_body_o_t,
         body: *mut PK_BODY_t,
+        tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Create topology of a minimum body.

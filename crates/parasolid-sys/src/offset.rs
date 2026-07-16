@@ -17,65 +17,67 @@ use crate::*;
 
 pub type PK_offset_method_t = c_int;
 /// Trim and extend (legacy).
-pub const PK_offset_method_sx_trim_c: PK_offset_method_t = 0;
+pub const PK_offset_method_sx_trim_c: PK_offset_method_t = 22150;
 /// Trim, repair, and extend.
-pub const PK_offset_method_sx_repair_1_c: PK_offset_method_t = 1;
+pub const PK_offset_method_sx_repair_1_c: PK_offset_method_t = 22151;
 /// Extended B-surface patching (recommended).
-pub const PK_offset_method_sx_repair_2_c: PK_offset_method_t = 2;
+pub const PK_offset_method_sx_repair_2_c: PK_offset_method_t = 22152;
 
 // -- offset_step: side face creation ------------------------------------------
 
 pub type PK_offset_step_t = c_int;
 /// No side faces (default).
-pub const PK_offset_step_no_c: PK_offset_step_t = 0;
+pub const PK_offset_step_no_c: PK_offset_step_t = 22310;
 /// Side faces at all smooth boundaries.
-pub const PK_offset_step_all_c: PK_offset_step_t = 1;
+pub const PK_offset_step_all_c: PK_offset_step_t = 22312;
 /// Side faces only where growing fails (not for facet geometry).
-pub const PK_offset_step_site_c: PK_offset_step_t = 2;
+pub const PK_offset_step_site_c: PK_offset_step_t = 22313;
 /// Side faces only at offset/non-offset boundaries (legacy v18.0).
-pub const PK_offset_step_pierce_c: PK_offset_step_t = 3;
+pub const PK_offset_step_pierce_c: PK_offset_step_t = 22311;
 
 // -- fix_degens: degeneracy repair --------------------------------------------
 
 pub type PK_fix_degens_t = c_int;
 /// No repair (default).
-pub const PK_fix_degens_no_c: PK_fix_degens_t = 0;
+pub const PK_fix_degens_no_c: PK_fix_degens_t = 24850;
 /// Repair only offset faces.
-pub const PK_fix_degens_offset_c: PK_fix_degens_t = 1;
+pub const PK_fix_degens_offset_c: PK_fix_degens_t = 24851;
 /// Repair offset faces and their non-offset pairs.
-pub const PK_fix_degens_all_c: PK_fix_degens_t = 2;
+pub const PK_fix_degens_all_c: PK_fix_degens_t = 24852;
 
 // -- blend_edges: blend creation at offset edges ------------------------------
 
 pub type PK_EDGE_offset_blend_t = c_int;
 /// Replace convex offset edges with blends.
-pub const PK_EDGE_offset_blend_convex_c: PK_EDGE_offset_blend_t = 1;
+pub const PK_EDGE_offset_blend_convex_c: PK_EDGE_offset_blend_t = 22641;
 
 // -- vertex_limit: vertex tolerance constraint --------------------------------
 
 pub type PK_VERTEX_limit_t = c_int;
 /// No limit (default).
-pub const PK_VERTEX_limit_no_c: PK_VERTEX_limit_t = 0;
+pub const PK_VERTEX_limit_no_c: PK_VERTEX_limit_t = 24280;
 /// Allow but report large tolerances.
-pub const PK_VERTEX_limit_report_c: PK_VERTEX_limit_t = 1;
+pub const PK_VERTEX_limit_report_c: PK_VERTEX_limit_t = 24281;
 /// Fail if limits not satisfied.
-pub const PK_VERTEX_limit_yes_c: PK_VERTEX_limit_t = 2;
+pub const PK_VERTEX_limit_yes_c: PK_VERTEX_limit_t = 24282;
 
 // -- edge_limit: edge tolerance constraint ------------------------------------
 
 pub type PK_EDGE_limit_t = c_int;
 /// No limit (default).
-pub const PK_EDGE_limit_no_c: PK_EDGE_limit_t = 0;
+pub const PK_EDGE_limit_no_c: PK_EDGE_limit_t = 24320;
 /// Allow but report large tolerances.
-pub const PK_EDGE_limit_report_c: PK_EDGE_limit_t = 1;
+pub const PK_EDGE_limit_report_c: PK_EDGE_limit_t = 24321;
 /// Fail if limits not satisfied.
-pub const PK_EDGE_limit_yes_c: PK_EDGE_limit_t = 2;
+pub const PK_EDGE_limit_yes_c: PK_EDGE_limit_t = 24322;
 
 // -- track_del: track partially tight-curved face deletions -------------------
 
 pub type PK_offset_track_del_t = c_int;
 /// Track partially tight-curved face deletions.
-pub const PK_offset_track_del_sx_repair_c: PK_offset_track_del_t = 1;
+pub const PK_offset_track_del_sx_repair_c: PK_offset_track_del_t = 24141;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_offset_track_del_no_c: PK_offset_track_del_t = 24140;
 
 // -- ortho_vx_split: laminar vertex splitting ---------------------------------
 
@@ -87,11 +89,11 @@ pub type PK_ortho_vx_split_t = c_int;
 
 pub type PK_FACE_grow_t = c_int;
 /// Do not grow any faces.
-pub const PK_FACE_grow_no_c: PK_FACE_grow_t = 0;
+pub const PK_FACE_grow_no_c: PK_FACE_grow_t = 24124;
 /// Grow the faces that are moving.
-pub const PK_FACE_grow_moving_c: PK_FACE_grow_t = 1;
+pub const PK_FACE_grow_moving_c: PK_FACE_grow_t = 24122;
 /// Grow the faces that are not moving.
-pub const PK_FACE_grow_fixed_c: PK_FACE_grow_t = 2;
+pub const PK_FACE_grow_fixed_c: PK_FACE_grow_t = 24123;
 
 // =============================================================================
 // Hollowing-specific enum types
@@ -99,11 +101,11 @@ pub const PK_FACE_grow_fixed_c: PK_FACE_grow_t = 2;
 
 pub type PK_hollow_local_t = c_int;
 /// Hollow entire body (default).
-pub const PK_hollow_local_none_c: PK_hollow_local_t = 0;
+pub const PK_hollow_local_none_c: PK_hollow_local_t = 23832;
 /// Hollow only specified faces (add to existing hollow).
-pub const PK_hollow_local_add_c: PK_hollow_local_t = 1;
+pub const PK_hollow_local_add_c: PK_hollow_local_t = 23830;
 /// Hollow everything except specified faces.
-pub const PK_hollow_local_exclude_c: PK_hollow_local_t = 2;
+pub const PK_hollow_local_exclude_c: PK_hollow_local_t = 23831;
 
 // =============================================================================
 // Thickening-specific enum types
@@ -111,7 +113,9 @@ pub const PK_hollow_local_exclude_c: PK_hollow_local_t = 2;
 
 pub type PK_thicken_method_t = c_int;
 /// Create side faces in specified punch direction.
-pub const PK_thicken_method_punch_c: PK_thicken_method_t = 1;
+pub const PK_thicken_method_punch_c: PK_thicken_method_t = 22041;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_thicken_method_offset_c: PK_thicken_method_t = 22040;
 
 // =============================================================================
 // Edge offset gap fill enum types
@@ -119,20 +123,20 @@ pub const PK_thicken_method_punch_c: PK_thicken_method_t = 1;
 
 pub type PK_VERTEX_gap_fill_t = c_int;
 /// Fill with round arc.
-pub const PK_VERTEX_gap_fill_round_c: PK_VERTEX_gap_fill_t = 0;
+pub const PK_VERTEX_gap_fill_round_c: PK_VERTEX_gap_fill_t = 21220;
 /// Fill with tangent extension.
-pub const PK_VERTEX_gap_fill_linear_c: PK_VERTEX_gap_fill_t = 1;
+pub const PK_VERTEX_gap_fill_linear_c: PK_VERTEX_gap_fill_t = 21221;
 
 // =============================================================================
 // Report constants
 // =============================================================================
 
 /// Degeneracies fixed report status.
-pub const PK_REPORT_1_fa_fix_degens_c: c_int = 1;
+pub const PK_REPORT_1_fa_fix_degens_c: c_int = 23904;
 /// Large vertex tolerance report status.
-pub const PK_REPORT_1_vx_large_tol_c: c_int = 2;
+pub const PK_REPORT_1_vx_large_tol_c: c_int = 23897;
 /// Large edge tolerance report status.
-pub const PK_REPORT_1_ed_large_tol_c: c_int = 3;
+pub const PK_REPORT_1_ed_large_tol_c: c_int = 23896;
 /// Track record: face deleted.
 pub const PK_TOPOLOGY_track_delete_c: c_int = 1;
 
@@ -141,9 +145,48 @@ pub const PK_TOPOLOGY_track_delete_c: c_int = 1;
 // =============================================================================
 
 /// Non-manifold edge/vertex blocking offset on body.
-pub const PK_offset_on_body_general_c: PK_local_status_t = 1;
+pub const PK_offset_on_body_general_c: PK_local_status_t = 23185;
 /// Edge tolerance limit failure.
-pub const PK_local_status_ed_large_tol_c: PK_local_status_t = 2;
+pub const PK_local_status_ed_large_tol_c: PK_local_status_t = 21476;
+// [re-abi] appended 38 missing member(s) from pk-enums.h
+pub const PK_local_status_ok_c: PK_local_status_t = 21450;
+pub const PK_local_status_nocheck_c: PK_local_status_t = 21451;
+pub const PK_local_status_fail_c: PK_local_status_t = 21452;
+pub const PK_local_status_cant_get_pt_c: PK_local_status_t = 21453;
+pub const PK_local_status_cant_get_cu_c: PK_local_status_t = 21454;
+pub const PK_local_status_cant_get_su_c: PK_local_status_t = 21455;
+pub const PK_local_status_cant_offset_c: PK_local_status_t = 21456;
+pub const PK_local_status_side_cu_fail_c: PK_local_status_t = 21457;
+pub const PK_local_status_side_su_fail_c: PK_local_status_t = 21458;
+pub const PK_local_status_not_same_by_c: PK_local_status_t = 21459;
+pub const PK_local_status_fa_fail_c: PK_local_status_t = 21460;
+pub const PK_local_status_fa_fa_fail_c: PK_local_status_t = 21461;
+pub const PK_local_status_ed_remains_c: PK_local_status_t = 21462;
+pub const PK_local_status_point_contact_c: PK_local_status_t = 21463;
+pub const PK_local_status_bad_reference_c: PK_local_status_t = 21464;
+pub const PK_local_status_not_supported_c: PK_local_status_t = 21465;
+pub const PK_local_status_cant_extend_c: PK_local_status_t = 21466;
+pub const PK_local_status_sheet_small_c: PK_local_status_t = 21467;
+pub const PK_local_status_cant_use_cu_c: PK_local_status_t = 21468;
+pub const PK_local_status_eds_unconnected_c: PK_local_status_t = 21469;
+pub const PK_local_status_non_laminar_c: PK_local_status_t = 21470;
+pub const PK_local_status_reference_loop_c: PK_local_status_t = 21471;
+pub const PK_local_status_lp_outside_fa_c: PK_local_status_t = 21472;
+pub const PK_local_status_target_missed_c: PK_local_status_t = 21473;
+pub const PK_local_status_wrong_side_c: PK_local_status_t = 21474;
+pub const PK_local_status_vx_large_tol_c: PK_local_status_t = 21475;
+pub const PK_local_status_blend_too_tight_c: PK_local_status_t = 21477;
+pub const PK_local_status_cant_make_blend_c: PK_local_status_t = 21478;
+pub const PK_local_status_bad_chamfer_c: PK_local_status_t = 21479;
+pub const PK_local_status_bad_blend_c: PK_local_status_t = 21480;
+pub const PK_local_status_not_blend_surf_c: PK_local_status_t = 21481;
+pub const PK_local_status_steep_edge_c: PK_local_status_t = 21482;
+pub const PK_local_status_bad_direction_c: PK_local_status_t = 21483;
+pub const PK_local_status_on_target_c: PK_local_status_t = 21484;
+pub const PK_local_status_not_extended_c: PK_local_status_t = 21485;
+pub const PK_local_status_negated_body_c: PK_local_status_t = 21486;
+pub const PK_local_status_miter_fail_c: PK_local_status_t = 21487;
+pub const PK_local_status_self_shadowing_c: PK_local_status_t = 21488;
 
 // =============================================================================
 // Options structures
@@ -415,57 +458,62 @@ impl Default for PK_FACE_hollow_o_t {
 }
 
 /// Options for `PK_BODY_thicken_3`.
+///
+/// Field order/offsets: `PKU_journal_BODY_thicken_o` (V37.01.243). The previous
+/// binding had the `n_edges/edges/n_surfaces/surfaces` block misplaced (right
+/// after `punch_dir`) and the tail (`offset_step/grow/update/n_pierce_faces`)
+/// scrambled; corrected here to match the journal byte offsets exactly.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_BODY_thicken_o_t {
     /// Version tag for structure compatibility.
-    pub o_t_version: c_int,
+    pub o_t_version: c_int, // @0
     /// Number of faces to thicken by non-default amounts.
-    pub n_faces: c_int,
+    pub n_faces: c_int, // @4
     /// Faces to thicken by non-default amounts.
-    pub faces: *const PK_FACE_t,
+    pub faces: *const PK_FACE_t, // @8
     /// Front offset per face (array of size `n_faces`).
-    pub front_offsets: *const c_double,
+    pub front_offsets: *const c_double, // @16
     /// Back offset per face (array of size `n_faces`).
-    pub back_offsets: *const c_double,
+    pub back_offsets: *const c_double, // @24
     /// Check face-face inconsistencies.
-    pub check_fa_fa: PK_LOGICAL_t,
+    pub check_fa_fa: PK_LOGICAL_t, // @32
     /// Side face creation method.
-    pub method: PK_thicken_method_t,
+    pub method: PK_thicken_method_t, // @36
     /// Punch direction vector (when `method` = `PK_thicken_method_punch_c`).
-    pub punch_dir: PK_VECTOR_t,
-    /// Number of laminar edges for user-supplied side surfaces.
-    pub n_edges: c_int,
-    /// Laminar edges for user-supplied side surfaces.
-    pub edges: *const PK_EDGE_t,
-    /// Number of user-supplied side surfaces.
-    pub n_surfaces: c_int,
-    /// User-supplied side surfaces.
-    pub surfaces: *const PK_SURF_t,
+    pub punch_dir: PK_VECTOR_t, // @40 (24 bytes)
     /// Self-intersection removal method.
-    pub offset_method: PK_offset_method_t,
+    pub offset_method: PK_offset_method_t, // @64
     /// Report self-intersections.
-    pub report_sx: PK_LOGICAL_t,
+    pub report_sx: PK_LOGICAL_t, // @68
     /// Fix degeneracies before thickening.
-    pub fix_degens: PK_fix_degens_t,
+    pub fix_degens: PK_fix_degens_t, // @72
     /// Report degeneracy fixes.
-    pub report_fix_degens: PK_LOGICAL_t,
+    pub report_fix_degens: PK_LOGICAL_t, // @76
+    /// Number of laminar edges for user-supplied side surfaces.
+    pub n_edges: c_int, // @80
+    /// Laminar edges for user-supplied side surfaces.
+    pub edges: *const PK_EDGE_t, // @88
+    /// Number of user-supplied side surfaces.
+    pub n_surfaces: c_int, // @96
+    /// User-supplied side surfaces.
+    pub surfaces: *const PK_SURF_t, // @104
     /// Create blend faces from offset edges.
-    pub blend_edges: PK_EDGE_offset_blend_t,
+    pub blend_edges: PK_EDGE_offset_blend_t, // @112
     /// Blend radius.
-    pub blend_radius: c_double,
+    pub blend_radius: c_double, // @120
     /// Split laminar vertices orthogonally.
-    pub ortho_vx_split: PK_ortho_vx_split_t,
-    /// Number of faces to pierce (remove from result).
-    pub n_pierce_faces: c_int,
-    /// Faces to pierce.
-    pub pierce_faces: *const PK_FACE_t,
-    /// Create side faces along smooth edges.
-    pub offset_step: PK_offset_step_t,
-    /// Heal overflowing features.
-    pub grow: PK_FACE_grow_t,
+    pub ortho_vx_split: PK_ortho_vx_split_t, // @128
     /// Update switch.
-    pub update: PK_local_ops_update_t,
+    pub update: PK_local_ops_update_t, // @132
+    /// Create side faces along smooth edges.
+    pub offset_step: PK_offset_step_t, // @136
+    /// Number of faces to pierce (remove from result).
+    pub n_pierce_faces: c_int, // @140
+    /// Faces to pierce.
+    pub pierce_faces: *const PK_FACE_t, // @144
+    /// Heal overflowing features.
+    pub grow: PK_FACE_grow_t, // @152
 }
 
 impl Default for PK_BODY_thicken_o_t {
@@ -557,9 +605,11 @@ unsafe extern "C" {
     /// * `options`   - Options structure.
     pub fn PK_BODY_offset_2(
         body: PK_BODY_t,
-        distance: c_double,
+        offset: c_double,
         tolerance: c_double,
-        options: *const PK_BODY_offset_o_t,
+        options: *mut PK_BODY_offset_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Offset a specific set of faces in a body.
@@ -576,10 +626,12 @@ unsafe extern "C" {
     /// * `options`   - Options structure.
     pub fn PK_FACE_offset_2(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        offsets: *const c_double,
+        faces: *mut PK_FACE_t,
+        offsets: *mut c_double,
         tolerance: c_double,
-        options: *const PK_FACE_offset_o_t,
+        options: *mut PK_FACE_offset_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Offset connected edges in a given direction within their owning body.
@@ -599,12 +651,11 @@ unsafe extern "C" {
     /// * `new_edges`   - (out) Array of new edge tags (PK-allocated, caller must free).
     pub fn PK_EDGE_offset_on_body(
         n_edges: c_int,
-        edges: *const PK_EDGE_t,
-        distance: c_double,
-        direction: *const PK_VECTOR_t,
-        options: *const PK_EDGE_offset_on_body_o_t,
-        n_new_edges: *mut c_int,
-        new_edges: *mut *mut PK_EDGE_t,
+        edges: *mut PK_EDGE_t,
+        direction: PK_HAND_t,
+        options: *mut PK_EDGE_offset_on_body_o_t,
+        results: *mut PK_EDGE_offset_on_body_r_t,
+        tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------
@@ -622,11 +673,18 @@ unsafe extern "C" {
     /// * `distance`  - Default offset distance for all faces.
     /// * `tolerance` - Tolerance for approximate geometry.
     /// * `options`   - Options structure (includes pierce faces, per-face offsets).
+    /// Hollow (shell) a solid. V35: `(PK_BODY_t body, double offset,
+    /// double tolerance, const PK_BODY_hollow_o_t *options,
+    /// PK_TOPOL_track_r_t *tracking, PK_TOPOL_local_r_t *results)`. The old
+    /// binding was missing the `tracking`/`results` outputs (both written
+    /// unconditionally, so NULL faults the kernel).
     pub fn PK_BODY_hollow_2(
         body: PK_BODY_t,
-        distance: c_double,
+        offset: c_double,
         tolerance: c_double,
         options: *const PK_BODY_hollow_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Hollow by specifying exactly which faces to offset and by how much.
@@ -642,10 +700,12 @@ unsafe extern "C" {
     /// * `options`   - Options structure.
     pub fn PK_FACE_hollow_3(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        offsets: *const c_double,
+        faces: *mut PK_FACE_t,
+        offsets: *mut c_double,
         tolerance: c_double,
-        options: *const PK_FACE_hollow_o_t,
+        options: *mut PK_FACE_hollow_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------
@@ -670,7 +730,9 @@ unsafe extern "C" {
         front_default: c_double,
         back_default: c_double,
         tolerance: c_double,
-        options: *const PK_BODY_thicken_o_t,
+        options: *mut PK_BODY_thicken_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------

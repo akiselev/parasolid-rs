@@ -21,19 +21,26 @@ use crate::*;
 
 pub type PK_transmit_format_t = c_int;
 /// Indexed format for per-face receive.
-pub const PK_transmit_format_indexio_c: PK_transmit_format_t = 1;
+pub const PK_transmit_format_indexio_c: PK_transmit_format_t = 18226;
+// [re-abi] appended 6 missing member(s) from pk-enums.h
+pub const PK_transmit_format_text_c: PK_transmit_format_t = 18220;
+pub const PK_transmit_format_binary_c: PK_transmit_format_t = 18221;
+pub const PK_transmit_format_neutral_c: PK_transmit_format_t = 18222;
+pub const PK_transmit_format_applio_c: PK_transmit_format_t = 18223;
+pub const PK_transmit_format_xml_c: PK_transmit_format_t = 18224;
+pub const PK_transmit_format_typed_binary_c: PK_transmit_format_t = 18225;
 
 pub type PK_transmit_meshes_t = c_int;
 /// Meshes written to a separate file.
-pub const PK_transmit_meshes_separate_c: PK_transmit_meshes_t = 0;
+pub const PK_transmit_meshes_separate_c: PK_transmit_meshes_t = 26130;
 /// Meshes embedded within the part file.
-pub const PK_transmit_meshes_embedded_c: PK_transmit_meshes_t = 1;
+pub const PK_transmit_meshes_embedded_c: PK_transmit_meshes_t = 26131;
 
 pub type PK_receive_using_seek_t = c_int;
 /// Load mesh data sequentially during receive.
-pub const PK_receive_using_seek_no_c: PK_receive_using_seek_t = 0;
+pub const PK_receive_using_seek_no_c: PK_receive_using_seek_t = 26380;
 /// Load mesh data lazily (only when needed).
-pub const PK_receive_using_seek_yes_c: PK_receive_using_seek_t = 1;
+pub const PK_receive_using_seek_yes_c: PK_receive_using_seek_t = 26381;
 
 // =============================================================================
 // Attribute definition mismatch enum
@@ -51,19 +58,19 @@ pub const PK_ATTDEF_mismatch_ignore_c: PK_ATTDEF_mismatch_t = 1;
 
 pub type PK_PARTITION_xmt_deltas_t = c_int;
 /// Do not transmit deltas (default).
-pub const PK_PARTITION_xmt_deltas_none_c: PK_PARTITION_xmt_deltas_t = 0;
+pub const PK_PARTITION_xmt_deltas_none_c: PK_PARTITION_xmt_deltas_t = 18230;
 /// Transmit deltas for main-line pmarks only.
-pub const PK_PARTITION_xmt_deltas_main_c: PK_PARTITION_xmt_deltas_t = 2;
+pub const PK_PARTITION_xmt_deltas_main_c: PK_PARTITION_xmt_deltas_t = 18232;
 /// Defer delta transmit to a later separate call.
-pub const PK_PARTITION_xmt_deltas_later_c: PK_PARTITION_xmt_deltas_t = 3;
+pub const PK_PARTITION_xmt_deltas_later_c: PK_PARTITION_xmt_deltas_t = 18233;
 
 pub type PK_PARTITION_rcv_deltas_t = c_int;
 /// Load pmarks and deltas during receive.
-pub const PK_PARTITION_rcv_deltas_yes_c: PK_PARTITION_rcv_deltas_t = 0;
+pub const PK_PARTITION_rcv_deltas_yes_c: PK_PARTITION_rcv_deltas_t = 18242;
 /// Do not load pmarks or deltas.
-pub const PK_PARTITION_rcv_deltas_no_c: PK_PARTITION_rcv_deltas_t = 1;
+pub const PK_PARTITION_rcv_deltas_no_c: PK_PARTITION_rcv_deltas_t = 18240;
 /// Delay loading pmarks and deltas.
-pub const PK_PARTITION_rcv_deltas_later_c: PK_PARTITION_rcv_deltas_t = 2;
+pub const PK_PARTITION_rcv_deltas_later_c: PK_PARTITION_rcv_deltas_t = 18241;
 
 // =============================================================================
 // Pmark new-at-mark enum
@@ -71,9 +78,9 @@ pub const PK_PARTITION_rcv_deltas_later_c: PK_PARTITION_rcv_deltas_t = 2;
 
 pub type PK_PMARK_new_at_t = c_int;
 /// Pmarks deleted on rollback to before delta receive (default).
-pub const PK_PMARK_new_at_current_mark_c: PK_PMARK_new_at_t = 0;
+pub const PK_PMARK_new_at_current_mark_c: PK_PMARK_new_at_t = 23560;
 /// Pmarks preserved until partition is deleted.
-pub const PK_PMARK_new_with_partition_c: PK_PMARK_new_at_t = 1;
+pub const PK_PMARK_new_with_partition_c: PK_PMARK_new_at_t = 23561;
 
 // =============================================================================
 // PK_FACE_output_surf_trimmed option enums
@@ -81,159 +88,246 @@ pub const PK_PMARK_new_with_partition_c: PK_PMARK_new_at_t = 1;
 
 pub type PK_FACE_trim_confine_t = c_int;
 /// Not confined to single period; loops may have gaps at degeneracies.
-pub const PK_FACE_trim_confine_no_c: PK_FACE_trim_confine_t = 0;
+pub const PK_FACE_trim_confine_no_c: PK_FACE_trim_confine_t = 13905;
 /// Confined to single period; loops may have gaps at degeneracies.
-pub const PK_FACE_trim_confine_yes_c: PK_FACE_trim_confine_t = 1;
+pub const PK_FACE_trim_confine_yes_c: PK_FACE_trim_confine_t = 13906;
 /// Confined to single period; loops closed without gaps; natural boundary may be omitted.
-pub const PK_FACE_trim_confine_closed_c: PK_FACE_trim_confine_t = 2;
+pub const PK_FACE_trim_confine_closed_c: PK_FACE_trim_confine_t = 13907;
 /// Confined to single period; loops closed; exactly one outer peripheral loop.
-pub const PK_FACE_trim_confine_periph_c: PK_FACE_trim_confine_t = 3;
+pub const PK_FACE_trim_confine_periph_c: PK_FACE_trim_confine_t = 13908;
 
 pub type PK_FACE_trim_degen_t = c_int;
 /// Do not represent degeneracies.
-pub const PK_FACE_trim_degen_no_c: PK_FACE_trim_degen_t = 0;
+pub const PK_FACE_trim_degen_no_c: PK_FACE_trim_degen_t = 13910;
 /// Represent degeneracies (including isolated parametric degeneracies).
-pub const PK_FACE_trim_degen_yes_c: PK_FACE_trim_degen_t = 1;
+pub const PK_FACE_trim_degen_yes_c: PK_FACE_trim_degen_t = 13909;
 
 // =============================================================================
 // Option structs
 // =============================================================================
 
+/// Compound-part receive mode (`PK_receive_compound_*_c`).
+pub type PK_receive_compound_t = c_int;
+
 /// Options for `PK_PART_transmit` / `PK_PART_transmit_u` / `PK_PART_transmit_b`.
+///
+/// Layout (40 bytes) recovered from the RE catalog — the previous struct put
+/// `transmit_format` at @8 and omitted `transmit_user_fields`/
+/// `transmit_nmnl_geometry`, so the kernel misread the format and read
+/// `transmit_meshes`/`indexed_context` past the end of the allocation.
 #[repr(C)]
 #[derive(Debug, Clone)]
 pub struct PK_PART_transmit_o_t {
-    /// Version tag for this options struct.
-    pub o_t_version: c_int,
-    /// Schema version to write (0 = current with embedded schema).
-    pub transmit_version: c_int,
-    /// Transmit format (standard or indexed).
-    pub transmit_format: PK_transmit_format_t,
-    /// How to handle mesh data.
-    pub transmit_meshes: PK_transmit_meshes_t,
+    pub o_t_version: c_int,                       // @0
+    /// Transmit format (text / binary / neutral / …).
+    pub transmit_format: PK_transmit_format_t,    // @4
+    /// Whether to transmit user fields.
+    pub transmit_user_fields: PK_LOGICAL_t,       // @8
+    /// Schema version to write (0 = current, with embedded schema).
+    pub transmit_version: c_int,                  // @12
+    /// Whether to transmit nominal geometry.
+    pub transmit_nmnl_geometry: PK_LOGICAL_t,     // @16
+    // @20: 4 bytes padding (pointer is 8-aligned)
     /// Opaque context pointer for indexed IO.
-    pub transmit_indexed_context: *mut c_void,
+    pub transmit_indexed_context: *mut c_void,    // @24
+    /// How to handle mesh data.
+    pub transmit_meshes: PK_transmit_meshes_t,    // @32
 }
 
 impl Default for PK_PART_transmit_o_t {
     fn default() -> Self {
         Self {
             o_t_version: 1,
+            transmit_format: 0, // 0 = frustrum/kernel default
+            transmit_user_fields: PK_LOGICAL_false,
             transmit_version: 0,
-            transmit_format: 0,
-            transmit_meshes: 0,
+            transmit_nmnl_geometry: PK_LOGICAL_false,
             transmit_indexed_context: std::ptr::null_mut(),
+            transmit_meshes: 0,
         }
     }
 }
 
 /// Options for `PK_PART_receive` / `PK_PART_receive_u` / `PK_PART_receive_b`.
+///
+/// Layout (72 bytes) from the RE catalog — the previous struct put
+/// `transmit_format` at @12 and omitted `n_part_indices`/`part_indices`/
+/// `receive_compound`/`receive_mixed`, so every field past `attdef_mismatch`
+/// was at the wrong offset and the kernel read four fields past the end.
 #[repr(C)]
 #[derive(Debug, Clone)]
 pub struct PK_PART_receive_o_t {
-    /// Version tag for this options struct.
-    pub o_t_version: c_int,
+    pub o_t_version: c_int,                        // @0
+    /// Expected transmit format (0 = auto-detect).
+    pub transmit_format: PK_transmit_format_t,     // @4
     /// Whether to receive user fields.
-    pub receive_user_fields: PK_LOGICAL_t,
-    /// What to do on attribute definition mismatch.
-    pub attdef_mismatch: PK_ATTDEF_mismatch_t,
-    /// Transmit format (standard or indexed).
-    pub transmit_format: PK_transmit_format_t,
-    /// Part index (for multi-part files).
-    pub part_index: c_int,
+    pub receive_user_fields: PK_LOGICAL_t,         // @8
+    /// What to do on attribute-definition mismatch.
+    pub attdef_mismatch: PK_ATTDEF_mismatch_t,     // @12
+    /// Part index (for indexed multi-part files).
+    pub part_index: c_int,                         // @16
+    /// Number of part indices to receive.
+    pub n_part_indices: c_int,                     // @20
+    /// Array of part indices.
+    pub part_indices: *const c_int,                // @24
     /// Number of identifiers to receive.
-    pub n_identifiers: c_int,
+    pub n_identifiers: c_int,                      // @32
+    // @36: 4 bytes padding
     /// Array of identifier values.
-    pub identifiers: *const c_int,
+    pub identifiers: *const c_int,                 // @40
     /// Opaque context pointer for indexed IO.
-    pub receive_indexed_context: *mut c_void,
-    /// If true, treat key as partition name.
-    pub key_is_partition: PK_LOGICAL_t,
+    pub receive_indexed_context: *mut c_void,      // @48
+    /// If true, treat key as a partition name.
+    pub key_is_partition: PK_LOGICAL_t,            // @56
+    /// Compound-part receive mode.
+    pub receive_compound: PK_receive_compound_t,   // @60
     /// Whether to use seek for mesh loading.
-    pub receive_using_seek: PK_receive_using_seek_t,
+    pub receive_using_seek: PK_receive_using_seek_t, // @64
+    /// Mixed (facet + b-rep) receive mode.
+    pub receive_mixed: PK_receive_mixed_t,         // @68
 }
 
 impl Default for PK_PART_receive_o_t {
     fn default() -> Self {
         Self {
             o_t_version: 1,
+            transmit_format: 0, // 0 = auto-detect
             receive_user_fields: PK_LOGICAL_false,
             attdef_mismatch: PK_ATTDEF_mismatch_fail_c,
-            transmit_format: 0,
             part_index: 0,
+            n_part_indices: 0,
+            part_indices: std::ptr::null(),
             n_identifiers: 0,
             identifiers: std::ptr::null(),
             receive_indexed_context: std::ptr::null_mut(),
             key_is_partition: PK_LOGICAL_false,
+            receive_compound: 0,
             receive_using_seek: PK_receive_using_seek_no_c,
+            receive_mixed: 0,
         }
     }
 }
 
 /// Options for `PK_PARTITION_transmit` / `PK_PARTITION_transmit_u` / `PK_PARTITION_transmit_b`.
+///
+/// Layout (56 bytes) recovered from `PKU_journal_PARTITION_transmit_o`
+/// (V37.01.243). The previous struct omitted `transmit_format`,
+/// `transmit_user_fields`, `pmarks`, `n_pmarks` and `transmit_indexed_context`,
+/// and placed `transmit_version`/`transmit_deltas`/`transmit_all_attdefs` at the
+/// wrong offsets (@4/@8/@12 instead of @16/@12/@20).
+// layout: PKU_journal_PARTITION_transmit_o
 #[repr(C)]
 #[derive(Debug, Clone)]
 pub struct PK_PARTITION_transmit_o_t {
     /// Version tag for this options struct.
-    pub o_t_version: c_int,
-    /// Schema version to write.
-    pub transmit_version: c_int,
+    pub o_t_version: c_int,                          // @0
+    /// Transmit format (text / binary / neutral / …).
+    pub transmit_format: PK_transmit_format_t,       // @4
+    /// Whether to transmit user fields.
+    pub transmit_user_fields: PK_LOGICAL_t,          // @8
     /// How to handle delta transmit.
-    pub transmit_deltas: PK_PARTITION_xmt_deltas_t,
+    pub transmit_deltas: PK_PARTITION_xmt_deltas_t,  // @12
+    /// Schema version to write.
+    pub transmit_version: c_int,                     // @16
     /// Transmit all attdefs or only used ones.
-    pub transmit_all_attdefs: PK_LOGICAL_t,
+    pub transmit_all_attdefs: PK_LOGICAL_t,          // @20
+    /// Array of pmarks to transmit (delta transmit). Pointer precedes its count
+    /// in the ABI, per the journal.
+    pub pmarks: *const PK_PMARK_t,                   // @24
+    /// Number of pmarks in `pmarks`.
+    pub n_pmarks: c_int,                             // @32
+    // @36: 4 bytes padding (pointer is 8-aligned)
+    /// Opaque context pointer for indexed IO.
+    pub transmit_indexed_context: *mut c_void,       // @40
     /// How to handle mesh data.
-    pub transmit_meshes: PK_transmit_meshes_t,
+    pub transmit_meshes: PK_transmit_meshes_t,       // @48
 }
 
 impl Default for PK_PARTITION_transmit_o_t {
     fn default() -> Self {
         Self {
             o_t_version: 1,
-            transmit_version: 0,
+            transmit_format: 0,
+            transmit_user_fields: PK_LOGICAL_false,
             transmit_deltas: PK_PARTITION_xmt_deltas_none_c,
+            transmit_version: 0,
             transmit_all_attdefs: PK_LOGICAL_false,
+            pmarks: std::ptr::null(),
+            n_pmarks: 0,
+            transmit_indexed_context: std::ptr::null_mut(),
             transmit_meshes: 0,
         }
     }
 }
 
 /// Options for `PK_PARTITION_receive` / `PK_PARTITION_receive_u` / `PK_PARTITION_receive_b`.
+///
+/// Layout (80 bytes) recovered from `PKU_journal_PARTITION_receive_o`
+/// (V37.01.243). The previous struct omitted `transmit_format`,
+/// `receive_user_fields`, `deltas_block`, `receive_compound`, `receive_mixed`
+/// and `receive_locked`, and mis-ordered every field after `o_t_version`.
+///
+/// NOTE: `receive_all_attdefs` (@56) and `allow_missing_deltas` (@57) are
+/// single-byte fields in this struct's ABI — the journal reads them at byte
+/// offsets 0x38 and 0x39, which is only consistent with `u8` members (a 4-byte
+/// int at @56 would collide with `receive_compound` at @60).
+// layout: PKU_journal_PARTITION_receive_o
 #[repr(C)]
 #[derive(Debug, Clone)]
 pub struct PK_PARTITION_receive_o_t {
     /// Version tag for this options struct.
-    pub o_t_version: c_int,
-    /// Whether to receive deltas/pmarks.
-    pub receive_deltas: PK_PARTITION_rcv_deltas_t,
-    /// Whether to receive all attribute definitions.
-    pub receive_all_attdefs: PK_LOGICAL_t,
-    /// Callback for attribute definition processing.
-    pub attdef_callback: *mut c_void,
-    /// Whether the callback is active.
-    pub attdef_callback_on: PK_LOGICAL_t,
-    /// Opaque context for attdef callback.
-    pub attdef_context: *mut c_void,
-    /// Allow missing deltas without error.
-    pub allow_missing_deltas: PK_LOGICAL_t,
-    /// Use seek-based loading for meshes.
-    pub receive_using_seek: PK_receive_using_seek_t,
-    /// Receive deltas from previous version.
-    pub receive_prev_version_deltas: PK_LOGICAL_t,
+    pub o_t_version: c_int,                          // @0
+    /// Expected transmit format (0 = auto-detect).
+    pub transmit_format: PK_transmit_format_t,       // @4
+    /// Whether to receive user fields.
+    pub receive_user_fields: PK_LOGICAL_t,           // @8
+    /// How to handle delta receive.
+    pub receive_deltas: PK_PARTITION_rcv_deltas_t,   // @12
+    /// Receive deltas written by a previous version.
+    pub receive_prev_version_deltas: PK_LOGICAL_t,   // @16
+    // @20: 4 bytes padding (pointer is 8-aligned)
+    /// Callback for attribute-definition naming (`PK_ATTDEF_name_cb_f_t`).
+    pub attdef_callback: *mut c_void,                // @24
+    /// Opaque context for the attdef callback.
+    pub attdef_context: *mut c_void,                 // @32
+    /// Whether the attdef callback is active.
+    pub attdef_callback_on: PK_LOGICAL_t,            // @40
+    // @44: 4 bytes padding
+    /// Opaque delta-block pointer.
+    pub deltas_block: *mut c_void,                   // @48
+    /// Whether to receive all attribute definitions (single byte in the ABI).
+    pub receive_all_attdefs: u8,                     // @56
+    /// Allow missing deltas without error (single byte in the ABI).
+    pub allow_missing_deltas: u8,                    // @57
+    // @58: 2 bytes padding (next c_int is 4-aligned at @60)
+    /// Compound-part receive mode.
+    pub receive_compound: PK_receive_compound_t,     // @60
+    /// Whether to use seek-based mesh loading.
+    pub receive_using_seek: PK_receive_using_seek_t, // @64
+    /// Mixed (facet + b-rep) receive mode.
+    pub receive_mixed: PK_receive_mixed_t,           // @68
+    /// Receive locked mode.
+    pub receive_locked: c_int,                       // @72
 }
 
 impl Default for PK_PARTITION_receive_o_t {
     fn default() -> Self {
         Self {
             o_t_version: 1,
+            transmit_format: 0,
+            receive_user_fields: PK_LOGICAL_false,
             receive_deltas: PK_PARTITION_rcv_deltas_yes_c,
-            receive_all_attdefs: PK_LOGICAL_false,
-            attdef_callback: std::ptr::null_mut(),
-            attdef_callback_on: PK_LOGICAL_false,
-            attdef_context: std::ptr::null_mut(),
-            allow_missing_deltas: PK_LOGICAL_false,
-            receive_using_seek: PK_receive_using_seek_no_c,
             receive_prev_version_deltas: PK_LOGICAL_false,
+            attdef_callback: std::ptr::null_mut(),
+            attdef_context: std::ptr::null_mut(),
+            attdef_callback_on: PK_LOGICAL_false,
+            deltas_block: std::ptr::null_mut(),
+            receive_all_attdefs: 0,
+            allow_missing_deltas: 0,
+            receive_compound: 0,
+            receive_using_seek: PK_receive_using_seek_no_c,
+            receive_mixed: 0,
+            receive_locked: 0,
         }
     }
 }
@@ -372,10 +466,9 @@ unsafe extern "C" {
     /// Transmit parts to application memory buffer.
     pub fn PK_PART_transmit_b(
         n_parts: c_int,
-        parts: *const PK_PART_t,
-        options: *const PK_PART_transmit_o_t,
-        n_bytes: *mut c_int,
-        buffer: *mut *mut c_void,
+        parts: *mut PK_PART_t,
+        options: *mut PK_PART_transmit_o_t,
+        block: *mut PK_MEMORY_block_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -399,9 +492,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Receive parts from application memory buffer.
+    /// V35: `(PK_MEMORY_block_t block, options, int *n_parts, PK_PART_t **parts)` —
+    /// the block variant takes an in-memory `PK_MEMORY_block_t`, not `(n_bytes, buffer)`.
     pub fn PK_PART_receive_b(
-        n_bytes: c_int,
-        buffer: *const c_void,
+        block: PK_MEMORY_block_t,
         options: *const PK_PART_receive_o_t,
         n_parts: *mut c_int,
         parts: *mut *mut PK_PART_t,
@@ -409,26 +503,33 @@ unsafe extern "C" {
 
     /// Get Parasolid version of part transmit data (from frustrum key).
     pub fn PK_PART_receive_version(
-        key: *const c_char,
-        version: *mut c_int,
+        key: *mut c_char,
+        transmit_format: PK_transmit_format_t,
+        version: *mut PK_SESSION_kernel_version_t,
     ) -> PK_ERROR_code_t;
 
     /// Get Parasolid version of part transmit data (Unicode key).
     pub fn PK_PART_receive_version_u(
-        key: *const c_char,
-        version: *mut c_int,
+        key: *mut PK_UCHAR_t,
+        transmit_format: PK_transmit_format_t,
+        version: *mut PK_SESSION_kernel_version_t,
     ) -> PK_ERROR_code_t;
 
     /// Get Parasolid version of part transmit data (memory buffer).
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_PART_receive_version_b(
-        n_bytes: c_int,
-        buffer: *const c_void,
-        version: *mut c_int,
+        block: PK_MEMORY_block_t,
+        transmit_format: PK_transmit_format_t,
+        version: *mut PK_SESSION_kernel_version_t,
     ) -> PK_ERROR_code_t;
 
     /// Receive meshes for a part (lazy loading).
     pub fn PK_PART_receive_meshes(
-        part: PK_PART_t,
+        n_parts: c_int,
+        parts: *mut PK_PART_t,
+        options: *mut PK_PART_receive_meshes_o_t,
+        n_owners: *mut c_int,
+        owners: *mut *mut PK_ENTITY_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -446,6 +547,7 @@ unsafe extern "C" {
     /// Find entity tag by identifier within a part.
     pub fn PK_PART_find_entity_by_ident(
         part: PK_PART_t,
+        class: PK_CLASS_t,
         identifier: c_int,
         entity: *mut PK_ENTITY_t,
     ) -> PK_ERROR_code_t;
@@ -465,31 +567,34 @@ unsafe extern "C" {
     /// adjusts SP-curves to fit, splits at degeneracies and G1 discontinuities.
     pub fn PK_CURVE_embed_in_surf_2(
         curve: PK_CURVE_t,
-        surface: PK_SURF_t,
-        range: PK_INTERVAL_t,
-        spcurve: *mut PK_ENTITY_t,
+        surf: PK_SURF_t,
+        options: *mut PK_CURVE_embed_in_surf_o_t,
+        n_spcurves: *mut c_int,
+        spcurves: *mut *mut PK_SPCURVE_t,
     ) -> PK_ERROR_code_t;
 
     /// Create SP-curves from surfaces and 3D trimming curves.
     /// Options for zero-length connectors, direction matching, C2 continuity.
     pub fn PK_CURVE_make_spcurves_2(
-        n_curves: c_int,
-        curves: *const PK_CURVE_t,
-        surfaces: *const PK_SURF_t,
-        intervals: *const PK_INTERVAL_t,
+        curve: PK_CURVE_t,
+        range: *const PK_INTERVAL_t,
+        surf: PK_SURF_t,
+        tolerance: c_double,
+        options: *mut PK_CURVE_make_spcurves_o_t,
         n_spcurves: *mut c_int,
-        spcurves: *mut *mut PK_ENTITY_t,
+        spcurves: *mut *mut PK_SPCURVE_t,
     ) -> PK_ERROR_code_t;
 
     /// Create a sheet body (single face) from surface geometry + trimming curves
     /// (SP-curves or 3D curves). Topology inferred from geometry.
+    /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_SURF_make_sheet_trimmed(
-        surface: PK_SURF_t,
-        n_curves: c_int,
-        curves: *const PK_ENTITY_t,
-        options: *const PK_SURF_make_sheet_trimmed_o_t,
+        surf: PK_SURF_t,
+        trim_data: PK_SURF_trim_data_t,
+        precision: c_double,
+        options: *mut PK_SURF_make_sheet_trimmed_o_t,
         body: *mut PK_BODY_t,
-        face: *mut PK_FACE_t,
+        state: *mut PK_check_state_t,
     ) -> PK_ERROR_code_t;
 
     /// Sew sheet bodies together to complete recreation of imported data.
@@ -502,11 +607,18 @@ unsafe extern "C" {
     /// Simplify geometry on a body.
     pub fn PK_BODY_simplify_geom(
         body: PK_BODY_t,
+        local: PK_LOGICAL_t,
+        n_geoms: *mut c_int,
+        geoms: *mut *mut PK_GEOM_t,
     ) -> PK_ERROR_code_t;
 
     /// Simplify geometry on a face.
     pub fn PK_FACE_simplify_geom(
-        face: PK_FACE_t,
+        n_faces: c_int,
+        faces: *mut PK_FACE_t,
+        options: *mut PK_FACE_simplify_geom_o_t,
+        n_geoms: *mut c_int,
+        geoms: *mut *mut PK_GEOM_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -533,11 +645,16 @@ unsafe extern "C" {
     /// face surfaces.
     pub fn PK_BODY_share_geom(
         body: PK_BODY_t,
+        icurve_only: PK_LOGICAL_t,
+        n_geoms: *mut c_int,
     ) -> PK_ERROR_code_t;
 
     /// Repair shell/region structure; fix topological clashes between shells.
     pub fn PK_BODY_repair_shells(
         body: PK_BODY_t,
+        options: *mut PK_BODY_repair_shells_o_t,
+        status: *mut PK_SHELL_repair_stat_t,
+        tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -547,49 +664,56 @@ unsafe extern "C" {
     /// Find self-intersections in a curve within the given parameter interval.
     pub fn PK_CURVE_find_self_int(
         curve: PK_CURVE_t,
-        interval: PK_INTERVAL_t,
-        n_ints: *mut c_int,
-        params: *mut *mut c_double,
+        options: *mut PK_CURVE_find_self_int_o_t,
+        results: *mut PK_CURVE_self_ints_t,
     ) -> PK_ERROR_code_t;
 
     /// Fix self-intersections in a curve within the given parameter interval.
     pub fn PK_CURVE_fix_self_int(
         curve: PK_CURVE_t,
-        interval: PK_INTERVAL_t,
-        new_curve: *mut PK_CURVE_t,
+        self_ints: *mut PK_CURVE_self_ints_t,
+        options: *mut PK_CURVE_fix_self_int_o_t,
+        results: *mut PK_CURVE_fix_self_int_r_t,
     ) -> PK_ERROR_code_t;
 
-    /// Find self-intersections in a surface within the given UV box.
+    /// Find self-intersections in a surface. V35 vendor form: the UV box is
+    /// carried in the options struct; results fill a `PK_SURF_self_ints_t`.
     pub fn PK_SURF_find_self_int(
-        surface: PK_SURF_t,
-        uvbox: PK_UVBOX_t,
-        n_ints: *mut c_int,
+        surf: PK_SURF_t,
+        options: *const PK_SURF_find_self_int_o_t,
+        results: *mut PK_SURF_self_ints_t,
     ) -> PK_ERROR_code_t;
 
     /// Fix self-intersections in a surface within the given UV box.
     pub fn PK_SURF_fix_self_int(
-        surface: PK_SURF_t,
-        uvbox: PK_UVBOX_t,
-        new_surface: *mut PK_SURF_t,
+        surf: PK_SURF_t,
+        self_ints: *mut PK_SURF_self_ints_t,
+        options: *mut PK_SURF_fix_self_int_o_t,
+        results: *mut PK_SURF_fix_self_int_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Repair degeneracies in a surface.
     pub fn PK_SURF_fix_degens(
-        surface: PK_SURF_t,
-        new_surface: *mut PK_SURF_t,
+        surf: PK_SURF_t,
+        degens: *mut PK_SURF_degens_t,
+        options: *mut PK_SURF_fix_degens_o_t,
+        results: *mut PK_SURF_fix_degens_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Repair degeneracies in a curve.
     pub fn PK_CURVE_fix_degens(
         curve: PK_CURVE_t,
-        new_curve: *mut PK_CURVE_t,
+        degens: *mut PK_CURVE_degens_t,
+        options: *mut PK_CURVE_fix_degens_o_t,
+        results: *mut PK_CURVE_fix_degens_r_t,
     ) -> PK_ERROR_code_t;
 
-    /// Find degeneracies in a surface within the given UV box.
+    /// Find degeneracies in a surface. V35 vendor form: the UV box is carried in
+    /// the options struct; results fill a `PK_SURF_degens_t`.
     pub fn PK_SURF_find_degens(
-        surface: PK_SURF_t,
-        uvbox: PK_UVBOX_t,
-        n_degens: *mut c_int,
+        surf: PK_SURF_t,
+        options: *const PK_SURF_find_degens_o_t,
+        results: *mut PK_SURF_degens_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -602,21 +726,26 @@ unsafe extern "C" {
     /// trimming curves, and their senses. Does NOT support facet geometry.
     pub fn PK_FACE_output_surf_trimmed(
         face: PK_FACE_t,
-        options: *const PK_FACE_output_surf_trimmed_o_t,
-        surface: *mut PK_SURF_t,
-        n_loops: *mut c_int,
-        n_curves_per_loop: *mut *mut c_int,
-        curves: *mut *mut PK_ENTITY_t,
-        senses: *mut *mut PK_LOGICAL_t,
+        options: *mut PK_FACE_output_surf_trimmed_o_t,
+        surf: *mut PK_SURF_t,
+        sense: *mut PK_LOGICAL_t,
+        trim_data: *mut PK_SURF_trim_data_t,
+        geoms: *mut *mut PK_GEOM_t,
+        intervals: *mut *mut PK_INTERVAL_t,
+        topols: *mut *mut PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
     /// Output position vectors along a curve within a parameter interval.
     pub fn PK_CURVE_output_vectors(
         curve: PK_CURVE_t,
-        interval: PK_INTERVAL_t,
-        tolerance: c_double,
+        interval: *const PK_INTERVAL_t,
+        want_ts: PK_LOGICAL_t,
+        curve_chord_tol: c_double,
+        curve_chord_ang: c_double,
+        curve_chord_max: c_double,
         n_vectors: *mut c_int,
         vectors: *mut *mut PK_VECTOR_t,
+        ts: *mut *mut c_double,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -626,18 +755,19 @@ unsafe extern "C" {
     /// Find knitting pattern for assembling sheet bodies.
     pub fn PK_BODY_find_knit_pattern(
         n_bodies: c_int,
-        bodies: *const PK_BODY_t,
-        n_pairs: *mut c_int,
-        edge_pairs: *mut *mut PK_EDGE_t,
+        bodies: *mut PK_BODY_t,
+        options: *mut PK_BODY_find_knit_pattern_o_t,
+        knit_pattern: *mut PK_BODY_knit_pattern_t,
+        n_absent_bodies: *mut c_int,
+        absent_bodies: *mut *mut PK_BODY_t,
     ) -> PK_ERROR_code_t;
 
     /// Apply knitting pattern to assemble sheet bodies into a single body.
     pub fn PK_BODY_apply_knit_pattern(
-        n_bodies: c_int,
-        bodies: *const PK_BODY_t,
-        n_pairs: c_int,
-        edge_pairs: *const PK_EDGE_t,
-        result_body: *mut PK_BODY_t,
+        body: PK_BODY_t,
+        knit_pattern: *mut PK_BODY_knit_pattern_t,
+        options: *mut PK_BODY_apply_knit_pattern_o_t,
+        knit_result: *mut PK_BODY_knit_result_t,
     ) -> PK_ERROR_code_t;
 
 }

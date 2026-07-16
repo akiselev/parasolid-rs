@@ -181,6 +181,25 @@ pub struct PK_SURF_param_t {
     pub v_period: c_double,
 }
 
+/// Standard form of a single parametric direction (`PK_CURVE_ask_param` writes
+/// one; `PK_SURF_ask_params` writes two, u then v). 40-byte layout recovered by
+/// decompiling `PK_CURVE_ask_param`: `range`@0, four i32 enum fields @16/20/24/28
+/// (`periodic`@24 ∈ 18020/18021/18022), `closed` logical byte @32.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_PARAM_sf_t {
+    pub range: PK_INTERVAL_t, // @0
+    pub extent: c_int,        // @16
+    pub form: c_int,          // @20
+    pub periodic: c_int,      // @24  (PK_PARAM_periodic_*_c)
+    pub convexity: c_int,     // @28
+    pub closed: PK_LOGICAL_t, // @32 (value in low byte)
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_PARAM_sf_t>() == 40);
+};
+
 // =============================================================================
 // Precision enums
 // =============================================================================
@@ -188,25 +207,27 @@ pub struct PK_SURF_param_t {
 /// SP-curve generation method for PK_EDGE_set_precision_2.
 pub type PK_set_precision_sp_method_t = c_int;
 /// Default G1 continuous SP-curves.
-pub const PK_set_precision_default_c: PK_set_precision_sp_method_t = 0;
+pub const PK_set_precision_default_c: PK_set_precision_sp_method_t = 23550;
 /// C2 continuous SP-curves.
-pub const PK_set_precision_c2_c: PK_set_precision_sp_method_t = 1;
+pub const PK_set_precision_c2_c: PK_set_precision_sp_method_t = 23551;
 
 /// Short edge reporting mode for PK_EDGE_set_precision_2.
 pub type PK_set_precision_report_t = c_int;
 /// Return PK_ERROR_bad_tolerance_c (default).
-pub const PK_set_precision_report_no_c: PK_set_precision_report_t = 0;
+pub const PK_set_precision_report_no_c: PK_set_precision_report_t = 23730;
 /// Return PK_ERROR_edge_too_short + edge group.
-pub const PK_set_precision_report_yes_c: PK_set_precision_report_t = 1;
+pub const PK_set_precision_report_yes_c: PK_set_precision_report_t = 23731;
+// [re-abi] appended 1 missing member(s) from pk-enums.h
+pub const PK_REPORT_4_error_report_c: PK_set_precision_report_t = 25922;
 
 /// Method for PK_EDGE_reset_precision_2.
 pub type PK_reset_prec_method_t = c_int;
 /// Any coincident curve acceptable.
-pub const PK_reset_prec_method_any_c: PK_reset_prec_method_t = 0;
+pub const PK_reset_prec_method_any_c: PK_reset_prec_method_t = 25090;
 /// True intersection curve preferable.
-pub const PK_reset_prec_method_inter_c: PK_reset_prec_method_t = 1;
+pub const PK_reset_prec_method_inter_c: PK_reset_prec_method_t = 25091;
 /// Only true intersection curve acceptable.
-pub const PK_reset_prec_method_int_only_c: PK_reset_prec_method_t = 2;
+pub const PK_reset_prec_method_int_only_c: PK_reset_prec_method_t = 25092;
 
 /// Edge optimise option — whether to include short edges.
 pub type PK_EDGE_optimise_short_t = c_int;
@@ -258,23 +279,23 @@ pub struct PK_EDGE_optimise_o_t {
 /// Gap closing in 3-space mode.
 pub type PK_LOOP_3_space_gap_t = c_int;
 /// Close gaps in model space (default).
-pub const PK_LOOP_3_space_gap_close_c: PK_LOOP_3_space_gap_t = 0;
+pub const PK_LOOP_3_space_gap_close_c: PK_LOOP_3_space_gap_t = 23681;
 
 /// Gap closing in 2-space (parameter space) mode.
 pub type PK_LOOP_2_space_gap_t = c_int;
 /// Don't close parameter space gaps (default).
-pub const PK_LOOP_2_space_gap_no_c: PK_LOOP_2_space_gap_t = 0;
+pub const PK_LOOP_2_space_gap_no_c: PK_LOOP_2_space_gap_t = 23690;
 /// Minimize gaps by transforming B-curves to meet in same period.
-pub const PK_LOOP_2_space_gap_minimise_c: PK_LOOP_2_space_gap_t = 1;
+pub const PK_LOOP_2_space_gap_minimise_c: PK_LOOP_2_space_gap_t = 23691;
 /// Close gaps by extending/trimming SP-curves.
-pub const PK_LOOP_2_space_gap_close_cu_c: PK_LOOP_2_space_gap_t = 2;
+pub const PK_LOOP_2_space_gap_close_cu_c: PK_LOOP_2_space_gap_t = 23692;
 /// Close gaps by reparameterizing surface if needed.
-pub const PK_LOOP_2_space_gap_close_all_c: PK_LOOP_2_space_gap_t = 3;
+pub const PK_LOOP_2_space_gap_close_all_c: PK_LOOP_2_space_gap_t = 23693;
 
 /// Fin trimming mode.
 pub type PK_LOOP_trim_geom_t = c_int;
 /// Don't trim fin geometry (default).
-pub const PK_LOOP_trim_geom_no_c: PK_LOOP_trim_geom_t = 0;
+pub const PK_LOOP_trim_geom_no_c: PK_LOOP_trim_geom_t = 24200;
 
 /// Options for PK_LOOP_close_gaps and PK_FACE_close_gaps.
 #[repr(C)]
@@ -529,9 +550,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the parameterisation type (periodic/non-periodic) of a curve.
+    // V35: writes a single 40-byte PK_PARAM_sf_t (the old PK_CURVE_param_t was bogus).
     pub fn PK_CURVE_ask_param(
         curve: PK_CURVE_t,
-        param: *mut PK_CURVE_param_t,
+        param: *mut PK_PARAM_sf_t,
     ) -> PK_ERROR_code_t;
 
     /// Evaluate curve position R(t) at parameter value `t`.
@@ -548,17 +570,21 @@ unsafe extern "C" {
     pub fn PK_CURVE_eval_with_tangent(
         curve: PK_CURVE_t,
         t: c_double,
-        position: *mut PK_VECTOR_t,
+        n_derivs: c_int,
+        p: *mut PK_VECTOR_t,
         tangent: *mut PK_VECTOR_t,
     ) -> PK_ERROR_code_t;
 
     /// Evaluate curve curvature at parameter `t`.
+    // V35 vendor form: (curve, t, *tangent, *principal_normal, *binormal,
+    // *curvature). No position out-arg (the old binding had a bogus `position`
+    // and was missing `binormal`).
     pub fn PK_CURVE_eval_curvature(
         curve: PK_CURVE_t,
         t: c_double,
-        position: *mut PK_VECTOR_t,
-        tangent: *mut PK_VECTOR_t,
-        principal_normal: *mut PK_VECTOR_t,
+        tangent: *mut PK_VECTOR1_t,
+        principal_normal: *mut PK_VECTOR1_t,
+        binormal: *mut PK_VECTOR1_t,
         curvature: *mut c_double,
     ) -> PK_ERROR_code_t;
 
@@ -577,7 +603,9 @@ unsafe extern "C" {
     pub fn PK_SURF_ask_uvbox(surf: PK_SURF_t, uvbox: *mut PK_UVBOX_t) -> PK_ERROR_code_t;
 
     /// Return the parameterisation type (periodic/non-periodic) in U and V.
-    pub fn PK_SURF_ask_params(surf: PK_SURF_t, param: *mut PK_SURF_param_t) -> PK_ERROR_code_t;
+    // V35: writes TWO 40-byte PK_PARAM_sf_t (u=param[0], v=param[1]); caller must
+    // pass a `[PK_PARAM_sf_t; 2]` buffer.
+    pub fn PK_SURF_ask_params(surf: PK_SURF_t, param: *mut PK_PARAM_sf_t) -> PK_ERROR_code_t;
 
     /// Evaluate surface position R(u,v) at parameter values `uv`.
     /// `n_u_deriv` and `n_v_deriv` specify derivative orders.
@@ -594,21 +622,23 @@ unsafe extern "C" {
     /// Evaluate surface at (u,v), returning position and outward unit normal.
     pub fn PK_SURF_eval_with_normal(
         surf: PK_SURF_t,
-        uv: *const c_double,
-        position: *mut c_double,
-        normal: *mut c_double,
+        uv: *const PK_UV_t,
+        n_u_derivs: c_int,
+        n_v_derivs: c_int,
+        triangular: PK_LOGICAL_t,
+        p: *mut PK_VECTOR_t,
+        normal: *mut PK_VECTOR_t,
     ) -> PK_ERROR_code_t;
 
     /// Evaluate surface curvature at (u,v).
     pub fn PK_SURF_eval_curvature(
         surf: PK_SURF_t,
-        uv: *const c_double,
-        position: *mut c_double,
-        normal: *mut c_double,
-        d1u: *mut c_double,
-        d1v: *mut c_double,
-        kmax: *mut c_double,
-        kmin: *mut c_double,
+        uv: *const PK_UV_t,
+        normal: *mut PK_VECTOR1_t,
+        principal_direction_1: *mut PK_VECTOR1_t,
+        principal_direction_2: *mut PK_VECTOR1_t,
+        principal_curvature_1: *mut c_double,
+        principal_curvature_2: *mut c_double,
     ) -> PK_ERROR_code_t;
 
     /// Inverse parameterisation: find (u,v) closest to `position` on the surface.
@@ -644,35 +674,46 @@ unsafe extern "C" {
     pub fn PK_EDGE_set_precision(
         edge: PK_EDGE_t,
         precision: c_double,
+        n_new_edges: *mut c_int,
+        new_edges: *mut *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     /// Set local precision on an edge with options (SP-curve method, short edge reporting).
     pub fn PK_EDGE_set_precision_2(
         edge: PK_EDGE_t,
         precision: c_double,
-        options: *const PK_EDGE_set_precision_2_o_t,
+        options: *mut PK_EDGE_set_precision_o_t,
+        n_new_edges: *mut c_int,
+        new_edges: *mut *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
     /// Reset precision on a tolerant edge to optimal value.
     pub fn PK_EDGE_optimise(
-        n_edges: c_int,
-        edges: *const PK_EDGE_t,
-        options: *const PK_EDGE_optimise_o_t,
+        edge: PK_EDGE_t,
+        options: *mut PK_EDGE_optimise_o_t,
+        result: *mut PK_EDGE_optimise_result_t,
+        achieved_deviation: *mut c_double,
     ) -> PK_ERROR_code_t;
 
     /// Remove local precision from an edge (simple form, restore exact geometry).
-    pub fn PK_EDGE_reset_precision(edge: PK_EDGE_t) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_reset_precision(
+        edge: PK_EDGE_t,
+        result: *mut PK_reset_prec_t,
+    ) -> PK_ERROR_code_t;
 
     /// Remove local precision from an edge with options (method for geometry determination).
     pub fn PK_EDGE_reset_precision_2(
         edge: PK_EDGE_t,
-        options: *const PK_EDGE_reset_precision_2_o_t,
+        options: *mut PK_EDGE_reset_precision_o_t,
+        result: *mut PK_reset_prec_t,
     ) -> PK_ERROR_code_t;
 
     /// Set appropriate precision automatically on an edge (may split edges).
     pub fn PK_EDGE_repair(
         n_edges: c_int,
-        edges: *const PK_EDGE_t,
+        edges: *mut PK_EDGE_t,
+        options: *mut PK_EDGE_repair_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -693,8 +734,10 @@ unsafe extern "C" {
 
     /// Optimize vertex precision to the minimum required value.
     pub fn PK_VERTEX_optimise(
-        n_vertices: c_int,
-        vertices: *const PK_VERTEX_t,
+        vertex: PK_VERTEX_t,
+        options: *mut PK_VERTEX_optimise_o_t,
+        result: *mut PK_VERTEX_optimise_result_t,
+        achieved_deviation: *mut c_double,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -703,14 +746,18 @@ unsafe extern "C" {
 
     /// Close gaps at tolerant vertices in a loop.
     pub fn PK_LOOP_close_gaps(
-        loop_: PK_LOOP_t,
-        options: *const PK_LOOP_close_gaps_o_t,
+        r#loop: PK_LOOP_t,
+        options: *mut PK_LOOP_close_gaps_o_t,
+        n_vertices: *mut c_int,
+        vertices: *mut *mut PK_VERTEX_t,
     ) -> PK_ERROR_code_t;
 
     /// Close gaps at tolerant vertices in a face.
     pub fn PK_FACE_close_gaps(
         face: PK_FACE_t,
-        options: *const PK_LOOP_close_gaps_o_t,
+        options: *mut PK_FACE_close_gaps_o_t,
+        n_vertices: *mut c_int,
+        vertices: *mut *mut PK_VERTEX_t,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================
@@ -734,6 +781,7 @@ unsafe extern "C" {
     pub fn PK_EDGE_attach_curve_nmnl(
         edge: PK_EDGE_t,
         curve: PK_CURVE_t,
+        options: *mut PK_EDGE_attach_curve_nmnl_o_t,
     ) -> PK_ERROR_code_t;
 
     /// Detach the nominal curve from a tolerant edge.
@@ -748,8 +796,12 @@ unsafe extern "C" {
     /// Return the accurate or notionally accurate geometry of an edge (nominal geometry).
     pub fn PK_EDGE_ask_geometry_nmnl(
         edge: PK_EDGE_t,
+        want_interval: PK_LOGICAL_t,
+        curve: *mut PK_CURVE_t,
         class: *mut PK_CLASS_t,
-        geom: *mut PK_GEOM_t,
+        ends: *mut PK_VECTOR_t,
+        t_int: *mut PK_INTERVAL_t,
+        sense: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     /// Return all edges for which this curve is the nominal geometry.
@@ -784,10 +836,13 @@ unsafe extern "C" {
     pub fn PK_GEOM_delete_single(geom: PK_GEOM_t) -> PK_ERROR_code_t;
 
     /// Enlarge geometries by scale factor.
+    /// V35: `(n_geoms, geoms, transfs, PK_ENTITY_t *entries, factor, options, results)` —
+    /// the old binding dropped the per-geom `entries` array.
     pub fn PK_GEOM_enlarge(
         n_geoms: c_int,
         geoms: *const PK_GEOM_t,
         transfs: *const PK_TRANSF_t,
+        entries: *const PK_ENTITY_t,
         factor: PK_scale_factor_t,
         options: *const PK_GEOM_enlarge_o_t,
         results: *mut PK_GEOM_enlarge_r_t,
@@ -872,32 +927,45 @@ unsafe extern "C" {
     /// Attach curves to edges (version 2, with options).
     pub fn PK_EDGE_attach_curves_2(
         n_edges: c_int,
-        edges: *const PK_EDGE_t,
-        curves: *const PK_CURVE_t,
+        edges: *mut PK_EDGE_t,
+        curves: *mut PK_CURVE_t,
+        options: *mut PK_EDGE_attach_curves_o_t,
+        tracking: *mut PK_ENTITY_track_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Attach surfaces to faces (batch).
     pub fn PK_FACE_attach_surfs(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        surfs: *const PK_SURF_t,
+        faces: *mut PK_FACE_t,
+        surfs: *mut PK_SURF_t,
+        senses: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     /// Create and attach a fitted surface to a face.
-    pub fn PK_FACE_attach_surf_fitting(face: PK_FACE_t) -> PK_ERROR_code_t;
+    pub fn PK_FACE_attach_surf_fitting(
+        face: PK_FACE_t,
+        local_check: PK_LOGICAL_t,
+        local_check_result: *mut PK_local_check_t,
+    ) -> PK_ERROR_code_t;
 
     /// Replace surfaces on faces (version 3).
     pub fn PK_FACE_replace_surfs_3(
         n_faces: c_int,
-        faces: *const PK_FACE_t,
-        surfs: *const PK_SURF_t,
+        faces: *mut PK_FACE_t,
+        surfs: *mut PK_SURF_t,
+        senses: *mut PK_LOGICAL_t,
+        tolerance: c_double,
+        options: *mut PK_FACE_replace_surfs_o_t,
+        tracking: *mut PK_TOPOL_track_r_t,
+        results: *mut PK_TOPOL_local_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Attach curves to fins (batch).
     pub fn PK_FIN_attach_curves(
         n_fins: c_int,
-        fins: *const PK_FIN_t,
-        curves: *const PK_CURVE_t,
+        fins: *mut PK_FIN_t,
+        curves: *mut PK_CURVE_t,
+        intervals: *mut PK_INTERVAL_t,
     ) -> PK_ERROR_code_t;
 
     /// Attach points to vertices (batch).
@@ -918,7 +986,8 @@ unsafe extern "C" {
     pub fn PK_PART_remove_geoms(
         part: PK_PART_t,
         n_geoms: c_int,
-        geoms: *const PK_GEOM_t,
+        geoms: *mut PK_GEOM_t,
+        n_removed: *mut c_int,
     ) -> PK_ERROR_code_t;
 
     // =========================================================================

@@ -242,15 +242,24 @@ pub type PK_VECTOR1_t = [c_double; 3];
 // Scale factor type
 // =============================================================================
 
-pub type PK_scale_factor_t = c_double;
+// Real ABI: `typedef int PK_scale_factor_t` — a discrete power-of-10 token enum
+// (PK_BODY_enlarge / PK_GEOM_enlarge scale by 1x/10x/100x/1000x, NOT an
+// arbitrary double). The old `= c_double` passed a float where the kernel reads
+// an int token.
+pub type PK_scale_factor_t = c_int;
+// [re-abi] appended 4 missing member(s) from pk-enums.h
+pub const PK_scale_factor_1x_c: PK_scale_factor_t = 26960;
+pub const PK_scale_factor_10x_c: PK_scale_factor_t = 26961;
+pub const PK_scale_factor_100x_c: PK_scale_factor_t = 26962;
+pub const PK_scale_factor_1000x_c: PK_scale_factor_t = 26963;
 
 // =============================================================================
 // Topology sense — direction relative to geometry
 // =============================================================================
 
 pub type PK_TOPOL_sense_t = c_int;
-pub const PK_TOPOL_sense_positive_c: PK_TOPOL_sense_t = 0;
-pub const PK_TOPOL_sense_negative_c: PK_TOPOL_sense_t = 1;
+pub const PK_TOPOL_sense_positive_c: PK_TOPOL_sense_t = 18542;
+pub const PK_TOPOL_sense_negative_c: PK_TOPOL_sense_t = 18541;
 
 // =============================================================================
 // Memory block — opaque transmit/receive buffer
@@ -281,6 +290,14 @@ pub struct PK_FACE_set_pair_t {
 
 /// Error code from neutral sheet operations.
 pub type PK_neutral_error_t = c_int;
+// [re-abi] appended 7 missing member(s) from pk-enums.h
+pub const PK_neutral_success_c: PK_neutral_error_t = 3800;
+pub const PK_neutral_illegal_input_c: PK_neutral_error_t = 3801;
+pub const PK_neutral_numerical_failure_c: PK_neutral_error_t = 3802;
+pub const PK_neutral_unknown_config_c: PK_neutral_error_t = 3803;
+pub const PK_neutral_imprint_failure_c: PK_neutral_error_t = 3804;
+pub const PK_neutral_extend_failure_c: PK_neutral_error_t = 3805;
+pub const PK_neutral_fill_hole_failure_c: PK_neutral_error_t = 3806;
 
 /// Per-face causes array from neutral sheet trimming.
 #[repr(C)]
