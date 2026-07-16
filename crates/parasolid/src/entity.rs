@@ -506,6 +506,57 @@ impl Entity {
         Ok(Entity::from_tag(copy_tag))
     }
 
+    /// A human-readable description of this entity's internals (class, tag, key
+    /// geometric/topological facts) — a debugging/oracle-diff aid. Wraps
+    /// `PK_ENTITY_ask_description` with default options; the PK-allocated string
+    /// is copied out and freed.
+    pub fn description(&self) -> PsResult<String> {
+        let mut desc: *mut std::os::raw::c_char = std::ptr::null_mut();
+        pk_call!(PK_ENTITY_ask_description(self.tag, std::ptr::null(), &mut desc));
+        let s = if desc.is_null() {
+            String::new()
+        } else {
+            let owned = unsafe { std::ffi::CStr::from_ptr(desc) }.to_string_lossy().into_owned();
+            // The DLL does not export PK_ENTITY_ask_description_r_f; the string is
+            // a plain PK allocation, freed via PK_MEMORY_free.
+            unsafe { let _ = PK_MEMORY_free(desc as *mut std::os::raw::c_void); }
+            owned
+        };
+        Ok(s)
+    }
+
+    /// Delete redundant topology reachable from this entity (e.g. edges/vertices
+    /// left over from an operation that no longer bound distinct geometry).
+    pub fn delete_redundant(&self) -> PsResult<()> {
+        pk_call!(PK_TOPOL_delete_redundant(self.tag));
+        Ok(())
+    }
+
+    /// Whether this (topological) entity clashes — overlaps or touches — with
+    /// `other`. Stops at the first clash found (a fast yes/no); the clash detail
+    /// list is discarded. The clash oracle for the boolean/interference path.
+    pub fn clashes_with(&self, other: Entity) -> PsResult<bool> {
+        let mut targets = [self.tag];
+        let mut tools = [other.tag];
+        let mut n_clash: std::os::raw::c_int = 0;
+        let mut clashes: *mut PK_TOPOL_clash_t = std::ptr::null_mut();
+        pk_call!(PK_TOPOL_clash(
+            1,
+            targets.as_mut_ptr(),
+            std::ptr::null_mut(),
+            1,
+            tools.as_mut_ptr(),
+            std::ptr::null_mut(),
+            std::ptr::null_mut(),
+            &mut n_clash,
+            &mut clashes,
+        ));
+        if !clashes.is_null() {
+            unsafe { let _ = PK_MEMORY_free(clashes as *mut std::os::raw::c_void); }
+        }
+        Ok(n_clash > 0)
+    }
+
     /// Minimum distance between this (topological) entity and `other`, with the
     /// closest point on each. Wraps `PK_TOPOL_range` (options defaulted).
     pub fn distance_to(&self, other: Entity) -> PsResult<RangeResult> {

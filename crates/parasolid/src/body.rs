@@ -108,6 +108,23 @@ impl Body {
         Ok(Body::from_tag(tag))
     }
 
+    /// Convert this body into a **general** body (Parasolid's most permissive
+    /// body kind, which may mix solid/sheet/wire and carry non-manifold and
+    /// isolated topology). Copies this body's topology into a new general body
+    /// and returns it. Requires general topology to be enabled on the session.
+    pub fn make_general(self) -> PsResult<Body> {
+        let mut topols = [self.tag];
+        let mut new_body: PK_BODY_t = PK_ENTITY_null;
+        let mut copy: PK_TOPOL_t = PK_ENTITY_null;
+        pk_call!(PK_TOPOL_make_general_body(
+            1,
+            topols.as_mut_ptr(),
+            &mut new_body,
+            &mut copy,
+        ));
+        Ok(Body::from_tag(new_body))
+    }
+
     /// Create a solid cylinder along the +Z axis with its base on the z=0
     /// plane (it spans `z ∈ 0..height`, so the centroid is at `z = height/2`),
     /// centred on the Z axis in x and y.

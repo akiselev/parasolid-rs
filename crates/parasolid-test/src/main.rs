@@ -937,6 +937,46 @@ fn main() {
     });
 
     // =========================================================================
+    // P0 Entity/Topol — description, redundant cleanup, clash, general body
+    // =========================================================================
+
+    test!("entity_description", {
+        let _session = Session::start(test_config())?;
+        let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        // The body's description mentions it is a body.
+        let d = body.entity().description()?;
+        assert!(!d.is_empty(), "entity description is non-empty");
+        assert!(d.to_lowercase().contains("body"), "body description mentions 'body': {d:?}");
+        // A face's description is also available and non-empty.
+        let fd = body.faces()?[0].entity().description()?;
+        assert!(!fd.is_empty(), "face description is non-empty");
+    });
+
+    // NOTE: Body::make_general (PK_TOPOL_make_general_body) returns mild error 10
+    // and Entity::clashes_with (PK_TOPOL_clash) returns mild 9999 under the
+    // minimal delta frustrum — both are signature-audited against the reference
+    // but need a fuller frustrum (rollback/partition store) to exercise. Left
+    // wrapped, tests deferred. Vertex::delete_acorn is likewise blocked (it needs
+    // an internal general body, which make_general would provide).
+
+    test!("topol_delete_redundant", {
+        let session = Session::start(test_config().general_topology(true))?;
+        let _ = &session;
+        // Imprint a point mid-edge (adds a redundant vertex splitting the edge),
+        // then delete_redundant removes the now-superfluous vertex.
+        let block = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        let e = block.edges()?[0];
+        let (v0, v1) = e.vertices()?;
+        let (a, b) = (v0.point()?, v1.point()?);
+        let mid = Vec3::new((a.x + b.x) / 2.0, (a.y + b.y) / 2.0, (a.z + b.z) / 2.0);
+        let n_v0 = block.vertices()?.len();
+        e.imprint_point(mid)?;
+        assert_eq!(block.vertices()?.len(), n_v0 + 1, "imprint split the edge");
+        block.entity().delete_redundant()?;
+        assert_eq!(block.vertices()?.len(), n_v0, "delete_redundant removed the split vertex");
+    });
+
+    // =========================================================================
     // P5 — point containment (inside / outside / on)
     // =========================================================================
 
