@@ -1462,6 +1462,50 @@ fn main() {
         assert!(near0(m[15] - 1.0, 1.0), "matrix[3][3] = 1 (unit scale)");
     });
 
+    test!("transform_native_constructors", {
+        let _session = Session::start(test_config())?;
+        let origin = Vec3::new(0.0, 0.0, 0.0);
+        let approx = |a: Vec3, b: Vec3| rel_ok(a.x, b.x) && rel_ok(a.y, b.y) && rel_ok(a.z, b.z);
+
+        // Rotation 90° about +z (right-hand rule): (1,0,0) → (0,1,0).
+        let rot = Transform::rotation(origin, Vec3::new(0.0, 0.0, 1.0), std::f64::consts::FRAC_PI_2)?;
+        assert!(approx(rot.apply(Vec3::new(1.0, 0.0, 0.0))?, Vec3::new(0.0, 1.0, 0.0)), "rotate +x → +y");
+        // As a direction it rotates identically (no translation to ignore here).
+        assert!(approx(rot.apply_direction(Vec3::new(1.0, 0.0, 0.0))?, Vec3::new(0.0, 1.0, 0.0)), "rotate dir");
+
+        // Reflection in the plane x=0 (normal +x): (1,2,3) → (-1,2,3).
+        let refl = Transform::reflection(origin, Vec3::new(1.0, 0.0, 0.0))?;
+        assert!(approx(refl.apply(Vec3::new(1.0, 2.0, 3.0))?, Vec3::new(-1.0, 2.0, 3.0)), "reflect across x=0");
+
+        // Uniform scale ×2 about the origin: (1,2,3) → (2,4,6).
+        let sc = Transform::scale_about(2.0, origin)?;
+        assert!(approx(sc.apply(Vec3::new(1.0, 2.0, 3.0))?, Vec3::new(2.0, 4.0, 6.0)), "scale ×2");
+    });
+
+    test!("transform_compose_and_equal", {
+        let _session = Session::start(test_config())?;
+        let approx = |a: Vec3, b: Vec3| rel_ok(a.x, b.x) && rel_ok(a.y, b.y) && rel_ok(a.z, b.z);
+
+        // then(): apply self, then other. Rotate +x→+y about z, then translate +10x.
+        let rot = Transform::rotation(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0), std::f64::consts::FRAC_PI_2)?;
+        let tr = Transform::translation(10.0, 0.0, 0.0)?;
+        let composed = rot.then(&tr)?;
+        // (1,0,0) --rot--> (0,1,0) --translate--> (10,1,0).
+        assert!(approx(composed.apply(Vec3::new(1.0, 0.0, 0.0))?, Vec3::new(10.0, 1.0, 0.0)),
+            "compose applies rot then translate");
+
+        // is_equal: identical translations are equal; different are not.
+        let a = Transform::translation(1.0, 2.0, 3.0)?;
+        let b = Transform::translation(1.0, 2.0, 3.0)?;
+        let c = Transform::translation(1.0, 2.0, 3.5)?;
+        assert!(a.is_equal(&b)?, "identical translations are equal");
+        assert!(!a.is_equal(&c)?, "different translations are not equal");
+
+        // apply_direction ignores translation: a pure translate leaves a direction unchanged.
+        assert!(approx(tr.apply_direction(Vec3::new(0.0, 0.0, 1.0))?, Vec3::new(0.0, 0.0, 1.0)),
+            "translation does not move a direction");
+    });
+
     test!("face_colour_attribute", {
         // PK_ATTDEF_find + PK_ATTRIB_create_empty + set/ask_doubles: attach the
         // system SDL/TYSA_COLOUR attribute (3 RGB doubles) to a face and read it

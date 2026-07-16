@@ -12,6 +12,7 @@ use parasolid_sys::*;
 
 use crate::body::Body;
 use crate::error::PsResult;
+use crate::geom::Vec3;
 use crate::memory::PkArray;
 
 /// A Parasolid transform entity (`PK_TRANSF_t`).
@@ -72,6 +73,66 @@ impl Transform {
         let mut sf = PK_TRANSF_sf_t { matrix: [0.0; 16] };
         pk_call!(PK_TRANSF_ask(self.tag, &mut sf));
         Ok(sf.matrix)
+    }
+
+    /// A rotation by `angle` radians about the axis through `point` with
+    /// direction `axis` (right-hand rule). Built natively via
+    /// `PK_TRANSF_create_rotation` rather than a hand-rolled matrix.
+    pub fn rotation(point: Vec3, axis: Vec3, angle: f64) -> PsResult<Transform> {
+        let p = point.to_pk();
+        let a = axis.to_pk();
+        let mut tag: PK_TRANSF_t = PK_ENTITY_null;
+        pk_call!(PK_TRANSF_create_rotation(&p, &a, angle, &mut tag));
+        Ok(Transform::from_tag(tag))
+    }
+
+    /// A reflection in the plane through `point` with unit normal `normal`.
+    pub fn reflection(point: Vec3, normal: Vec3) -> PsResult<Transform> {
+        let p = point.to_pk();
+        let n = normal.to_pk();
+        let mut tag: PK_TRANSF_t = PK_ENTITY_null;
+        pk_call!(PK_TRANSF_create_reflection(&p, &n, &mut tag));
+        Ok(Transform::from_tag(tag))
+    }
+
+    /// A uniform scale by `factor` about `centre` (`PK_TRANSF_create_equal_scale`).
+    pub fn scale_about(factor: f64, centre: Vec3) -> PsResult<Transform> {
+        let c = centre.to_pk();
+        let mut tag: PK_TRANSF_t = PK_ENTITY_null;
+        pk_call!(PK_TRANSF_create_equal_scale(factor, &c, &mut tag));
+        Ok(Transform::from_tag(tag))
+    }
+
+    /// Compose two transforms: the result applies `self` first, then `other`
+    /// (`PK_TRANSF_transform`).
+    pub fn then(&self, other: &Transform) -> PsResult<Transform> {
+        let mut tag: PK_TRANSF_t = PK_ENTITY_null;
+        pk_call!(PK_TRANSF_transform(self.tag, other.tag, &mut tag));
+        Ok(Transform::from_tag(tag))
+    }
+
+    /// Whether two transforms are numerically equal.
+    pub fn is_equal(&self, other: &Transform) -> PsResult<bool> {
+        let mut eq: PK_LOGICAL_t = PK_LOGICAL_false;
+        pk_call!(PK_TRANSF_is_equal(self.tag, other.tag, &mut eq));
+        Ok(eq == PK_LOGICAL_true)
+    }
+
+    /// Apply this transform to a **position** vector.
+    pub fn apply(&self, point: Vec3) -> PsResult<Vec3> {
+        let v = point.to_pk();
+        let mut out = PK_VECTOR_t::default();
+        pk_call!(PK_VECTOR_transform(&v, self.tag, &mut out));
+        Ok(Vec3::from_pk(out))
+    }
+
+    /// Apply this transform to a **direction** vector (ignores the translation
+    /// component).
+    pub fn apply_direction(&self, dir: Vec3) -> PsResult<Vec3> {
+        let v = dir.to_pk();
+        let mut out = PK_VECTOR_t::default();
+        pk_call!(PK_VECTOR_transform_direction(&v, self.tag, &mut out));
+        Ok(Vec3::from_pk(out))
     }
 }
 
