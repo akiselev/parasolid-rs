@@ -147,11 +147,17 @@ the oracle must expose the same adjacency so structures can be compared.
       regions, 6 faces × 1 outer loop × 4 fins = 24 fins = 2 × 12 edges, fin
       4-cycles, each edge has 2 fins. Fixed `PK_LOOP_type_t` (was 0..8; real
       tokens are 5410..5419, outer=5412/winding=5414 confirmed).
-- [ ] Full adjacency matrix test on the two-region/two-shell box (mirrors
+- [x] Full adjacency matrix test on the two-region/two-shell box (mirrors
       CADabra's target model): every Region↔Shell↔Face↔Loop↔Fin↔Edge↔Vertex
       link + fin orientation/sense, `PK_FIN_ask_..`, `PK_LOOP_ask_type`,
-      `PK_FACE_ask_oriented_surf` (face sense vs surface normal).
-- [ ] Edge/vertex convexity, `PK_EDGE_ask_convexity`, face-face edge sharing.
+      `PK_FACE_ask_oriented_surf` (face sense vs surface normal). Extended with
+      `Shell::sign` (`PK_SHELL_find_sign`), `Region::region_type`/`make_solid`/
+      `make_void`, `Fin::geometry` (`PK_FIN_ask_geometry`), `Face::surface_type`/
+      `extreme`/`is_coincident` (`PK_FACE_find_extreme`/`is_coincident`, +
+      `Coincidence` enum, validated on stacked coincident block faces),
+      `Edge::find_interval`/`set_precision`/`reset_precision`/`make_wire_body`,
+      `Body::create_minimum` (acorn vertex + shell).
+- [x] Edge/vertex convexity, `PK_EDGE_ask_convexity`, face-face edge sharing.
 
 ## P4 — Surface/surface intersection (SSI oracle — highest oracle value)
 
@@ -216,7 +222,9 @@ Coarse invariants that catch gross modeling errors fast.
       *topology)` with no options. Enclosure tokens were also wrong (0/1/2); real
       are inside=5701, outside=5702, on=5703 (dynamic-observed). Wrapped as
       `Body::contains_point()` → `Enclosure`; validated on block + sphere.
-- [ ] `PK_ENTITY_range` point→body distance; `PK_TOPOL_..` clash tests.
+- [~] `PK_ENTITY_range` point→body distance (covered via `Entity::distance_to`);
+      `PK_TOPOL_clash` wrapped as `Entity::clashes_with` but returns mild 9999
+      under the minimal frustrum — signature-audited, runtime-deferred.
 
 ## P6 — File I/O round-trip (model interchange oracle)
 
@@ -275,11 +283,17 @@ when CADabra's Boolean path needs oracling.
       `[unknown]` markers and any struct/signature not yet cross-checked
       against the header mirror. `parasolid-sys` has ~1150 `extern` fns; only a
       few dozen are validated. Treat everything unaudited as suspect.
-- [ ] Build a tiny **oracle crate/module** (`parasolid` side) exposing the
+- [x] Build a tiny **oracle crate/module** (`parasolid` side) exposing the
       comparison primitives CADabra's testkit will call: `eval_surface`,
       `eval_curve`, `mass_props`, `intersect_surfaces`, `body_from_primitive`,
       `transmit/receive` — a stable, validated-only API. Nothing unvalidated
-      leaks into the oracle surface.
+      leaks into the oracle surface. **Done:** `crates/parasolid/src/oracle.rs`
+      — `oracle::{block,cylinder,sphere,cone,torus}`, `sample_surface` (position
+      + unit outward normal), `sample_curve` (position + unit tangent, raw
+      `PK_CURVE_eval` derivative normalised), `intersect_surfaces`, and a new
+      `Body::topology_summary` → `TopologySummary` structural fingerprint
+      (transform-invariant). Validated end-to-end (`oracle_facade_end_to_end`,
+      `oracle_xt_roundtrip_preserves_model`). Mass/box/containment stay on `Body`.
 - [ ] Define the **exp-cadabra ↔ parasolid-rs bridge**: how CADabra feeds a
       primitive/model to the oracle and how results are diffed (tolerances,
       topology canonicalization, parameterization alignment). Write it up in

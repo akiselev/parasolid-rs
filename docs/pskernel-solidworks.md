@@ -734,3 +734,82 @@ facet set with mild **`PSM_mesh_create_result` 4/9 → PK 5241** and returns a n
 mesh tag (`PKU_interpret_mesh_load_error` maps the internal result). Independent of
 winding. `mesh_from_triangles` reports **SKIP** on 5241 (not FAIL) so the blocker
 stays visible; it will pass automatically if construction is later unblocked.
+
+## Spine completion + oracle facade (2026-07-15)
+
+Suite **117 → 131 passing** (1 skip). New runtime-validated wrapper surface,
+plus an undocumented-function finding and several honest deferrals.
+
+### P0 B-rep spine completion (no option structs)
+
+- `Shell::sign` (`PK_SHELL_find_sign`) — tokens positive=3550/negative=3551/
+  **open=3552** (3552 was missing from `-sys`, added). A solid block's bounding
+  shells report a closed (positive/negative) sign.
+- `Region::region_type`/`make_solid`/`make_void`. `region_type` is derived from
+  `is_solid` — the raw `PK_REGION_ask_type` takes an **undocumented options
+  struct** (a bare 2-arg call yields 5022 = o_t_version_unknown), so it is not
+  used. `make_void`/`make_solid` flip the material flag (validated round-trip).
+- `Fin::geometry` (`PK_FIN_ask_geometry`) — returns the fin's underlying **3D
+  curve** (a different tag from `PK_FIN_ask_curve`, which is the SP-curve) over a
+  non-degenerate interval. Note `PK_FIN_find_interval` returns error 96 on block
+  face fins (the existing `Fin::interval` wrapper is latently broken; use
+  `geometry`).
+- `Face::surface_type` — delegates to the backing surface's class. **`PK_FACE_ask_type`
+  is NOT the simple surface-class query the docs imply:** decompiled, it is
+  `(face, options*, result*)` with a versioned option struct and a token-filled
+  result struct (writes 0x6a10/0x1648/0x6a19). Skipped in favour of the surface
+  class, which is the same classification.
+- `Face::extreme` (`PK_FACE_find_extreme`) and `Face::is_coincident`
+  (`PK_FACE_is_coincident`, NULL options + the direct `tol` arg → `Coincidence`
+  enum over `PK_FACE_coi_t` 21880-21887). Validated: two stacked blocks' shared
+  faces are coincident; offset parallel faces are not.
+- `Edge::find_interval`/`set_precision`/`reset_precision` (`PK_reset_prec_t`
+  binary-confirmed ok=17201..failure=17204) and `Edge::make_wire_body`
+  (`PK_EDGE_make_wire_body` — a block edge → a 1-edge/2-vertex wire body).
+- `Body::create_minimum` (`PK_POINT_make_minimum_body`) → a single **acorn**
+  vertex whose lone shell's `acorn_vertex` round-trips.
+
+### P0 Entity/Topol
+
+- `Entity::description` (`PK_ENTITY_ask_description`, NULL opts). The DLL does
+  **not export `PK_ENTITY_ask_description_r_f`** — the returned string is a plain
+  PK allocation, freed with `PK_MEMORY_free`.
+- `Entity::delete_redundant` (`PK_TOPOL_delete_redundant`) — removes an
+  imprint-split vertex (validated via a mid-edge imprint then cleanup).
+
+### Native Transform algebra (pure math)
+
+`Transform::rotation`/`reflection`/`scale_about` (`PK_TRANSF_create_rotation`/
+`_reflection`/`_equal_scale`), `then` composition (`PK_TRANSF_transform`,
+self-then-other order confirmed), `is_equal`, and `apply`/`apply_direction`
+(`PK_VECTOR_transform`/`_transform_direction`). All match closed form (rotate
++x→+y about z, reflect across x=0, ×2 scale, rot∘translate).
+
+### Body::disjoin + oracle facade
+
+- `Body::disjoin` (`PK_BODY_disjoin`) — a connected solid disjoins to its single
+  component (topology/volume preserved). The multi-lump split path needs a
+  boolean with `allow_disjoint`, which the minimal boolean wrapper does not
+  expose.
+- **`parasolid::oracle`** — the stable, validated-only comparison surface for
+  CADabra's testkit: primitive builders, `sample_surface` (position + unit
+  outward normal), `sample_curve` (position + **unit** tangent, normalising the
+  raw `PK_CURVE_eval` derivative — for a radius-r circle the raw derivative has
+  length r), `intersect_surfaces` (orphan surfaces only — a face's owned surface
+  gives 916), and `Body::topology_summary` → `TopologySummary`, a
+  transform-invariant B-rep fingerprint. Validated end-to-end incl. an XT
+  transmit/receive round-trip that preserves volume + topology.
+
+### Deferred (bindings kept, signature-audited, runtime-blocked)
+
+- `Entity::clashes_with` (`PK_TOPOL_clash`) → mild **9999** even with NULL
+  options (reference confirms the 9-arg signature; needs a fuller frustrum).
+- `Body::make_general` (`PK_TOPOL_make_general_body`) → mild **10** (needs a
+  partition/rollback store), which gates `Vertex::delete_acorn` — decompile
+  shows `delete_acorn` raises **5064** unless the vertex's body is an internal
+  **general body (type 6)**.
+- `Body::make_section_with_surfs` (`PK_BODY_make_section_with_surfs`) returns 0
+  bodies with both NULL and a computed 80-byte `PK_BODY_make_section_o_t`
+  (the field @72 vs Rust's @68 for `keep_coi_faces` hints the layout is off);
+  needs `PKU_journal_BODY_make_section_o` decompiled. `section_with_surf`
+  (split-in-place) already covers the section oracle.
