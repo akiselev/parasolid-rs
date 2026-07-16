@@ -2531,6 +2531,88 @@ fn main() {
     });
 
     // =========================================================================
+    // Oracle facade — the validated-only comparison surface, end to end
+    // =========================================================================
+
+    test!("oracle_facade_end_to_end", {
+        use parasolid::oracle;
+        let _session = Session::start(test_config())?;
+
+        // Primitive construction + coarse invariants.
+        let cyl = oracle::cylinder(5.0, 20.0)?;
+        let mp = cyl.mass_props()?;
+        assert!(rel_ok(mp.amount, std::f64::consts::PI * 25.0 * 20.0), "cylinder volume");
+        let bb = cyl.bounding_box()?;
+        assert!(rel_ok(bb.max.z - bb.min.z, 20.0), "cylinder height from box");
+        assert_eq!(cyl.contains_point(Vec3::new(0.0, 0.0, 10.0))?, Enclosure::Inside, "axis point inside");
+
+        // Structural fingerprint: a cylinder is 1 solid + 1 void region, 3 faces,
+        // 2 circular edges, 2 seam vertices.
+        let ts = cyl.topology_summary()?;
+        assert_eq!(ts.faces, 3, "cylinder faces");
+        assert_eq!(ts.solid_regions, 1, "one solid region");
+        assert_eq!(ts.regions, 2, "solid + void regions");
+        assert_eq!(ts.edges, 2, "two circular edges");
+
+        // Exact surface sampling: the cylindrical face's normal is unit & radial.
+        let side = cyl.faces()?.into_iter()
+            .find(|f| f.surface_type().map(|t| t == SurfType::Cylinder).unwrap_or(false))
+            .expect("cylindrical face");
+        let uv = side.uvbox()?;
+        let s = oracle::sample_surface(&side.surf()?, (uv.u_min + uv.u_max) / 2.0, (uv.v_min + uv.v_max) / 2.0)?;
+        let nlen = (s.normal.x * s.normal.x + s.normal.y * s.normal.y + s.normal.z * s.normal.z).sqrt();
+        assert!(rel_ok(nlen, 1.0), "surface normal is unit, |n| = {nlen}");
+        assert!(s.normal.z.abs() < 1e-9, "cylinder normal is horizontal (radial)");
+
+        // Curve sampling: a cap edge is a radius-5 circle; the tangent is unit.
+        let cap_edge = cyl.edges()?[0];
+        let cs = oracle::sample_curve(&cap_edge.curve()?, 0.0)?;
+        let tlen = (cs.tangent.x * cs.tangent.x + cs.tangent.y * cs.tangent.y + cs.tangent.z * cs.tangent.z).sqrt();
+        assert!(rel_ok(tlen, 1.0), "curve tangent is unit, |t| = {tlen}");
+
+        // Surface/surface intersection (on orphan surfaces, the validated SSI
+        // path): a radius-5 cylinder ∩ the plane z=10 = one circle.
+        let ocyl = Surf::cylinder(
+            Axis2::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0)),
+            5.0,
+        )?;
+        let plane = Surf::plane(Axis2::new(
+            Vec3::new(0.0, 0.0, 10.0), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let ix = oracle::intersect_surfaces(&ocyl, &plane)?;
+        assert_eq!(ix.curves.len(), 1, "plane ∩ cylinder is one circle");
+
+        // Structural fingerprint is invariant under a rigid transform.
+        let moved = oracle::block(4.0, 6.0, 8.0)?;
+        let before = moved.topology_summary()?;
+        moved.transform(&Transform::translation(3.0, -2.0, 1.0)?)?;
+        assert_eq!(moved.topology_summary()?, before, "topology summary is transform-invariant");
+    });
+
+    test!("oracle_xt_roundtrip_preserves_model", {
+        use parasolid::{fileio, oracle};
+        let out_dir = "oracle_rt_out";
+        let _ = std::fs::create_dir_all(out_dir);
+        let session = Session::start(
+            test_config().frustrum(FrustrumConfig::new().base_dir(out_dir)),
+        )?;
+
+        // Build a body, capture its oracle signature, write it to XT, read it
+        // back, and confirm the signature survives the round-trip.
+        let body = oracle::cone(4.0, 9.0, 0.3)?;
+        let vol0 = body.volume()?;
+        let ts0 = body.topology_summary()?;
+        fileio::transmit(std::slice::from_ref(&body), "oracle_rt")?;
+        let restored = fileio::receive("oracle_rt")?;
+        assert_eq!(restored.len(), 1, "one body read back");
+        assert!(rel_ok(restored[0].volume()?, vol0), "volume preserved across XT round-trip");
+        assert_eq!(restored[0].topology_summary()?, ts0, "topology preserved across XT round-trip");
+
+        drop(session);
+        let _ = std::fs::remove_dir_all(out_dir);
+    });
+
+    // =========================================================================
     // Convergent modeling: build a mesh from facets (callback API)
     // =========================================================================
 

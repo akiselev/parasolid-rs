@@ -46,6 +46,7 @@ mod check;
 mod facet;
 pub mod boolean;
 pub mod fileio;
+pub mod oracle;
 
 pub use error::{BadArg, ErrorDetails, PsError, PsResult, Severity};
 pub use boolean::{BooleanOp, BooleanOptions};
@@ -74,3 +75,4 @@ pub use transform::Transform;
 pub use attrib::{AttribDef, ATTRIB_COLOUR};
 pub use check::CheckFault;
 pub use facet::{FacetMesh, Mesh};
+pub use oracle::{CurveSample, SurfaceSample, TopologySummary};
