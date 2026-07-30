@@ -1,17 +1,16 @@
 // XT persistence-format oracle: emit known bodies in text + binary to separate keys.
 use parasolid::*;
 use parasolid_sys::*;
-use std::ffi::CString;
 use std::os::raw::c_int;
+use std::{env, ffi::CString, fs};
 
 fn xmit(tag: i32, key: &str, fmt: PK_transmit_format_t) {
     let key_c = CString::new(key).unwrap();
     let mut opts = PK_PART_transmit_o_t::default();
     opts.transmit_format = fmt;
     let parts = [tag];
-    let e = unsafe {
-        PK_PART_transmit(parts.len() as c_int, parts.as_ptr(), key_c.as_ptr(), &opts)
-    };
+    let e =
+        unsafe { PK_PART_transmit(parts.len() as c_int, parts.as_ptr(), key_c.as_ptr(), &opts) };
     println!("transmit key={key} fmt={fmt} -> err={e}");
 }
 
@@ -25,16 +24,30 @@ fn dump(b: &Body, name: &str) {
 
 fn emit(b: &Body, name: &str) {
     dump(b, name);
-    xmit(b.tag(), name, PK_transmit_format_text_c);
-    xmit(b.tag(), name, PK_transmit_format_binary_c);
+    xmit(b.tag(), &format!("{name}_text"), PK_transmit_format_text_c);
+    xmit(
+        b.tag(),
+        &format!("{name}_bare"),
+        PK_transmit_format_binary_c,
+    );
+    xmit(
+        b.tag(),
+        &format!("{name}_neutral"),
+        PK_transmit_format_neutral_c,
+    );
+    xmit(
+        b.tag(),
+        &format!("{name}_typed"),
+        PK_transmit_format_typed_binary_c,
+    );
 }
 
 fn main() {
-    let cfg = SessionConfig::new().check_arguments(false).frustrum(
-        FrustrumConfig::new().base_dir(
-            "/tmp/claude-1000/-home-dev-projects-parasolid-re/ccf7881f-5d90-471c-9b56-208ecdb81733/scratchpad/xt",
-        ),
-    );
+    let output_dir = env::var("XT_DUMP_DIR").unwrap_or_else(|_| "xtdump-output".to_owned());
+    fs::create_dir_all(&output_dir).unwrap();
+    let cfg = SessionConfig::new()
+        .check_arguments(false)
+        .frustrum(FrustrumConfig::new().base_dir(output_dir));
     let _s = Session::start(cfg).unwrap();
 
     // 1) block 10x20x30 -> half-widths 5/10/15, 6 faces/12 edges/8 vertices

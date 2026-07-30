@@ -9,16 +9,36 @@
 //! part tag is the same as the partition tag. Bodies that belong to the same
 //! partition are transmitted together.
 
+use crate::body::Body;
+use crate::error::{PsError, PsResult};
+use crate::memory::PkArray;
+use parasolid_sys::*;
 use std::ffi::CString;
 use std::os::raw::c_int;
-use parasolid_sys::*;
-use crate::error::{PsError, PsResult};
-use crate::body::Body;
-use crate::memory::PkArray;
 
 // =============================================================================
 // transmit
 // =============================================================================
+
+/// Public-PK transmit encodings supported by the native frustrum.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TransmitFormat {
+    Text,
+    BareBinary,
+    NeutralBinary,
+    TypedBinary,
+}
+
+impl TransmitFormat {
+    fn token(self) -> PK_transmit_format_t {
+        match self {
+            Self::Text => PK_transmit_format_text_c,
+            Self::BareBinary => PK_transmit_format_binary_c,
+            Self::NeutralBinary => PK_transmit_format_neutral_c,
+            Self::TypedBinary => PK_transmit_format_typed_binary_c,
+        }
+    }
+}
 
 /// Transmit bodies to an XT file via frustrum key.
 ///
@@ -30,6 +50,11 @@ use crate::memory::PkArray;
 /// `PK_PART_transmit` call; bodies in different partitions each generate a
 /// separate call with the same key.
 pub fn transmit(bodies: &[Body], key: &str) -> PsResult<()> {
+    transmit_with_format(bodies, key, TransmitFormat::Text)
+}
+
+/// Transmit bodies to XT using an explicit text or binary encoding.
+pub fn transmit_with_format(bodies: &[Body], key: &str, format: TransmitFormat) -> PsResult<()> {
     let key_cstr = CString::new(key)
         .map_err(|_| PsError::Session("transmit key contains null byte".into()))?;
 
@@ -39,10 +64,8 @@ pub fn transmit(bodies: &[Body], key: &str) -> PsResult<()> {
     // failed with 5048.)
     let part_tags: Vec<PK_PART_t> = bodies.iter().map(|b| b.tag()).collect();
 
-    // Text Parasolid Transmit (`.xmt_txt`). `0` is not a valid format token
-    // (the enum starts at 18220), so it must be set explicitly.
     let mut opts = PK_PART_transmit_o_t::default();
-    opts.transmit_format = PK_transmit_format_text_c;
+    opts.transmit_format = format.token();
 
     pk_call!(PK_PART_transmit(
         part_tags.len() as c_int,
@@ -64,8 +87,8 @@ pub fn transmit(bodies: &[Body], key: &str) -> PsResult<()> {
 /// iterates each returned part (partition) and collects all bodies via
 /// `PK_PARTITION_ask_bodies`.
 pub fn receive(key: &str) -> PsResult<Vec<Body>> {
-    let key_cstr = CString::new(key)
-        .map_err(|_| PsError::Session("receive key contains null byte".into()))?;
+    let key_cstr =
+        CString::new(key).map_err(|_| PsError::Session("receive key contains null byte".into()))?;
 
     let mut opts = PK_PART_receive_o_t::default();
     opts.transmit_format = PK_transmit_format_text_c;

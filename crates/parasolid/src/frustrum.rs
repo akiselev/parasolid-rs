@@ -22,7 +22,7 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Seek, SeekFrom, Write};
 use std::os::raw::{c_char, c_int};
-use std::panic::{catch_unwind, AssertUnwindSafe};
+use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::path::{Path, PathBuf};
 use std::sync::{LazyLock, Mutex};
 
@@ -238,7 +238,7 @@ fn header_line(content: &str) -> Vec<u8> {
 ///
 /// `pr2hdr` is the part-2 header data supplied by Parasolid in FFOPWR
 /// (`KEYWORD1=value1;KEYWORD2=value2...`).
-fn build_header(pr2hdr: &str) -> Vec<u8> {
+fn build_header(pr2hdr: &str, binary: bool) -> Vec<u8> {
     let mut out = Vec::new();
     out.extend(header_line(
         "**ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
@@ -246,11 +246,14 @@ fn build_header(pr2hdr: &str) -> Vec<u8> {
     out.extend(header_line(
         "**PARASOLID !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~0123456789",
     ));
-    out.extend(b"**PART1;FRU=parasolid-rs;APPL=parasolid-rs;\n".to_vec());
+    let format = if binary { "binary" } else { "text" };
+    out.extend(
+        format!("**PART1;FRU=parasolid-rs;APPL=parasolid-rs;FORMAT={format};\n").into_bytes(),
+    );
     if pr2hdr.is_empty() {
         out.extend(b"**PART2;\n".to_vec());
     } else {
-        out.extend(format!("**PART2;{pr2hdr};\n").into_bytes());
+        out.extend(format!("**PART2;{};\n", pr2hdr.trim_end_matches(';')).into_bytes());
     }
     out.extend(b"**PART3;\n".to_vec());
     out.extend(header_line("**END_OF_HEADER"));
@@ -554,7 +557,10 @@ unsafe extern "C" fn default_ffopwr(
                 let bytes = std::slice::from_raw_parts(pr2hdr as *const u8, *pr2len as usize);
                 std::str::from_utf8(bytes).unwrap_or("")
             };
-            if writer.write_all(&build_header(pr2)).is_err() {
+            if writer
+                .write_all(&build_header(pr2, *format == FFBNRY))
+                .is_err()
+            {
                 *ifail = FR_write_fail;
                 return;
             }
