@@ -588,9 +588,7 @@ impl Session {
             PK_SESSION_behave_as_unset_c => Ok(Behaviour::Unset),
             PK_SESSION_behave_as_latest_c => Ok(Behaviour::Latest),
             PK_SESSION_behave_as_value_c => Ok(Behaviour::Version(beh.behaviour_value)),
-            other => Err(PsError::Session(format!(
-                "unknown behaviour type {other}"
-            ))),
+            other => Err(PsError::Session(format!("unknown behaviour type {other}"))),
         }
     }
 
@@ -637,9 +635,7 @@ impl Session {
             PK_SESSION_behave_as_unset_c => Ok(Behaviour::Unset),
             PK_SESSION_behave_as_latest_c => Ok(Behaviour::Latest),
             PK_SESSION_behave_as_value_c => Ok(Behaviour::Version(beh.behaviour_value)),
-            other => Err(PsError::Session(format!(
-                "unknown behaviour type {other}"
-            ))),
+            other => Err(PsError::Session(format!("unknown behaviour type {other}"))),
         }
     }
 
@@ -726,9 +722,5 @@ impl Drop for Session {
 
 #[inline]
 fn to_logical(b: bool) -> PK_LOGICAL_t {
-    if b {
-        PK_LOGICAL_true
-    } else {
-        PK_LOGICAL_false
-    }
+    if b { PK_LOGICAL_true } else { PK_LOGICAL_false }
 }

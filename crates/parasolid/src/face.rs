@@ -1,15 +1,15 @@
 //! Face type — a bounded region of a surface.
 
-use std::os::raw::c_int;
-use parasolid_sys::*;
-use crate::error::PsResult;
-use crate::memory::PkArray;
-use crate::entity::Entity;
 use crate::body::Body;
 use crate::edge::Edge;
-use crate::vertex::Vertex;
-use crate::surf::{Surf, SurfType};
+use crate::entity::Entity;
+use crate::error::PsResult;
 use crate::geom::Vec3;
+use crate::memory::PkArray;
+use crate::surf::{Surf, SurfType};
+use crate::vertex::Vertex;
+use parasolid_sys::*;
+use std::os::raw::c_int;
 
 /// The result of a face-face coincidence test ([`Face::is_coincident`]).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -53,9 +53,15 @@ pub struct Face {
 }
 
 impl Face {
-    pub(crate) fn from_tag(tag: PK_FACE_t) -> Self { Self { tag } }
-    pub fn tag(&self) -> i32 { self.tag }
-    pub fn entity(&self) -> Entity { Entity::from_tag(self.tag) }
+    pub(crate) fn from_tag(tag: PK_FACE_t) -> Self {
+        Self { tag }
+    }
+    pub fn tag(&self) -> i32 {
+        self.tag
+    }
+    pub fn entity(&self) -> Entity {
+        Entity::from_tag(self.tag)
+    }
 
     /// Return the body that owns this face.
     pub fn body(&self) -> PsResult<Body> {
@@ -126,7 +132,10 @@ impl Face {
         let mut ptr = std::ptr::null_mut();
         pk_call!(PK_FACE_ask_loops(self.tag, &mut n, &mut ptr));
         let array = unsafe { PkArray::from_raw(ptr, n) };
-        Ok(array.iter().map(|&tag| crate::Loop::from_tag(tag)).collect())
+        Ok(array
+            .iter()
+            .map(|&tag| crate::Loop::from_tag(tag))
+            .collect())
     }
 
     /// Return the first loop of this face, or `None` if it has none.
@@ -155,7 +164,12 @@ impl Face {
     pub fn uvbox(&self) -> PsResult<crate::UvBox> {
         let mut b = PK_UVBOX_t { param: [0.0; 4] };
         pk_call!(PK_FACE_find_uvbox(self.tag, &mut b));
-        Ok(crate::UvBox { u_min: b.param[0], v_min: b.param[1], u_max: b.param[2], v_max: b.param[3] })
+        Ok(crate::UvBox {
+            u_min: b.param[0],
+            v_min: b.param[1],
+            u_max: b.param[2],
+            v_max: b.param[3],
+        })
     }
 
     /// Whether this face fills a simple uvbox-bounded patch of its surface, and
@@ -207,7 +221,9 @@ impl Face {
         let d3 = dirs[2].to_pk();
         let mut ex = PK_VECTOR_t::default();
         let mut topol: PK_TOPOL_t = PK_ENTITY_null;
-        pk_call!(PK_FACE_find_extreme(self.tag, &d1, &d2, &d3, &mut ex, &mut topol));
+        pk_call!(PK_FACE_find_extreme(
+            self.tag, &d1, &d2, &d3, &mut ex, &mut topol
+        ));
         Ok((Vec3::from_pk(ex), Entity::from_tag(topol)))
     }
 
@@ -235,7 +251,9 @@ impl Face {
     pub fn common_edges(&self, other: Face) -> PsResult<Vec<Edge>> {
         let mut n: c_int = 0;
         let mut ptr = std::ptr::null_mut();
-        pk_call!(PK_FACE_find_edges_common(self.tag, other.tag, &mut n, &mut ptr));
+        pk_call!(PK_FACE_find_edges_common(
+            self.tag, other.tag, &mut n, &mut ptr
+        ));
         let array = unsafe { PkArray::from_raw(ptr, n) };
         Ok(array.iter().map(|&t| Edge::from_tag(t)).collect())
     }
@@ -252,7 +270,10 @@ impl Face {
         curve: &crate::Curve,
         bounds: (f64, f64),
     ) -> PsResult<(Vec<Edge>, Vec<Face>)> {
-        let iv = PK_INTERVAL_t { low: bounds.0, high: bounds.1 };
+        let iv = PK_INTERVAL_t {
+            low: bounds.0,
+            high: bounds.1,
+        };
         let mut n_new_edges: c_int = 0;
         let mut new_edges: *mut PK_EDGE_t = std::ptr::null_mut();
         let mut n_new_faces: c_int = 0;

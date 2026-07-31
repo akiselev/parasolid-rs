@@ -11,10 +11,7 @@ use std::os::raw::c_int;
 #[link(name = "pskernel")]
 unsafe extern "C" {
     /// Get owning body of frame.
-    pub fn PK_FRAME_ask_body(
-        frame: PK_FRAME_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FRAME_ask_body(frame: PK_FRAME_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Get geometry attached to frame.
     pub fn PK_FRAME_ask_geometry(
@@ -31,10 +28,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Get frame orientation sense.
-    pub fn PK_FRAME_ask_sense(
-        frame: PK_FRAME_t,
-        sense: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FRAME_ask_sense(frame: PK_FRAME_t, sense: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Attach surface/curve/point to frame.
     pub fn PK_FRAME_attach_geoms(

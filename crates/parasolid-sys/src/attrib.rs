@@ -224,16 +224,12 @@ pub type PK_PART_ask_attribs_cb_fn_t = Option<
 >;
 
 /// Callback for rollback attribute deletion (del_attrib_cb in PK_PMARK_goto_2).
-pub type PK_del_attrib_cb_fn_t = Option<
-    unsafe extern "C" fn(
-        attrib: PK_ATTRIB_t,
-        attdef: PK_ATTDEF_t,
-        context: PK_POINTER_t,
-    ),
->;
+pub type PK_del_attrib_cb_fn_t =
+    Option<unsafe extern "C" fn(attrib: PK_ATTRIB_t, attdef: PK_ATTDEF_t, context: PK_POINTER_t)>;
 
 /// Attribute filter callback function type.
-pub type PK_ATTRIB_filter_f_t = Option<unsafe extern "C" fn(PK_ATTRIB_t, PK_POINTER_t) -> PK_LOGICAL_t>;
+pub type PK_ATTRIB_filter_f_t =
+    Option<unsafe extern "C" fn(PK_ATTRIB_t, PK_POINTER_t) -> PK_LOGICAL_t>;
 
 // =============================================================================
 // Bulletin board setup structure
@@ -285,10 +281,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Delete the given appitems.
-    pub fn PK_APPITEM_delete(
-        n_appitems: c_int,
-        appitems: *const PK_APPITEM_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_APPITEM_delete(n_appitems: c_int, appitems: *const PK_APPITEM_t) -> PK_ERROR_code_t;
 
     /// Return the pointers for the given appitems.
     pub fn PK_APPITEM_ask(
@@ -305,10 +298,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Test whether the given argument is an appitem.
-    pub fn PK_APPITEM_is(
-        entity: PK_ENTITY_t,
-        is_appitem: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_APPITEM_is(entity: PK_ENTITY_t, is_appitem: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // PK_ATTDEF — attribute definitions (Ch. 92)
@@ -327,22 +317,13 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return standard form for attribute definition (non-named fields).
-    pub fn PK_ATTDEF_ask(
-        attdef: PK_ATTDEF_t,
-        sf: *mut PK_ATTDEF_sf_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ATTDEF_ask(attdef: PK_ATTDEF_t, sf: *mut PK_ATTDEF_sf_t) -> PK_ERROR_code_t;
 
     /// Return standard form for attribute definition (named fields).
-    pub fn PK_ATTDEF_ask_2(
-        attdef: PK_ATTDEF_t,
-        sf: *mut PK_ATTDEF_sf_2_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ATTDEF_ask_2(attdef: PK_ATTDEF_t, sf: *mut PK_ATTDEF_sf_2_t) -> PK_ERROR_code_t;
 
     /// Map from an attribute name to a definition.
-    pub fn PK_ATTDEF_find(
-        name: *const c_char,
-        attdef: *mut PK_ATTDEF_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ATTDEF_find(name: *const c_char, attdef: *mut PK_ATTDEF_t) -> PK_ERROR_code_t;
 
     /// Ask whether the given attdef is a group closing attribute definition.
     pub fn PK_ATTDEF_is_group_closing(
@@ -384,16 +365,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return callback on/off flags.
-    pub fn PK_ATTDEF_ask_callback_flags(
-        attdef: PK_ATTDEF_t,
-        flags: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ATTDEF_ask_callback_flags(attdef: PK_ATTDEF_t, flags: *mut c_int) -> PK_ERROR_code_t;
 
     /// Set context data for an attribute definition.
-    pub fn PK_ATTDEF_set_contexts(
-        attdef: PK_ATTDEF_t,
-        context: PK_POINTER_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ATTDEF_set_contexts(attdef: PK_ATTDEF_t, context: PK_POINTER_t) -> PK_ERROR_code_t;
 
     /// Return context data for an attribute definition.
     pub fn PK_ATTDEF_ask_contexts(
@@ -422,16 +397,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the entity owning an attribute.
-    pub fn PK_ATTRIB_ask_owner(
-        attrib: PK_ATTRIB_t,
-        owner: *mut PK_ENTITY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ATTRIB_ask_owner(attrib: PK_ATTRIB_t, owner: *mut PK_ENTITY_t) -> PK_ERROR_code_t;
 
     /// Return the attribute definition of an attribute.
-    pub fn PK_ATTRIB_ask_attdef(
-        attrib: PK_ATTRIB_t,
-        attdef: *mut PK_ATTDEF_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ATTRIB_ask_attdef(attrib: PK_ATTRIB_t, attdef: *mut PK_ATTDEF_t) -> PK_ERROR_code_t;
 
     // --- Numbered field write ---
 
@@ -887,40 +856,22 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Set up the bulletin board: specify which entity/event combinations to record.
-    pub fn PK_BB_create(
-        sf: *const PK_BB_sf_t,
-        bb: *mut PK_BB_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BB_create(sf: *const PK_BB_sf_t, bb: *mut PK_BB_t) -> PK_ERROR_code_t;
 
     /// Switch bulletin board on/off.
-    pub fn PK_BB_set_status(
-        bb: PK_BB_t,
-        status: PK_BB_status_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BB_set_status(bb: PK_BB_t, status: PK_BB_status_t) -> PK_ERROR_code_t;
 
     /// Query the current setup of the bulletin board.
-    pub fn PK_BB_ask(
-        bb: PK_BB_t,
-        sf: *mut PK_BB_sf_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BB_ask(bb: PK_BB_t, sf: *mut PK_BB_sf_t) -> PK_ERROR_code_t;
 
     /// Query whether the BB is currently recording.
-    pub fn PK_BB_ask_status(
-        bb: PK_BB_t,
-        status: *mut PK_BB_status_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BB_ask_status(bb: PK_BB_t, status: *mut PK_BB_status_t) -> PK_ERROR_code_t;
 
     /// Determine whether an entity is a bulletin board.
-    pub fn PK_BB_is(
-        entity: PK_ENTITY_t,
-        is_bb: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BB_is(entity: PK_ENTITY_t, is_bb: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Query whether the bulletin board is empty.
-    pub fn PK_BB_is_empty(
-        bb: PK_BB_t,
-        is_empty: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BB_is_empty(bb: PK_BB_t, is_empty: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Output events since last emptied; optionally empty the BB.
     ///

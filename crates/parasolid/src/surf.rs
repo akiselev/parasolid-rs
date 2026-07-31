@@ -2,12 +2,12 @@
 
 use std::os::raw::c_int;
 
-use parasolid_sys::*;
-use crate::error::PsResult;
-use crate::entity::Entity;
 use crate::curve::Curve;
-use crate::geom::{Vec3, Axis2};
+use crate::entity::Entity;
+use crate::error::PsResult;
+use crate::geom::{Axis2, Vec3};
 use crate::memory::PkArray;
+use parasolid_sys::*;
 
 /// Surface curvature at a `(u,v)` point (from [`Surf::eval_curvature`]).
 #[derive(Debug, Clone, Copy)]
@@ -70,8 +70,19 @@ impl UvBox {
 /// Concrete surface type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum SurfType {
-    Plane, Cylinder, Cone, Sphere, Torus,
-    Bsurf, Offset, Swept, Spun, Fsurf, Mesh, Blendsf, Ssurf,
+    Plane,
+    Cylinder,
+    Cone,
+    Sphere,
+    Torus,
+    Bsurf,
+    Offset,
+    Swept,
+    Spun,
+    Fsurf,
+    Mesh,
+    Blendsf,
+    Ssurf,
 }
 
 /// A surface entity handle.
@@ -82,31 +93,53 @@ pub struct Surf {
 
 /// Plane parameters: basis frame (origin + normal axis + reference direction).
 #[derive(Debug, Clone, Copy)]
-pub struct PlaneData { pub basis: Axis2 }
+pub struct PlaneData {
+    pub basis: Axis2,
+}
 
 /// Cylinder parameters: radius and axis frame.
 #[derive(Debug, Clone, Copy)]
-pub struct CylinderData { pub radius: f64, pub basis: Axis2 }
+pub struct CylinderData {
+    pub radius: f64,
+    pub basis: Axis2,
+}
 
 /// Cone parameters: `radius` is the cone radius **at the basis frame's origin**
 /// (not at the apex), `semi_angle` is the half-angle in radians, and `basis` is
 /// the axis frame. The radius grows with distance along `+axis` as
 /// `radius + t·tan(semi_angle)`.
 #[derive(Debug, Clone, Copy)]
-pub struct ConeData { pub radius: f64, pub semi_angle: f64, pub basis: Axis2 }
+pub struct ConeData {
+    pub radius: f64,
+    pub semi_angle: f64,
+    pub basis: Axis2,
+}
 
 /// Sphere parameters: radius and basis frame.
 #[derive(Debug, Clone, Copy)]
-pub struct SphereData { pub radius: f64, pub basis: Axis2 }
+pub struct SphereData {
+    pub radius: f64,
+    pub basis: Axis2,
+}
 
 /// Torus parameters: major and minor radii, and axis frame.
 #[derive(Debug, Clone, Copy)]
-pub struct TorusData { pub major_radius: f64, pub minor_radius: f64, pub basis: Axis2 }
+pub struct TorusData {
+    pub major_radius: f64,
+    pub minor_radius: f64,
+    pub basis: Axis2,
+}
 
 impl Surf {
-    pub(crate) fn from_tag(tag: PK_SURF_t) -> Self { Self { tag } }
-    pub fn tag(&self) -> i32 { self.tag }
-    pub fn entity(&self) -> Entity { Entity::from_tag(self.tag) }
+    pub(crate) fn from_tag(tag: PK_SURF_t) -> Self {
+        Self { tag }
+    }
+    pub fn tag(&self) -> i32 {
+        self.tag
+    }
+    pub fn entity(&self) -> Entity {
+        Entity::from_tag(self.tag)
+    }
 
     /// Determine the concrete surface type.
     pub fn surf_type(&self) -> PsResult<SurfType> {
@@ -126,9 +159,12 @@ impl Surf {
             PkClass::Mesh => SurfType::Mesh,
             PkClass::Blendsf => SurfType::Blendsf,
             PkClass::Ssurf => SurfType::Ssurf,
-            _ => return Err(crate::error::PsError::Session(
-                format!("entity {} is not a surface (class {:?})", self.tag, class)
-            )),
+            _ => {
+                return Err(crate::error::PsError::Session(format!(
+                    "entity {} is not a surface (class {:?})",
+                    self.tag, class
+                )));
+            }
         })
     }
 
@@ -136,35 +172,51 @@ impl Surf {
     pub fn ask_plane(&self) -> PsResult<PlaneData> {
         let mut sf = unsafe { std::mem::zeroed::<PK_PLANE_sf_t>() };
         pk_call!(PK_PLANE_ask(self.tag, &mut sf));
-        Ok(PlaneData { basis: Axis2::from_pk(sf.basis_set) })
+        Ok(PlaneData {
+            basis: Axis2::from_pk(sf.basis_set),
+        })
     }
 
     /// Extract cylinder parameters.
     pub fn ask_cylinder(&self) -> PsResult<CylinderData> {
         let mut sf = unsafe { std::mem::zeroed::<PK_CYL_sf_t>() };
         pk_call!(PK_CYL_ask(self.tag, &mut sf));
-        Ok(CylinderData { radius: sf.radius, basis: Axis2::from_pk(sf.basis_set) })
+        Ok(CylinderData {
+            radius: sf.radius,
+            basis: Axis2::from_pk(sf.basis_set),
+        })
     }
 
     /// Extract cone parameters.
     pub fn ask_cone(&self) -> PsResult<ConeData> {
         let mut sf = unsafe { std::mem::zeroed::<PK_CONE_sf_t>() };
         pk_call!(PK_CONE_ask(self.tag, &mut sf));
-        Ok(ConeData { radius: sf.radius, semi_angle: sf.semi_angle, basis: Axis2::from_pk(sf.basis_set) })
+        Ok(ConeData {
+            radius: sf.radius,
+            semi_angle: sf.semi_angle,
+            basis: Axis2::from_pk(sf.basis_set),
+        })
     }
 
     /// Extract sphere parameters.
     pub fn ask_sphere(&self) -> PsResult<SphereData> {
         let mut sf = unsafe { std::mem::zeroed::<PK_SPHERE_sf_t>() };
         pk_call!(PK_SPHERE_ask(self.tag, &mut sf));
-        Ok(SphereData { radius: sf.radius, basis: Axis2::from_pk(sf.basis_set) })
+        Ok(SphereData {
+            radius: sf.radius,
+            basis: Axis2::from_pk(sf.basis_set),
+        })
     }
 
     /// Extract torus parameters.
     pub fn ask_torus(&self) -> PsResult<TorusData> {
         let mut sf = unsafe { std::mem::zeroed::<PK_TORUS_sf_t>() };
         pk_call!(PK_TORUS_ask(self.tag, &mut sf));
-        Ok(TorusData { major_radius: sf.major_radius, minor_radius: sf.minor_radius, basis: Axis2::from_pk(sf.basis_set) })
+        Ok(TorusData {
+            major_radius: sf.major_radius,
+            minor_radius: sf.minor_radius,
+            basis: Axis2::from_pk(sf.basis_set),
+        })
     }
 
     /// Evaluate surface position at (u, v).
@@ -225,7 +277,8 @@ impl Surf {
         let len = (nx * nx + ny * ny + nz * nz).sqrt();
         if len <= 1e-15 {
             return Err(crate::error::PsError::Session(format!(
-                "degenerate surface normal at u={}, v={}: |dR/du x dR/dv| = {:.2e}", u, v, len
+                "degenerate surface normal at u={}, v={}: |dR/du x dR/dv| = {:.2e}",
+                u, v, len
             )));
         }
         let normal = Vec3::new(nx / len, ny / len, nz / len);
@@ -253,7 +306,12 @@ impl Surf {
     pub fn uvbox(&self) -> PsResult<UvBox> {
         let mut b = PK_UVBOX_t { param: [0.0; 4] };
         pk_call!(PK_SURF_ask_uvbox(self.tag, &mut b));
-        Ok(UvBox { u_min: b.param[0], v_min: b.param[1], u_max: b.param[2], v_max: b.param[3] })
+        Ok(UvBox {
+            u_min: b.param[0],
+            v_min: b.param[1],
+            u_max: b.param[2],
+            v_max: b.param[3],
+        })
     }
 
     /// Create a bounded **sheet body** from this surface over the given UV box.
@@ -280,7 +338,15 @@ impl Surf {
         let mut d2: PK_VECTOR1_t = [0.0; 3];
         let mut k1 = 0.0f64;
         let mut k2 = 0.0f64;
-        pk_call!(PK_SURF_eval_curvature(self.tag, &uv, &mut normal, &mut d1, &mut d2, &mut k1, &mut k2));
+        pk_call!(PK_SURF_eval_curvature(
+            self.tag,
+            &uv,
+            &mut normal,
+            &mut d1,
+            &mut d2,
+            &mut k1,
+            &mut k2
+        ));
         Ok(SurfCurvature {
             normal: Vec3::from_pk(normal),
             principal_direction_1: Vec3::from_pk(d1),
@@ -307,7 +373,10 @@ impl Surf {
     pub fn spun(profile: &Curve, axis_location: Vec3, axis_direction: Vec3) -> PsResult<Surf> {
         let sf = PK_SPUN_sf_t {
             profile: profile.tag,
-            axis: PK_AXIS1_sf_t { location: axis_location.to_pk(), axis: axis_direction.to_pk() },
+            axis: PK_AXIS1_sf_t {
+                location: axis_location.to_pk(),
+                axis: axis_direction.to_pk(),
+            },
         };
         let mut tag: PK_SPUN_t = PK_ENTITY_null;
         pk_call!(PK_SPUN_create(&sf, &mut tag));
@@ -327,7 +396,10 @@ impl Surf {
 
     /// Create an orphan **swept** surface: sweep `profile` along `path`.
     pub fn swept(profile: &Curve, path: Vec3) -> PsResult<Surf> {
-        let sf = PK_SWEPT_sf_t { profile: profile.tag, path: path.to_pk() };
+        let sf = PK_SWEPT_sf_t {
+            profile: profile.tag,
+            path: path.to_pk(),
+        };
         let mut tag: PK_SWEPT_t = PK_ENTITY_null;
         pk_call!(PK_SWEPT_create(&sf, &mut tag));
         Ok(Surf::from_tag(tag))
@@ -337,13 +409,19 @@ impl Surf {
     pub fn ask_swept(&self) -> PsResult<SweptData> {
         let mut sf = unsafe { std::mem::zeroed::<PK_SWEPT_sf_t>() };
         pk_call!(PK_SWEPT_ask(self.tag, &mut sf));
-        Ok(SweptData { profile: Curve::from_tag(sf.profile), path: Vec3::from_pk(sf.path) })
+        Ok(SweptData {
+            profile: Curve::from_tag(sf.profile),
+            path: Vec3::from_pk(sf.path),
+        })
     }
 
     /// Create an orphan **offset** surface: offset `base` by signed `distance`
     /// along its normal.
     pub fn offset_surface(base: &Surf, distance: f64) -> PsResult<Surf> {
-        let sf = PK_OFFSET_sf_t { basis_surf: base.tag, distance };
+        let sf = PK_OFFSET_sf_t {
+            basis_surf: base.tag,
+            distance,
+        };
         let mut tag: PK_OFFSET_t = PK_ENTITY_null;
         pk_call!(PK_OFFSET_create(&sf, &mut tag));
         Ok(Surf::from_tag(tag))
@@ -353,7 +431,10 @@ impl Surf {
     pub fn ask_offset(&self) -> PsResult<OffsetData> {
         let mut sf = unsafe { std::mem::zeroed::<PK_OFFSET_sf_t>() };
         pk_call!(PK_OFFSET_ask(self.tag, &mut sf));
-        Ok(OffsetData { basis_surf: Surf::from_tag(sf.basis_surf), distance: sf.distance })
+        Ok(OffsetData {
+            basis_surf: Surf::from_tag(sf.basis_surf),
+            distance: sf.distance,
+        })
     }
 
     /// Create a non-rational **B-surface** (NURBS surface) from its per-direction
@@ -371,7 +452,10 @@ impl Surf {
         v_knots: &[f64],
         v_mults: &[i32],
     ) -> PsResult<Surf> {
-        let verts: Vec<f64> = control_points.iter().flat_map(|p| [p.x, p.y, p.z]).collect();
+        let verts: Vec<f64> = control_points
+            .iter()
+            .flat_map(|p| [p.x, p.y, p.z])
+            .collect();
         let sf = PK_BSURF_sf_t {
             u_degree,
             v_degree,

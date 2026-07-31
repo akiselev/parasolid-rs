@@ -79,10 +79,8 @@ unsafe extern "C" {
     // ---- Creation ----------------------------------------------------------
 
     /// Create a transformation from a 4x4 matrix in standard form.
-    pub fn PK_TRANSF_create(
-        sf: *const PK_TRANSF_sf_t,
-        transf: *mut PK_TRANSF_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TRANSF_create(sf: *const PK_TRANSF_sf_t, transf: *mut PK_TRANSF_t)
+    -> PK_ERROR_code_t;
 
     /// Create a uniform (equal) scale transformation.
     pub fn PK_TRANSF_create_equal_scale(
@@ -124,10 +122,7 @@ unsafe extern "C" {
     // ---- Query -------------------------------------------------------------
 
     /// Retrieve the standard form of an existing transformation entity.
-    pub fn PK_TRANSF_ask(
-        transf: PK_TRANSF_t,
-        sf: *mut PK_TRANSF_sf_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TRANSF_ask(transf: PK_TRANSF_t, sf: *mut PK_TRANSF_sf_t) -> PK_ERROR_code_t;
 
     // ---- Composition -------------------------------------------------------
 
@@ -147,10 +142,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Scale (enlarge) a transformation by a factor.
-    pub fn PK_TRANSF_enlarge(
-        transf: PK_TRANSF_t,
-        factor: c_double,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TRANSF_enlarge(transf: PK_TRANSF_t, factor: c_double) -> PK_ERROR_code_t;
 
     // ---- Checking & Classification -----------------------------------------
 

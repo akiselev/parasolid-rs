@@ -162,13 +162,8 @@ pub type PK_FFCLOS_f_t = Option<
 /// - `nbytes`: number of bytes to allocate (input).
 /// - `memory`: pointer to receive allocated memory (output).
 /// - `ifail`: 0 on success (output).
-pub type PK_FMALLO_f_t = Option<
-    unsafe extern "C" fn(
-        nbytes: *const c_int,
-        memory: *mut *mut c_char,
-        ifail: *mut c_int,
-    ),
->;
+pub type PK_FMALLO_f_t =
+    Option<unsafe extern "C" fn(nbytes: *const c_int, memory: *mut *mut c_char, ifail: *mut c_int)>;
 
 /// FMFREE — free virtual memory.
 ///
@@ -176,37 +171,26 @@ pub type PK_FMALLO_f_t = Option<
 /// - `nbytes`: number of bytes that were allocated (input).
 /// - `memory`: pointer to memory to free (input/output, set to NULL on success).
 /// - `ifail`: 0 on success (output).
-pub type PK_FMFREE_f_t = Option<
-    unsafe extern "C" fn(
-        nbytes: *const c_int,
-        memory: *mut *mut c_char,
-        ifail: *mut c_int,
-    ),
->;
+pub type PK_FMFREE_f_t =
+    Option<unsafe extern "C" fn(nbytes: *const c_int, memory: *mut *mut c_char, ifail: *mut c_int)>;
 
 /// GOOPSG — open a hierarchical graphical segment (optional).
 ///
 /// - `n_data`: number of integers in `data` array (input).
 /// - `data`: segment descriptor data (input).
-pub type PK_GOOPSG_f_t = Option<
-    unsafe extern "C" fn(n_data: *const c_int, data: *const c_int),
->;
+pub type PK_GOOPSG_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
 
 /// GOSGMT — output a non-hierarchical (single-level) graphical segment (optional).
 ///
 /// - `n_data`: number of integers in `data` array (input).
 /// - `data`: segment descriptor data (input).
-pub type PK_GOSGMT_f_t = Option<
-    unsafe extern "C" fn(n_data: *const c_int, data: *const c_int),
->;
+pub type PK_GOSGMT_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
 
 /// GOCLSG — close a hierarchical graphical segment (optional).
 ///
 /// - `n_data`: number of integers in `data` array (input).
 /// - `data`: segment descriptor data (input).
-pub type PK_GOCLSG_f_t = Option<
-    unsafe extern "C" fn(n_data: *const c_int, data: *const c_int),
->;
+pub type PK_GOCLSG_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
 
 /// FFOPRB — open file for rollback reading (obsolete, use PK_DELTA instead).
 pub type PK_FFOPRB_f_t = Option<
@@ -220,22 +204,12 @@ pub type PK_FFOPRB_f_t = Option<
 >;
 
 /// FFSEEK — seek to position in rollback file (obsolete).
-pub type PK_FFSEEK_f_t = Option<
-    unsafe extern "C" fn(
-        strid: *const c_int,
-        position: *const c_int,
-        ifail: *mut c_int,
-    ),
->;
+pub type PK_FFSEEK_f_t =
+    Option<unsafe extern "C" fn(strid: *const c_int, position: *const c_int, ifail: *mut c_int)>;
 
 /// FFTELL — return current position in rollback file (obsolete).
-pub type PK_FFTELL_f_t = Option<
-    unsafe extern "C" fn(
-        strid: *const c_int,
-        position: *mut c_int,
-        ifail: *mut c_int,
-    ),
->;
+pub type PK_FFTELL_f_t =
+    Option<unsafe extern "C" fn(strid: *const c_int, position: *mut c_int, ifail: *mut c_int)>;
 
 /// FFSKXT — open file for reading XT format specifically (legacy variant of FFOPRD).
 ///
@@ -256,7 +230,7 @@ pub type PK_UCOPRD_f_t = Option<
         n_guises: *const c_int,
         guises: *const c_int,
         key_len: *const c_int,
-        key: *const c_int,  // Unicode char array, not c_char
+        key: *const c_int, // Unicode char array, not c_char
         ifail: *mut c_int,
     ),
 >;
@@ -267,7 +241,7 @@ pub type PK_UCOPWR_f_t = Option<
         n_guises: *const c_int,
         guises: *const c_int,
         key_len: *const c_int,
-        key: *const c_int,  // Unicode char array, not c_char
+        key: *const c_int, // Unicode char array, not c_char
         ifail: *mut c_int,
     ),
 >;

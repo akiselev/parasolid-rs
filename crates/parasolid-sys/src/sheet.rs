@@ -790,9 +790,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Orientates all edges of a wire body in the same direction as a given edge.
-    pub fn PK_EDGE_propagate_orientation(
-        edge: PK_EDGE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_propagate_orientation(edge: PK_EDGE_t) -> PK_ERROR_code_t;
 
     /// Splits a wire body by adding a new vertex at the end of a specified edge.
     ///

@@ -252,7 +252,6 @@ impl Default for PK_make_bsurf_update_t {
     }
 }
 
-
 /// Update switch for surface replacement (DEPRECATED — see `PK_local_ops_update_t`).
 /// Covers V14.0 and earlier.
 #[repr(C)]
@@ -426,9 +425,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Start shuffling return array arguments to test order-independence.
-    pub fn PK_DEBUG_shuffle_start(
-        options: *mut PK_DEBUG_shuffle_start_o_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_shuffle_start(options: *mut PK_DEBUG_shuffle_start_o_t) -> PK_ERROR_code_t;
 
     /// Stop shuffling return array arguments.
     pub fn PK_DEBUG_shuffle_stop() -> PK_ERROR_code_t;
@@ -494,9 +491,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return structure registrar for `PK_DEBUG_BODY_compare`.
-    pub fn PK_DEBUG_BODY_compare_r_f(
-        result: *mut PK_DEBUG_BODY_compare_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_BODY_compare_r_f(result: *mut PK_DEBUG_BODY_compare_r_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Debug data extraction
@@ -513,9 +508,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Write a comment to the debug report file.
-    pub fn PK_DEBUG_report_comment(
-        comment: *const c_char,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_report_comment(comment: *const c_char) -> PK_ERROR_code_t;
 
     /// Start recording debug info from PK functions.
     pub fn PK_DEBUG_report_start(
@@ -545,7 +538,5 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Debug data callback registrar.
-    pub fn PK_DEBUG_data_f(
-        data: *mut PK_DEBUG_data_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_DEBUG_data_f(data: *mut PK_DEBUG_data_t) -> PK_ERROR_code_t;
 }

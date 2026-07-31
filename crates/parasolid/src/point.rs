@@ -1,9 +1,9 @@
 //! Point type — a geometric point entity.
 
-use parasolid_sys::*;
-use crate::error::PsResult;
 use crate::entity::Entity;
+use crate::error::PsResult;
 use crate::geom::Vec3;
+use parasolid_sys::*;
 
 /// A point entity handle.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -12,9 +12,15 @@ pub struct Point {
 }
 
 impl Point {
-    pub(crate) fn from_tag(tag: PK_POINT_t) -> Self { Self { tag } }
-    pub fn tag(&self) -> i32 { self.tag }
-    pub fn entity(&self) -> Entity { Entity::from_tag(self.tag) }
+    pub(crate) fn from_tag(tag: PK_POINT_t) -> Self {
+        Self { tag }
+    }
+    pub fn tag(&self) -> i32 {
+        self.tag
+    }
+    pub fn entity(&self) -> Entity {
+        Entity::from_tag(self.tag)
+    }
 
     /// Return the 3D position of this point.
     pub fn position(&self) -> PsResult<Vec3> {

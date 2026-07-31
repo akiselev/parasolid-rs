@@ -39,69 +39,48 @@ unsafe extern "C" {
     /// ```c
     /// PK_ERROR_code_t PK_ENTITY_ask_class(PK_ENTITY_t entity, PK_CLASS_t *eclass);
     /// ```
-    pub fn PK_ENTITY_ask_class(
-        entity: PK_ENTITY_t,
-        eclass: *mut PK_CLASS_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_ask_class(entity: PK_ENTITY_t, eclass: *mut PK_CLASS_t) -> PK_ERROR_code_t;
 
     /// Test whether an entity is a topological entity.
     ///
     /// ```c
     /// PK_ERROR_code_t PK_ENTITY_is_topol(PK_ENTITY_t entity, PK_LOGICAL_t *answer);
     /// ```
-    pub fn PK_ENTITY_is_topol(
-        entity: PK_ENTITY_t,
-        answer: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_is_topol(entity: PK_ENTITY_t, answer: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Test whether an entity is a geometric entity.
     ///
     /// ```c
     /// PK_ERROR_code_t PK_ENTITY_is_geom(PK_ENTITY_t entity, PK_LOGICAL_t *answer);
     /// ```
-    pub fn PK_ENTITY_is_geom(
-        entity: PK_ENTITY_t,
-        answer: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_is_geom(entity: PK_ENTITY_t, answer: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Test whether an entity is a surface.
     ///
     /// ```c
     /// PK_ERROR_code_t PK_ENTITY_is_surf(PK_ENTITY_t entity, PK_LOGICAL_t *answer);
     /// ```
-    pub fn PK_ENTITY_is_surf(
-        entity: PK_ENTITY_t,
-        answer: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_is_surf(entity: PK_ENTITY_t, answer: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Test whether an entity is a curve.
     ///
     /// ```c
     /// PK_ERROR_code_t PK_ENTITY_is_curve(PK_ENTITY_t entity, PK_LOGICAL_t *answer);
     /// ```
-    pub fn PK_ENTITY_is_curve(
-        entity: PK_ENTITY_t,
-        answer: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_is_curve(entity: PK_ENTITY_t, answer: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Test whether an entity is a part (body or assembly).
     ///
     /// ```c
     /// PK_ERROR_code_t PK_ENTITY_is_part(PK_ENTITY_t entity, PK_LOGICAL_t *answer);
     /// ```
-    pub fn PK_ENTITY_is_part(
-        entity: PK_ENTITY_t,
-        answer: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_is_part(entity: PK_ENTITY_t, answer: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Delete an entity from the session.
     ///
     /// V35: `(int n_entities, const PK_ENTITY_t entities[])` — deletes an ARRAY.
     /// The old single-`entity` binding passed the tag as `n_entities` (a count).
-    pub fn PK_ENTITY_delete(
-        n_entities: c_int,
-        entities: *const PK_ENTITY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_delete(n_entities: c_int, entities: *const PK_ENTITY_t) -> PK_ERROR_code_t;
 
     /// Delete all attributes attached to an entity.
     ///
@@ -119,10 +98,7 @@ unsafe extern "C" {
     /// ```c
     /// PK_ERROR_code_t PK_ENTITY_copy(PK_ENTITY_t entity, PK_ENTITY_t *copy);
     /// ```
-    pub fn PK_ENTITY_copy(
-        entity: PK_ENTITY_t,
-        copy: *mut PK_ENTITY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_copy(entity: PK_ENTITY_t, copy: *mut PK_ENTITY_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // PK_CLASS — hierarchy enquiry
@@ -164,9 +140,7 @@ unsafe extern "C" {
     ///     PK_MEMORY_free_f_t  free_fn
     /// );
     /// ```
-    pub fn PK_MEMORY_register_callbacks(
-        frustrum: PK_MEMORY_frustrum_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MEMORY_register_callbacks(frustrum: PK_MEMORY_frustrum_t) -> PK_ERROR_code_t;
 
     /// Query the currently registered memory callbacks.
     ///
@@ -176,17 +150,13 @@ unsafe extern "C" {
     ///     PK_MEMORY_free_f_t  *free_fn
     /// );
     /// ```
-    pub fn PK_MEMORY_ask_callbacks(
-        frustrum: *mut PK_MEMORY_frustrum_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MEMORY_ask_callbacks(frustrum: *mut PK_MEMORY_frustrum_t) -> PK_ERROR_code_t;
 
     /// Allocate memory through the registered Parasolid allocator.
     ///
     /// ```c
     /// PK_ERROR_code_t PK_MEMORY_alloc(int size, void **pointer);
     /// ```
-    pub fn PK_MEMORY_alloc(
-        pointer: *mut *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MEMORY_alloc(pointer: *mut *mut c_void) -> PK_ERROR_code_t;
 
 }

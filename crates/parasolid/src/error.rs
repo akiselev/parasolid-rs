@@ -147,9 +147,8 @@ impl PsError {
         }
 
         // Try to get detailed error info from PK
-        let details = query_last_error().unwrap_or_else(|| {
-            ErrorDetails::simple(code, default_severity(code))
-        });
+        let details = query_last_error()
+            .unwrap_or_else(|| ErrorDetails::simple(code, default_severity(code)));
 
         // Map to variant
         if code == PK_ERROR_not_an_entity {

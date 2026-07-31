@@ -1048,11 +1048,15 @@ pub struct PK_FACE_emboss_o_t {
 
 /// Options for `PK_BODY_make_swept_profiles`.
 #[repr(C)]
-pub struct PK_BODY_make_swept_profiles_o_t { _private: [u8; 0] }
+pub struct PK_BODY_make_swept_profiles_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from tracked sweep operations.
 #[repr(C)]
-pub struct PK_BODY_tracked_sweep_2_r_t { _private: [u8; 0] }
+pub struct PK_BODY_tracked_sweep_2_r_t {
+    _private: [u8; 0],
+}
 
 // =============================================================================
 // Extern "C" function declarations
@@ -1197,9 +1201,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free function for `PK_BODY_make_swept_tool_r_t`.
-    pub fn PK_BODY_sweep_tool_r_f(
-        result: *mut PK_BODY_make_swept_tool_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BODY_sweep_tool_r_f(result: *mut PK_BODY_make_swept_tool_r_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Ch. 38 — Lofting
@@ -1274,9 +1276,13 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Free results from `PK_BODY_make_swept_profiles`.
-    pub fn PK_BODY_make_swept_profiles_r_f(results: *mut PK_BODY_tracked_sweep_2_r_t) -> PK_ERROR_code_t;
+    pub fn PK_BODY_make_swept_profiles_r_f(
+        results: *mut PK_BODY_tracked_sweep_2_r_t,
+    ) -> PK_ERROR_code_t;
 
     /// Free results from `PK_BODY_make_swept_body_2`.
-    pub fn PK_BODY_make_swept_body_2_r_f(results: *mut PK_BODY_tracked_sweep_2_r_t) -> PK_ERROR_code_t;
+    pub fn PK_BODY_make_swept_body_2_r_f(
+        results: *mut PK_BODY_tracked_sweep_2_r_t,
+    ) -> PK_ERROR_code_t;
 
 }

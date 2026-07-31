@@ -126,7 +126,10 @@ impl Body {
     /// diff the oracle applies before comparing geometry.
     pub fn topology_summary(&self) -> PsResult<TopologySummary> {
         let regions = self.regions()?;
-        let solid_regions = regions.iter().filter(|r| r.is_solid().unwrap_or(false)).count();
+        let solid_regions = regions
+            .iter()
+            .filter(|r| r.is_solid().unwrap_or(false))
+            .count();
         let mut shells = 0usize;
         let mut loops = 0usize;
         for f in self.faces()? {

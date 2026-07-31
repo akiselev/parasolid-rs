@@ -50,13 +50,22 @@ fn main() {
     //    keep A (copy-on-write journal restore).
     let gr = unsafe { PK_MARK_goto(mark) };
     println!("PK_MARK_goto rc = {gr}");
-    println!("A valid after roll: class = {:?} (expect ok, 0)", class_of(at));
-    println!("B valid after roll: class = {:?} (expect error => B undone)", class_of(bt));
+    println!(
+        "A valid after roll: class = {:?} (expect ok, 0)",
+        class_of(at)
+    );
+    println!(
+        "B valid after roll: class = {:?} (expect error => B undone)",
+        class_of(bt)
+    );
 
     // 5. Create C after rollback: does the tag counter rewind (tag reuse)?
     std::mem::forget(b); // B is dead now; don't let Drop double-free
     let c = Body::create_solid_block(3.0, 3.0, 3.0).expect("C");
-    println!("C body tag = {}  (== B's {bt}? => tag counter rewound on roll)", c.tag());
+    println!(
+        "C body tag = {}  (== B's {bt}? => tag counter rewound on roll)",
+        c.tag()
+    );
     std::mem::forget(c);
     std::mem::forget(a);
 }

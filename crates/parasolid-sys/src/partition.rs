@@ -20,8 +20,6 @@ pub type PK_partition_type_t = c_int;
 pub const PK_PARTITION_type_standard_c: PK_partition_type_t = 23510;
 pub const PK_PARTITION_type_light_c: PK_partition_type_t = 23511;
 
-
-
 // =============================================================================
 // PK_PARTITION_copy — copy_deltas enum
 // =============================================================================
@@ -33,10 +31,6 @@ pub const PK_PARTITION_copy_deltas_none_c: PK_partition_copy_deltas_t = 23310;
 pub const PK_PARTITION_copy_deltas_all_c: PK_partition_copy_deltas_t = 23311;
 pub const PK_PARTITION_copy_deltas_main_c: PK_partition_copy_deltas_t = 23312;
 pub const PK_PARTITION_copy_deltas_curr_c: PK_partition_copy_deltas_t = 23313;
-
-
-
-
 
 // =============================================================================
 // PK_PARTITION_create options + results
@@ -116,12 +110,8 @@ pub struct PK_PARTITION_make_pmark_2_o_t {
 // =============================================================================
 
 /// Callback invoked before attribute deletion during rollback.
-pub type PK_PMARK_goto_del_attrib_cb_t = Option<
-    unsafe extern "C" fn(
-        attrib: PK_ATTRIB_t,
-        context: *mut c_void,
-    ),
->;
+pub type PK_PMARK_goto_del_attrib_cb_t =
+    Option<unsafe extern "C" fn(attrib: PK_ATTRIB_t, context: *mut c_void)>;
 
 /// Options for `PK_PMARK_goto_2`.
 #[repr(C)]
@@ -240,8 +230,7 @@ pub type PK_DELTA_open_for_write_f_t =
 /// Delta callback: open the delta stream for `pmark` for reading. Unlike the
 /// write side, this takes ONLY the pmark (no strid out-param): read streams are
 /// identified by the pmark itself, which the kernel then passes to `read`/`close`.
-pub type PK_DELTA_open_for_read_f_t =
-    Option<unsafe extern "C" fn(pmark: PK_PMARK_t) -> c_int>;
+pub type PK_DELTA_open_for_read_f_t = Option<unsafe extern "C" fn(pmark: PK_PMARK_t) -> c_int>;
 
 /// Delta callback: close a delta stream. Returns ifail.
 pub type PK_DELTA_close_f_t = Option<unsafe extern "C" fn(strid: c_int) -> c_int>;
@@ -303,9 +292,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Create a new empty partition in the session.
-    pub fn PK_PARTITION_create_empty(
-        partition: *mut PK_PARTITION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_create_empty(partition: *mut PK_PARTITION_t) -> PK_ERROR_code_t;
 
     /// Set partition type (light or standard).
     pub fn PK_PARTITION_set_type(
@@ -343,15 +330,11 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Set the current partition.
-    pub fn PK_PARTITION_set_current(
-        partition: PK_PARTITION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_set_current(partition: PK_PARTITION_t) -> PK_ERROR_code_t;
 
     /// Return whether a tag is a partition.
-    pub fn PK_PARTITION_is(
-        entity: PK_ENTITY_t,
-        is_partition: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_is(entity: PK_ENTITY_t, is_partition: *mut PK_LOGICAL_t)
+    -> PK_ERROR_code_t;
 
     /// Return the set of appitems in the given partition.
     pub fn PK_PARTITION_ask_appitems(
@@ -393,20 +376,14 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Move a (new) body into a different partition.
-    pub fn PK_BODY_change_partition(
-        body: PK_BODY_t,
-        partition: PK_PARTITION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BODY_change_partition(body: PK_BODY_t, partition: PK_PARTITION_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Partition marks (PMARK)
     // =========================================================================
 
     /// Returns true if partition mark exists.
-    pub fn PK_PMARK_is(
-        entity: PK_ENTITY_t,
-        is_pmark: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PMARK_is(entity: PK_ENTITY_t, is_pmark: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Delete partition marks.
     pub fn PK_PMARK_delete(
@@ -443,16 +420,11 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return partition mark preceding given one.
-    pub fn PK_PMARK_ask_preceding(
-        pmark: PK_PMARK_t,
-        preceding: *mut PK_PMARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PMARK_ask_preceding(pmark: PK_PMARK_t, preceding: *mut PK_PMARK_t)
+    -> PK_ERROR_code_t;
 
     /// Return the identifier of a pmark.
-    pub fn PK_PMARK_ask_identifier(
-        pmark: PK_PMARK_t,
-        identifier: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PMARK_ask_identifier(pmark: PK_PMARK_t, identifier: *mut c_int) -> PK_ERROR_code_t;
 
     /// What-if query: entities created/deleted/modified if rolled to pmark.
     pub fn PK_PMARK_ask_entities(
@@ -576,35 +548,22 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Returns true if session mark exists.
-    pub fn PK_MARK_is(
-        entity: PK_ENTITY_t,
-        is_mark: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_is(entity: PK_ENTITY_t, is_mark: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Create a session mark (creates pmarks in all partitions not at a pmark).
-    pub fn PK_MARK_create(
-        mark: *mut PK_MARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_create(mark: *mut PK_MARK_t) -> PK_ERROR_code_t;
 
     /// Create a session mark (version 2).
-    pub fn PK_MARK_create_2(
-        mark: *mut PK_MARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_create_2(mark: *mut PK_MARK_t) -> PK_ERROR_code_t;
 
     /// Delete a session mark.
-    pub fn PK_MARK_delete(
-        mark: PK_MARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_delete(mark: PK_MARK_t) -> PK_ERROR_code_t;
 
     /// Delete a session mark (version 2).
-    pub fn PK_MARK_delete_2(
-        mark: PK_MARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_delete_2(mark: PK_MARK_t) -> PK_ERROR_code_t;
 
     /// Roll session to state when given mark was set (legacy).
-    pub fn PK_MARK_goto(
-        mark: PK_MARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_goto(mark: PK_MARK_t) -> PK_ERROR_code_t;
 
     /// Roll session to state when given mark was set (with options and return data).
     pub fn PK_MARK_goto_2(
@@ -614,16 +573,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return mark after the given one.
-    pub fn PK_MARK_ask_following(
-        mark: PK_MARK_t,
-        following: *mut PK_MARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_ask_following(mark: PK_MARK_t, following: *mut PK_MARK_t) -> PK_ERROR_code_t;
 
     /// Return mark before the given one.
-    pub fn PK_MARK_ask_preceding(
-        mark: PK_MARK_t,
-        preceding: *mut PK_MARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_ask_preceding(mark: PK_MARK_t, preceding: *mut PK_MARK_t) -> PK_ERROR_code_t;
 
     /// Return pmarks that would be current if mark rolled to.
     pub fn PK_MARK_ask_pmarks(
@@ -641,20 +594,14 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return whether mark rollback is active.
-    pub fn PK_MARK_is_on(
-        is_on: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_is_on(is_on: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Whether roll-forward is enabled. V35: `(PK_LOGICAL_t *is_enabled)` — a
     /// single out-param (only valid once non-partitioned rollback is started).
-    pub fn PK_MARK_ask_forward(
-        is_enabled: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_ask_forward(is_enabled: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Return the registered mark frustrum. V35: `(PK_MARK_frustrum_t *frustrum)`.
-    pub fn PK_MARK_ask_frustrum(
-        frustrum: *mut PK_MARK_frustrum_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_ask_frustrum(frustrum: *mut PK_MARK_frustrum_t) -> PK_ERROR_code_t;
 
     /// Start non-partitioned PK rollback. V35: `(PK_MARK_frustrum_t frustrum,
     /// const PK_MARK_start_o_t *options)`. Mutually exclusive with partitioned
@@ -672,9 +619,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Register rollback Frustrum functions (must call before session start).
-    pub fn PK_DELTA_register_callbacks(
-        callbacks: *const PK_DELTA_callbacks_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_DELTA_register_callbacks(callbacks: *const PK_DELTA_callbacks_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Partition I/O
@@ -732,9 +677,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Receive deltas for a partition.
-    pub fn PK_PARTITION_receive_deltas(
-        partition: PK_PARTITION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_receive_deltas(partition: PK_PARTITION_t) -> PK_ERROR_code_t;
 
     /// Receive deltas for a partition (version 2).
     pub fn PK_PARTITION_receive_deltas_2(
@@ -777,10 +720,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Set a guard on a partition.
-    pub fn PK_PARTITION_set_guard(
-        partition: PK_PARTITION_t,
-        pmark: PK_PMARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_set_guard(partition: PK_PARTITION_t, pmark: PK_PMARK_t) -> PK_ERROR_code_t;
 
     /// Check if a partition has a guard.
     pub fn PK_PARTITION_has_guard(
@@ -789,14 +729,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Roll partition to its guard pmark.
-    pub fn PK_PARTITION_goto_guard(
-        partition: PK_PARTITION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_goto_guard(partition: PK_PARTITION_t) -> PK_ERROR_code_t;
 
     /// Clear a guard on a partition.
-    pub fn PK_PARTITION_clear_guard(
-        partition: PK_PARTITION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_clear_guard(partition: PK_PARTITION_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Partition cloning
@@ -880,15 +816,10 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Create partition (roll-forward variant).
-    pub fn PK_PARTITION_create_r_f(
-        partition: *mut PK_PARTITION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_create_r_f(partition: *mut PK_PARTITION_t) -> PK_ERROR_code_t;
 
     /// General partition ask (roll-forward variant).
-    pub fn PK_PARTITION_ask_r_f(
-        partition: PK_PARTITION_t,
-        data: *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_ask_r_f(partition: PK_PARTITION_t, data: *mut c_void) -> PK_ERROR_code_t;
 
     /// Return all pmarks in partition (version 2, roll-forward variant).
     pub fn PK_PARTITION_ask_pmarks_2_r_f(
@@ -902,9 +833,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Roll partition to its guard pmark (roll-forward variant).
-    pub fn PK_PARTITION_goto_guard_r_f(
-        partition: PK_PARTITION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PARTITION_goto_guard_r_f(partition: PK_PARTITION_t) -> PK_ERROR_code_t;
 
     /// Check if partition has lattices (roll-forward variant).
     pub fn PK_PARTITION_has_lattices_r_f(
@@ -913,17 +842,11 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Create session mark (roll-forward variant).
-    pub fn PK_MARK_create_r_f(
-        mark: *mut PK_MARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_create_r_f(mark: *mut PK_MARK_t) -> PK_ERROR_code_t;
 
     /// Delete session mark (roll-forward variant).
-    pub fn PK_MARK_delete_r_f(
-        mark: PK_MARK_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MARK_delete_r_f(mark: PK_MARK_t) -> PK_ERROR_code_t;
 
     /// Free memory block.
-    pub fn PK_MEMORY_block_f(
-        block: *mut PK_MEMORY_block_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MEMORY_block_f(block: *mut PK_MEMORY_block_t) -> PK_ERROR_code_t;
 }

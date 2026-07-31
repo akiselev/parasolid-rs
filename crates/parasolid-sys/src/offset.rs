@@ -580,7 +580,9 @@ impl Default for PK_EDGE_offset_on_body_o_t {
 
 /// Results from `PK_BODY_thicken_2`.
 #[repr(C)]
-pub struct PK_BODY_thicken_r_t { _private: [u8; 0] }
+pub struct PK_BODY_thicken_r_t {
+    _private: [u8; 0],
+}
 
 // =============================================================================
 // Extern "C" function declarations

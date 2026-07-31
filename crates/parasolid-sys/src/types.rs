@@ -306,4 +306,3 @@ pub struct PK_FACE_neutral_causes_array_t {
     pub n_causes: c_int,
     pub causes: *mut c_int,
 }
-

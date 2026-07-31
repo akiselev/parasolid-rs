@@ -1,13 +1,13 @@
 //! Body type — the top-level topological entity in Parasolid.
 
-use std::os::raw::c_int;
-use parasolid_sys::*;
-use crate::error::PsResult;
-use crate::memory::PkArray;
-use crate::entity::Entity;
-use crate::face::Face;
 use crate::edge::Edge;
+use crate::entity::Entity;
+use crate::error::PsResult;
+use crate::face::Face;
+use crate::memory::PkArray;
 use crate::vertex::Vertex;
+use parasolid_sys::*;
+use std::os::raw::c_int;
 
 /// The type of a body (dimensionality).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -27,9 +27,15 @@ pub struct Body {
 }
 
 impl Body {
-    pub(crate) fn from_tag(tag: PK_BODY_t) -> Self { Self { tag } }
-    pub fn tag(&self) -> i32 { self.tag }
-    pub fn entity(&self) -> Entity { Entity::from_tag(self.tag) }
+    pub(crate) fn from_tag(tag: PK_BODY_t) -> Self {
+        Self { tag }
+    }
+    pub fn tag(&self) -> i32 {
+        self.tag
+    }
+    pub fn entity(&self) -> Entity {
+        Entity::from_tag(self.tag)
+    }
 
     // --- Queries ---
 
@@ -76,7 +82,10 @@ impl Body {
         let mut ptr = std::ptr::null_mut();
         pk_call!(PK_BODY_ask_shells(self.tag, &mut n, &mut ptr));
         let array = unsafe { PkArray::from_raw(ptr, n) };
-        Ok(array.iter().map(|&tag| crate::Shell::from_tag(tag)).collect())
+        Ok(array
+            .iter()
+            .map(|&tag| crate::Shell::from_tag(tag))
+            .collect())
     }
 
     /// Return all regions of this body (solid material and surrounding void).
@@ -85,7 +94,10 @@ impl Body {
         let mut ptr = std::ptr::null_mut();
         pk_call!(PK_BODY_ask_regions(self.tag, &mut n, &mut ptr));
         let array = unsafe { PkArray::from_raw(ptr, n) };
-        Ok(array.iter().map(|&tag| crate::Region::from_tag(tag)).collect())
+        Ok(array
+            .iter()
+            .map(|&tag| crate::Region::from_tag(tag))
+            .collect())
     }
 
     // --- Primitive creation ---
@@ -94,7 +106,13 @@ impl Body {
     /// (x spans ±x/2, y spans ±y/2, z spans 0..z — per PK_BODY_create_solid_block docs).
     pub fn create_solid_block(x: f64, y: f64, z: f64) -> PsResult<Body> {
         let mut tag: PK_BODY_t = PK_ENTITY_null;
-        pk_call!(PK_BODY_create_solid_block(x, y, z, std::ptr::null(), &mut tag));
+        pk_call!(PK_BODY_create_solid_block(
+            x,
+            y,
+            z,
+            std::ptr::null(),
+            &mut tag
+        ));
         Ok(Body::from_tag(tag))
     }
 
@@ -130,7 +148,12 @@ impl Body {
     /// centred on the Z axis in x and y.
     pub fn create_solid_cylinder(radius: f64, height: f64) -> PsResult<Body> {
         let mut tag: PK_BODY_t = PK_ENTITY_null;
-        pk_call!(PK_BODY_create_solid_cyl(radius, height, std::ptr::null(), &mut tag));
+        pk_call!(PK_BODY_create_solid_cyl(
+            radius,
+            height,
+            std::ptr::null(),
+            &mut tag
+        ));
         Ok(Body::from_tag(tag))
     }
 
@@ -200,6 +223,37 @@ impl Body {
     pub fn offset(&self, distance: f64) -> PsResult<()> {
         pk_call!(PK_BODY_offset(self.tag, distance, 1.0e-6, PK_LOGICAL_false));
         Ok(())
+    }
+
+    /// Simplify this body's geometry in place where possible
+    /// (`PK_BODY_simplify_geom`): B-curves/B-surfaces that are exactly (within
+    /// modeller precision) analytic are replaced by the analytic forms —
+    /// rational B-curve → non-rational B-curve / line / circle; non-rational
+    /// B-curve → line; rational B-surface → non-rational B-surface / plane /
+    /// cylinder / cone / sphere / torus; non-rational B-surface → plane.
+    ///
+    /// `local = false` replaces a B-geometry only when a **single** simpler
+    /// geometry covers the entire original; `local = true` also allows partial
+    /// (piecewise) replacement, which may put edges/faces that shared one
+    /// B-geometry onto different geometries afterwards.
+    ///
+    /// Topology is unchanged; replaced geometry is deleted. Returns the new
+    /// geometry entities.
+    pub fn simplify_geom(&self, local: bool) -> PsResult<Vec<Entity>> {
+        let mut n_geoms: c_int = 0;
+        let mut geoms: *mut PK_GEOM_t = std::ptr::null_mut();
+        pk_call!(PK_BODY_simplify_geom(
+            self.tag,
+            if local {
+                PK_LOGICAL_true
+            } else {
+                PK_LOGICAL_false
+            },
+            &mut n_geoms,
+            &mut geoms,
+        ));
+        let array = unsafe { PkArray::from_raw(geoms, n_geoms) };
+        Ok(array.iter().map(|&t| Entity::from_tag(t)).collect())
     }
 
     /// **Hollow** (shell) this solid in place, leaving walls of
@@ -279,7 +333,9 @@ impl Body {
     ) -> PsResult<Body> {
         let sf = basis.to_pk();
         let mut tag: PK_BODY_t = PK_ENTITY_null;
-        pk_call!(PK_BODY_create_sheet_rectangle(x_length, y_length, &sf, &mut tag));
+        pk_call!(PK_BODY_create_sheet_rectangle(
+            x_length, y_length, &sf, &mut tag
+        ));
         Ok(Body::from_tag(tag))
     }
 
@@ -332,7 +388,11 @@ impl Body {
     /// Create a solid sphere centered at the origin.
     pub fn create_solid_sphere(radius: f64) -> PsResult<Body> {
         let mut tag: PK_BODY_t = PK_ENTITY_null;
-        pk_call!(PK_BODY_create_solid_sphere(radius, std::ptr::null(), &mut tag));
+        pk_call!(PK_BODY_create_solid_sphere(
+            radius,
+            std::ptr::null(),
+            &mut tag
+        ));
         Ok(Body::from_tag(tag))
     }
 
@@ -345,14 +405,25 @@ impl Body {
     /// plain cylinder-like extrusion; a negative `semi_angle` narrows it.
     pub fn create_solid_cone(radius: f64, height: f64, semi_angle: f64) -> PsResult<Body> {
         let mut tag: PK_BODY_t = PK_ENTITY_null;
-        pk_call!(PK_BODY_create_solid_cone(radius, height, semi_angle, std::ptr::null(), &mut tag));
+        pk_call!(PK_BODY_create_solid_cone(
+            radius,
+            height,
+            semi_angle,
+            std::ptr::null(),
+            &mut tag
+        ));
         Ok(Body::from_tag(tag))
     }
 
     /// Create a solid torus centered at the origin, major axis along Z.
     pub fn create_solid_torus(major_radius: f64, minor_radius: f64) -> PsResult<Body> {
         let mut tag: PK_BODY_t = PK_ENTITY_null;
-        pk_call!(PK_BODY_create_solid_torus(major_radius, minor_radius, std::ptr::null(), &mut tag));
+        pk_call!(PK_BODY_create_solid_torus(
+            major_radius,
+            minor_radius,
+            std::ptr::null(),
+            &mut tag
+        ));
         Ok(Body::from_tag(tag))
     }
 
@@ -370,7 +441,13 @@ impl Body {
         let surf = crate::surf::Surf::plane(plane)?;
         let mut n: c_int = 0;
         let mut ptr: *mut PK_EDGE_t = std::ptr::null_mut();
-        pk_call!(PK_BODY_imprint_plane(self.tag, surf.tag(), tol, &mut n, &mut ptr));
+        pk_call!(PK_BODY_imprint_plane(
+            self.tag,
+            surf.tag(),
+            tol,
+            &mut n,
+            &mut ptr
+        ));
         let arr = unsafe { PkArray::from_raw(ptr, n) };
         Ok(arr.iter().map(|&t| Edge::from_tag(t)).collect())
     }
@@ -386,7 +463,9 @@ impl Body {
         // PK_imprint_r_t (64 B) is filled unconditionally — pass a real buffer.
         let mut results: PK_imprint_r_t = unsafe { std::mem::zeroed() };
         let rc = unsafe { PK_BODY_imprint_body(self.tag, tool.tag, &mut opts, &mut results) };
-        unsafe { let _ = PK_imprint_r_f(&mut results); }
+        unsafe {
+            let _ = PK_imprint_r_f(&mut results);
+        }
         crate::error::pk_check(rc)?;
         Ok(())
     }
@@ -395,8 +474,16 @@ impl Body {
     /// higher-dimensional body in place (a sheet region → a solid of revolution).
     /// `angle` is in radians (`TAU` for a full revolution). Consumes `self` and
     /// returns the same tag, now revolved. Wraps `PK_BODY_spin`.
-    pub fn spin(self, axis_origin: crate::geom::Vec3, axis_dir: crate::geom::Vec3, angle: f64) -> PsResult<Body> {
-        let mut axis = PK_AXIS1_sf_t { location: axis_origin.to_pk(), axis: axis_dir.to_pk() };
+    pub fn spin(
+        self,
+        axis_origin: crate::geom::Vec3,
+        axis_dir: crate::geom::Vec3,
+        angle: f64,
+    ) -> PsResult<Body> {
+        let mut axis = PK_AXIS1_sf_t {
+            location: axis_origin.to_pk(),
+            axis: axis_dir.to_pk(),
+        };
         let mut n_laterals: c_int = 0;
         let mut laterals: *mut PK_TOPOL_t = std::ptr::null_mut();
         let mut bases: *mut PK_TOPOL_t = std::ptr::null_mut();
@@ -445,21 +532,36 @@ impl Body {
     }
 
     pub fn unite(self, tools: Vec<Body>) -> PsResult<Vec<Body>> {
-        crate::boolean::boolean(self, tools, crate::boolean::BooleanOp::Unite, &crate::boolean::BooleanOptions::default())
+        crate::boolean::boolean(
+            self,
+            tools,
+            crate::boolean::BooleanOp::Unite,
+            &crate::boolean::BooleanOptions::default(),
+        )
     }
 
     /// Subtract tool bodies from this body.
     ///
     /// Consumes `self` and the tool bodies. Returns all resulting bodies.
     pub fn subtract(self, tools: Vec<Body>) -> PsResult<Vec<Body>> {
-        crate::boolean::boolean(self, tools, crate::boolean::BooleanOp::Subtract, &crate::boolean::BooleanOptions::default())
+        crate::boolean::boolean(
+            self,
+            tools,
+            crate::boolean::BooleanOp::Subtract,
+            &crate::boolean::BooleanOptions::default(),
+        )
     }
 
     /// Intersect this body with tool bodies.
     ///
     /// Consumes `self` and the tool bodies. Returns all resulting bodies.
     pub fn intersect(self, tools: Vec<Body>) -> PsResult<Vec<Body>> {
-        crate::boolean::boolean(self, tools, crate::boolean::BooleanOp::Intersect, &crate::boolean::BooleanOptions::default())
+        crate::boolean::boolean(
+            self,
+            tools,
+            crate::boolean::BooleanOp::Intersect,
+            &crate::boolean::BooleanOptions::default(),
+        )
     }
 
     /// Split a disconnected body — for example the multi-lump result of uniting

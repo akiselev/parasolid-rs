@@ -143,7 +143,9 @@ pub const PK_REGION_type_solid_c: PK_REGION_type_t = 1; // PK_LOGICAL_t TRUE
 
 /// Options for `PK_BODY_create_topology`.
 #[repr(C)]
-pub struct PK_BODY_create_topology_o_t { _private: [u8; 0] }
+pub struct PK_BODY_create_topology_o_t {
+    _private: [u8; 0],
+}
 
 // =============================================================================
 // Extern functions
@@ -151,7 +153,9 @@ pub struct PK_BODY_create_topology_o_t { _private: [u8; 0] }
 
 /// Options for `PK_FACE_ask_faces_adjacent` (opaque; pass NULL for defaults).
 #[repr(C)]
-pub struct PK_FACE_ask_faces_adjacent_o_t { _private: [u8; 0] }
+pub struct PK_FACE_ask_faces_adjacent_o_t {
+    _private: [u8; 0],
+}
 
 #[link(name = "pskernel")]
 unsafe extern "C" {
@@ -165,10 +169,7 @@ unsafe extern "C" {
     /// ```c
     /// PK_ERROR_code_t PK_BODY_ask_type(PK_BODY_t body, PK_BODY_type_t *btype);
     /// ```
-    pub fn PK_BODY_ask_type(
-        body: PK_BODY_t,
-        btype: *mut PK_BODY_type_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BODY_ask_type(body: PK_BODY_t, btype: *mut PK_BODY_type_t) -> PK_ERROR_code_t;
 
     /// Set (convert) the body type where topology allows.
     ///
@@ -187,10 +188,7 @@ unsafe extern "C" {
     /// ```c
     /// PK_ERROR_code_t PK_BODY_ask_config(PK_BODY_t body, PK_BODY_config_t *config);
     /// ```
-    pub fn PK_BODY_ask_config(
-        body: PK_BODY_t,
-        config: *mut PK_BODY_config_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BODY_ask_config(body: PK_BODY_t, config: *mut PK_BODY_config_t) -> PK_ERROR_code_t;
 
     /// Reverse the orientation of all surfaces in a body.
     ///
@@ -319,16 +317,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the first face in a body's internal list.
-    pub fn PK_BODY_ask_first_face(
-        body: PK_BODY_t,
-        face: *mut PK_FACE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BODY_ask_first_face(body: PK_BODY_t, face: *mut PK_FACE_t) -> PK_ERROR_code_t;
 
     /// Return the first edge in a body's internal list.
-    pub fn PK_BODY_ask_first_edge(
-        body: PK_BODY_t,
-        edge: *mut PK_EDGE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BODY_ask_first_edge(body: PK_BODY_t, edge: *mut PK_EDGE_t) -> PK_ERROR_code_t;
 
     /// Copy a body retaining only topology (no geometry).
     ///
@@ -347,10 +339,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Return the body that owns a face.
-    pub fn PK_FACE_ask_body(
-        face: PK_FACE_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_ask_body(face: PK_FACE_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Return all edges of a face.
     pub fn PK_FACE_ask_edges(
@@ -367,16 +356,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the first loop in a face.
-    pub fn PK_FACE_ask_first_loop(
-        face: PK_FACE_t,
-        loop_: *mut PK_LOOP_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_ask_first_loop(face: PK_FACE_t, loop_: *mut PK_LOOP_t) -> PK_ERROR_code_t;
 
     /// Return the next face in the body's internal face list.
-    pub fn PK_FACE_ask_next_in_body(
-        face: PK_FACE_t,
-        next: *mut PK_FACE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_ask_next_in_body(face: PK_FACE_t, next: *mut PK_FACE_t) -> PK_ERROR_code_t;
 
     /// Return faces adjacent to a given face.
     /// V35: `(int n_faces, const PK_FACE_t faces[], options, int
@@ -398,10 +381,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the shells that reference a face.
-    pub fn PK_FACE_ask_shells(
-        face: PK_FACE_t,
-        shells: *mut PK_SHELL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_ask_shells(face: PK_FACE_t, shells: *mut PK_SHELL_t) -> PK_ERROR_code_t;
 
     /// Return the oriented surface of a face (surface tag + orientation flag).
     ///
@@ -413,10 +393,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the surface attached to a face (without orientation).
-    pub fn PK_FACE_ask_surf(
-        face: PK_FACE_t,
-        surf: *mut PK_SURF_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_ask_surf(face: PK_FACE_t, surf: *mut PK_SURF_t) -> PK_ERROR_code_t;
 
     /// Find the parametric outer loop of a face.
     pub fn PK_FACE_find_outer_loop(
@@ -445,10 +422,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Return the body that owns an edge.
-    pub fn PK_EDGE_ask_body(
-        edge: PK_EDGE_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_ask_body(edge: PK_EDGE_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Return the vertices at edge endpoints.
     pub fn PK_EDGE_ask_vertices(
@@ -471,22 +445,13 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the first fin of an edge.
-    pub fn PK_EDGE_ask_first_fin(
-        edge: PK_EDGE_t,
-        fin: *mut PK_FIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_ask_first_fin(edge: PK_EDGE_t, fin: *mut PK_FIN_t) -> PK_ERROR_code_t;
 
     /// Return the edge type (wireframe/laminar/normal/general).
-    pub fn PK_EDGE_ask_type(
-        edge: PK_EDGE_t,
-        etype: *mut PK_EDGE_type_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_ask_type(edge: PK_EDGE_t, etype: *mut PK_EDGE_type_t) -> PK_ERROR_code_t;
 
     /// Return the curve attached to an edge.
-    pub fn PK_EDGE_ask_curve(
-        edge: PK_EDGE_t,
-        curve: *mut PK_CURVE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_ask_curve(edge: PK_EDGE_t, curve: *mut PK_CURVE_t) -> PK_ERROR_code_t;
 
     /// Return the oriented curve of an edge (curve tag + orientation flag).
     pub fn PK_EDGE_ask_oriented_curve(
@@ -496,10 +461,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the next edge in the body's internal edge list.
-    pub fn PK_EDGE_ask_next_in_body(
-        edge: PK_EDGE_t,
-        next: *mut PK_EDGE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_ask_next_in_body(edge: PK_EDGE_t, next: *mut PK_EDGE_t) -> PK_ERROR_code_t;
 
     /// Return shells that reference an edge.
     pub fn PK_EDGE_ask_shells(
@@ -525,58 +487,31 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Return the edge that a fin belongs to.
-    pub fn PK_FIN_ask_edge(
-        fin: PK_FIN_t,
-        edge: *mut PK_EDGE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_edge(fin: PK_FIN_t, edge: *mut PK_EDGE_t) -> PK_ERROR_code_t;
 
     /// Return the loop that a fin belongs to.
-    pub fn PK_FIN_ask_loop(
-        fin: PK_FIN_t,
-        loop_: *mut PK_LOOP_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_loop(fin: PK_FIN_t, loop_: *mut PK_LOOP_t) -> PK_ERROR_code_t;
 
     /// Return the face that a fin belongs to (via its loop).
-    pub fn PK_FIN_ask_face(
-        fin: PK_FIN_t,
-        face: *mut PK_FACE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_face(fin: PK_FIN_t, face: *mut PK_FACE_t) -> PK_ERROR_code_t;
 
     /// Return the body that owns a fin.
-    pub fn PK_FIN_ask_body(
-        fin: PK_FIN_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_body(fin: PK_FIN_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Return the next fin in the same loop.
-    pub fn PK_FIN_ask_next_in_loop(
-        fin: PK_FIN_t,
-        next: *mut PK_FIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_next_in_loop(fin: PK_FIN_t, next: *mut PK_FIN_t) -> PK_ERROR_code_t;
 
     /// Return the previous fin in the same loop.
-    pub fn PK_FIN_ask_previous_in_loop(
-        fin: PK_FIN_t,
-        prev: *mut PK_FIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_previous_in_loop(fin: PK_FIN_t, prev: *mut PK_FIN_t) -> PK_ERROR_code_t;
 
     /// Return the next fin of the same edge (radial traversal).
-    pub fn PK_FIN_ask_next_of_edge(
-        fin: PK_FIN_t,
-        next: *mut PK_FIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_next_of_edge(fin: PK_FIN_t, next: *mut PK_FIN_t) -> PK_ERROR_code_t;
 
     /// Return the previous fin of the same edge (radial traversal).
-    pub fn PK_FIN_ask_previous_of_edge(
-        fin: PK_FIN_t,
-        prev: *mut PK_FIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_previous_of_edge(fin: PK_FIN_t, prev: *mut PK_FIN_t) -> PK_ERROR_code_t;
 
     /// Test whether a fin is positive (edge direction matches fin direction).
-    pub fn PK_FIN_is_positive(
-        fin: PK_FIN_t,
-        is_positive: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_is_positive(fin: PK_FIN_t, is_positive: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Return the oriented curve of a fin.
     pub fn PK_FIN_ask_oriented_curve(
@@ -597,32 +532,20 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the curve attached to a fin.
-    pub fn PK_FIN_ask_curve(
-        fin: PK_FIN_t,
-        curve: *mut PK_CURVE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_curve(fin: PK_FIN_t, curve: *mut PK_CURVE_t) -> PK_ERROR_code_t;
 
     /// Return the fin type.
-    pub fn PK_FIN_ask_type(
-        fin: PK_FIN_t,
-        ftype: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_ask_type(fin: PK_FIN_t, ftype: *mut c_int) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Loop navigation
     // =========================================================================
 
     /// Return the body that owns a loop.
-    pub fn PK_LOOP_ask_body(
-        loop_: PK_LOOP_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_LOOP_ask_body(loop_: PK_LOOP_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Return the face that a loop belongs to.
-    pub fn PK_LOOP_ask_face(
-        loop_: PK_LOOP_t,
-        face: *mut PK_FACE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_LOOP_ask_face(loop_: PK_LOOP_t, face: *mut PK_FACE_t) -> PK_ERROR_code_t;
 
     /// Return all fins in a loop.
     pub fn PK_LOOP_ask_fins(
@@ -632,16 +555,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the first fin in a loop.
-    pub fn PK_LOOP_ask_first_fin(
-        loop_: PK_LOOP_t,
-        fin: *mut PK_FIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_LOOP_ask_first_fin(loop_: PK_LOOP_t, fin: *mut PK_FIN_t) -> PK_ERROR_code_t;
 
     /// Return the next loop in the same face.
-    pub fn PK_LOOP_ask_next_in_face(
-        loop_: PK_LOOP_t,
-        next: *mut PK_LOOP_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_LOOP_ask_next_in_face(loop_: PK_LOOP_t, next: *mut PK_LOOP_t) -> PK_ERROR_code_t;
 
     /// Return all edges in a loop.
     pub fn PK_LOOP_ask_edges(
@@ -658,32 +575,21 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the loop type (outer/inner/winding/vertex/wire/unclear).
-    pub fn PK_LOOP_ask_type(
-        loop_: PK_LOOP_t,
-        ltype: *mut PK_LOOP_type_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_LOOP_ask_type(loop_: PK_LOOP_t, ltype: *mut PK_LOOP_type_t) -> PK_ERROR_code_t;
 
     /// Test whether a loop is an isolated vertex loop.
-    pub fn PK_LOOP_is_isolated(
-        loop_: PK_LOOP_t,
-        is_isolated: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_LOOP_is_isolated(loop_: PK_LOOP_t, is_isolated: *mut PK_LOGICAL_t)
+    -> PK_ERROR_code_t;
 
     // =========================================================================
     // Vertex navigation
     // =========================================================================
 
     /// Return the body that owns a vertex.
-    pub fn PK_VERTEX_ask_body(
-        vertex: PK_VERTEX_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_VERTEX_ask_body(vertex: PK_VERTEX_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Return the point attached to a vertex.
-    pub fn PK_VERTEX_ask_point(
-        vertex: PK_VERTEX_t,
-        point: *mut PK_POINT_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_VERTEX_ask_point(vertex: PK_VERTEX_t, point: *mut PK_POINT_t) -> PK_ERROR_code_t;
 
     /// Return the faces adjacent to a vertex.
     pub fn PK_VERTEX_ask_faces(
@@ -701,10 +607,8 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the vertex type (standard/tolerant).
-    pub fn PK_VERTEX_ask_type(
-        vertex: PK_VERTEX_t,
-        vtype: *mut PK_VERTEX_type_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_VERTEX_ask_type(vertex: PK_VERTEX_t, vtype: *mut PK_VERTEX_type_t)
+    -> PK_ERROR_code_t;
 
     /// Return shells that reference a vertex.
     pub fn PK_VERTEX_ask_shells(
@@ -725,10 +629,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Return the body that owns a shell.
-    pub fn PK_SHELL_ask_body(
-        shell: PK_SHELL_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SHELL_ask_body(shell: PK_SHELL_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Return the oriented faces of a shell.
     pub fn PK_SHELL_ask_oriented_faces(
@@ -739,16 +640,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Return the region that a shell bounds.
-    pub fn PK_SHELL_ask_region(
-        shell: PK_SHELL_t,
-        region: *mut PK_REGION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SHELL_ask_region(shell: PK_SHELL_t, region: *mut PK_REGION_t) -> PK_ERROR_code_t;
 
     /// Return the shell type (face/wire/acorn).
-    pub fn PK_SHELL_ask_type(
-        shell: PK_SHELL_t,
-        stype: *mut PK_SHELL_type_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SHELL_ask_type(shell: PK_SHELL_t, stype: *mut PK_SHELL_type_t) -> PK_ERROR_code_t;
 
     /// Return the acorn vertex of an acorn shell.
     pub fn PK_SHELL_ask_acorn_vertex(
@@ -764,20 +659,14 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Determine the sign of a shell with respect to its region.
-    pub fn PK_SHELL_find_sign(
-        shell: PK_SHELL_t,
-        sign: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SHELL_find_sign(shell: PK_SHELL_t, sign: *mut c_int) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Region navigation
     // =========================================================================
 
     /// Return the body that owns a region.
-    pub fn PK_REGION_ask_body(
-        region: PK_REGION_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REGION_ask_body(region: PK_REGION_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Return all shells bounding a region.
     pub fn PK_REGION_ask_shells(
@@ -794,16 +683,11 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Test whether a region is solid (vs. void).
-    pub fn PK_REGION_is_solid(
-        region: PK_REGION_t,
-        is_solid: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REGION_is_solid(region: PK_REGION_t, is_solid: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Return the region type (solid/void).
-    pub fn PK_REGION_ask_type(
-        region: PK_REGION_t,
-        rtype: *mut PK_REGION_type_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REGION_ask_type(region: PK_REGION_t, rtype: *mut PK_REGION_type_t)
+    -> PK_ERROR_code_t;
 
     /// Change a region to solid.
     pub fn PK_REGION_make_solid(region: PK_REGION_t) -> PK_ERROR_code_t;
@@ -812,10 +696,7 @@ unsafe extern "C" {
     pub fn PK_REGION_make_void(region: PK_REGION_t) -> PK_ERROR_code_t;
 
     /// Transfer a body into the void region of another body.
-    pub fn PK_REGION_combine_bodies(
-        region: PK_REGION_t,
-        body: PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REGION_combine_bodies(region: PK_REGION_t, body: PK_BODY_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Topological utility
@@ -836,9 +717,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Detach geometry from topology.
-    pub fn PK_TOPOL_detach_geom(
-        topol: PK_TOPOL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TOPOL_detach_geom(topol: PK_TOPOL_t) -> PK_ERROR_code_t;
 
     /// Copy topology subset into a new general body.
     pub fn PK_TOPOL_make_general_body(
@@ -958,10 +837,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Create a minimum body (single vertex) from a point.
-    pub fn PK_POINT_make_minimum_body(
-        point: PK_POINT_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_POINT_make_minimum_body(point: PK_POINT_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Create a wire body from a curve (version 2).
     /// [RE-regenerated from V35 TSV prototype]
@@ -1001,16 +877,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Create a solid body from a sphere surface.
-    pub fn PK_SPHERE_make_solid_body(
-        sphere: PK_SPHERE_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SPHERE_make_solid_body(sphere: PK_SPHERE_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     /// Create a solid body from a torus surface.
-    pub fn PK_TORUS_make_solid_body(
-        torus: PK_TORUS_t,
-        body: *mut PK_BODY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TORUS_make_solid_body(torus: PK_TORUS_t, body: *mut PK_BODY_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Body creation from topology
@@ -1116,16 +986,11 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Delete wireframe edges from a body.
-    pub fn PK_EDGE_delete_wireframe(
-        n_edges: c_int,
-        edges: *const PK_EDGE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_delete_wireframe(n_edges: c_int, edges: *const PK_EDGE_t) -> PK_ERROR_code_t;
 
     /// Remove faces from a general body.
-    pub fn PK_FACE_delete_from_gen_body(
-        n_faces: c_int,
-        faces: *const PK_FACE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_delete_from_gen_body(n_faces: c_int, faces: *const PK_FACE_t)
+    -> PK_ERROR_code_t;
 
     /// Remove acorn vertices from a general body.
     pub fn PK_VERTEX_delete_acorn(

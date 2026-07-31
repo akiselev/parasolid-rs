@@ -887,8 +887,8 @@ pub struct PK_BODY_fix_blends_o_t {
     pub n_explicit_cliff_edges: c_int,
     pub explicit_cliff_edges: *const PK_EDGE_t,
     pub explicit_cliff_edges_type: *const PK_blend_ov_exp_cliff_t,
-    pub y_blend_data: *const c_int, // opaque, set null if unused
-    pub setback_data: *const c_int, // opaque, set null if unused
+    pub y_blend_data: *const c_int,       // opaque, set null if unused
+    pub setback_data: *const c_int,       // opaque, set null if unused
     pub setback_shape_data: *const c_int, // opaque, set null if unused
     pub vx_twin: PK_TOPOL_t,
     pub local_check: PK_LOGICAL_t,
@@ -1242,9 +1242,7 @@ unsafe extern "C" {
 
     /// Removes an unfixed blend from an edge.
     /// If blend was set via PK_EDGE_set_blend_chain, removes from ALL edges in chain.
-    pub fn PK_EDGE_remove_blend(
-        edge: PK_EDGE_t,
-    ) -> PK_ERROR_t;
+    pub fn PK_EDGE_remove_blend(edge: PK_EDGE_t) -> PK_ERROR_t;
 
     /// Returns topology created by blend fixing for an edge.
     pub fn PK_EDGE_find_blend_topol(
@@ -1311,9 +1309,8 @@ unsafe extern "C" {
     ) -> PK_ERROR_t;
 
     /// Frees result structure from PK_FACE_make_3_face_blend.
-    pub fn PK_FACE_make_3_face_blend_r_f(
-        results: *mut PK_FACE_make_3_face_blend_r_t,
-    ) -> PK_ERROR_t;
+    pub fn PK_FACE_make_3_face_blend_r_f(results: *mut PK_FACE_make_3_face_blend_r_t)
+    -> PK_ERROR_t;
 
     // -------------------------------------------------------------------------
     // Blend identification and analysis
@@ -1377,15 +1374,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Frees result structure from PK_FACE_identify_blends_2.
-    pub fn PK_FACE_identify_blends_2_r_f(
-        n_blends: c_int,
-        blends: *mut PK_FACE_t,
-    ) -> PK_ERROR_t;
+    pub fn PK_FACE_identify_blends_2_r_f(n_blends: c_int, blends: *mut PK_FACE_t) -> PK_ERROR_t;
 
     /// Frees rib result structure.
-    pub fn PK_blend_rib_r_f(
-        ribs: *mut PK_blend_rib_r_t,
-    ) -> PK_ERROR_t;
+    pub fn PK_blend_rib_r_f(ribs: *mut PK_blend_rib_r_t) -> PK_ERROR_t;
 
     /// Asks blend information from a local ball (LBALL).
     pub fn PK_LBALL_ask_blend(
@@ -1395,9 +1387,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Frees result from PK_LBALL_ask_blend.
-    pub fn PK_LBALL_ask_blend_r_f(
-        result: *mut PK_LBALL_ask_blend_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_LBALL_ask_blend_r_f(result: *mut PK_LBALL_ask_blend_r_t) -> PK_ERROR_code_t;
 
     /// Query the standard form of a blend surface (rolling-ball blend).
     /// Blend surfaces have no create function — they are produced by blending operations.

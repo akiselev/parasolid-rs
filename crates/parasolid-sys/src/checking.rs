@@ -33,8 +33,7 @@ pub const PK_check_returns_latest_c: PK_check_returns_t = 23660;
 pub type PK_check_extra_faults_t = c_int;
 pub const PK_check_extra_faults_0_c: PK_check_extra_faults_t = 24720;
 pub const PK_check_extra_faults_1_c: PK_check_extra_faults_t = 24721;
-pub const PK_check_extra_faults_latest_c: PK_check_extra_faults_t =
-    PK_check_extra_faults_1_c;
+pub const PK_check_extra_faults_latest_c: PK_check_extra_faults_t = PK_check_extra_faults_1_c;
 
 // =============================================================================
 // Attribute checking constants
@@ -603,9 +602,7 @@ unsafe extern "C" {
 // =============================================================================
 
 #[link(name = "pskernel")]
-unsafe extern "C" {
-
-}
+unsafe extern "C" {}
 
 // =============================================================================
 // Extern "C" — Report functions
@@ -614,50 +611,30 @@ unsafe extern "C" {
 #[link(name = "pskernel")]
 unsafe extern "C" {
     /// Find a named report. Use `"SDL/TYREP00"` for the Parasolid report.
-    pub fn PK_REPORT_find(
-        name: *const c_char,
-        report: *mut PK_REPORT_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REPORT_find(name: *const c_char, report: *mut PK_REPORT_t) -> PK_ERROR_code_t;
 
     /// Copy a report from Parasolid memory into PK memory. Free the result
     /// with `PK_REPORT_r_f`.
-    pub fn PK_REPORT_ask(
-        report: PK_REPORT_t,
-        report_r: *mut PK_REPORT_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REPORT_ask(report: PK_REPORT_t, report_r: *mut PK_REPORT_r_t) -> PK_ERROR_code_t;
 
     /// Delete all records in a report and free its memory.
-    pub fn PK_REPORT_clear(
-        report: PK_REPORT_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REPORT_clear(report: PK_REPORT_t) -> PK_ERROR_code_t;
 
     /// Free PK memory used by a `PK_REPORT_r_t` returned from `PK_REPORT_ask`.
     /// Does NOT clear the report itself.
-    pub fn PK_REPORT_r_f(
-        report_r: *mut PK_REPORT_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REPORT_r_f(report_r: *mut PK_REPORT_r_t) -> PK_ERROR_code_t;
 
     /// Query whether a report is currently open (being written to).
-    pub fn PK_REPORT_is_open(
-        report: PK_REPORT_t,
-        is_open: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REPORT_is_open(report: PK_REPORT_t, is_open: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Create a new report entity.
-    pub fn PK_REPORT_create(
-        name: *const c_char,
-        report: *mut PK_REPORT_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REPORT_create(name: *const c_char, report: *mut PK_REPORT_t) -> PK_ERROR_code_t;
 
     /// Delete a report entity.
-    pub fn PK_REPORT_delete(
-        report: PK_REPORT_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REPORT_delete(report: PK_REPORT_t) -> PK_ERROR_code_t;
 
     /// Close an open report.
-    pub fn PK_REPORT_close(
-        report: PK_REPORT_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REPORT_close(report: PK_REPORT_t) -> PK_ERROR_code_t;
 
     /// Add records to a report.
     pub fn PK_REPORT_add_records(
@@ -667,8 +644,5 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Set the function name associated with a report.
-    pub fn PK_REPORT_set_function(
-        report: PK_REPORT_t,
-        function: *const c_char,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_REPORT_set_function(report: PK_REPORT_t, function: *const c_char) -> PK_ERROR_code_t;
 }

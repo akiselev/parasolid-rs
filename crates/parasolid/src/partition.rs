@@ -5,9 +5,9 @@
 
 use parasolid_sys::*;
 
+use crate::Entity;
 use crate::error::PsResult;
 use crate::memory::PkArray;
-use crate::Entity;
 
 // =============================================================================
 // RollbackResult
@@ -78,10 +78,7 @@ impl Pmark {
         let mut n_del: i32 = 0;
         let mut del_p: *mut i32 = std::ptr::null_mut();
         pk_call!(PK_PMARK_goto(
-            self.tag,
-            &mut n_new, &mut new_p,
-            &mut n_mod, &mut mod_p,
-            &mut n_del, &mut del_p,
+            self.tag, &mut n_new, &mut new_p, &mut n_mod, &mut mod_p, &mut n_del, &mut del_p,
         ));
         // Free the kernel-allocated arrays via RAII.
         unsafe {
@@ -105,10 +102,7 @@ impl Pmark {
         let mut n_del: i32 = 0;
         let mut del_p: *mut i32 = std::ptr::null_mut();
         pk_call!(PK_PMARK_goto(
-            self.tag,
-            &mut n_new, &mut new_p,
-            &mut n_mod, &mut mod_p,
-            &mut n_del, &mut del_p,
+            self.tag, &mut n_new, &mut new_p, &mut n_mod, &mut mod_p, &mut n_del, &mut del_p,
         ));
         let new_entities = unsafe { PkArray::from_raw(new_p, n_new) }
             .iter()

@@ -11,11 +11,23 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
-    pub fn new(x: f64, y: f64, z: f64) -> Self { Self { x, y, z } }
-    pub fn zero() -> Self { Self { x: 0.0, y: 0.0, z: 0.0 } }
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z }
+    }
+    pub fn zero() -> Self {
+        Self {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
+    }
 
     pub(crate) fn from_pk(v: PK_VECTOR_t) -> Self {
-        Self { x: v[0], y: v[1], z: v[2] }
+        Self {
+            x: v[0],
+            y: v[1],
+            z: v[2],
+        }
     }
 
     pub(crate) fn to_pk(&self) -> PK_VECTOR_t {
@@ -36,7 +48,11 @@ impl Axis2 {
     /// normal or an axis of revolution) and a `ref_direction` (the local X
     /// reference, which should be perpendicular to `axis`).
     pub fn new(origin: Vec3, axis: Vec3, ref_direction: Vec3) -> Self {
-        Self { origin, axis, ref_direction }
+        Self {
+            origin,
+            axis,
+            ref_direction,
+        }
     }
 
     pub(crate) fn from_pk(sf: PK_AXIS2_sf_t) -> Self {

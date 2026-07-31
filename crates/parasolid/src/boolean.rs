@@ -1,10 +1,10 @@
 //! Boolean operations — unite, subtract, intersect.
 
-use std::os::raw::c_int;
-use parasolid_sys::*;
-use crate::error::PsResult;
 use crate::body::Body;
+use crate::error::PsResult;
 use crate::memory::PkArray;
+use parasolid_sys::*;
+use std::os::raw::c_int;
 
 // =============================================================================
 // BooleanOp
@@ -34,8 +34,13 @@ impl Default for BooleanOptions {
 }
 
 impl BooleanOptions {
-    pub fn new() -> Self { Self::default() }
-    pub fn tracking(mut self, enable: bool) -> Self { self.tracking = enable; self }
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn tracking(mut self, enable: bool) -> Self {
+        self.tracking = enable;
+        self
+    }
 }
 
 // =============================================================================
@@ -47,7 +52,12 @@ impl BooleanOptions {
 /// Uses `PK_BODY_boolean_2` with the version-2 options struct (see
 /// [`PK_BODY_boolean_o_t`]). Tracking data is always requested through the
 /// `tracking` output argument and freed before returning.
-pub fn boolean(target: Body, tools: Vec<Body>, op: BooleanOp, _options: &BooleanOptions) -> PsResult<Vec<Body>> {
+pub fn boolean(
+    target: Body,
+    tools: Vec<Body>,
+    op: BooleanOp,
+    _options: &BooleanOptions,
+) -> PsResult<Vec<Body>> {
     let tool_tags: Vec<PK_BODY_t> = tools.iter().map(|b| b.tag()).collect();
 
     let opts = PK_BODY_boolean_o_t {
@@ -62,14 +72,16 @@ pub fn boolean(target: Body, tools: Vec<Body>, op: BooleanOp, _options: &Boolean
     let mut tracking: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
     let mut results: PK_boolean_r_t = unsafe { std::mem::zeroed() };
 
-    let code = unsafe { PK_BODY_boolean_2(
-        target.tag(),
-        tool_tags.len() as c_int,
-        tool_tags.as_ptr(),
-        &opts,
-        &mut tracking,
-        &mut results,
-    ) };
+    let code = unsafe {
+        PK_BODY_boolean_2(
+            target.tag(),
+            tool_tags.len() as c_int,
+            tool_tags.as_ptr(),
+            &opts,
+            &mut tracking,
+            &mut results,
+        )
+    };
 
     // Always free tracking data, even on error — PK may have partially
     // populated it before returning an error code.

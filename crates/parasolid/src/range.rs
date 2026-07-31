@@ -23,7 +23,11 @@ pub struct Aabb {
 impl Aabb {
     /// The box's extents `(dx, dy, dz)`.
     pub fn size(&self) -> Vec3 {
-        Vec3::new(self.max.x - self.min.x, self.max.y - self.min.y, self.max.z - self.min.z)
+        Vec3::new(
+            self.max.x - self.min.x,
+            self.max.y - self.min.y,
+            self.max.z - self.min.z,
+        )
     }
 
     /// The box centre.
@@ -56,7 +60,12 @@ impl Body {
         let v = point.to_pk();
         let mut enclosure: PK_enclosure_t = 0;
         let mut topol: PK_TOPOL_t = PK_ENTITY_null;
-        pk_call!(PK_BODY_contains_vector(self.tag, &v, &mut enclosure, &mut topol));
+        pk_call!(PK_BODY_contains_vector(
+            self.tag,
+            &v,
+            &mut enclosure,
+            &mut topol
+        ));
         Ok(match enclosure {
             PK_enclosure_inside_c => Enclosure::Inside,
             PK_enclosure_outside_c => Enclosure::Outside,

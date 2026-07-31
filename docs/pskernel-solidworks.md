@@ -800,6 +800,46 @@ self-then-other order confirmed), `is_equal`, and `apply`/`apply_direction`
   transform-invariant B-rep fingerprint. Validated end-to-end incl. an XT
   transmit/receive round-trip that preserves volume + topology.
 
+### PK_EDGE_optimise + PK_BODY_simplify_geom (validated 2026-07-30)
+
+- **`PK_EDGE_optimise_o_t` was silently ABI-wrong** and is now fixed from the
+  authoritative RE catalog (`parasolid-re/catalog/pk-option-structs.tsv`):
+  the real x86-64 layout is `o_t_version:int@0, max_dev:double@8,
+  set_max_dev:PK_EDGE_max_dev_t@16, optimise_short@20` (size 24). The old
+  binding had only `{o_t_version, optimise_short}` (8 bytes) — the kernel
+  would have read 16 bytes past the struct. Token values were also
+  placeholders: real ones are `PK_EDGE_optimise_short_{no,yes}_c =
+  25640/25641`, `PK_EDGE_max_dev_{edge_tol,supplied}_c = 22880/22881`,
+  `PK_EDGE_optimise_{success,failure}_c = 22870/22871` (all from
+  `pk-enums.h`). Compile-time size/offset asserts added. `o_t_version = 1`
+  accepted by V37.01.243 under argument checking [probed].
+- **`Edge::optimise`** validated end-to-end (block edge made tolerant at
+  1e-4/5e-4, then optimised): both `set_max_dev` arms drive the kernel
+  correctly. Probed semantics: on an **exact** edge the call succeeds with
+  `(success, achieved 0.0)` (no argument error); on tolerant edges over a
+  30-part corpus + the synthetic block, `achieved_deviation` and the new
+  tolerance bottom out at exactly **5.25e-7** (kernel floor, presumably
+  1.05 × 5e-7 safety) whenever the true SP-curve deviation is below it —
+  EDGE_optimise never returned an edge to exact (that is reset_precision's
+  job).
+- **`PK_BODY_simplify_geom` has NO option struct** (validated: V35 header doc
+  + RE catalog; signature `(body, local:PK_LOGICAL_t, *n_geoms, **geoms)`).
+  A vestigial `PK_BODY_simplify_geom_o_t` was removed from `editing.rs`;
+  `PK_FACE_simplify_geom_o_t` gained its missing `want_geoms:PK_LOGICAL_t@4`
+  (size 8) from the catalog.
+- **`Body::simplify_geom`** validated: a degree-2 **rational** B-curve wire
+  edge that is exactly a quarter circle (new `Curve::bcurve_rational`,
+  homogeneous `(xw,yw,zw,w)` vertices) simplifies to an analytic `Circle`
+  with the exact radius. Corpus behavior (30 seeded xt-parser-validation
+  parts): replaced one B-surface per body in 20/30 (17 → analytic
+  Plane/Cyl/Cone/Sphere/Torus, 3 → simpler B-surface); `local=true` and
+  `local=false` gave identical results on this sample. **Side effect worth
+  knowing:** after surface replacement the kernel recomputed the geometry of
+  53.6% (60/112) of null-curve tolerant edges into exact Line/Circle/Icurve
+  edges at 5e-9 precision — tolerant-edge repair came from simplify_geom,
+  never from EDGE_optimise. Previously-exact conic edges were never
+  disturbed (56/56 preserved).
+
 ### Deferred (bindings kept, signature-audited, runtime-blocked)
 
 - `Entity::clashes_with` (`PK_TOPOL_clash`) → mild **9999** even with NULL

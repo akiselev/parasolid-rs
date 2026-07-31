@@ -118,20 +118,20 @@ pub type PK_receive_compound_t = c_int;
 #[repr(C)]
 #[derive(Debug, Clone)]
 pub struct PK_PART_transmit_o_t {
-    pub o_t_version: c_int,                       // @0
+    pub o_t_version: c_int, // @0
     /// Transmit format (text / binary / neutral / …).
-    pub transmit_format: PK_transmit_format_t,    // @4
+    pub transmit_format: PK_transmit_format_t, // @4
     /// Whether to transmit user fields.
-    pub transmit_user_fields: PK_LOGICAL_t,       // @8
+    pub transmit_user_fields: PK_LOGICAL_t, // @8
     /// Schema version to write (0 = current, with embedded schema).
-    pub transmit_version: c_int,                  // @12
+    pub transmit_version: c_int, // @12
     /// Whether to transmit nominal geometry.
-    pub transmit_nmnl_geometry: PK_LOGICAL_t,     // @16
+    pub transmit_nmnl_geometry: PK_LOGICAL_t, // @16
     // @20: 4 bytes padding (pointer is 8-aligned)
     /// Opaque context pointer for indexed IO.
-    pub transmit_indexed_context: *mut c_void,    // @24
+    pub transmit_indexed_context: *mut c_void, // @24
     /// How to handle mesh data.
-    pub transmit_meshes: PK_transmit_meshes_t,    // @32
+    pub transmit_meshes: PK_transmit_meshes_t, // @32
 }
 
 impl Default for PK_PART_transmit_o_t {
@@ -157,34 +157,34 @@ impl Default for PK_PART_transmit_o_t {
 #[repr(C)]
 #[derive(Debug, Clone)]
 pub struct PK_PART_receive_o_t {
-    pub o_t_version: c_int,                        // @0
+    pub o_t_version: c_int, // @0
     /// Expected transmit format (0 = auto-detect).
-    pub transmit_format: PK_transmit_format_t,     // @4
+    pub transmit_format: PK_transmit_format_t, // @4
     /// Whether to receive user fields.
-    pub receive_user_fields: PK_LOGICAL_t,         // @8
+    pub receive_user_fields: PK_LOGICAL_t, // @8
     /// What to do on attribute-definition mismatch.
-    pub attdef_mismatch: PK_ATTDEF_mismatch_t,     // @12
+    pub attdef_mismatch: PK_ATTDEF_mismatch_t, // @12
     /// Part index (for indexed multi-part files).
-    pub part_index: c_int,                         // @16
+    pub part_index: c_int, // @16
     /// Number of part indices to receive.
-    pub n_part_indices: c_int,                     // @20
+    pub n_part_indices: c_int, // @20
     /// Array of part indices.
-    pub part_indices: *const c_int,                // @24
+    pub part_indices: *const c_int, // @24
     /// Number of identifiers to receive.
-    pub n_identifiers: c_int,                      // @32
+    pub n_identifiers: c_int, // @32
     // @36: 4 bytes padding
     /// Array of identifier values.
-    pub identifiers: *const c_int,                 // @40
+    pub identifiers: *const c_int, // @40
     /// Opaque context pointer for indexed IO.
-    pub receive_indexed_context: *mut c_void,      // @48
+    pub receive_indexed_context: *mut c_void, // @48
     /// If true, treat key as a partition name.
-    pub key_is_partition: PK_LOGICAL_t,            // @56
+    pub key_is_partition: PK_LOGICAL_t, // @56
     /// Compound-part receive mode.
-    pub receive_compound: PK_receive_compound_t,   // @60
+    pub receive_compound: PK_receive_compound_t, // @60
     /// Whether to use seek for mesh loading.
     pub receive_using_seek: PK_receive_using_seek_t, // @64
     /// Mixed (facet + b-rep) receive mode.
-    pub receive_mixed: PK_receive_mixed_t,         // @68
+    pub receive_mixed: PK_receive_mixed_t, // @68
 }
 
 impl Default for PK_PART_receive_o_t {
@@ -220,27 +220,27 @@ impl Default for PK_PART_receive_o_t {
 #[derive(Debug, Clone)]
 pub struct PK_PARTITION_transmit_o_t {
     /// Version tag for this options struct.
-    pub o_t_version: c_int,                          // @0
+    pub o_t_version: c_int, // @0
     /// Transmit format (text / binary / neutral / …).
-    pub transmit_format: PK_transmit_format_t,       // @4
+    pub transmit_format: PK_transmit_format_t, // @4
     /// Whether to transmit user fields.
-    pub transmit_user_fields: PK_LOGICAL_t,          // @8
+    pub transmit_user_fields: PK_LOGICAL_t, // @8
     /// How to handle delta transmit.
-    pub transmit_deltas: PK_PARTITION_xmt_deltas_t,  // @12
+    pub transmit_deltas: PK_PARTITION_xmt_deltas_t, // @12
     /// Schema version to write.
-    pub transmit_version: c_int,                     // @16
+    pub transmit_version: c_int, // @16
     /// Transmit all attdefs or only used ones.
-    pub transmit_all_attdefs: PK_LOGICAL_t,          // @20
+    pub transmit_all_attdefs: PK_LOGICAL_t, // @20
     /// Array of pmarks to transmit (delta transmit). Pointer precedes its count
     /// in the ABI, per the journal.
-    pub pmarks: *const PK_PMARK_t,                   // @24
+    pub pmarks: *const PK_PMARK_t, // @24
     /// Number of pmarks in `pmarks`.
-    pub n_pmarks: c_int,                             // @32
+    pub n_pmarks: c_int, // @32
     // @36: 4 bytes padding (pointer is 8-aligned)
     /// Opaque context pointer for indexed IO.
-    pub transmit_indexed_context: *mut c_void,       // @40
+    pub transmit_indexed_context: *mut c_void, // @40
     /// How to handle mesh data.
-    pub transmit_meshes: PK_transmit_meshes_t,       // @48
+    pub transmit_meshes: PK_transmit_meshes_t, // @48
 }
 
 impl Default for PK_PARTITION_transmit_o_t {
@@ -276,38 +276,38 @@ impl Default for PK_PARTITION_transmit_o_t {
 #[derive(Debug, Clone)]
 pub struct PK_PARTITION_receive_o_t {
     /// Version tag for this options struct.
-    pub o_t_version: c_int,                          // @0
+    pub o_t_version: c_int, // @0
     /// Expected transmit format (0 = auto-detect).
-    pub transmit_format: PK_transmit_format_t,       // @4
+    pub transmit_format: PK_transmit_format_t, // @4
     /// Whether to receive user fields.
-    pub receive_user_fields: PK_LOGICAL_t,           // @8
+    pub receive_user_fields: PK_LOGICAL_t, // @8
     /// How to handle delta receive.
-    pub receive_deltas: PK_PARTITION_rcv_deltas_t,   // @12
+    pub receive_deltas: PK_PARTITION_rcv_deltas_t, // @12
     /// Receive deltas written by a previous version.
-    pub receive_prev_version_deltas: PK_LOGICAL_t,   // @16
+    pub receive_prev_version_deltas: PK_LOGICAL_t, // @16
     // @20: 4 bytes padding (pointer is 8-aligned)
     /// Callback for attribute-definition naming (`PK_ATTDEF_name_cb_f_t`).
-    pub attdef_callback: *mut c_void,                // @24
+    pub attdef_callback: *mut c_void, // @24
     /// Opaque context for the attdef callback.
-    pub attdef_context: *mut c_void,                 // @32
+    pub attdef_context: *mut c_void, // @32
     /// Whether the attdef callback is active.
-    pub attdef_callback_on: PK_LOGICAL_t,            // @40
+    pub attdef_callback_on: PK_LOGICAL_t, // @40
     // @44: 4 bytes padding
     /// Opaque delta-block pointer.
-    pub deltas_block: *mut c_void,                   // @48
+    pub deltas_block: *mut c_void, // @48
     /// Whether to receive all attribute definitions (single byte in the ABI).
-    pub receive_all_attdefs: u8,                     // @56
+    pub receive_all_attdefs: u8, // @56
     /// Allow missing deltas without error (single byte in the ABI).
-    pub allow_missing_deltas: u8,                    // @57
+    pub allow_missing_deltas: u8, // @57
     // @58: 2 bytes padding (next c_int is 4-aligned at @60)
     /// Compound-part receive mode.
-    pub receive_compound: PK_receive_compound_t,     // @60
+    pub receive_compound: PK_receive_compound_t, // @60
     /// Whether to use seek-based mesh loading.
     pub receive_using_seek: PK_receive_using_seek_t, // @64
     /// Mixed (facet + b-rep) receive mode.
-    pub receive_mixed: PK_receive_mixed_t,           // @68
+    pub receive_mixed: PK_receive_mixed_t, // @68
     /// Receive locked mode.
-    pub receive_locked: c_int,                       // @72
+    pub receive_locked: c_int, // @72
 }
 
 impl Default for PK_PARTITION_receive_o_t {

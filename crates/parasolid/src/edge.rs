@@ -1,15 +1,15 @@
 //! Edge type — a bounded segment of a curve.
 
-use std::os::raw::c_int;
-use parasolid_sys::*;
-use crate::error::PsResult;
-use crate::memory::PkArray;
-use crate::entity::Entity;
 use crate::body::Body;
-use crate::face::Face;
-use crate::vertex::Vertex;
 use crate::curve::Curve;
+use crate::entity::Entity;
+use crate::error::PsResult;
+use crate::face::Face;
 use crate::geom::Vec3;
+use crate::memory::PkArray;
+use crate::vertex::Vertex;
+use parasolid_sys::*;
+use std::os::raw::c_int;
 
 /// The type of an edge as reported by `PK_EDGE_ask_type` — the edge's
 /// vertex-topology (open/closed/ring). The manifold family
@@ -56,9 +56,15 @@ pub struct Edge {
 }
 
 impl Edge {
-    pub(crate) fn from_tag(tag: PK_EDGE_t) -> Self { Self { tag } }
-    pub fn tag(&self) -> i32 { self.tag }
-    pub fn entity(&self) -> Entity { Entity::from_tag(self.tag) }
+    pub(crate) fn from_tag(tag: PK_EDGE_t) -> Self {
+        Self { tag }
+    }
+    pub fn tag(&self) -> i32 {
+        self.tag
+    }
+    pub fn entity(&self) -> Entity {
+        Entity::from_tag(self.tag)
+    }
 
     /// Return the body that owns this edge.
     pub fn body(&self) -> PsResult<Body> {
@@ -120,7 +126,10 @@ impl Edge {
         let mut curve: PK_CURVE_t = PK_ENTITY_null;
         let mut class: PK_CLASS_t = 0;
         let mut ends = [PK_VECTOR_t::default(); 2];
-        let mut t_range = PK_INTERVAL_t { low: 0.0, high: 0.0 };
+        let mut t_range = PK_INTERVAL_t {
+            low: 0.0,
+            high: 0.0,
+        };
         let mut sense: PK_LOGICAL_t = PK_LOGICAL_false;
         pk_call!(PK_EDGE_ask_geometry(
             self.tag,
@@ -185,7 +194,10 @@ impl Edge {
         let mut ptr = std::ptr::null_mut();
         pk_call!(PK_EDGE_ask_shells(self.tag, &mut n, &mut ptr));
         let array = unsafe { PkArray::from_raw(ptr, n) };
-        Ok(array.iter().map(|&tag| crate::Shell::from_tag(tag)).collect())
+        Ok(array
+            .iter()
+            .map(|&tag| crate::Shell::from_tag(tag))
+            .collect())
     }
 
     /// The next edge in the owning body's edge list, or `None` at the end.
@@ -201,7 +213,12 @@ impl Edge {
     pub fn is_planar(&self) -> PsResult<(bool, Option<Vec3>)> {
         let mut is_planar: PK_LOGICAL_t = PK_LOGICAL_false;
         let mut plane: PK_PLANE_t = PK_ENTITY_null;
-        pk_call!(PK_EDGE_is_planar(self.tag, PK_LOGICAL_true, &mut is_planar, &mut plane));
+        pk_call!(PK_EDGE_is_planar(
+            self.tag,
+            PK_LOGICAL_true,
+            &mut is_planar,
+            &mut plane
+        ));
         let planar = is_planar == PK_LOGICAL_true;
         if planar && plane != PK_ENTITY_null {
             let mut sf = unsafe { std::mem::zeroed::<PK_PLANE_sf_t>() };
@@ -253,10 +270,16 @@ impl Edge {
     /// vertices, within `tolerance`. If `same_convexity`, the chain is further
     /// restricted to edges of matching convexity (feature-edge grouping).
     pub fn g1_edges(&self, tolerance: f64, same_convexity: bool) -> PsResult<Vec<Edge>> {
-        let conv = if same_convexity { PK_LOGICAL_true } else { PK_LOGICAL_false };
+        let conv = if same_convexity {
+            PK_LOGICAL_true
+        } else {
+            PK_LOGICAL_false
+        };
         let mut n: c_int = 0;
         let mut ptr = std::ptr::null_mut();
-        pk_call!(PK_EDGE_find_g1_edges(self.tag, tolerance, conv, &mut n, &mut ptr));
+        pk_call!(PK_EDGE_find_g1_edges(
+            self.tag, tolerance, conv, &mut n, &mut ptr
+        ));
         let array = unsafe { PkArray::from_raw(ptr, n) };
         Ok(array.iter().map(|&t| Edge::from_tag(t)).collect())
     }
@@ -270,7 +293,9 @@ impl Edge {
         let d3 = dirs[2].to_pk();
         let mut ex = PK_VECTOR_t::default();
         let mut topol: PK_TOPOL_t = PK_ENTITY_null;
-        pk_call!(PK_EDGE_find_extreme(self.tag, &d1, &d2, &d3, &mut ex, &mut topol));
+        pk_call!(PK_EDGE_find_extreme(
+            self.tag, &d1, &d2, &d3, &mut ex, &mut topol
+        ));
         Ok((Vec3::from_pk(ex), Entity::from_tag(topol)))
     }
 
@@ -278,7 +303,10 @@ impl Edge {
     /// `PK_EDGE_find_interval` call — an independent cross-check of
     /// [`interval`](Self::interval) (which derives it from `ask_geometry`).
     pub fn find_interval(&self) -> PsResult<(f64, f64)> {
-        let mut iv = PK_INTERVAL_t { low: 0.0, high: 0.0 };
+        let mut iv = PK_INTERVAL_t {
+            low: 0.0,
+            high: 0.0,
+        };
         pk_call!(PK_EDGE_find_interval(self.tag, &mut iv));
         Ok((iv.low, iv.high))
     }
@@ -302,6 +330,47 @@ impl Edge {
         Ok(result)
     }
 
+    /// Optimise the tolerance of this **tolerant** edge (`PK_EDGE_optimise`):
+    /// try to reset the edge tolerance to a value between the maximum measured
+    /// deviation of its curves (all fin SP-curves and any nominal geometry)
+    /// and an upper bound.
+    ///
+    /// `upper_bound` — `None` uses the edge's current tolerance as the upper
+    /// bound (the PK default); `Some(d)` supplies `d` as the upper bound.
+    /// `optimise_short` — whether to also optimise short edges (edges lying
+    /// entirely within a vertex bubble); PK default is no.
+    ///
+    /// Returns `(modified, achieved_deviation)`: `modified` is `true` on
+    /// `PK_EDGE_optimise_success_c` (the tolerance was changed) and `false` on
+    /// `PK_EDGE_optimise_failure_c`; `achieved_deviation` (the maximum
+    /// measured deviation) is returned in both cases. An unrecognised result
+    /// token is reported as an error rather than mapped onto either outcome.
+    pub fn optimise(&self, upper_bound: Option<f64>, optimise_short: bool) -> PsResult<(bool, f64)> {
+        let mut opts = PK_EDGE_optimise_o_t::default();
+        if let Some(d) = upper_bound {
+            opts.set_max_dev = PK_EDGE_max_dev_supplied_c;
+            opts.max_dev = d;
+        }
+        if optimise_short {
+            opts.optimise_short = PK_EDGE_optimise_short_yes_c;
+        }
+        let mut result: PK_EDGE_optimise_result_t = 0;
+        let mut achieved = 0.0f64;
+        pk_call!(PK_EDGE_optimise(
+            self.tag,
+            &mut opts,
+            &mut result,
+            &mut achieved,
+        ));
+        match result {
+            r if r == PK_EDGE_optimise_success_c => Ok((true, achieved)),
+            r if r == PK_EDGE_optimise_failure_c => Ok((false, achieved)),
+            other => Err(crate::error::PsError::Session(format!(
+                "PK_EDGE_optimise returned unknown result token {other}"
+            ))),
+        }
+    }
+
     /// Wrap free edges as a standalone wire body for isolated interrogation.
     /// Tracking output is freed immediately.
     pub fn make_wire_body(edges: &[Edge]) -> PsResult<Body> {
@@ -316,7 +385,9 @@ impl Edge {
             &mut body,
             &mut tracking,
         ));
-        unsafe { let _ = PK_TOPOL_track_r_f(&mut tracking); }
+        unsafe {
+            let _ = PK_TOPOL_track_r_f(&mut tracking);
+        }
         Ok(Body::from_tag(body))
     }
 }

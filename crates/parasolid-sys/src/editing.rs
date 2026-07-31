@@ -42,7 +42,6 @@ pub const PK_local_ops_update_v270_c: PK_local_ops_update_t = 25592;
 pub const PK_local_ops_update_v271_c: PK_local_ops_update_t = 25593;
 pub const PK_local_ops_update_v280_c: PK_local_ops_update_t = 25594;
 
-
 /// Report status: face-face repair performed.
 pub const PK_REPORT_1_fa_fa_repair_c: c_int = 23907;
 /// Report status: deform surface partially created.
@@ -247,19 +246,32 @@ pub struct PK_FACE_delete_blends_o_t {
 // Simplify geometry (Ch. 62)
 // =============================================================================
 
-/// Options for `PK_BODY_simplify_geom`.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_BODY_simplify_geom_o_t {
-    pub o_t_version: c_int,
-}
+// NOTE: `PK_BODY_simplify_geom` takes NO option structure — its signature is
+// `(PK_BODY_t body, PK_LOGICAL_t local, int *n_geoms, PK_GEOM_t **geoms)`
+// [validated: docs/v35-headers/pk_body_simplify_geom.html AND
+// parasolid-re/catalog/pk-signatures.tsv (empty option-struct column)]. A
+// vestigial `PK_BODY_simplify_geom_o_t {o_t_version}` struct previously
+// declared here modeled a type that does not exist in the vendor API and was
+// referenced by nothing; it has been removed.
 
 /// Options for `PK_FACE_simplify_geom`.
+///
+/// Layout [validated] against `parasolid-re/catalog/pk-option-structs.tsv`:
+/// `o_t_version:int@0, want_geoms:PK_LOGICAL_t@4`, size 8. The previous stub
+/// omitted `want_geoms` (4-byte struct).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_FACE_simplify_geom_o_t {
+    /// Version of the options structure.
     pub o_t_version: c_int,
+    /// Whether to return the new geometry entities.
+    pub want_geoms: PK_LOGICAL_t,
 }
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_FACE_simplify_geom_o_t>() == 8);
+    assert!(core::mem::offset_of!(PK_FACE_simplify_geom_o_t, want_geoms) == 4);
+};
 
 // =============================================================================
 // PK_BODY_find_facesets options and results (Ch. 62)
@@ -537,15 +549,15 @@ pub struct PK_replace_vertex_data_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_FACE_replace_surfs_o_t {
-    pub o_t_version: c_int,                     // @0x00
-    pub check_fa_fa: PK_check_fa_fa_t,          // @0x04
-    pub edge_data: PK_replace_edge_data_t,      // @0x08 (40 bytes)
-    pub vertex_data: PK_replace_vertex_data_t,  // @0x30 (32 bytes)
-    pub edge_help: PK_replace_help_points_t,    // @0x50 (24 bytes)
-    pub vertex_help: PK_replace_help_points_t,  // @0x68 (24 bytes)
-    pub merge: PK_replace_merge_t,              // @0x80
-    pub adjust: PK_LOGICAL_t,                   // @0x84
-    pub update: PK_local_ops_update_t,          // @0x88 (pad @0x8c)
+    pub o_t_version: c_int,                          // @0x00
+    pub check_fa_fa: PK_check_fa_fa_t,               // @0x04
+    pub edge_data: PK_replace_edge_data_t,           // @0x08 (40 bytes)
+    pub vertex_data: PK_replace_vertex_data_t,       // @0x30 (32 bytes)
+    pub edge_help: PK_replace_help_points_t,         // @0x50 (24 bytes)
+    pub vertex_help: PK_replace_help_points_t,       // @0x68 (24 bytes)
+    pub merge: PK_replace_merge_t,                   // @0x80
+    pub adjust: PK_LOGICAL_t,                        // @0x84
+    pub update: PK_local_ops_update_t,               // @0x88 (pad @0x8c)
     pub variation_data: PK_replace_variation_data_t, // @0x90 (16 bytes)
 }
 
@@ -1308,25 +1320,31 @@ pub const PK_ERROR_failed_to_change: PK_ERROR_code_t = 603;
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_BODY_create_implicit_o_t {
-    pub o_t_version: c_int,       // @0x00
-    pub implicit_surf: [u64; 2],  // @0x08 (16-byte SURF_implicit descriptor)
-    pub tolerance: c_double,      // @0x18
-    pub front_offset: c_double,   // @0x20
-    pub back_offset: c_double,    // @0x28
-    pub offset_method: c_int,     // @0x30 (0x6acc/0x6acd)
+    pub o_t_version: c_int,      // @0x00
+    pub implicit_surf: [u64; 2], // @0x08 (16-byte SURF_implicit descriptor)
+    pub tolerance: c_double,     // @0x18
+    pub front_offset: c_double,  // @0x20
+    pub back_offset: c_double,   // @0x28
+    pub offset_method: c_int,    // @0x30 (0x6acc/0x6acd)
 }
 
 /// Results from `PK_BODY_create_implicit`.
 #[repr(C)]
-pub struct PK_BODY_create_implicit_r_t { _private: [u8; 0] }
+pub struct PK_BODY_create_implicit_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_BODY_is_cellular`.
 #[repr(C)]
-pub struct PK_BODY_is_cellular_o_t { _private: [u8; 0] }
+pub struct PK_BODY_is_cellular_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_BODY_is_cellular`.
 #[repr(C)]
-pub struct PK_BODY_is_cellular_r_t { _private: [u8; 0] }
+pub struct PK_BODY_is_cellular_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_BODY_is_disjoint`.
 ///
@@ -1341,15 +1359,21 @@ pub struct PK_BODY_is_disjoint_o_t {
 
 /// Results from `PK_BODY_is_disjoint`.
 #[repr(C)]
-pub struct PK_BODY_is_disjoint_r_t { _private: [u8; 0] }
+pub struct PK_BODY_is_disjoint_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_BODY_enlarge`.
 #[repr(C)]
-pub struct PK_BODY_enlarge_o_t { _private: [u8; 0] }
+pub struct PK_BODY_enlarge_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_BODY_enlarge`.
 #[repr(C)]
-pub struct PK_BODY_enlarge_r_t { _private: [u8; 0] }
+pub struct PK_BODY_enlarge_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_BODY_slice`.
 ///
@@ -1374,7 +1398,9 @@ pub struct PK_BODY_slice_o_t {
 
 /// Results from `PK_BODY_slice`.
 #[repr(C)]
-pub struct PK_BODY_slice_r_t { _private: [u8; 0] }
+pub struct PK_BODY_slice_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_BODY_make_patterned`.
 ///
@@ -1398,31 +1424,45 @@ pub struct PK_BODY_make_patterned_o_t {
 
 /// Results from `PK_BODY_make_patterned`.
 #[repr(C)]
-pub struct PK_BODY_make_patterned_r_t { _private: [u8; 0] }
+pub struct PK_BODY_make_patterned_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_FACE_make_valid_faces`.
 #[repr(C)]
-pub struct PK_FACE_make_valid_faces_o_t { _private: [u8; 0] }
+pub struct PK_FACE_make_valid_faces_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_FACE_make_valid_faces`.
 #[repr(C)]
-pub struct PK_FACE_make_valid_faces_r_t { _private: [u8; 0] }
+pub struct PK_FACE_make_valid_faces_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_FACE_repair`.
 #[repr(C)]
-pub struct PK_FACE_repair_o_t { _private: [u8; 0] }
+pub struct PK_FACE_repair_o_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_FACE_fix_mesh_defects`.
 #[repr(C)]
-pub struct PK_FACE_fix_mesh_defects_o_t { _private: [u8; 0] }
+pub struct PK_FACE_fix_mesh_defects_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_FACE_fix_mesh_defects`.
 #[repr(C)]
-pub struct PK_FACE_fix_mesh_defects_r_t { _private: [u8; 0] }
+pub struct PK_FACE_fix_mesh_defects_r_t {
+    _private: [u8; 0],
+}
 
 /// Tracking results for entity operations.
 #[repr(C)]
-pub struct PK_ENTITY_track_r_t { _private: [u8; 0] }
+pub struct PK_ENTITY_track_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_REGION_embed_body`.
 ///
@@ -1440,11 +1480,15 @@ pub struct PK_REGION_embed_body_o_t {
 
 /// Results from `PK_REGION_embed_body`.
 #[repr(C)]
-pub struct PK_REGION_embed_body_r_t { _private: [u8; 0] }
+pub struct PK_REGION_embed_body_r_t {
+    _private: [u8; 0],
+}
 
 /// Local operation results.
 #[repr(C)]
-pub struct PK_TOPOL_local_r_t { _private: [u8; 0] }
+pub struct PK_TOPOL_local_r_t {
+    _private: [u8; 0],
+}
 
 // =============================================================================
 // Extern function declarations
@@ -1477,9 +1521,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Remove faces from a sheet body (alternate entry point).
-    pub fn PK_FACE_delete_from_sheet_body(
-        face: PK_FACE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_delete_from_sheet_body(face: PK_FACE_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Edge deletion (Ch. 61)
@@ -1518,9 +1560,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free results from PK_BODY_find_facesets.
-    pub fn PK_BODY_find_facesets_r_f(
-        results: *mut PK_BODY_find_facesets_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BODY_find_facesets_r_f(results: *mut PK_BODY_find_facesets_r_t) -> PK_ERROR_code_t;
 
     /// Identify specific types of details (holes, rubber faces) in a body.
     pub fn PK_BODY_identify_details(
@@ -2038,7 +2078,9 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Free results from `PK_BODY_create_implicit`.
-    pub fn PK_BODY_create_implicit_r_f(results: *mut PK_BODY_create_implicit_r_t) -> PK_ERROR_code_t;
+    pub fn PK_BODY_create_implicit_r_f(
+        results: *mut PK_BODY_create_implicit_r_t,
+    ) -> PK_ERROR_code_t;
 
     /// Free results from `PK_BODY_is_cellular`.
     pub fn PK_BODY_is_cellular_r_f(results: *mut PK_BODY_is_cellular_r_t) -> PK_ERROR_code_t;
@@ -2056,10 +2098,14 @@ unsafe extern "C" {
     pub fn PK_BODY_make_patterned_r_f(results: *mut PK_BODY_make_patterned_r_t) -> PK_ERROR_code_t;
 
     /// Free results from `PK_FACE_make_valid_faces`.
-    pub fn PK_FACE_make_valid_faces_r_f(results: *mut PK_FACE_make_valid_faces_r_t) -> PK_ERROR_code_t;
+    pub fn PK_FACE_make_valid_faces_r_f(
+        results: *mut PK_FACE_make_valid_faces_r_t,
+    ) -> PK_ERROR_code_t;
 
     /// Free results from `PK_FACE_fix_mesh_defects`.
-    pub fn PK_FACE_fix_mesh_defects_r_f(results: *mut PK_FACE_fix_mesh_defects_r_t) -> PK_ERROR_code_t;
+    pub fn PK_FACE_fix_mesh_defects_r_f(
+        results: *mut PK_FACE_fix_mesh_defects_r_t,
+    ) -> PK_ERROR_code_t;
 
     /// Free entity tracking results.
     pub fn PK_ENTITY_copy_r_f(results: *mut PK_ENTITY_track_r_t) -> PK_ERROR_code_t;

@@ -14,7 +14,6 @@ use crate::*;
 
 // -- Body type ----------------------------------------------------------------
 
-
 // -- Fin type -----------------------------------------------------------------
 
 pub type PK_FIN_type_t = c_int;
@@ -224,12 +223,12 @@ pub struct PK_FSURF_sf_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_find_nabox_o_t {
-    pub o_t_version: c_int,             // @0
-    pub have_axis1: PK_LOGICAL_t,       // @4
-    pub axis1: crate::PK_AXIS1_sf_t,    // @8  (48B)
-    pub have_axis2: PK_LOGICAL_t,       // @56
-    pub axis2: crate::PK_AXIS2_sf_t,    // @64 (72B)
-    pub quality: PK_NABOX_quality_t,    // @136
+    pub o_t_version: c_int,          // @0
+    pub have_axis1: PK_LOGICAL_t,    // @4
+    pub axis1: crate::PK_AXIS1_sf_t, // @8  (48B)
+    pub have_axis2: PK_LOGICAL_t,    // @56
+    pub axis2: crate::PK_AXIS2_sf_t, // @64 (72B)
+    pub quality: PK_NABOX_quality_t, // @136
 } // 144 bytes
 
 impl Default for PK_TOPOL_find_nabox_o_t {
@@ -241,7 +240,10 @@ impl Default for PK_TOPOL_find_nabox_o_t {
         Self {
             o_t_version: 2,
             have_axis1: PK_LOGICAL_false,
-            axis1: crate::PK_AXIS1_sf_t { location: [0.0; 3], axis: [0.0, 0.0, 1.0] },
+            axis1: crate::PK_AXIS1_sf_t {
+                location: [0.0; 3],
+                axis: [0.0, 0.0, 1.0],
+            },
             have_axis2: PK_LOGICAL_false,
             axis2: crate::PK_AXIS2_sf_t {
                 location: [0.0; 3],
@@ -491,43 +493,63 @@ pub struct PK_BODY_topology_t {
 
 /// Options for `PK_TOPOL_find_box_2`.
 #[repr(C)]
-pub struct PK_TOPOL_find_box_2_o_t { _private: [u8; 0] }
+pub struct PK_TOPOL_find_box_2_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_TOPOL_find_box_2`.
 #[repr(C)]
-pub struct PK_TOPOL_find_box_2_r_t { _private: [u8; 0] }
+pub struct PK_TOPOL_find_box_2_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_TOPOL_find_connected`.
 #[repr(C)]
-pub struct PK_TOPOL_find_connected_o_t { _private: [u8; 0] }
+pub struct PK_TOPOL_find_connected_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_TOPOL_find_connected`.
 #[repr(C)]
-pub struct PK_TOPOL_find_connected_r_t { _private: [u8; 0] }
+pub struct PK_TOPOL_find_connected_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_TOPOL_is_connected`.
 #[repr(C)]
-pub struct PK_TOPOL_is_connected_o_t { _private: [u8; 0] }
+pub struct PK_TOPOL_is_connected_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_TOPOL_is_connected`.
 #[repr(C)]
-pub struct PK_TOPOL_is_connected_r_t { _private: [u8; 0] }
+pub struct PK_TOPOL_is_connected_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_TOPOL_make_new`.
 #[repr(C)]
-pub struct PK_TOPOL_make_new_o_t { _private: [u8; 0] }
+pub struct PK_TOPOL_make_new_o_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_ENTITY_copy_2`.
 #[repr(C)]
-pub struct PK_ENTITY_copy_o_t { _private: [u8; 0] }
+pub struct PK_ENTITY_copy_o_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_BODY_ask_topology`.
 #[repr(C)]
-pub struct PK_BODY_ask_topology_o_t { _private: [u8; 0] }
+pub struct PK_BODY_ask_topology_o_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_ENTITY_ask_description`.
 #[repr(C)]
-pub struct PK_ENTITY_ask_description_o_t { _private: [u8; 0] }
+pub struct PK_ENTITY_ask_description_o_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_ENTITY_range`.
 ///
@@ -538,28 +560,30 @@ pub struct PK_ENTITY_ask_description_o_t { _private: [u8; 0] }
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_ENTITY_range_o_t {
-    pub o_t_version: c_int,                             // @0
-    pub bound: PK_range_bound_t,                        // @8   (32 bytes)
-    pub range_type: PK_range_type_t,                    // @40
-    pub param_entity: PK_range_param_entity_t,          // @44
-    pub n_guesses_1: c_int,                             // @48
-    pub guesses_1: *const PK_range_guess_s_t,           // @56  (elem stride 0x30)
-    pub n_guesses_2: c_int,                             // @64
-    pub guesses_2: *const PK_range_guess_s_t,           // @72
-    pub n_param_bounds_1: c_int,                        // @80
-    pub param_bounds_1: *const PK_range_param_bound_t,  // @88  (elem stride 0x28)
-    pub n_param_bounds_2: c_int,                        // @96
-    pub param_bounds_2: *const PK_range_param_bound_t,  // @104
-    pub n_entities_with_scales: c_int,                  // @112
-    pub entities_with_scales: *const PK_ENTITY_t,       // @120 (elem stride 4)
+    pub o_t_version: c_int,                            // @0
+    pub bound: PK_range_bound_t,                       // @8   (32 bytes)
+    pub range_type: PK_range_type_t,                   // @40
+    pub param_entity: PK_range_param_entity_t,         // @44
+    pub n_guesses_1: c_int,                            // @48
+    pub guesses_1: *const PK_range_guess_s_t,          // @56  (elem stride 0x30)
+    pub n_guesses_2: c_int,                            // @64
+    pub guesses_2: *const PK_range_guess_s_t,          // @72
+    pub n_param_bounds_1: c_int,                       // @80
+    pub param_bounds_1: *const PK_range_param_bound_t, // @88  (elem stride 0x28)
+    pub n_param_bounds_2: c_int,                       // @96
+    pub param_bounds_2: *const PK_range_param_bound_t, // @104
+    pub n_entities_with_scales: c_int,                 // @112
+    pub entities_with_scales: *const PK_ENTITY_t,      // @120 (elem stride 4)
     /// One scale per entity in `entities_with_scales` (shares that count).
-    pub scale_factors: *const c_int,                    // @128 (elem stride 4)
-    pub output_scale: c_int,                            // @136
+    pub scale_factors: *const c_int, // @128 (elem stride 4)
+    pub output_scale: c_int,                           // @136
 } // 144 bytes
 
 /// Results from `PK_ENTITY_range`.
 #[repr(C)]
-pub struct PK_ENTITY_range_r_t { _private: [u8; 0] }
+pub struct PK_ENTITY_range_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_ENTITY_range_vector`.
 ///
@@ -569,29 +593,35 @@ pub struct PK_ENTITY_range_r_t { _private: [u8; 0] }
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_ENTITY_range_vector_o_t {
-    pub o_t_version: c_int,                        // @0
-    pub bound: PK_range_bound_t,                   // @8   (32 bytes)
-    pub param_entity: PK_range_param_entity_t,     // @40
-    pub n_guesses: c_int,                          // @44
-    pub guesses: *const PK_range_guess_s_t,        // @48  (elem stride 0x30)
-    pub n_entities_with_scales: c_int,             // @56
-    pub entities_with_scales: *const PK_ENTITY_t,  // @64  (elem stride 4)
+    pub o_t_version: c_int,                       // @0
+    pub bound: PK_range_bound_t,                  // @8   (32 bytes)
+    pub param_entity: PK_range_param_entity_t,    // @40
+    pub n_guesses: c_int,                         // @44
+    pub guesses: *const PK_range_guess_s_t,       // @48  (elem stride 0x30)
+    pub n_entities_with_scales: c_int,            // @56
+    pub entities_with_scales: *const PK_ENTITY_t, // @64  (elem stride 4)
     /// One scale per entity in `entities_with_scales` (shares that count).
-    pub scale_factors: *const c_int,               // @72  (elem stride 4)
-    pub output_scale: c_int,                       // @80
+    pub scale_factors: *const c_int, // @72  (elem stride 4)
+    pub output_scale: c_int,                      // @80
 } // 88 bytes
 
 /// Results from `PK_ENTITY_range_vector`.
 #[repr(C)]
-pub struct PK_ENTITY_range_vector_r_t { _private: [u8; 0] }
+pub struct PK_ENTITY_range_vector_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_LOOP_offset_planar`.
 #[repr(C)]
-pub struct PK_LOOP_offset_planar_o_t { _private: [u8; 0] }
+pub struct PK_LOOP_offset_planar_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_LOOP_offset_planar`.
 #[repr(C)]
-pub struct PK_LOOP_offset_planar_r_t { _private: [u8; 0] }
+pub struct PK_LOOP_offset_planar_r_t {
+    _private: [u8; 0],
+}
 
 // =============================================================================
 // FFI function declarations
@@ -599,7 +629,9 @@ pub struct PK_LOOP_offset_planar_r_t { _private: [u8; 0] }
 
 /// Options for `PK_EDGE_ask_convexity` (opaque; pass NULL for defaults).
 #[repr(C)]
-pub struct PK_EDGE_ask_convexity_o_t { _private: [u8; 0] }
+pub struct PK_EDGE_ask_convexity_o_t {
+    _private: [u8; 0],
+}
 
 #[link(name = "pskernel")]
 unsafe extern "C" {
@@ -619,16 +651,10 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Return the standard form of a foreign curve.
-    pub fn PK_FCURVE_ask(
-        fcurve: PK_FCURVE_t,
-        fcurve_sf: *mut PK_FCURVE_sf_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FCURVE_ask(fcurve: PK_FCURVE_t, fcurve_sf: *mut PK_FCURVE_sf_t) -> PK_ERROR_code_t;
 
     /// Return the standard form of a foreign surface.
-    pub fn PK_FSURF_ask(
-        fsurf: PK_FSURF_t,
-        fsurf_sf: *mut PK_FSURF_sf_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FSURF_ask(fsurf: PK_FSURF_t, fsurf_sf: *mut PK_FSURF_sf_t) -> PK_ERROR_code_t;
 
     // B-curve / B-surface standard form and variants
 
@@ -717,15 +743,9 @@ unsafe extern "C" {
         edges: *mut *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;
 
-    pub fn PK_CURVE_ask_fin(
-        curve: PK_CURVE_t,
-        fin: *mut PK_FIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_CURVE_ask_fin(curve: PK_CURVE_t, fin: *mut PK_FIN_t) -> PK_ERROR_code_t;
 
-    pub fn PK_CURVE_ask_part(
-        curve: PK_CURVE_t,
-        part: *mut PK_PART_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_CURVE_ask_part(curve: PK_CURVE_t, part: *mut PK_PART_t) -> PK_ERROR_code_t;
 
     pub fn PK_CURVE_find_surfs_common(
         curve: PK_CURVE_t,
@@ -741,10 +761,8 @@ unsafe extern "C" {
     // Entity queries
     // =========================================================================
 
-    pub fn PK_ENTITY_ask_identifier(
-        entity: PK_ENTITY_t,
-        identifier: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_ask_identifier(entity: PK_ENTITY_t, identifier: *mut c_int)
+    -> PK_ERROR_code_t;
 
     pub fn PK_ENTITY_ask_owning_groups_2(
         entity: PK_ENTITY_t,
@@ -816,10 +834,7 @@ unsafe extern "C" {
 
     pub fn PK_POINT_ask_part(point: PK_POINT_t, part: *mut PK_PART_t) -> PK_ERROR_code_t;
 
-    pub fn PK_POINT_ask_vertex(
-        point: PK_POINT_t,
-        vertex: *mut PK_VERTEX_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_POINT_ask_vertex(point: PK_POINT_t, vertex: *mut PK_VERTEX_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Shell / Surface / Vertex connectivity
@@ -1000,10 +1015,7 @@ unsafe extern "C" {
     /// added an `options: *const PK_TOPOL_find_box_o_t` argument that does not
     /// exist here (the options form is the separate `PK_TOPOL_find_box_2`).
     /// `box` is filled `[xmin, ymin, zmin, xmax, ymax, zmax]`.
-    pub fn PK_TOPOL_find_box(
-        topol: PK_TOPOL_t,
-        box_: *mut PK_BOX_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TOPOL_find_box(topol: PK_TOPOL_t, box_: *mut PK_BOX_t) -> PK_ERROR_code_t;
 
     pub fn PK_TOPOL_find_nabox(
         n_topols: c_int,
@@ -1047,29 +1059,17 @@ unsafe extern "C" {
 
     // -- Parameter boxes --
 
-    pub fn PK_FACE_find_uvbox(
-        face: PK_FACE_t,
-        uvbox: *mut PK_UVBOX_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_find_uvbox(face: PK_FACE_t, uvbox: *mut PK_UVBOX_t) -> PK_ERROR_code_t;
 
-    pub fn PK_FIN_find_uvbox(
-        fin: PK_FIN_t,
-        uvbox: *mut PK_UVBOX_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_find_uvbox(fin: PK_FIN_t, uvbox: *mut PK_UVBOX_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Intervals and extremes
     // =========================================================================
 
-    pub fn PK_EDGE_find_interval(
-        edge: PK_EDGE_t,
-        interval: *mut PK_INTERVAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_find_interval(edge: PK_EDGE_t, interval: *mut PK_INTERVAL_t) -> PK_ERROR_code_t;
 
-    pub fn PK_FIN_find_interval(
-        fin: PK_FIN_t,
-        interval: *mut PK_INTERVAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FIN_find_interval(fin: PK_FIN_t, interval: *mut PK_INTERVAL_t) -> PK_ERROR_code_t;
 
     pub fn PK_EDGE_find_extreme(
         edge: PK_EDGE_t,
@@ -1126,15 +1126,9 @@ unsafe extern "C" {
         topologies: *mut PK_TOPOL_t,
     ) -> PK_ERROR_code_t;
 
-    pub fn PK_FACE_set_approx(
-        n_faces: c_int,
-        faces: *mut PK_FACE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_set_approx(n_faces: c_int, faces: *mut PK_FACE_t) -> PK_ERROR_code_t;
 
-    pub fn PK_FACE_unset_approx(
-        n_faces: c_int,
-        faces: *mut PK_FACE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_unset_approx(n_faces: c_int, faces: *mut PK_FACE_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Vector comparison
@@ -1146,10 +1140,7 @@ unsafe extern "C" {
         is_equal: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
-    pub fn PK_VECTOR_is_zero(
-        vec: *const c_double,
-        is_zero: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_VECTOR_is_zero(vec: *const c_double, is_zero: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     pub fn PK_VECTOR_is_parallel(
         vec1: *const c_double,
@@ -1157,10 +1148,7 @@ unsafe extern "C" {
         is_parallel: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
-    pub fn PK_VECTOR_normalise(
-        vec: *const c_double,
-        unit: *mut c_double,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_VECTOR_normalise(vec: *const c_double, unit: *mut c_double) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Transformation comparison
@@ -1517,10 +1505,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Query polyline standard form.
-    pub fn PK_PLINE_ask(
-        pline: PK_PLINE_t,
-        pline_sf: *mut PK_PLINE_sf_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PLINE_ask(pline: PK_PLINE_t, pline_sf: *mut PK_PLINE_sf_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Loop operations
@@ -1542,7 +1527,9 @@ unsafe extern "C" {
     pub fn PK_TOPOL_find_box_2_r_f(results: *mut PK_TOPOL_find_box_2_r_t) -> PK_ERROR_code_t;
 
     /// Free results from `PK_TOPOL_find_connected`.
-    pub fn PK_TOPOL_find_connected_r_f(results: *mut PK_TOPOL_find_connected_r_t) -> PK_ERROR_code_t;
+    pub fn PK_TOPOL_find_connected_r_f(
+        results: *mut PK_TOPOL_find_connected_r_t,
+    ) -> PK_ERROR_code_t;
 
     /// Free results from `PK_TOPOL_is_connected`.
     pub fn PK_TOPOL_is_connected_r_f(results: *mut PK_TOPOL_is_connected_r_t) -> PK_ERROR_code_t;
@@ -1560,7 +1547,9 @@ unsafe extern "C" {
     pub fn PK_ENTITY_range_vector_r_f(results: *mut PK_ENTITY_range_vector_r_t) -> PK_ERROR_code_t;
 
     /// Free entity description string.
-    pub fn PK_ENTITY_ask_description_r_f(description: *mut *mut std::os::raw::c_char) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_ask_description_r_f(
+        description: *mut *mut std::os::raw::c_char,
+    ) -> PK_ERROR_code_t;
 
     /// Free results from `PK_LOOP_offset_planar`.
     pub fn PK_LOOP_offset_planar_r_f(results: *mut PK_LOOP_offset_planar_r_t) -> PK_ERROR_code_t;

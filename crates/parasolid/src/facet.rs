@@ -124,7 +124,13 @@ impl Body {
         // faces raised faults; the tables are still valid. Only serious/fatal
         // errors abort.
         let code = unsafe {
-            PK_TOPOL_facet_2(1, &mut topol, std::ptr::null_mut(), &mut options, &mut result)
+            PK_TOPOL_facet_2(
+                1,
+                &mut topol,
+                std::ptr::null_mut(),
+                &mut options,
+                &mut result,
+            )
         };
         if code != 0 {
             match crate::error::PsError::from_code(code) {
@@ -201,9 +207,15 @@ unsafe extern "C" fn facet_vector_reader(
 }
 
 impl FacetMesh {
-    pub(crate) fn from_tag(tag: PK_MESH_t) -> Self { Self { tag } }
-    pub fn tag(&self) -> i32 { self.tag }
-    pub fn entity(&self) -> Entity { Entity::from_tag(self.tag) }
+    pub(crate) fn from_tag(tag: PK_MESH_t) -> Self {
+        Self { tag }
+    }
+    pub fn tag(&self) -> i32 {
+        self.tag
+    }
+    pub fn entity(&self) -> Entity {
+        Entity::from_tag(self.tag)
+    }
 
     /// Build a convergent mesh from independent triangles (each three corner
     /// points). Wraps `PK_MESH_create_from_facets` with an independent-facet

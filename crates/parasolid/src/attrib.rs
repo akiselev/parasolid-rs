@@ -49,7 +49,11 @@ impl Face {
     pub fn set_colour(&self, r: f64, g: f64, b: f64) -> PsResult<()> {
         let attdef = AttribDef::find(ATTRIB_COLOUR)?;
         let mut attrib: PK_ATTRIB_t = PK_ENTITY_null;
-        pk_call!(PK_ATTRIB_create_empty(self.tag(), attdef.tag(), &mut attrib));
+        pk_call!(PK_ATTRIB_create_empty(
+            self.tag(),
+            attdef.tag(),
+            &mut attrib
+        ));
         let rgb = [r, g, b];
         pk_call!(PK_ATTRIB_set_doubles(attrib, 0, 3, rgb.as_ptr()));
         Ok(())
@@ -75,7 +79,12 @@ impl Face {
         };
         let mut n_doubles: c_int = 0;
         let mut doubles: *mut f64 = std::ptr::null_mut();
-        pk_call!(PK_ATTRIB_ask_doubles(attrib, 0, &mut n_doubles, &mut doubles));
+        pk_call!(PK_ATTRIB_ask_doubles(
+            attrib,
+            0,
+            &mut n_doubles,
+            &mut doubles
+        ));
         let vals = unsafe { PkArray::from_raw(doubles, n_doubles) };
         if vals.len() < 3 {
             return Ok(None);

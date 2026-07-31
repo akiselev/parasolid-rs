@@ -22,8 +22,8 @@ const FR_OK: c_int = 0;
 // that strid == the pmark, so write/read/close/delete all key uniformly (the
 // read side is only ever given the pmark — see `open_for_read`).
 struct DeltaStore {
-    deltas: HashMap<i32, Vec<u8>>,      // pmark -> serialized delta
-    read_cursor: HashMap<i32, usize>,   // pmark -> current read offset
+    deltas: HashMap<i32, Vec<u8>>,    // pmark -> serialized delta
+    read_cursor: HashMap<i32, usize>, // pmark -> current read offset
 }
 
 impl DeltaStore {

@@ -24,11 +24,24 @@ fn main() {
     macro_rules! test {
         ($name:expr, $body:block) => {
             print!("  {} ... ", $name);
-            match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| -> Result<(), Box<dyn std::error::Error>> { $body; Ok(()) })) {
-                Ok(Ok(())) => { println!("OK"); passed += 1; }
-                Ok(Err(e)) => { println!("FAIL: {}", e); failed += 1; }
+            match std::panic::catch_unwind(std::panic::AssertUnwindSafe(
+                || -> Result<(), Box<dyn std::error::Error>> {
+                    $body;
+                    Ok(())
+                },
+            )) {
+                Ok(Ok(())) => {
+                    println!("OK");
+                    passed += 1;
+                }
+                Ok(Err(e)) => {
+                    println!("FAIL: {}", e);
+                    failed += 1;
+                }
                 Err(p) => {
-                    let msg = p.downcast_ref::<&str>().map(|s| s.to_string())
+                    let msg = p
+                        .downcast_ref::<&str>()
+                        .map(|s| s.to_string())
                         .or_else(|| p.downcast_ref::<String>().cloned())
                         .unwrap_or_else(|| "unknown panic".to_string());
                     println!("PANIC: {}", msg);
@@ -59,11 +72,26 @@ fn main() {
         let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
         assert_eq!(body.body_type()?, BodyType::Solid);
         let faces = body.faces()?;
-        assert_eq!(faces.len(), 6, "block should have 6 faces, got {}", faces.len());
+        assert_eq!(
+            faces.len(),
+            6,
+            "block should have 6 faces, got {}",
+            faces.len()
+        );
         let edges = body.edges()?;
-        assert_eq!(edges.len(), 12, "block should have 12 edges, got {}", edges.len());
+        assert_eq!(
+            edges.len(),
+            12,
+            "block should have 12 edges, got {}",
+            edges.len()
+        );
         let verts = body.vertices()?;
-        assert_eq!(verts.len(), 8, "block should have 8 vertices, got {}", verts.len());
+        assert_eq!(
+            verts.len(),
+            8,
+            "block should have 8 vertices, got {}",
+            verts.len()
+        );
     });
 
     test!("create_solid_cylinder", {
@@ -71,7 +99,12 @@ fn main() {
         let body = Body::create_solid_cylinder(5.0, 20.0)?;
         assert_eq!(body.body_type()?, BodyType::Solid);
         let faces = body.faces()?;
-        assert_eq!(faces.len(), 3, "cylinder should have 3 faces, got {}", faces.len());
+        assert_eq!(
+            faces.len(),
+            3,
+            "cylinder should have 3 faces, got {}",
+            faces.len()
+        );
     });
 
     test!("create_solid_sphere", {
@@ -79,7 +112,12 @@ fn main() {
         let body = Body::create_solid_sphere(10.0)?;
         assert_eq!(body.body_type()?, BodyType::Solid);
         let faces = body.faces()?;
-        assert_eq!(faces.len(), 1, "sphere should have 1 face, got {}", faces.len());
+        assert_eq!(
+            faces.len(),
+            1,
+            "sphere should have 1 face, got {}",
+            faces.len()
+        );
     });
 
     // =========================================================================
@@ -113,8 +151,12 @@ fn main() {
             let dx = p1.x - p0.x;
             let dy = p1.y - p0.y;
             let dz = p1.z - p0.z;
-            let len = (dx*dx + dy*dy + dz*dz).sqrt();
-            assert!((len - 10.0).abs() < 1e-6, "edge length should be 10, got {}", len);
+            let len = (dx * dx + dy * dy + dz * dz).sqrt();
+            assert!(
+                (len - 10.0).abs() < 1e-6,
+                "edge length should be 10, got {}",
+                len
+            );
         }
     });
 
@@ -126,8 +168,16 @@ fn main() {
         // vertices at x = ±5, y = ±10, z = 0 or 30.
         for v in &verts {
             let p = v.point()?;
-            assert!((p.x.abs() - 5.0).abs() < 1e-6, "x should be ±5, got {}", p.x);
-            assert!((p.y.abs() - 10.0).abs() < 1e-6, "y should be ±10, got {}", p.y);
+            assert!(
+                (p.x.abs() - 5.0).abs() < 1e-6,
+                "x should be ±5, got {}",
+                p.x
+            );
+            assert!(
+                (p.y.abs() - 10.0).abs() < 1e-6,
+                "y should be ±10, got {}",
+                p.y
+            );
             assert!(
                 p.z.abs() < 1e-6 || (p.z - 30.0).abs() < 1e-6,
                 "z should be 0 or 30, got {}",
@@ -172,7 +222,11 @@ fn main() {
         let face = &body.faces()?[0];
         let surf = face.surf()?;
         let data = surf.ask_sphere()?;
-        assert!((data.radius - 25.0).abs() < 1e-10, "radius should be 25, got {}", data.radius);
+        assert!(
+            (data.radius - 25.0).abs() < 1e-10,
+            "radius should be 25, got {}",
+            data.radius
+        );
     });
 
     test!("surface_eval", {
@@ -182,8 +236,12 @@ fn main() {
         let surf = face.surf()?;
         // Evaluate at some parameter
         let pos = surf.eval(0.5, 0.5)?;
-        let dist = (pos.x*pos.x + pos.y*pos.y + pos.z*pos.z).sqrt();
-        assert!((dist - 10.0).abs() < 1e-6, "point should be on sphere (r=10), dist={}", dist);
+        let dist = (pos.x * pos.x + pos.y * pos.y + pos.z * pos.z).sqrt();
+        assert!(
+            (dist - 10.0).abs() < 1e-6,
+            "point should be on sphere (r=10), dist={}",
+            dist
+        );
     });
 
     test!("edge_curve_type", {
@@ -206,8 +264,12 @@ fn main() {
         let dx = p1.x - p0.x;
         let dy = p1.y - p0.y;
         let dz = p1.z - p0.z;
-        let len = (dx*dx + dy*dy + dz*dz).sqrt();
-        assert!((len - 10.0).abs() < 1e-6, "edge length should be 10, got {}", len);
+        let len = (dx * dx + dy * dy + dz * dz).sqrt();
+        assert!(
+            (len - 10.0).abs() < 1e-6,
+            "edge length should be 10, got {}",
+            len
+        );
     });
 
     // =========================================================================
@@ -233,7 +295,10 @@ fn main() {
 
     test!("check_arguments_enabled", {
         let session = Session::start(test_config())?;
-        assert!(session.check_arguments()?, "check_arguments should be enabled");
+        assert!(
+            session.check_arguments()?,
+            "check_arguments should be enabled"
+        );
     });
 
     // =========================================================================
@@ -260,24 +325,63 @@ fn main() {
         let mp = body.mass_props()?;
         let vol = x * y * z;
         let area = 2.0 * (x * y + y * z + z * x);
-        assert!(rel_ok(mp.amount, vol), "block volume {} != {}", mp.amount, vol);
+        assert!(
+            rel_ok(mp.amount, vol),
+            "block volume {} != {}",
+            mp.amount,
+            vol
+        );
         assert!(rel_ok(mp.mass, vol), "block mass {} != {}", mp.mass, vol);
-        assert!(rel_ok(mp.periphery, area), "block area {} != {}", mp.periphery, area);
+        assert!(
+            rel_ok(mp.periphery, area),
+            "block area {} != {}",
+            mp.periphery,
+            area
+        );
         // Base centred at origin, z spans 0..z → CoG = (0, 0, z/2).
         let cg = mp.center_of_gravity;
-        assert!(near0(cg.x, x) && near0(cg.y, y), "block CoG x/y not ~0: {:?}", cg);
-        assert!((cg.z - z / 2.0).abs() < 1e-6, "block CoG z {} != {}", cg.z, z / 2.0);
+        assert!(
+            near0(cg.x, x) && near0(cg.y, y),
+            "block CoG x/y not ~0: {:?}",
+            cg
+        );
+        assert!(
+            (cg.z - z / 2.0).abs() < 1e-6,
+            "block CoG z {} != {}",
+            cg.z,
+            z / 2.0
+        );
         // Solid block inertia about CoG (m=vol): Ixx=m/12(y^2+z^2), etc.
         let (ixx, iyy, izz) = (
             vol / 12.0 * (y * y + z * z),
             vol / 12.0 * (x * x + z * z),
             vol / 12.0 * (x * x + y * y),
         );
-        assert!(rel_ok(mp.inertia[0], ixx), "block Ixx {} != {}", mp.inertia[0], ixx);
-        assert!(rel_ok(mp.inertia[4], iyy), "block Iyy {} != {}", mp.inertia[4], iyy);
-        assert!(rel_ok(mp.inertia[8], izz), "block Izz {} != {}", mp.inertia[8], izz);
+        assert!(
+            rel_ok(mp.inertia[0], ixx),
+            "block Ixx {} != {}",
+            mp.inertia[0],
+            ixx
+        );
+        assert!(
+            rel_ok(mp.inertia[4], iyy),
+            "block Iyy {} != {}",
+            mp.inertia[4],
+            iyy
+        );
+        assert!(
+            rel_ok(mp.inertia[8], izz),
+            "block Izz {} != {}",
+            mp.inertia[8],
+            izz
+        );
         for k in [1usize, 2, 3, 5, 6, 7] {
-            assert!(near0(mp.inertia[k], ixx), "block off-diag[{}] {} not ~0", k, mp.inertia[k]);
+            assert!(
+                near0(mp.inertia[k], ixx),
+                "block off-diag[{}] {} not ~0",
+                k,
+                mp.inertia[k]
+            );
         }
     });
 
@@ -288,15 +392,34 @@ fn main() {
         let mp = body.mass_props()?;
         let vol = 4.0 / 3.0 * std::f64::consts::PI * r.powi(3);
         let area = 4.0 * std::f64::consts::PI * r * r;
-        assert!(rel_ok(mp.amount, vol), "sphere volume {} != {}", mp.amount, vol);
-        assert!(rel_ok(mp.periphery, area), "sphere area {} != {}", mp.periphery, area);
+        assert!(
+            rel_ok(mp.amount, vol),
+            "sphere volume {} != {}",
+            mp.amount,
+            vol
+        );
+        assert!(
+            rel_ok(mp.periphery, area),
+            "sphere area {} != {}",
+            mp.periphery,
+            area
+        );
         let cg = mp.center_of_gravity;
-        assert!(near0(cg.x, r) && near0(cg.y, r) && near0(cg.z, r),
-            "sphere CoG not ~origin: {:?}", cg);
+        assert!(
+            near0(cg.x, r) && near0(cg.y, r) && near0(cg.z, r),
+            "sphere CoG not ~origin: {:?}",
+            cg
+        );
         // Solid sphere inertia about CoG: I = 2/5 m r^2 on the diagonal, 0 off.
         let i_diag = 2.0 / 5.0 * mp.mass * r * r;
         for k in [0usize, 4, 8] {
-            assert!(rel_ok(mp.inertia[k], i_diag), "sphere I diag[{}] {} != {}", k, mp.inertia[k], i_diag);
+            assert!(
+                rel_ok(mp.inertia[k], i_diag),
+                "sphere I diag[{}] {} != {}",
+                k,
+                mp.inertia[k],
+                i_diag
+            );
         }
     });
 
@@ -307,15 +430,39 @@ fn main() {
         let mp = body.mass_props()?;
         let vol = std::f64::consts::PI * r * r * h;
         let area = 2.0 * std::f64::consts::PI * r * r + 2.0 * std::f64::consts::PI * r * h;
-        assert!(rel_ok(mp.amount, vol), "cyl volume {} != {}", mp.amount, vol);
-        assert!(rel_ok(mp.periphery, area), "cyl area {} != {}", mp.periphery, area);
+        assert!(
+            rel_ok(mp.amount, vol),
+            "cyl volume {} != {}",
+            mp.amount,
+            vol
+        );
+        assert!(
+            rel_ok(mp.periphery, area),
+            "cyl area {} != {}",
+            mp.periphery,
+            area
+        );
         // Base on z=0 plane → centroid at z = h/2, centred on the Z axis.
         let cg = mp.center_of_gravity;
-        assert!(near0(cg.x, r) && near0(cg.y, r), "cyl CoG x/y not ~0: {:?}", cg);
-        assert!((cg.z - h / 2.0).abs() < 1e-6, "cyl CoG z {} != {}", cg.z, h / 2.0);
+        assert!(
+            near0(cg.x, r) && near0(cg.y, r),
+            "cyl CoG x/y not ~0: {:?}",
+            cg
+        );
+        assert!(
+            (cg.z - h / 2.0).abs() < 1e-6,
+            "cyl CoG z {} != {}",
+            cg.z,
+            h / 2.0
+        );
         // Cylinder about its axis: Izz = 1/2 m r^2.
         let izz = 0.5 * mp.mass * r * r;
-        assert!(rel_ok(mp.inertia[8], izz), "cyl Izz {} != {}", mp.inertia[8], izz);
+        assert!(
+            rel_ok(mp.inertia[8], izz),
+            "cyl Izz {} != {}",
+            mp.inertia[8],
+            izz
+        );
     });
 
     test!("massprops_cone_truncated", {
@@ -328,7 +475,12 @@ fn main() {
         let body = Body::create_solid_cone(rb, h, semi)?;
         let mp = body.mass_props()?;
         let vol = std::f64::consts::PI * h / 3.0 * (rb * rb + rb * rt + rt * rt);
-        assert!(rel_ok(mp.amount, vol), "cone volume {} != {}", mp.amount, vol);
+        assert!(
+            rel_ok(mp.amount, vol),
+            "cone volume {} != {}",
+            mp.amount,
+            vol
+        );
     });
 
     test!("massprops_torus", {
@@ -338,12 +490,25 @@ fn main() {
         let mp = body.mass_props()?;
         let vol = 2.0 * std::f64::consts::PI.powi(2) * major * minor * minor;
         let area = 4.0 * std::f64::consts::PI.powi(2) * major * minor;
-        assert!(rel_ok(mp.amount, vol), "torus volume {} != {}", mp.amount, vol);
-        assert!(rel_ok(mp.periphery, area), "torus area {} != {}", mp.periphery, area);
+        assert!(
+            rel_ok(mp.amount, vol),
+            "torus volume {} != {}",
+            mp.amount,
+            vol
+        );
+        assert!(
+            rel_ok(mp.periphery, area),
+            "torus area {} != {}",
+            mp.periphery,
+            area
+        );
         // Centred at the origin, major axis along Z.
         let cg = mp.center_of_gravity;
-        assert!(near0(cg.x, major) && near0(cg.y, major) && near0(cg.z, minor),
-            "torus CoG not ~origin: {:?}", cg);
+        assert!(
+            near0(cg.x, major) && near0(cg.y, major) && near0(cg.z, minor),
+            "torus CoG not ~origin: {:?}",
+            cg
+        );
     });
 
     // =========================================================================
@@ -356,32 +521,71 @@ fn main() {
 
         let pl = Surf::plane(zbasis(Vec3::new(0.0, 0.0, 5.0)))?;
         assert_eq!(pl.surf_type()?, SurfType::Plane);
-        assert!(rel_ok(pl.ask_plane()?.basis.origin.z, 5.0), "plane origin z");
+        assert!(
+            rel_ok(pl.ask_plane()?.basis.origin.z, 5.0),
+            "plane origin z"
+        );
 
         let sp = Surf::sphere(zbasis(Vec3::new(1.0, 2.0, 3.0)), 4.0)?;
         let spd = sp.ask_sphere()?;
         assert!(rel_ok(spd.radius, 4.0), "sphere r");
-        assert!(rel_ok(spd.basis.origin.x, 1.0) && rel_ok(spd.basis.origin.y, 2.0)
-            && rel_ok(spd.basis.origin.z, 3.0), "sphere center {:?}", spd.basis.origin);
+        assert!(
+            rel_ok(spd.basis.origin.x, 1.0)
+                && rel_ok(spd.basis.origin.y, 2.0)
+                && rel_ok(spd.basis.origin.z, 3.0),
+            "sphere center {:?}",
+            spd.basis.origin
+        );
 
-        assert!(rel_ok(Surf::cylinder(zbasis(Vec3::zero()), 5.0)?.ask_cylinder()?.radius, 5.0), "cyl r");
+        assert!(
+            rel_ok(
+                Surf::cylinder(zbasis(Vec3::zero()), 5.0)?
+                    .ask_cylinder()?
+                    .radius,
+                5.0
+            ),
+            "cyl r"
+        );
 
         let cod = Surf::cone(zbasis(Vec3::zero()), 3.0, 0.5)?.ask_cone()?;
-        assert!(rel_ok(cod.radius, 3.0) && rel_ok(cod.semi_angle, 0.5), "cone {:?}", (cod.radius, cod.semi_angle));
+        assert!(
+            rel_ok(cod.radius, 3.0) && rel_ok(cod.semi_angle, 0.5),
+            "cone {:?}",
+            (cod.radius, cod.semi_angle)
+        );
 
         let td = Surf::torus(zbasis(Vec3::zero()), 10.0, 3.0)?.ask_torus()?;
-        assert!(rel_ok(td.major_radius, 10.0) && rel_ok(td.minor_radius, 3.0), "torus radii");
+        assert!(
+            rel_ok(td.major_radius, 10.0) && rel_ok(td.minor_radius, 3.0),
+            "torus radii"
+        );
 
         let lnd = Curve::line(Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0))?.ask_line()?;
-        assert!(rel_ok(lnd.origin.x, 1.0) && rel_ok(lnd.direction.y, 1.0), "line {:?}", (lnd.origin, lnd.direction));
+        assert!(
+            rel_ok(lnd.origin.x, 1.0) && rel_ok(lnd.direction.y, 1.0),
+            "line {:?}",
+            (lnd.origin, lnd.direction)
+        );
 
-        assert!(rel_ok(Curve::circle(zbasis(Vec3::zero()), 7.0)?.ask_circle()?.radius, 7.0), "circle r");
+        assert!(
+            rel_ok(
+                Curve::circle(zbasis(Vec3::zero()), 7.0)?
+                    .ask_circle()?
+                    .radius,
+                7.0
+            ),
+            "circle r"
+        );
 
         let eld = Curve::ellipse(zbasis(Vec3::zero()), 6.0, 4.0)?.ask_ellipse()?;
         assert!(rel_ok(eld.r1, 6.0) && rel_ok(eld.r2, 4.0), "ellipse radii");
 
         let pp = Point::create(Vec3::new(9.0, 8.0, 7.0))?.position()?;
-        assert!(rel_ok(pp.x, 9.0) && rel_ok(pp.y, 8.0) && rel_ok(pp.z, 7.0), "point {:?}", pp);
+        assert!(
+            rel_ok(pp.x, 9.0) && rel_ok(pp.y, 8.0) && rel_ok(pp.z, 7.0),
+            "point {:?}",
+            pp
+        );
     });
 
     // =========================================================================
@@ -397,8 +601,16 @@ fn main() {
         let r = s1.intersect(&s2)?;
         assert_eq!(r.curves.len(), 1, "sphere-sphere = one circle");
         let cd = r.curves[0].curve.ask_circle()?;
-        assert!(rel_ok(cd.radius, 4.0), "sphere-sphere circle radius {} != 4", cd.radius);
-        assert!(rel_ok(cd.basis.origin.x, 3.0), "circle plane at x=3, got {}", cd.basis.origin.x);
+        assert!(
+            rel_ok(cd.radius, 4.0),
+            "sphere-sphere circle radius {} != 4",
+            cd.radius
+        );
+        assert!(
+            rel_ok(cd.basis.origin.x, 3.0),
+            "circle plane at x=3, got {}",
+            cd.basis.origin.x
+        );
     });
 
     test!("ssi_orphan_plane_sphere", {
@@ -409,43 +621,103 @@ fn main() {
         let sph = Surf::sphere(zb(Vec3::zero()), 5.0)?;
         let r = plane.intersect(&sph)?;
         assert_eq!(r.curves.len(), 1, "plane-sphere = one circle");
-        assert!(rel_ok(r.curves[0].curve.ask_circle()?.radius, 4.0), "plane-sphere circle radius");
+        assert!(
+            rel_ok(r.curves[0].curve.ask_circle()?.radius, 4.0),
+            "plane-sphere circle radius"
+        );
     });
 
     test!("ssi_orphan_cyl_cyl", {
         let _session = Session::start(test_config())?;
         // Two equal-radius cylinders with perpendicular axes intersect in the
         // classic Steinmetz curves (4 basis-curve segments).
-        let ca = Surf::cylinder(Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0)), 3.0)?;
-        let cb = Surf::cylinder(Axis2::new(Vec3::zero(), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)), 3.0)?;
+        let ca = Surf::cylinder(
+            Axis2::new(
+                Vec3::zero(),
+                Vec3::new(0.0, 0.0, 1.0),
+                Vec3::new(1.0, 0.0, 0.0),
+            ),
+            3.0,
+        )?;
+        let cb = Surf::cylinder(
+            Axis2::new(
+                Vec3::zero(),
+                Vec3::new(1.0, 0.0, 0.0),
+                Vec3::new(0.0, 1.0, 0.0),
+            ),
+            3.0,
+        )?;
         let r = ca.intersect(&cb)?;
-        assert!(r.curves.len() >= 1, "perpendicular equal cylinders should intersect, got {}", r.curves.len());
+        assert!(
+            r.curves.len() >= 1,
+            "perpendicular equal cylinders should intersect, got {}",
+            r.curves.len()
+        );
     });
 
     test!("ssi_pair_matrix", {
         let _session = Session::start(test_config())?;
         let zb = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
-        let yplane = || Surf::plane(Axis2::new(Vec3::zero(), Vec3::new(0.0, 1.0, 0.0), Vec3::new(1.0, 0.0, 0.0)));
+        let yplane = || {
+            Surf::plane(Axis2::new(
+                Vec3::zero(),
+                Vec3::new(0.0, 1.0, 0.0),
+                Vec3::new(1.0, 0.0, 0.0),
+            ))
+        };
 
         // plane through cylinder axis → 2 lines (transversal).
         let r = yplane()?.intersect(&Surf::cylinder(zb(Vec3::zero()), 3.0)?)?;
-        assert_eq!(r.curves.iter().filter(|c| c.curve.curve_type().unwrap() == CurveType::Line).count(), 2, "plane∩cyl = 2 lines");
+        assert_eq!(
+            r.curves
+                .iter()
+                .filter(|c| c.curve.curve_type().unwrap() == CurveType::Line)
+                .count(),
+            2,
+            "plane∩cyl = 2 lines"
+        );
 
         // sphere(5) ∩ coaxial cylinder(3) → 2 circles.
-        let r = Surf::sphere(zb(Vec3::zero()), 5.0)?.intersect(&Surf::cylinder(zb(Vec3::zero()), 3.0)?)?;
-        assert_eq!(r.curves.len(), 2, "sphere∩cyl = 2 circles, got {}", r.curves.len());
-        assert!(r.curves.iter().all(|c| c.curve.curve_type().unwrap() == CurveType::Circle));
+        let r = Surf::sphere(zb(Vec3::zero()), 5.0)?
+            .intersect(&Surf::cylinder(zb(Vec3::zero()), 3.0)?)?;
+        assert_eq!(
+            r.curves.len(),
+            2,
+            "sphere∩cyl = 2 circles, got {}",
+            r.curves.len()
+        );
+        assert!(
+            r.curves
+                .iter()
+                .all(|c| c.curve.curve_type().unwrap() == CurveType::Circle)
+        );
 
         // equatorial plane ∩ torus(10,3) → 2 circles (inner r=7, outer r=13).
-        let r = Surf::plane(zb(Vec3::zero()))?.intersect(&Surf::torus(zb(Vec3::zero()), 10.0, 3.0)?)?;
-        let mut radii: Vec<f64> = r.curves.iter().map(|c| c.curve.ask_circle().unwrap().radius).collect();
+        let r =
+            Surf::plane(zb(Vec3::zero()))?.intersect(&Surf::torus(zb(Vec3::zero()), 10.0, 3.0)?)?;
+        let mut radii: Vec<f64> = r
+            .curves
+            .iter()
+            .map(|c| c.curve.ask_circle().unwrap().radius)
+            .collect();
         radii.sort_by(|a, b| a.partial_cmp(b).unwrap());
         assert_eq!(radii.len(), 2, "plane∩torus = 2 circles");
-        assert!(rel_ok(radii[0], 7.0) && rel_ok(radii[1], 13.0), "torus section radii {:?}", radii);
+        assert!(
+            rel_ok(radii[0], 7.0) && rel_ok(radii[1], 13.0),
+            "torus section radii {:?}",
+            radii
+        );
 
         // plane through a pointed cone's apex → 2 lines.
         let r = yplane()?.intersect(&Surf::cone(zb(Vec3::zero()), 0.0, 0.5)?)?;
-        assert_eq!(r.curves.iter().filter(|c| c.curve.curve_type().unwrap() == CurveType::Line).count(), 2, "plane∩cone thru apex = 2 lines");
+        assert_eq!(
+            r.curves
+                .iter()
+                .filter(|c| c.curve.curve_type().unwrap() == CurveType::Line)
+                .count(),
+            2,
+            "plane∩cone thru apex = 2 lines"
+        );
     });
 
     test!("ssi_tangency_coincidence_disjoint", {
@@ -461,23 +733,47 @@ fn main() {
 
         // Disjoint spheres → nothing.
         let disjoint = s1.intersect(&Surf::sphere(zb(Vec3::new(20.0, 0.0, 0.0)), 5.0)?)?;
-        assert!(disjoint.points.is_empty() && disjoint.curves.is_empty(), "disjoint spheres = empty");
+        assert!(
+            disjoint.points.is_empty() && disjoint.curves.is_empty(),
+            "disjoint spheres = empty"
+        );
 
         // Coincident planes → no intersection data (documented).
         let a = Surf::plane(zb(Vec3::new(0.0, 0.0, 2.0)))?;
         let b = Surf::plane(zb(Vec3::new(0.0, 0.0, 2.0)))?;
         let coincident = a.intersect(&b)?;
-        assert!(coincident.points.is_empty() && coincident.curves.is_empty(), "coincident planes = empty");
+        assert!(
+            coincident.points.is_empty() && coincident.curves.is_empty(),
+            "coincident planes = empty"
+        );
 
         // Plane tangent to a cylinder → a tangential line (kind classified).
         let cyl = Surf::cylinder(zb(Vec3::zero()), 3.0)?;
-        let ptan = Surf::plane(Axis2::new(Vec3::new(3.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)))?;
+        let ptan = Surf::plane(Axis2::new(
+            Vec3::new(3.0, 0.0, 0.0),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ))?;
         let tan = ptan.intersect(&cyl)?;
         assert_eq!(tan.curves.len(), 1, "tangent plane-cyl = 1 line");
-        assert_eq!(tan.curves[0].classify(), IntersectionKind::Tangential, "should be tangential");
+        assert_eq!(
+            tan.curves[0].classify(),
+            IntersectionKind::Tangential,
+            "should be tangential"
+        );
         // And a transversal case classifies the other way.
-        let thru = Surf::plane(Axis2::new(Vec3::zero(), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)))?.intersect(&cyl)?;
-        assert!(thru.curves.iter().all(|c| c.classify() == IntersectionKind::Transversal), "through-axis = transversal");
+        let thru = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ))?
+        .intersect(&cyl)?;
+        assert!(
+            thru.curves
+                .iter()
+                .all(|c| c.classify() == IntersectionKind::Transversal),
+            "through-axis = transversal"
+        );
     });
 
     // =========================================================================
@@ -496,7 +792,10 @@ fn main() {
             let dot = (p.x * n.x + p.y * n.y + p.z * n.z) / plen; // n · outward radial
             assert!((plen - r).abs() < 1e-6, "point off sphere: |p|={plen}");
             assert!((nlen - 1.0).abs() < 1e-9, "normal not unit: {nlen}");
-            assert!((dot - 1.0).abs() < 1e-6, "sphere surface normal not outward radial: {dot}");
+            assert!(
+                (dot - 1.0).abs() < 1e-6,
+                "sphere surface normal not outward radial: {dot}"
+            );
         }
     });
 
@@ -508,18 +807,37 @@ fn main() {
 
         // Cylinder: u periodic [0, 2π] (angular seam), v unbounded.
         let cyl = Surf::cylinder(zb(Vec3::zero()), 5.0)?.uvbox()?;
-        assert!(rel_ok(cyl.u_min, 0.0) && rel_ok(cyl.u_max, tau), "cyl u ∈ [0,2π]: {:?}", cyl);
-        assert!(cyl.v_max - cyl.v_min > 1e3, "cyl v should be unbounded: {:?}", cyl);
+        assert!(
+            rel_ok(cyl.u_min, 0.0) && rel_ok(cyl.u_max, tau),
+            "cyl u ∈ [0,2π]: {:?}",
+            cyl
+        );
+        assert!(
+            cyl.v_max - cyl.v_min > 1e3,
+            "cyl v should be unbounded: {:?}",
+            cyl
+        );
 
         // Sphere: u periodic [0, 2π]; v [-π/2, π/2] with poles at the ends.
         let sph = Surf::sphere(zb(Vec3::zero()), 5.0)?.uvbox()?;
-        assert!(rel_ok(sph.u_min, 0.0) && rel_ok(sph.u_max, tau), "sphere u seam");
-        assert!(rel_ok(sph.v_min, -pi / 2.0) && rel_ok(sph.v_max, pi / 2.0), "sphere v poles: {:?}", sph);
+        assert!(
+            rel_ok(sph.u_min, 0.0) && rel_ok(sph.u_max, tau),
+            "sphere u seam"
+        );
+        assert!(
+            rel_ok(sph.v_min, -pi / 2.0) && rel_ok(sph.v_max, pi / 2.0),
+            "sphere v poles: {:?}",
+            sph
+        );
 
         // Torus: u periodic [0, 2π], v periodic [-π, π].
         let tor = Surf::torus(zb(Vec3::zero()), 10.0, 3.0)?.uvbox()?;
         assert!(rel_ok(tor.u_min, 0.0) && rel_ok(tor.u_max, tau), "torus u");
-        assert!(rel_ok(tor.v_min, -pi) && rel_ok(tor.v_max, pi), "torus v: {:?}", tor);
+        assert!(
+            rel_ok(tor.v_min, -pi) && rel_ok(tor.v_max, pi),
+            "torus v: {:?}",
+            tor
+        );
     });
 
     test!("surface_parameterise_roundtrip", {
@@ -539,7 +857,9 @@ fn main() {
         let _session = Session::start(test_config())?;
         // A cylinder's circular edge: eval at t, invert, eval again.
         let body = Body::create_solid_cylinder(5.0, 12.0)?;
-        let curve = body.edges()?.iter()
+        let curve = body
+            .edges()?
+            .iter()
             .map(|e| e.curve().unwrap())
             .find(|c| c.curve_type().unwrap() == CurveType::Circle)
             .expect("cylinder circular edge")
@@ -557,21 +877,35 @@ fn main() {
         let _session = Session::start(test_config())?;
         let (r, h) = (5.0, 12.0);
         let body = Body::create_solid_cylinder(r, h)?;
-        let circles: Vec<_> = body.edges()?.iter()
+        let circles: Vec<_> = body
+            .edges()?
+            .iter()
             .map(|e| e.curve().unwrap())
             .filter(|c| c.curve_type().unwrap() == CurveType::Circle)
             .map(|c| c.ask_circle().unwrap())
             .collect();
-        assert_eq!(circles.len(), 2, "cylinder has 2 circular edges, got {}", circles.len());
+        assert_eq!(
+            circles.len(),
+            2,
+            "cylinder has 2 circular edges, got {}",
+            circles.len()
+        );
         for cd in &circles {
             assert!(rel_ok(cd.radius, r), "circle radius {} != {}", cd.radius, r);
-            assert!(near0(cd.basis.origin.x, r) && near0(cd.basis.origin.y, r),
-                "circle centre off Z axis: {:?}", cd.basis.origin);
+            assert!(
+                near0(cd.basis.origin.x, r) && near0(cd.basis.origin.y, r),
+                "circle centre off Z axis: {:?}",
+                cd.basis.origin
+            );
         }
         // Centres at the two cap planes z=0 and z=h.
         let mut zs: Vec<f64> = circles.iter().map(|c| c.basis.origin.z).collect();
         zs.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        assert!(near0(zs[0], h) && rel_ok(zs[1], h), "circle z centres {:?}", zs);
+        assert!(
+            near0(zs[0], h) && rel_ok(zs[1], h),
+            "circle z centres {:?}",
+            zs
+        );
     });
 
     test!("line_extraction_and_tangent", {
@@ -582,14 +916,20 @@ fn main() {
         assert_eq!(curve.curve_type()?, CurveType::Line);
         let ld = curve.ask_line()?;
         // Direction is a unit vector.
-        let dlen = (ld.direction.x.powi(2) + ld.direction.y.powi(2) + ld.direction.z.powi(2)).sqrt();
+        let dlen =
+            (ld.direction.x.powi(2) + ld.direction.y.powi(2) + ld.direction.z.powi(2)).sqrt();
         assert!((dlen - 1.0).abs() < 1e-9, "line direction not unit: {dlen}");
         // eval endpoints span the edge; tangent is unit and along the chord.
         let (t0, t1) = edge.interval()?;
         let (p0, tan) = curve.eval_with_tangent(t0)?;
         let p1 = curve.eval(t1)?;
         let chord = ((p1.x - p0.x).powi(2) + (p1.y - p0.y).powi(2) + (p1.z - p0.z).powi(2)).sqrt();
-        assert!((t1 - t0 - chord).abs() < 1e-6, "arc-length param: interval {} != chord {}", t1 - t0, chord);
+        assert!(
+            (t1 - t0 - chord).abs() < 1e-6,
+            "arc-length param: interval {} != chord {}",
+            t1 - t0,
+            chord
+        );
         let tlen = (tan.x * tan.x + tan.y * tan.y + tan.z * tan.z).sqrt();
         assert!((tlen - 1.0).abs() < 1e-9, "tangent not unit: {tlen}");
     });
@@ -598,13 +938,23 @@ fn main() {
         let _session = Session::start(test_config())?;
         // radius (at base/basis origin) 5, height 3, semi-angle 45°.
         let body = Body::create_solid_cone(5.0, 3.0, std::f64::consts::FRAC_PI_4)?;
-        let cone = body.faces()?.iter()
+        let cone = body
+            .faces()?
+            .iter()
             .map(|f| f.surf().unwrap())
             .find(|s| s.surf_type().unwrap() == SurfType::Cone)
             .expect("cone should have a conical face")
             .ask_cone()?;
-        assert!(rel_ok(cone.radius, 5.0), "cone sf radius {} != 5 (radius is at basis origin)", cone.radius);
-        assert!(rel_ok(cone.semi_angle, std::f64::consts::FRAC_PI_4), "cone semi_angle {}", cone.semi_angle);
+        assert!(
+            rel_ok(cone.radius, 5.0),
+            "cone sf radius {} != 5 (radius is at basis origin)",
+            cone.radius
+        );
+        assert!(
+            rel_ok(cone.semi_angle, std::f64::consts::FRAC_PI_4),
+            "cone semi_angle {}",
+            cone.semi_angle
+        );
     });
 
     // =========================================================================
@@ -615,16 +965,31 @@ fn main() {
         let _session = Session::start(test_config())?;
         let r = 5.0;
         let cyl = Body::create_solid_cylinder(r, 12.0)?;
-        let side = cyl.faces()?.iter().map(|f| f.surf().unwrap())
-            .find(|s| s.surf_type().unwrap() == SurfType::Cylinder).expect("side");
-        let plane = cyl.faces()?.iter().map(|f| f.surf().unwrap())
-            .find(|s| s.surf_type().unwrap() == SurfType::Plane).expect("cap plane");
+        let side = cyl
+            .faces()?
+            .iter()
+            .map(|f| f.surf().unwrap())
+            .find(|s| s.surf_type().unwrap() == SurfType::Cylinder)
+            .expect("side");
+        let plane = cyl
+            .faces()?
+            .iter()
+            .map(|f| f.surf().unwrap())
+            .find(|s| s.surf_type().unwrap() == SurfType::Plane)
+            .expect("cap plane");
         let isect = side.intersect(&plane)?;
         assert_eq!(isect.points.len(), 0, "cyl∩plane point count");
         assert_eq!(isect.curves.len(), 1, "cyl∩plane should be one circle");
         let ic = &isect.curves[0];
-        assert_eq!(ic.curve.curve_type()?, CurveType::Circle, "intersection is a circle");
-        assert!(rel_ok(ic.curve.ask_circle()?.radius, r), "intersection circle radius");
+        assert_eq!(
+            ic.curve.curve_type()?,
+            CurveType::Circle,
+            "intersection is a circle"
+        );
+        assert!(
+            rel_ok(ic.curve.ask_circle()?.radius, r),
+            "intersection circle radius"
+        );
     });
 
     test!("ssi_plane_plane_line", {
@@ -644,7 +1009,10 @@ fn main() {
                 }
             }
         }
-        assert!(found_line, "two adjacent block face planes should intersect in a line");
+        assert!(
+            found_line,
+            "two adjacent block face planes should intersect in a line"
+        );
     });
 
     test!("ssi_face_face_line", {
@@ -670,14 +1038,24 @@ fn main() {
         let _session = Session::start(test_config())?;
         let r = 5.0;
         let cyl = Body::create_solid_cylinder(r, 12.0)?;
-        let side = cyl.faces()?.into_iter()
-            .find(|f| f.surf().unwrap().surf_type().unwrap() == SurfType::Cylinder).unwrap();
-        let cap = cyl.faces()?.iter().map(|f| f.surf().unwrap())
-            .find(|s| s.surf_type().unwrap() == SurfType::Plane).unwrap();
+        let side = cyl
+            .faces()?
+            .into_iter()
+            .find(|f| f.surf().unwrap().surf_type().unwrap() == SurfType::Cylinder)
+            .unwrap();
+        let cap = cyl
+            .faces()?
+            .iter()
+            .map(|f| f.surf().unwrap())
+            .find(|s| s.surf_type().unwrap() == SurfType::Plane)
+            .unwrap();
         let isect = side.intersect_surf(&cap)?;
         assert_eq!(isect.curves.len(), 1, "cyl face ∩ cap surf = one curve");
         assert_eq!(isect.curves[0].curve.curve_type()?, CurveType::Circle);
-        assert!(rel_ok(isect.curves[0].curve.ask_circle()?.radius, r), "circle radius");
+        assert!(
+            rel_ok(isect.curves[0].curve.ask_circle()?.radius, r),
+            "circle radius"
+        );
     });
 
     test!("ssi_curve_curve_vertex", {
@@ -696,9 +1074,21 @@ fn main() {
             let (lk, hk) = ek.interval()?;
             let hits = c0.intersect_curve((l0, h0), &ek.curve()?, (lk, hk))?;
             if let Some(h) = hits.first() {
-                let at_v0 = ((h.position.x - p0.x).powi(2) + (h.position.y - p0.y).powi(2) + (h.position.z - p0.z).powi(2)).sqrt() < 1e-6;
-                let at_v1 = ((h.position.x - p1.x).powi(2) + (h.position.y - p1.y).powi(2) + (h.position.z - p1.z).powi(2)).sqrt() < 1e-6;
-                assert!(at_v0 || at_v1, "curve-curve hit should be at a shared vertex, got {:?}", h.position);
+                let at_v0 = ((h.position.x - p0.x).powi(2)
+                    + (h.position.y - p0.y).powi(2)
+                    + (h.position.z - p0.z).powi(2))
+                .sqrt()
+                    < 1e-6;
+                let at_v1 = ((h.position.x - p1.x).powi(2)
+                    + (h.position.y - p1.y).powi(2)
+                    + (h.position.z - p1.z).powi(2))
+                .sqrt()
+                    < 1e-6;
+                assert!(
+                    at_v0 || at_v1,
+                    "curve-curve hit should be at a shared vertex, got {:?}",
+                    h.position
+                );
                 found = true;
                 break;
             }
@@ -712,28 +1102,49 @@ fn main() {
         let faces = blk.faces()?;
         let edges = blk.edges()?;
         // A vertical edge (endpoints differ in z) and a horizontal (z-normal) face.
-        let vedge = edges.iter().find(|e| {
-            let (a, b) = e.vertices().unwrap();
-            (a.point().unwrap().z - b.point().unwrap().z).abs() > 1.0
-        }).unwrap();
+        let vedge = edges
+            .iter()
+            .find(|e| {
+                let (a, b) = e.vertices().unwrap();
+                (a.point().unwrap().z - b.point().unwrap().z).abs() > 1.0
+            })
+            .unwrap();
         let (vl, vh) = vedge.interval()?;
         let vc = vedge.curve()?;
-        let hface = faces.iter().find(|f| {
-            let s = f.surf().unwrap();
-            s.surf_type().unwrap() == SurfType::Plane && s.ask_plane().unwrap().basis.axis.z.abs() > 0.9
-        }).unwrap();
+        let hface = faces
+            .iter()
+            .find(|f| {
+                let s = f.surf().unwrap();
+                s.surf_type().unwrap() == SurfType::Plane
+                    && s.ask_plane().unwrap().basis.axis.z.abs() > 0.9
+            })
+            .unwrap();
         let hsurf = hface.surf()?;
         // Widen so the crossing is interior to the interval.
         let span = vh - vl;
         let sh = hsurf.intersect_curve(&vc, (vl - span, vh + span))?;
-        assert_eq!(sh.len(), 1, "vertical line crosses horizontal plane once, got {}", sh.len());
+        assert_eq!(
+            sh.len(),
+            1,
+            "vertical line crosses horizontal plane once, got {}",
+            sh.len()
+        );
         let fh = hface.intersect_curve(&vc, (vl - span, vh + span))?;
-        assert_eq!(fh.len(), 1, "vertical line crosses horizontal face once, got {}", fh.len());
+        assert_eq!(
+            fh.len(),
+            1,
+            "vertical line crosses horizontal face once, got {}",
+            fh.len()
+        );
         // Same crossing point from both.
         let d = ((sh[0].position.x - fh[0].position.x).powi(2)
             + (sh[0].position.y - fh[0].position.y).powi(2)
-            + (sh[0].position.z - fh[0].position.z).powi(2)).sqrt();
-        assert!(d < 1e-6, "surf/face curve-intersection points disagree by {d}");
+            + (sh[0].position.z - fh[0].position.z).powi(2))
+        .sqrt();
+        assert!(
+            d < 1e-6,
+            "surf/face curve-intersection points disagree by {d}"
+        );
     });
 
     // =========================================================================
@@ -750,7 +1161,12 @@ fn main() {
 
         // Regions: exactly one solid, plus the surrounding void → 2 total.
         let regions = body.regions()?;
-        assert_eq!(regions.len(), 2, "block regions (solid + void), got {}", regions.len());
+        assert_eq!(
+            regions.len(),
+            2,
+            "block regions (solid + void), got {}",
+            regions.len()
+        );
         let n_solid = regions.iter().filter(|r| r.is_solid().unwrap()).count();
         assert_eq!(n_solid, 1, "exactly one solid region, got {}", n_solid);
 
@@ -759,7 +1175,10 @@ fn main() {
         let shells = body.shells()?;
         assert!(!shells.is_empty(), "block should have >=1 shell");
         for sh in &shells {
-            assert!(region_tags.contains(&sh.region()?.tag()), "shell.region not in body");
+            assert!(
+                region_tags.contains(&sh.region()?.tag()),
+                "shell.region not in body"
+            );
         }
         // The solid region's shells cover all 6 faces.
         let solid = regions.iter().find(|r| r.is_solid().unwrap()).unwrap();
@@ -769,7 +1188,11 @@ fn main() {
                 solid_faces.insert(f.tag());
             }
         }
-        assert_eq!(solid_faces.len(), 6, "solid region should touch all 6 faces");
+        assert_eq!(
+            solid_faces.len(),
+            6,
+            "solid region should touch all 6 faces"
+        );
 
         // Each face: exactly one outer loop of 4 fins forming a cycle.
         let mut total_fins = 0;
@@ -778,9 +1201,18 @@ fn main() {
             assert_eq!(loops.len(), 1, "block face has 1 loop, got {}", loops.len());
             let lp = loops[0];
             assert_eq!(lp.face()?.tag(), f.tag(), "loop.face round-trip");
-            assert_eq!(lp.loop_type()?, LoopType::Outer, "block face loop should be outer");
+            assert_eq!(
+                lp.loop_type()?,
+                LoopType::Outer,
+                "block face loop should be outer"
+            );
             let fins = lp.fins()?;
-            assert_eq!(fins.len(), 4, "rectangular face loop has 4 fins, got {}", fins.len());
+            assert_eq!(
+                fins.len(),
+                4,
+                "rectangular face loop has 4 fins, got {}",
+                fins.len()
+            );
             total_fins += fins.len();
             // Fins cycle back to the start after 4 next_in_loop steps.
             let mut cur = fins[0];
@@ -843,7 +1275,10 @@ fn main() {
         let (curve, (t0, t1), _sense) = fin.geometry()?;
         assert!(curve.tag() != 0, "fin geometry returns a curve");
         assert!(curve.entity().is_curve()?, "fin geometry entity is a curve");
-        assert!(t1 > t0, "fin geometry interval is non-degenerate ({t0}..{t1})");
+        assert!(
+            t1 > t0,
+            "fin geometry interval is non-degenerate ({t0}..{t1})"
+        );
     });
 
     test!("face_surface_type_and_extreme", {
@@ -855,12 +1290,20 @@ fn main() {
         }
         // A cylinder has exactly one cylindrical face (+ 2 plane caps).
         let cyl = Body::create_solid_cylinder(5.0, 20.0)?;
-        let n_side = cyl.faces()?.iter().filter(|f| f.surface_type().unwrap() == SurfType::Cylinder).count();
+        let n_side = cyl
+            .faces()?
+            .iter()
+            .filter(|f| f.surface_type().unwrap() == SurfType::Cylinder)
+            .count();
         assert_eq!(n_side, 1, "cylinder has 1 cylindrical face");
 
         // Face::extreme returns real coordinates: the topmost face point over the
         // whole block sits at z = 30 (block base at z = 0).
-        let dirs = [Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)];
+        let dirs = [
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ];
         let zmax = block
             .faces()?
             .iter()
@@ -878,21 +1321,46 @@ fn main() {
         let b = Body::create_solid_block(10.0, 20.0, 30.0)?;
         b.transform(&Transform::translation(0.0, 0.0, 30.0)?)?;
 
-        let dirs_up = [Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)];
-        let dirs_dn = [Vec3::new(0.0, 0.0, -1.0), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)];
+        let dirs_up = [
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ];
+        let dirs_dn = [
+            Vec3::new(0.0, 0.0, -1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ];
         // A face whose whole extent is at z=30: extreme in -z still gives z=30.
-        let a_top = a.faces()?.into_iter()
-            .find(|f| rel_ok(f.extreme(dirs_dn).unwrap().0.z, 30.0)).expect("A top face");
-        let b_bot = b.faces()?.into_iter()
-            .find(|f| rel_ok(f.extreme(dirs_up).unwrap().0.z, 30.0)).expect("B bottom face");
+        let a_top = a
+            .faces()?
+            .into_iter()
+            .find(|f| rel_ok(f.extreme(dirs_dn).unwrap().0.z, 30.0))
+            .expect("A top face");
+        let b_bot = b
+            .faces()?
+            .into_iter()
+            .find(|f| rel_ok(f.extreme(dirs_up).unwrap().0.z, 30.0))
+            .expect("B bottom face");
         let (coi, _pt) = a_top.is_coincident(b_bot, 1e-7)?;
-        assert!(coi.is_coincident(), "stacked block faces coincide, got {:?}", coi);
+        assert!(
+            coi.is_coincident(),
+            "stacked block faces coincide, got {:?}",
+            coi
+        );
 
         // A's top and bottom faces are parallel but offset — not coincident.
-        let a_bot = a.faces()?.into_iter()
-            .find(|f| rel_ok(f.extreme(dirs_up).unwrap().0.z, 0.0)).expect("A bottom face");
+        let a_bot = a
+            .faces()?
+            .into_iter()
+            .find(|f| rel_ok(f.extreme(dirs_up).unwrap().0.z, 0.0))
+            .expect("A bottom face");
         let (coi2, _) = a_top.is_coincident(a_bot, 1e-7)?;
-        assert_eq!(coi2, Coincidence::No, "offset parallel faces are not coincident");
+        assert_eq!(
+            coi2,
+            Coincidence::No,
+            "offset parallel faces are not coincident"
+        );
     });
 
     test!("edge_find_interval_and_precision", {
@@ -902,13 +1370,24 @@ fn main() {
         // find_interval cross-checks the ask_geometry interval.
         let (a0, a1) = e.interval()?;
         let (b0, b1) = e.find_interval()?;
-        assert!(rel_ok(a0, b0) && rel_ok(a1, b1), "find_interval == ask_geometry interval");
+        assert!(
+            rel_ok(a0, b0) && rel_ok(a1, b1),
+            "find_interval == ask_geometry interval"
+        );
 
         // Make the edge tolerant, then restore it.
         let _new = e.set_precision(0.01)?;
-        assert!(e.precision()? > 1e-4, "edge became tolerant, precision {}", e.precision()?);
+        assert!(
+            e.precision()? > 1e-4,
+            "edge became tolerant, precision {}",
+            e.precision()?
+        );
         let tok = e.reset_precision()?;
-        assert!(tok == 17201 || tok == 17202, "reset_precision ok/tangent, got {}", tok);
+        assert!(
+            tok == 17201 || tok == 17202,
+            "reset_precision ok/tangent, got {}",
+            tok
+        );
     });
 
     test!("edge_make_wire_body", {
@@ -929,11 +1408,17 @@ fn main() {
         assert_eq!(verts.len(), 1, "minimum body has exactly 1 vertex");
         let v = verts[0];
         let p = v.point()?;
-        assert!(rel_ok(p.x, 1.0) && rel_ok(p.y, 2.0) && rel_ok(p.z, 3.0), "acorn vertex position");
+        assert!(
+            rel_ok(p.x, 1.0) && rel_ok(p.y, 2.0) && rel_ok(p.z, 3.0),
+            "acorn vertex position"
+        );
         // Its lone shell is a vertex-only (acorn) shell.
         assert_eq!(v.shells()?.len(), 1, "acorn vertex is in 1 shell");
-        assert_eq!(v.shells()?[0].acorn_vertex()?.map(|a| a.tag()), Some(v.tag()),
-            "the shell's acorn vertex is this vertex");
+        assert_eq!(
+            v.shells()?[0].acorn_vertex()?.map(|a| a.tag()),
+            Some(v.tag()),
+            "the shell's acorn vertex is this vertex"
+        );
     });
 
     // =========================================================================
@@ -946,7 +1431,10 @@ fn main() {
         // The body's description mentions it is a body.
         let d = body.entity().description()?;
         assert!(!d.is_empty(), "entity description is non-empty");
-        assert!(d.to_lowercase().contains("body"), "body description mentions 'body': {d:?}");
+        assert!(
+            d.to_lowercase().contains("body"),
+            "body description mentions 'body': {d:?}"
+        );
         // A face's description is also available and non-empty.
         let fd = body.faces()?[0].entity().description()?;
         assert!(!fd.is_empty(), "face description is non-empty");
@@ -973,7 +1461,11 @@ fn main() {
         e.imprint_point(mid)?;
         assert_eq!(block.vertices()?.len(), n_v0 + 1, "imprint split the edge");
         block.entity().delete_redundant()?;
-        assert_eq!(block.vertices()?.len(), n_v0, "delete_redundant removed the split vertex");
+        assert_eq!(
+            block.vertices()?.len(),
+            n_v0,
+            "delete_redundant removed the split vertex"
+        );
     });
 
     // =========================================================================
@@ -984,11 +1476,23 @@ fn main() {
         let _session = Session::start(test_config())?;
         // Block base at origin: x∈±5, y∈±10, z∈0..30.
         let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
-        assert_eq!(body.contains_point(Vec3::new(0.0, 0.0, 15.0))?, Enclosure::Inside);
-        assert_eq!(body.contains_point(Vec3::new(100.0, 0.0, 0.0))?, Enclosure::Outside);
-        assert_eq!(body.contains_point(Vec3::new(0.0, 0.0, -1.0))?, Enclosure::Outside);
+        assert_eq!(
+            body.contains_point(Vec3::new(0.0, 0.0, 15.0))?,
+            Enclosure::Inside
+        );
+        assert_eq!(
+            body.contains_point(Vec3::new(100.0, 0.0, 0.0))?,
+            Enclosure::Outside
+        );
+        assert_eq!(
+            body.contains_point(Vec3::new(0.0, 0.0, -1.0))?,
+            Enclosure::Outside
+        );
         // A point on the +x face (x=5) is on the boundary.
-        assert_eq!(body.contains_point(Vec3::new(5.0, 0.0, 15.0))?, Enclosure::On);
+        assert_eq!(
+            body.contains_point(Vec3::new(5.0, 0.0, 15.0))?,
+            Enclosure::On
+        );
     });
 
     test!("contains_point_sphere", {
@@ -996,8 +1500,14 @@ fn main() {
         let r = 15.0;
         let body = Body::create_solid_sphere(r)?;
         assert_eq!(body.contains_point(Vec3::zero())?, Enclosure::Inside);
-        assert_eq!(body.contains_point(Vec3::new(r * 0.9, 0.0, 0.0))?, Enclosure::Inside);
-        assert_eq!(body.contains_point(Vec3::new(r + 1.0, 0.0, 0.0))?, Enclosure::Outside);
+        assert_eq!(
+            body.contains_point(Vec3::new(r * 0.9, 0.0, 0.0))?,
+            Enclosure::Inside
+        );
+        assert_eq!(
+            body.contains_point(Vec3::new(r + 1.0, 0.0, 0.0))?,
+            Enclosure::Outside
+        );
         assert_eq!(body.contains_point(Vec3::new(r, 0.0, 0.0))?, Enclosure::On);
     });
 
@@ -1010,9 +1520,21 @@ fn main() {
         // Block base centred at origin: x in ±5, y in ±10, z in 0..30.
         let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
         let bb = body.bounding_box()?;
-        assert!(rel_ok(bb.min.x, -5.0) && rel_ok(bb.max.x, 5.0), "bbox x {:?}", bb);
-        assert!(rel_ok(bb.min.y, -10.0) && rel_ok(bb.max.y, 10.0), "bbox y {:?}", bb);
-        assert!(near0(bb.min.z, 30.0) && rel_ok(bb.max.z, 30.0), "bbox z {:?}", bb);
+        assert!(
+            rel_ok(bb.min.x, -5.0) && rel_ok(bb.max.x, 5.0),
+            "bbox x {:?}",
+            bb
+        );
+        assert!(
+            rel_ok(bb.min.y, -10.0) && rel_ok(bb.max.y, 10.0),
+            "bbox y {:?}",
+            bb
+        );
+        assert!(
+            near0(bb.min.z, 30.0) && rel_ok(bb.max.z, 30.0),
+            "bbox z {:?}",
+            bb
+        );
     });
 
     test!("bbox_sphere", {
@@ -1023,11 +1545,18 @@ fn main() {
         let sz = bb.size();
         // Guaranteed-containing box: at least the true diameter, not wildly more.
         for (got, axis) in [(sz.x, "x"), (sz.y, "y"), (sz.z, "z")] {
-            assert!(got >= 2.0 * r - 1e-6 && got <= 2.0 * r * 1.01,
-                "sphere bbox {axis} extent {got} not ~{}", 2.0 * r);
+            assert!(
+                got >= 2.0 * r - 1e-6 && got <= 2.0 * r * 1.01,
+                "sphere bbox {axis} extent {got} not ~{}",
+                2.0 * r
+            );
         }
         let c = bb.center();
-        assert!(near0(c.x, r) && near0(c.y, r) && near0(c.z, r), "sphere bbox center {:?}", c);
+        assert!(
+            near0(c.x, r) && near0(c.y, r) && near0(c.z, r),
+            "sphere bbox center {:?}",
+            c
+        );
     });
 
     // =========================================================================
@@ -1090,7 +1619,11 @@ fn main() {
         let n0 = part.bodies()?.len();
         let block = Body::create_solid_block(1.0, 2.0, 3.0)?;
         let bodies = part.bodies()?;
-        assert_eq!(bodies.len(), n0 + 1, "new block appears in the current partition");
+        assert_eq!(
+            bodies.len(),
+            n0 + 1,
+            "new block appears in the current partition"
+        );
         assert!(
             bodies.iter().any(|b| b.tag() == block.tag()),
             "current partition should list the created block"
@@ -1129,7 +1662,10 @@ fn main() {
             mark.tag(),
             "current mark should be the one just created"
         );
-        assert!(at_mark, "modeller should be at the mark right after creating it");
+        assert!(
+            at_mark,
+            "modeller should be at the mark right after creating it"
+        );
     });
 
     // =========================================================================
@@ -1140,9 +1676,8 @@ fn main() {
     test!("xt_roundtrip", {
         let out_dir = "xt_roundtrip_out";
         let _ = std::fs::create_dir_all(out_dir);
-        let session = Session::start(
-            test_config().frustrum(FrustrumConfig::new().base_dir(out_dir)),
-        )?;
+        let session =
+            Session::start(test_config().frustrum(FrustrumConfig::new().base_dir(out_dir)))?;
 
         let block = Body::create_solid_block(10.0, 20.0, 30.0)?;
         let n_faces = block.faces()?.len();
@@ -1162,10 +1697,17 @@ fn main() {
         assert_eq!(r.vertices()?.len(), n_verts, "XT preserved vertex count");
         // Geometric fidelity: volume and centre of gravity survive the round-trip.
         let mp1 = r.mass_props()?;
-        assert!(rel_ok(mp1.amount, mp0.amount), "XT volume drift: {} vs {}", mp1.amount, mp0.amount);
+        assert!(
+            rel_ok(mp1.amount, mp0.amount),
+            "XT volume drift: {} vs {}",
+            mp1.amount,
+            mp0.amount
+        );
         assert!(
             (mp1.center_of_gravity.z - mp0.center_of_gravity.z).abs() < 1e-6,
-            "XT CoG drift: {} vs {}", mp1.center_of_gravity.z, mp0.center_of_gravity.z
+            "XT CoG drift: {} vs {}",
+            mp1.center_of_gravity.z,
+            mp0.center_of_gravity.z
         );
 
         drop(session);
@@ -1185,7 +1727,10 @@ fn main() {
         assert_eq!(result.len(), 1, "subtract yields exactly one body");
         let vol = result[0].mass_props()?.amount;
         let expected = 8000.0 - std::f64::consts::PI * 9.0 * 20.0; // 8000 - 180π
-        assert!(rel_ok(vol, expected), "drilled-block volume {vol} != {expected}");
+        assert!(
+            rel_ok(vol, expected),
+            "drilled-block volume {vol} != {expected}"
+        );
     });
 
     test!("boolean_unite_block_cylinder", {
@@ -1207,7 +1752,10 @@ fn main() {
         assert_eq!(result.len(), 1, "intersect yields one body");
         let vol = result[0].mass_props()?.amount;
         let expected = std::f64::consts::PI * 9.0 * 20.0; // 180π — the cylinder ∩ block
-        assert!(rel_ok(vol, expected), "intersection volume {vol} != {expected}");
+        assert!(
+            rel_ok(vol, expected),
+            "intersection volume {vol} != {expected}"
+        );
     });
 
     // =========================================================================
@@ -1222,12 +1770,23 @@ fn main() {
             Vec3::new(1.0, 0.0, 0.0),
         );
         let disk = Body::create_sheet_circle(5.0, basis)?; // disk r=5 in z=0 plane
-        assert_eq!(disk.body_type()?, BodyType::Sheet, "disk profile is a sheet");
+        assert_eq!(
+            disk.body_type()?,
+            BodyType::Sheet,
+            "disk profile is a sheet"
+        );
         let solid = disk.extrude(Vec3::new(0.0, 0.0, 10.0))?; // extrude 10 along +z
-        assert_eq!(solid.body_type()?, BodyType::Solid, "extrusion of a sheet is a solid");
+        assert_eq!(
+            solid.body_type()?,
+            BodyType::Solid,
+            "extrusion of a sheet is a solid"
+        );
         let vol = solid.mass_props()?.amount;
         let expected = std::f64::consts::PI * 25.0 * 10.0; // πr²h = 250π
-        assert!(rel_ok(vol, expected), "extruded cylinder volume {vol} != {expected}");
+        assert!(
+            rel_ok(vol, expected),
+            "extruded cylinder volume {vol} != {expected}"
+        );
     });
 
     test!("extrude_rectangle_to_box", {
@@ -1256,12 +1815,24 @@ fn main() {
         // Any single edge: all 12 are length 20, convex 90°.
         let n = block.fillet_edges(&edges[0..1], 3.0)?;
         assert!(n >= 1, "at least one fillet face created (got {n})");
-        assert_eq!(block.body_type()?, BodyType::Solid, "still a solid after fillet");
-        assert_eq!(block.faces()?.len(), 7, "cube + 1 rolling-ball fillet = 7 faces");
+        assert_eq!(
+            block.body_type()?,
+            BodyType::Solid,
+            "still a solid after fillet"
+        );
+        assert_eq!(
+            block.faces()?.len(),
+            7,
+            "cube + 1 rolling-ball fillet = 7 faces"
+        );
         // Rounding a convex 90° edge (length L=20, r=3) removes (1 − π/4)·r²·L.
         let removed = (1.0 - std::f64::consts::PI / 4.0) * 9.0 * 20.0;
         let vol = block.mass_props()?.amount;
-        assert!(rel_ok(vol, 8000.0 - removed), "filleted volume {vol} != {}", 8000.0 - removed);
+        assert!(
+            rel_ok(vol, 8000.0 - removed),
+            "filleted volume {vol} != {}",
+            8000.0 - removed
+        );
     });
 
     // =========================================================================
@@ -1272,19 +1843,33 @@ fn main() {
         let _s = Session::start(test_config())?;
         let block = Body::create_solid_block(20.0, 20.0, 20.0)?; // 8000
         block.offset(1.0)?; // every face out by 1 → 22³
-        assert_eq!(block.body_type()?, BodyType::Solid, "still a solid after offset");
+        assert_eq!(
+            block.body_type()?,
+            BodyType::Solid,
+            "still a solid after offset"
+        );
         let vol = block.mass_props()?.amount;
-        assert!(rel_ok(vol, 22.0f64.powi(3)), "offset block volume {vol} != 10648");
+        assert!(
+            rel_ok(vol, 22.0f64.powi(3)),
+            "offset block volume {vol} != 10648"
+        );
     });
 
     test!("hollow_block_shell", {
         let _s = Session::start(test_config())?;
         let block = Body::create_solid_block(20.0, 20.0, 20.0)?; // 8000
         block.hollow(2.0)?; // wall thickness 2 → internal cavity 16³
-        assert_eq!(block.body_type()?, BodyType::Solid, "closed shell is a solid");
+        assert_eq!(
+            block.body_type()?,
+            BodyType::Solid,
+            "closed shell is a solid"
+        );
         let vol = block.mass_props()?.amount;
         let expected = 8000.0 - 16.0f64.powi(3); // 8000 − 4096 = 3904 (wall material)
-        assert!(rel_ok(vol, expected), "hollow shell volume {vol} != {expected}");
+        assert!(
+            rel_ok(vol, expected),
+            "hollow shell volume {vol} != {expected}"
+        );
     });
 
     // =========================================================================
@@ -1300,16 +1885,32 @@ fn main() {
         // The graph must contain the body itself and every face/edge/vertex.
         assert!(tags.contains(&block.tag()), "topology includes the body");
         for f in block.faces()? {
-            assert!(tags.contains(&f.tag()), "topology includes face {}", f.tag());
+            assert!(
+                tags.contains(&f.tag()),
+                "topology includes face {}",
+                f.tag()
+            );
         }
         for e in block.edges()? {
-            assert!(tags.contains(&e.tag()), "topology includes edge {}", e.tag());
+            assert!(
+                tags.contains(&e.tag()),
+                "topology includes edge {}",
+                e.tag()
+            );
         }
         for v in block.vertices()? {
-            assert!(tags.contains(&v.tag()), "topology includes vertex {}", v.tag());
+            assert!(
+                tags.contains(&v.tag()),
+                "topology includes vertex {}",
+                v.tag()
+            );
         }
         // 1 body + 1 shell + 6 faces + 6 loops + 12 edges + 8 vertices (+fins) ≥ 34.
-        assert!(topols.len() >= 34, "expected ≥34 topols, got {}", topols.len());
+        assert!(
+            topols.len() >= 34,
+            "expected ≥34 topols, got {}",
+            topols.len()
+        );
         assert!(n_relations > 0, "topology graph has parent→child relations");
     });
 
@@ -1327,7 +1928,11 @@ fn main() {
         ))?;
         assert_eq!(session.parts()?.len(), 1, "one body before the section");
         block.section_with_surf(&plane)?; // fence = both → split
-        assert_eq!(session.parts()?.len(), 2, "section split the block into two bodies");
+        assert_eq!(
+            session.parts()?.len(),
+            2,
+            "section split the block into two bodies"
+        );
         // The original tag is now one half — a 20×20×10 box.
         assert_eq!(block.faces()?.len(), 6, "each half is a 6-faced box");
         let half = block.mass_props()?.amount;
@@ -1344,7 +1949,11 @@ fn main() {
         let v0 = block.volume()?;
         let pieces = block.disjoin()?;
         assert_eq!(pieces.len(), 1, "connected body disjoins to one component");
-        assert_eq!(pieces[0].faces()?.len(), 6, "the component is the 6-faced block");
+        assert_eq!(
+            pieces[0].faces()?.len(),
+            6,
+            "the component is the 6-faced block"
+        );
         assert!(rel_ok(pieces[0].volume()?, v0), "disjoin preserves volume");
     });
 
@@ -1357,8 +1966,15 @@ fn main() {
         let block = Body::create_solid_block(10.0, 20.0, 30.0)?;
         for e in block.edges()? {
             // Every outer edge of a block is a sharp convex 90° edge.
-            assert_eq!(e.convexity()?, parasolid_sys::PK_EDGE_convexity_convex_c, "block edge should be convex");
-            assert!(!e.is_smooth(0.01)?, "block edge is a sharp (non-smooth) 90° edge");
+            assert_eq!(
+                e.convexity()?,
+                parasolid_sys::PK_EDGE_convexity_convex_c,
+                "block edge should be convex"
+            );
+            assert!(
+                !e.is_smooth(0.01)?,
+                "block edge is a sharp (non-smooth) 90° edge"
+            );
         }
     });
 
@@ -1367,7 +1983,11 @@ fn main() {
         let block = Body::create_solid_block(10.0, 20.0, 30.0)?;
         for f in block.faces()? {
             // Each of a block's 6 faces borders exactly 4 others.
-            assert_eq!(f.adjacent_faces()?.len(), 4, "block face has 4 adjacent faces");
+            assert_eq!(
+                f.adjacent_faces()?.len(),
+                4,
+                "block face has 4 adjacent faces"
+            );
         }
     });
 
@@ -1418,7 +2038,11 @@ fn main() {
         assert!(rel_ok(block.mass_props()?.amount, 1.0), "unit block volume");
         // ask_smp should report a non-negative processor count.
         let info = session.smp()?;
-        assert!(info.n_processors >= 0, "n_processors sane: {}", info.n_processors);
+        assert!(
+            info.n_processors >= 0,
+            "n_processors sane: {}",
+            info.n_processors
+        );
     });
 
     test!("body_copy_independent", {
@@ -1428,11 +2052,17 @@ fn main() {
         let copy = block.copy()?;
         assert_ne!(block.tag(), copy.tag(), "copy has a distinct tag");
         assert_eq!(session.parts()?.len(), 2, "two bodies in the session");
-        assert!(rel_ok(copy.mass_props()?.amount, 48.0), "copy has same volume");
+        assert!(
+            rel_ok(copy.mass_props()?.amount, 48.0),
+            "copy has same volume"
+        );
         // Deleting the copy leaves the original intact.
         copy.delete()?;
         assert_eq!(session.parts()?.len(), 1, "original survives");
-        assert!(rel_ok(block.mass_props()?.amount, 48.0), "original volume intact");
+        assert!(
+            rel_ok(block.mass_props()?.amount, 48.0),
+            "original volume intact"
+        );
     });
 
     test!("transform_translation_moves_cog", {
@@ -1446,9 +2076,18 @@ fn main() {
         block.transform(&t)?;
         let mp = block.mass_props()?;
         assert!(rel_ok(mp.amount, 8.0), "volume preserved under translation");
-        assert!(near0(mp.center_of_gravity.x - (cog0.x + 10.0), 10.0), "CoG x shifted +10");
-        assert!(near0(mp.center_of_gravity.y - (cog0.y - 5.0), 5.0), "CoG y shifted -5");
-        assert!(near0(mp.center_of_gravity.z - (cog0.z + 3.0), 3.0), "CoG z shifted +3");
+        assert!(
+            near0(mp.center_of_gravity.x - (cog0.x + 10.0), 10.0),
+            "CoG x shifted +10"
+        );
+        assert!(
+            near0(mp.center_of_gravity.y - (cog0.y - 5.0), 5.0),
+            "CoG y shifted -5"
+        );
+        assert!(
+            near0(mp.center_of_gravity.z - (cog0.z + 3.0), 3.0),
+            "CoG z shifted +3"
+        );
     });
 
     test!("transform_uniform_scale_volume", {
@@ -1457,7 +2096,10 @@ fn main() {
         let block = Body::create_solid_block(1.0, 1.0, 1.0)?;
         let t = Transform::uniform_scale(2.0)?;
         block.transform(&t)?;
-        assert!(rel_ok(block.mass_props()?.amount, 8.0), "unit cube scaled x2 -> vol 8");
+        assert!(
+            rel_ok(block.mass_props()?.amount, 8.0),
+            "unit cube scaled x2 -> vol 8"
+        );
     });
 
     test!("transform_matrix_roundtrip", {
@@ -1482,18 +2124,46 @@ fn main() {
         let approx = |a: Vec3, b: Vec3| rel_ok(a.x, b.x) && rel_ok(a.y, b.y) && rel_ok(a.z, b.z);
 
         // Rotation 90° about +z (right-hand rule): (1,0,0) → (0,1,0).
-        let rot = Transform::rotation(origin, Vec3::new(0.0, 0.0, 1.0), std::f64::consts::FRAC_PI_2)?;
-        assert!(approx(rot.apply(Vec3::new(1.0, 0.0, 0.0))?, Vec3::new(0.0, 1.0, 0.0)), "rotate +x → +y");
+        let rot = Transform::rotation(
+            origin,
+            Vec3::new(0.0, 0.0, 1.0),
+            std::f64::consts::FRAC_PI_2,
+        )?;
+        assert!(
+            approx(
+                rot.apply(Vec3::new(1.0, 0.0, 0.0))?,
+                Vec3::new(0.0, 1.0, 0.0)
+            ),
+            "rotate +x → +y"
+        );
         // As a direction it rotates identically (no translation to ignore here).
-        assert!(approx(rot.apply_direction(Vec3::new(1.0, 0.0, 0.0))?, Vec3::new(0.0, 1.0, 0.0)), "rotate dir");
+        assert!(
+            approx(
+                rot.apply_direction(Vec3::new(1.0, 0.0, 0.0))?,
+                Vec3::new(0.0, 1.0, 0.0)
+            ),
+            "rotate dir"
+        );
 
         // Reflection in the plane x=0 (normal +x): (1,2,3) → (-1,2,3).
         let refl = Transform::reflection(origin, Vec3::new(1.0, 0.0, 0.0))?;
-        assert!(approx(refl.apply(Vec3::new(1.0, 2.0, 3.0))?, Vec3::new(-1.0, 2.0, 3.0)), "reflect across x=0");
+        assert!(
+            approx(
+                refl.apply(Vec3::new(1.0, 2.0, 3.0))?,
+                Vec3::new(-1.0, 2.0, 3.0)
+            ),
+            "reflect across x=0"
+        );
 
         // Uniform scale ×2 about the origin: (1,2,3) → (2,4,6).
         let sc = Transform::scale_about(2.0, origin)?;
-        assert!(approx(sc.apply(Vec3::new(1.0, 2.0, 3.0))?, Vec3::new(2.0, 4.0, 6.0)), "scale ×2");
+        assert!(
+            approx(
+                sc.apply(Vec3::new(1.0, 2.0, 3.0))?,
+                Vec3::new(2.0, 4.0, 6.0)
+            ),
+            "scale ×2"
+        );
     });
 
     test!("transform_compose_and_equal", {
@@ -1501,12 +2171,21 @@ fn main() {
         let approx = |a: Vec3, b: Vec3| rel_ok(a.x, b.x) && rel_ok(a.y, b.y) && rel_ok(a.z, b.z);
 
         // then(): apply self, then other. Rotate +x→+y about z, then translate +10x.
-        let rot = Transform::rotation(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0), std::f64::consts::FRAC_PI_2)?;
+        let rot = Transform::rotation(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            std::f64::consts::FRAC_PI_2,
+        )?;
         let tr = Transform::translation(10.0, 0.0, 0.0)?;
         let composed = rot.then(&tr)?;
         // (1,0,0) --rot--> (0,1,0) --translate--> (10,1,0).
-        assert!(approx(composed.apply(Vec3::new(1.0, 0.0, 0.0))?, Vec3::new(10.0, 1.0, 0.0)),
-            "compose applies rot then translate");
+        assert!(
+            approx(
+                composed.apply(Vec3::new(1.0, 0.0, 0.0))?,
+                Vec3::new(10.0, 1.0, 0.0)
+            ),
+            "compose applies rot then translate"
+        );
 
         // is_equal: identical translations are equal; different are not.
         let a = Transform::translation(1.0, 2.0, 3.0)?;
@@ -1516,8 +2195,13 @@ fn main() {
         assert!(!a.is_equal(&c)?, "different translations are not equal");
 
         // apply_direction ignores translation: a pure translate leaves a direction unchanged.
-        assert!(approx(tr.apply_direction(Vec3::new(0.0, 0.0, 1.0))?, Vec3::new(0.0, 0.0, 1.0)),
-            "translation does not move a direction");
+        assert!(
+            approx(
+                tr.apply_direction(Vec3::new(0.0, 0.0, 1.0))?,
+                Vec3::new(0.0, 0.0, 1.0)
+            ),
+            "translation does not move a direction"
+        );
     });
 
     test!("face_colour_attribute", {
@@ -1590,11 +2274,17 @@ fn main() {
         let (new_edges, new_faces) = top.imprint_curve(&circle, (0.0, two_pi))?;
 
         assert!(!new_edges.is_empty(), "imprint created at least one edge");
-        assert!(!new_faces.is_empty(), "imprint created at least one new face");
+        assert!(
+            !new_faces.is_empty(),
+            "imprint created at least one new face"
+        );
         // The top face is now split into two (disk + surround): 7 total.
         assert_eq!(block.faces()?.len(), 7, "top face split → 7 faces");
         // Volume is unchanged (imprint only adds edges/faces, no material).
-        assert!(rel_ok(block.mass_props()?.amount, 1000.0), "volume preserved");
+        assert!(
+            rel_ok(block.mass_props()?.amount, 1000.0),
+            "volume preserved"
+        );
         assert!(block.is_valid()?, "imprinted body still valid");
     });
 
@@ -1605,8 +2295,16 @@ fn main() {
         let _session = Session::start(test_config())?;
         let block = Body::create_solid_block(4.0, 4.0, 4.0)?;
         let mesh = block.facet()?;
-        assert_eq!(mesh.n_facets, 12, "box → 12 triangles, got {}", mesh.n_facets);
-        assert_eq!(mesh.n_fins, 36, "12 triangles → 36 fins, got {}", mesh.n_fins);
+        assert_eq!(
+            mesh.n_facets, 12,
+            "box → 12 triangles, got {}",
+            mesh.n_facets
+        );
+        assert_eq!(
+            mesh.n_fins, 36,
+            "12 triangles → 36 fins, got {}",
+            mesh.n_fins
+        );
         // A second call is deterministic (mesh generation is stable).
         assert_eq!(block.facet()?.n_facets, 12, "faceting is deterministic");
     });
@@ -1633,15 +2331,24 @@ fn main() {
         // A face's surface is geometric.
         let se = face.surf()?.entity();
         assert_eq!(se.class()?, PkClass::Plane, "block face surface is a plane");
-        assert!(se.is_geom()? && se.is_surf()? && !se.is_curve()?, "plane is a surface");
+        assert!(
+            se.is_geom()? && se.is_surf()? && !se.is_curve()?,
+            "plane is a surface"
+        );
 
         // An orphan line is a curve; a point is geometric but not a surface.
         let line = Curve::line(Vec3::zero(), Vec3::new(1.0, 0.0, 0.0))?;
         assert_eq!(line.entity().class()?, PkClass::Line, "line class");
-        assert!(line.entity().is_curve()? && line.entity().is_geom()?, "line is a curve");
+        assert!(
+            line.entity().is_curve()? && line.entity().is_geom()?,
+            "line is a curve"
+        );
         let pt = Point::create(Vec3::new(1.0, 2.0, 3.0))?;
         assert_eq!(pt.entity().class()?, PkClass::Point, "point class");
-        assert!(pt.entity().is_geom()? && !pt.entity().is_topol()?, "point is geom, not topol");
+        assert!(
+            pt.entity().is_geom()? && !pt.entity().is_topol()?,
+            "point is geom, not topol"
+        );
 
         // Generic copy + delete round-trips validity.
         let pcopy = pt.entity().copy()?;
@@ -1670,13 +2377,21 @@ fn main() {
                 n_faces += 1;
                 // Face ownership + surface handle consistency.
                 assert_eq!(face.body()?.tag(), body.tag(), "face.body round-trip");
-                assert_eq!(face.surf_tag()?, face.surf()?.tag(), "surf_tag == surf().tag");
+                assert_eq!(
+                    face.surf_tag()?,
+                    face.surf()?.tag(),
+                    "surf_tag == surf().tag"
+                );
                 // Empirically, PK_SHELL_ask_oriented_faces sets `orientation`
                 // TRUE when the surface normal points *into* the region's
                 // material, so the solid's outward normal is the opposite sign.
                 let pl = face.surf()?.ask_plane()?;
                 let s = if orient_out { -1.0 } else { 1.0 };
-                let nout = Vec3::new(pl.basis.axis.x * s, pl.basis.axis.y * s, pl.basis.axis.z * s);
+                let nout = Vec3::new(
+                    pl.basis.axis.x * s,
+                    pl.basis.axis.y * s,
+                    pl.basis.axis.z * s,
+                );
                 // Point on the face (its plane origin) minus the centroid.
                 let d = Vec3::new(
                     pl.basis.origin.x - cog.x,
@@ -1684,7 +2399,10 @@ fn main() {
                     pl.basis.origin.z - cog.z,
                 );
                 let dot = d.x * nout.x + d.y * nout.y + d.z * nout.z;
-                assert!(dot > 0.0, "outward normal must point away from CoG, dot={dot}");
+                assert!(
+                    dot > 0.0,
+                    "outward normal must point away from CoG, dot={dot}"
+                );
             }
         }
         assert_eq!(n_faces, 6, "block solid shell has 6 faces, got {n_faces}");
@@ -1697,10 +2415,21 @@ fn main() {
     test!("mass_shortcuts", {
         let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(2.0, 3.0, 4.0)?;
-        assert!(rel_ok(body.volume()?, 24.0), "volume() shortcut = {}", body.volume()?);
-        assert!(rel_ok(body.mass()?, 24.0), "mass() shortcut (unit density) = {}", body.mass()?);
+        assert!(
+            rel_ok(body.volume()?, 24.0),
+            "volume() shortcut = {}",
+            body.volume()?
+        );
+        assert!(
+            rel_ok(body.mass()?, 24.0),
+            "mass() shortcut (unit density) = {}",
+            body.mass()?
+        );
         let mp = body.mass_props_with_accuracy(0.999999)?;
-        assert!(rel_ok(mp.amount, 24.0) && rel_ok(mp.mass, 24.0), "high-accuracy mass props");
+        assert!(
+            rel_ok(mp.amount, 24.0) && rel_ok(mp.mass, 24.0),
+            "high-accuracy mass props"
+        );
     });
 
     // =========================================================================
@@ -1716,8 +2445,16 @@ fn main() {
         assert_eq!(fins.len(), 4, "rectangular face loop = 4 fins");
         for f in &fins {
             // next/previous are mutual inverses.
-            assert_eq!(f.next_in_loop()?.previous_in_loop()?.tag(), f.tag(), "next∘prev = id");
-            assert_eq!(f.previous_in_loop()?.next_in_loop()?.tag(), f.tag(), "prev∘next = id");
+            assert_eq!(
+                f.next_in_loop()?.previous_in_loop()?.tag(),
+                f.tag(),
+                "next∘prev = id"
+            );
+            assert_eq!(
+                f.previous_in_loop()?.next_in_loop()?.tag(),
+                f.tag(),
+                "prev∘next = id"
+            );
             // fin.loop_ round-trips to the loop; fin.edge is one of the face's edges.
             assert_eq!(f.loop_()?.tag(), lp.tag(), "fin.loop_ round-trip");
             let e = f.edge()?;
@@ -1739,7 +2476,11 @@ fn main() {
                 .precision(1e-7)
                 .angle_precision(1e-9),
         )?;
-        assert!((session.precision()? - 1e-7).abs() < 1e-12, "precision get {}", session.precision()?);
+        assert!(
+            (session.precision()? - 1e-7).abs() < 1e-12,
+            "precision get {}",
+            session.precision()?
+        );
         assert!(
             (session.angle_precision()? - 1e-9).abs() < 1e-13,
             "angle precision get {}",
@@ -1767,7 +2508,11 @@ fn main() {
                 .check_self_int(true)
                 .general_topology(true),
         )?;
-        assert_eq!(session.check_continuity()?, 1, "continuity level round-trip");
+        assert_eq!(
+            session.check_continuity()?,
+            1,
+            "continuity level round-trip"
+        );
         assert!(session.check_self_int()?, "check_self_int on");
         assert!(session.general_topology()?, "general_topology on");
         assert!(session.check_arguments()?, "check_arguments on");
@@ -1785,7 +2530,9 @@ fn main() {
 
     test!("session_user_field_len", {
         let session = Session::start(
-            SessionConfig::new().check_arguments(true).user_field_len(16),
+            SessionConfig::new()
+                .check_arguments(true)
+                .user_field_len(16),
         )?;
         assert_eq!(session.user_field_len()?, 16, "user field len set at start");
     });
@@ -1798,7 +2545,11 @@ fn main() {
         let session = Session::start(SessionConfig::new().check_arguments(true).rollback(true))?;
         let part = session.current_partition()?;
         let init = part.initial_pmark()?;
-        assert_eq!(init.partition()?.tag(), part.tag(), "pmark.partition round-trip");
+        assert_eq!(
+            init.partition()?.tag(),
+            part.tag(),
+            "pmark.partition round-trip"
+        );
         let (cur, _at) = part.current_pmark()?;
         let _id = cur.identifier()?; // identifier is queryable
 
@@ -1827,7 +2578,10 @@ fn main() {
         assert_eq!(orig.bodies()?.len(), 1, "one body after create");
         let _line = Curve::line(Vec3::zero(), Vec3::new(1.0, 0.0, 0.0))?;
         let _pt = Point::create(Vec3::new(1.0, 2.0, 3.0))?;
-        assert!(!orig.geoms()?.is_empty(), "orphan geometry registered in partition");
+        assert!(
+            !orig.geoms()?.is_empty(),
+            "orphan geometry registered in partition"
+        );
 
         // NOTE: a *second* partition can be created (distinct tag) but cannot be
         // made current or deleted under the minimal in-memory delta frustrum —
@@ -1837,7 +2591,11 @@ fn main() {
         // original partition's bodies()/geoms()/pmark surface is fully exercised
         // above and in partition_pmark_navigation.
         let p2 = Partition::create()?;
-        assert_ne!(p2.tag(), orig.tag(), "PK_PARTITION_create yields a distinct tag");
+        assert_ne!(
+            p2.tag(),
+            orig.tag(),
+            "PK_PARTITION_create yields a distinct tag"
+        );
     });
 
     // =========================================================================
@@ -1855,7 +2613,11 @@ fn main() {
             // The face normal = surface normal adjusted by the face's sense;
             // by Parasolid convention it points out of the solid material.
             let s = if f.orientation()? { 1.0 } else { -1.0 };
-            let nrm = Vec3::new(pl.basis.axis.x * s, pl.basis.axis.y * s, pl.basis.axis.z * s);
+            let nrm = Vec3::new(
+                pl.basis.axis.x * s,
+                pl.basis.axis.y * s,
+                pl.basis.axis.z * s,
+            );
             let d = Vec3::new(
                 pl.basis.origin.x - cog.x,
                 pl.basis.origin.y - cog.y,
@@ -1877,8 +2639,15 @@ fn main() {
         let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
         let b0 = body.bounding_box()?;
-        let (sx, sy, sz) = (b0.max.x - b0.min.x, b0.max.y - b0.min.y, b0.max.z - b0.min.z);
-        assert!(rel_ok(sx, 10.0) && rel_ok(sy, 20.0) && rel_ok(sz, 30.0), "initial extents {sx},{sy},{sz}");
+        let (sx, sy, sz) = (
+            b0.max.x - b0.min.x,
+            b0.max.y - b0.min.y,
+            b0.max.z - b0.min.z,
+        );
+        assert!(
+            rel_ok(sx, 10.0) && rel_ok(sy, 20.0) && rel_ok(sz, 30.0),
+            "initial extents {sx},{sy},{sz}"
+        );
 
         // 90° rotation about Z (row-major, transforms [x y z 1]^T).
         #[rustfmt::skip]
@@ -1894,9 +2663,19 @@ fn main() {
         body.transform(&rot)?;
 
         let b1 = body.bounding_box()?;
-        let (ax, ay, az) = (b1.max.x - b1.min.x, b1.max.y - b1.min.y, b1.max.z - b1.min.z);
-        assert!(rel_ok(ax, 20.0) && rel_ok(ay, 10.0) && rel_ok(az, 30.0), "rotated extents swap x/y: {ax},{ay},{az}");
-        assert!(rel_ok(body.volume()?, 6000.0), "rigid rotation preserves volume");
+        let (ax, ay, az) = (
+            b1.max.x - b1.min.x,
+            b1.max.y - b1.min.y,
+            b1.max.z - b1.min.z,
+        );
+        assert!(
+            rel_ok(ax, 20.0) && rel_ok(ay, 10.0) && rel_ok(az, 30.0),
+            "rotated extents swap x/y: {ax},{ay},{az}"
+        );
+        assert!(
+            rel_ok(body.volume()?, 6000.0),
+            "rigid rotation preserves volume"
+        );
     });
 
     // =========================================================================
@@ -1910,11 +2689,18 @@ fn main() {
         let post2 = Body::create_solid_cylinder(2.0, 40.0)?; // r=2, concentric (inside post1)
         let opts = BooleanOptions::new().tracking(true);
         let result = boolean::boolean(block, vec![post1, post2], BooleanOp::Unite, &opts)?;
-        assert_eq!(result.len(), 1, "multi-tool unite yields one connected body");
+        assert_eq!(
+            result.len(),
+            1,
+            "multi-tool unite yields one connected body"
+        );
         let vol = result[0].mass_props()?.amount;
         // The r=2 post lies inside the r=3 post, so the union protrusion is r=3.
         let expected = 8000.0 + std::f64::consts::PI * 9.0 * 20.0;
-        assert!(rel_ok(vol, expected), "multi-tool union volume {vol} != {expected}");
+        assert!(
+            rel_ok(vol, expected),
+            "multi-tool union volume {vol} != {expected}"
+        );
     });
 
     // =========================================================================
@@ -1932,13 +2718,20 @@ fn main() {
                     .frustrum(FrustrumConfig::new().base_dir(dir))
                     .journal_file("session"),
             )?;
-            assert!(session.journalling()?, "journalling on when a journal file is configured");
+            assert!(
+                session.journalling()?,
+                "journalling on when a journal file is configured"
+            );
             // Exercise the modeller so the journal captures API calls.
             let _b = Body::create_solid_block(2.0, 2.0, 2.0)?;
             // Session drop stops the kernel, flushing + closing the journal.
         }
         let path = std::path::Path::new(dir).join("session.jnl");
-        assert!(path.exists(), "journal file {} should exist after session stop", path.display());
+        assert!(
+            path.exists(),
+            "journal file {} should exist after session stop",
+            path.display()
+        );
         let meta = std::fs::metadata(&path)?;
         assert!(meta.len() > 0, "journal file should be non-empty");
     });
@@ -1951,13 +2744,23 @@ fn main() {
         // Validates PK_CURVE_find_length, which takes PK_INTERVAL_t BY VALUE
         // (16-byte {low,high} struct). A wrong by-value ABI corrupts the arg.
         let _session = Session::start(test_config())?;
-        let zb = Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let zb = Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let circle = Curve::circle(zb, 5.0)?;
         let clen = circle.length((0.0, std::f64::consts::TAU))?;
-        assert!(rel_ok(clen, std::f64::consts::TAU * 5.0), "circle length {clen} != 2π·5");
+        assert!(
+            rel_ok(clen, std::f64::consts::TAU * 5.0),
+            "circle length {clen} != 2π·5"
+        );
         // A line is arc-length parameterised: length over [0,7] = 7.
         let line = Curve::line(Vec3::zero(), Vec3::new(1.0, 0.0, 0.0))?;
-        assert!(rel_ok(line.length((0.0, 7.0))?, 7.0), "line length over [0,7] != 7");
+        assert!(
+            rel_ok(line.length((0.0, 7.0))?, 7.0),
+            "line length over [0,7] != 7"
+        );
     });
 
     test!("edge_contains_point", {
@@ -1971,7 +2774,10 @@ fn main() {
         let mid = Vec3::new((a.x + b.x) / 2.0, (a.y + b.y) / 2.0, (a.z + b.z) / 2.0);
         assert!(edge.contains_point(mid)?, "edge midpoint lies on the edge");
         let far = Vec3::new(a.x + 1000.0, a.y + 1000.0, a.z);
-        assert!(!edge.contains_point(far)?, "distant point is not on the edge");
+        assert!(
+            !edge.contains_point(far)?,
+            "distant point is not on the edge"
+        );
     });
 
     test!("surf_make_sheet_body", {
@@ -1980,12 +2786,25 @@ fn main() {
         // (INTERVAL + VECTOR + UVBOX). A plane bounded to [0,10]×[0,20] gives a
         // rectangular sheet of area 200.
         let _session = Session::start(test_config())?;
-        let zb = Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let zb = Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let plane = Surf::plane(zb)?;
-        let sheet = plane.make_sheet_body(UvBox { u_min: 0.0, v_min: 0.0, u_max: 10.0, v_max: 20.0 })?;
+        let sheet = plane.make_sheet_body(UvBox {
+            u_min: 0.0,
+            v_min: 0.0,
+            u_max: 10.0,
+            v_max: 20.0,
+        })?;
         assert_eq!(sheet.body_type()?, BodyType::Sheet, "made a sheet body");
         // Sheet mass "amount" is area for a sheet body.
-        assert!(rel_ok(sheet.mass_props()?.amount, 200.0), "sheet area {} != 200", sheet.mass_props()?.amount);
+        assert!(
+            rel_ok(sheet.mass_props()?.amount, 200.0),
+            "sheet area {} != 200",
+            sheet.mass_props()?.amount
+        );
         assert_eq!(sheet.faces()?.len(), 1, "planar sheet has one face");
     });
 
@@ -2005,12 +2824,18 @@ fn main() {
         // A cylinder has circular edges that are not Open (Closed or Ring),
         // exercising a second decode of the enum.
         let cyl = Body::create_solid_cylinder(5.0, 12.0)?;
-        let non_open = cyl.edges()?.iter().any(|e| !matches!(e.edge_type().unwrap(), EdgeType::Open));
+        let non_open = cyl
+            .edges()?
+            .iter()
+            .any(|e| !matches!(e.edge_type().unwrap(), EdgeType::Open));
         assert!(non_open, "cylinder has a non-Open (circular) edge");
         // Every corner is a normal vertex.
         for v in body.vertices()? {
             let vt = v.vertex_type()?;
-            assert!(matches!(vt, VertexType::Normal), "block vertex type = {vt:?}");
+            assert!(
+                matches!(vt, VertexType::Normal),
+                "block vertex type = {vt:?}"
+            );
         }
         // Fins of a face loop are normal (manifold) fins.
         let face = body.faces()?[0];
@@ -2037,7 +2862,10 @@ fn main() {
             assert_eq!(r.body()?.tag(), body.tag(), "region.body round-trip");
         }
         let solid = regions.iter().find(|r| r.is_solid().unwrap()).unwrap();
-        assert!(!solid.adjacent_regions()?.is_empty(), "solid region adjacent to the void");
+        assert!(
+            !solid.adjacent_regions()?.is_empty(),
+            "solid region adjacent to the void"
+        );
 
         // Shells: body round-trip; a face's single shell is one of the body's shells.
         let shell_tags: HashSet<i32> = body.shells()?.iter().map(|s| s.tag()).collect();
@@ -2045,7 +2873,10 @@ fn main() {
             assert_eq!(s.body()?.tag(), body.tag(), "shell.body round-trip");
         }
         let face = body.faces()?[0];
-        assert!(shell_tags.contains(&face.shell()?.tag()), "face.shell ∈ body shells");
+        assert!(
+            shell_tags.contains(&face.shell()?.tag()),
+            "face.shell ∈ body shells"
+        );
 
         // Face → first loop → loop navigation.
         let lp = face.first_loop()?.expect("face has a first loop");
@@ -2064,16 +2895,31 @@ fn main() {
         // A manifold fin may carry an SP-curve or no own curve (the geometry lives
         // on the edge); only assert curve-ness when the fin has its own curve.
         if !fc.entity().is_null() {
-            assert!(fc.entity().is_curve()?, "fin curve, when present, is a curve");
-            assert_eq!(ff.curve()?.entity().tag(), fc.entity().tag(), "fin.curve == oriented curve");
+            assert!(
+                fc.entity().is_curve()?,
+                "fin curve, when present, is a curve"
+            );
+            assert_eq!(
+                ff.curve()?.entity().tag(),
+                fc.entity().tag(),
+                "fin.curve == oriented curve"
+            );
         }
         let _pos = ff.is_positive()?;
         // A manifold edge's radial ring is exactly 2 fins.
-        assert_eq!(ff.next_of_edge()?.next_of_edge()?.tag(), ff.tag(), "manifold radial ring = 2 fins");
+        assert_eq!(
+            ff.next_of_edge()?.next_of_edge()?.tag(),
+            ff.tag(),
+            "manifold radial ring = 2 fins"
+        );
 
         // Edge navigation.
         let e = ff.edge()?;
-        assert_eq!(e.first_fin()?.edge()?.tag(), e.tag(), "edge.first_fin.edge round-trip");
+        assert_eq!(
+            e.first_fin()?.edge()?.tag(),
+            e.tag(),
+            "edge.first_fin.edge round-trip"
+        );
         assert!(!e.shells()?.is_empty(), "edge belongs to ≥1 shell");
         let (ec, _) = e.oriented_curve()?;
         assert!(ec.entity().is_curve()?, "edge oriented curve is a curve");
@@ -2084,7 +2930,10 @@ fn main() {
         // Vertex navigation.
         let v = lp.vertices()?[0];
         assert!(!v.shells()?.is_empty(), "vertex belongs to ≥1 shell");
-        assert!(v.isolated_loops()?.is_empty(), "a normal block vertex has no isolated loops");
+        assert!(
+            v.isolated_loops()?.is_empty(),
+            "a normal block vertex has no isolated loops"
+        );
     });
 
     // =========================================================================
@@ -2097,8 +2946,14 @@ fn main() {
         let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 20.0, 30.0)?;
         // Point (10,0,15) is 5 outside the +X face (x=5).
-        let r = body.entity().distance_to_point(Vec3::new(10.0, 0.0, 15.0))?;
-        assert!(rel_ok(r.distance, 5.0), "point→body distance {} != 5", r.distance);
+        let r = body
+            .entity()
+            .distance_to_point(Vec3::new(10.0, 0.0, 15.0))?;
+        assert!(
+            rel_ok(r.distance, 5.0),
+            "point→body distance {} != 5",
+            r.distance
+        );
         assert!(
             rel_ok(r.point_1.x, 5.0) && r.point_1.y.abs() < 1e-6 && rel_ok(r.point_1.z, 15.0),
             "closest point on +X face {:?}",
@@ -2114,9 +2969,18 @@ fn main() {
         b2.transform(&Transform::translation(20.0, 0.0, 0.0)?)?;
         let expected = b2.bounding_box()?.min.x - b1.bounding_box()?.max.x;
         let r = b1.entity().distance_to(b2.entity())?;
-        assert!(rel_ok(r.distance, expected), "block→block distance {} != {}", r.distance, expected);
+        assert!(
+            rel_ok(r.distance, expected),
+            "block→block distance {} != {}",
+            r.distance,
+            expected
+        );
         // The first closest point lies on b1's +X face.
-        assert!(rel_ok(r.point_1.x, b1.bounding_box()?.max.x), "closest point on b1 +X face: {:?}", r.point_1);
+        assert!(
+            rel_ok(r.point_1.x, b1.bounding_box()?.max.x),
+            "closest point on b1 +X face: {:?}",
+            r.point_1
+        );
     });
 
     // =========================================================================
@@ -2130,7 +2994,11 @@ fn main() {
         let circ = cyl
             .edges()?
             .into_iter()
-            .find(|e| e.curve().map(|c| c.curve_type().ok() == Some(CurveType::Circle)).unwrap_or(false))
+            .find(|e| {
+                e.curve()
+                    .map(|c| c.curve_type().ok() == Some(CurveType::Circle))
+                    .unwrap_or(false)
+            })
             .expect("cylinder has a circular edge");
         let (planar, normal) = circ.is_planar()?;
         assert!(planar, "circular edge is planar");
@@ -2144,7 +3012,10 @@ fn main() {
         let ((sp, st), (ep, _et)) = e.end_tangents()?;
         let dlen = ((ep.x - sp.x).powi(2) + (ep.y - sp.y).powi(2) + (ep.z - sp.z).powi(2)).sqrt();
         assert!(dlen > 1.0, "edge endpoints distinct (len {dlen})");
-        assert!((st.x * st.x + st.y * st.y + st.z * st.z).sqrt() > 1e-6, "start tangent non-zero");
+        assert!(
+            (st.x * st.x + st.y * st.y + st.z * st.z).sqrt() > 1e-6,
+            "start tangent non-zero"
+        );
         assert!(e.precision()? >= 0.0, "edge precision non-negative");
     });
 
@@ -2160,7 +3031,10 @@ fn main() {
         assert!(p0 >= 0.0, "vertex precision non-negative, got {p0}");
         // Setting a tolerant precision, when accepted, is reflected back.
         if v.set_precision(1e-4).is_ok() {
-            assert!(v.precision()? >= p0, "set_precision did not lower tolerance");
+            assert!(
+                v.precision()? >= p0,
+                "set_precision did not lower tolerance"
+            );
         }
     });
 
@@ -2182,7 +3056,10 @@ fn main() {
         assert!(!pv, "cylinder side is not periodic in v");
         // Trimmed uvbox: u spans 2π, v spans the height [0,12].
         let uv = side.uvbox()?;
-        assert!(rel_ok(uv.u_max - uv.u_min, std::f64::consts::TAU), "cyl face u-span ≈ 2π");
+        assert!(
+            rel_ok(uv.u_max - uv.u_min, std::f64::consts::TAU),
+            "cyl face u-span ≈ 2π"
+        );
         assert!(rel_ok(uv.v_max - uv.v_min, 12.0), "cyl face v-span ≈ 12");
 
         // A block's planar face is a uvbox patch and shares exactly one edge with
@@ -2192,7 +3069,11 @@ fn main() {
         assert!(f0.is_uvbox()?, "block planar face is a uvbox patch");
         let adj = f0.adjacent_faces()?;
         assert!(!adj.is_empty(), "block face has neighbours");
-        assert_eq!(f0.common_edges(adj[0])?.len(), 1, "adjacent block faces share 1 edge");
+        assert_eq!(
+            f0.common_edges(adj[0])?.len(),
+            1,
+            "adjacent block faces share 1 edge"
+        );
     });
 
     // =========================================================================
@@ -2201,7 +3082,9 @@ fn main() {
 
     test!("imprint_point_face_and_edge", {
         let session = Session::start(
-            SessionConfig::new().check_arguments(true).general_topology(true),
+            SessionConfig::new()
+                .check_arguments(true)
+                .general_topology(true),
         )?;
         let _ = &session;
         let block = Body::create_solid_block(10.0, 10.0, 10.0)?;
@@ -2214,7 +3097,9 @@ fn main() {
             .find(|f| {
                 f.surf()
                     .and_then(|s| s.ask_plane())
-                    .map(|pl| (pl.basis.origin.z - bb.max.z).abs() < 1e-9 && pl.basis.axis.z.abs() > 0.99)
+                    .map(|pl| {
+                        (pl.basis.origin.z - bb.max.z).abs() < 1e-9 && pl.basis.axis.z.abs() > 0.99
+                    })
                     .unwrap_or(false)
             })
             .expect("top face");
@@ -2222,8 +3107,15 @@ fn main() {
         let cy = (bb.min.y + bb.max.y) / 2.0;
         let n_v0 = block.vertices()?.len();
         let nv = top.imprint_point(Vec3::new(cx, cy, bb.max.z))?;
-        assert!(rel_ok(nv.point()?.z, bb.max.z), "imprinted vertex on top face");
-        assert_eq!(block.vertices()?.len(), n_v0 + 1, "face point-imprint added 1 vertex");
+        assert!(
+            rel_ok(nv.point()?.z, bb.max.z),
+            "imprinted vertex on top face"
+        );
+        assert_eq!(
+            block.vertices()?.len(),
+            n_v0 + 1,
+            "face point-imprint added 1 vertex"
+        );
 
         // Split an edge at its midpoint: +1 vertex, +1 edge.
         let block2 = Body::create_solid_block(8.0, 8.0, 8.0)?;
@@ -2238,7 +3130,11 @@ fn main() {
             rel_ok(mp.x, mid.x) && rel_ok(mp.y, mid.y) && rel_ok(mp.z, mid.z),
             "split vertex at edge midpoint"
         );
-        assert_eq!(block2.edges()?.len(), n_e0 + 1, "edge point-imprint split the edge");
+        assert_eq!(
+            block2.edges()?.len(),
+            n_e0 + 1,
+            "edge point-imprint split the edge"
+        );
     });
 
     // =========================================================================
@@ -2255,7 +3151,10 @@ fn main() {
         // themselves exercise on SP-curve fins from spline surfaces / imprints.)
         let block = Body::create_solid_block(10.0, 10.0, 10.0)?;
         let fin = block.faces()?[0].loops()?[0].first_fin()?;
-        assert!(fin.interval().is_err(), "analytic-face fin exposes no SP-curve interval (clean err)");
+        assert!(
+            fin.interval().is_err(),
+            "analytic-face fin exposes no SP-curve interval (clean err)"
+        );
     });
 
     // =========================================================================
@@ -2269,9 +3168,16 @@ fn main() {
         let circ = cyl
             .edges()?
             .into_iter()
-            .find(|e| e.curve().map(|c| c.curve_type().ok() == Some(CurveType::Circle)).unwrap_or(false))
+            .find(|e| {
+                e.curve()
+                    .map(|c| c.curve_type().ok() == Some(CurveType::Circle))
+                    .unwrap_or(false)
+            })
             .expect("circular edge");
-        assert!(!circ.g1_edges(1e-6, false)?.is_empty(), "circular edge G1 chain non-empty");
+        assert!(
+            !circ.g1_edges(1e-6, false)?.is_empty(),
+            "circular edge G1 chain non-empty"
+        );
 
         // The +z-extreme point of a vertical block edge is its top vertex.
         let block = Body::create_solid_block(10.0, 20.0, 30.0)?;
@@ -2289,8 +3195,16 @@ fn main() {
             Vec3::new(1.0, 0.0, 0.0),
             Vec3::new(0.0, 1.0, 0.0),
         ])?;
-        assert!(rel_ok(ex.z, bb.max.z), "extreme +z point at top, z={}", ex.z);
-        assert_eq!(topol.class()?, PkClass::Vertex, "extreme sub-topology is a vertex");
+        assert!(
+            rel_ok(ex.z, bb.max.z),
+            "extreme +z point at top, z={}",
+            ex.z
+        );
+        assert_eq!(
+            topol.class()?,
+            PkClass::Vertex,
+            "extreme sub-topology is a vertex"
+        );
     });
 
     // =========================================================================
@@ -2302,19 +3216,31 @@ fn main() {
         let body = Body::create_solid_block(10.0, 10.0, 10.0)?;
         // All faces are planes → analytic → classic geometry.
         assert_eq!(body.entity().geom_category()?, GeomCategory::Classic);
-        assert_eq!(body.faces()?[0].entity().geom_category()?, GeomCategory::Classic);
+        assert_eq!(
+            body.faces()?[0].entity().geom_category()?,
+            GeomCategory::Classic
+        );
     });
 
     test!("entity_identifier_stable", {
         let _session = Session::start(test_config())?;
         let faces = Body::create_solid_block(10.0, 10.0, 10.0)?.faces()?;
         let id0 = faces[0].entity().identifier()?;
-        assert_eq!(id0, faces[0].entity().identifier()?, "identifier stable across queries");
-        assert_ne!(id0, faces[1].entity().identifier()?, "distinct faces have distinct ids");
+        assert_eq!(
+            id0,
+            faces[0].entity().identifier()?,
+            "identifier stable across queries"
+        );
+        assert_ne!(
+            id0,
+            faces[1].entity().identifier()?,
+            "distinct faces have distinct ids"
+        );
     });
 
     test!("entity_user_field_roundtrip", {
-        let _session = Session::start(SessionConfig::new().check_arguments(true).user_field_len(2))?;
+        let _session =
+            Session::start(SessionConfig::new().check_arguments(true).user_field_len(2))?;
         let e = Body::create_solid_block(10.0, 10.0, 10.0)?.entity();
         assert_eq!(e.user_field()?, vec![0, 0], "user field starts zeroed");
         e.set_user_field(&[7, 11])?;
@@ -2329,16 +3255,27 @@ fn main() {
         let _session = Session::start(test_config())?;
         let block = Body::create_solid_block(20.0, 20.0, 20.0)?; // z ∈ [0,20]
         // Imprint the mid-height plane z=10 (normal +z).
-        let mid = Axis2::new(Vec3::new(0.0, 0.0, 10.0), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let mid = Axis2::new(
+            Vec3::new(0.0, 0.0, 10.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let new_edges = block.imprint_plane(mid, 1.0e-8)?;
-        assert_eq!(block.body_type()?, BodyType::Solid, "still solid after imprint");
+        assert_eq!(
+            block.body_type()?,
+            BodyType::Solid,
+            "still solid after imprint"
+        );
         // The plane cuts the 4 side faces (6→10 faces), splits the 4 vertical
         // edges and adds a 4-edge rim (12→20 edges), adds 4 mid-rim vertices (8→12).
         assert_eq!(block.faces()?.len(), 10, "side faces split → 10 faces");
         assert_eq!(block.edges()?.len(), 20, "split + rim → 20 edges");
         assert_eq!(block.vertices()?.len(), 12, "mid-rim vertices → 12");
         assert!(!new_edges.is_empty(), "imprint returned new loop edges");
-        assert!(rel_ok(block.mass_props()?.amount, 8000.0), "no material change");
+        assert!(
+            rel_ok(block.mass_props()?.amount, 8000.0),
+            "no material change"
+        );
     });
 
     // =========================================================================
@@ -2348,25 +3285,53 @@ fn main() {
     test!("spin_disk_to_torus", {
         let _session = Session::start(test_config())?;
         // Disk r=1 in the XZ plane (normal +Y), centred at (5,0,0).
-        let basis = Axis2::new(Vec3::new(5.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0), Vec3::new(1.0, 0.0, 0.0));
+        let basis = Axis2::new(
+            Vec3::new(5.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let disk = Body::create_sheet_circle(1.0, basis)?;
         // Full revolution about the Z axis → a solid torus, major R=5, minor r=1.
-        let torus = disk.spin(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), std::f64::consts::TAU)?;
-        assert_eq!(torus.body_type()?, BodyType::Solid, "revolved disk is a solid torus");
+        let torus = disk.spin(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            std::f64::consts::TAU,
+        )?;
+        assert_eq!(
+            torus.body_type()?,
+            BodyType::Solid,
+            "revolved disk is a solid torus"
+        );
         // V = 2π²·R·r² = 2π²·5·1 = 10π² ≈ 98.696.
         let expected = 2.0 * std::f64::consts::PI.powi(2) * 5.0 * 1.0;
-        assert!(rel_ok(torus.mass_props()?.amount, expected), "torus volume {} != {expected}", torus.mass_props()?.amount);
+        assert!(
+            rel_ok(torus.mass_props()?.amount, expected),
+            "torus volume {} != {expected}",
+            torus.mass_props()?.amount
+        );
     });
 
     test!("sweep_disk_to_cylinder", {
         let _session = Session::start(test_config())?;
         // Disk r=3 in the XY plane (normal +Z), swept 7 along +Z → a cylinder.
-        let basis = Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let basis = Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let disk = Body::create_sheet_circle(3.0, basis)?;
         let solid = disk.sweep(Vec3::new(0.0, 0.0, 7.0))?;
-        assert_eq!(solid.body_type()?, BodyType::Solid, "swept sheet is a solid");
+        assert_eq!(
+            solid.body_type()?,
+            BodyType::Solid,
+            "swept sheet is a solid"
+        );
         let expected = std::f64::consts::PI * 9.0 * 7.0; // πr²h = 63π
-        assert!(rel_ok(solid.mass_props()?.amount, expected), "swept volume {} != {expected}", solid.mass_props()?.amount);
+        assert!(
+            rel_ok(solid.mass_props()?.amount, expected),
+            "swept volume {} != {expected}",
+            solid.mass_props()?.amount
+        );
     });
 
     // =========================================================================
@@ -2375,10 +3340,18 @@ fn main() {
 
     test!("surf_eval_curvature_cylinder", {
         let _session = Session::start(test_config())?;
-        let basis = Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let basis = Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let cyl = Surf::cylinder(basis, 2.0)?;
         let c = cyl.eval_curvature(0.0, 0.0)?; // u=0 → point (2,0,0)
-        assert!(c.normal.x.abs() > 0.99 && c.normal.y.abs() < 1e-6 && c.normal.z.abs() < 1e-6, "normal ≈ ±X: {:?}", c.normal);
+        assert!(
+            c.normal.x.abs() > 0.99 && c.normal.y.abs() < 1e-6 && c.normal.z.abs() < 1e-6,
+            "normal ≈ ±X: {:?}",
+            c.normal
+        );
         // Principal curvatures of a cylinder r=2: {0 axial, 1/2 hoop}.
         let (kmin, kmax) = {
             let a = c.principal_curvature_1.abs();
@@ -2386,26 +3359,56 @@ fn main() {
             (a.min(b), a.max(b))
         };
         assert!(kmin < 1e-9, "axial κ should be 0, got {kmin}");
-        assert!((kmax - 0.5).abs() < 1e-9, "hoop κ should be 1/2, got {kmax}");
-        assert!(c.principal_direction_1.z.abs() > 0.99 || c.principal_direction_2.z.abs() > 0.99, "one principal dir is axis Z");
+        assert!(
+            (kmax - 0.5).abs() < 1e-9,
+            "hoop κ should be 1/2, got {kmax}"
+        );
+        assert!(
+            c.principal_direction_1.z.abs() > 0.99 || c.principal_direction_2.z.abs() > 0.99,
+            "one principal dir is axis Z"
+        );
     });
 
     test!("curve_eval_curvature_circle", {
         let _session = Session::start(test_config())?;
-        let basis = Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let basis = Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let circ = Curve::circle(basis, 3.0)?;
         let c = circ.eval_curvature(0.0)?; // t=0 → point (3,0,0)
-        assert!((c.curvature - 1.0 / 3.0).abs() < 1e-9, "κ should be 1/3, got {}", c.curvature);
-        assert!(c.tangent.x.abs() < 1e-9 && (c.tangent.y.abs() - 1.0).abs() < 1e-9, "tangent ≈ ±Y: {:?}", c.tangent);
-        assert!(c.principal_normal.x.abs() > 0.99, "principal normal ≈ ±X (to centre): {:?}", c.principal_normal);
+        assert!(
+            (c.curvature - 1.0 / 3.0).abs() < 1e-9,
+            "κ should be 1/3, got {}",
+            c.curvature
+        );
+        assert!(
+            c.tangent.x.abs() < 1e-9 && (c.tangent.y.abs() - 1.0).abs() < 1e-9,
+            "tangent ≈ ±Y: {:?}",
+            c.tangent
+        );
+        assert!(
+            c.principal_normal.x.abs() > 0.99,
+            "principal normal ≈ ±X (to centre): {:?}",
+            c.principal_normal
+        );
     });
 
     test!("curve_interval_and_periodicity", {
         let _session = Session::start(test_config())?;
-        let basis = Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let basis = Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let circ = Curve::circle(basis, 3.0)?;
         let (lo, hi) = circ.interval()?;
-        assert!((hi - lo - std::f64::consts::TAU).abs() < 1e-9, "circle interval width ≈ 2π, got {}", hi - lo);
+        assert!(
+            (hi - lo - std::f64::consts::TAU).abs() < 1e-9,
+            "circle interval width ≈ 2π, got {}",
+            hi - lo
+        );
         assert!(circ.is_periodic()?, "circle is periodic");
         // Line: non-periodic. (The `closed` byte in PK_PARAM_sf_t is unreliable
         // across curve kinds — periodicity is the validated field.)
@@ -2421,7 +3424,10 @@ fn main() {
         assert_eq!(body.edges()?.len(), 1, "line segment → 1 edge");
         assert_eq!(body.vertices()?.len(), 2, "open wire → 2 vertices");
         let (t0, t1) = body.edges()?[0].interval()?;
-        assert!((body.edges()?[0].curve()?.length((t0, t1))? - 10.0).abs() < 1e-6, "wire edge length 10");
+        assert!(
+            (body.edges()?[0].curve()?.length((t0, t1))? - 10.0).abs() < 1e-6,
+            "wire edge length 10"
+        );
     });
 
     test!("spun_surface_roundtrip", {
@@ -2432,15 +3438,26 @@ fn main() {
         assert_eq!(spun.surf_type()?, SurfType::Spun);
         let d = spun.ask_spun()?;
         assert_eq!(d.profile.tag(), line.tag(), "profile tag round-trips");
-        assert!((d.axis_direction.z - 1.0).abs() < 1e-9, "axis +Z: {:?}", d.axis_direction);
+        assert!(
+            (d.axis_direction.z - 1.0).abs() < 1e-9,
+            "axis +Z: {:?}",
+            d.axis_direction
+        );
         let bx = spun.uvbox()?;
         let p = spun.eval(0.5 * (bx.u_min + bx.u_max), 0.0)?;
-        assert!(((p.x * p.x + p.y * p.y).sqrt() - 5.0).abs() < 1e-6, "spun radius 5");
+        assert!(
+            ((p.x * p.x + p.y * p.y).sqrt() - 5.0).abs() < 1e-6,
+            "spun radius 5"
+        );
     });
 
     test!("swept_surface_roundtrip", {
         let _session = Session::start(test_config())?;
-        let basis = Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let basis = Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let circ = Curve::circle(basis, 3.0)?;
         let swept = Surf::swept(&circ, Vec3::new(0.0, 0.0, 1.0))?;
         assert_eq!(swept.surf_type()?, SurfType::Swept);
@@ -2448,7 +3465,10 @@ fn main() {
         assert_eq!(d.profile.tag(), circ.tag(), "profile tag round-trips");
         let bx = swept.uvbox()?;
         let p = swept.eval(0.5 * (bx.u_min + bx.u_max), 0.0)?;
-        assert!(((p.x * p.x + p.y * p.y).sqrt() - 3.0).abs() < 1e-6, "swept radius 3");
+        assert!(
+            ((p.x * p.x + p.y * p.y).sqrt() - 3.0).abs() < 1e-6,
+            "swept radius 3"
+        );
     });
 
     test!("offset_surface_analytic_refused", {
@@ -2458,9 +3478,16 @@ fn main() {
         // error 1037. The binding + PK_OFFSET_sf_t layout are validated by the
         // clean error (not a crash/garbage). A genuine offset ENTITY needs a
         // non-analytic (b-surface) base — deferred until NURBS creation is wrapped.
-        let basis = Axis2::new(Vec3::zero(), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let basis = Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
         let cyl = Surf::cylinder(basis, 2.0)?;
-        assert!(Surf::offset_surface(&cyl, 1.0).is_err(), "analytic offset is refused (simplifies)");
+        assert!(
+            Surf::offset_surface(&cyl, 1.0).is_err(),
+            "analytic offset is refused (simplifies)"
+        );
     });
 
     // NOTE: Body::imprint_body (PK_BODY_imprint_body) is wrapped and its
@@ -2501,15 +3528,28 @@ fn main() {
         let bc = Curve::bcurve(3, &cps, &[0.0, 1.0], &[4, 4])?;
         // Geometry is the real validation: Bézier at t=0.5 = (P0+3P1+3P2+P3)/8 = (5, 7.5, 0).
         let p = bc.eval(0.5)?;
-        assert!(rel_ok(p.x, 5.0) && rel_ok(p.y, 7.5) && p.z.abs() < 1e-9, "Bézier(0.5) = {p:?}");
-        assert!(rel_ok(bc.eval(0.0)?.y, 0.0) && rel_ok(bc.eval(1.0)?.x, 10.0), "clamped endpoints");
+        assert!(
+            rel_ok(p.x, 5.0) && rel_ok(p.y, 7.5) && p.z.abs() < 1e-9,
+            "Bézier(0.5) = {p:?}"
+        );
+        assert!(
+            rel_ok(bc.eval(0.0)?.y, 0.0) && rel_ok(bc.eval(1.0)?.x, 10.0),
+            "clamped endpoints"
+        );
         // The definitive B-curve proof: PK_BCURVE_ask round-trips the standard form
         // (it only succeeds on a b-curve). (Parasolid classifies a standalone
         // b-spline as an "icurve" — a spline-family curve — so curve_type() is not
         // asserted here.)
         let d = bc.ask_bcurve()?;
-        assert_eq!((d.degree, d.n_vertices), (3, 4), "degree/vertex count round-trip");
-        assert!(rel_ok(d.control_points[1].y, 10.0), "control point round-trip");
+        assert_eq!(
+            (d.degree, d.n_vertices),
+            (3, 4),
+            "degree/vertex count round-trip"
+        );
+        assert!(
+            rel_ok(d.control_points[1].y, 10.0),
+            "control point round-trip"
+        );
     });
 
     test!("bsurf_bilinear_patch", {
@@ -2525,9 +3565,15 @@ fn main() {
         let bs = Surf::bsurf(1, 1, 2, 2, &cps, &[0.0, 1.0], &[2, 2], &[0.0, 1.0], &[2, 2])?;
         // Geometry validation: centre and corner of the flat square patch.
         let p = bs.eval(0.5, 0.5)?;
-        assert!(rel_ok(p.x, 5.0) && rel_ok(p.y, 5.0) && p.z.abs() < 1e-9, "patch centre = {p:?}");
+        assert!(
+            rel_ok(p.x, 5.0) && rel_ok(p.y, 5.0) && p.z.abs() < 1e-9,
+            "patch centre = {p:?}"
+        );
         let c = bs.eval(1.0, 1.0)?;
-        assert!(rel_ok(c.x, 10.0) && rel_ok(c.y, 10.0), "patch corner (u1,v1) = {c:?}");
+        assert!(
+            rel_ok(c.x, 10.0) && rel_ok(c.y, 10.0),
+            "patch corner (u1,v1) = {c:?}"
+        );
     });
 
     // =========================================================================
@@ -2541,10 +3587,20 @@ fn main() {
         // Primitive construction + coarse invariants.
         let cyl = oracle::cylinder(5.0, 20.0)?;
         let mp = cyl.mass_props()?;
-        assert!(rel_ok(mp.amount, std::f64::consts::PI * 25.0 * 20.0), "cylinder volume");
+        assert!(
+            rel_ok(mp.amount, std::f64::consts::PI * 25.0 * 20.0),
+            "cylinder volume"
+        );
         let bb = cyl.bounding_box()?;
-        assert!(rel_ok(bb.max.z - bb.min.z, 20.0), "cylinder height from box");
-        assert_eq!(cyl.contains_point(Vec3::new(0.0, 0.0, 10.0))?, Enclosure::Inside, "axis point inside");
+        assert!(
+            rel_ok(bb.max.z - bb.min.z, 20.0),
+            "cylinder height from box"
+        );
+        assert_eq!(
+            cyl.contains_point(Vec3::new(0.0, 0.0, 10.0))?,
+            Enclosure::Inside,
+            "axis point inside"
+        );
 
         // Structural fingerprint: a cylinder is 1 solid + 1 void region, 3 faces,
         // 2 circular edges, 2 seam vertices.
@@ -2555,29 +3611,52 @@ fn main() {
         assert_eq!(ts.edges, 2, "two circular edges");
 
         // Exact surface sampling: the cylindrical face's normal is unit & radial.
-        let side = cyl.faces()?.into_iter()
-            .find(|f| f.surface_type().map(|t| t == SurfType::Cylinder).unwrap_or(false))
+        let side = cyl
+            .faces()?
+            .into_iter()
+            .find(|f| {
+                f.surface_type()
+                    .map(|t| t == SurfType::Cylinder)
+                    .unwrap_or(false)
+            })
             .expect("cylindrical face");
         let uv = side.uvbox()?;
-        let s = oracle::sample_surface(&side.surf()?, (uv.u_min + uv.u_max) / 2.0, (uv.v_min + uv.v_max) / 2.0)?;
-        let nlen = (s.normal.x * s.normal.x + s.normal.y * s.normal.y + s.normal.z * s.normal.z).sqrt();
+        let s = oracle::sample_surface(
+            &side.surf()?,
+            (uv.u_min + uv.u_max) / 2.0,
+            (uv.v_min + uv.v_max) / 2.0,
+        )?;
+        let nlen =
+            (s.normal.x * s.normal.x + s.normal.y * s.normal.y + s.normal.z * s.normal.z).sqrt();
         assert!(rel_ok(nlen, 1.0), "surface normal is unit, |n| = {nlen}");
-        assert!(s.normal.z.abs() < 1e-9, "cylinder normal is horizontal (radial)");
+        assert!(
+            s.normal.z.abs() < 1e-9,
+            "cylinder normal is horizontal (radial)"
+        );
 
         // Curve sampling: a cap edge is a radius-5 circle; the tangent is unit.
         let cap_edge = cyl.edges()?[0];
         let cs = oracle::sample_curve(&cap_edge.curve()?, 0.0)?;
-        let tlen = (cs.tangent.x * cs.tangent.x + cs.tangent.y * cs.tangent.y + cs.tangent.z * cs.tangent.z).sqrt();
+        let tlen = (cs.tangent.x * cs.tangent.x
+            + cs.tangent.y * cs.tangent.y
+            + cs.tangent.z * cs.tangent.z)
+            .sqrt();
         assert!(rel_ok(tlen, 1.0), "curve tangent is unit, |t| = {tlen}");
 
         // Surface/surface intersection (on orphan surfaces, the validated SSI
         // path): a radius-5 cylinder ∩ the plane z=10 = one circle.
         let ocyl = Surf::cylinder(
-            Axis2::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0)),
+            Axis2::new(
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 1.0),
+                Vec3::new(1.0, 0.0, 0.0),
+            ),
             5.0,
         )?;
         let plane = Surf::plane(Axis2::new(
-            Vec3::new(0.0, 0.0, 10.0), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 10.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
         ))?;
         let ix = oracle::intersect_surfaces(&ocyl, &plane)?;
         assert_eq!(ix.curves.len(), 1, "plane ∩ cylinder is one circle");
@@ -2586,16 +3665,19 @@ fn main() {
         let moved = oracle::block(4.0, 6.0, 8.0)?;
         let before = moved.topology_summary()?;
         moved.transform(&Transform::translation(3.0, -2.0, 1.0)?)?;
-        assert_eq!(moved.topology_summary()?, before, "topology summary is transform-invariant");
+        assert_eq!(
+            moved.topology_summary()?,
+            before,
+            "topology summary is transform-invariant"
+        );
     });
 
     test!("oracle_xt_roundtrip_preserves_model", {
         use parasolid::{fileio, oracle};
         let out_dir = "oracle_rt_out";
         let _ = std::fs::create_dir_all(out_dir);
-        let session = Session::start(
-            test_config().frustrum(FrustrumConfig::new().base_dir(out_dir)),
-        )?;
+        let session =
+            Session::start(test_config().frustrum(FrustrumConfig::new().base_dir(out_dir)))?;
 
         // Build a body, capture its oracle signature, write it to XT, read it
         // back, and confirm the signature survives the round-trip.
@@ -2605,8 +3687,15 @@ fn main() {
         fileio::transmit(std::slice::from_ref(&body), "oracle_rt")?;
         let restored = fileio::receive("oracle_rt")?;
         assert_eq!(restored.len(), 1, "one body read back");
-        assert!(rel_ok(restored[0].volume()?, vol0), "volume preserved across XT round-trip");
-        assert_eq!(restored[0].topology_summary()?, ts0, "topology preserved across XT round-trip");
+        assert!(
+            rel_ok(restored[0].volume()?, vol0),
+            "volume preserved across XT round-trip"
+        );
+        assert_eq!(
+            restored[0].topology_summary()?,
+            ts0,
+            "topology preserved across XT round-trip"
+        );
 
         drop(session);
         let _ = std::fs::remove_dir_all(out_dir);
@@ -2652,15 +3741,146 @@ fn main() {
             },
         ));
         match outcome {
-            Ok(Ok(true)) => { println!("OK"); passed += 1; }
+            Ok(Ok(true)) => {
+                println!("OK");
+                passed += 1;
+            }
             Ok(Ok(false)) => {
                 println!("SKIP (callback ABI validated; construction blocked on PSM 5241)");
                 skipped += 1;
             }
-            Ok(Err(e)) => { println!("FAIL: {}", e); failed += 1; }
-            Err(_) => { println!("PANIC"); failed += 1; }
+            Ok(Err(e)) => {
+                println!("FAIL: {}", e);
+                failed += 1;
+            }
+            Err(_) => {
+                println!("PANIC");
+                failed += 1;
+            }
         }
     }
+
+    // =========================================================================
+    // Geometry simplification + tolerant-edge optimisation
+    // =========================================================================
+
+    test!("body_simplify_geom_rational_arc_to_circle", {
+        let _session = Session::start(test_config())?;
+        // Degree-2 rational Bézier that is EXACTLY a quarter circle of radius 5
+        // about the origin in z = 0: P0=(5,0,0) w=1, P1=(5,5,0) w=√2/2,
+        // P2=(0,5,0) w=1 (the standard conic arc weights for a 90° sweep).
+        let w1 = std::f64::consts::FRAC_1_SQRT_2;
+        let cps = [
+            Vec3::new(5.0, 0.0, 0.0),
+            Vec3::new(5.0, 5.0, 0.0),
+            Vec3::new(0.0, 5.0, 0.0),
+        ];
+        let bc = Curve::bcurve_rational(2, &cps, &[1.0, w1, 1.0], &[0.0, 1.0], &[3, 3])?;
+        // Geometric sanity of the rational eval: every sample lies on r = 5.
+        for t in [0.1, 0.25, 0.5, 0.75, 0.9] {
+            let p = bc.eval(t)?;
+            let r = (p.x * p.x + p.y * p.y).sqrt();
+            assert!(
+                (r - 5.0).abs() < 1e-9 && p.z.abs() < 1e-12,
+                "rational arc sample at t={t} has |P|={r}"
+            );
+        }
+        let body = bc.make_wire_body((0.0, 1.0))?;
+        let edges = body.edges()?;
+        assert_eq!(edges.len(), 1, "one wire edge");
+        let before = edges[0].curve()?.curve_type()?;
+        assert!(
+            !matches!(before, CurveType::Circle),
+            "edge curve must start non-analytic (got {before:?})"
+        );
+
+        // Global simplification: the whole rational B-curve is exactly a circle.
+        let new_geoms = body.simplify_geom(false)?;
+        assert!(
+            !new_geoms.is_empty(),
+            "simplify_geom returned no new geometry"
+        );
+        let edges_after = body.edges()?;
+        assert_eq!(edges_after.len(), 1, "topology unchanged");
+        let after_curve = edges_after[0].curve()?;
+        assert_eq!(
+            after_curve.curve_type()?,
+            CurveType::Circle,
+            "rational quadratic arc should simplify to an analytic circle"
+        );
+        let circle = after_curve.ask_circle()?;
+        assert!(
+            rel_ok(circle.radius, 5.0),
+            "simplified circle radius {} != 5",
+            circle.radius
+        );
+    });
+
+    test!("edge_optimise_tolerant_edge", {
+        let _session = Session::start(test_config())?;
+        let body = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        let edges = body.edges()?;
+        assert_eq!(edges.len(), 12, "block has 12 edges");
+        let edge = edges[0];
+
+        // Make the (exact) block edge tolerant with a deliberately loose
+        // tolerance, then let PK_EDGE_optimise tighten it back toward the true
+        // deviation of its SP-curves (~session precision for a planar block).
+        let new_edges = edge.set_precision(1.0e-4)?;
+        assert!(new_edges.is_empty(), "no split expected on a straight edge");
+        let coarse = edge.precision()?;
+        assert!(
+            (coarse - 1.0e-4).abs() < 1e-12,
+            "edge precision after set_precision = {coarse}"
+        );
+
+        let (modified, achieved) = edge.optimise(None, false)?;
+        let optimised = edge.precision()?;
+        assert!(
+            achieved.is_finite() && achieved >= 0.0,
+            "achieved deviation {achieved} not a valid measurement"
+        );
+        assert!(
+            modified,
+            "optimise reported failure (achieved {achieved:.3e}, precision {optimised:.3e})"
+        );
+        assert!(
+            optimised < 1.0e-4,
+            "optimise did not tighten the coarse tolerance: {optimised:.3e}"
+        );
+        assert!(
+            optimised >= achieved,
+            "new tolerance {optimised:.3e} below measured deviation {achieved:.3e}"
+        );
+
+        // Supplied-upper-bound arm — this drives `max_dev`@8 and
+        // `set_max_dev`@16 through the kernel, so a struct-layout error here
+        // surfaces as an argument-check failure or a nonsense tolerance.
+        let again = edge.set_precision(5.0e-4)?;
+        assert!(again.is_empty(), "no split on re-coarsening");
+        let (m2, d2) = edge.optimise(Some(5.0e-5), false)?;
+        let p2 = edge.precision()?;
+        // Probed V37.01.243: measured deviation ~5.25e-7 (the SP-curve
+        // deviation of the tolerant block edge), tolerance set to exactly the
+        // measured deviation — inside [max deviation, supplied bound].
+        assert!(
+            m2 && p2 <= 5.0e-5 && p2 >= d2 && d2 > 0.0 && d2 < 5.0e-5,
+            "supplied-bound optimise: modified {m2}, deviation {d2:.3e}, precision {p2:.3e}"
+        );
+
+        // Negative control on an exact (non-tolerant) edge. Probed V37.01.243
+        // behavior: NOT an argument error — the kernel accepts the call and
+        // reports success with achieved_deviation 0.0 (an exact edge has no
+        // curve deviation). Pinned so a future signature regression (which
+        // would surface as an argument-check error or garbage deviation)
+        // breaks this test.
+        let exact_edge = edges[1];
+        let (exact_modified, exact_dev) = exact_edge.optimise(None, false)?;
+        assert!(
+            exact_modified && exact_dev == 0.0,
+            "optimise(exact edge) expected Ok((true, 0.0)), got ({exact_modified}, {exact_dev})"
+        );
+    });
 
     // =========================================================================
     // Summary

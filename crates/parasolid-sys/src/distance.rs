@@ -103,11 +103,11 @@ pub struct PK_range_end_t {
 #[derive(Debug, Clone, Copy)]
 pub struct PK_range_2_r_t {
     /// Computed distance.
-    pub distance: c_double,      // @0
+    pub distance: c_double, // @0
     /// Details for the first entity endpoint.
-    pub end_1: PK_range_end_t,   // @8
+    pub end_1: PK_range_end_t, // @8
     /// Details for the second entity endpoint.
-    pub end_2: PK_range_end_t,   // @56
+    pub end_2: PK_range_end_t, // @56
 }
 
 /// Result of a range computation between an entity and a position vector.
@@ -116,9 +116,9 @@ pub struct PK_range_2_r_t {
 #[derive(Debug, Clone, Copy)]
 pub struct PK_range_1_r_t {
     /// Computed distance.
-    pub distance: c_double,   // @0
+    pub distance: c_double, // @0
     /// Details for the entity endpoint.
-    pub end: PK_range_end_t,  // @8
+    pub end: PK_range_end_t, // @8
 }
 
 // =============================================================================

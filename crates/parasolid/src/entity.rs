@@ -34,7 +34,11 @@ pub struct Obb {
 impl Obb {
     /// Extents (max − min) along the three basis axes.
     pub fn extents(&self) -> [f64; 3] {
-        [self.max.x - self.min.x, self.max.y - self.min.y, self.max.z - self.min.z]
+        [
+            self.max.x - self.min.x,
+            self.max.y - self.min.y,
+            self.max.z - self.min.z,
+        ]
     }
 }
 
@@ -512,14 +516,22 @@ impl Entity {
     /// is copied out and freed.
     pub fn description(&self) -> PsResult<String> {
         let mut desc: *mut std::os::raw::c_char = std::ptr::null_mut();
-        pk_call!(PK_ENTITY_ask_description(self.tag, std::ptr::null(), &mut desc));
+        pk_call!(PK_ENTITY_ask_description(
+            self.tag,
+            std::ptr::null(),
+            &mut desc
+        ));
         let s = if desc.is_null() {
             String::new()
         } else {
-            let owned = unsafe { std::ffi::CStr::from_ptr(desc) }.to_string_lossy().into_owned();
+            let owned = unsafe { std::ffi::CStr::from_ptr(desc) }
+                .to_string_lossy()
+                .into_owned();
             // The DLL does not export PK_ENTITY_ask_description_r_f; the string is
             // a plain PK allocation, freed via PK_MEMORY_free.
-            unsafe { let _ = PK_MEMORY_free(desc as *mut std::os::raw::c_void); }
+            unsafe {
+                let _ = PK_MEMORY_free(desc as *mut std::os::raw::c_void);
+            }
             owned
         };
         Ok(s)
@@ -552,7 +564,9 @@ impl Entity {
             &mut clashes,
         ));
         if !clashes.is_null() {
-            unsafe { let _ = PK_MEMORY_free(clashes as *mut std::os::raw::c_void); }
+            unsafe {
+                let _ = PK_MEMORY_free(clashes as *mut std::os::raw::c_void);
+            }
         }
         Ok(n_clash > 0)
     }
@@ -633,7 +647,13 @@ impl Entity {
         let mut tag = self.tag;
         let mut opts = PK_TOPOL_find_nabox_o_t::default();
         let mut sf: PK_NABOX_sf_t = unsafe { std::mem::zeroed() };
-        pk_call!(PK_TOPOL_find_nabox(1, &mut tag, std::ptr::null_mut(), &mut opts, &mut sf));
+        pk_call!(PK_TOPOL_find_nabox(
+            1,
+            &mut tag,
+            std::ptr::null_mut(),
+            &mut opts,
+            &mut sf
+        ));
         Ok(Obb {
             basis: [
                 Vec3::from_pk(sf.basis_set[0]),

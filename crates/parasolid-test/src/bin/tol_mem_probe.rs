@@ -55,8 +55,13 @@ fn dump(base: u64, tag: &str) {
         println!("    {:34} = {:>14.6e}", n, v);
     }
     // A1 formula predictions from the measured L,T:
-    println!("    PREDICT from 10*L/T = {:.6e}   100*L/T = {:.6e}   0.5*L/T = {:.6e}   T/(10L) = {:.6e}",
-        10.0 * l / t, 100.0 * l / t, 0.5 * l / t, t / (10.0 * l));
+    println!(
+        "    PREDICT from 10*L/T = {:.6e}   100*L/T = {:.6e}   0.5*L/T = {:.6e}   T/(10L) = {:.6e}",
+        10.0 * l / t,
+        100.0 * l / t,
+        0.5 * l / t,
+        t / (10.0 * l)
+    );
 }
 
 fn main() {
@@ -92,13 +97,18 @@ fn main() {
         let code = unsafe { sys::PK_SESSION_set_precision(p) };
         let mut got = 0.0f64;
         let _ = unsafe { sys::PK_SESSION_ask_precision(&mut got) };
-        println!("\n== set_precision({:.0e}) -> code {} ; ask_precision={:.6e} ==", p, code, got);
+        println!(
+            "\n== set_precision({:.0e}) -> code {} ; ask_precision={:.6e} ==",
+            p, code, got
+        );
         dump(base, &format!("T={:.0e}", p));
     }
 
     // Reset linear to default, then sweep ANGULAR precision to identify DAT_3238.
     let _ = unsafe { sys::PK_SESSION_set_precision(1e-8) };
-    println!("\n\n#### ANGULAR SWEEP (linear reset to 1e-8) — is DAT_1845d3238 the angular precision? ####");
+    println!(
+        "\n\n#### ANGULAR SWEEP (linear reset to 1e-8) — is DAT_1845d3238 the angular precision? ####"
+    );
     for a in [1e-11_f64, 1e-9, 1e-12, 1e-10, 1e-11] {
         let code = unsafe { sys::PK_SESSION_set_angle_precision(a) };
         let mut ga = 0.0f64;

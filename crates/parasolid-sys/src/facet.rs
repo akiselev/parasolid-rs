@@ -1332,12 +1332,8 @@ pub struct PK_MESH_make_bodies_o_t {
 }
 
 /// Callback type for propagation from seed mtopol (PK_MTOPOL_make_meshes).
-pub type PK_MTOPOL_select_cb_t = Option<
-    unsafe extern "C" fn(
-        mtopol: PK_MTOPOL_t,
-        data: *mut c_void,
-    ) -> PK_LOGICAL_t,
->;
+pub type PK_MTOPOL_select_cb_t =
+    Option<unsafe extern "C" fn(mtopol: PK_MTOPOL_t, data: *mut c_void) -> PK_LOGICAL_t>;
 
 /// Callback type for returning tracking information (PK_MTOPOL_make_meshes).
 pub type PK_MTOPOL_map_cb_f_t = Option<
@@ -1484,12 +1480,8 @@ pub type PK_MESH_facet_reader_t = Option<
 >;
 
 /// Callback type for freeing facet data blocks.
-pub type PK_MESH_facet_free_t = Option<
-    unsafe extern "C" fn(
-        context: *mut c_void,
-        facet_data: *mut c_void,
-    ),
->;
+pub type PK_MESH_facet_free_t =
+    Option<unsafe extern "C" fn(context: *mut c_void, facet_data: *mut c_void)>;
 
 /// Options for PK_MESH_create_from_facets.
 ///
@@ -1499,14 +1491,14 @@ pub type PK_MESH_facet_free_t = Option<
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_MESH_create_from_facets_o_t {
-    pub o_t_version: c_int,        // @0
-    pub vertices_estimate: c_int,  // @4
-    pub facet_estimate: c_int,     // @8
+    pub o_t_version: c_int,               // @0
+    pub vertices_estimate: c_int,         // @4
+    pub facet_estimate: c_int,            // @8
     pub facet_free: PK_MESH_facet_free_t, // @16
-    pub create: PK_MESH_create_t,  // @24
-    pub have_box: PK_LOGICAL_t,    // @28
-    pub box_: PK_BOX_t,            // @32
-    pub thread_safe: PK_LOGICAL_t, // @80
+    pub create: PK_MESH_create_t,         // @24
+    pub have_box: PK_LOGICAL_t,           // @28
+    pub box_: PK_BOX_t,                   // @32
+    pub thread_safe: PK_LOGICAL_t,        // @80
 }
 
 // =============================================================================
@@ -1698,9 +1690,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free memory for returned facet tables from PK_TOPOL_facet_2.
-    pub fn PK_TOPOL_facet_2_r_f(
-        result: *mut PK_TOPOL_facet_2_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TOPOL_facet_2_r_f(result: *mut PK_TOPOL_facet_2_r_t) -> PK_ERROR_code_t;
 
     /// Facet topology (legacy version).
     /// [RE-regenerated from V35 TSV prototype]
@@ -1714,9 +1704,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free memory for returned facet tables from PK_TOPOL_facet.
-    pub fn PK_TOPOL_facet_r_f(
-        result: *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TOPOL_facet_r_f(result: *mut c_void) -> PK_ERROR_code_t;
 
     /// Facet topology with output through GO (Graphical Output) interface.
     ///
@@ -1775,9 +1763,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free result from PK_TOPOL_render_volume.
-    pub fn PK_TOPOL_render_volume_r_f(
-        result: *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TOPOL_render_volume_r_f(result: *mut c_void) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Picking functions
@@ -1795,9 +1781,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free result from PK_BODY_pick_topols.
-    pub fn PK_BODY_pick_topols_r_f(
-        result: *mut PK_BODY_pick_topols_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BODY_pick_topols_r_f(result: *mut PK_BODY_pick_topols_r_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Convergent modeling session functions
@@ -1843,9 +1827,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free tracking map result from PK_MTOPOL_make_meshes.
-    pub fn PK_MTOPOL_map_r_f(
-        result: *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MTOPOL_map_r_f(result: *mut c_void) -> PK_ERROR_code_t;
 
     /// Convert mesh to single trimmed classic surface.
     pub fn PK_MESH_make_surf_trimmed(
@@ -1910,14 +1892,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free defect array from PK_MESH_find_defects/PK_MESH_fix_defects.
-    pub fn PK_MESH_defect_array_f(
-        details: *mut PK_MESH_defect_details_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MESH_defect_array_f(details: *mut PK_MESH_defect_details_t) -> PK_ERROR_code_t;
 
     /// Free defect details from PK_MESH_find_defects/PK_MESH_fix_defects.
-    pub fn PK_MESH_defect_details_f(
-        details: *mut PK_MESH_defect_details_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MESH_defect_details_f(details: *mut PK_MESH_defect_details_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Mesh normal management
@@ -1954,16 +1932,10 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Number of mfacets in mesh.
-    pub fn PK_MESH_ask_n_mfacets(
-        mesh: PK_MESH_t,
-        n_mfacets: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MESH_ask_n_mfacets(mesh: PK_MESH_t, n_mfacets: *mut c_int) -> PK_ERROR_code_t;
 
     /// Number of mvertices in mesh.
-    pub fn PK_MESH_ask_n_mvertices(
-        mesh: PK_MESH_t,
-        n_mvertices: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MESH_ask_n_mvertices(mesh: PK_MESH_t, n_mvertices: *mut c_int) -> PK_ERROR_code_t;
 
     /// Evaluate UV-parameters; returns position, mfacet, and mfin/mvertex at position.
     pub fn PK_MESH_eval_with_mtopol(
@@ -2025,9 +1997,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free result from PK_MESH_is_loaded.
-    pub fn PK_MESH_is_loaded_r_f(
-        result: *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MESH_is_loaded_r_f(result: *mut c_void) -> PK_ERROR_code_t;
 
     /// Imprint array of vectors onto a mesh.
     pub fn PK_MESH_imprint_vectors(
@@ -2041,9 +2011,8 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free result from PK_MESH_imprint_vectors.
-    pub fn PK_MESH_imprint_vectors_r_f(
-        result: *mut PK_MESH_imprint_vectors_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MESH_imprint_vectors_r_f(result: *mut PK_MESH_imprint_vectors_r_t)
+    -> PK_ERROR_code_t;
 
     // =========================================================================
     // MFACET enquiry
@@ -2077,10 +2046,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Returns normal vector of mfacet.
-    pub fn PK_MFACET_ask_normal(
-        mfacet: PK_MFACET_t,
-        normal: *mut PK_VECTOR_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MFACET_ask_normal(mfacet: PK_MFACET_t, normal: *mut PK_VECTOR_t) -> PK_ERROR_code_t;
 
     /// Returns positions of mvertices of mfacet.
     pub fn PK_MFACET_ask_positions(
@@ -2114,28 +2080,16 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Returns mfacet containing the mfin.
-    pub fn PK_MFIN_ask_mfacet(
-        mfin: PK_MFIN_t,
-        mfacet: *mut PK_MFACET_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MFIN_ask_mfacet(mfin: PK_MFIN_t, mfacet: *mut PK_MFACET_t) -> PK_ERROR_code_t;
 
     /// Returns coincident mfin in adjacent facet.
-    pub fn PK_MFIN_ask_mfin_adjacent(
-        mfin: PK_MFIN_t,
-        adjacent: *mut PK_MFIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MFIN_ask_mfin_adjacent(mfin: PK_MFIN_t, adjacent: *mut PK_MFIN_t) -> PK_ERROR_code_t;
 
     /// Returns index of mfin in its mfacet.
-    pub fn PK_MFIN_ask_mfin_index(
-        mfin: PK_MFIN_t,
-        index: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MFIN_ask_mfin_index(mfin: PK_MFIN_t, index: *mut c_int) -> PK_ERROR_code_t;
 
     /// Returns mvertex pointed to by mfin.
-    pub fn PK_MFIN_ask_mvertex(
-        mfin: PK_MFIN_t,
-        mvertex: *mut PK_MVERTEX_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MFIN_ask_mvertex(mfin: PK_MFIN_t, mvertex: *mut PK_MVERTEX_t) -> PK_ERROR_code_t;
 
     /// Returns normal at mvertex of given mfin (per-mfin normal if multiple exist).
     pub fn PK_MFIN_ask_mvx_normal(
@@ -2156,16 +2110,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Returns next mfin in mfacet.
-    pub fn PK_MFIN_ask_next_in_mfacet(
-        mfin: PK_MFIN_t,
-        next: *mut PK_MFIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MFIN_ask_next_in_mfacet(mfin: PK_MFIN_t, next: *mut PK_MFIN_t) -> PK_ERROR_code_t;
 
     /// Returns next mfin around mvertex.
-    pub fn PK_MFIN_ask_next_of_mvertex(
-        mfin: PK_MFIN_t,
-        next: *mut PK_MFIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MFIN_ask_next_of_mvertex(mfin: PK_MFIN_t, next: *mut PK_MFIN_t) -> PK_ERROR_code_t;
 
     /// Returns previous mfin in mfacet.
     pub fn PK_MFIN_ask_previous_in_mfacet(
@@ -2180,10 +2128,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Whether mfin is laminar.
-    pub fn PK_MFIN_is_laminar(
-        mfin: PK_MFIN_t,
-        is_laminar: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MFIN_is_laminar(mfin: PK_MFIN_t, is_laminar: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Whether two mfins belong to same mfacet.
     pub fn PK_MFIN_is_same_mfacet(
@@ -2219,10 +2164,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Returns an mfin pointing to mvertex.
-    pub fn PK_MVERTEX_ask_mfin(
-        mvertex: PK_MVERTEX_t,
-        mfin: *mut PK_MFIN_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MVERTEX_ask_mfin(mvertex: PK_MVERTEX_t, mfin: *mut PK_MFIN_t) -> PK_ERROR_code_t;
 
     /// Returns ring of mvertices around mvertex.
     pub fn PK_MVERTEX_ask_mvertices_ring(
@@ -2256,22 +2198,13 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Returns bounding box for mtopol.
-    pub fn PK_MTOPOL_ask_box(
-        mtopol: PK_MTOPOL_t,
-        box_: *mut PK_BOX_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MTOPOL_ask_box(mtopol: PK_MTOPOL_t, box_: *mut PK_BOX_t) -> PK_ERROR_code_t;
 
     /// Returns class of mesh topology element.
-    pub fn PK_MTOPOL_ask_class(
-        mtopol: PK_MTOPOL_t,
-        class: *mut PK_CLASS_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MTOPOL_ask_class(mtopol: PK_MTOPOL_t, class: *mut PK_CLASS_t) -> PK_ERROR_code_t;
 
     /// Whether given mtopol is valid.
-    pub fn PK_MTOPOL_is(
-        mtopol: PK_MTOPOL_t,
-        is_valid: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_MTOPOL_is(mtopol: PK_MTOPOL_t, is_valid: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Fin to mesh topology
@@ -2293,10 +2226,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Create a polyline.
-    pub fn PK_PLINE_create(
-        sf: *const PK_PLINE_sf_t,
-        pline: *mut PK_PLINE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_PLINE_create(sf: *const PK_PLINE_sf_t, pline: *mut PK_PLINE_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Face imprint

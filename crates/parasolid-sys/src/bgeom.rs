@@ -28,22 +28,22 @@ pub struct PK_BCURVE_sf_t {
     pub vertices: *const c_double, // @16
     pub _reserved_24: c_int,       // @24  (unknown; set 0)
     /// Number of **distinct** knot values (validator reads this at @28).
-    pub n_knots: c_int,            // @28
+    pub n_knots: c_int, // @28
     /// Multiplicity of each distinct knot (length `n_knots`). Parasolid uses
     /// distinct-knots + multiplicities, NOT an expanded knot vector.
-    pub knot_mult: *const c_int,   // @32
+    pub knot_mult: *const c_int, // @32
     /// Distinct knot values (length `n_knots`) — validator reads @40 as doubles.
-    pub knots: *const c_double,    // @40
+    pub knots: *const c_double, // @40
     /// Knot-type classification (`PK_knot_type_t`): non_uniform=8501,
     /// uniform=8502, piecewise_bezier=8504, bezier_ends=8505, smooth_seam=8506.
-    pub knot_type: c_int,          // @48
+    pub knot_type: c_int, // @48
     pub is_periodic: u8,           // @52
     pub is_closed: u8,             // @53
     pub _pad: [u8; 2],             // @54
     /// Journal-confirmed (`PKU_journal_BCURVE_sf`, `param_1[0xe]`): the ask/create
     /// path reads/writes this at @56. Omitting it made the struct 56 B (real is
     /// 64) → `PK_BCURVE_ask` wrote `self_intersecting` past the end (OOB).
-    pub self_intersecting: c_int,  // @56  (struct rounds to 64 B)
+    pub self_intersecting: c_int, // @56  (struct rounds to 64 B)
 }
 
 /// Standard form of a B-surface (NURBS surface).
@@ -64,9 +64,9 @@ pub struct PK_BSURF_sf_t {
     pub vertices: *const c_double, // @24
     pub _reserved_32: c_int,       // @32
     /// Number of **distinct** u knots.
-    pub n_u_knots: c_int,          // @36
+    pub n_u_knots: c_int, // @36
     /// Number of **distinct** v knots.
-    pub n_v_knots: c_int,          // @40  (u/v counts are adjacent; arrays interleave)
+    pub n_v_knots: c_int, // @40  (u/v counts are adjacent; arrays interleave)
     pub u_knot_mult: *const c_int, // @48
     pub v_knot_mult: *const c_int, // @56
     pub u_knots: *const c_double,  // @64
@@ -80,7 +80,7 @@ pub struct PK_BSURF_sf_t {
     /// Journal-confirmed (`PKU_journal_BSURF_sf`, `param_1[0x17]`/`[0x18]`): two
     /// c_int tail fields, NOT one 8-byte pointer. The old `_extra_96: usize`
     /// mislabeled the @92 slot (was padding) and mistyped @96 as 8 bytes.
-    pub self_intersecting: c_int,  // @92
+    pub self_intersecting: c_int, // @92
     pub convexity: c_int,          // @96  (→ struct rounds to 104 bytes)
 }
 
@@ -497,10 +497,8 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Create B-curve from control points and knot vector.
-    pub fn PK_BCURVE_create(
-        sf: *const PK_BCURVE_sf_t,
-        bcurve: *mut PK_BCURVE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BCURVE_create(sf: *const PK_BCURVE_sf_t, bcurve: *mut PK_BCURVE_t)
+    -> PK_ERROR_code_t;
 
     /// Create B-curve from piecewise data (Bezier, Hermite, polynomial, Taylor).
     pub fn PK_BCURVE_create_piecewise(
@@ -548,10 +546,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Create B-surface from control points and knot vectors.
-    pub fn PK_BSURF_create(
-        sf: *const PK_BSURF_sf_t,
-        bsurf: *mut PK_BSURF_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BSURF_create(sf: *const PK_BSURF_sf_t, bsurf: *mut PK_BSURF_t) -> PK_ERROR_code_t;
 
     /// Create B-surface from piecewise data.
     pub fn PK_BSURF_create_piecewise(
@@ -700,16 +695,10 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Query B-curve standard form.
-    pub fn PK_BCURVE_ask(
-        bcurve: PK_BCURVE_t,
-        sf: *mut PK_BCURVE_sf_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BCURVE_ask(bcurve: PK_BCURVE_t, sf: *mut PK_BCURVE_sf_t) -> PK_ERROR_code_t;
 
     /// Query B-surface standard form.
-    pub fn PK_BSURF_ask(
-        bsurf: PK_BSURF_t,
-        sf: *mut PK_BSURF_sf_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BSURF_ask(bsurf: PK_BSURF_t, sf: *mut PK_BSURF_sf_t) -> PK_ERROR_code_t;
 
     /// Query knots and multiplicities of a B-curve.
     pub fn PK_BCURVE_ask_knots(
@@ -761,22 +750,13 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Add knot to B-curve.
-    pub fn PK_BCURVE_add_knot(
-        bcurve: PK_BCURVE_t,
-        knot_value: c_double,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BCURVE_add_knot(bcurve: PK_BCURVE_t, knot_value: c_double) -> PK_ERROR_code_t;
 
     /// Add U-direction knot to B-surface.
-    pub fn PK_BSURF_add_u_knot(
-        bsurf: PK_BSURF_t,
-        knot_value: c_double,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BSURF_add_u_knot(bsurf: PK_BSURF_t, knot_value: c_double) -> PK_ERROR_code_t;
 
     /// Add V-direction knot to B-surface.
-    pub fn PK_BSURF_add_v_knot(
-        bsurf: PK_BSURF_t,
-        knot_value: c_double,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BSURF_add_v_knot(bsurf: PK_BSURF_t, knot_value: c_double) -> PK_ERROR_code_t;
 
     /// Remove knots from B-curve within tolerance.
     pub fn PK_BCURVE_remove_knots(
@@ -981,15 +961,10 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Set approximation evaluation on B-curve.
-    pub fn PK_BCURVE_set_approx(
-        bcurve: PK_BCURVE_t,
-        tolerance: c_double,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BCURVE_set_approx(bcurve: PK_BCURVE_t, tolerance: c_double) -> PK_ERROR_code_t;
 
     /// Unset approximation evaluation on B-curve.
-    pub fn PK_BCURVE_unset_approx(
-        bcurve: PK_BCURVE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BCURVE_unset_approx(bcurve: PK_BCURVE_t) -> PK_ERROR_code_t;
 
     /// Evaluate B-curve using approximation.
     pub fn PK_BCURVE_eval_approx(
@@ -1000,15 +975,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Set approximation evaluation on B-surface.
-    pub fn PK_BSURF_set_approx(
-        bsurf: PK_BSURF_t,
-        tolerance: c_double,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BSURF_set_approx(bsurf: PK_BSURF_t, tolerance: c_double) -> PK_ERROR_code_t;
 
     /// Unset approximation evaluation on B-surface.
-    pub fn PK_BSURF_unset_approx(
-        bsurf: PK_BSURF_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BSURF_unset_approx(bsurf: PK_BSURF_t) -> PK_ERROR_code_t;
 
     /// Evaluate B-surface using approximation.
     pub fn PK_BSURF_eval_approx(
@@ -1057,14 +1027,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Extend B-curve (return-form variant).
-    pub fn PK_BCURVE_extend_r_f(
-        loc: *mut PK_BCURVE_extend_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BCURVE_extend_r_f(loc: *mut PK_BCURVE_extend_r_t) -> PK_ERROR_code_t;
 
     /// Spline return-form variant.
-    pub fn PK_BCURVE_spline_r_f(
-        result: *mut PK_BCURVE_spline_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BCURVE_spline_r_f(result: *mut PK_BCURVE_spline_r_t) -> PK_ERROR_code_t;
 
     /// Reparameterise surface of faces (return-form variant).
     pub fn PK_FACE_reparameterise_surf_r_f(

@@ -1,14 +1,14 @@
 //! Vertex type — a topological point.
 
-use std::os::raw::c_int;
-use parasolid_sys::*;
-use crate::error::PsResult;
-use crate::memory::PkArray;
-use crate::entity::Entity;
 use crate::body::Body;
 use crate::edge::Edge;
+use crate::entity::Entity;
+use crate::error::PsResult;
 use crate::face::Face;
 use crate::geom::Vec3;
+use crate::memory::PkArray;
+use parasolid_sys::*;
+use std::os::raw::c_int;
 
 /// A vertex in a body's topology.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -17,9 +17,15 @@ pub struct Vertex {
 }
 
 impl Vertex {
-    pub(crate) fn from_tag(tag: PK_VERTEX_t) -> Self { Self { tag } }
-    pub fn tag(&self) -> i32 { self.tag }
-    pub fn entity(&self) -> Entity { Entity::from_tag(self.tag) }
+    pub(crate) fn from_tag(tag: PK_VERTEX_t) -> Self {
+        Self { tag }
+    }
+    pub fn tag(&self) -> i32 {
+        self.tag
+    }
+    pub fn entity(&self) -> Entity {
+        Entity::from_tag(self.tag)
+    }
 
     /// Return the body that owns this vertex.
     pub fn body(&self) -> PsResult<Body> {
@@ -44,7 +50,12 @@ impl Vertex {
         let mut n: c_int = 0;
         let mut edge_ptr = std::ptr::null_mut();
         let mut sense_ptr: *mut PK_LOGICAL_t = std::ptr::null_mut();
-        pk_call!(PK_VERTEX_ask_oriented_edges(self.tag, &mut n, &mut edge_ptr, &mut sense_ptr));
+        pk_call!(PK_VERTEX_ask_oriented_edges(
+            self.tag,
+            &mut n,
+            &mut edge_ptr,
+            &mut sense_ptr
+        ));
         let edges = unsafe { PkArray::from_raw(edge_ptr, n) }
             .iter()
             .map(|&tag| Edge::from_tag(tag))
@@ -80,7 +91,10 @@ impl Vertex {
         let mut ptr = std::ptr::null_mut();
         pk_call!(PK_VERTEX_ask_shells(self.tag, &mut n, &mut ptr));
         let array = unsafe { PkArray::from_raw(ptr, n) };
-        Ok(array.iter().map(|&tag| crate::Shell::from_tag(tag)).collect())
+        Ok(array
+            .iter()
+            .map(|&tag| crate::Shell::from_tag(tag))
+            .collect())
     }
 
     /// The vertex-only loops where this vertex is the sole content.
@@ -89,7 +103,10 @@ impl Vertex {
         let mut ptr = std::ptr::null_mut();
         pk_call!(PK_VERTEX_ask_isolated_loops(self.tag, &mut n, &mut ptr));
         let array = unsafe { PkArray::from_raw(ptr, n) };
-        Ok(array.iter().map(|&tag| crate::Loop::from_tag(tag)).collect())
+        Ok(array
+            .iter()
+            .map(|&tag| crate::Loop::from_tag(tag))
+            .collect())
     }
 
     /// The tolerant-vertex precision (the geometric tolerance band of the vertex).

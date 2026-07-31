@@ -105,8 +105,14 @@ impl Curve {
             r#box: PK_BOX_t { coord: [0.0; 6] },
             common_surf: PK_ENTITY_null,
         };
-        let iv1 = PK_INTERVAL_t { low: interval.0, high: interval.1 };
-        let iv2 = PK_INTERVAL_t { low: other_interval.0, high: other_interval.1 };
+        let iv1 = PK_INTERVAL_t {
+            low: interval.0,
+            high: interval.1,
+        };
+        let iv2 = PK_INTERVAL_t {
+            low: other_interval.0,
+            high: other_interval.1,
+        };
         let mut n: c_int = 0;
         let (mut vectors, mut ts1, mut ts2, mut types) = (
             std::ptr::null_mut(),
@@ -115,8 +121,16 @@ impl Curve {
             std::ptr::null_mut(),
         );
         pk_call!(PK_CURVE_intersect_curve(
-            self.tag, iv1, other.tag, iv2, &opts,
-            &mut n, &mut vectors, &mut ts1, &mut ts2, &mut types,
+            self.tag,
+            iv1,
+            other.tag,
+            iv2,
+            &opts,
+            &mut n,
+            &mut vectors,
+            &mut ts1,
+            &mut ts2,
+            &mut types,
         ));
         let v = unsafe { PkArray::from_raw(vectors, n) };
         let t1 = unsafe { PkArray::from_raw(ts1, n) };
@@ -136,11 +150,18 @@ impl Curve {
 impl Surf {
     /// Intersect this surface with a bounded region of a curve
     /// (`PK_SURF_intersect_curve`).
-    pub fn intersect_curve(&self, curve: &Curve, interval: (f64, f64)) -> PsResult<Vec<SurfCurveHit>> {
+    pub fn intersect_curve(
+        &self,
+        curve: &Curve,
+        interval: (f64, f64),
+    ) -> PsResult<Vec<SurfCurveHit>> {
         // Full documented v1 layout, zero-initialised (have_box = false).
         let mut opts: PK_SURF_intersect_curve_o_t = unsafe { std::mem::zeroed() };
         opts.o_t_version = 1;
-        let iv = PK_INTERVAL_t { low: interval.0, high: interval.1 };
+        let iv = PK_INTERVAL_t {
+            low: interval.0,
+            high: interval.1,
+        };
         let mut n: c_int = 0;
         let (mut vectors, mut uvs, mut ts, mut types) = (
             std::ptr::null_mut(),
@@ -149,8 +170,15 @@ impl Surf {
             std::ptr::null_mut(),
         );
         pk_call!(PK_SURF_intersect_curve(
-            self.tag, curve.tag, iv, &opts,
-            &mut n, &mut vectors, &mut uvs, &mut ts, &mut types,
+            self.tag,
+            curve.tag,
+            iv,
+            &opts,
+            &mut n,
+            &mut vectors,
+            &mut uvs,
+            &mut ts,
+            &mut types,
         ));
         let v = unsafe { PkArray::from_raw(vectors, n) };
         let uv = unsafe { PkArray::from_raw(uvs, n) };
@@ -170,8 +198,15 @@ impl Surf {
 impl Face {
     /// Intersect this face with a bounded region of a curve
     /// (`PK_FACE_intersect_curve`, no options).
-    pub fn intersect_curve(&self, curve: &Curve, interval: (f64, f64)) -> PsResult<Vec<FaceCurveHit>> {
-        let iv = PK_INTERVAL_t { low: interval.0, high: interval.1 };
+    pub fn intersect_curve(
+        &self,
+        curve: &Curve,
+        interval: (f64, f64),
+    ) -> PsResult<Vec<FaceCurveHit>> {
+        let iv = PK_INTERVAL_t {
+            low: interval.0,
+            high: interval.1,
+        };
         let mut n: c_int = 0;
         let (mut vectors, mut uvs, mut ts, mut topols, mut types) = (
             std::ptr::null_mut(),
@@ -181,8 +216,15 @@ impl Face {
             std::ptr::null_mut(),
         );
         pk_call!(PK_FACE_intersect_curve(
-            self.tag, curve.tag, iv,
-            &mut n, &mut vectors, &mut uvs, &mut ts, &mut topols, &mut types,
+            self.tag,
+            curve.tag,
+            iv,
+            &mut n,
+            &mut vectors,
+            &mut uvs,
+            &mut ts,
+            &mut topols,
+            &mut types,
         ));
         let v = unsafe { PkArray::from_raw(vectors, n) };
         let uv = unsafe { PkArray::from_raw(uvs, n) };
@@ -212,10 +254,19 @@ impl Face {
             std::ptr::null_mut(),
         );
         pk_call!(PK_FACE_intersect_face(
-            self.tag, other.tag, &opts,
-            &mut n_vectors, &mut vectors, &mut n_curves, &mut curves, &mut bounds, &mut types,
+            self.tag,
+            other.tag,
+            &opts,
+            &mut n_vectors,
+            &mut vectors,
+            &mut n_curves,
+            &mut curves,
+            &mut bounds,
+            &mut types,
         ));
-        Ok(collect_point_curves(n_vectors, vectors, n_curves, curves, bounds, types))
+        Ok(collect_point_curves(
+            n_vectors, vectors, n_curves, curves, bounds, types,
+        ))
     }
 
     /// Intersect this face with a surface (`PK_FACE_intersect_surf`).
@@ -230,10 +281,19 @@ impl Face {
             std::ptr::null_mut(),
         );
         pk_call!(PK_FACE_intersect_surf(
-            self.tag, surf.tag(), &opts,
-            &mut n_vectors, &mut vectors, &mut n_curves, &mut curves, &mut bounds, &mut types,
+            self.tag,
+            surf.tag(),
+            &opts,
+            &mut n_vectors,
+            &mut vectors,
+            &mut n_curves,
+            &mut curves,
+            &mut bounds,
+            &mut types,
         ));
-        Ok(collect_point_curves(n_vectors, vectors, n_curves, curves, bounds, types))
+        Ok(collect_point_curves(
+            n_vectors, vectors, n_curves, curves, bounds, types,
+        ))
     }
 }
 

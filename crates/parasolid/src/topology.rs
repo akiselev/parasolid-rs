@@ -196,7 +196,11 @@ impl Region {
     /// entry point additionally takes an (undocumented) options struct and is not
     /// used here.
     pub fn region_type(&self) -> PsResult<RegionType> {
-        Ok(if self.is_solid()? { RegionType::Solid } else { RegionType::Void })
+        Ok(if self.is_solid()? {
+            RegionType::Solid
+        } else {
+            RegionType::Void
+        })
     }
 
     /// Mark this region as solid (fill it with material). Used by the
@@ -227,7 +231,12 @@ impl Shell {
         let mut n = 0;
         let mut faces = std::ptr::null_mut();
         let mut orients = std::ptr::null_mut();
-        pk_call!(PK_SHELL_ask_oriented_faces(self.tag, &mut n, &mut faces, &mut orients));
+        pk_call!(PK_SHELL_ask_oriented_faces(
+            self.tag,
+            &mut n,
+            &mut faces,
+            &mut orients
+        ));
         let face_arr = unsafe { PkArray::from_raw(faces, n) };
         let orient_arr = unsafe { PkArray::from_raw(orients, n) };
         Ok(face_arr
@@ -423,7 +432,10 @@ impl Fin {
         let mut curve: PK_CURVE_t = PK_ENTITY_null;
         let mut class: PK_CLASS_t = 0;
         let mut ends = [PK_VECTOR_t::default(); 2];
-        let mut t_int = PK_INTERVAL_t { low: 0.0, high: 0.0 };
+        let mut t_int = PK_INTERVAL_t {
+            low: 0.0,
+            high: 0.0,
+        };
         let mut sense: PK_LOGICAL_t = PK_LOGICAL_false;
         pk_call!(PK_FIN_ask_geometry(
             self.tag,
@@ -434,7 +446,11 @@ impl Fin {
             &mut t_int,
             &mut sense,
         ));
-        Ok((Curve::from_tag(curve), (t_int.low, t_int.high), sense == PK_LOGICAL_true))
+        Ok((
+            Curve::from_tag(curve),
+            (t_int.low, t_int.high),
+            sense == PK_LOGICAL_true,
+        ))
     }
 
     /// Whether the fin runs in the same direction as its edge.
@@ -460,7 +476,10 @@ impl Fin {
 
     /// The fin's parametric interval on its curve, as `(t_min, t_max)`.
     pub fn interval(&self) -> PsResult<(f64, f64)> {
-        let mut iv = PK_INTERVAL_t { low: 0.0, high: 0.0 };
+        let mut iv = PK_INTERVAL_t {
+            low: 0.0,
+            high: 0.0,
+        };
         pk_call!(PK_FIN_find_interval(self.tag, &mut iv));
         Ok((iv.low, iv.high))
     }
@@ -469,7 +488,12 @@ impl Fin {
     pub fn uvbox(&self) -> PsResult<crate::UvBox> {
         let mut b = PK_UVBOX_t { param: [0.0; 4] };
         pk_call!(PK_FIN_find_uvbox(self.tag, &mut b));
-        Ok(crate::UvBox { u_min: b.param[0], v_min: b.param[1], u_max: b.param[2], v_max: b.param[3] })
+        Ok(crate::UvBox {
+            u_min: b.param[0],
+            v_min: b.param[1],
+            u_max: b.param[2],
+            v_max: b.param[3],
+        })
     }
 
     /// Map a curve parameter `t` on this fin to the owning face's `(u, v)`
@@ -477,7 +501,13 @@ impl Fin {
     pub fn surf_params(&self, t: f64) -> PsResult<(f64, f64)> {
         let est = PK_UV_t::default();
         let mut parms = PK_UV_t::default();
-        pk_call!(PK_FIN_find_surf_parameters(self.tag, t, PK_LOGICAL_false, &est, &mut parms));
+        pk_call!(PK_FIN_find_surf_parameters(
+            self.tag,
+            t,
+            PK_LOGICAL_false,
+            &est,
+            &mut parms
+        ));
         Ok((parms[0], parms[1]))
     }
 
@@ -486,7 +516,13 @@ impl Fin {
     pub fn curve_param(&self, uv: (f64, f64)) -> PsResult<f64> {
         let parms: PK_UV_t = [uv.0, uv.1];
         let mut t = 0.0f64;
-        pk_call!(PK_FIN_find_curve_parameter(self.tag, &parms, PK_LOGICAL_false, 0.0, &mut t));
+        pk_call!(PK_FIN_find_curve_parameter(
+            self.tag,
+            &parms,
+            PK_LOGICAL_false,
+            0.0,
+            &mut t
+        ));
         Ok(t)
     }
 }

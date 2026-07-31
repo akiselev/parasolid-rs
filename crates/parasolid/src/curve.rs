@@ -1,10 +1,10 @@
 //! Curve type — geometry attached to edges.
 
-use parasolid_sys::*;
-use crate::error::PsResult;
-use crate::entity::Entity;
 use crate::body::Body;
-use crate::geom::{Vec3, Axis2};
+use crate::entity::Entity;
+use crate::error::PsResult;
+use crate::geom::{Axis2, Vec3};
+use parasolid_sys::*;
 
 /// Periodicity of a parametric direction (`PK_PARAM_periodic_t`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -62,7 +62,16 @@ pub struct CurveCurvature {
 /// Concrete curve type.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CurveType {
-    Line, Circle, Ellipse, Bcurve, Icurve, Fcurve, Scurve, Tcurve, Cpcurve, Pline,
+    Line,
+    Circle,
+    Ellipse,
+    Bcurve,
+    Icurve,
+    Fcurve,
+    Scurve,
+    Tcurve,
+    Cpcurve,
+    Pline,
 }
 
 /// A curve entity handle.
@@ -94,9 +103,15 @@ pub struct EllipseData {
 }
 
 impl Curve {
-    pub(crate) fn from_tag(tag: PK_CURVE_t) -> Self { Self { tag } }
-    pub fn tag(&self) -> i32 { self.tag }
-    pub fn entity(&self) -> Entity { Entity::from_tag(self.tag) }
+    pub(crate) fn from_tag(tag: PK_CURVE_t) -> Self {
+        Self { tag }
+    }
+    pub fn tag(&self) -> i32 {
+        self.tag
+    }
+    pub fn entity(&self) -> Entity {
+        Entity::from_tag(self.tag)
+    }
 
     /// Determine the concrete curve type.
     pub fn curve_type(&self) -> PsResult<CurveType> {
@@ -113,9 +128,12 @@ impl Curve {
             PkClass::Tcurve => CurveType::Tcurve,
             PkClass::Cpcurve => CurveType::Cpcurve,
             PkClass::Pline => CurveType::Pline,
-            _ => return Err(crate::error::PsError::Session(
-                format!("entity {} is not a curve (class {:?})", self.tag, class)
-            )),
+            _ => {
+                return Err(crate::error::PsError::Session(format!(
+                    "entity {} is not a curve (class {:?})",
+                    self.tag, class
+                )));
+            }
         })
     }
 
@@ -135,7 +153,10 @@ impl Curve {
     pub fn ask_circle(&self) -> PsResult<CircleData> {
         let mut sf = unsafe { std::mem::zeroed::<PK_CIRCLE_sf_t>() };
         pk_call!(PK_CIRCLE_ask(self.tag, &mut sf));
-        Ok(CircleData { radius: sf.radius, basis: Axis2::from_pk(sf.basis_set) })
+        Ok(CircleData {
+            radius: sf.radius,
+            basis: Axis2::from_pk(sf.basis_set),
+        })
     }
 
     /// Extract ellipse parameters.
@@ -144,7 +165,11 @@ impl Curve {
     pub fn ask_ellipse(&self) -> PsResult<EllipseData> {
         let mut sf = unsafe { std::mem::zeroed::<PK_ELLIPSE_sf_t>() };
         pk_call!(PK_ELLIPSE_ask(self.tag, &mut sf));
-        Ok(EllipseData { r1: sf.R1, r2: sf.R2, basis: Axis2::from_pk(sf.basis_set) })
+        Ok(EllipseData {
+            r1: sf.R1,
+            r2: sf.R2,
+            basis: Axis2::from_pk(sf.basis_set),
+        })
     }
 
     /// Evaluate curve position at parameter t.
@@ -175,9 +200,15 @@ impl Curve {
     /// the Win64 ABI). Returns the length only; the achieved parameter range is
     /// discarded.
     pub fn length(&self, interval: (f64, f64)) -> PsResult<f64> {
-        let iv = PK_INTERVAL_t { low: interval.0, high: interval.1 };
+        let iv = PK_INTERVAL_t {
+            low: interval.0,
+            high: interval.1,
+        };
         let mut length = 0.0f64;
-        let mut range = PK_INTERVAL_t { low: 0.0, high: 0.0 };
+        let mut range = PK_INTERVAL_t {
+            low: 0.0,
+            high: 0.0,
+        };
         pk_call!(PK_CURVE_find_length(self.tag, iv, &mut length, &mut range));
         Ok(length)
     }
@@ -193,12 +224,58 @@ impl Curve {
         knots: &[f64],
         multiplicities: &[i32],
     ) -> PsResult<Curve> {
-        let verts: Vec<f64> = control_points.iter().flat_map(|p| [p.x, p.y, p.z]).collect();
+        let verts: Vec<f64> = control_points
+            .iter()
+            .flat_map(|p| [p.x, p.y, p.z])
+            .collect();
         let sf = PK_BCURVE_sf_t {
             degree,
             n_vertices: control_points.len() as std::os::raw::c_int,
             vertex_dim: 3,
             is_rational: PK_LOGICAL_false,
+            vertices: verts.as_ptr(),
+            _reserved_24: 0,
+            n_knots: knots.len() as std::os::raw::c_int,
+            knot_mult: multiplicities.as_ptr(),
+            knots: knots.as_ptr(),
+            knot_type: PK_knot_non_uniform_c,
+            is_periodic: 0,
+            is_closed: 0,
+            _pad: [0; 2],
+            self_intersecting: 0,
+        };
+        let mut tag: PK_BCURVE_t = PK_ENTITY_null;
+        pk_call!(PK_BCURVE_create(&sf, &mut tag));
+        Ok(Curve::from_tag(tag))
+    }
+
+    /// Create a **rational** B-curve (NURBS curve) from `degree`, weighted
+    /// control points, and a distinct-knot vector with multiplicities.
+    /// Vertices are passed to Parasolid in homogeneous form `(x·w, y·w, z·w, w)`
+    /// (`vertex_dim = 4`); the `weights` slice must match `control_points` in
+    /// length. See [`bcurve`](Self::bcurve) for the knot conventions.
+    pub fn bcurve_rational(
+        degree: i32,
+        control_points: &[Vec3],
+        weights: &[f64],
+        knots: &[f64],
+        multiplicities: &[i32],
+    ) -> PsResult<Curve> {
+        if control_points.len() != weights.len() {
+            return Err(crate::error::PsError::Session(
+                "bcurve_rational: control_points and weights lengths differ".into(),
+            ));
+        }
+        let verts: Vec<f64> = control_points
+            .iter()
+            .zip(weights)
+            .flat_map(|(p, &w)| [p.x * w, p.y * w, p.z * w, w])
+            .collect();
+        let sf = PK_BCURVE_sf_t {
+            degree,
+            n_vertices: control_points.len() as std::os::raw::c_int,
+            vertex_dim: 4,
+            is_rational: PK_LOGICAL_true,
             vertices: verts.as_ptr(),
             _reserved_24: 0,
             n_knots: knots.len() as std::os::raw::c_int,
@@ -224,7 +301,8 @@ impl Curve {
         let control_points: Vec<Vec3> = if sf.vertices.is_null() {
             Vec::new()
         } else {
-            let slice = unsafe { std::slice::from_raw_parts(sf.vertices, sf.n_vertices as usize * dim) };
+            let slice =
+                unsafe { std::slice::from_raw_parts(sf.vertices, sf.n_vertices as usize * dim) };
             (0..sf.n_vertices as usize)
                 .map(|i| Vec3::new(slice[i * dim], slice[i * dim + 1], slice[i * dim + 2]))
                 .collect()
@@ -235,9 +313,15 @@ impl Curve {
             unsafe { std::slice::from_raw_parts(sf.knots, sf.n_knots as usize) }.to_vec()
         };
         unsafe {
-            if !sf.vertices.is_null() { let _ = PK_MEMORY_free(sf.vertices as *mut std::os::raw::c_void); }
-            if !sf.knots.is_null() { let _ = PK_MEMORY_free(sf.knots as *mut std::os::raw::c_void); }
-            if !sf.knot_mult.is_null() { let _ = PK_MEMORY_free(sf.knot_mult as *mut std::os::raw::c_void); }
+            if !sf.vertices.is_null() {
+                let _ = PK_MEMORY_free(sf.vertices as *mut std::os::raw::c_void);
+            }
+            if !sf.knots.is_null() {
+                let _ = PK_MEMORY_free(sf.knots as *mut std::os::raw::c_void);
+            }
+            if !sf.knot_mult.is_null() {
+                let _ = PK_MEMORY_free(sf.knot_mult as *mut std::os::raw::c_void);
+            }
         }
         Ok(BCurveData {
             degree: sf.degree,
@@ -274,7 +358,10 @@ impl Curve {
 
     /// Parametric interval `(low, high)` of the curve (`PK_CURVE_ask_interval`).
     pub fn interval(&self) -> PsResult<(f64, f64)> {
-        let mut iv = PK_INTERVAL_t { low: 0.0, high: 0.0 };
+        let mut iv = PK_INTERVAL_t {
+            low: 0.0,
+            high: 0.0,
+        };
         pk_call!(PK_CURVE_ask_interval(self.tag, &mut iv));
         Ok((iv.low, iv.high))
     }
@@ -303,7 +390,10 @@ impl Curve {
     /// Wrap this orphan curve as a **wire body** over the parameter interval
     /// `(low, high)` (`PK_CURVE_make_wire_body`; interval passed by value).
     pub fn make_wire_body(&self, interval: (f64, f64)) -> PsResult<Body> {
-        let range = PK_INTERVAL_t { low: interval.0, high: interval.1 };
+        let range = PK_INTERVAL_t {
+            low: interval.0,
+            high: interval.1,
+        };
         let mut tag: PK_BODY_t = PK_ENTITY_null;
         pk_call!(PK_CURVE_make_wire_body(self.tag, range, &mut tag));
         Ok(Body::from_tag(tag))

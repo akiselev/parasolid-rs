@@ -144,10 +144,7 @@ unsafe extern "C" {
     /// - `slit_face`: the slit face to remove
     /// - `surviving_edge`: receives the surviving edge tag
     /// [RE-regenerated from V35 TSV prototype]
-    pub fn PK_FACE_euler_unslit(
-        face: PK_FACE_t,
-        surviving: PK_EDGE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_euler_unslit(face: PK_FACE_t, surviving: PK_EDGE_t) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------
     // Edge splitting / vertex merging
@@ -171,10 +168,7 @@ unsafe extern "C" {
     /// - `vertex`: vertex to delete
     /// - `edge`: receives the surviving edge
     /// [RE-regenerated from V35 TSV prototype]
-    pub fn PK_VERTEX_euler_merge_edges(
-        vertex: PK_VERTEX_t,
-        edge: PK_EDGE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_VERTEX_euler_merge_edges(vertex: PK_VERTEX_t, edge: PK_EDGE_t) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------
     // Edge/vertex creation and deletion
@@ -266,10 +260,7 @@ unsafe extern "C" {
     /// - `face`: target face
     /// - `new_loop`: receives the new loop
     /// - `new_vertex`: receives the new vertex
-    pub fn PK_FACE_euler_make_loop(
-        face: PK_FACE_t,
-        new_loop: *mut PK_LOOP_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_FACE_euler_make_loop(face: PK_FACE_t, new_loop: *mut PK_LOOP_t) -> PK_ERROR_code_t;
 
     /// Delete an isolated vertex and loop from a face.
     pub fn PK_LOOP_euler_delete_isolated(loop_: PK_LOOP_t) -> PK_ERROR_code_t;
@@ -387,9 +378,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Delete a bi-wire ring edge and face (decreases genus).
-    pub fn PK_EDGE_euler_delete_ring_loop(
-        edge: PK_EDGE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_euler_delete_ring_loop(edge: PK_EDGE_t) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------
     // Loop transfer
@@ -400,10 +389,7 @@ unsafe extern "C" {
     ///
     /// - `loop_`: loop to transfer
     /// - `face`: destination face
-    pub fn PK_LOOP_euler_transfer(
-        loop_: PK_LOOP_t,
-        face: PK_FACE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_LOOP_euler_transfer(loop_: PK_LOOP_t, face: PK_FACE_t) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------
     // Fin gluing
@@ -429,9 +415,7 @@ unsafe extern "C" {
     ///
     /// - `n_topols`: number of input topologies
     /// - `topols`: array of topologies to process
-    pub fn PK_TOPOL_delete_redundant(
-        topol: PK_TOPOL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_TOPOL_delete_redundant(topol: PK_TOPOL_t) -> PK_ERROR_code_t;
 
     /// Identify redundant topological entities without deleting them.
     ///

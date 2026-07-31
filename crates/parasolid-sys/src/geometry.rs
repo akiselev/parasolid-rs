@@ -230,11 +230,28 @@ pub const PK_reset_prec_method_inter_c: PK_reset_prec_method_t = 25091;
 pub const PK_reset_prec_method_int_only_c: PK_reset_prec_method_t = 25092;
 
 /// Edge optimise option — whether to include short edges.
+///
+/// Token values [validated] against `parasolid-re/catalog/pk-enums.h` (V35
+/// numeric token appendix, triple-cross-validated). The previous binding used
+/// placeholder values 0/1 under the wrong names `PK_EDGE_optimise_{no,yes}_c`.
 pub type PK_EDGE_optimise_short_t = c_int;
-/// Do not include short edges.
-pub const PK_EDGE_optimise_no_c: PK_EDGE_optimise_short_t = 0;
-/// Include short edges.
-pub const PK_EDGE_optimise_yes_c: PK_EDGE_optimise_short_t = 1;
+/// Do not optimise short edges (default). [validated]
+pub const PK_EDGE_optimise_short_no_c: PK_EDGE_optimise_short_t = 25640;
+/// Optimise short edges as well. [validated]
+pub const PK_EDGE_optimise_short_yes_c: PK_EDGE_optimise_short_t = 25641;
+
+/// Source of the tolerance upper bound for PK_EDGE_optimise (`set_max_dev`).
+/// [validated] against `parasolid-re/catalog/pk-enums.h`.
+pub type PK_EDGE_max_dev_t = c_int;
+/// Upper bound is the edge's current tolerance (default). [validated]
+pub const PK_EDGE_max_dev_edge_tol_c: PK_EDGE_max_dev_t = 22880;
+/// Upper bound is the supplied `max_dev` value. [validated]
+pub const PK_EDGE_max_dev_supplied_c: PK_EDGE_max_dev_t = 22881;
+
+/// PK_EDGE_optimise result: the edge tolerance was modified. [validated]
+pub const PK_EDGE_optimise_success_c: PK_EDGE_optimise_result_t = 22870;
+/// PK_EDGE_optimise result: no acceptable new tolerance found. [validated]
+pub const PK_EDGE_optimise_failure_c: PK_EDGE_optimise_result_t = 22871;
 
 // =============================================================================
 // Options structures for precision functions
@@ -263,13 +280,48 @@ pub struct PK_EDGE_reset_precision_2_o_t {
 }
 
 /// Options for PK_EDGE_optimise.
+///
+/// Layout [validated] against `parasolid-re/catalog/pk-option-structs.tsv`
+/// (x86-64, all 365 `_o_t` layouts; this DLL, V37.01.243):
+/// `o_t_version:int@0, max_dev:double@8, set_max_dev@16, optimise_short@20`,
+/// size 24. The previous binding omitted `max_dev`/`set_max_dev` entirely
+/// (8-byte struct) — a silent ABI hole: the kernel would have read 16 bytes of
+/// stack garbage past our struct.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_EDGE_optimise_o_t {
     /// Version of the options structure.
     pub o_t_version: c_int,
-    /// Whether to include short edges.
+    /// Desired tolerance upper bound; read when `set_max_dev` is
+    /// `PK_EDGE_max_dev_supplied_c`.
+    pub max_dev: c_double,
+    /// Whether the upper bound is the edge's current tolerance
+    /// (`PK_EDGE_max_dev_edge_tol_c`, default) or the supplied `max_dev`.
+    pub set_max_dev: PK_EDGE_max_dev_t,
+    /// Whether to optimise short edges (default no).
     pub optimise_short: PK_EDGE_optimise_short_t,
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_EDGE_optimise_o_t>() == 24);
+    assert!(core::mem::offset_of!(PK_EDGE_optimise_o_t, o_t_version) == 0);
+    assert!(core::mem::offset_of!(PK_EDGE_optimise_o_t, max_dev) == 8);
+    assert!(core::mem::offset_of!(PK_EDGE_optimise_o_t, set_max_dev) == 16);
+    assert!(core::mem::offset_of!(PK_EDGE_optimise_o_t, optimise_short) == 20);
+};
+
+impl Default for PK_EDGE_optimise_o_t {
+    /// Mirror of `PK_EDGE_optimise_o_m`: version 1 [probed: accepted by
+    /// V37.01.243 under argument checking], edge-tolerance upper bound, short
+    /// edges not optimised.
+    fn default() -> Self {
+        Self {
+            o_t_version: 1,
+            max_dev: 0.0,
+            set_max_dev: PK_EDGE_max_dev_edge_tol_c,
+            optimise_short: PK_EDGE_optimise_short_no_c,
+        }
+    }
 }
 
 // =============================================================================
@@ -343,39 +395,57 @@ pub const PK_ERROR_edge_too_short: PK_ERROR_code_t = 405;
 
 /// Options for `PK_GEOM_copy`.
 #[repr(C)]
-pub struct PK_GEOM_copy_o_t { _private: [u8; 0] }
+pub struct PK_GEOM_copy_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_GEOM_copy`.
 #[repr(C)]
-pub struct PK_GEOM_copy_r_t { _private: [u8; 0] }
+pub struct PK_GEOM_copy_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_GEOM_enlarge`.
 #[repr(C)]
-pub struct PK_GEOM_enlarge_o_t { _private: [u8; 0] }
+pub struct PK_GEOM_enlarge_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_GEOM_enlarge`.
 #[repr(C)]
-pub struct PK_GEOM_enlarge_r_t { _private: [u8; 0] }
+pub struct PK_GEOM_enlarge_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_VECTOR_make_lsq_plane`.
 #[repr(C)]
-pub struct PK_VECTOR_make_lsq_plane_o_t { _private: [u8; 0] }
+pub struct PK_VECTOR_make_lsq_plane_o_t {
+    _private: [u8; 0],
+}
 
 /// Opaque result type for curve degeneracies.
 #[repr(C)]
-pub struct PK_CURVE_degens_t { _private: [u8; 0] }
+pub struct PK_CURVE_degens_t {
+    _private: [u8; 0],
+}
 
 /// Opaque result type for curve self-intersections.
 #[repr(C)]
-pub struct PK_CURVE_self_ints_t { _private: [u8; 0] }
+pub struct PK_CURVE_self_ints_t {
+    _private: [u8; 0],
+}
 
 /// Opaque result type for surface degeneracies.
 #[repr(C)]
-pub struct PK_SURF_degens_t { _private: [u8; 0] }
+pub struct PK_SURF_degens_t {
+    _private: [u8; 0],
+}
 
 /// Opaque result type for surface self-intersections.
 #[repr(C)]
-pub struct PK_SURF_self_ints_t { _private: [u8; 0] }
+pub struct PK_SURF_self_ints_t {
+    _private: [u8; 0],
+}
 
 // =============================================================================
 // extern "C" — Surface create/ask functions
@@ -418,10 +488,8 @@ unsafe extern "C" {
     // -------------------------------------------------------------------------
 
     /// Create a sphere from its standard form.
-    pub fn PK_SPHERE_create(
-        sf: *const PK_SPHERE_sf_t,
-        sphere: *mut PK_SPHERE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SPHERE_create(sf: *const PK_SPHERE_sf_t, sphere: *mut PK_SPHERE_t)
+    -> PK_ERROR_code_t;
 
     /// Query the standard form of a sphere.
     pub fn PK_SPHERE_ask(sphere: PK_SPHERE_t, sf: *mut PK_SPHERE_sf_t) -> PK_ERROR_code_t;
@@ -461,10 +529,8 @@ unsafe extern "C" {
     // -------------------------------------------------------------------------
 
     /// Create an offset surface from its standard form.
-    pub fn PK_OFFSET_create(
-        sf: *const PK_OFFSET_sf_t,
-        offset: *mut PK_OFFSET_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_OFFSET_create(sf: *const PK_OFFSET_sf_t, offset: *mut PK_OFFSET_t)
+    -> PK_ERROR_code_t;
 
     /// Query the standard form of an offset surface.
     pub fn PK_OFFSET_ask(offset: PK_OFFSET_t, sf: *mut PK_OFFSET_sf_t) -> PK_ERROR_code_t;
@@ -488,10 +554,8 @@ unsafe extern "C" {
     // -------------------------------------------------------------------------
 
     /// Create a circle from its standard form.
-    pub fn PK_CIRCLE_create(
-        sf: *const PK_CIRCLE_sf_t,
-        circle: *mut PK_CIRCLE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_CIRCLE_create(sf: *const PK_CIRCLE_sf_t, circle: *mut PK_CIRCLE_t)
+    -> PK_ERROR_code_t;
 
     /// Query the standard form of a circle.
     pub fn PK_CIRCLE_ask(circle: PK_CIRCLE_t, sf: *mut PK_CIRCLE_sf_t) -> PK_ERROR_code_t;
@@ -551,10 +615,7 @@ unsafe extern "C" {
 
     /// Return the parameterisation type (periodic/non-periodic) of a curve.
     // V35: writes a single 40-byte PK_PARAM_sf_t (the old PK_CURVE_param_t was bogus).
-    pub fn PK_CURVE_ask_param(
-        curve: PK_CURVE_t,
-        param: *mut PK_PARAM_sf_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_CURVE_ask_param(curve: PK_CURVE_t, param: *mut PK_PARAM_sf_t) -> PK_ERROR_code_t;
 
     /// Evaluate curve position R(t) at parameter value `t`.
     /// `n_deriv` specifies the number of derivatives to compute (0 = position only).
@@ -665,10 +726,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Return the current precision of an edge.
-    pub fn PK_EDGE_ask_precision(
-        edge: PK_EDGE_t,
-        precision: *mut c_double,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_ask_precision(edge: PK_EDGE_t, precision: *mut c_double) -> PK_ERROR_code_t;
 
     /// Set local precision on an edge (simple form).
     pub fn PK_EDGE_set_precision(
@@ -727,10 +785,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Set precision on a vertex.
-    pub fn PK_VERTEX_set_precision(
-        vertex: PK_VERTEX_t,
-        precision: c_double,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_VERTEX_set_precision(vertex: PK_VERTEX_t, precision: c_double) -> PK_ERROR_code_t;
 
     /// Optimize vertex precision to the minimum required value.
     pub fn PK_VERTEX_optimise(
@@ -788,10 +843,7 @@ unsafe extern "C" {
     pub fn PK_EDGE_detach_curve_nmnl(edge: PK_EDGE_t) -> PK_ERROR_code_t;
 
     /// Return the accurate or notionally accurate curve of an edge (nominal geometry).
-    pub fn PK_EDGE_ask_curve_nmnl(
-        edge: PK_EDGE_t,
-        curve: *mut PK_CURVE_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_EDGE_ask_curve_nmnl(edge: PK_EDGE_t, curve: *mut PK_CURVE_t) -> PK_ERROR_code_t;
 
     /// Return the accurate or notionally accurate geometry of an edge (nominal geometry).
     pub fn PK_EDGE_ask_geometry_nmnl(
@@ -894,24 +946,16 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Free curve degeneracies result.
-    pub fn PK_CURVE_degens_f(
-        result: *mut PK_CURVE_degens_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_CURVE_degens_f(result: *mut PK_CURVE_degens_t) -> PK_ERROR_code_t;
 
     /// Free curve self-intersections result.
-    pub fn PK_CURVE_self_ints_f(
-        result: *mut PK_CURVE_self_ints_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_CURVE_self_ints_f(result: *mut PK_CURVE_self_ints_t) -> PK_ERROR_code_t;
 
     /// Free surface degeneracies result.
-    pub fn PK_SURF_degens_f(
-        result: *mut PK_SURF_degens_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SURF_degens_f(result: *mut PK_SURF_degens_t) -> PK_ERROR_code_t;
 
     /// Free surface self-intersections result.
-    pub fn PK_SURF_self_ints_f(
-        result: *mut PK_SURF_self_ints_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SURF_self_ints_f(result: *mut PK_SURF_self_ints_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Geometry attach/detach

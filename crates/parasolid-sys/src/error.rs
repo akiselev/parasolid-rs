@@ -90,14 +90,14 @@ pub const PK_ERROR_STRING_LEN: usize = 32;
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_ERROR_sf_t {
-    pub function: [c_char; PK_ERROR_STRING_LEN],       // @0
-    pub code: PK_ERROR_code_t,                         // @32
-    pub code_token: [c_char; PK_ERROR_STRING_LEN],     // @36
-    pub severity: PK_ERROR_severity_t,                 // @68
-    pub argument_number: c_int,                        // @72
-    pub argument_name: [c_char; PK_ERROR_STRING_LEN],  // @76
-    pub argument_index: c_int,                         // @108
-    pub entity: PK_ENTITY_t,                           // @112
+    pub function: [c_char; PK_ERROR_STRING_LEN],      // @0
+    pub code: PK_ERROR_code_t,                        // @32
+    pub code_token: [c_char; PK_ERROR_STRING_LEN],    // @36
+    pub severity: PK_ERROR_severity_t,                // @68
+    pub argument_number: c_int,                       // @72
+    pub argument_name: [c_char; PK_ERROR_STRING_LEN], // @76
+    pub argument_index: c_int,                        // @108
+    pub entity: PK_ENTITY_t,                          // @112
 } // 116 bytes
 
 // =============================================================================
@@ -173,9 +173,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_t;
 
     /// Clears information about the last PK error.
-    pub fn PK_ERROR_clear_last(
-        was_error: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ERROR_clear_last(was_error: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Raises an artificial PK error; invokes the registered error handler.
     pub fn PK_ERROR_raise(error_sf: *const PK_ERROR_sf_t) -> PK_ERROR_t;
@@ -184,14 +182,10 @@ unsafe extern "C" {
     pub fn PK_ERROR_reraise(was_error: *mut PK_LOGICAL_t) -> PK_ERROR_t;
 
     /// Registers an error handler callback.
-    pub fn PK_ERROR_register_callbacks(
-        frustrum: *const PK_ERROR_frustrum_t,
-    ) -> PK_ERROR_t;
+    pub fn PK_ERROR_register_callbacks(frustrum: *const PK_ERROR_frustrum_t) -> PK_ERROR_t;
 
     /// Returns the current error handler, or null fields if none registered.
-    pub fn PK_ERROR_ask_callbacks(
-        frustrum: *mut PK_ERROR_frustrum_t,
-    ) -> PK_ERROR_t;
+    pub fn PK_ERROR_ask_callbacks(frustrum: *mut PK_ERROR_frustrum_t) -> PK_ERROR_t;
 
     // -------------------------------------------------------------------------
     // Thread-safe error functions
@@ -210,10 +204,7 @@ unsafe extern "C" {
     // -------------------------------------------------------------------------
 
     /// Whether tag refers to a living entity.
-    pub fn PK_ENTITY_is(
-        entity: PK_ENTITY_t,
-        is_entity: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_t;
+    pub fn PK_ENTITY_is(entity: PK_ENTITY_t, is_entity: *mut PK_LOGICAL_t) -> PK_ERROR_t;
 
     // -------------------------------------------------------------------------
     // Partition mark (rollback) — used in error recovery

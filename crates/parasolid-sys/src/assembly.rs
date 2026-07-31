@@ -20,16 +20,11 @@ unsafe extern "C" {
     // ---- Assembly creation & modification -----------------------------------
 
     /// Create an empty assembly (no instances).
-    pub fn PK_ASSEMBLY_create_empty(
-        assembly: *mut PK_ASSEMBLY_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ASSEMBLY_create_empty(assembly: *mut PK_ASSEMBLY_t) -> PK_ERROR_code_t;
 
     /// Transform an assembly by composing a transformation onto all of its
     /// instances' transforms.
-    pub fn PK_ASSEMBLY_transform(
-        assembly: PK_ASSEMBLY_t,
-        transf: PK_TRANSF_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ASSEMBLY_transform(assembly: PK_ASSEMBLY_t, transf: PK_TRANSF_t) -> PK_ERROR_code_t;
 
     /// Flatten an assembly hierarchy into a single-level assembly where every
     /// instance directly references a body (no sub-assemblies).
@@ -82,10 +77,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Change the part referenced by an instance.
-    pub fn PK_INSTANCE_change_part(
-        instance: PK_INSTANCE_t,
-        part: PK_PART_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_INSTANCE_change_part(instance: PK_INSTANCE_t, part: PK_PART_t) -> PK_ERROR_code_t;
 
     /// Replace the transform of an instance. The old transform entity is
     /// deleted and the new one is adopted.
@@ -96,10 +88,7 @@ unsafe extern "C" {
 
     /// Transform an instance by composing a transformation onto its existing
     /// transform.
-    pub fn PK_INSTANCE_transform(
-        instance: PK_INSTANCE_t,
-        transf: PK_TRANSF_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_INSTANCE_transform(instance: PK_INSTANCE_t, transf: PK_TRANSF_t) -> PK_ERROR_code_t;
 
     // ---- Instance query -----------------------------------------------------
 

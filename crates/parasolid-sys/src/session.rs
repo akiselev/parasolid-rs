@@ -366,23 +366,17 @@ unsafe extern "C" {
 
     /// Registers frustrum function pointers with Parasolid.
     /// Must be called before `PK_SESSION_start`.
-    pub fn PK_SESSION_register_frustrum(
-        fru: *const PK_SESSION_frustrum_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_register_frustrum(fru: *const PK_SESSION_frustrum_t) -> PK_ERROR_code_t;
 
     /// Starts a Parasolid modeling session.
     /// Frustrum must already be registered.
-    pub fn PK_SESSION_start(
-        options: *const PK_SESSION_start_o_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_start(options: *const PK_SESSION_start_o_t) -> PK_ERROR_code_t;
 
     /// Stops the current Parasolid session.
     pub fn PK_SESSION_stop() -> PK_ERROR_code_t;
 
     /// Aborts the Parasolid session (emergency cleanup).
-    pub fn PK_SESSION_abort(
-        reason: PK_abort_reason_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_abort(reason: PK_abort_reason_t) -> PK_ERROR_code_t;
 
     /// Tidies the Parasolid session after an incomplete operation.
     pub fn PK_SESSION_tidy() -> PK_ERROR_code_t;
@@ -492,7 +486,9 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Returns the latest supported behaviour version.
-    pub fn PK_SESSION_ask_latest_behaviour(behaviour: *mut PK_SESSION_behaviour_t) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_latest_behaviour(
+        behaviour: *mut PK_SESSION_behaviour_t,
+    ) -> PK_ERROR_code_t;
 
     /// Returns the current angle precision.
     pub fn PK_SESSION_ask_angle_precision(precision: *mut c_double) -> PK_ERROR_code_t;
@@ -540,33 +536,24 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Returns the registered frustrum.
-    pub fn PK_SESSION_ask_frustrum(
-        fru: *mut PK_SESSION_frustrum_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_frustrum(fru: *mut PK_SESSION_frustrum_t) -> PK_ERROR_code_t;
 
     /// Returns the registered frustrum (version 2 — extended).
-    pub fn PK_SESSION_ask_fru_2(
-        fru: *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_fru_2(fru: *mut c_void) -> PK_ERROR_code_t;
 
     /// Returns the PK function currently being executed.
-    pub fn PK_SESSION_ask_function(
-        name: *mut *const c_char,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_function(name: *mut *const c_char) -> PK_ERROR_code_t;
 
     /// Returns the Parasolid kernel version.
     /// V35: `(PK_SESSION_kernel_version_t *info)` — a single struct out-param,
     /// not three int pointers. The old 3-pointer form worked only by luck (the
     /// kernel wrote the struct starting at `&major`, spilling into the adjacent
     /// `minor`/`patch` stack slots).
-    pub fn PK_SESSION_ask_kernel_version(
-        info: *mut PK_SESSION_kernel_version_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_kernel_version(info: *mut PK_SESSION_kernel_version_t)
+    -> PK_ERROR_code_t;
 
     /// Returns the Parasolid schema version.
-    pub fn PK_SESSION_ask_schema_version(
-        version: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_schema_version(version: *mut c_int) -> PK_ERROR_code_t;
 
     /// Returns all attribute definitions in the current session.
     pub fn PK_SESSION_ask_attdefs(
@@ -576,9 +563,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Returns the current partition.
-    pub fn PK_SESSION_ask_curr_partition(
-        partition: *mut PK_PARTITION_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_curr_partition(partition: *mut PK_PARTITION_t) -> PK_ERROR_code_t;
 
     /// Returns all partitions in the session.
     pub fn PK_SESSION_ask_partitions(
@@ -587,53 +572,37 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Returns all parts in the session.
-    pub fn PK_SESSION_ask_parts(
-        n_parts: *mut c_int,
-        parts: *mut *mut PK_PART_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_parts(n_parts: *mut c_int, parts: *mut *mut PK_PART_t)
+    -> PK_ERROR_code_t;
 
     /// Returns the current mark in the session.
     /// Current session mark and whether the modeller is at it. V35:
     /// `(PK_MARK_t *mark, PK_LOGICAL_t *at_mark)` — the old 1-arg binding made
     /// the kernel write `at_mark` through an unpassed argument.
-    pub fn PK_SESSION_ask_mark(
-        mark: *mut PK_MARK_t,
-        at_mark: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_mark(mark: *mut PK_MARK_t, at_mark: *mut PK_LOGICAL_t)
+    -> PK_ERROR_code_t;
 
     /// Returns the current applio registration.
-    pub fn PK_SESSION_ask_applio(
-        applio: *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_applio(applio: *mut c_void) -> PK_ERROR_code_t;
 
     /// Returns the current applio registration (version 2).
-    pub fn PK_SESSION_ask_applio_2(
-        applio: *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_applio_2(applio: *mut c_void) -> PK_ERROR_code_t;
 
     /// Returns the current indexio registration.
-    pub fn PK_SESSION_ask_indexio(
-        indexio: *mut c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_indexio(indexio: *mut c_void) -> PK_ERROR_code_t;
 
     /// Returns whether the session can be rolled forward.
-    pub fn PK_SESSION_is_roll_forward_on(
-        is_on: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_is_roll_forward_on(is_on: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Returns whether rollback is enabled.
-    pub fn PK_SESSION_is_rollback_on(
-        is_on: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_is_rollback_on(is_on: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Tag management
     // =========================================================================
 
     /// Returns the number of tags remaining in the current session.
-    pub fn PK_SESSION_ask_tags_remaining(
-        n_remaining: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_tags_remaining(n_remaining: *mut c_int) -> PK_ERROR_code_t;
 
     /// Sets the upper bound of the Parasolid tag number range.
     pub fn PK_SESSION_set_tag_limit(limit: c_int) -> PK_ERROR_code_t;
@@ -658,17 +627,12 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Returns the amount of memory occupied by the model data structure.
-    pub fn PK_SESSION_ask_memory_usage(
-        n_bytes: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_memory_usage(n_bytes: *mut c_int) -> PK_ERROR_code_t;
 
     /// Returns the amount of memory occupied by a body's data structures.
     // Full vendor form (pk-reference.tsv): the returned `total` output was
     // dropped by clean-prototypes.tsv. size_t → usize on x86_64.
-    pub fn PK_BODY_ask_memory_usage(
-        body: PK_BODY_t,
-        total: *mut usize,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_BODY_ask_memory_usage(body: PK_BODY_t, total: *mut usize) -> PK_ERROR_code_t;
 
     /// Sets the minimum contiguous memory block size Parasolid requests via FMALLO.
     /// Range: ~1/8 MB (default) to 16 MB. Zero resets to default.
@@ -688,9 +652,7 @@ unsafe extern "C" {
     pub fn PK_SESSION_ask_journalling(enabled: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Adds a comment to the journal file (only effective when journaling is on).
-    pub fn PK_SESSION_comment(
-        comment: *const c_char,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_comment(comment: *const c_char) -> PK_ERROR_code_t;
 
     // =========================================================================
     // User fields
@@ -704,15 +666,11 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Reads the user field data for an entity.
-    pub fn PK_ENTITY_ask_user_field(
-        entity: PK_ENTITY_t,
-        user_field: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_ENTITY_ask_user_field(entity: PK_ENTITY_t, user_field: *mut c_int)
+    -> PK_ERROR_code_t;
 
     /// Returns the current user field length setting.
-    pub fn PK_SESSION_ask_user_field_len(
-        len: *mut c_int,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_ask_user_field_len(len: *mut c_int) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Session transmit / receive (snapshot)
@@ -759,35 +717,22 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Registers application frustrum functions for "applio" transmit format.
-    pub fn PK_SESSION_register_applio_2(
-        applio: *const c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_register_applio_2(applio: *const c_void) -> PK_ERROR_code_t;
 
     /// Registers application frustrum functions for "applio" transmit format (version 1).
-    pub fn PK_SESSION_register_applio(
-        applio: *const c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_register_applio(applio: *const c_void) -> PK_ERROR_code_t;
 
     /// Registers the indexio frustrum.
-    pub fn PK_SESSION_register_indexio(
-        indexio: *const c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_register_indexio(indexio: *const c_void) -> PK_ERROR_code_t;
 
     /// Registers the extended frustrum (version 2).
-    pub fn PK_SESSION_register_fru_2(
-        fru: *const c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_register_fru_2(fru: *const c_void) -> PK_ERROR_code_t;
 
     /// Registers session (general registration call).
-    pub fn PK_SESSION_register(
-        code: c_int,
-        data: PK_POINTER_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_register(code: c_int, data: PK_POINTER_t) -> PK_ERROR_code_t;
 
     /// Registers a polling callback for long operations.
-    pub fn PK_SESSION_register_polling_cb(
-        callback: *const c_void,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_register_polling_cb(callback: *const c_void) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Kernel state queries
@@ -815,9 +760,7 @@ unsafe extern "C" {
     /// V35: `(PK_SESSION_smp_o_t *options)` — the thread count is a field of the
     /// options struct, NOT a bare int. The old `(int n_threads)` binding passed
     /// the count where the kernel dereferences a pointer.
-    pub fn PK_SESSION_set_smp(
-        options: *const PK_SESSION_smp_o_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_SESSION_set_smp(options: *const PK_SESSION_smp_o_t) -> PK_ERROR_code_t;
 
     /// Returns the current SMP parameters: thread format, thread count, processor count.
     /// V35: `(PK_SESSION_smp_r_t *results)` — a single struct out-param. The old
@@ -846,9 +789,7 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Returns the error handler registered for the calling thread, or NULL.
-    pub fn PK_THREAD_ask_error_cbs(
-        callbacks: *mut PK_ERROR_callbacks_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_THREAD_ask_error_cbs(callbacks: *mut PK_ERROR_callbacks_t) -> PK_ERROR_code_t;
 
     /// Returns whether the PK interface is excluding other threads,
     /// and whether the calling thread caused the exclusion.
@@ -872,9 +813,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Returns the memory callbacks registered for the calling thread.
-    pub fn PK_THREAD_ask_memory_cbs(
-        cbs: *mut PK_THREAD_memory_cbs_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_THREAD_ask_memory_cbs(cbs: *mut PK_THREAD_memory_cbs_t) -> PK_ERROR_code_t;
 
     /// Returns all partitions locked to the calling thread.
     pub fn PK_THREAD_ask_partitions(
@@ -890,9 +829,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Stops chaining PK functions in the calling thread.
-    pub fn PK_THREAD_chain_stop(
-        options: *mut PK_THREAD_chain_stop_o_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_THREAD_chain_stop(options: *mut PK_THREAD_chain_stop_o_t) -> PK_ERROR_code_t;
 
     /// Tries to clear an exclusion preventing other threads from entering Parasolid.
     pub fn PK_THREAD_clear_exclusion(
@@ -902,9 +839,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Clears the most recent PK error in the calling thread.
-    pub fn PK_THREAD_clear_last_error(
-        was_error: *mut PK_LOGICAL_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_THREAD_clear_last_error(was_error: *mut PK_LOGICAL_t) -> PK_ERROR_code_t;
 
     /// Returns whether the calling thread is executing inside the kernel.
     pub fn PK_THREAD_is_in_kernel(
@@ -933,14 +868,10 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Registers error callbacks for the calling thread.
-    pub fn PK_THREAD_register_error_cbs(
-        callbacks: *const PK_ERROR_callbacks_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_THREAD_register_error_cbs(callbacks: *const PK_ERROR_callbacks_t) -> PK_ERROR_code_t;
 
     /// Registers memory allocation/free callbacks for the calling thread.
-    pub fn PK_THREAD_register_memory_cbs(
-        cbs: *const PK_THREAD_memory_cbs_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_THREAD_register_memory_cbs(cbs: *const PK_THREAD_memory_cbs_t) -> PK_ERROR_code_t;
 
     /// Restores Parasolid to a valid state for the calling thread
     /// after a PK function has not completed (e.g. longjmp from error handler).

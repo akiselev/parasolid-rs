@@ -559,19 +559,19 @@ pub struct PK_boolean_config_o_t {
 #[repr(C)]
 pub struct PK_BODY_boolean_o_t {
     /// Structure version — MUST be in `2..=19`. Version 1 → error 5043.
-    pub o_t_version: c_int,                          // @0
+    pub o_t_version: c_int, // @0
     /// Boolean operation (unite/subtract/intersect).
-    pub function: PK_boolean_function_t,             // @4
+    pub function: PK_boolean_function_t, // @4
     /// Performance sub-structure; NULL → kernel builds the default.
     pub configuration: *const PK_boolean_config_o_t, // @8
     /// Coincidence tolerance; `0.0` → kernel default (≈ 1e-8).
-    pub default_tol: c_double,                       // @16
+    pub default_tol: c_double, // @16
     /// Three v2 boolean flags at offsets 24/25/26 (default 0). Semantics not
     /// individually confirmed — v2 exposes them as `u8`s; likely disjoint/prune
     /// controls. All-zero reproduces the kernel's NULL-options defaults.
-    pub flags_v2: [u8; 3],                           // @24..27  (@27 = padding)
+    pub flags_v2: [u8; 3], // @24..27  (@27 = padding)
     /// Fence behaviour (default `PK_boolean_fence_none_c`).
-    pub fence: PK_boolean_fence_t,                   // @28
+    pub fence: PK_boolean_fence_t, // @28
 }
 
 impl Default for PK_BODY_boolean_o_t {
@@ -735,17 +735,17 @@ pub struct PK_boolean_r_t {
 /// tolerance (48 B) with `update=0` (an INVALID token).
 #[repr(C)]
 pub struct PK_BODY_imprint_o_t {
-    pub o_t_version: c_int,                            // @0
-    pub imprint_tool: PK_LOGICAL_t,                    // @4
-    pub imprint_overlapping: PK_LOGICAL_t,             // @8
-    pub matched_region: *const PK_boolean_match_o_t,   // @16
-    pub imprint_complete_targ: PK_imprint_complete_t,  // @24
-    pub imprint_extend_targ: PK_imprint_extend_t,      // @28
-    pub imprint_complete_tool: PK_imprint_complete_t,  // @32
-    pub imprint_extend_tool: PK_imprint_extend_t,      // @36
-    pub update: PK_boolean_update_t,                   // @40
-    pub have_tolerance: PK_LOGICAL_t,                  // @44
-    pub tolerance: c_double,                           // @48
+    pub o_t_version: c_int,                           // @0
+    pub imprint_tool: PK_LOGICAL_t,                   // @4
+    pub imprint_overlapping: PK_LOGICAL_t,            // @8
+    pub matched_region: *const PK_boolean_match_o_t,  // @16
+    pub imprint_complete_targ: PK_imprint_complete_t, // @24
+    pub imprint_extend_targ: PK_imprint_extend_t,     // @28
+    pub imprint_complete_tool: PK_imprint_complete_t, // @32
+    pub imprint_extend_tool: PK_imprint_extend_t,     // @36
+    pub update: PK_boolean_update_t,                  // @40
+    pub have_tolerance: PK_LOGICAL_t,                 // @44
+    pub tolerance: c_double,                          // @48
 } // 56 bytes
 
 impl Default for PK_BODY_imprint_o_t {
@@ -1250,18 +1250,18 @@ pub const PK_section_check_fa_yes_c: PK_section_check_fa_t = 21811;
 #[repr(C)]
 #[derive(Debug, Clone)]
 pub struct PK_BODY_section_o_t {
-    pub o_t_version: c_int,                           // @0
-    pub fence: PK_section_fence_t,                    // @4
-    pub matched_region: *const PK_boolean_match_o_t,  // @8
-    pub merge_imprinted: u8,                          // @16
-    pub merge_new_faces: u8,                          // @17
-    pub selective_merge: u8,                          // @18
-    pub check_fa: PK_section_check_fa_t,              // @20
-    pub default_tol: c_double,                        // @24
-    pub max_tol: c_double,                            // @32
-    pub tracking: u8,                                 // @40
-    pub keep_target_edges: u8,                        // @41
-    pub keep_as_facet: PK_BODY_keep_as_facet_t,       // @44
+    pub o_t_version: c_int,                          // @0
+    pub fence: PK_section_fence_t,                   // @4
+    pub matched_region: *const PK_boolean_match_o_t, // @8
+    pub merge_imprinted: u8,                         // @16
+    pub merge_new_faces: u8,                         // @17
+    pub selective_merge: u8,                         // @18
+    pub check_fa: PK_section_check_fa_t,             // @20
+    pub default_tol: c_double,                       // @24
+    pub max_tol: c_double,                           // @32
+    pub tracking: u8,                                // @40
+    pub keep_target_edges: u8,                       // @41
+    pub keep_as_facet: PK_BODY_keep_as_facet_t,      // @44
 } // 48 bytes
 
 impl Default for PK_BODY_section_o_t {
@@ -1335,31 +1335,45 @@ pub struct PK_FACE_section_o_t {
 
 /// Options for `PK_FACE_imprint_faces`.
 #[repr(C)]
-pub struct PK_FACE_imprint_o_t { _private: [u8; 0] }
+pub struct PK_FACE_imprint_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from face imprint operations.
 #[repr(C)]
-pub struct PK_imprint_r_t { _bytes: [u8; 128] }
+pub struct PK_imprint_r_t {
+    _bytes: [u8; 128],
+}
 
 /// Results from `PK_FACE_pattern`.
 #[repr(C)]
-pub struct PK_FACE_pattern_r_t { _private: [u8; 0] }
+pub struct PK_FACE_pattern_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_FACE_pattern_2`.
 #[repr(C)]
-pub struct PK_FACE_pattern_2_o_t { _private: [u8; 0] }
+pub struct PK_FACE_pattern_2_o_t {
+    _private: [u8; 0],
+}
 
 /// Results from `PK_FACE_pattern_2`.
 #[repr(C)]
-pub struct PK_FACE_pattern_2_r_t { _private: [u8; 0] }
+pub struct PK_FACE_pattern_2_r_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_FACE_imprint_cus_vector`.
 #[repr(C)]
-pub struct PK_FACE_imprint_cus_vector_o_t { _private: [u8; 0] }
+pub struct PK_FACE_imprint_cus_vector_o_t {
+    _private: [u8; 0],
+}
 
 /// Options for `PK_BODY_imprint_cus_vector`.
 #[repr(C)]
-pub struct PK_BODY_imprint_cus_vector_o_t { _private: [u8; 0] }
+pub struct PK_BODY_imprint_cus_vector_o_t {
+    _private: [u8; 0],
+}
 
 // =============================================================================
 // Extern "C" function declarations

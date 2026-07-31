@@ -4,8 +4,8 @@
 //! in formats suitable for comparison against other geometric kernels.
 
 use crate::error::PsResult;
-use crate::surf::Surf;
 use crate::geom::Vec3;
+use crate::surf::Surf;
 
 /// A sampled point on a face with position, normal, and UV parameters.
 #[derive(Debug, Clone, Copy)]
@@ -19,12 +19,40 @@ pub struct SamplePoint {
 /// Analytic surface parameters in a form suitable for cross-kernel comparison.
 #[derive(Debug, Clone)]
 pub enum SurfaceParams {
-    Plane { origin: Vec3, normal: Vec3, ref_dir: Vec3 },
-    Cylinder { radius: f64, origin: Vec3, axis: Vec3, ref_dir: Vec3 },
-    Cone { radius: f64, semi_angle: f64, origin: Vec3, axis: Vec3, ref_dir: Vec3 },
-    Sphere { radius: f64, origin: Vec3, axis: Vec3, ref_dir: Vec3 },
-    Torus { major_radius: f64, minor_radius: f64, origin: Vec3, axis: Vec3, ref_dir: Vec3 },
-    Other { surf_type: crate::surf::SurfType },
+    Plane {
+        origin: Vec3,
+        normal: Vec3,
+        ref_dir: Vec3,
+    },
+    Cylinder {
+        radius: f64,
+        origin: Vec3,
+        axis: Vec3,
+        ref_dir: Vec3,
+    },
+    Cone {
+        radius: f64,
+        semi_angle: f64,
+        origin: Vec3,
+        axis: Vec3,
+        ref_dir: Vec3,
+    },
+    Sphere {
+        radius: f64,
+        origin: Vec3,
+        axis: Vec3,
+        ref_dir: Vec3,
+    },
+    Torus {
+        major_radius: f64,
+        minor_radius: f64,
+        origin: Vec3,
+        axis: Vec3,
+        ref_dir: Vec3,
+    },
+    Other {
+        surf_type: crate::surf::SurfType,
+    },
 }
 
 /// Extract analytic surface parameters for comparison.

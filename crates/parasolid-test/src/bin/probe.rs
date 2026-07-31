@@ -110,18 +110,25 @@ fn main() {
     println!("class torus       = {}", class_of(s));
 
     // --- Body types beyond solid ---
-    let uvbox = PK_UVBOX_t { param: [0.0, 0.0, 5.0, 5.0] };
+    let uvbox = PK_UVBOX_t {
+        param: [0.0, 0.0, 5.0, 5.0],
+    };
     let mut sheet = 0;
     unsafe { PK_FACE_ask_surf(block.faces().unwrap()[0].tag(), &mut surf) };
     if unsafe { surf_make_sheet_body(surf, uvbox, &mut sheet) } == 0 {
         println!("BODY_type sheet   = {}", body_type(sheet));
     }
     let mut wire = 0;
-    let range = PK_INTERVAL_t { low: 0.0, high: 5.0 };
+    let range = PK_INTERVAL_t {
+        low: 0.0,
+        high: 5.0,
+    };
     if unsafe { curve_make_wire_body(curve, range, &mut wire) } == 0 {
         println!("BODY_type wire    = {}", body_type(wire));
     }
-    let sf = PK_POINT_sf_t { position: [1.0, 2.0, 3.0] };
+    let sf = PK_POINT_sf_t {
+        position: [1.0, 2.0, 3.0],
+    };
     let mut pt: PK_POINT_t = 0;
     unsafe { PK_POINT_create(&sf, &mut pt) };
     let mut min_body = 0;
