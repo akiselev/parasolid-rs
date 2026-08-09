@@ -616,9 +616,26 @@ algebra question is actually being asked.
 
 ## Start here
 
-Stages 0–6 are complete (172 tests). Next is **Stage 7 — surface/surface
-intersection**, the highest-value rung and the one CADabra is being rewritten
-around.
+Stages 0–6 are complete and have been through an **adversarial review by seven
+independent reviewers** (see `docs/pskernel-solidworks.md` §"Adversarial review
+of Stages 1–6"). That review found three memory-safety bugs reachable from safe
+Rust, a class of dead-option-field bug, and a dozen over-scoped claims — all now
+fixed or recorded. Suite: **179 passed, 0 failed, 1 skipped**.
+
+Two lessons worth carrying into Stage 7:
+
+1. **Apply the option-version protocol before trusting any recovered layout.**
+   Stage 6 recovered range option structs from journal helpers, which describe
+   the *post-migration* struct, and stamped `o_t_version: 1` — silently
+   disabling `range_type`, `opt_level` and `param_bound`. The procedure to catch
+   this already existed in `docs/option-version-protocol.md` and was not run.
+2. **Assert on every output the wrapper claims to return.** `Entity::distance_to`
+   returned a garbage second witness for as long as it existed, because the test
+   asserted only `distance` and `point_1`. Several "verified" claims rested on
+   tests that could not have failed.
+
+Next is **Stage 7 — surface/surface intersection**, the highest-value rung and
+the one CADabra is being rewritten around.
 
 Two of its seven intersection entry points are already validated; what is open
 is the **full analytic pair matrix** — sphere-sphere, cyl-cyl (parallel / skew /

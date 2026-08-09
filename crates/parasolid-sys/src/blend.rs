@@ -815,13 +815,52 @@ impl Default for PK_EDGE_set_blend_constant_o_t {
     }
 }
 
-/// Parasolid array descriptor for faces (`{length, array}`). Treated as opaque
-/// here — `PK_BODY_fix_blends` returns `PK_FACE_array_t **unders` which we only
-/// pass through as a pointer.
+/// Parasolid array descriptor for faces: **`{ array, length }`**, 16 bytes.
+///
+/// Note the order — the pointer comes *first*, not the count. This was recovered
+/// from three independent points in `pskernel.dll` (V37.01.243):
+///
+/// 1. **Producer** — `PK_BODY_fix_blends` (`0x180133ab0`) builds `unders` with
+///    `PKU_alloc(n << 4, 1)` (16 bytes per element), then per element does
+///    `*plVar29 = PKU_alloc_array_from_list(list, 1);`  (pointer at `+0`)
+///    `*(int *)(plVar29 + 1) = *(int *)(list + 0x20);` (count at `+8`)
+///    `plVar29 += 2;` (stride 16). It later sorts the block with
+///    `FUN_180c9e540(*unders, *n_blends, 0x10, ...)` — element size `0x10`,
+///    element count `n_blends`.
+/// 2. **Journaller** — `PKU_journal_tag_array_array` walks the outer descriptor
+///    as `{ptr @0, int len @8}` and each element as `puVar3[0..1]` = tag
+///    pointer, `puVar3[2]` = length (`KIU_journal_int`), advancing `puVar3 += 4`
+///    (16 bytes). The `PK_BODY_fix_blends_o_t` journaller names the two fields
+///    `"limit_topols.array"` (the pointer, at o_t `+0x168`) and
+///    `"limit_topols.length"` (the int, at o_t `+0x170`) — hence `array` /
+///    `length` below.
+/// 3. **Freer** — `PK_BODY_find_facesets_r_f` (`0x18012d7d0`) and
+///    `PK_identify_facesets_r_f` (`0x180143fb0`) both do, per 16-byte element:
+///    `if (0 < *(int *)(e + 8)) PK_MEMORY_free(*(void **)(e + 0));`
+///    then `PK_MEMORY_free(base)`. So the inner arrays are freed **first**, the
+///    outer block second, and the inner free is **guarded on `length > 0`** —
+///    a zero-length element's `array` pointer must not be passed to
+///    `PK_MEMORY_free`.
+///
+/// The trailing 4 bytes at `+0xc` are copied around wholesale by the journaller
+/// but never read as a value; they are treated as padding here.
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PK_FACE_array_t {
-    _private: [u8; 0],
+    /// PK-allocated array of `length` face tags. Free with `PK_MEMORY_free`
+    /// only when `length > 0`.
+    pub array: *mut PK_FACE_t,
+    /// Number of faces in `array`.
+    pub length: c_int,
+    /// Padding to the 8-byte alignment of `array`. Not a kernel field as far as
+    /// the evidence above shows.
+    pub _padding: c_int,
 }
+
+const _: () = {
+    assert!(std::mem::size_of::<PK_FACE_array_t>() == 16);
+    assert!(std::mem::align_of::<PK_FACE_array_t>() == 8);
+};
 
 /// Options for PK_EDGE_set_blend_chain.
 #[repr(C)]
@@ -1209,11 +1248,21 @@ unsafe extern "C" {
 
     /// Fixes (incorporates) unfixed blends into a body.
     /// Converts blend attributes on edges into actual blend faces.
-    /// Realise blends set by `PK_EDGE_set_blend_*` into faces. V35 (8 args):
+    /// Realise blends set by `PK_EDGE_set_blend_*` into faces. **9 args** —
     /// `(body, options, int *n_blends, PK_FACE_t **blends,
     ///  PK_FACE_array_t **unders, int **topols, PK_blend_fault_t *fault,
-    ///  PK_EDGE_t *fault_edge)`. The old binding had extra `n_topols`/`n_unders`
-    /// counts, the wrong array order, and no `fault_edge`.
+    ///  PK_EDGE_t *fault_edge, PK_ENTITY_t *fault_topol)`. An older binding had
+    /// extra `n_topols`/`n_unders` counts, the wrong array order, and no
+    /// `fault_edge`; a later one dropped `fault_topol`.
+    ///
+    /// `fault`, `fault_edge` and `fault_topol` are **not** null-checked by the
+    /// kernel: the tail of the implementation (`0x180133ab0`) ends with the
+    /// unconditional stores `*param_7 = ...; *param_8 = ...; *param_9 = ...`.
+    /// Omitting `fault_topol` from the declaration therefore made the callee
+    /// store through whatever junk happened to sit in the 9th argument's home
+    /// slot — an intermittent wild write (observed as page faults on
+    /// `0x0`/`0x1`/`0x7fff00000010` inside `fillet_edges`, whose reproduction
+    /// depended on unrelated stack contents). All three must be real pointers.
     pub fn PK_BODY_fix_blends(
         body: PK_BODY_t,
         options: *const PK_BODY_fix_blends_o_t,
@@ -1223,6 +1272,7 @@ unsafe extern "C" {
         topols: *mut *mut c_int,
         fault: *mut PK_blend_fault_t,
         fault_edge: *mut PK_EDGE_t,
+        fault_topol: *mut PK_ENTITY_t,
     ) -> PK_ERROR_code_t;
 
     // -------------------------------------------------------------------------

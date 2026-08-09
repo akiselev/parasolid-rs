@@ -20,6 +20,19 @@ pub enum BodyType {
     General,
 }
 
+/// Result of [`Body::fillet_edges_detailed`].
+///
+/// `unders[i]` names the faces that blend face `blends[i]` was built over — the
+/// lineage `PK_BODY_fix_blends` reports through its `PK_FACE_array_t **unders`
+/// out-parameter. The two vectors are parallel and both `n_blends` long.
+#[derive(Debug, Clone, Default)]
+pub struct FilletResult {
+    /// The blend (fillet) faces created, in kernel order.
+    pub blends: Vec<Face>,
+    /// Per blend face, the underlying faces it consumed.
+    pub unders: Vec<Vec<Face>>,
+}
+
 /// A Parasolid body — owns topology (faces, edges, vertices).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Body {
@@ -280,7 +293,16 @@ impl Body {
     /// workflow: `PK_EDGE_set_blend_constant` to mark the edges, then
     /// `PK_BODY_fix_blends` to realise them into fillet faces. Returns the number
     /// of blend faces created.
+    ///
+    /// Only the count is returned; use [`Body::fillet_edges_detailed`] when you
+    /// want the blend faces themselves and their under-face lineage.
     pub fn fillet_edges(&self, edges: &[Edge], radius: f64) -> PsResult<i32> {
+        Ok(self.fillet_edges_detailed(edges, radius)?.blends.len() as i32)
+    }
+
+    /// Same as [`Body::fillet_edges`], but returns the created blend faces and,
+    /// for each one, the faces/topology it was built over (`unders`).
+    pub fn fillet_edges_detailed(&self, edges: &[Edge], radius: f64) -> PsResult<FilletResult> {
         let edge_tags: Vec<PK_EDGE_t> = edges.iter().map(|e| e.tag()).collect();
 
         // Phase 1: set a constant blend on the edges. Default options via NULL
@@ -307,6 +329,9 @@ impl Body {
         let mut topols: *mut c_int = std::ptr::null_mut();
         let mut fault: PK_blend_fault_t = 0;
         let mut fault_edge: PK_EDGE_t = PK_ENTITY_null;
+        // `fault_topol` is NOT optional: PK_BODY_fix_blends (0x180133ab0) stores
+        // through it unconditionally, so it must be a real pointer.
+        let mut fault_topol: PK_ENTITY_t = PK_ENTITY_null;
         pk_call!(PK_BODY_fix_blends(
             self.tag,
             std::ptr::null(), // default options
@@ -316,19 +341,46 @@ impl Body {
             &mut topols,
             &mut fault,
             &mut fault_edge,
+            &mut fault_topol,
         ));
+        let blend_faces: Vec<Face>;
+        let under_faces: Vec<Vec<Face>>;
         unsafe {
-            let _ = PkArray::from_raw(blends, n_blends);
+            let blends_owned = PkArray::from_raw(blends, n_blends);
+            blend_faces = blends_owned.iter().map(|&t| Face::from_tag(t)).collect();
             let _ = PkArray::from_raw(topols, n_blends);
-            // `unders` was previously never freed at all. Release the outer
-            // array here.
-            //
-            // KNOWN RESIDUAL LEAK: each element is a `PK_FACE_array_t` that
-            // owns an inner face array. `PK_FACE_array_t` is still an opaque
-            // stub in parasolid-sys, so freeing the inner arrays would mean
-            // guessing its layout — and freeing a wrong pointer is far worse
-            // than leaking. Materialise that struct, then free the inner arrays
-            // here.
+
+            // `unders` is a PK-allocated block of `n_blends` `PK_FACE_array_t`
+            // descriptors, each `{ PK_FACE_t *array; int length; }` (16 bytes),
+            // each owning its own face array. Copy the contents out, then free
+            // inner-arrays-first / outer-block-second, exactly as the kernel's
+            // own `PK_BODY_find_facesets_r_f` (0x18012d7d0) does — including its
+            // `length > 0` guard, since a zero-length descriptor's pointer is
+            // not a valid allocation.
+            under_faces = if unders.is_null() || n_blends <= 0 {
+                Vec::new()
+            } else {
+                let descs = std::slice::from_raw_parts(unders, n_blends as usize);
+                let collected: Vec<Vec<Face>> = descs
+                    .iter()
+                    .map(|d| {
+                        if d.array.is_null() || d.length <= 0 {
+                            Vec::new()
+                        } else {
+                            std::slice::from_raw_parts(d.array, d.length as usize)
+                                .iter()
+                                .map(|&t| Face::from_tag(t))
+                                .collect()
+                        }
+                    })
+                    .collect();
+                for d in descs {
+                    if d.length > 0 && !d.array.is_null() {
+                        let _ = PK_MEMORY_free(d.array as *mut std::os::raw::c_void);
+                    }
+                }
+                collected
+            };
             if !unders.is_null() {
                 let _ = PK_MEMORY_free(unders as *mut std::os::raw::c_void);
             }
@@ -342,11 +394,15 @@ impl Body {
         if fault != PK_blend_fault_no_fault_c {
             return Err(crate::error::PsError::Session(format!(
                 "fillet failed: blend fault {fault} on edge {fault_edge} \
+                 (topol {fault_topol}) \
                  ({n_set} of {} edges marked, {n_blends} blends produced)",
                 edge_tags.len()
             )));
         }
-        Ok(n_blends)
+        Ok(FilletResult {
+            blends: blend_faces,
+            unders: under_faces,
+        })
     }
 
     /// Create a rectangular planar **sheet** of `x_length` × `y_length` in the

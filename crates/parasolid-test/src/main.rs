@@ -6026,6 +6026,33 @@ fn main() {
         );
     });
 
+    test!("regress_session_defaults_to_latest_behaviour", {
+        let session = Session::start(test_config())?;
+
+        // `o_t_version` is a PER-OPTIONS-STRUCT field, not a session setting.
+        // The session-level equivalent is PK_SESSION_set_behaviour, and a
+        // session that never sets it reports `Unset` — meaning "use the
+        // original system switches", the backwards-compatibility mode kept so
+        // customers can reproduce decades-old parts bit-for-bit. An oracle
+        // wants current algorithms, so the default is now Latest.
+        let b = session.behaviour()?;
+        assert_eq!(
+            b,
+            Behaviour::Latest,
+            "session should default to the latest kernel behaviour, got {b:?}"
+        );
+
+        // And an explicit request must still be honoured, with the kernel's
+        // acceptance status checked rather than discarded.
+        drop(session);
+        let s2 = Session::start(SessionConfig::new().behaviour(Behaviour::Unset))?;
+        assert_eq!(
+            s2.behaviour()?,
+            Behaviour::Unset,
+            "an explicit behaviour request must override the default"
+        );
+    });
+
     // =========================================================================
     // Summary
     // =========================================================================

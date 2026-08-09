@@ -228,7 +228,16 @@ impl SessionConfig {
             general_topology: None,
             roll_forward: None,
             check_arguments: None,
-            behaviour: None,
+            // Default to the LATEST kernel behaviour.
+            //
+            // A session that never calls PK_SESSION_set_behaviour reports
+            // `Unset`, which means "use the original system switches" — the
+            // backwards-compatibility mode Siemens keeps so customers can
+            // reproduce parts designed decades ago bit-for-bit. As an oracle we
+            // want current algorithms, not frozen historical ones, so Latest is
+            // the right default here. Override with
+            // `SessionConfig::behaviour()` if a specific vintage is ever needed.
+            behaviour: Some(Behaviour::Latest),
             precision: None,
             angle_precision: None,
             err_reports: None,
@@ -493,6 +502,20 @@ impl Session {
                 &mut behaviour_previous,
                 &mut status,
             ));
+            // The kernel can decline or clamp a behaviour request and still
+            // return no error — the outcome lives in `status`. Dropping it (as
+            // this did) meant `Session::start` could report success while every
+            // later operation ran under a behaviour the caller did not ask for,
+            // which is the highest-blast-radius silent mismatch in the crate.
+            if status != PK_behaviour_status_ok_c {
+                return Err(PsError::Session(format!(
+                    "requested session behaviour was not accepted (status {status}, \
+                     requested type {}, set type {}, previous type {})",
+                    beh.behaviour_type,
+                    behaviour_set.behaviour_type,
+                    behaviour_previous.behaviour_type
+                )));
+            }
         }
         if let Some(p) = config.precision {
             pk_call!(PK_SESSION_set_precision(p));

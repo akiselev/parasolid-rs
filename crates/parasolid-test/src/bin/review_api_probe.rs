@@ -318,9 +318,10 @@ fn main() {
     let mut topols: *mut c_int = std::ptr::null_mut();
     let mut fault: PK_blend_fault_t = -1;
     let mut fault_edge: PK_EDGE_t = PK_ENTITY_null;
+    let mut fault_topol: PK_ENTITY_t = PK_ENTITY_null;
     let fc = unsafe {
         PK_BODY_fix_blends(blk3.tag(), std::ptr::null(), &mut n_blends, &mut blends,
-            &mut unders, &mut topols, &mut fault, &mut fault_edge)
+            &mut unders, &mut topols, &mut fault, &mut fault_edge, &mut fault_topol)
     };
     println!("  PK_BODY_fix_blends -> err {fc}, n_blends={n_blends}, fault={fault} (18391=no_fault), fault_edge={fault_edge}, unders={unders:p}");
 

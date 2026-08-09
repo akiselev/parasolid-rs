@@ -1395,3 +1395,205 @@ projection (the vendor reference says so explicitly for the array form):
 `(0,0,100)` gives 96 and the north pole. Contrast `PK_SURF_parameterise_vector`,
 which *refuses* off-surface points (Stage 5). The two are not interchangeable
 and are now wrapped separately: `Surf::range_to_point` vs `Surf::parameterise`.
+
+## Adversarial review of Stages 1–6 (2026-08-09)
+
+Seven independent reviewers with clean context, each tasked to **falsify** rather
+than confirm, verifying live under Wine and cross-checking in Ghidra. Suite went
+172 → **179 passed, 0 failed, 1 skipped** (seven regression tests added).
+
+The review found defects in every stage, including three memory-safety bugs
+reachable from safe Rust. What follows is what was wrong and what changed.
+
+### Memory safety (all fixed)
+
+1. **`PK_SESSION_ask_memory_usage` — arbitrary memory corruption.** Declared as
+   one `*mut c_int`; the kernel takes **two `size_t*`** and writes both as
+   qwords (`MOV qword ptr [RDI],RAX` / `[RSI],RAX`). Every call wrote 8 bytes
+   into a 4-byte slot and stored 8 more through whatever was in RDX. Now
+   `(total, free)`, exposed as `Session::memory_usage_detail`.
+2. **`PK_range_end_t` is 56 bytes, not 48** — it carries trailing `region`@48
+   and `negative`@49 logicals (`PKU_journal_range_end`). Consequences:
+   `PK_range_2_r_t::end_2` sits at **@64, not @56**, the struct is 120 bytes not
+   104, and `Entity::distance_to` both overran its stack local by 16 bytes and
+   returned garbage — `point_2` came back as `7.7e-312` and `witness_2.entity`
+   as an invalid tag. `PK_range_1_r_t` is 64 bytes, not 56.
+3. **`PK_boolean_r_t` was 8 bytes short.** `PK_boolean_r_f` reads `n_faults` at
+   `[r+0x10]` and a faults array at `[r+0x18]`, frees a per-fault
+   sub-allocation, then writes both back — so a 24-byte struct meant freeing a
+   pointer read from uninitialised stack. Now 32 bytes with `n_faults`/`faults`.
+4. **`PK_TOPOL_track_r_t` was 8 bytes short** and its field names were fiction.
+   `PK_TOPOL_track_r_f` frees pointers at +0x8/+0x10/+0x18/+0x20 and writes back
+   at +0x20. Now a documented opaque 40 bytes rather than four invented fields.
+5. **`Surf::eval_jet(triangular)` with `n_u != n_v` killed the process.** The
+   kernel requires equal orders but only *checks* when argument checking is on;
+   with it off it terminates rather than erroring. The wrapper now rejects the
+   input, so safe Rust cannot abort the host. `slot_count` also corrected to the
+   kernel's `((n_u+2)*(n_u+1))/2` (it uses `n_u` alone).
+
+### Correctness
+
+6. **`o_t_version: 1` made option fields dead** — found independently by two
+   reviewers. The kernel migrates from the stamped version, copying only that
+   version's prefix and overwriting the rest. `PK_range_type_maximum_c` silently
+   returned the **minimum** with no error; an illegal `opt_level` was accepted;
+   a supplied `param_bound` was ignored while the call still reported `found`.
+   Defaults now stamp the highest accepted version (3, or 2 for
+   `PK_GEOM_range_vector`). **This is exactly the trap
+   `docs/option-version-protocol.md` was written to prevent, and Stage 6 failed
+   to apply its own procedure** — layouts were recovered from journal helpers,
+   which describe the *post-migration* struct.
+7. **Rational B-curves returned homogeneous control points.** `ask_bcurve` read
+   `(x·w, y·w, z·w)` without dividing by `w` — a weight of 4 displaced a control
+   point 4×. Now Cartesian, with `weights` and `knot_mult` surfaced (the latter
+   was fetched and freed unread, so a curve could not be round-tripped).
+8. **`Body::fillet_edges` reported failure as success.** `PK_BODY_fix_blends`
+   returns `no_errors` for an impossible blend and reports it via `fault` /
+   `fault_edge`, both of which were discarded — the caller saw `Ok(0)`. Now
+   surfaced as an error naming the offending edge. `unders` was also never
+   freed.
+9. **Severity fallback inverted.** Severity 2 is trivially reachable
+   (`PK_BODY_hollow_2` over-large inward → `boolean_failure` 1058;
+   `PK_BODY_offset(-5)` → `face_check_fails` 5035), and both leave the target
+   body destroyed. `default_severity` mapped everything unrecognised to `Mild`,
+   so `requires_rollback()` answered **false** for a failure that requires one.
+   Unknown severity now defaults to `Serious`: an unnecessary rollback costs
+   little, a missed one leaves a corrupt model in use.
+10. **`PK_ERROR_invalid_object` = 9999 was missing.** The sweep stopped at 9000.
+    A static reconstruction of the kernel's whole code→token map (the switch in
+    `PKU_error_code_mnemonic` plus the `KI_*` array) diffed against the table:
+    **0 mismatches, 0 spurious, exactly 1 missing**. Also recorded: codes
+    15000–15999 have no individual names (the band collapses to `"$PF_ERROR"`).
+11. **`PK_CLASS_attdef` is 6003**, not the `-3` sentinel — measured via
+    `PK_ENTITY_ask_class` on a real attdef. (6002 and 6005 are the other two
+    unmapped entity subclasses.)
+12. **`ParamExtent::is_bounded()` was false for every NURBS.** Every B-curve and
+    B-surface reports extent **18001**, which fell through to `Other`. Now
+    `ParamExtent::KnotBounded`.
+13. **`PK_BODY_find_extreme_o_t` was missing `o_t_version`** — any non-NULL
+    options struct failed instantly with 5022. Latent only because the wrapper
+    passes NULL.
+
+### Claims corrected (documentation was wrong, code was fine)
+
+- **Bit-exactness is not universal.** `PK_CONE_sf_t.semi_angle` is stored as a
+  **(sin, cos) pair** (`PKU_check_CONE_sf` calls `AGA_sin`/`AGA_cos`), so ~14 %
+  of angles lose 1 ULP and repeated round-trips **drift monotonically with no
+  fixed point**. Every other field of every other analytic family is bit-exact,
+  including oblique bases. CADabra must use a tolerance band for cone angles and
+  exact relations elsewhere.
+- **Rejection guarantees hold only under `check_arguments(true)`**; with it off,
+  NaN radii, null axes and zero radii are all stored silently. And `+Inf` is
+  accepted *even with checking on* — NaN is rejected by an explicit `!NAN(x)`
+  test that infinities pass. `PK_SESSION_set_precision(+Inf)` likewise succeeds.
+- **Admissibility is precision-dependent**: `radius > session_precision`,
+  bisected to a ratio of exactly 1.0000 at four precisions. `PK_ERROR_radius_le_0`
+  fires for strictly positive radii. Rejection tokens are not uniform — cone
+  `radius = 0` is *accepted*; torus gives `radius_eq_0` / `radius_sum_le_0`.
+- **`extent == Periodic` does not imply periodic.** A closed-but-non-periodic
+  B-curve reports `extent = 18003` with `periodic = 18020`. The curve and
+  surface token maps also differ. Reducing a parameter mod an implied "period"
+  corrupts closed splines.
+- **`curve_class` for surfaces is not derived from the iso-curve** — it is a
+  hardcoded switch on the surface's own class, and the sphere-v anomaly is a
+  lookup-table omission (class 53 is present in the u switch, absent from v),
+  not a statement about meridians. A fourth token 18043 exists, unbound.
+- **`Periodicity::Seamed` (18022) never occurs** in any tested configuration,
+  including a cylindrical face cut open at u=0 — which is precisely what the
+  documented description claimed would produce it.
+- **Deviation vectors are over *columns*, not rows**, and the orthogonality
+  slots pair as (c0,c1), (c1,c2), (c0,c2) — not the order anyone would guess.
+- **`PK_TRANSF_classify_r_f` frees nothing** — it is a pure re-initialiser, so
+  the ownership rationale in its doc comment was wrong.
+- **Face uvbox padding is ×1.012 exactly, and only when `is_uvbox` is false**;
+  when true, `find_uvbox` is bit-exact. **B-surface boxes are the control-polygon
+  hull** (78 % over on a test bump) — conservative, but "tight" applies to
+  analytic geometry only.
+- **`MinRadius.position` and `.param` disagree** for surface entries after the
+  first: the kernel copies `positions[0]` into `positions[1]` while `parms[1]`
+  names a different point. `param` is authoritative.
+- **`find_extreme` requires three linearly independent directions** — repeating
+  one gives `PK_ERROR_coplanar` (952); you cannot "supply fewer".
+
+### Confirmed correct under harder testing
+
+The `PK_range_bound_t` upper/lower swap (the highest-risk recent change) is
+**right**, verified three ways including runtime `upper`/`lower` status tokens.
+`PK_ERROR_raise` canonicalization is now *proven* rather than assumed — both the
+raise path and the real-error path call the same `PKU_error_code_mnemonic`. The
+116-byte `PK_ERROR_sf_t` is confirmed by a global record array at **stride
+0x74**, and a 0xAA poison-fill (stronger than the original zero-fill) found zero
+writes past 116 across 44 error cases. The 120-byte classify layout, the
+rectangular and triangular jet indexing (extended to orders 3 and 4), the
+curvature sign convention (re-derived from the second fundamental form at a
+saddle), `find_min_radii` never exceeding 2 entries, the `PK_PARAM_sf_t` 40-byte
+stride, the `PK_ENTITY_range` structs previously flagged unvalidated, the clash
+options' byte-sized logicals, and the seam identification (extended to 3rd-order
+derivatives) all survived. A mechanical diff of **all 2502 `pub const` values**
+against the RE catalog found **0 mismatches**.
+
+### `PK_FACE_array_t` and a fourth memory-safety bug (2026-08-09)
+
+Reverse-engineered and implemented. **16 bytes, pointer first**:
+`{ array: *mut PK_FACE_t @0, length: c_int @8, _padding @12 }`. Established from
+three independent points in the DLL:
+
+- **Producer** — `PK_BODY_fix_blends` (@180133ab0) allocates `unders` as
+  `PKU_alloc(n << 4, 1)` (16 B/element) and writes the pointer at +0 and the
+  count at +8, then sorts the block with element size `0x10` and element count
+  `n_blends` — so the outer array has no count of its own; each element does.
+- **Journaller** — `PKU_journal_tag_array_array` walks each element as
+  `{ptr, len}` stepping by 4 ints, and the options journaller names the two
+  fields `limit_topols.array` / `limit_topols.length`.
+- **Ownership** — there is no `fix_blends_r_f`; `PK_BODY_find_facesets_r_f` and
+  `PK_identify_facesets_r_f` both free per 16-byte element as
+  `if (length > 0) PK_MEMORY_free(array)`, then free the base. So inner arrays
+  first, outer block second, **guarded on `length > 0`**.
+
+An earlier reviewer's asserted `{length, array}` ordering was **wrong** — which
+is why it was worth deriving rather than trusting.
+
+**The more serious find: `PK_BODY_fix_blends` takes NINE arguments, not eight.**
+The binding omitted the trailing `PK_ENTITY_t *fault_topol`, and the
+implementation stores through it **unconditionally** with no null check. Every
+call therefore wrote through whatever junk occupied the 9th argument's home slot
+— an intermittent wild write whose reproduction depended on unrelated stack
+contents (observed as `0x0`, `0x1`, and a page fault on `0x7fff00000010`; an
+unrelated `eprintln!` made it vanish). This is the **fourth** memory-safety
+defect the review surfaced, and the only one that was invisible in a normal run.
+
+`fillet_edges` keeps its signature; new `Body::fillet_edges_detailed` returns
+`FilletResult { blends, unders }`, surfacing the under-face lineage that was
+previously freed unread. Verified on a 10-cube: a 12-edge r=0.25 fillet yields
+**20 blends** = 12 edge blends (2 unders each) + 8 corner blends (3 unders each),
+every inner tag confirmed class 5004 (face), both levels freed cleanly across
+repeated passes.
+
+### Session behaviour was left on the legacy setting
+
+`o_t_version` is per-options-struct, not a session setting. The session-level
+equivalent is `PK_SESSION_set_behaviour`, and a session that never sets it
+reports `Unset` — "use the original system switches", the backwards-compatibility
+mode kept so customers can reproduce decades-old parts bit-for-bit. **Every
+result in Stages 0–6 was produced under that legacy behaviour.**
+`SessionConfig` now defaults to `Behaviour::Latest`, and the acceptance `status`
+output (previously discarded) is checked, so a declined or clamped request fails
+loudly instead of silently running every later operation under the wrong
+behaviour. All tests pass unchanged under Latest, so no validated oracle value
+is behaviour-version-sensitive.
+
+Remaining `o_t_version` work: 60 of the 66 `Default` impls still stamp v1.
+Bumping each needs the per-struct procedure in `docs/option-version-protocol.md`
+— the ceiling differs per entry point (too high gives 5022) and a higher version
+makes the kernel read more fields, all of which then need legal enum defaults
+(zero gives 5014).
+
+### Known-remaining (recorded, not fixed)
+- Fatal severity (3) remains unobserved after 44 attempts.
+- Clash tokens 1 and 3 exist and are unbound; `clash_type` is populated even
+  with `find_intersect = 0`.
+- Several lossy wrappers remain (`Body::ask_topology` drops the parent/child
+  graph, `Session::apply_config` drops the behaviour status, `Edge::is_planar`
+  leaks a `PK_PLANE_t` per call, `PK_TOPOL_local_r_f`/`PK_section_r_f` are
+  undeclared so local-op status is discarded).
+- `PK_BODY_imprint_body(t, t)` page-faults — no self-imprint guard.
