@@ -1381,6 +1381,13 @@ pub struct PK_BODY_imprint_cus_vector_o_t {
 
 #[link(name = "pskernel")]
 unsafe extern "C" {
+    /// Free a `PK_boolean_r_t` produced by `PK_BODY_boolean_2`.
+    ///
+    /// The result struct owns more than the `bodies` array — freeing only that
+    /// array leaks the remainder. Copy any tags out first: this releases
+    /// `bodies` too.
+    pub fn PK_boolean_r_f(results: *mut PK_boolean_r_t) -> PK_ERROR_code_t;
+
     // =========================================================================
     // Session — general topology toggle
     // =========================================================================

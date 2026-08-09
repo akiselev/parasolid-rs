@@ -429,13 +429,6 @@ impl Default for PK_SURF_make_sheet_trimmed_o_t {
 // Additional error codes for file I/O
 // =============================================================================
 
-/// Non-printing characters in attribute strings when saving pre-V12.1.
-pub const PK_ERROR_bad_text_conversion: PK_ERROR_code_t = 900;
-/// Attribute definition mismatch on receive (with `PK_ATTDEF_mismatch_fail_c`).
-pub const PK_ERROR_attr_defn_mismatch: PK_ERROR_code_t = 901;
-/// Invalid option data (e.g. pmarks with `PK_PARTITION_xmt_deltas_later_c`).
-pub const PK_ERROR_bad_option_data: PK_ERROR_code_t = 902;
-
 // =============================================================================
 // Extern functions
 // =============================================================================

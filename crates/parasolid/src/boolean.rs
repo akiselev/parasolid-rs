@@ -2,7 +2,6 @@
 
 use crate::body::Body;
 use crate::error::PsResult;
-use crate::memory::PkArray;
 use parasolid_sys::*;
 use std::os::raw::c_int;
 
@@ -87,13 +86,25 @@ pub fn boolean(
     // populated it before returning an error code.
     unsafe { PK_TOPOL_track_r_f(&mut tracking) };
 
-    // Check the boolean result code after freeing tracking.
-    crate::error::pk_check(code)?;
+    // Copy the tags out before freeing: `bodies` is kernel-allocated and
+    // `PK_boolean_r_f` releases it along with whatever else the result struct
+    // owns. Body is a plain tag, so the copy outlives the free.
+    let result_bodies: Vec<Body> = if results.bodies.is_null() || results.n_bodies <= 0 {
+        Vec::new()
+    } else {
+        (0..results.n_bodies as usize)
+            .map(|i| Body::from_tag(unsafe { *results.bodies.add(i) }))
+            .collect()
+    };
 
-    // Wrap bodies in PkArray BEFORE any further fallible operations so
-    // the PK-allocated array is freed on drop regardless of error paths.
-    let bodies = unsafe { PkArray::from_raw(results.bodies, results.n_bodies) };
-    let result_bodies: Vec<Body> = bodies.iter().map(|&tag| Body::from_tag(tag)).collect();
+    // Free the whole result struct through its matching API rather than just
+    // the `bodies` array — the struct carries further kernel allocations that a
+    // bare array free leaks.
+    unsafe { PK_boolean_r_f(&mut results) };
+
+    // Check the boolean result code only after both frees, so an error path
+    // cannot leak either allocation.
+    crate::error::pk_check(code)?;
 
     Ok(result_bodies)
 }

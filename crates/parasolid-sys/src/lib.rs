@@ -40,6 +40,10 @@ pub use frustrum::*;
 mod error;
 pub use error::*;
 
+// PK_ERROR_* numeric codes, probed from the DLL (see error_codes.rs).
+mod error_codes;
+pub use error_codes::*;
+
 // Model structure and topology
 mod topology;
 pub use topology::*;

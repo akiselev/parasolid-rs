@@ -4,6 +4,7 @@
 //! Run:   WINEPATH=/path/to/SOLIDWORKS cargo run -p parasolid-test --target x86_64-pc-windows-gnu
 
 use parasolid::*;
+use parasolid_sys::*;
 
 /// Session config used by every test: argument checking on, so the kernel
 /// validates our FFI arguments and surfaces struct/signature mismatches early.
@@ -3879,6 +3880,667 @@ fn main() {
         assert!(
             exact_modified && exact_dev == 0.0,
             "optimise(exact edge) expected Ok((true, 0.0)), got ({exact_modified}, {exact_dev})"
+        );
+    });
+
+    // =========================================================================
+    // Stage 0 — the trust boundary: error record, severity, code table
+    // =========================================================================
+
+    test!("error_sf_all_fields_populated", {
+        let _session = Session::start(test_config())?;
+
+        // A negative dimension names a specific positional argument, so this
+        // one case exercises every field of PK_ERROR_sf_t at once.
+        let err = Body::create_solid_block(-1.0, 1.0, 1.0)
+            .expect_err("negative block dimension must fail");
+
+        let d = err.details().expect("error must carry details");
+        assert_eq!(
+            d.code, PK_ERROR_distance_le_0,
+            "code should be the probed distance_le_0 ({PK_ERROR_distance_le_0}), got {}",
+            d.code
+        );
+        assert_eq!(
+            d.code_token.as_deref(),
+            Some("PK_ERROR_distance_le_0"),
+            "kernel's own token for the code"
+        );
+        assert_eq!(
+            d.function, "PK_BODY_create_solid_block",
+            "function name read from the inline char[32] at offset 0"
+        );
+        assert_eq!(
+            d.severity,
+            Severity::Mild,
+            "severity read from offset 68, not guessed from the code"
+        );
+        assert_eq!(d.bad_args.len(), 1, "kernel reports exactly one bad argument");
+        assert_eq!(d.bad_args[0].index, 1, "first argument is the bad one");
+        assert_eq!(
+            d.bad_args[0].name.as_deref(),
+            Some("x"),
+            "argument name read from the inline char[32] at offset 76"
+        );
+    });
+
+    test!("error_not_an_entity_carries_tag", {
+        let _session = Session::start(test_config())?;
+
+        // Dispatch on PK_ERROR_not_an_entity: with the old fabricated value
+        // (504) this arm could never fire, because the kernel emits 22.
+        // `Body` is Copy, so the tag survives the delete and goes stale.
+        let body = Body::create_solid_block(1.0, 1.0, 1.0)?;
+        let tag = body.tag();
+        body.delete()?;
+
+        let err = body.faces().expect_err("deleted body must fail");
+        match err {
+            PsError::NotAnEntity { tag: reported } => assert_eq!(
+                reported, tag,
+                "entity field (offset 112) should carry the offending tag"
+            ),
+            other => panic!("expected NotAnEntity, got {other:?}"),
+        }
+    });
+
+    test!("error_code_table_matches_kernel_tokens", {
+        let _session = Session::start(test_config())?;
+
+        // The probed table is only trustworthy if the kernel agrees. Raise each
+        // code and check the kernel's canonical token is the constant's name.
+        // A regression in the generated table breaks this immediately.
+        let sample: &[(PK_ERROR_code_t, &str)] = &[
+            (PK_ERROR_distance_le_0, "PK_ERROR_distance_le_0"),
+            (PK_ERROR_not_an_entity, "PK_ERROR_not_an_entity"),
+            (PK_ERROR_o_t_version_unknown, "PK_ERROR_o_t_version_unknown"),
+            (PK_ERROR_o_t_version_incorrect, "PK_ERROR_o_t_version_incorrect"),
+            (PK_ERROR_field_of_wrong_type, "PK_ERROR_field_of_wrong_type"),
+            (PK_ERROR_not_general, "PK_ERROR_not_general"),
+            (PK_ERROR_cant_be_aborted, "PK_ERROR_cant_be_aborted"),
+            (PK_ERROR_has_no_name, "PK_ERROR_has_no_name"),
+            (PK_ERROR_wrong_entity, "PK_ERROR_wrong_entity"),
+            (PK_ERROR_not_implemented, "PK_ERROR_not_implemented"),
+        ];
+
+        for &(code, name) in sample {
+            let mut sf = [0u8; 116];
+            sf[32..36].copy_from_slice(&code.to_le_bytes());
+            sf[68..72].copy_from_slice(&PK_ERROR_mild.to_le_bytes());
+            unsafe { PK_ERROR_raise(sf.as_ptr() as *const PK_ERROR_sf_t) };
+
+            let mut back: PK_ERROR_sf_t = unsafe { std::mem::zeroed() };
+            let mut was_error: PK_LOGICAL_t = PK_LOGICAL_false;
+            unsafe { PK_ERROR_ask_last(&mut was_error, &mut back) };
+            assert_eq!(was_error, PK_LOGICAL_true, "raise({code}) recorded no error");
+
+            let bytes: Vec<u8> = back.code_token.iter().map(|&c| c as u8).collect();
+            let end = bytes.iter().position(|&b| b == 0).unwrap_or(bytes.len());
+            let token = String::from_utf8_lossy(&bytes[..end]).into_owned();
+            assert_eq!(token, name, "kernel token for code {code}");
+            assert_eq!(back.code, code, "code round-trip for {name}");
+
+            let mut cleared: PK_LOGICAL_t = PK_LOGICAL_false;
+            unsafe { PK_ERROR_clear_last(&mut cleared) };
+        }
+    });
+
+    test!("error_record_is_stale_after_success", {
+        let _session = Session::start(test_config())?;
+
+        // Kernel behaviour (probed): a successful call does NOT clear the error
+        // record — was_error stays true and still describes the old failure.
+        // Any code reading PK_ERROR_ask_last unconditionally would misattribute
+        // it, which is why query_last_error() guards on the expected code.
+        let _ = Body::create_solid_block(-1.0, 1.0, 1.0).expect_err("must fail");
+        let good = Body::create_solid_block(2.0, 2.0, 2.0)?;
+        assert_eq!(good.faces()?.len(), 6, "the successful call really succeeded");
+
+        let mut sf: PK_ERROR_sf_t = unsafe { std::mem::zeroed() };
+        let mut was_error: PK_LOGICAL_t = PK_LOGICAL_false;
+        unsafe { PK_ERROR_ask_last(&mut was_error, &mut sf) };
+        assert_eq!(
+            was_error, PK_LOGICAL_true,
+            "record is expected to persist across a successful call"
+        );
+        assert_eq!(
+            sf.code, PK_ERROR_distance_le_0,
+            "stale record still names the earlier failure"
+        );
+    });
+
+    // =========================================================================
+    // Stage 1 — numerics and tolerance semantics
+    // =========================================================================
+
+    test!("stage1_precision_set_readback_restore", {
+        let session = Session::start(test_config())?;
+
+        // Rung 01 experiment 2: set a supported value, read it back, restore.
+        // Asserting the *default* as well pins the tolerance context CADabra's
+        // comparator has to match.
+        let default_linear = session.precision()?;
+        let default_angular = session.angle_precision()?;
+        assert!(
+            default_linear > 0.0 && default_linear < 1.0e-6,
+            "default linear precision {default_linear:e} outside the expected ~1e-8 range"
+        );
+        assert!(
+            default_angular > 0.0 && default_angular < 1.0e-6,
+            "default angular precision {default_angular:e} outside expected range"
+        );
+
+        // Read-back must be the *actual* value, not the requested one.
+        for requested in [1.0e-7_f64, 1.0e-6, 1.0e-9] {
+            unsafe { PK_SESSION_set_precision(requested) };
+            let actual = session.precision()?;
+            assert!(
+                (actual - requested).abs() <= requested * 1e-12,
+                "requested precision {requested:e}, read back {actual:e}"
+            );
+        }
+        unsafe { PK_SESSION_set_precision(default_linear) };
+        assert_eq!(
+            session.precision()?,
+            default_linear,
+            "restore must return exactly the original value"
+        );
+    });
+
+    test!("stage1_create_ask_is_bit_exact", {
+        let _session = Session::start(test_config())?;
+
+        // The question this settles: does an authored f64 survive construction
+        // bit-for-bit, or does the kernel normalize/repair it? That decides
+        // whether CADabra's comparator may use exact relations or must use
+        // bands. Values are deliberately non-dyadic with full mantissas.
+        let r: f64 = 3.700_000_000_000_000_4;
+        let ox: f64 = 1.234_567_890_123_456_7;
+        let oz: f64 = -9.876_543_210_987_654;
+
+        let basis = Axis2::new(
+            Vec3::new(ox, 0.0, oz),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        let sphere = Surf::sphere(basis, r)?;
+        let s = sphere.ask_sphere()?;
+        assert_eq!(
+            s.radius.to_bits(),
+            r.to_bits(),
+            "sphere radius not bit-exact: authored {r:e}, read {:e}",
+            s.radius
+        );
+        assert_eq!(
+            s.basis.origin.x.to_bits(),
+            ox.to_bits(),
+            "origin.x not bit-exact"
+        );
+        assert_eq!(
+            s.basis.origin.z.to_bits(),
+            oz.to_bits(),
+            "origin.z not bit-exact"
+        );
+
+        let cyl = Surf::cylinder(basis, r)?;
+        assert_eq!(
+            cyl.ask_cylinder()?.radius.to_bits(),
+            r.to_bits(),
+            "cylinder radius not bit-exact"
+        );
+
+        let circle = Curve::circle(basis, r)?;
+        assert_eq!(
+            circle.ask_circle()?.radius.to_bits(),
+            r.to_bits(),
+            "circle radius not bit-exact"
+        );
+
+        // A point is the purest case: no basis, no derived quantities.
+        let p = Point::create(Vec3::new(ox, oz, r))?;
+        let back = p.position()?;
+        assert_eq!(back.x.to_bits(), ox.to_bits(), "point.x not bit-exact");
+        assert_eq!(back.y.to_bits(), oz.to_bits(), "point.y not bit-exact");
+        assert_eq!(back.z.to_bits(), r.to_bits(), "point.z not bit-exact");
+    });
+
+    test!("stage1_scale_ladder_round_trips", {
+        let _session = Session::start(test_config())?;
+
+        // Model-unit scale ladder. Parasolid's documented working range is
+        // roughly 1e-8..1e8 in session units; this records where create->ask
+        // stops being exact, which is the band CADabra has to respect.
+        for exp in [-6i32, -3, 0, 3, 6, 8] {
+            let r = 10f64.powi(exp);
+            let basis = Axis2::new(
+                Vec3::new(r, -r, r),
+                Vec3::new(0.0, 0.0, 1.0),
+                Vec3::new(1.0, 0.0, 0.0),
+            );
+            let sph = Surf::sphere(basis, r)?;
+            let got = sph.ask_sphere()?;
+            assert_eq!(
+                got.radius.to_bits(),
+                r.to_bits(),
+                "radius 1e{exp} not bit-exact on round-trip"
+            );
+            assert_eq!(
+                got.basis.origin.x.to_bits(),
+                r.to_bits(),
+                "origin 1e{exp} not bit-exact on round-trip"
+            );
+        }
+    });
+
+    test!("stage1_rejects_degenerate_input", {
+        let _session = Session::start(test_config())?;
+
+        // Rejection behaviour is part of the numeric contract: a kernel that
+        // silently repairs bad input cannot be an oracle for a kernel that
+        // refuses it. Each of these must fail, and now that the error table is
+        // probed we can assert *which* argument the kernel blames.
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        let zero_radius = Surf::sphere(basis, 0.0).expect_err("zero radius must be rejected");
+        let d = zero_radius.details().expect("details");
+        assert_eq!(
+            d.code_token.as_deref(),
+            Some("PK_ERROR_radius_le_0"),
+            "zero sphere radius should be radius_le_0, got {:?}",
+            d.code_token
+        );
+
+        let neg = Surf::cylinder(basis, -1.0).expect_err("negative radius must be rejected");
+        assert_eq!(
+            neg.details().and_then(|d| d.code_token.clone()).as_deref(),
+            Some("PK_ERROR_radius_le_0"),
+            "negative cylinder radius"
+        );
+
+        // A zero-length direction is a different failure mode from a bad
+        // magnitude, and the kernel distinguishes them.
+        let null_axis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let bad_axis = Surf::plane(null_axis).expect_err("zero axis must be rejected");
+        let token = bad_axis.details().and_then(|d| d.code_token.clone());
+        assert!(
+            token.is_some(),
+            "zero-length axis rejection carried no code token"
+        );
+    });
+
+    // =========================================================================
+    // Stage 2 — frames and transforms (classification / validation half)
+    // =========================================================================
+
+    test!("stage2_classify_lattice", {
+        let _session = Session::start(test_config())?;
+
+        // The classification lattice CADabra's frame types must mirror.
+        let identity = Transform::from_matrix([
+            1.0, 0.0, 0.0, 0.0, //
+            0.0, 1.0, 0.0, 0.0, //
+            0.0, 0.0, 1.0, 0.0, //
+            0.0, 0.0, 0.0, 1.0,
+        ])?;
+        let c = identity.classify(false)?;
+        assert_eq!(c.matrix_type, MatrixType::Identity, "identity");
+        assert!((c.determinant - 1.0).abs() < 1e-12, "det {}", c.determinant);
+        assert!(c.matrix_type.is_rigid_motion());
+        assert!(!c.matrix_type.reverses_orientation());
+
+        // Kernel quirk, pinned deliberately: a pure translation with unit
+        // global scale comes back Unclassified even though its linear part is
+        // the identity. `PK_TRANSF_classify` stores `unclassified` up front and
+        // only overwrites it for recognised cases (decompile-confirmed). Give
+        // the very same translation a global scale and it classifies Identity —
+        // see the pair of asserts below. CADabra must therefore not use
+        // matrix_type alone as a rigid-motion predicate.
+        let translated = Transform::translation(3.0, -4.0, 5.0)?;
+        let c = translated.classify(false)?;
+        assert_eq!(
+            c.matrix_type,
+            MatrixType::Unclassified,
+            "pure translation is expected to classify Unclassified on V37.01.243"
+        );
+        assert!(
+            !c.matrix_type.is_rigid_motion(),
+            "and therefore is_rigid_motion() is false for it — the documented trap"
+        );
+
+        // Same translation, plus a global scale in matrix[3][3]: now Identity.
+        let scaled_translation = Transform::from_matrix([
+            1.0, 0.0, 0.0, 3.0, //
+            0.0, 1.0, 0.0, -4.0, //
+            0.0, 0.0, 1.0, 5.0, //
+            0.0, 0.0, 0.0, 0.4,
+        ])?;
+        let cs = scaled_translation.classify(false)?;
+        assert_eq!(
+            cs.matrix_type,
+            MatrixType::Identity,
+            "the identical translation with a global scale classifies Identity"
+        );
+        assert!(
+            (cs.scale - 2.5).abs() < 1e-9,
+            "global scale is the reciprocal of matrix[3][3]: expected 2.5, got {}",
+            cs.scale
+        );
+        assert!(
+            (c.translation.x - 3.0).abs() < 1e-12
+                && (c.translation.y + 4.0).abs() < 1e-12
+                && (c.translation.z - 5.0).abs() < 1e-12,
+            "translation component {:?}",
+            c.translation
+        );
+
+        let rot = Transform::rotation(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            std::f64::consts::FRAC_PI_3,
+        )?;
+        let c = rot.classify(false)?;
+        assert_eq!(c.matrix_type, MatrixType::Rotation, "rotation");
+        assert!(
+            (c.determinant - 1.0).abs() < 1e-12,
+            "rotation determinant {}",
+            c.determinant
+        );
+        assert!(c.matrix_type.is_rigid_motion() && !c.matrix_type.reverses_orientation());
+
+        let refl = Transform::reflection(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0))?;
+        let c = refl.classify(false)?;
+        assert_eq!(c.matrix_type, MatrixType::Reflection, "reflection");
+        assert!(
+            c.determinant < 0.0,
+            "a reflection must have negative determinant, got {}",
+            c.determinant
+        );
+        assert!(
+            c.matrix_type.reverses_orientation() && !c.matrix_type.is_rigid_motion(),
+            "reflection must be flagged orientation-reversing and not a rigid motion"
+        );
+
+        // Uniform scale: the scale factor is reported separately from the
+        // matrix type, which is what lets a similarity stay exact.
+        let scaled = Transform::uniform_scale(4.0)?;
+        let c = scaled.classify(false)?;
+        assert!(
+            (c.scale - 4.0).abs() < 1e-9 || (c.scale - 0.25).abs() < 1e-9,
+            "uniform scale factor reported as {} (expected 4 or its reciprocal)",
+            c.scale
+        );
+
+        // Perspective is always zero for a modelling transform.
+        assert!(
+            c.perspective.x == 0.0 && c.perspective.y == 0.0 && c.perspective.z == 0.0,
+            "unexpected perspective component {:?}",
+            c.perspective
+        );
+    });
+
+    test!("stage2_classify_diagnostics", {
+        let _session = Session::start(test_config())?;
+
+        // Diagnostics report how far each row is from unit length and from
+        // mutual orthogonality — the kernel's own measurement of "is this frame
+        // orthonormal", and the evidence for whether it repairs silently.
+        // `axis` must be a unit vector — (1,1,1) is rejected with
+        // PK_ERROR_not_a_unit_vector (pinned in stage2_rotation_axis_must_be_unit).
+        let s3 = 1.0 / 3.0_f64.sqrt();
+        let rot = Transform::rotation(
+            Vec3::new(1.0, 2.0, 3.0),
+            Vec3::new(s3, s3, s3),
+            0.7,
+        )?;
+
+        let without = rot.classify(false)?;
+        assert!(
+            without.unit_rows_deviations.is_none(),
+            "no diagnostics requested, yet deviations were reported"
+        );
+
+        let with = rot.classify(true)?;
+        let unit = with.unit_rows_deviations.expect("unit deviations requested");
+        let orth = with.orthog_rows_deviations.expect("orthog deviations requested");
+        for (label, v) in [("unit", unit), ("orthog", orth)] {
+            for (axis, value) in [("x", v.x), ("y", v.y), ("z", v.z)] {
+                assert!(
+                    value.is_finite() && value.abs() < 1e-9,
+                    "{label}_rows_deviations.{axis} = {value:e} — an exact rotation should be orthonormal to roundoff"
+                );
+            }
+        }
+    });
+
+    test!("stage2_check_accepts_and_rejects", {
+        let _session = Session::start(test_config())?;
+
+        // A valid transform has no faults.
+        let rot = Transform::rotation(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            0.4,
+        )?;
+        let faults = rot.check(10)?;
+        assert!(faults.is_empty(), "valid rotation reported faults: {faults:?}");
+
+        // A deliberately non-orthonormal matrix: rows 0 and 1 are parallel, so
+        // the linear part is singular. The question is whether the kernel
+        // rejects it at construction or accepts and repairs it — either answer
+        // is informative, but it must not be silent.
+        let singular = Transform::from_matrix([
+            1.0, 0.0, 0.0, 0.0, //
+            1.0, 0.0, 0.0, 0.0, //
+            0.0, 0.0, 1.0, 0.0, //
+            0.0, 0.0, 0.0, 1.0,
+        ]);
+        match singular {
+            Err(e) => {
+                let token = e.details().and_then(|d| d.code_token.clone());
+                assert!(
+                    token.is_some(),
+                    "singular matrix rejected without a code token"
+                );
+            }
+            Ok(t) => {
+                // Accepted at construction — then check() or classify() must
+                // expose the problem rather than pretending it is a rotation.
+                let c = t.classify(true)?;
+                let faults = t.check(10)?;
+                assert!(
+                    !faults.is_empty()
+                        || matches!(
+                            c.matrix_type,
+                            MatrixType::General | MatrixType::Unclassified
+                        ),
+                    "singular matrix accepted, no faults, and classified as {:?}",
+                    c.matrix_type
+                );
+            }
+        }
+    });
+
+    test!("stage2_transform_orphan_geometry", {
+        let _session = Session::start(test_config())?;
+
+        // Placing orphan geometry at an arbitrary oblique pose is what stops
+        // every later fixture (SSI especially) from being axis-aligned-only.
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let sphere = Surf::sphere(basis, 5.0)?;
+
+        let s3 = 1.0 / 3.0_f64.sqrt();
+        let oblique = Transform::rotation(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(s3, s3, s3),
+            0.9,
+        )?
+        .then(&Transform::translation(7.0, -2.0, 3.0)?)?;
+
+        let out = oblique.apply_to_geoms(&[sphere.tag()])?;
+        assert_eq!(out.len(), 1, "one geom in, one out");
+        let (_tag, exact) = out[0];
+        assert!(_tag != 0, "transformed geom tag is null");
+        assert!(
+            exact,
+            "a rigid motion of an analytic sphere should be achieved exactly"
+        );
+
+        // A sphere is rotation-invariant about its centre, so the readback test
+        // is the centre landing on the translation and the radius surviving.
+        let (moved_surf, exact_again) = sphere.transformed(&oblique)?;
+        assert!(exact_again, "second placement should also be exact");
+        let moved = moved_surf.ask_sphere()?;
+        assert!(
+            (moved.radius - 5.0).abs() < 1e-12,
+            "radius changed under a rigid motion: {}",
+            moved.radius
+        );
+        assert!(
+            (moved.basis.origin.x - 7.0).abs() < 1e-9
+                && (moved.basis.origin.y + 2.0).abs() < 1e-9
+                && (moved.basis.origin.z - 3.0).abs() < 1e-9,
+            "centre after oblique placement = {:?}, expected (7, -2, 3)",
+            moved.basis.origin
+        );
+    });
+
+    test!("stage2_rotation_axis_must_be_unit", {
+        let _session = Session::start(test_config())?;
+
+        // The kernel demands a *unit* axis and says so precisely. This is the
+        // kind of precondition that has to be in CADabra's type system rather
+        // than discovered at run time, so pin the exact code token.
+        let s3 = 1.0 / 3.0_f64.sqrt();
+        for (label, axis) in [
+            ("unit Z", Vec3::new(0.0, 0.0, 1.0)),
+            ("unit diagonal", Vec3::new(s3, s3, s3)),
+        ] {
+            Transform::rotation(Vec3::new(0.0, 0.0, 0.0), axis, 0.5)
+                .unwrap_or_else(|e| panic!("{label} axis should be accepted: {e}"));
+        }
+
+        for (label, axis) in [
+            ("non-unit (1,1,1)", Vec3::new(1.0, 1.0, 1.0)),
+            ("scaled Z (0,0,2)", Vec3::new(0.0, 0.0, 2.0)),
+            ("zero vector", Vec3::new(0.0, 0.0, 0.0)),
+        ] {
+            let err = Transform::rotation(Vec3::new(0.0, 0.0, 0.0), axis, 0.5)
+                .expect_err(&format!("{label} must be rejected"));
+            assert_eq!(
+                err.details().and_then(|d| d.code_token.clone()).as_deref(),
+                Some("PK_ERROR_not_a_unit_vector"),
+                "{label} should fail as not_a_unit_vector"
+            );
+        }
+    });
+
+    test!("stage2_classify_general_and_shear", {
+        let _session = Session::start(test_config())?;
+
+        // Non-uniform scale and shear are the cases that must NOT masquerade as
+        // similarities — a kernel that reported them as rotations would let an
+        // inexact placement into oracle truth.
+        let nonuniform = Transform::from_matrix([
+            2.0, 0.0, 0.0, 0.0, //
+            0.0, 3.0, 0.0, 0.0, //
+            0.0, 0.0, 4.0, 0.0, //
+            0.0, 0.0, 0.0, 1.0,
+        ])?;
+        let c = nonuniform.classify(true)?;
+        assert_eq!(c.matrix_type, MatrixType::General, "non-uniform scale");
+        assert!(
+            (c.determinant - 24.0).abs() < 1e-9,
+            "determinant should be 2*3*4 = 24, got {}",
+            c.determinant
+        );
+        assert!(
+            !c.matrix_type.is_rigid_motion(),
+            "a non-uniform scale is not a rigid motion"
+        );
+        // Rows are 2, 3, 4 long, so the deviations from unit length are
+        // reported as 1-|row|^2-style residuals — nonzero is the assertion that
+        // matters, and it is what a comparator would key on.
+        let unit_dev = c.unit_rows_deviations.expect("diagnostics requested");
+        assert!(
+            unit_dev.x != 0.0 && unit_dev.y != 0.0 && unit_dev.z != 0.0,
+            "every row should deviate from unit length: {unit_dev:?}"
+        );
+
+        // Shear: rows stay unit-ish but stop being mutually orthogonal, and the
+        // determinant is still 1 — so determinant alone cannot detect it.
+        let shear = Transform::from_matrix([
+            1.0, 0.5, 0.0, 0.0, //
+            0.0, 1.0, 0.0, 0.0, //
+            0.0, 0.0, 1.0, 0.0, //
+            0.0, 0.0, 0.0, 1.0,
+        ])?;
+        let c = shear.classify(true)?;
+        assert_eq!(c.matrix_type, MatrixType::General, "shear");
+        assert!(
+            (c.determinant - 1.0).abs() < 1e-9,
+            "a shear has unit determinant ({}) — determinant alone cannot detect it",
+            c.determinant
+        );
+        let orth = c.orthog_rows_deviations.expect("diagnostics requested");
+        assert!(
+            orth.x.abs() > 1e-6 || orth.y.abs() > 1e-6 || orth.z.abs() > 1e-6,
+            "shear must show a nonzero orthogonality deviation: {orth:?}"
+        );
+    });
+
+    test!("stage1_geometry_storage_is_precision_independent", {
+        let session = Session::start(test_config())?;
+
+        // Does session precision leak into how geometry is *stored*? If it did,
+        // an oracle result would depend on a session setting and could not be
+        // compared across runs. Build the same surface under two very different
+        // precisions and require bit-identical readback.
+        let r: f64 = 2.718_281_828_459_045;
+        let basis = Axis2::new(
+            Vec3::new(1.0, 2.0, 3.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        let default_precision = session.precision()?;
+
+        unsafe { PK_SESSION_set_precision(1.0e-9) };
+        let tight = Surf::sphere(basis, r)?.ask_sphere()?;
+
+        unsafe { PK_SESSION_set_precision(1.0e-5) };
+        let loose = Surf::sphere(basis, r)?.ask_sphere()?;
+
+        unsafe { PK_SESSION_set_precision(default_precision) };
+
+        assert_eq!(
+            tight.radius.to_bits(),
+            loose.radius.to_bits(),
+            "radius readback changed with session precision ({} vs {})",
+            tight.radius,
+            loose.radius
+        );
+        assert_eq!(
+            tight.basis.origin.x.to_bits(),
+            loose.basis.origin.x.to_bits(),
+            "origin readback changed with session precision"
+        );
+        assert_eq!(
+            tight.radius.to_bits(),
+            r.to_bits(),
+            "and both are still bit-exact against the authored value"
         );
     });
 

@@ -296,9 +296,6 @@ pub const PK_REPORT_1_osthread_fail_c: c_int = 23901;
 /// Report record: OS resumed creating worker threads.
 pub const PK_REPORT_1_osthread_ok_c: c_int = 23902;
 
-/// Error returned to waiting threads when the modeller is stopped after a fatal error.
-pub const PK_ERROR_modeller_not_started: PK_ERROR_code_t = 2;
-
 // =============================================================================
 // SMP facet constant
 // =============================================================================

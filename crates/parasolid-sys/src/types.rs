@@ -133,12 +133,6 @@ pub struct PK_UVBOX_t {
 
 pub type PK_ERROR_code_t = c_int;
 
-/// No error.
-pub const PK_ERROR_no_errors: PK_ERROR_code_t = 0;
-/// General failure.
-pub const PK_ERROR_general: PK_ERROR_code_t = 1;
-/// Not an entity (bad tag).
-pub const PK_ERROR_not_an_entity: PK_ERROR_code_t = 504;
 
 // =============================================================================
 // Class identifiers

@@ -18,30 +18,6 @@ pub type PK_ERROR_t = PK_ERROR_code_t;
 // Additional error code constants (beyond those in types.rs)
 // =============================================================================
 
-/// General system error; Parasolid failed unexpectedly.
-pub const PK_ERROR_system_error: PK_ERROR_code_t = 2;
-
-/// Fatal error; session so corrupted no further PK calls are possible.
-pub const PK_ERROR_fatal_error: PK_ERROR_code_t = 3;
-
-/// Unforeseeable error Parasolid cannot diagnose internally.
-pub const PK_ERROR_unhandleable_condition: PK_ERROR_code_t = 4;
-
-/// Run-time error in Parasolid kernel being processed by signal handler.
-pub const PK_ERROR_run_time_error: PK_ERROR_code_t = 5;
-
-/// PK_SESSION_abort called by signal handler due to user interrupt.
-pub const PK_ERROR_aborted: PK_ERROR_code_t = 6;
-
-/// User interrupt attempted during a PK function that cannot be safely aborted.
-pub const PK_ERROR_cant_be_aborted: PK_ERROR_code_t = 7;
-
-/// Negative radius, height, or similar geometric parameter.
-pub const PK_ERROR_distance_le_0: PK_ERROR_code_t = 502;
-
-/// Run-time error occurred in a frustrum function (not PK kernel).
-pub const PK_ERROR_fru_error: PK_ERROR_code_t = 8;
-
 // =============================================================================
 // Error severity constants
 // =============================================================================

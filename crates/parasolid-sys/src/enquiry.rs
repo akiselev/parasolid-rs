@@ -161,8 +161,6 @@ pub const PK_NABOX_quality_improved_c: PK_NABOX_quality_t = 26471;
 // -- Error on failure ---------------------------------------------------------
 
 pub const PK_ERROR_on_fail_no_c: c_int = 24952;
-pub const PK_ERROR_not_implemented: PK_ERROR_code_t = 600;
-
 // =============================================================================
 // Standard-form structs for geometric _ask queries
 // =============================================================================
@@ -1539,6 +1537,12 @@ unsafe extern "C" {
 
     /// Free topology tracking results.
     pub fn PK_TOPOL_track_r_f(results: *mut PK_TOPOL_track_r_t) -> PK_ERROR_code_t;
+
+    /// Free entity tracking results.
+    ///
+    /// Partner of the `PK_ENTITY_track_r_t` outputs already produced by
+    /// `bgeom.rs` and `enquiry.rs`; without it those allocations leak.
+    pub fn PK_ENTITY_track_r_f(tracking: *mut PK_ENTITY_track_r_t) -> PK_ERROR_code_t;
 
     /// Free results from `PK_ENTITY_range`.
     pub fn PK_ENTITY_range_r_f(results: *mut PK_ENTITY_range_r_t) -> PK_ERROR_code_t;

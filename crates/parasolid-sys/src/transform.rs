@@ -70,6 +70,105 @@ pub type PK_TRANSF_diagnostics_t = c_int;
 /// Return unit_rows_deviations and orthog_rows_deviations.
 pub const PK_TRANSF_diagnostics_all_c: PK_TRANSF_diagnostics_t = 25301;
 
+/// No optional diagnostics from `PK_TRANSF_classify` (the default).
+///
+/// [decompile-confirmed] `PK_TRANSF_classify` initialises its default options
+/// with `0x62d4` = 25300 and validates `diagnostics` against exactly
+/// `{0x62d4, 0x62d5}`, so this is the complete two-member set. Confirmed at
+/// runtime too: 25300 leaves the deviation vectors zeroed, 25301 fills them.
+pub const PK_TRANSF_diagnostics_none_c: PK_TRANSF_diagnostics_t = 25300;
+
+// =============================================================================
+// Option / result structs — [journal-recovered] V37.01.243
+//
+// Layouts read out of each function's own journalling code, which passes the
+// field name as a string literal to a per-type writer. See
+// `docs/option-version-protocol.md` §3.
+// =============================================================================
+
+/// Options for `PK_TRANSF_classify`.
+///
+/// Journal: `*options` → `o_t_version`, `options[1]` → `diagnostics`.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_TRANSF_classify_o_t {
+    pub o_t_version: c_int,                  // @0
+    pub diagnostics: PK_TRANSF_diagnostics_t, // @4
+}
+
+impl Default for PK_TRANSF_classify_o_t {
+    fn default() -> Self {
+        PK_TRANSF_classify_o_t {
+            o_t_version: 1,
+            diagnostics: PK_TRANSF_diagnostics_none_c,
+        }
+    }
+}
+
+/// Results from `PK_TRANSF_classify` — 120 bytes.
+///
+/// The journal writes, in this order: `matrix_type` at `*results`,
+/// `translation` at `+0x10`, `perspective` at `+0x16`, `scale` at `+0x1c`,
+/// `determinant` at `+2`, `unit_rows_deviations` at `+4`,
+/// `orthog_rows_deviations` at `+10` — all in 4-byte units. Sorting those by
+/// offset gives a gapless struct with every `PK_VECTOR_t` (3 × f64) correctly
+/// aligned, which is the cross-check that the unit size is right:
+///
+/// ```text
+/// @0   matrix_type              (PK_matrix_type_t)
+/// @8   determinant              (f64)
+/// @16  unit_rows_deviations     (PK_VECTOR_t, 24 B)
+/// @40  orthog_rows_deviations   (PK_VECTOR_t, 24 B)
+/// @64  translation              (PK_VECTOR_t, 24 B)
+/// @88  perspective              (PK_VECTOR_t, 24 B)
+/// @112 scale                    (f64)
+/// ```
+///
+/// The deviation vectors are only filled when `diagnostics` is
+/// `PK_TRANSF_diagnostics_all_c`. Free with `PK_TRANSF_classify_r_f`.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_TRANSF_classify_r_t {
+    pub matrix_type: PK_matrix_type_t,        // @0
+    pub determinant: c_double,                // @8
+    pub unit_rows_deviations: PK_VECTOR_t,    // @16
+    pub orthog_rows_deviations: PK_VECTOR_t,  // @40
+    pub translation: PK_VECTOR_t,             // @64
+    pub perspective: PK_VECTOR_t,             // @88
+    pub scale: c_double,                      // @112
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_TRANSF_classify_r_t>() == 120);
+};
+
+/// Options for `PK_GEOM_transform_2`.
+///
+/// Journal: `o_t_version` @0, `tolerance` at `options + 2` (f64 → byte 8),
+/// `modify` at `options[4]` (byte 16), `want_out_geoms` at `options[5]`
+/// (LOGICAL, byte 20), `want_exact` at byte 0x15 = 21.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_GEOM_transform_o_t {
+    pub o_t_version: c_int,          // @0
+    pub tolerance: c_double,         // @8
+    pub modify: c_int,               // @16
+    pub want_out_geoms: PK_LOGICAL_t, // @20
+    pub want_exact: PK_LOGICAL_t,    // @21
+}
+
+/// Options for `PK_TRANSF_transform_2`.
+///
+/// Journal: `o_t_version` @0, `operation_1` @4, `operation_2` @8, `modify` @12.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_TRANSF_transform_o_t {
+    pub o_t_version: c_int,   // @0
+    pub operation_1: c_int,   // @4
+    pub operation_2: c_int,   // @8
+    pub modify: PK_LOGICAL_t, // @12
+}
+
 // =============================================================================
 // Extern declarations
 // =============================================================================
@@ -137,7 +236,7 @@ unsafe extern "C" {
     pub fn PK_TRANSF_transform_2(
         transf_1: PK_TRANSF_t,
         transf_2: PK_TRANSF_t,
-        options: *mut PK_TRANSF_transform_o_t,
+        options: *const PK_TRANSF_transform_o_t,
         results: *mut PK_TRANSF_transform_r_t,
     ) -> PK_ERROR_code_t;
 
@@ -149,7 +248,7 @@ unsafe extern "C" {
     /// Simple validity check on a transformation.
     pub fn PK_TRANSF_check(
         transf: PK_TRANSF_t,
-        options: *mut PK_TRANSF_check_o_t,
+        options: *const PK_TRANSF_check_o_t,
         n_faults: *mut c_int,
         faults: *mut *mut PK_check_fault_t,
     ) -> PK_ERROR_code_t;
@@ -160,9 +259,15 @@ unsafe extern "C" {
     /// optionally row deviation diagnostics.
     pub fn PK_TRANSF_classify(
         transf: PK_TRANSF_t,
-        options: *mut PK_TRANSF_classify_o_t,
+        options: *const PK_TRANSF_classify_o_t,
         results: *mut PK_TRANSF_classify_r_t,
     ) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_TRANSF_classify`.
+    ///
+    /// Mandatory partner: `PK_TRANSF_classify` allocates inside its result
+    /// struct (row-deviation diagnostics), so every classify call owes a free.
+    pub fn PK_TRANSF_classify_r_f(results: *mut PK_TRANSF_classify_r_t) -> PK_ERROR_code_t;
 
     /// Test whether two transformations are equal.
     pub fn PK_TRANSF_is_equal(
@@ -177,9 +282,9 @@ unsafe extern "C" {
     /// [RE-regenerated from V35 TSV prototype]
     pub fn PK_GEOM_transform_2(
         n_geoms: c_int,
-        in_geoms: *mut PK_GEOM_t,
+        in_geoms: *const PK_GEOM_t,
         transf: PK_TRANSF_t,
-        options: *mut PK_GEOM_transform_o_t,
+        options: *const PK_GEOM_transform_o_t,
         out_geoms: *mut PK_GEOM_t,
         exact: *mut PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;

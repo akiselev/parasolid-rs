@@ -1,6 +1,7 @@
 //! Error types, severity classification, and the `pk_call!` macro.
 
 use std::fmt;
+use std::os::raw::c_char;
 
 use parasolid_sys::*;
 
@@ -21,6 +22,21 @@ pub enum Severity {
     Fatal,
 }
 
+impl Severity {
+    /// Map a `PK_ERROR_sf_t.severity` token to a `Severity`.
+    ///
+    /// Returns `None` for `PK_ERROR_none` (0) and for any unrecognised value,
+    /// so the caller can fall back rather than silently reporting `Mild`.
+    fn from_token(token: PK_ERROR_severity_t) -> Option<Self> {
+        match token {
+            PK_ERROR_mild => Some(Severity::Mild),
+            PK_ERROR_serious => Some(Severity::Serious),
+            PK_ERROR_fatal => Some(Severity::Fatal),
+            _ => None,
+        }
+    }
+}
+
 impl fmt::Display for Severity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -36,12 +52,20 @@ impl fmt::Display for Severity {
 // =============================================================================
 
 /// Information about an invalid argument reported by Parasolid.
+///
+/// The kernel reports **at most one** bad argument per error (confirmed against
+/// `PK_ERROR_sf_t`, which carries a single `argument_number`/`argument_name`
+/// pair — not the array of 20 an earlier binding modelled).
 #[derive(Debug, Clone)]
 pub struct BadArg {
-    /// 1-based index of the invalid argument.
+    /// 1-based index of the invalid argument (0 when the error names no
+    /// positional argument, e.g. a bad option-struct field).
     pub index: i32,
-    /// Name of the argument, if available.
+    /// Name of the argument, if available (e.g. `"x"`, `"entity"`, `"body"`).
     pub name: Option<String>,
+    /// Index *within* the argument when it is an array; `-1` when not
+    /// applicable.
+    pub element: i32,
 }
 
 // =============================================================================
@@ -51,13 +75,18 @@ pub struct BadArg {
 /// Detailed information about a Parasolid error, extracted from `PK_ERROR_sf_t`.
 #[derive(Debug, Clone)]
 pub struct ErrorDetails {
-    /// PK error code (e.g. `PK_ERROR_general`, `PK_ERROR_not_an_entity`).
+    /// PK error code (e.g. `PK_ERROR_not_an_entity`). Numeric values live in
+    /// `parasolid_sys::error_codes` and are probed, not documented.
     pub code: i32,
     /// Severity level.
     pub severity: Severity,
     /// Name of the PK function that raised the error.
     pub function: String,
-    /// Invalid arguments, if any.
+    /// The kernel's own name for `code` (e.g. `"PK_ERROR_distance_le_0"`), read
+    /// from `PK_ERROR_sf_t.code_token`. Authoritative — this is how the numeric
+    /// table in `parasolid_sys::error_codes` was recovered.
+    pub code_token: Option<String>,
+    /// Invalid arguments, if any. The kernel reports at most one.
     pub bad_args: Vec<BadArg>,
     /// Entity tag involved in the error, if any (0 = none).
     pub entity: Option<i32>,
@@ -70,6 +99,7 @@ impl ErrorDetails {
             code,
             severity,
             function: String::new(),
+            code_token: None,
             bad_args: Vec::new(),
             entity: None,
         }
@@ -119,7 +149,8 @@ pub enum PsError {
     /// restart** the session.
     Fatal(ErrorDetails),
 
-    /// The entity tag is no longer valid (`PK_ERROR_not_an_entity`, code 504).
+    /// The entity tag is no longer valid (`PK_ERROR_not_an_entity`, code 22
+    /// — probed; the previous binding claimed 504, so this arm never fired).
     NotAnEntity {
         /// The invalid tag value.
         tag: i32,
@@ -147,7 +178,7 @@ impl PsError {
         }
 
         // Try to get detailed error info from PK
-        let details = query_last_error()
+        let details = query_last_error(code)
             .unwrap_or_else(|| ErrorDetails::simple(code, default_severity(code)));
 
         // Map to variant
@@ -246,55 +277,70 @@ macro_rules! pk_call {
 // Internal helpers
 // =============================================================================
 
-/// Byte offset of the `code` (i32) field in the real `PK_ERROR_sf_t`.
-///
-/// The kernel struct starts with the function name as a **32-byte inline char
-/// array**, not a `*const char` (probed against pskernel.dll V37.01.243 under
-/// Wine — the first 8 bytes read as "PK_TOPOL"). `code` follows at byte 32.
-const SF_CODE_OFFSET: usize = 32;
-/// Length of the leading inline function-name char array.
-const SF_FUNCTION_LEN: usize = SF_CODE_OFFSET;
+/// Decode an inline, NUL-padded `c_char` array into a `String`.
+fn inline_str(field: &[c_char]) -> String {
+    let bytes: Vec<u8> = field.iter().map(|&c| c as u8).collect();
+    let end = bytes.iter().position(|&b| b == 0).unwrap_or(bytes.len());
+    String::from_utf8_lossy(&bytes[..end]).into_owned()
+}
 
 /// Try to get error details from the session-level error state.
 ///
-/// Reads `PK_ERROR_ask_last` into a raw byte buffer and extracts only the two
-/// fields whose offsets are confirmed against the DLL: the inline function-name
-/// string (bytes `0..32`) and the error `code` (i32 at byte 32).
+/// # Layout provenance
 ///
-/// # Why not the typed `PK_ERROR_sf_t`
+/// Reads the typed `PK_ERROR_sf_t`, whose 116-byte layout is **runtime-confirmed**
+/// against pskernel.dll V37.01.243 under Wine by
+/// `crates/parasolid-test/src/bin/error_probe.rs`: raising four distinct kinds
+/// of error (bad dimension, bogus tag, wrong entity class, bad option version)
+/// produced a coherent reading of every field — `function`@0, `code`@32,
+/// `code_token`@36, `severity`@68, `argument_number`@72, `argument_name`@76,
+/// `argument_index`@108, `entity`@112 — with no nonzero byte at or past offset
+/// 116. The string fields are **inline char arrays**, not pointers; an earlier
+/// binding modelled them as `*const c_char` and page-faulted on every error.
 ///
-/// That binding is wrong: it models `function` (and `bad_arg_names`) as
-/// `*const c_char` pointers, but the kernel stores them as **inline char
-/// arrays**. Reading them as pointers dereferences ASCII bytes as an address
-/// and page-faults. The full struct also carries extra inline string fields
-/// (the error-name and bad-field name) not present in the typed definition, so
-/// severity / n_bad_args / bad_args are at unknown offsets and are **not**
-/// parsed here. The thread-local `PK_THREAD_ask_last_error` variant is likewise
-/// avoided — it faults inside the kernel. Both need a header audit; see
-/// `docs/pskernel-solidworks.md`.
-fn query_last_error() -> Option<ErrorDetails> {
-    // Generous buffer: the real struct is larger than the typed one and holds
-    // several inline strings.
-    let mut buf = [0u8; 2048];
+/// `PK_THREAD_ask_last_error` remains unused: it faults inside the kernel and
+/// needs a separate threading audit.
+///
+/// # Staleness
+///
+/// The kernel does **not** clear the record on a successful call — `was_error`
+/// stays true and still describes the previous failure (observed directly). So
+/// this is only meaningful immediately after a call that returned non-zero,
+/// which is the only place it is called from. As a guard, a record whose `code`
+/// disagrees with the code we are reporting is treated as stale and dropped.
+fn query_last_error(expected_code: PK_ERROR_code_t) -> Option<ErrorDetails> {
+    let mut sf: PK_ERROR_sf_t = unsafe { std::mem::zeroed() };
     let mut was_error: PK_LOGICAL_t = PK_LOGICAL_false;
-    let rc = unsafe { PK_ERROR_ask_last(&mut was_error, buf.as_mut_ptr() as *mut PK_ERROR_sf_t) };
+    let rc = unsafe { PK_ERROR_ask_last(&mut was_error, &mut sf) };
     if rc != PK_ERROR_no_errors || was_error != PK_LOGICAL_true {
         return None;
     }
+    // Stale record from an earlier failure: do not attribute it to this call.
+    if sf.code != expected_code {
+        return None;
+    }
 
-    let function = {
-        let name = &buf[..SF_FUNCTION_LEN];
-        let end = name.iter().position(|&b| b == 0).unwrap_or(SF_FUNCTION_LEN);
-        String::from_utf8_lossy(&name[..end]).into_owned()
+    let bad_args = if sf.argument_number > 0 {
+        let name = inline_str(&sf.argument_name);
+        vec![BadArg {
+            index: sf.argument_number,
+            name: (!name.is_empty()).then_some(name),
+            element: sf.argument_index,
+        }]
+    } else {
+        Vec::new()
     };
-    let code = i32::from_le_bytes(buf[SF_CODE_OFFSET..SF_CODE_OFFSET + 4].try_into().unwrap());
 
     Some(ErrorDetails {
-        code,
-        severity: default_severity(code),
-        function,
-        bad_args: Vec::new(),
-        entity: None,
+        code: sf.code,
+        severity: Severity::from_token(sf.severity).unwrap_or_else(|| default_severity(sf.code)),
+        function: inline_str(&sf.function),
+        code_token: {
+            let t = inline_str(&sf.code_token);
+            (!t.is_empty()).then_some(t)
+        },
+        bad_args,
+        entity: (sf.entity != 0).then_some(sf.entity),
     })
 }
 

@@ -465,10 +465,7 @@ pub struct PK_GEOM_range_vector_many_o_t {
 pub struct PK_GEOM_render_line_o_t {
     _private: [u8; 0],
 }
-#[repr(C)]
-pub struct PK_GEOM_transform_o_t {
-    _private: [u8; 0],
-}
+// PK_GEOM_transform_o_t: real layout defined in transform.rs (journal-recovered).
 #[repr(C)]
 pub struct PK_GROUP_ask_closure_o_t {
     _private: [u8; 0],
@@ -799,22 +796,13 @@ pub struct PK_TOPOL_range_local_o_t {
 pub struct PK_TOPOL_range_local_vector_o_t {
     _private: [u8; 0],
 }
-#[repr(C)]
-pub struct PK_TRANSF_classify_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
-pub struct PK_TRANSF_classify_r_t {
-    _private: [u8; 0],
-}
+// PK_TRANSF_classify_o_t: real layout defined in transform.rs (journal-recovered).
+// PK_TRANSF_classify_r_t: real layout defined in transform.rs (journal-recovered).
 #[repr(C)]
 pub struct PK_TRANSF_create_view_o_t {
     _private: [u8; 0],
 }
-#[repr(C)]
-pub struct PK_TRANSF_transform_o_t {
-    _private: [u8; 0],
-}
+// PK_TRANSF_transform_o_t: real layout defined in transform.rs (journal-recovered).
 #[repr(C)]
 pub struct PK_TRANSF_transform_r_t {
     _private: [u8; 0],

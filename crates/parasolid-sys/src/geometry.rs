@@ -376,19 +376,6 @@ pub const PK_BODY_curve_nmnl_enabled_c: PK_BODY_curve_nmnl_state_t = 1;
 // Error constants specific to geometry
 // =============================================================================
 
-/// Plane axes not orthogonal.
-pub const PK_ERROR_vectors_not_orthogonal: PK_ERROR_code_t = 400;
-/// Point outside size box.
-pub const PK_ERROR_bad_position: PK_ERROR_code_t = 401;
-/// Wrong curve type for swept/spun surface.
-pub const PK_ERROR_unsuitable_entity: PK_ERROR_code_t = 402;
-/// Spun surface would self-intersect.
-pub const PK_ERROR_su_self_intersect: PK_ERROR_code_t = 403;
-/// Tolerance error during precision setting.
-pub const PK_ERROR_bad_tolerance_c: PK_ERROR_code_t = 404;
-/// Edge too short during precision setting.
-pub const PK_ERROR_edge_too_short: PK_ERROR_code_t = 405;
-
 // =============================================================================
 // Opaque options/result structs for geometry operations
 // =============================================================================

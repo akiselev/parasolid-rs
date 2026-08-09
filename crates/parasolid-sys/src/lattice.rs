@@ -276,6 +276,117 @@ pub struct PK_LATTICE_ask_n_lrods_r_t {
     _private: [u8; 0],
 }
 
+// =============================================================================
+// Core / form / connectivity / regions — [decompile-observed] V37.01.243
+//
+// These five had NO documented prototype in any reference (`pk-reference.tsv`
+// lists them MISSING), so arity and pointer-ness come from decompiling the
+// exports themselves, and the field names come from each function's own
+// journalling code (the `PKU_journal_*` method — the kernel names every field
+// it writes to the journal).
+//
+//   PK_LATTICE_ask_core          @1803466c0   (lattice, options, results)
+//   PK_LATTICE_ask_form          @180347260   (lattice, options, results)
+//   PK_LATTICE_ask_connectivity  @180345ed0   (lattice, options, results)
+//   PK_LATTICE_ask_regions       @180348eb0   (lattice, options, results)
+//   PK_LATTICE_create_by_core    @18034b980   (options, results)
+//
+// Only `PK_LATTICE_ask_regions_r_t` is fully mapped. The others keep opaque
+// bodies on purpose: the journal names their leading fields but not the full
+// union tails, and inventing the rest is exactly the failure that produced a
+// wholly wrong `PK_ERROR_*` table. Callers must zero a generous buffer and
+// treat these as unvalidated until a live probe exists (Stage 15).
+// =============================================================================
+
+/// Options for `PK_LATTICE_ask_core`. Journal shows a single consumed field,
+/// `o_t_version`, which the kernel requires to be 1.
+#[repr(C)]
+pub struct PK_LATTICE_ask_core_o_t {
+    _private: [u8; 0],
+}
+/// Results from `PK_LATTICE_ask_core`.
+///
+/// Partially mapped: `r_t_version` @0, then a core-kind token @4 (the empty
+/// result writes `0x6b30`), then a union whose `data.implicit_volume` arm the
+/// journal names as `implicit_surf`, `basis_set`, `front_offset`,
+/// `back_offset`. Tail not mapped — treat as opaque.
+#[repr(C)]
+pub struct PK_LATTICE_ask_core_r_t {
+    _private: [u8; 0],
+}
+
+/// Options for `PK_LATTICE_ask_form` (`o_t_version` only).
+#[repr(C)]
+pub struct PK_LATTICE_ask_form_o_t {
+    _private: [u8; 0],
+}
+/// Results from `PK_LATTICE_ask_form`. Journal names only `r_t_version`.
+#[repr(C)]
+pub struct PK_LATTICE_ask_form_r_t {
+    _private: [u8; 0],
+}
+
+/// Options for `PK_LATTICE_ask_connectivity` (`o_t_version` only).
+#[repr(C)]
+pub struct PK_LATTICE_ask_connectivity_o_t {
+    _private: [u8; 0],
+}
+/// Results from `PK_LATTICE_ask_connectivity`.
+///
+/// Journal field order: `r_t_version`, `lattice_connectivity`, `n_components`
+/// — all int-sized, so the head is `{i32, i32, i32}`. Kept opaque pending a
+/// live probe confirming there is no tail.
+#[repr(C)]
+pub struct PK_LATTICE_ask_connectivity_r_t {
+    _private: [u8; 0],
+}
+
+/// Options for `PK_LATTICE_ask_regions`.
+///
+/// Layout from the caller's own journalling: `o_t_version` @0 then
+/// `want_senses` @4, journalled via `PKU_journal_LOGICAL` on `param_2[1]`.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_LATTICE_ask_regions_o_t {
+    pub o_t_version: c_int,
+    pub want_senses: PK_LOGICAL_t,
+}
+
+/// Results from `PK_LATTICE_ask_regions` — **fully mapped** from
+/// `PKU_journal_LATTICE_ask_regions_r` (V37.01.243).
+///
+/// The helper walks `param_1[0]` as `r_t_version`, `param_1[1]` as the shared
+/// element count for all three arrays, then three pointers at `param_1+2`,
+/// `param_1+4`, `param_1+6` (byte offsets 8/16/24). `senses` is indexed by
+/// byte, not by 4, so it is an array of one-byte logicals; `regions` and
+/// `frames` are indexed `* 4` and tagged `REGION` / `FRAME` respectively.
+///
+/// Free with `PK_LATTICE_ask_regions_r_f`.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_LATTICE_ask_regions_r_t {
+    pub r_t_version: c_int,          // @0
+    pub n_regions: c_int,            // @4  — length of all three arrays
+    pub regions: *mut PK_REGION_t,   // @8
+    pub senses: *mut PK_LOGICAL_t,   // @16 — one byte per element
+    pub frames: *mut PK_ENTITY_t,    // @24 — PK_FRAME_t tags
+}
+
+/// Options for `PK_LATTICE_create_by_core`.
+///
+/// Journal names an implicit-volume core (`implicit_surf`, `basis_set`,
+/// `front_offset`, `back_offset`) plus a `bound` field well into the struct
+/// (`options + 0x2a` ints). Not fully mapped — opaque.
+#[repr(C)]
+pub struct PK_LATTICE_create_by_core_o_t {
+    _private: [u8; 0],
+}
+/// Results from `PK_LATTICE_create_by_core`. Journal names `r_t_version`.
+#[repr(C)]
+pub struct PK_LATTICE_create_by_core_r_t {
+    _private: [u8; 0],
+}
+
 /// Options for `PK_LATTICE_find_box`.
 #[repr(C)]
 pub struct PK_LATTICE_find_box_o_t {
@@ -520,6 +631,52 @@ unsafe extern "C" {
         lattice: PK_LATTICE_t,
         options: *const PK_LATTICE_find_box_o_t,
         results: *mut PK_LATTICE_find_box_r_t,
+    ) -> PK_ERROR_code_t;
+
+    // ---- Core / form / connectivity / regions ------------------------------
+    // [decompile-observed] arity and pointer-ness; see the struct block above.
+
+    /// Ask the core geometry a lattice was built from.
+    pub fn PK_LATTICE_ask_core(
+        lattice: PK_LATTICE_t,
+        options: *const PK_LATTICE_ask_core_o_t,
+        results: *mut PK_LATTICE_ask_core_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Ask a lattice's form.
+    pub fn PK_LATTICE_ask_form(
+        lattice: PK_LATTICE_t,
+        options: *const PK_LATTICE_ask_form_o_t,
+        results: *mut PK_LATTICE_ask_form_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Ask a lattice's connectivity and component count.
+    pub fn PK_LATTICE_ask_connectivity(
+        lattice: PK_LATTICE_t,
+        options: *const PK_LATTICE_ask_connectivity_o_t,
+        results: *mut PK_LATTICE_ask_connectivity_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Ask the regions a lattice occupies, optionally with senses and frames.
+    pub fn PK_LATTICE_ask_regions(
+        lattice: PK_LATTICE_t,
+        options: *const PK_LATTICE_ask_regions_o_t,
+        results: *mut PK_LATTICE_ask_regions_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Free results from `PK_LATTICE_ask_regions`.
+    pub fn PK_LATTICE_ask_regions_r_f(
+        results: *mut PK_LATTICE_ask_regions_r_t,
+    ) -> PK_ERROR_code_t;
+
+    /// Create a lattice from a core geometry definition.
+    ///
+    /// Two arguments only — the lattice comes back in `results`, matching
+    /// `PK_BODY_create_implicit`'s shape rather than the usual
+    /// `(entity, options, results)`.
+    pub fn PK_LATTICE_create_by_core(
+        options: *const PK_LATTICE_create_by_core_o_t,
+        results: *mut PK_LATTICE_create_by_core_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Non-axis-aligned bounding box of lattice.

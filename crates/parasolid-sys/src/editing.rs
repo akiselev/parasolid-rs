@@ -1297,13 +1297,6 @@ pub struct PK_FACE_offset_2_o_t {
 // Error codes specific to editing
 // =============================================================================
 
-/// Cannot heal wound (edge delete).
-pub const PK_ERROR_cant_heal_wound: PK_ERROR_code_t = 600;
-/// Invalid option combination.
-pub const PK_ERROR_bad_combination: PK_ERROR_code_t = 602;
-/// Face change operation failed.
-pub const PK_ERROR_failed_to_change: PK_ERROR_code_t = 603;
-
 // =============================================================================
 // Loop types (referenced by delete/fill operations)
 // =============================================================================
