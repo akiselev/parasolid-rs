@@ -27,6 +27,10 @@ pub struct SurfDirParam {
     pub range: (f64, f64),
     pub periodic: crate::curve::Periodicity,
     pub closed: bool,
+    /// Extent of this direction's range.
+    pub extent: crate::curve::ParamExtent,
+    /// Class of the iso-curve along this direction.
+    pub curve_class: crate::curve::ParamCurveClass,
 }
 
 /// Spun (surface of revolution) parameters (from [`Surf::ask_spun`]).
@@ -364,6 +368,8 @@ impl Surf {
             range: (p.range.low, p.range.high),
             periodic: crate::curve::Periodicity::from_token(p.periodic),
             closed: (p.closed & 0xff) != 0,
+            extent: crate::curve::ParamExtent::from_token(p.extent),
+            curve_class: crate::curve::ParamCurveClass::from_token(p.curve_class),
         };
         Ok((mk(&sf[0]), mk(&sf[1])))
     }

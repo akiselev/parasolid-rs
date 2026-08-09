@@ -933,6 +933,14 @@ unsafe extern "C" {
         interval: *mut PK_INTERVAL_t,
     ) -> PK_ERROR_code_t;
 
+    /// Minimum radius of curvature of a curve over a parameter interval.
+    ///
+    /// `t_int` is a by-value `PK_INTERVAL_t` (16 bytes); the Win64 ABI passes
+    /// aggregates larger than 8 bytes by hidden pointer, so `*const` is the
+    /// correct binding — same convention as every other interval/uvbox arg here.
+    ///
+    /// `n_radii` is 0 when there is no curvature minimum in the interval (a
+    /// straight line has no finite radius anywhere) — an answer, not a failure.
     pub fn PK_CURVE_find_min_radius(
         curve: PK_CURVE_t,
         t_int: *const PK_INTERVAL_t,
@@ -942,6 +950,11 @@ unsafe extern "C" {
         param: *mut c_double,
     ) -> PK_ERROR_code_t;
 
+    /// Minimum radii of curvature of a surface over a uv box.
+    ///
+    /// Writes **up to two** entries into each of `radii` / `positions` /
+    /// `parms`; `n_radii` says how many are valid, so all three buffers must
+    /// have room for 2. `uv_box` is by-value (32 bytes → by pointer on Win64).
     pub fn PK_SURF_find_min_radii(
         surf: PK_SURF_t,
         uv_box: *const PK_UVBOX_t,

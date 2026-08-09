@@ -182,19 +182,63 @@ pub struct PK_SURF_param_t {
 }
 
 /// Standard form of a single parametric direction (`PK_CURVE_ask_param` writes
-/// one; `PK_SURF_ask_params` writes two, u then v). 40-byte layout recovered by
-/// decompiling `PK_CURVE_ask_param`: `range`@0, four i32 enum fields @16/20/24/28
-/// (`periodic`@24 ∈ 18020/18021/18022), `closed` logical byte @32.
+/// one; `PK_SURF_ask_params` writes two, u then v). 40 bytes.
+///
+/// Layout and token semantics recovered by decompiling `PK_CURVE_ask_param`
+/// (V37.01.243) and cross-checked against every analytic family at runtime
+/// (`crates/parasolid-test/src/bin/domain_probe.rs`).
+///
+/// - `extent` / `form` @16/@20 — the kernel maps an internal 0..3 code onto
+///   tokens in **descending** order: `0 → 18003`, `1 → 18002`, `2 → 18001`,
+///   `3 → 18000`; `PK_SURF_ask_params` additionally emits `18004`. Observed:
+///   18000 on unbounded ranges (line, plane, cylinder v), 18003 on periodic
+///   ranges, 18004 on bounded ranges (sphere v, cone v). **18001 and 18002
+///   exist in the mapping but were not produced by any analytic family here**,
+///   so they are deliberately left unnamed rather than guessed.
+///   `extent` and `form` agree everywhere except a half-bounded range: a cone's
+///   v is `extent = 18004` (bounded) but `form = 18000` (infinite).
+/// - `periodic` @24 — `PK_PARAM_periodic_no_c` 18020 / `_yes_c` 18021 /
+///   `_seamed_c` 18022. The decompile shows this is *derived*: extent/form code
+///   0 (i.e. token 18003) selects yes/seamed, everything else selects no. So
+///   `extent == 18003` and periodicity are two views of one fact.
+/// - `curve_class` @28 — **not a convexity**, despite the name it was given
+///   before. The decompile takes the *underlying iso-curve's class tag* and
+///   maps `30 → 18040`, `31 → 18041`, anything else `→ 18042`. Observed
+///   accordingly: 18040 for straight directions (line, plane, cylinder v),
+///   18041 for circular ones (circle, cylinder u, torus), 18042 otherwise
+///   (ellipse, sphere v).
+/// - `closed` @32 — logical in the low byte.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_PARAM_sf_t {
     pub range: PK_INTERVAL_t, // @0
-    pub extent: c_int,        // @16
-    pub form: c_int,          // @20
-    pub periodic: c_int,      // @24  (PK_PARAM_periodic_*_c)
-    pub convexity: c_int,     // @28
+    pub extent: c_int,        // @16  PK_PARAM_extent_*_c
+    pub form: c_int,          // @20  same token band as `extent`
+    pub periodic: c_int,      // @24  PK_PARAM_periodic_*_c
+    /// Class of the underlying iso-curve — see the struct docs. Formerly
+    /// mis-named `convexity`.
+    pub curve_class: c_int,   // @28
     pub closed: PK_LOGICAL_t, // @32 (value in low byte)
 }
+
+/// Token band shared by `PK_PARAM_sf_t::extent` and `::form`.
+pub type PK_PARAM_extent_t = c_int;
+/// Range is unbounded in this direction. [probed]
+pub const PK_PARAM_extent_infinite_c: PK_PARAM_extent_t = 18000;
+/// Range wraps — this direction is periodic. [probed]
+pub const PK_PARAM_extent_periodic_c: PK_PARAM_extent_t = 18003;
+/// Range is bounded. [probed] (emitted by `PK_SURF_ask_params`.)
+pub const PK_PARAM_extent_bounded_c: PK_PARAM_extent_t = 18004;
+
+/// Token band of `PK_PARAM_sf_t::curve_class`, derived from the iso-curve's
+/// internal class tag.
+pub type PK_PARAM_curve_class_t = c_int;
+/// Underlying iso-curve is straight (internal class 30). [probed]
+pub const PK_PARAM_curve_class_straight_c: PK_PARAM_curve_class_t = 18040;
+/// Underlying iso-curve is circular (internal class 31). [probed]
+pub const PK_PARAM_curve_class_circular_c: PK_PARAM_curve_class_t = 18041;
+/// Any other iso-curve class. [probed]
+pub const PK_PARAM_curve_class_other_c: PK_PARAM_curve_class_t = 18042;
 
 const _: () = {
     assert!(core::mem::size_of::<PK_PARAM_sf_t>() == 40);

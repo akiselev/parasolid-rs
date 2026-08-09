@@ -172,17 +172,53 @@ impl Face {
         })
     }
 
-    /// Whether this face fills a simple uvbox-bounded patch of its surface, and
-    /// if so, that box.
+    /// Whether this face fills a simple uvbox-bounded patch of its surface.
+    ///
+    /// **One-sided guarantee** (stated by the vendor reference): the kernel
+    /// may fail to notice that a face *is* a parametric rectangle, but it will
+    /// never claim one that is not. So `true` is trustworthy and `false` means
+    /// "not established", not "definitely not".
     pub fn is_uvbox(&self) -> PsResult<bool> {
+        Ok(self.as_uvbox()?.is_some())
+    }
+
+    /// The face's uv rectangle when it *is* a parametric rectangle, else `None`.
+    ///
+    /// Unlike [`Face::uvbox`] — which is a conservative superset — this box is
+    /// exact when it is returned at all. Carries the same one-sided guarantee
+    /// as [`Face::is_uvbox`].
+    pub fn as_uvbox(&self) -> PsResult<Option<crate::UvBox>> {
         let mut is_uvbox: PK_LOGICAL_t = PK_LOGICAL_false;
         let mut b = PK_UVBOX_t { param: [0.0; 4] };
         pk_call!(PK_FACE_is_uvbox(self.tag, &mut is_uvbox, &mut b));
-        Ok(is_uvbox == PK_LOGICAL_true)
+        if is_uvbox != PK_LOGICAL_true {
+            return Ok(None);
+        }
+        Ok(Some(crate::UvBox {
+            u_min: b.param[0],
+            v_min: b.param[1],
+            u_max: b.param[2],
+            v_max: b.param[3],
+        }))
+    }
+
+    /// Periodicity of this face in `(u, v)`, preserving the kernel's
+    /// three-way distinction: not periodic, periodic, or **seamed**.
+    ///
+    /// The seamed case matters — it is a periodic direction that has been cut,
+    /// so the face has a real edge where the parameterisation wraps.
+    pub fn periodicity(&self) -> PsResult<(crate::Periodicity, crate::Periodicity)> {
+        let mut u: PK_PARAM_periodic_t = 0;
+        let mut v: PK_PARAM_periodic_t = 0;
+        pk_call!(PK_FACE_is_periodic(self.tag, &mut u, &mut v));
+        Ok((
+            crate::Periodicity::from_token(u),
+            crate::Periodicity::from_token(v),
+        ))
     }
 
     /// Whether this face is periodic in `(u, v)` (a seam or a full wrap counts
-    /// as periodic).
+    /// as periodic). Use [`Face::periodicity`] to keep the seamed distinction.
     pub fn is_periodic(&self) -> PsResult<(bool, bool)> {
         let mut u: PK_PARAM_periodic_t = 0;
         let mut v: PK_PARAM_periodic_t = 0;

@@ -36,6 +36,68 @@ pub struct CurveParam {
     pub range: (f64, f64),
     pub periodic: Periodicity,
     pub closed: bool,
+    /// Extent of the parameter range: unbounded, periodic, or bounded.
+    /// See [`ParamExtent`].
+    pub extent: ParamExtent,
+    /// Class of the underlying curve, as the kernel reports it in the
+    /// parameterisation record. See [`ParamCurveClass`].
+    pub curve_class: ParamCurveClass,
+}
+
+/// Extent of a parameter range (`PK_PARAM_sf_t::extent` / `::form`).
+///
+/// `Periodic` and [`Periodicity::Periodic`] are two views of one fact — the
+/// kernel derives the periodicity token from this one.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ParamExtent {
+    /// Unbounded in this direction.
+    Infinite,
+    /// Wraps around; the direction is periodic.
+    Periodic,
+    /// Bounded.
+    Bounded,
+    /// A token in the band that no analytic family produced here (18001 /
+    /// 18002 are reachable in the kernel's mapping but were never observed),
+    /// or an unknown value. Carried through rather than guessed at.
+    Other(i32),
+}
+
+impl ParamExtent {
+    pub(crate) fn from_token(t: i32) -> Self {
+        match t {
+            PK_PARAM_extent_infinite_c => ParamExtent::Infinite,
+            PK_PARAM_extent_periodic_c => ParamExtent::Periodic,
+            PK_PARAM_extent_bounded_c => ParamExtent::Bounded,
+            other => ParamExtent::Other(other),
+        }
+    }
+
+    /// Whether the range is finite in this direction.
+    pub fn is_bounded(&self) -> bool {
+        matches!(self, ParamExtent::Bounded | ParamExtent::Periodic)
+    }
+}
+
+/// Class of the iso-curve underlying a parameter direction
+/// (`PK_PARAM_sf_t::curve_class`).
+///
+/// The kernel derives this from the curve's internal class tag, so it is a
+/// representation fact, not a geometric measurement.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ParamCurveClass {
+    Straight,
+    Circular,
+    Other(i32),
+}
+
+impl ParamCurveClass {
+    pub(crate) fn from_token(t: i32) -> Self {
+        match t {
+            PK_PARAM_curve_class_straight_c => ParamCurveClass::Straight,
+            PK_PARAM_curve_class_circular_c => ParamCurveClass::Circular,
+            other => ParamCurveClass::Other(other),
+        }
+    }
 }
 
 /// B-curve (NURBS curve) standard form (from [`Curve::ask_bcurve`]).
@@ -197,8 +259,12 @@ impl Curve {
     ///
     /// Wraps `PK_CURVE_find_length`, which takes the interval **by value**
     /// (`PK_INTERVAL_t` is a 16-byte `{low, high}` struct, passed indirectly on
-    /// the Win64 ABI). Returns the length only; the achieved parameter range is
-    /// discarded.
+    /// the Win64 ABI).
+    ///
+    /// Returns the nominal length only. The kernel also reports a **range
+    /// bounding the true arc length** — use [`Curve::length_with_bounds`] when
+    /// the enclosure matters, which it does anywhere the result feeds a
+    /// tolerance decision.
     pub fn length(&self, interval: (f64, f64)) -> PsResult<f64> {
         let iv = PK_INTERVAL_t {
             low: interval.0,
@@ -211,6 +277,27 @@ impl Curve {
         };
         pk_call!(PK_CURVE_find_length(self.tag, iv, &mut length, &mut range));
         Ok(length)
+    }
+
+    /// Arc length together with the kernel's **conservative enclosure** of the
+    /// true length (`PK_CURVE_find_length`'s fourth output).
+    ///
+    /// Returns `(nominal, low, high)`. For analytically integrable curves the
+    /// range collapses to a point (a circle's width is exactly 0); for an
+    /// ellipse it is genuinely wider than zero, and that width is the honest
+    /// statement of how well the length is known.
+    pub fn length_with_bounds(&self, interval: (f64, f64)) -> PsResult<(f64, f64, f64)> {
+        let iv = PK_INTERVAL_t {
+            low: interval.0,
+            high: interval.1,
+        };
+        let mut length = 0.0f64;
+        let mut range = PK_INTERVAL_t {
+            low: 0.0,
+            high: 0.0,
+        };
+        pk_call!(PK_CURVE_find_length(self.tag, iv, &mut length, &mut range));
+        Ok((length, range.low, range.high))
     }
 
     /// Create a non-rational **B-curve** (NURBS curve) from its `degree`, control
@@ -374,6 +461,8 @@ impl Curve {
             range: (sf.range.low, sf.range.high),
             periodic: Periodicity::from_token(sf.periodic),
             closed: (sf.closed & 0xff) != 0,
+            extent: ParamExtent::from_token(sf.extent),
+            curve_class: ParamCurveClass::from_token(sf.curve_class),
         })
     }
 

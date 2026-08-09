@@ -4545,6 +4545,698 @@ fn main() {
     });
 
     // =========================================================================
+    // Stage 3 — evaluation and jets
+    // =========================================================================
+
+    test!("stage3_surf_jet_layout_rectangular", {
+        let _session = Session::start(test_config())?;
+
+        // A torus has every mixed partial nonzero, so no (i,j) ordering can
+        // hide behind a zero. Closed form:
+        //   R(u,v) = ((MAJ + MIN cos v) cos u, (MAJ + MIN cos v) sin u, MIN sin v)
+        let (maj, min) = (5.0_f64, 1.5_f64);
+        let (u, v) = (0.6_f64, 0.9_f64);
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let tor = Surf::torus(basis, maj, min)?;
+
+        // ∂^(i+j)/∂u^i∂v^j, built by differentiating the radial and z factors.
+        let expect = |i: usize, j: usize| -> Vec3 {
+            let radial = |jj: usize| match jj % 4 {
+                0 => maj + min * v.cos(),
+                1 => -min * v.sin(),
+                2 => -min * v.cos(),
+                _ => min * v.sin(),
+            };
+            let rad = if j == 0 { radial(0) } else { radial(j) };
+            let z = if i > 0 {
+                0.0
+            } else {
+                match j % 4 {
+                    0 => min * v.sin(),
+                    1 => min * v.cos(),
+                    2 => -min * v.sin(),
+                    _ => -min * v.cos(),
+                }
+            };
+            let (c, s) = (u.cos(), u.sin());
+            let (cu, su) = match i % 4 {
+                0 => (c, s),
+                1 => (-s, c),
+                2 => (-c, -s),
+                _ => (s, -c),
+            };
+            Vec3::new(rad * cu, rad * su, z)
+        };
+
+        let jet = tor.eval_jet(u, v, 2, 2, false)?;
+        for i in 0..=2 {
+            for j in 0..=2 {
+                let got = jet
+                    .d(i, j)
+                    .unwrap_or_else(|| panic!("rectangular jet missing d{i}u.d{j}v"));
+                let want = expect(i, j);
+                assert!(
+                    (got.x - want.x).abs() < 1e-9
+                        && (got.y - want.y).abs() < 1e-9
+                        && (got.z - want.z).abs() < 1e-9,
+                    "d{i}u.d{j}v = ({:.6},{:.6},{:.6}), expected ({:.6},{:.6},{:.6})",
+                    got.x,
+                    got.y,
+                    got.z,
+                    want.x,
+                    want.y,
+                    want.z
+                );
+            }
+        }
+
+        // Out-of-table requests are None, not silently-wrong neighbours.
+        assert!(jet.d(3, 0).is_none(), "d3u is outside an n_u=2 table");
+        assert!(jet.d(0, 3).is_none(), "d3v is outside an n_v=2 table");
+    });
+
+    test!("stage3_surf_jet_layout_triangular", {
+        let _session = Session::start(test_config())?;
+
+        // The triangular table is the same u-fastest ordering with each row
+        // truncated to i+j <= n. Cross-check it against the rectangular table
+        // rather than against closed form: any indexing error shows up as a
+        // disagreement between the two packings for the same derivative.
+        let (maj, min) = (5.0_f64, 1.5_f64);
+        let (u, v) = (0.6_f64, 0.9_f64);
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let tor = Surf::torus(basis, maj, min)?;
+
+        let rect = tor.eval_jet(u, v, 2, 2, false)?;
+        let tri = tor.eval_jet(u, v, 2, 2, true)?;
+
+        for (i, j) in [(0, 0), (1, 0), (2, 0), (0, 1), (1, 1), (0, 2)] {
+            let a = rect.d(i, j).expect("rectangular slot");
+            let b = tri
+                .d(i, j)
+                .unwrap_or_else(|| panic!("triangular table should carry d{i}u.d{j}v"));
+            assert!(
+                (a.x - b.x).abs() < 1e-12
+                    && (a.y - b.y).abs() < 1e-12
+                    && (a.z - b.z).abs() < 1e-12,
+                "packings disagree at d{i}u.d{j}v: rect ({:.9},{:.9},{:.9}) vs tri ({:.9},{:.9},{:.9})",
+                a.x, a.y, a.z, b.x, b.y, b.z
+            );
+        }
+
+        // Terms with i+j > n are absent from a triangular table — and the
+        // rectangular table does carry them, so this is a real distinction.
+        for (i, j) in [(2, 1), (1, 2), (2, 2)] {
+            assert!(
+                tri.d(i, j).is_none(),
+                "triangular table must not carry d{i}u.d{j}v (i+j > 2)"
+            );
+            assert!(
+                rect.d(i, j).is_some(),
+                "rectangular table should carry d{i}u.d{j}v"
+            );
+        }
+    });
+
+    test!("stage3_curve_jet_orders", {
+        let _session = Session::start(test_config())?;
+
+        // A circle's derivatives cycle with period 4, so an off-by-one in the
+        // order indexing produces a 90-degree-rotated vector, not a small error.
+        let r = 3.0_f64;
+        let t = 0.4_f64;
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let circ = Curve::circle(basis, r)?;
+        let jet = circ.eval_jet(t, 3)?;
+        assert_eq!(jet.order(), 3);
+
+        let (c, s) = (t.cos(), t.sin());
+        let expect = [
+            Vec3::new(r * c, r * s, 0.0),
+            Vec3::new(-r * s, r * c, 0.0),
+            Vec3::new(-r * c, -r * s, 0.0),
+            Vec3::new(r * s, -r * c, 0.0),
+        ];
+        for (k, want) in expect.iter().enumerate() {
+            let got = jet.d(k).unwrap_or_else(|| panic!("missing d{k}"));
+            assert!(
+                (got.x - want.x).abs() < 1e-9
+                    && (got.y - want.y).abs() < 1e-9
+                    && (got.z - want.z).abs() < 1e-9,
+                "d{k}/dt = ({:.6},{:.6},{:.6}), expected ({:.6},{:.6},{:.6})",
+                got.x, got.y, got.z, want.x, want.y, want.z
+            );
+        }
+        assert!(jet.d(4).is_none(), "order 4 was not requested");
+
+        // Unit tangent is the normalised first derivative.
+        let tan = jet.unit_tangent().expect("circle has a nonzero tangent");
+        assert!(
+            (tan.x * tan.x + tan.y * tan.y + tan.z * tan.z - 1.0).abs() < 1e-12,
+            "tangent not unit length"
+        );
+        assert!(
+            (tan.x + s).abs() < 1e-9 && (tan.y - c).abs() < 1e-9,
+            "tangent direction wrong: ({:.6},{:.6},{:.6})",
+            tan.x, tan.y, tan.z
+        );
+    });
+
+    test!("stage3_curvature_sign_convention", {
+        let _session = Session::start(test_config())?;
+
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // Sphere: the reported normal is OUTWARD and both principal curvatures
+        // are +1/r. So positive curvature means the surface bends *away* from
+        // the normal — the sign convention CADabra must adopt wholesale.
+        let r = 4.0_f64;
+        let sph = Surf::sphere(basis, r)?;
+        let c = sph.eval_curvature(0.3, 0.2)?;
+        let p = sph.eval(0.3, 0.2)?;
+        let outward = c.normal.x * p.x + c.normal.y * p.y + c.normal.z * p.z;
+        assert!(
+            outward > 0.0,
+            "sphere normal should point outward, got dot {outward}"
+        );
+        assert!(
+            (c.principal_curvature_1 - 1.0 / r).abs() < 1e-9
+                && (c.principal_curvature_2 - 1.0 / r).abs() < 1e-9,
+            "sphere principal curvatures should both be +1/r = {:.6}, got {:+.6}/{:+.6}",
+            1.0 / r,
+            c.principal_curvature_1,
+            c.principal_curvature_2
+        );
+
+        // Cylinder: curvature 1 pairs with direction 1. k1 = 0 along the axis,
+        // k2 = 1/r around the hoop — so the pairing, not any magnitude order,
+        // is what carries the meaning.
+        let cyl = Surf::cylinder(basis, 2.0)?;
+        let c = cyl.eval_curvature(0.4, 1.0)?;
+        assert!(
+            c.principal_curvature_1.abs() < 1e-12,
+            "axial curvature should be 0, got {}",
+            c.principal_curvature_1
+        );
+        assert!(
+            (c.principal_curvature_2 - 0.5).abs() < 1e-9,
+            "hoop curvature should be 1/2, got {}",
+            c.principal_curvature_2
+        );
+        assert!(
+            c.principal_direction_1.z.abs() > 0.999,
+            "direction 1 should be the cylinder axis, got ({:.3},{:.3},{:.3})",
+            c.principal_direction_1.x,
+            c.principal_direction_1.y,
+            c.principal_direction_1.z
+        );
+
+        // Torus: the sharpest test — the outer equator is convex (positive
+        // Gaussian curvature) and the inner equator is a saddle (negative). A
+        // convention error flips one of these.
+        let (maj, min) = (5.0_f64, 1.5_f64);
+        let tor = Surf::torus(basis, maj, min)?;
+
+        let outer = tor.eval_curvature(0.0, 0.0)?;
+        let gauss_outer = outer.principal_curvature_1 * outer.principal_curvature_2;
+        assert!(
+            gauss_outer > 0.0,
+            "outer equator must have positive Gaussian curvature, got {gauss_outer:+.6}"
+        );
+        assert!(
+            (outer.principal_curvature_1 - 1.0 / (maj + min)).abs() < 1e-9,
+            "outer major curvature should be 1/(MAJ+MIN) = {:.6}, got {:+.6}",
+            1.0 / (maj + min),
+            outer.principal_curvature_1
+        );
+
+        let inner = tor.eval_curvature(0.0, std::f64::consts::PI)?;
+        let gauss_inner = inner.principal_curvature_1 * inner.principal_curvature_2;
+        assert!(
+            gauss_inner < 0.0,
+            "inner equator must be a saddle (negative Gaussian curvature), got {gauss_inner:+.6}"
+        );
+        assert!(
+            (inner.principal_curvature_1 + 1.0 / (maj - min)).abs() < 1e-9,
+            "inner major curvature should be -1/(MAJ-MIN) = {:.6}, got {:+.6}",
+            -1.0 / (maj - min),
+            inner.principal_curvature_1
+        );
+    });
+
+    test!("stage3_singularity_is_a_type_not_a_magnitude", {
+        let _session = Session::start(test_config())?;
+
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // Away from the pole, everything is ordinary.
+        let sph = Surf::sphere(basis, 4.0)?;
+        let ordinary = sph.eval_jet(0.3, 0.2, 1, 1, false)?;
+        assert!(!ordinary.is_singular(), "a generic sphere point is regular");
+        assert!(ordinary.unit_normal().is_some());
+
+        // At the pole the *chart* degenerates: du vanishes, so no normal can be
+        // formed from the parameterisation. eval still succeeds — the kernel
+        // does not raise — so a caller that ignored the degenerate normal would
+        // silently propagate a garbage direction.
+        let pole = sph.eval_jet(0.0, std::f64::consts::FRAC_PI_2, 1, 1, false)?;
+        let du = pole.du().expect("du present");
+        assert!(
+            (du.x * du.x + du.y * du.y + du.z * du.z).sqrt() < 1e-12,
+            "at the pole du should vanish"
+        );
+        assert!(
+            pole.is_singular() && pole.unit_normal().is_none(),
+            "the pole must be reported as a parametric singularity"
+        );
+
+        // But the *surface* is perfectly smooth there: curvature is still
+        // defined and equals 1/r. Parametric singularity is not geometric
+        // singularity, and conflating them is a modelling error.
+        let c = sph.eval_curvature(0.0, std::f64::consts::FRAC_PI_2)?;
+        assert!(
+            (c.principal_curvature_1 - 0.25).abs() < 1e-9
+                && (c.principal_curvature_2 - 0.25).abs() < 1e-9,
+            "sphere curvature at the pole is still 1/r: got {:+.6}/{:+.6}",
+            c.principal_curvature_1,
+            c.principal_curvature_2
+        );
+
+        // A cone apex is singular in both senses.
+        let semi = 0.5_f64;
+        let cone = Surf::cone(basis, 3.0, semi)?;
+        let v_apex = -3.0 / semi.tan();
+        let apex = cone.eval_jet(0.0, v_apex, 1, 1, false)?;
+        assert!(
+            apex.is_singular(),
+            "the cone apex must be reported as singular"
+        );
+    });
+
+    test!("stage3_min_radius_of_curvature", {
+        let _session = Session::start(test_config())?;
+
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // A circle's radius of curvature is its radius, everywhere.
+        let circ = Curve::circle(basis, 3.0)?;
+        let m = circ
+            .find_min_radius(0.0, 6.28)?
+            .expect("a circle has a minimum radius");
+        assert!(
+            (m.radius - 3.0).abs() < 1e-9,
+            "circle min radius should be 3, got {}",
+            m.radius
+        );
+
+        // A straight line has no finite radius anywhere: the kernel reports
+        // n_radii = 0, which must surface as None rather than as infinity or an
+        // error.
+        let line = Curve::line(Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0))?;
+        assert!(
+            line.find_min_radius(0.0, 10.0)?.is_none(),
+            "a straight line has no curvature minimum"
+        );
+
+        // A torus reports two minima, and they are SIGNED — the second is
+        // -MIN, following the same sign convention as the curvatures.
+        let (maj, min_r) = (5.0_f64, 1.5_f64);
+        let tor = Surf::torus(basis, maj, min_r)?;
+        let radii = tor.find_min_radii(tor.uvbox()?)?;
+        assert_eq!(radii.len(), 2, "torus should report two curvature minima");
+        assert!(
+            (radii[0].radius - (maj - min_r)).abs() < 1e-9,
+            "first torus min radius should be MAJ-MIN = {}, got {}",
+            maj - min_r,
+            radii[0].radius
+        );
+        assert!(
+            (radii[1].radius + min_r).abs() < 1e-9,
+            "second torus min radius should be -MIN = {}, got {} (radii are signed)",
+            -min_r,
+            radii[1].radius
+        );
+
+        // A plane has no curvature minimum at all.
+        let plane = Surf::plane(basis)?;
+        assert!(
+            plane.find_min_radii(plane.uvbox()?)?.is_empty(),
+            "a plane has no curvature minima"
+        );
+    });
+
+    test!("stage3_handed_evaluation", {
+        let _session = Session::start(test_config())?;
+
+        // PK_HAND_left_c / _right_c (32760/32761) were unexercised constants.
+        // If either token were wrong the kernel would reject the argument, so
+        // a successful call is itself the check that they are real.
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let circ = Curve::circle(basis, 3.0)?;
+        let t = 0.4_f64;
+
+        let left = circ.eval_jet_handed(t, 2, Hand::Left)?;
+        let right = circ.eval_jet_handed(t, 2, Hand::Right)?;
+        let plain = circ.eval_jet(t, 2)?;
+
+        // A circle is smooth, so all three must agree exactly at every order.
+        for k in 0..=2 {
+            let (l, r, p) = (
+                left.d(k).expect("left"),
+                right.d(k).expect("right"),
+                plain.d(k).expect("plain"),
+            );
+            assert!(
+                (l.x - r.x).abs() < 1e-12
+                    && (l.y - r.y).abs() < 1e-12
+                    && (l.z - r.z).abs() < 1e-12,
+                "hands disagree at order {k} on a smooth curve"
+            );
+            assert!(
+                (l.x - p.x).abs() < 1e-12
+                    && (l.y - p.y).abs() < 1e-12
+                    && (l.z - p.z).abs() < 1e-12,
+                "handed and two-sided evaluation disagree at order {k}"
+            );
+        }
+    });
+
+    // =========================================================================
+    // Stage 4 — domains: intervals, uv-boxes, periodicity, seams
+    // =========================================================================
+
+    test!("stage4_param_record_per_family", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // extent and periodicity are two views of one fact: the kernel derives
+        // the periodicity token from the extent code, so Periodic <=> periodic.
+        let line = Curve::line(Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0))?;
+        let p = line.param()?;
+        assert_eq!(p.extent, ParamExtent::Infinite, "a line is unbounded");
+        assert_eq!(p.periodic, Periodicity::NonPeriodic);
+        assert_eq!(p.curve_class, ParamCurveClass::Straight);
+
+        let circ = Curve::circle(b, 3.0)?;
+        let p = circ.param()?;
+        assert_eq!(p.extent, ParamExtent::Periodic, "a circle wraps");
+        assert_eq!(p.periodic, Periodicity::Periodic);
+        assert_eq!(p.curve_class, ParamCurveClass::Circular);
+        assert!(
+            (p.range.1 - p.range.0 - std::f64::consts::TAU).abs() < 1e-12,
+            "circle period should be 2pi, got {}",
+            p.range.1 - p.range.0
+        );
+
+        // An ellipse is periodic but not circular — the class field separates
+        // representation from periodicity.
+        let ell = Curve::ellipse(b, 5.0, 2.0)?;
+        let p = ell.param()?;
+        assert_eq!(p.extent, ParamExtent::Periodic);
+        assert!(
+            matches!(p.curve_class, ParamCurveClass::Other(18042)),
+            "ellipse iso-class should be the 'other' token, got {:?}",
+            p.curve_class
+        );
+
+        // Surfaces: each direction is described independently.
+        let cyl = Surf::cylinder(b, 2.0)?;
+        let (u, v) = cyl.params()?;
+        assert_eq!(u.extent, ParamExtent::Periodic, "cylinder u wraps");
+        assert_eq!(u.curve_class, ParamCurveClass::Circular);
+        assert_eq!(v.extent, ParamExtent::Infinite, "cylinder v is unbounded");
+        assert_eq!(v.curve_class, ParamCurveClass::Straight);
+
+        let sph = Surf::sphere(b, 4.0)?;
+        let (u, v) = sph.params()?;
+        assert_eq!(u.extent, ParamExtent::Periodic);
+        assert_eq!(
+            v.extent,
+            ParamExtent::Bounded,
+            "sphere v runs pole to pole and is bounded"
+        );
+        assert_eq!(v.periodic, Periodicity::NonPeriodic);
+
+        let tor = Surf::torus(b, 5.0, 1.5)?;
+        let (u, v) = tor.params()?;
+        assert_eq!(u.extent, ParamExtent::Periodic, "torus wraps in both");
+        assert_eq!(v.extent, ParamExtent::Periodic);
+    });
+
+    test!("stage4_seam_is_an_exact_identification", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let tau = std::f64::consts::TAU;
+
+        // The question that decides the domain type: is a seam an
+        // identification of two parameter values? It is only safe to treat the
+        // domain as a quotient if u and u+period agree in position AND in every
+        // derivative — position alone would still permit a kink at the seam.
+        let cases: Vec<(&str, Surf, f64, f64)> = vec![
+            ("cylinder u", Surf::cylinder(b, 2.0)?, 0.0, 1.0),
+            ("sphere u", Surf::sphere(b, 4.0)?, 0.0, 0.3),
+            ("torus u", Surf::torus(b, 5.0, 1.5)?, 0.0, 0.4),
+        ];
+        for (label, surf, u, v) in cases {
+            let a = surf.eval_jet(u, v, 1, 1, false)?;
+            let c = surf.eval_jet(u + tau, v, 1, 1, false)?;
+            let dist = |p: Vec3, q: Vec3| {
+                ((p.x - q.x).powi(2) + (p.y - q.y).powi(2) + (p.z - q.z).powi(2)).sqrt()
+            };
+            assert!(
+                dist(a.position(), c.position()) < 1e-12,
+                "{label}: position differs across the seam by {:.3e}",
+                dist(a.position(), c.position())
+            );
+            assert!(
+                dist(a.du().unwrap(), c.du().unwrap()) < 1e-12,
+                "{label}: du differs across the seam — the seam is not smooth"
+            );
+            assert!(
+                dist(a.dv().unwrap(), c.dv().unwrap()) < 1e-12,
+                "{label}: dv differs across the seam"
+            );
+        }
+
+        // The torus also wraps in v, so the identification is two-dimensional.
+        let tor = Surf::torus(b, 5.0, 1.5)?;
+        let a = tor.eval_jet(0.4, 0.0, 1, 1, false)?;
+        let c = tor.eval_jet(0.4, tau, 1, 1, false)?;
+        let p = a.position();
+        let q = c.position();
+        assert!(
+            ((p.x - q.x).powi(2) + (p.y - q.y).powi(2) + (p.z - q.z).powi(2)).sqrt() < 1e-12,
+            "torus v seam is not an identification"
+        );
+    });
+
+    test!("stage4_pole_collapses_the_u_fibre", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let sph = Surf::sphere(b, 4.0)?;
+        let uvb = sph.uvbox()?;
+
+        // A pole is not a seam: it is a boundary of the v range where the whole
+        // u fibre collapses to a single point. Distinguishing the two is the
+        // reason the domain type cannot just be "wrapped interval".
+        for (label, v) in [("south", uvb.v_min), ("north", uvb.v_max)] {
+            let p1 = sph.eval(0.0, v)?;
+            let p2 = sph.eval(2.0, v)?;
+            let p3 = sph.eval(5.0, v)?;
+            let d = |a: Vec3, c: Vec3| {
+                ((a.x - c.x).powi(2) + (a.y - c.y).powi(2) + (a.z - c.z).powi(2)).sqrt()
+            };
+            assert!(
+                d(p1, p2) < 1e-12 && d(p1, p3) < 1e-12,
+                "{label} pole should collapse every u to one point, spread {:.3e}",
+                d(p1, p2).max(d(p1, p3))
+            );
+            assert!(
+                sph.eval_jet(0.9, v, 1, 1, false)?.is_singular(),
+                "{label} pole must be a parametric singularity"
+            );
+        }
+
+        // And the interior is not degenerate, so this is a property of the
+        // boundary rather than of the surface.
+        assert!(!sph.eval_jet(0.9, 0.0, 1, 1, false)?.is_singular());
+    });
+
+    test!("stage4_face_uvbox_is_conservative", {
+        let _session = Session::start(test_config())?;
+
+        // Whether a face's uv box is tight or merely conservative decides
+        // whether it can be used for exclusion tests. Measured on a cylinder
+        // body: the planar cap is a DISC of radius 2, so its exact box would be
+        // [-2,2]^2 — the kernel reports a slightly larger one.
+        let body = Body::create_solid_cylinder(2.0, 6.0)?;
+        let faces = body.faces()?;
+
+        let mut saw_padded_plane = false;
+        let mut saw_exact_cylinder = false;
+
+        for face in &faces {
+            let box_ = face.uvbox()?;
+            match face.surface_type()? {
+                SurfType::Plane => {
+                    // Conservative: strictly larger than the true [-2,2]^2.
+                    assert!(
+                        box_.u_min <= -2.0 && box_.u_max >= 2.0,
+                        "planar cap box must contain the disc: {box_:?}"
+                    );
+                    assert!(
+                        box_.u_min < -2.0 || box_.u_max > 2.0,
+                        "planar cap box is expected to be padded, got {box_:?}"
+                    );
+                    // A disc is not a parametric rectangle, and the kernel says so.
+                    assert!(
+                        face.as_uvbox()?.is_none(),
+                        "a circular face must not be reported as a parametric rectangle"
+                    );
+                    saw_padded_plane = true;
+                }
+                SurfType::Cylinder => {
+                    // The side face IS a parametric rectangle, and there the
+                    // box is exact: u over the full period, v over the height.
+                    let exact = face
+                        .as_uvbox()?
+                        .expect("the cylindrical wall is a parametric rectangle");
+                    assert!(
+                        (exact.u_max - exact.u_min - std::f64::consts::TAU).abs() < 1e-9,
+                        "wall u should span exactly one period, got {}",
+                        exact.u_max - exact.u_min
+                    );
+                    assert!(
+                        (exact.v_max - exact.v_min - 6.0).abs() < 1e-9,
+                        "wall v should span exactly the height, got {}",
+                        exact.v_max - exact.v_min
+                    );
+                    saw_exact_cylinder = true;
+                }
+                _ => {}
+            }
+        }
+        assert!(saw_padded_plane, "expected planar cap faces");
+        assert!(saw_exact_cylinder, "expected a cylindrical wall face");
+    });
+
+    test!("stage4_face_periodicity_keeps_the_seamed_case", {
+        let _session = Session::start(test_config())?;
+
+        let body = Body::create_solid_cylinder(2.0, 6.0)?;
+        for face in &body.faces()? {
+            let (pu, pv) = face.periodicity()?;
+            match face.surface_type()? {
+                SurfType::Cylinder => {
+                    assert!(
+                        pu.is_periodic(),
+                        "the cylindrical wall must be periodic in u, got {pu:?}"
+                    );
+                    assert_eq!(pv, Periodicity::NonPeriodic, "wall v is not periodic");
+                }
+                SurfType::Plane => {
+                    assert_eq!(pu, Periodicity::NonPeriodic, "planar cap u");
+                    assert_eq!(pv, Periodicity::NonPeriodic, "planar cap v");
+                }
+                _ => {}
+            }
+        }
+    });
+
+    test!("stage4_arc_length_carries_an_enclosure", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let tau = std::f64::consts::TAU;
+
+        // PK_CURVE_find_length returns a nominal length AND a range bounding
+        // the true length. Dropping the range — as the plain `length()` does —
+        // discards the only statement of how well the answer is known.
+        let circ = Curve::circle(b, 3.0)?;
+        let (len, lo, hi) = circ.length_with_bounds((0.0, tau))?;
+        assert!(
+            (len - 3.0 * tau).abs() < 1e-9,
+            "circle circumference should be 2*pi*r = {}, got {len}",
+            3.0 * tau
+        );
+        assert!(
+            lo <= len && len <= hi,
+            "nominal length {len} must lie inside its own enclosure [{lo},{hi}]"
+        );
+        assert!(
+            (hi - lo) == 0.0,
+            "a circle's length is exact, so the enclosure should be degenerate, got width {:.3e}",
+            hi - lo
+        );
+
+        // An ellipse has no closed-form arc length, and the kernel says so by
+        // returning a strictly positive enclosure width.
+        let ell = Curve::ellipse(b, 5.0, 2.0)?;
+        let (len, lo, hi) = ell.length_with_bounds((0.0, tau))?;
+        assert!(
+            lo <= len && len <= hi,
+            "ellipse length {len} outside its enclosure [{lo},{hi}]"
+        );
+        assert!(
+            hi - lo > 0.0,
+            "an ellipse's arc length is approximated; the enclosure should have positive width"
+        );
+        assert!(
+            hi - lo < 1e-4,
+            "enclosure width {:.3e} is implausibly wide",
+            hi - lo
+        );
+        // Sanity: between the bounding circles of radius 2 and 5.
+        assert!(
+            len > 2.0 * tau && len < 5.0 * tau,
+            "ellipse perimeter {len} outside the bounding-circle range"
+        );
+    });
+
+    // =========================================================================
     // Summary
     // =========================================================================
 
