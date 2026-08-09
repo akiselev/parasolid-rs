@@ -217,7 +217,7 @@ pub struct PK_PARAM_sf_t {
     pub periodic: c_int,      // @24  PK_PARAM_periodic_*_c
     /// Class of the underlying iso-curve — see the struct docs. Formerly
     /// mis-named `convexity`.
-    pub curve_class: c_int,   // @28
+    pub curve_class: c_int, // @28
     pub closed: PK_LOGICAL_t, // @32 (value in low byte)
 }
 

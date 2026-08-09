@@ -332,12 +332,7 @@ impl Transform {
         };
         let mut n_faults: std::os::raw::c_int = 0;
         let mut faults: *mut PK_check_fault_t = std::ptr::null_mut();
-        pk_call!(PK_TRANSF_check(
-            self.tag,
-            &opts,
-            &mut n_faults,
-            &mut faults
-        ));
+        pk_call!(PK_TRANSF_check(self.tag, &opts, &mut n_faults, &mut faults));
         let array = unsafe { PkArray::from_raw(faults, n_faults) };
         Ok(array
             .iter()

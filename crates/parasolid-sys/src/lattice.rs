@@ -365,11 +365,11 @@ pub struct PK_LATTICE_ask_regions_o_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_LATTICE_ask_regions_r_t {
-    pub r_t_version: c_int,          // @0
-    pub n_regions: c_int,            // @4  — length of all three arrays
-    pub regions: *mut PK_REGION_t,   // @8
-    pub senses: *mut PK_LOGICAL_t,   // @16 — one byte per element
-    pub frames: *mut PK_ENTITY_t,    // @24 — PK_FRAME_t tags
+    pub r_t_version: c_int,        // @0
+    pub n_regions: c_int,          // @4  — length of all three arrays
+    pub regions: *mut PK_REGION_t, // @8
+    pub senses: *mut PK_LOGICAL_t, // @16 — one byte per element
+    pub frames: *mut PK_ENTITY_t,  // @24 — PK_FRAME_t tags
 }
 
 /// Options for `PK_LATTICE_create_by_core`.
@@ -665,9 +665,7 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
     /// Free results from `PK_LATTICE_ask_regions`.
-    pub fn PK_LATTICE_ask_regions_r_f(
-        results: *mut PK_LATTICE_ask_regions_r_t,
-    ) -> PK_ERROR_code_t;
+    pub fn PK_LATTICE_ask_regions_r_f(results: *mut PK_LATTICE_ask_regions_r_t) -> PK_ERROR_code_t;
 
     /// Create a lattice from a core geometry definition.
     ///

@@ -72,14 +72,29 @@ pub struct PK_range_guess_s_t {
 }
 
 /// Parametric bounds for a geometrical entity used in range functions.
+///
+/// **[journal-recovered]** from `PKU_journal_range_param_bound` (V37.01.243) —
+/// 40 bytes, and *not* the `{interval, uvbox}` pair the previous definition
+/// used (which was 48 bytes and put both members side by side). The real shape
+/// is a flag, a class discriminator, and a **union**: class `0x204` selects the
+/// interval form, anything else the uvbox form.
+///
+/// ```text
+/// @0  have_param_bound   (PK_LOGICAL_t)
+/// @4  param_bound_class  (0x204 = interval, else uvbox)
+/// @8  union { PK_INTERVAL_t (16B) | PK_UVBOX_t (32B) }
+/// ```
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_range_param_bound_t {
-    /// Parameter interval for curves.
-    pub interval: PK_INTERVAL_t,
-    /// UV-box for surfaces.
-    pub uvbox: PK_UVBOX_t,
+    pub have_param_bound: PK_LOGICAL_t, // @0
+    pub param_bound_class: c_int,       // @4
+    /// Union storage; interpret per `param_bound_class`.
+    pub bound: [c_double; 4],           // @8 (32 bytes, the larger member)
 }
+
+/// `param_bound_class` value selecting the interval (curve) form. [probed]
+pub const PK_range_param_bound_class_interval_c: c_int = 0x204;
 
 /// Details of one endpoint in a range result.
 #[repr(C)]
@@ -134,10 +149,10 @@ pub struct PK_range_1_r_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_range_bound_t {
-    pub have_lower_bound: PK_LOGICAL_t, // @0
-    pub lower_bound: c_double,          // @8
-    pub have_upper_bound: PK_LOGICAL_t, // @16
-    pub upper_bound: c_double,          // @24
+    pub have_upper_bound: PK_LOGICAL_t, // @0
+    pub upper_bound: c_double,          // @8
+    pub have_lower_bound: PK_LOGICAL_t, // @16
+    pub lower_bound: c_double,          // @24
 } // 32 bytes
 
 impl Default for PK_range_bound_t {
@@ -229,47 +244,112 @@ const _: () = {
     assert!(core::mem::size_of::<PK_TOPOL_range_vector_o_t>() == 104);
 };
 
-/// Options for `PK_GEOM_range` and related geometry range functions.
+/// Options for `PK_GEOM_range` — **[journal-recovered]**, 240 bytes.
+///
+/// The previous definition had the fields in the wrong order and the wrong
+/// sizes. Real layout, from `PK_GEOM_range`'s own journalling:
+///
+/// ```text
+/// @0   o_t_version        @4   have_tolerance     @8   tolerance
+/// @16  bound (32B)        @48  guesses[0] (48B)   @96  guesses[1] (48B)
+/// @144 range_type         @152 param_bound[0] (40B)
+/// @192 param_bound[1] (40B)                       @232 opt_level
+/// ```
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_GEOM_range_o_t {
-    pub o_t_version: c_int,
-    /// Whether a tolerance is supplied.
-    pub have_tolerance: PK_LOGICAL_t,
-    /// Accuracy tolerance.
-    pub tolerance: c_double,
-    /// Upper/lower distance bound.
-    pub bound: c_double,
-    /// Optimization level.
-    pub opt_level: PK_range_opt_t,
-    /// Type of range (min or max).
-    pub range_type: PK_range_type_t,
-    /// Initial estimate for entity 1.
-    pub guess_1: PK_range_guess_s_t,
-    /// Initial estimate for entity 2.
-    pub guess_2: PK_range_guess_s_t,
-    /// Parametric bounds for entity 1.
-    pub param_bound_1: PK_range_param_bound_t,
-    /// Parametric bounds for entity 2.
-    pub param_bound_2: PK_range_param_bound_t,
+    pub o_t_version: c_int,                     // @0
+    pub have_tolerance: PK_LOGICAL_t,           // @4
+    pub tolerance: c_double,                    // @8
+    pub bound: PK_range_bound_t,                // @16
+    pub guesses: [PK_range_guess_s_t; 2],       // @48
+    pub range_type: PK_range_type_t,            // @144
+    _pad: c_int,                                // @148
+    pub param_bound: [PK_range_param_bound_t; 2], // @152
+    pub opt_level: PK_range_opt_t,              // @232
 }
 
-/// Options for `PK_GEOM_range_vector` and related geometry-to-vector functions.
+const _: () = {
+    assert!(core::mem::size_of::<PK_GEOM_range_o_t>() == 240);
+};
+
+impl Default for PK_GEOM_range_o_t {
+    fn default() -> Self {
+        let no_guess = PK_range_guess_s_t {
+            guess_type: PK_range_guess_no_c,
+            parameters: [0.0, 0.0],
+            vector: [0.0, 0.0, 0.0],
+        };
+        let no_pbound = PK_range_param_bound_t {
+            have_param_bound: PK_LOGICAL_false,
+            param_bound_class: PK_range_param_bound_class_interval_c,
+            bound: [0.0; 4],
+        };
+        Self {
+            o_t_version: 1,
+            have_tolerance: PK_LOGICAL_false,
+            tolerance: 0.0,
+            bound: PK_range_bound_t::default(),
+            guesses: [no_guess, no_guess],
+            range_type: PK_range_type_minimum_c,
+            _pad: 0,
+            param_bound: [no_pbound, no_pbound],
+            opt_level: PK_range_opt_accuracy_c,
+        }
+    }
+}
+
+/// Options for `PK_GEOM_range_vector` — **[journal-recovered]**, 104 bytes.
+///
+/// The previous definition listed `opt_level` before `guess` and carried a
+/// `param_bound` the kernel does not read here; passing it produced
+/// `PK_ERROR_field_of_wrong_type` (5014) naming `local_opts`. Real layout
+/// matches `PK_TOPOL_range_vector_o_t` minus its trailing `param_entity`:
+///
+/// ```text
+/// @0  o_t_version  @4 have_tolerance  @8 tolerance
+/// @16 bound (32B)  @48 guess (48B)    @96 opt_level
+/// ```
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_GEOM_range_vector_o_t {
-    pub o_t_version: c_int,
-    /// Whether a tolerance is supplied.
-    pub have_tolerance: PK_LOGICAL_t,
-    /// Accuracy tolerance.
-    pub tolerance: c_double,
-    /// Optimization level.
-    pub opt_level: PK_range_opt_t,
-    /// Initial estimate.
-    pub guess: PK_range_guess_s_t,
-    /// Parametric bounds for the geometry.
-    pub param_bound: PK_range_param_bound_t,
+    pub o_t_version: c_int,           // @0
+    pub have_tolerance: PK_LOGICAL_t, // @4
+    pub tolerance: c_double,          // @8
+    pub bound: PK_range_bound_t,      // @16
+    pub guess: PK_range_guess_s_t,    // @48
+    pub opt_level: PK_range_opt_t,    // @96
 }
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_GEOM_range_vector_o_t>() == 104);
+};
+
+impl Default for PK_GEOM_range_vector_o_t {
+    fn default() -> Self {
+        // Zero is NOT a valid token for `guess_type` or `opt_level`; leaving
+        // them zeroed makes the kernel reject the whole struct with
+        // PK_ERROR_field_of_wrong_type (5014) naming `local_opts`.
+        Self {
+            o_t_version: 1,
+            have_tolerance: PK_LOGICAL_false,
+            tolerance: 0.0,
+            bound: PK_range_bound_t::default(),
+            guess: PK_range_guess_s_t {
+                guess_type: PK_range_guess_no_c,
+                parameters: [0.0, 0.0],
+                vector: [0.0, 0.0, 0.0],
+            },
+            opt_level: PK_range_opt_accuracy_c,
+        }
+    }
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_range_bound_t>() == 32);
+    assert!(core::mem::size_of::<PK_range_param_bound_t>() == 40);
+    assert!(core::mem::size_of::<PK_range_guess_s_t>() == 48);
+};
 
 /// Options for local range functions.
 #[repr(C)]
@@ -295,50 +375,127 @@ pub struct PK_GEOM_range_local_o_t {
 // =============================================================================
 
 /// Classification of a clash between two topological entities.
+///
+/// **[probed]** — recovered by running `PK_TOPOL_clash` over known
+/// configurations (`crates/parasolid-test/src/bin/range_probe.rs`). The
+/// previous constants were plain 0..4 and **wrong**, the same fabricated-enum
+/// shape as the old `PK_ERROR_*` table.
+///
+/// | configuration | observed token |
+/// |---|---:|
+/// | identical blocks (full overlap) | 7 |
+/// | partially overlapping blocks | 7 |
+/// | blocks sharing exactly one face | 4 |
+/// | small block strictly inside a large one | 2 |
+/// | disjoint blocks | *no records* |
+///
+/// Only these three values have been observed. The containment case was not
+/// probed in both directions, so no separate `b_in_a` constant is claimed.
 pub type PK_TOPOL_clash_type_t = c_int;
-/// Bounding topologies cross; entities share common volume/area/length.
-pub const PK_TOPOL_clash_interfere_c: PK_TOPOL_clash_type_t = 0;
-/// Bounding topologies touch but do not share common interior.
-pub const PK_TOPOL_clash_abut_no_class_c: PK_TOPOL_clash_type_t = 1;
-/// Entity A entirely contained within entity B.
-pub const PK_TOPOL_clash_a_in_b_c: PK_TOPOL_clash_type_t = 2;
-/// Entity B entirely contained within entity A.
-pub const PK_TOPOL_clash_b_in_a_c: PK_TOPOL_clash_type_t = 3;
-/// Wire body clash detected (no further classification).
-pub const PK_TOPOL_clash_exists_c: PK_TOPOL_clash_type_t = 4;
+
+/// Entities share common interior (overlap, partial or total). [probed]
+pub const PK_TOPOL_clash_interfere_c: PK_TOPOL_clash_type_t = 7;
+/// Entities touch but share no common interior. [probed]
+pub const PK_TOPOL_clash_abut_c: PK_TOPOL_clash_type_t = 4;
+/// One entity lies strictly inside the other. [probed]
+pub const PK_TOPOL_clash_contained_c: PK_TOPOL_clash_type_t = 2;
 
 /// Options for `PK_TOPOL_clash`.
+///
+/// **[journal-recovered]** from `PKU_journal_TOPOL_clash_o` (V37.01.243). The
+/// previous definition was wrong in two ways that matter: it omitted the three
+/// leading exception-list fields entirely, and it modelled the four logicals as
+/// 4-byte ints when the kernel packs them as **single bytes** at 24..27. Every
+/// field after `o_t_version` was therefore at the wrong offset.
+///
+/// ```text
+/// @0  o_t_version
+/// @4  n_op_ex               number of excepted topology pairs
+/// @8  op_ex1                PK_TOPOL_t* — exception list, side 1
+/// @16 op_ex2                PK_TOPOL_t* — exception list, side 2
+/// @24 find_all              (1 byte)
+/// @25 find_intersect        (1 byte)
+/// @26 mul_target_tf         (1 byte)
+/// @27 mul_tool_tf           (1 byte)
+/// @28 target_owner
+/// @32 tool_owner
+/// @36 n_parts_with_scales
+/// @40 parts_with_scales     PK_PART_t*
+/// @48 scale_factors
+/// ```
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_clash_o_t {
-    pub o_t_version: c_int,
-    /// Find all clashes (`PK_LOGICAL_true`) or stop after first (`PK_LOGICAL_false`, default).
-    pub find_all: PK_LOGICAL_t,
-    /// Classify each clash type; populates `clash_types` in result.
-    pub find_intersect: PK_LOGICAL_t,
+    pub o_t_version: c_int,        // @0
+    pub n_op_ex: c_int,            // @4
+    pub op_ex1: *const PK_TOPOL_t, // @8
+    pub op_ex2: *const PK_TOPOL_t, // @16
+    /// Find all clashes, or stop after the first (default).
+    pub find_all: u8, // @24
+    /// Classify each clash; populates `clash_type` in the result elements.
+    pub find_intersect: u8, // @25
     /// Supply per-target transforms.
-    pub mul_target_tf: PK_LOGICAL_t,
+    pub mul_target_tf: u8, // @26
     /// Supply per-tool transforms.
-    pub mul_tool_tf: PK_LOGICAL_t,
-    /// Owning body of targets (for face-level classification).
-    pub target_owner: PK_BODY_t,
-    /// Owning body of tools.
-    pub tool_owner: PK_BODY_t,
+    pub mul_tool_tf: u8, // @27
+    /// Owning body of the targets (for face-level classification).
+    pub target_owner: PK_BODY_t, // @28
+    /// Owning body of the tools.
+    pub tool_owner: PK_BODY_t, // @32
+    pub n_parts_with_scales: c_int, // @36
+    pub parts_with_scales: *const PK_PART_t, // @40
+    pub scale_factors: *const c_double, // @48
 }
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_TOPOL_clash_o_t>() == 56);
+};
 
 impl Default for PK_TOPOL_clash_o_t {
     fn default() -> Self {
         Self {
             o_t_version: 1,
-            find_all: PK_LOGICAL_false,
-            find_intersect: PK_LOGICAL_false,
-            mul_target_tf: PK_LOGICAL_false,
-            mul_tool_tf: PK_LOGICAL_false,
+            n_op_ex: 0,
+            op_ex1: core::ptr::null(),
+            op_ex2: core::ptr::null(),
+            find_all: 0,
+            find_intersect: 0,
+            mul_target_tf: 0,
+            mul_tool_tf: 0,
             target_owner: PK_ENTITY_null,
             tool_owner: PK_ENTITY_null,
+            n_parts_with_scales: 0,
+            parts_with_scales: core::ptr::null(),
+            scale_factors: core::ptr::null(),
         }
     }
 }
+
+/// One clash reported by `PK_TOPOL_clash` — **[decompile-recovered]**, 20 bytes.
+///
+/// `PK_TOPOL_clash_t` was previously a bare `c_int` typedef, so the returned
+/// array could not be read at all. The journalling loop in the real
+/// `PK_TOPOL_clash` (export @18043f9a0) walks the array with a stride of
+/// **5 ints**, emitting `target`, `target_index`, `tool`, `tool_index`,
+/// `clash_type` in that order.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_TOPOL_clash_rec_t {
+    /// The clashing target topology.
+    pub target: PK_TOPOL_t, // @0
+    /// Index of that target in the caller's `targets` array.
+    pub target_index: c_int, // @4
+    /// The clashing tool topology.
+    pub tool: PK_TOPOL_t, // @8
+    /// Index of that tool in the caller's `tools` array.
+    pub tool_index: c_int, // @12
+    /// Classification, populated when `find_intersect` is set.
+    pub clash_type: PK_TOPOL_clash_type_t, // @16
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_TOPOL_clash_rec_t>() == 20);
+};
 
 /// Result structure for `PK_TOPOL_clash`.
 #[repr(C)]

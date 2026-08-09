@@ -41,14 +41,22 @@ fn dump_curve_param(label: &str, c: &Curve) {
     // length — a conservative enclosure, not just a number.
     let len = {
         let mut l = 0.0f64;
-        let mut range = PK_INTERVAL_t { low: 0.0, high: 0.0 };
+        let mut range = PK_INTERVAL_t {
+            low: 0.0,
+            high: 0.0,
+        };
         let iv = PK_INTERVAL_t {
             low: sf.range.low,
             high: sf.range.high,
         };
         let lrc = unsafe { PK_CURVE_find_length(c.tag(), iv, &mut l, &mut range) };
         if lrc == PK_ERROR_no_errors {
-            format!("{l:.6} in [{:.6},{:.6}] (w={:.2e})", range.low, range.high, range.high - range.low)
+            format!(
+                "{l:.6} in [{:.6},{:.6}] (w={:.2e})",
+                range.low,
+                range.high,
+                range.high - range.low
+            )
         } else {
             format!("err {lrc}")
         }
@@ -124,10 +132,34 @@ fn main() {
 
     println!("\n== seam identification: is u ≡ u+period exactly? ==");
     let tau = std::f64::consts::TAU;
-    check_seam("cylinder u seam", &Surf::cylinder(b, 2.0).unwrap(), 0.0, tau, 1.0);
-    check_seam("sphere u seam", &Surf::sphere(b, 4.0).unwrap(), 0.0, tau, 0.3);
-    check_seam("torus u seam", &Surf::torus(b, 5.0, 1.5).unwrap(), 0.0, tau, 0.4);
-    check_seam("torus v seam", &Surf::torus(b, 5.0, 1.5).unwrap(), 0.4, tau, 0.0);
+    check_seam(
+        "cylinder u seam",
+        &Surf::cylinder(b, 2.0).unwrap(),
+        0.0,
+        tau,
+        1.0,
+    );
+    check_seam(
+        "sphere u seam",
+        &Surf::sphere(b, 4.0).unwrap(),
+        0.0,
+        tau,
+        0.3,
+    );
+    check_seam(
+        "torus u seam",
+        &Surf::torus(b, 5.0, 1.5).unwrap(),
+        0.0,
+        tau,
+        0.4,
+    );
+    check_seam(
+        "torus v seam",
+        &Surf::torus(b, 5.0, 1.5).unwrap(),
+        0.4,
+        tau,
+        0.0,
+    );
     println!("  (a nonzero |dP| would mean the seam is NOT a clean identification)");
 
     println!("\n== poles: how does a degenerate boundary appear? ==");
@@ -162,7 +194,10 @@ fn main() {
     // A full cylinder body: the side face is periodic in u; the caps are planar.
     let body = Body::create_solid_cylinder(2.0, 6.0).unwrap();
     for (idx, face) in body.faces().unwrap().iter().enumerate() {
-        let st = face.surface_type().map(|t| format!("{t:?}")).unwrap_or_default();
+        let st = face
+            .surface_type()
+            .map(|t| format!("{t:?}"))
+            .unwrap_or_default();
         let mut uvbox = PK_UVBOX_t { param: [0.0; 4] };
         let rc = unsafe { PK_FACE_find_uvbox(face.tag(), &mut uvbox) };
         let mut u_per: PK_PARAM_periodic_t = 0;

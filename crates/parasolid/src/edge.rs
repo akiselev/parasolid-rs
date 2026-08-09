@@ -345,7 +345,11 @@ impl Edge {
     /// `PK_EDGE_optimise_failure_c`; `achieved_deviation` (the maximum
     /// measured deviation) is returned in both cases. An unrecognised result
     /// token is reported as an error rather than mapped onto either outcome.
-    pub fn optimise(&self, upper_bound: Option<f64>, optimise_short: bool) -> PsResult<(bool, f64)> {
+    pub fn optimise(
+        &self,
+        upper_bound: Option<f64>,
+        optimise_short: bool,
+    ) -> PsResult<(bool, f64)> {
         let mut opts = PK_EDGE_optimise_o_t::default();
         if let Some(d) = upper_bound {
             opts.set_max_dev = PK_EDGE_max_dev_supplied_c;

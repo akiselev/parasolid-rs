@@ -20,6 +20,114 @@ pub struct RangeResult {
     pub distance: f64,
     pub point_1: Vec3,
     pub point_2: Vec3,
+    /// How the kernel classifies this answer. `Found` is the only status that
+    /// asserts a real minimum; the bounded-out statuses mean the search was cut
+    /// short by a supplied bound and the distance is only a one-sided fact.
+    pub status: RangeStatus,
+    /// The witness on the first entity: which sub-entity the closest point
+    /// actually lies on, and its parameters there.
+    pub witness_1: RangeWitness,
+    /// The witness on the second entity (for point queries this describes the
+    /// entity end; the point has no sub-entity).
+    pub witness_2: Option<RangeWitness>,
+}
+
+/// Classification of a range/distance answer (`PK_range_result_t`).
+///
+/// # This is not a multiplicity
+///
+/// `Found` says a minimum was located — it does **not** say the minimum is
+/// unique. A point on a cylinder's axis is equidistant from every point of the
+/// wall, and the kernel still answers `Found` with one arbitrary (though
+/// deterministic) witness. Callers that need uniqueness must establish it
+/// themselves; nothing in this result carries it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RangeStatus {
+    /// A minimum was found.
+    Found,
+    /// The search stopped against the supplied lower bound.
+    BoundedBelow,
+    /// The search stopped against the supplied upper bound.
+    BoundedAbove,
+    /// No qualifying range was found.
+    NotFound,
+    /// A token outside the documented set.
+    Other(i32),
+}
+
+impl RangeStatus {
+    fn from_token(t: PK_range_result_t) -> Self {
+        match t {
+            PK_range_result_found_c => RangeStatus::Found,
+            PK_range_result_lower_c => RangeStatus::BoundedBelow,
+            PK_range_result_upper_c => RangeStatus::BoundedAbove,
+            PK_range_result_not_found_c => RangeStatus::NotFound,
+            other => RangeStatus::Other(other),
+        }
+    }
+
+    /// Whether this status asserts an actual minimum distance.
+    pub fn is_found(&self) -> bool {
+        matches!(self, RangeStatus::Found)
+    }
+}
+
+/// Where a closest point actually lies (`PK_range_end_t`).
+///
+/// The sub-entity is the part of the answer most easily lost: for a block, a
+/// query can land on a face, an edge or a vertex, and which one it is changes
+/// what the caller may conclude.
+#[derive(Debug, Clone, Copy)]
+pub struct RangeWitness {
+    /// The queried entity.
+    pub entity: Entity,
+    /// The sub-entity the closest point lies on (face / edge / vertex), or
+    /// `None` when the kernel reports none.
+    pub sub_entity: Option<Entity>,
+    /// Position of the closest point.
+    pub position: Vec3,
+    /// Parameters at that point — `t` in `.0` for a curve/edge, `(u, v)` for a
+    /// surface/face.
+    pub parameters: (f64, f64),
+}
+
+impl RangeResult {
+    /// Build from a one-sided range result (entity vs a supplied point).
+    pub(crate) fn from_range_1(r: &PK_range_1_r_t, status: PK_range_result_t, probe: Vec3) -> Self {
+        RangeResult {
+            distance: r.distance,
+            point_1: Vec3::from_pk(r.end.position),
+            point_2: probe,
+            status: RangeStatus::from_token(status),
+            witness_1: RangeWitness::from_end(&r.end),
+            witness_2: None,
+        }
+    }
+}
+
+impl RangeWitness {
+    fn from_end(e: &PK_range_end_t) -> Self {
+        RangeWitness {
+            entity: Entity::from_tag(e.entity),
+            sub_entity: (e.sub_entity != PK_ENTITY_null).then(|| Entity::from_tag(e.sub_entity)),
+            position: Vec3::from_pk(e.position),
+            parameters: (e.parameters[0], e.parameters[1]),
+        }
+    }
+}
+
+/// One clash reported by [`Entity::clash_records`].
+#[derive(Debug, Clone, Copy)]
+pub struct ClashRecord {
+    pub target: Entity,
+    /// Index of the target in the caller's array.
+    pub target_index: i32,
+    pub tool: Entity,
+    /// Index of the tool in the caller's array.
+    pub tool_index: i32,
+    /// Raw classification token. Deliberately not mapped to an enum: the
+    /// `PK_TOPOL_clash_*_c` constants are unverified guesses.
+    pub clash_type_token: i32,
 }
 
 /// Oriented (non-axis-aligned) bounding box: three orthonormal basis axes plus
@@ -550,16 +658,31 @@ impl Entity {
     pub fn clashes_with(&self, other: Entity) -> PsResult<bool> {
         let mut targets = [self.tag];
         let mut tools = [other.tag];
+        // The transform arrays are NOT optional: passing NULL makes the kernel
+        // reject argument 3 (`tf1`) with 9999. The reference's "substitutes an
+        // identity transform internally" means a per-entity array whose entries
+        // may be PK_ENTITY_null — not a null array pointer. Previously
+        // misdiagnosed as needing a fuller frustrum.
+        let mut tf1 = [PK_ENTITY_null];
+        let mut tf2 = [PK_ENTITY_null];
+        // Real options are required too: with NULL the call faults. The layout
+        // is journal-recovered (56 bytes); `find_intersect` asks the kernel to
+        // classify each clash rather than merely report one.
+        let mut opts = PK_TOPOL_clash_o_t {
+            find_all: 1,
+            find_intersect: 1,
+            ..PK_TOPOL_clash_o_t::default()
+        };
         let mut n_clash: std::os::raw::c_int = 0;
         let mut clashes: *mut PK_TOPOL_clash_t = std::ptr::null_mut();
         pk_call!(PK_TOPOL_clash(
             1,
             targets.as_mut_ptr(),
-            std::ptr::null_mut(),
+            tf1.as_mut_ptr(),
             1,
             tools.as_mut_ptr(),
-            std::ptr::null_mut(),
-            std::ptr::null_mut(),
+            tf2.as_mut_ptr(),
+            &mut opts,
             &mut n_clash,
             &mut clashes,
         ));
@@ -569,6 +692,56 @@ impl Entity {
             }
         }
         Ok(n_clash > 0)
+    }
+
+    /// Clash detection with the per-clash records the kernel actually returns
+    /// (`PK_TOPOL_clash`).
+    ///
+    /// Each record names the clashing target and tool, their indices in the
+    /// caller's arrays, and a `clash_type` classification. **The `clash_type`
+    /// token values in `parasolid_sys` are `[guess]`** — the raw integer is
+    /// surfaced here rather than being mapped onto an unverified enum.
+    pub fn clash_records(&self, other: Entity) -> PsResult<Vec<ClashRecord>> {
+        let mut targets = [self.tag];
+        let mut tools = [other.tag];
+        let mut tf1 = [PK_ENTITY_null];
+        let mut tf2 = [PK_ENTITY_null];
+        let mut opts = PK_TOPOL_clash_o_t {
+            find_all: 1,
+            find_intersect: 1,
+            ..PK_TOPOL_clash_o_t::default()
+        };
+        let mut n_clash: std::os::raw::c_int = 0;
+        let mut clashes: *mut PK_TOPOL_clash_t = std::ptr::null_mut();
+        pk_call!(PK_TOPOL_clash(
+            1,
+            targets.as_mut_ptr(),
+            tf1.as_mut_ptr(),
+            1,
+            tools.as_mut_ptr(),
+            tf2.as_mut_ptr(),
+            &mut opts,
+            &mut n_clash,
+            &mut clashes,
+        ));
+        let mut out = Vec::new();
+        if !clashes.is_null() {
+            let recs = clashes as *const PK_TOPOL_clash_rec_t;
+            for i in 0..n_clash.max(0) as usize {
+                let r = unsafe { *recs.add(i) };
+                out.push(ClashRecord {
+                    target: Entity::from_tag(r.target),
+                    target_index: r.target_index,
+                    tool: Entity::from_tag(r.tool),
+                    tool_index: r.tool_index,
+                    clash_type_token: r.clash_type,
+                });
+            }
+            unsafe {
+                let _ = PK_MEMORY_free(clashes as *mut std::os::raw::c_void);
+            }
+        }
+        Ok(out)
     }
 
     /// Minimum distance between this (topological) entity and `other`, with the
@@ -588,6 +761,9 @@ impl Entity {
             distance: r.distance,
             point_1: Vec3::from_pk(r.end_1.position),
             point_2: Vec3::from_pk(r.end_2.position),
+            status: RangeStatus::from_token(status),
+            witness_1: RangeWitness::from_end(&r.end_1),
+            witness_2: Some(RangeWitness::from_end(&r.end_2)),
         })
     }
 
@@ -609,6 +785,9 @@ impl Entity {
             distance: r.distance,
             point_1: Vec3::from_pk(r.end.position),
             point_2: point,
+            status: RangeStatus::from_token(status),
+            witness_1: RangeWitness::from_end(&r.end),
+            witness_2: None,
         })
     }
 
@@ -703,5 +882,38 @@ impl fmt::Debug for Entity {
 impl fmt::Display for Entity {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "entity#{}", self.tag)
+    }
+}
+
+impl crate::body::Body {
+    /// The extreme point of this body in a direction, and the topology that
+    /// realises it (`PK_BODY_find_extreme`).
+    ///
+    /// The three directions are applied in order as tie-breakers: `direction_1`
+    /// selects the extreme, then `direction_2` and `direction_3` resolve
+    /// remaining ties. Three independent directions pin a vertex on a block;
+    /// fewer would leave a whole face or edge extremal, and the returned
+    /// topology says which happened.
+    pub fn find_extreme(
+        &self,
+        direction_1: Vec3,
+        direction_2: Vec3,
+        direction_3: Vec3,
+    ) -> PsResult<(Vec3, Entity)> {
+        let d1 = direction_1.to_pk();
+        let d2 = direction_2.to_pk();
+        let d3 = direction_3.to_pk();
+        let mut ex = PK_VECTOR_t::default();
+        let mut topol: PK_TOPOL_t = PK_ENTITY_null;
+        pk_call!(PK_BODY_find_extreme(
+            self.tag(),
+            &d1,
+            &d2,
+            &d3,
+            std::ptr::null_mut(),
+            &mut ex,
+            &mut topol,
+        ));
+        Ok((Vec3::from_pk(ex), Entity::from_tag(topol)))
     }
 }

@@ -144,7 +144,14 @@ impl crate::surf::Surf {
     /// direction. `triangular` selects the packed table that omits terms with
     /// `i + j > max(n_u, n_v)` — cheaper, and the natural shape when only total
     /// order matters.
-    pub fn eval_jet(&self, u: f64, v: f64, n_u: usize, n_v: usize, triangular: bool) -> PsResult<SurfJet> {
+    pub fn eval_jet(
+        &self,
+        u: f64,
+        v: f64,
+        n_u: usize,
+        n_v: usize,
+        triangular: bool,
+    ) -> PsResult<SurfJet> {
         let count = SurfJet::slot_count(n_u, n_v, triangular);
         let mut raw = vec![0.0f64; count * 3];
         let uv = [u, v];

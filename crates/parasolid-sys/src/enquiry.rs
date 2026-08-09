@@ -577,10 +577,63 @@ pub struct PK_ENTITY_range_o_t {
     pub output_scale: c_int,                           // @136
 } // 144 bytes
 
-/// Results from `PK_ENTITY_range`.
+/// One endpoint of an `PK_ENTITY_range` solution — **[journal-recovered]**
+/// from `PKU_journal_ENTITY_range_end` (V37.01.243).
+///
+/// Distinct from [`PK_range_end_t`] (used by `PK_TOPOL_range`): this record has
+/// a leading int and a trailing `inside` classification that the simpler form
+/// lacks.
+///
+/// ```text
+/// @0  (leading int, journalled as "entity" before the tag itself)
+/// @4  entity
+/// @8  sub_entity
+/// @16 vector          PK_VECTOR_t (3 doubles)
+/// @40 parameters[0]
+/// @48 parameters[1]
+/// @56 inside
+/// ```
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_ENTITY_range_end_t {
+    pub leading: c_int,            // @0
+    pub entity: PK_ENTITY_t,       // @4
+    pub sub_entity: PK_ENTITY_t,   // @8
+    _pad: c_int,                   // @12 (alignment before the vector)
+    pub vector: PK_VECTOR_t,       // @16
+    pub parameters: [c_double; 2], // @40
+    pub inside: c_int,             // @56
+    _tail: c_int,                  // @60
+}
+
+/// Results from `PK_ENTITY_range` — **[journal-recovered]** from
+/// `PKU_journal_ENTITY_range_r` (V37.01.243). Previously an opaque stub, so the
+/// **multi-solution** answers this call exists to provide could not be read.
+///
+/// All four arrays are `n_results` long and index in parallel: `results[i]` is
+/// the per-solution `PK_range_result_t` status, `distances[i]` its distance,
+/// and `ends_1[i]` / `ends_2[i]` the witness on each side.
+///
+/// ```text
+/// @0  r_t_version
+/// @4  n_results
+/// @8  results     PK_range_result_t*   (stride 4)
+/// @16 distances   double*              (stride 8)
+/// @24 ends_1      PK_ENTITY_range_end_t*
+/// @32 ends_2      PK_ENTITY_range_end_t*
+/// ```
+///
+/// Layout is decompile-derived and **not yet runtime-validated** — the
+/// multi-solution call is not wrapped. Treat as unconfirmed until it is.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PK_ENTITY_range_r_t {
-    _private: [u8; 0],
+    pub r_t_version: c_int,                 // @0
+    pub n_results: c_int,                   // @4
+    pub results: *mut PK_range_result_t,    // @8
+    pub distances: *mut c_double,           // @16
+    pub ends_1: *mut PK_ENTITY_range_end_t, // @24
+    pub ends_2: *mut PK_ENTITY_range_end_t, // @32
 }
 
 /// Options for `PK_ENTITY_range_vector`.
@@ -629,6 +682,63 @@ pub struct PK_LOOP_offset_planar_r_t {
 #[repr(C)]
 pub struct PK_EDGE_ask_convexity_o_t {
     _private: [u8; 0],
+}
+
+/// Options for `PK_CURVE_find_box` — **[decompile-recovered]**, 24 bytes.
+///
+/// `PK_CURVE_find_box` reads `*options` as the version, `options[1]`'s low byte
+/// as `have_interval`, and `options + 2` (byte 8) as a `PK_INTERVAL_t`; it also
+/// journals exactly those fields. When `have_interval` is false the box covers
+/// the whole curve.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_CURVE_find_box_o_t {
+    pub o_t_version: c_int,          // @0
+    pub have_interval: PK_LOGICAL_t, // @4
+    pub interval: PK_INTERVAL_t,     // @8
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_CURVE_find_box_o_t>() == 24);
+};
+
+impl Default for PK_CURVE_find_box_o_t {
+    fn default() -> Self {
+        Self {
+            o_t_version: 1,
+            have_interval: PK_LOGICAL_false,
+            interval: PK_INTERVAL_t {
+                low: 0.0,
+                high: 0.0,
+            },
+        }
+    }
+}
+
+/// Options for `PK_SURF_find_box` — **[decompile-recovered]**, 40 bytes.
+///
+/// Same shape as [`PK_CURVE_find_box_o_t`] with a `PK_UVBOX_t` (4 doubles) at
+/// byte 8 instead of an interval.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_SURF_find_box_o_t {
+    pub o_t_version: c_int,       // @0
+    pub have_uvbox: PK_LOGICAL_t, // @4
+    pub uvbox: PK_UVBOX_t,        // @8
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_SURF_find_box_o_t>() == 40);
+};
+
+impl Default for PK_SURF_find_box_o_t {
+    fn default() -> Self {
+        Self {
+            o_t_version: 1,
+            have_uvbox: PK_LOGICAL_false,
+            uvbox: PK_UVBOX_t { param: [0.0; 4] },
+        }
+    }
 }
 
 #[link(name = "pskernel")]

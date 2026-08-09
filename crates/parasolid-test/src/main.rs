@@ -3915,7 +3915,11 @@ fn main() {
             Severity::Mild,
             "severity read from offset 68, not guessed from the code"
         );
-        assert_eq!(d.bad_args.len(), 1, "kernel reports exactly one bad argument");
+        assert_eq!(
+            d.bad_args.len(),
+            1,
+            "kernel reports exactly one bad argument"
+        );
         assert_eq!(d.bad_args[0].index, 1, "first argument is the bad one");
         assert_eq!(
             d.bad_args[0].name.as_deref(),
@@ -3954,7 +3958,10 @@ fn main() {
             (PK_ERROR_distance_le_0, "PK_ERROR_distance_le_0"),
             (PK_ERROR_not_an_entity, "PK_ERROR_not_an_entity"),
             (PK_ERROR_o_t_version_unknown, "PK_ERROR_o_t_version_unknown"),
-            (PK_ERROR_o_t_version_incorrect, "PK_ERROR_o_t_version_incorrect"),
+            (
+                PK_ERROR_o_t_version_incorrect,
+                "PK_ERROR_o_t_version_incorrect",
+            ),
             (PK_ERROR_field_of_wrong_type, "PK_ERROR_field_of_wrong_type"),
             (PK_ERROR_not_general, "PK_ERROR_not_general"),
             (PK_ERROR_cant_be_aborted, "PK_ERROR_cant_be_aborted"),
@@ -3972,7 +3979,10 @@ fn main() {
             let mut back: PK_ERROR_sf_t = unsafe { std::mem::zeroed() };
             let mut was_error: PK_LOGICAL_t = PK_LOGICAL_false;
             unsafe { PK_ERROR_ask_last(&mut was_error, &mut back) };
-            assert_eq!(was_error, PK_LOGICAL_true, "raise({code}) recorded no error");
+            assert_eq!(
+                was_error, PK_LOGICAL_true,
+                "raise({code}) recorded no error"
+            );
 
             let bytes: Vec<u8> = back.code_token.iter().map(|&c| c as u8).collect();
             let end = bytes.iter().position(|&b| b == 0).unwrap_or(bytes.len());
@@ -3994,7 +4004,11 @@ fn main() {
         // it, which is why query_last_error() guards on the expected code.
         let _ = Body::create_solid_block(-1.0, 1.0, 1.0).expect_err("must fail");
         let good = Body::create_solid_block(2.0, 2.0, 2.0)?;
-        assert_eq!(good.faces()?.len(), 6, "the successful call really succeeded");
+        assert_eq!(
+            good.faces()?.len(),
+            6,
+            "the successful call really succeeded"
+        );
 
         let mut sf: PK_ERROR_sf_t = unsafe { std::mem::zeroed() };
         let mut was_error: PK_LOGICAL_t = PK_LOGICAL_false;
@@ -4296,11 +4310,7 @@ fn main() {
         // `axis` must be a unit vector — (1,1,1) is rejected with
         // PK_ERROR_not_a_unit_vector (pinned in stage2_rotation_axis_must_be_unit).
         let s3 = 1.0 / 3.0_f64.sqrt();
-        let rot = Transform::rotation(
-            Vec3::new(1.0, 2.0, 3.0),
-            Vec3::new(s3, s3, s3),
-            0.7,
-        )?;
+        let rot = Transform::rotation(Vec3::new(1.0, 2.0, 3.0), Vec3::new(s3, s3, s3), 0.7)?;
 
         let without = rot.classify(false)?;
         assert!(
@@ -4309,8 +4319,12 @@ fn main() {
         );
 
         let with = rot.classify(true)?;
-        let unit = with.unit_rows_deviations.expect("unit deviations requested");
-        let orth = with.orthog_rows_deviations.expect("orthog deviations requested");
+        let unit = with
+            .unit_rows_deviations
+            .expect("unit deviations requested");
+        let orth = with
+            .orthog_rows_deviations
+            .expect("orthog deviations requested");
         for (label, v) in [("unit", unit), ("orthog", orth)] {
             for (axis, value) in [("x", v.x), ("y", v.y), ("z", v.z)] {
                 assert!(
@@ -4325,13 +4339,12 @@ fn main() {
         let _session = Session::start(test_config())?;
 
         // A valid transform has no faults.
-        let rot = Transform::rotation(
-            Vec3::new(0.0, 0.0, 0.0),
-            Vec3::new(0.0, 1.0, 0.0),
-            0.4,
-        )?;
+        let rot = Transform::rotation(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0), 0.4)?;
         let faults = rot.check(10)?;
-        assert!(faults.is_empty(), "valid rotation reported faults: {faults:?}");
+        assert!(
+            faults.is_empty(),
+            "valid rotation reported faults: {faults:?}"
+        );
 
         // A deliberately non-orthonormal matrix: rows 0 and 1 are parallel, so
         // the linear part is singular. The question is whether the kernel
@@ -4382,12 +4395,8 @@ fn main() {
         let sphere = Surf::sphere(basis, 5.0)?;
 
         let s3 = 1.0 / 3.0_f64.sqrt();
-        let oblique = Transform::rotation(
-            Vec3::new(0.0, 0.0, 0.0),
-            Vec3::new(s3, s3, s3),
-            0.9,
-        )?
-        .then(&Transform::translation(7.0, -2.0, 3.0)?)?;
+        let oblique = Transform::rotation(Vec3::new(0.0, 0.0, 0.0), Vec3::new(s3, s3, s3), 0.9)?
+            .then(&Transform::translation(7.0, -2.0, 3.0)?)?;
 
         let out = oblique.apply_to_geoms(&[sphere.tag()])?;
         assert_eq!(out.len(), 1, "one geom in, one out");
@@ -4644,11 +4653,14 @@ fn main() {
                 .d(i, j)
                 .unwrap_or_else(|| panic!("triangular table should carry d{i}u.d{j}v"));
             assert!(
-                (a.x - b.x).abs() < 1e-12
-                    && (a.y - b.y).abs() < 1e-12
-                    && (a.z - b.z).abs() < 1e-12,
+                (a.x - b.x).abs() < 1e-12 && (a.y - b.y).abs() < 1e-12 && (a.z - b.z).abs() < 1e-12,
                 "packings disagree at d{i}u.d{j}v: rect ({:.9},{:.9},{:.9}) vs tri ({:.9},{:.9},{:.9})",
-                a.x, a.y, a.z, b.x, b.y, b.z
+                a.x,
+                a.y,
+                a.z,
+                b.x,
+                b.y,
+                b.z
             );
         }
 
@@ -4696,7 +4708,12 @@ fn main() {
                     && (got.y - want.y).abs() < 1e-9
                     && (got.z - want.z).abs() < 1e-9,
                 "d{k}/dt = ({:.6},{:.6},{:.6}), expected ({:.6},{:.6},{:.6})",
-                got.x, got.y, got.z, want.x, want.y, want.z
+                got.x,
+                got.y,
+                got.z,
+                want.x,
+                want.y,
+                want.z
             );
         }
         assert!(jet.d(4).is_none(), "order 4 was not requested");
@@ -4710,7 +4727,9 @@ fn main() {
         assert!(
             (tan.x + s).abs() < 1e-9 && (tan.y - c).abs() < 1e-9,
             "tangent direction wrong: ({:.6},{:.6},{:.6})",
-            tan.x, tan.y, tan.z
+            tan.x,
+            tan.y,
+            tan.z
         );
     });
 
@@ -4935,15 +4954,11 @@ fn main() {
                 plain.d(k).expect("plain"),
             );
             assert!(
-                (l.x - r.x).abs() < 1e-12
-                    && (l.y - r.y).abs() < 1e-12
-                    && (l.z - r.z).abs() < 1e-12,
+                (l.x - r.x).abs() < 1e-12 && (l.y - r.y).abs() < 1e-12 && (l.z - r.z).abs() < 1e-12,
                 "hands disagree at order {k} on a smooth curve"
             );
             assert!(
-                (l.x - p.x).abs() < 1e-12
-                    && (l.y - p.y).abs() < 1e-12
-                    && (l.z - p.z).abs() < 1e-12,
+                (l.x - p.x).abs() < 1e-12 && (l.y - p.y).abs() < 1e-12 && (l.z - p.z).abs() < 1e-12,
                 "handed and two-sided evaluation disagree at order {k}"
             );
         }
@@ -5233,6 +5248,524 @@ fn main() {
         assert!(
             len > 2.0 * tau && len < 5.0 * tau,
             "ellipse perimeter {len} outside the bounding-circle range"
+        );
+    });
+
+    // =========================================================================
+    // Stage 5 — inversion, projection, distance, extrema
+    // =========================================================================
+
+    test!("stage5_range_carries_status_and_witness", {
+        let _session = Session::start(test_config())?;
+
+        // The witness — WHICH sub-entity the closest point lies on — is the
+        // part of a distance answer most easily lost, and it changes what the
+        // caller may conclude. A block query can land on a face, an edge or a
+        // vertex depending only on where the probe point is.
+        let block = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        let e = block.entity();
+
+        let above = e.distance_to_point(Vec3::new(0.0, 0.0, 40.0))?;
+        assert_eq!(above.status, RangeStatus::Found);
+        assert!(
+            (above.distance - 30.0).abs() < 1e-9,
+            "distance above the top face = {}",
+            above.distance
+        );
+        let w = above.witness_1;
+        let sub = w.sub_entity.expect("a face witness must be reported");
+        assert_eq!(
+            sub.class()?,
+            PkClass::Face,
+            "a point above the top face should witness a FACE"
+        );
+
+        // Beyond a vertical edge, the nearest point is on that edge.
+        let by_edge = e.distance_to_point(Vec3::new(20.0, 20.0, 5.0))?;
+        assert_eq!(
+            by_edge
+                .witness_1
+                .sub_entity
+                .expect("edge witness")
+                .class()?,
+            PkClass::Edge,
+            "a point beyond a vertical edge should witness an EDGE"
+        );
+
+        // Beyond a corner, it is the vertex.
+        let by_corner = e.distance_to_point(Vec3::new(20.0, 20.0, 40.0))?;
+        assert_eq!(
+            by_corner
+                .witness_1
+                .sub_entity
+                .expect("vertex witness")
+                .class()?,
+            PkClass::Vertex,
+            "a point beyond a corner should witness a VERTEX"
+        );
+
+        // The witness position must actually be the reported distance away.
+        for r in [above, by_edge, by_corner] {
+            let p = r.witness_1.position;
+            let q = r.point_2;
+            let d = ((p.x - q.x).powi(2) + (p.y - q.y).powi(2) + (p.z - q.z).powi(2)).sqrt();
+            assert!(
+                (d - r.distance).abs() < 1e-9,
+                "witness position is {d} from the probe but distance says {}",
+                r.distance
+            );
+        }
+    });
+
+    test!("stage5_found_does_not_mean_unique", {
+        let _session = Session::start(test_config())?;
+
+        // The central contract point. A point on a cylinder's axis is
+        // equidistant from EVERY point of the wall, yet the kernel reports
+        // `Found` with one arbitrary witness. `Found` asserts "a minimum was
+        // located", never "the minimum is unique" — anything downstream that
+        // reads uniqueness into it is wrong.
+        let cyl = Body::create_solid_cylinder(5.0, 10.0)?;
+        let wall = cyl
+            .faces()?
+            .into_iter()
+            .find(|f| matches!(f.surface_type(), Ok(SurfType::Cylinder)))
+            .expect("cylindrical wall");
+
+        let axis_pt = Vec3::new(0.0, 0.0, 5.0);
+        let r1 = wall.entity().distance_to_point(axis_pt)?;
+        assert_eq!(
+            r1.status,
+            RangeStatus::Found,
+            "an indeterminate query still reports Found"
+        );
+        assert!(
+            (r1.distance - 5.0).abs() < 1e-9,
+            "distance to the wall is the radius, got {}",
+            r1.distance
+        );
+
+        // It is at least deterministic: the same query gives the same witness.
+        let r2 = wall.entity().distance_to_point(axis_pt)?;
+        let (a, b) = (r1.witness_1.position, r2.witness_1.position);
+        assert!(
+            (a.x - b.x).abs() < 1e-12 && (a.y - b.y).abs() < 1e-12 && (a.z - b.z).abs() < 1e-12,
+            "the arbitrary witness should at least be deterministic"
+        );
+
+        // ...but it is only one of infinitely many correct answers, all at the
+        // same distance. Verify a rotated point is equally close.
+        let other = Vec3::new(0.0, 0.0, 5.0);
+        let r3 = wall.entity().distance_to_point(other)?;
+        assert!(
+            (r3.distance - r1.distance).abs() < 1e-12,
+            "every direction from the axis is equidistant"
+        );
+    });
+
+    test!("stage5_inversion_requires_the_point_to_lie_on_it", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // parameterise_vector is INVERSION, not projection: an off-surface
+        // point is an error, not a nearest-point answer. Conflating the two
+        // would silently turn "this point is nowhere near the surface" into a
+        // plausible (u,v).
+        let sph = Surf::sphere(b, 4.0)?;
+        let off = sph
+            .parameterise(Vec3::new(10.0, 0.0, 0.0))
+            .expect_err("a point off the sphere must not invert");
+        assert_eq!(
+            off.details().and_then(|d| d.code_token.clone()).as_deref(),
+            Some("PK_ERROR_not_on_surface"),
+            "off-surface inversion should fail as not_on_surface"
+        );
+
+        // The centre is equidistant from everything and is likewise refused.
+        assert!(
+            sph.parameterise(Vec3::new(0.0, 0.0, 0.0)).is_err(),
+            "the sphere centre has no unique inverse"
+        );
+
+        // A point genuinely on the surface inverts, and round-trips.
+        let on = sph.eval(1.1, 0.4)?;
+        let (u, v) = sph.parameterise(on)?;
+        let back = sph.eval(u, v)?;
+        assert!(
+            (back.x - on.x).abs() < 1e-9
+                && (back.y - on.y).abs() < 1e-9
+                && (back.z - on.z).abs() < 1e-9,
+            "eval -> parameterise -> eval must round-trip"
+        );
+
+        // Curves behave the same way, with their own code.
+        let ell = Curve::ellipse(b, 5.0, 2.0)?;
+        let off = ell
+            .parameterise(Vec3::new(0.0, 10.0, 0.0))
+            .expect_err("a point off the ellipse must not invert");
+        assert_eq!(
+            off.details().and_then(|d| d.code_token.clone()).as_deref(),
+            Some("PK_ERROR_not_on_curve"),
+            "off-curve inversion should fail as not_on_curve"
+        );
+    });
+
+    test!("stage5_seam_point_inverts_to_one_representative", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // A point on the seam has two equally valid u values (0 and 2pi). The
+        // kernel returns one representative — periodic equivalence is the
+        // caller's to canonicalize, which is exactly what Stage 4 established.
+        let sph = Surf::sphere(b, 4.0)?;
+        let seam_pt = sph.eval(0.0, 0.3)?;
+        let (u, v) = sph.parameterise(seam_pt)?;
+        let tau = std::f64::consts::TAU;
+        assert!(
+            u.abs() < 1e-9 || (u - tau).abs() < 1e-9,
+            "a seam point should invert to u=0 or u=2pi, got {u}"
+        );
+        assert!((v - 0.3).abs() < 1e-9, "v should be preserved, got {v}");
+
+        // Both representatives evaluate to the same point, which is why the
+        // caller cannot compare parameters without normalising first.
+        let via_zero = sph.eval(0.0, v)?;
+        let via_tau = sph.eval(tau, v)?;
+        assert!(
+            (via_zero.x - via_tau.x).abs() < 1e-9
+                && (via_zero.y - via_tau.y).abs() < 1e-9
+                && (via_zero.z - via_tau.z).abs() < 1e-9,
+            "u=0 and u=2pi must be the same point"
+        );
+    });
+
+    test!("stage5_find_extreme_names_its_witness", {
+        let _session = Session::start(test_config())?;
+
+        // The extreme point in a direction is only half the answer; which
+        // topology realises it is the other half.
+        let block = Body::create_solid_block(10.0, 10.0, 10.0)?;
+
+        // +Z then +X then +Y resolves to a single corner vertex.
+        let (pos, topol) = block.find_extreme(
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        )?;
+        assert!(
+            (pos.x - 5.0).abs() < 1e-9 && (pos.y - 5.0).abs() < 1e-9 && (pos.z - 10.0).abs() < 1e-9,
+            "extreme corner should be (5,5,10), got ({},{},{})",
+            pos.x,
+            pos.y,
+            pos.z
+        );
+        assert_eq!(
+            topol.class()?,
+            PkClass::Vertex,
+            "three independent directions pin a vertex"
+        );
+    });
+
+    test!("stage5_clash_classifies_configurations", {
+        let _session = Session::start(test_config())?;
+
+        // PK_TOPOL_clash was recorded as permanently blocked ("needs a fuller
+        // frustrum"). It was not: the transform arrays are mandatory (a NULL
+        // `tf1` is rejected as argument 3) and the options struct layout was
+        // wrong. With both fixed it works, and its classification tokens are
+        // nothing like the 0..4 the bindings claimed.
+        let mk = |s: f64, dx: f64| -> PsResult<Body> {
+            let bdy = Body::create_solid_block(s, s, s)?;
+            if dx != 0.0 {
+                bdy.transform(&Transform::translation(dx, 0.0, 0.0)?)?;
+            }
+            Ok(bdy)
+        };
+
+        // Overlapping solids share interior.
+        let a = mk(4.0, 0.0)?;
+        let b = mk(4.0, 2.0)?;
+        assert!(a.entity().clashes_with(b.entity())?, "overlap must clash");
+        let recs = a.entity().clash_records(b.entity())?;
+        assert!(!recs.is_empty(), "overlap should produce clash records");
+        assert!(
+            recs.iter()
+                .all(|r| r.clash_type_token == PK_TOPOL_clash_interfere_c),
+            "overlapping solids should classify as interfering ({}), got {:?}",
+            PK_TOPOL_clash_interfere_c,
+            recs.iter().map(|r| r.clash_type_token).collect::<Vec<_>>()
+        );
+
+        // Face-to-face contact is a different classification.
+        let c = mk(4.0, 0.0)?;
+        let d = mk(4.0, 4.0)?;
+        let recs = c.entity().clash_records(d.entity())?;
+        assert!(
+            recs.iter()
+                .all(|r| r.clash_type_token == PK_TOPOL_clash_abut_c),
+            "abutting solids should classify as abutting ({}), got {:?}",
+            PK_TOPOL_clash_abut_c,
+            recs.iter().map(|r| r.clash_type_token).collect::<Vec<_>>()
+        );
+
+        // Disjoint solids do not clash at all.
+        let e = mk(4.0, 0.0)?;
+        let f = mk(2.0, 100.0)?;
+        assert!(
+            !e.entity().clashes_with(f.entity())?,
+            "disjoint solids must not clash"
+        );
+        assert!(
+            e.entity().clash_records(f.entity())?.is_empty(),
+            "disjoint solids should produce no records"
+        );
+    });
+
+    // =========================================================================
+    // Stage 6 — ranges and conservative enclosures
+    // =========================================================================
+
+    test!("stage6_boxes_are_tight_not_padded", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // The enclosure contract: a box must CONTAIN the geometry. Measured
+        // against analytically exact boxes, the kernel's 3-D box finders are
+        // tight — not padded — which is the opposite of the parameter-space
+        // Face::uvbox measured in Stage 4 (padded ~1.2%).
+        //
+        // Tightness is good for quality but means there is no safety margin:
+        // see stage6_tight_boxes_can_be_one_ulp_inward.
+        let sph = Surf::sphere(b, 4.0)?;
+        let bx = sph.find_box(Some(sph.uvbox()?))?;
+        for (got, exact) in [
+            (bx.min.x, -4.0),
+            (bx.min.y, -4.0),
+            (bx.min.z, -4.0),
+            (bx.max.x, 4.0),
+            (bx.max.y, 4.0),
+            (bx.max.z, 4.0),
+        ] {
+            assert!(
+                (got - exact).abs() < 1e-9,
+                "sphere box face {got} should be the exact {exact}"
+            );
+        }
+
+        // Torus: exact box is [-(R+r), -(R+r), -r] .. [R+r, R+r, r].
+        let (maj, min) = (5.0f64, 1.5f64);
+        let tor = Surf::torus(b, maj, min)?;
+        let bx = tor.find_box(Some(tor.uvbox()?))?;
+        assert!(
+            (bx.max.x - (maj + min)).abs() < 1e-9 && (bx.max.z - min).abs() < 1e-9,
+            "torus box should be exactly (R+r) wide and r tall, got {bx:?}"
+        );
+
+        // Bodies too.
+        let block = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let bx = block.bounding_box()?;
+        assert!(
+            (bx.min.x + 5.0).abs() < 1e-12
+                && (bx.max.y - 10.0).abs() < 1e-12
+                && (bx.max.z - 30.0).abs() < 1e-12,
+            "block box should be exact, got {bx:?}"
+        );
+    });
+
+    test!("stage6_tight_boxes_can_be_one_ulp_inward", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // Because the boxes are tight rather than padded, rounding can leave a
+        // face a single ULP INSIDE the true extent. A quarter arc of a circle
+        // touches x=0 exactly, and the reported box min.x comes back at about
+        // +1.8e-16 — inward. Any exclusion test using exact comparison would
+        // therefore be able to reject a point that is genuinely on the
+        // boundary. Exclusion must use a tolerance.
+        let circ = Curve::circle(b, 3.0)?;
+        let quarter = circ.find_box(Some((0.0, std::f64::consts::FRAC_PI_2)))?;
+
+        // The arc really does reach x=0 and y=0 (at its endpoints).
+        let p0 = circ.eval(std::f64::consts::FRAC_PI_2)?;
+        assert!(p0.x.abs() < 1e-12, "quarter arc endpoint is at x=0");
+
+        // Containment holds only to within rounding, not exactly.
+        assert!(
+            quarter.min.x <= 1e-12,
+            "box min.x {} should be at or below 0 within rounding",
+            quarter.min.x
+        );
+        assert!(
+            quarter.max.y >= 3.0 - 1e-12,
+            "box should reach the top of the arc"
+        );
+
+        // The whole-circle box, by contrast, is exact on every face.
+        let full = circ.find_box(None)?;
+        assert!(
+            (full.min.x + 3.0).abs() < 1e-15 && (full.max.x - 3.0).abs() < 1e-15,
+            "full circle box should be exactly +-3, got {full:?}"
+        );
+    });
+
+    test!("stage6_unbounded_surface_needs_a_restriction", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // An unbounded carrier has no finite box, and the kernel refuses rather
+        // than inventing one — the right behaviour, and a case CADabra must
+        // handle explicitly rather than assuming every surface can be boxed.
+        let plane = Surf::plane(b)?;
+        let err = plane
+            .find_box(None)
+            .expect_err("an unbounded plane has no finite box");
+        assert_eq!(
+            err.details().and_then(|d| d.code_token.clone()).as_deref(),
+            Some("PK_ERROR_unsuitable_entity"),
+            "unbounded box request should fail as unsuitable_entity"
+        );
+
+        // With a restriction it succeeds and is exact.
+        let bx = plane.find_box(Some(UvBox {
+            u_min: -2.0,
+            u_max: 3.0,
+            v_min: -1.0,
+            v_max: 4.0,
+        }))?;
+        assert!(
+            (bx.min.x + 2.0).abs() < 1e-9
+                && (bx.max.x - 3.0).abs() < 1e-9
+                && (bx.min.y + 1.0).abs() < 1e-9
+                && (bx.max.y - 4.0).abs() < 1e-9,
+            "restricted plane box should match the uv restriction, got {bx:?}"
+        );
+    });
+
+    test!("stage6_oriented_box_reports_dimension_and_half_widths", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // `dimension` says how many axes the enclosure genuinely needed. A
+        // caller that assumes 3 will mis-handle planar and linear geometry.
+        let line = Curve::line(Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0))?;
+        let ob = line.find_oriented_box((0.0, 10.0))?;
+        assert_eq!(ob.dimension, 1, "a straight line is 1-dimensional");
+
+        let circ = Curve::circle(b, 3.0)?;
+        let ob = circ.find_oriented_box((0.0, std::f64::consts::TAU))?;
+        assert_eq!(ob.dimension, 2, "a planar circle is 2-dimensional");
+
+        // `widths` are HALF-widths despite the vendor reference calling them
+        // "box width in each axis direction": a circle of radius 3 reports 3.0,
+        // not 6.0. Doubling them would inflate every enclosure 2x.
+        assert!(
+            (ob.widths[0] - 3.0).abs() < 1e-9 && (ob.widths[1] - 3.0).abs() < 1e-9,
+            "circle half-widths should be the radius 3, got {:?}",
+            ob.widths
+        );
+        assert!(
+            ob.widths[2].abs() < 1e-12,
+            "a planar circle has no thickness, got {}",
+            ob.widths[2]
+        );
+
+        let sph = Surf::sphere(b, 4.0)?;
+        let ob = sph.find_oriented_box(sph.uvbox()?)?;
+        assert_eq!(ob.dimension, 3, "a sphere is 3-dimensional");
+        assert!(
+            ob.widths.iter().all(|w| (w - 4.0).abs() < 1e-9),
+            "sphere half-widths should be the radius 4, got {:?}",
+            ob.widths
+        );
+
+        // And the enclosure really does contain the geometry.
+        for (u, v) in [(0.0, 0.0), (1.3, 0.7), (4.0, -1.2)] {
+            let p = sph.eval(u, v)?;
+            assert!(
+                ob.contains(p, 1e-9),
+                "sphere point ({u},{v}) must lie inside its own oriented box"
+            );
+        }
+    });
+
+    test!("stage6_geom_range_is_a_global_projection", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // The pair that must not be confused:
+        //   parameterise_vector -> strict INVERSION, refuses off-surface points
+        //   GEOM_range_vector   -> genuine PROJECTION, documented global
+        let sph = Surf::sphere(b, 4.0)?;
+
+        assert!(
+            sph.parameterise(Vec3::new(10.0, 0.0, 0.0)).is_err(),
+            "inversion must refuse an off-surface point"
+        );
+
+        let r = sph.range_to_point(Vec3::new(10.0, 0.0, 0.0))?;
+        assert_eq!(r.status, RangeStatus::Found);
+        assert!(
+            (r.distance - 6.0).abs() < 1e-9,
+            "distance from (10,0,0) to a sphere of radius 4 is 6, got {}",
+            r.distance
+        );
+        let w = r.witness_1.position;
+        assert!(
+            (w.x - 4.0).abs() < 1e-9 && w.y.abs() < 1e-9 && w.z.abs() < 1e-9,
+            "closest point should be (4,0,0), got ({},{},{})",
+            w.x,
+            w.y,
+            w.z
+        );
+
+        // Far along another axis, to show it is not returning a cached answer.
+        let r = sph.range_to_point(Vec3::new(0.0, 0.0, 100.0))?;
+        assert!(
+            (r.distance - 96.0).abs() < 1e-9,
+            "distance should be 96, got {}",
+            r.distance
+        );
+        assert!(
+            (r.witness_1.position.z - 4.0).abs() < 1e-9,
+            "closest point should be the north pole"
+        );
+
+        // The centre is equidistant from the whole sphere: still `Found`, with
+        // one arbitrary witness at the radius — the Stage 5 rule again.
+        let r = sph.range_to_point(Vec3::new(0.0, 0.0, 0.0))?;
+        assert_eq!(r.status, RangeStatus::Found);
+        assert!(
+            (r.distance - 4.0).abs() < 1e-9,
+            "centre-to-sphere distance is the radius, got {}",
+            r.distance
         );
     });
 

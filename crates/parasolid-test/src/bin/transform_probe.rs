@@ -124,21 +124,36 @@ fn main() {
 
     println!("\n== isolating what drives matrix_type ==");
     let variants: &[(&str, [f64; 16])] = &[
-        ("identity, m15=1", [
-            1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-        ]),
-        ("transl only, m15=1", [
-            1.0, 0.0, 0.0, 3.0, 0.0, 1.0, 0.0, -4.0, 0.0, 0.0, 1.0, 5.0, 0.0, 0.0, 0.0, 1.0,
-        ]),
-        ("scale_about clone, m15=0.4", [
-            1.0, 0.0, 0.0, -0.6, 0.0, 1.0, 0.0, -1.2, 0.0, 0.0, 1.0, -1.8, 0.0, 0.0, 0.0, 0.4,
-        ]),
-        ("transl, m15=0.4", [
-            1.0, 0.0, 0.0, 3.0, 0.0, 1.0, 0.0, -4.0, 0.0, 0.0, 1.0, 5.0, 0.0, 0.0, 0.0, 0.4,
-        ]),
-        ("identity, m15=0.4", [
-            1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.4,
-        ]),
+        (
+            "identity, m15=1",
+            [
+                1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
+            ],
+        ),
+        (
+            "transl only, m15=1",
+            [
+                1.0, 0.0, 0.0, 3.0, 0.0, 1.0, 0.0, -4.0, 0.0, 0.0, 1.0, 5.0, 0.0, 0.0, 0.0, 1.0,
+            ],
+        ),
+        (
+            "scale_about clone, m15=0.4",
+            [
+                1.0, 0.0, 0.0, -0.6, 0.0, 1.0, 0.0, -1.2, 0.0, 0.0, 1.0, -1.8, 0.0, 0.0, 0.0, 0.4,
+            ],
+        ),
+        (
+            "transl, m15=0.4",
+            [
+                1.0, 0.0, 0.0, 3.0, 0.0, 1.0, 0.0, -4.0, 0.0, 0.0, 1.0, 5.0, 0.0, 0.0, 0.0, 0.4,
+            ],
+        ),
+        (
+            "identity, m15=0.4",
+            [
+                1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.4,
+            ],
+        ),
     ];
     for (label, m) in variants {
         match Transform::from_matrix(*m) {
@@ -155,12 +170,18 @@ fn main() {
 
     println!("\n== raw classify result bytes (is matrix_type really @0?) ==");
     for (label, m) in [
-        ("identity", [
-            1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0f64,
-        ]),
-        ("translation m15=1", [
-            1.0, 0.0, 0.0, 3.0, 0.0, 1.0, 0.0, -4.0, 0.0, 0.0, 1.0, 5.0, 0.0, 0.0, 0.0, 1.0f64,
-        ]),
+        (
+            "identity",
+            [
+                1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0f64,
+            ],
+        ),
+        (
+            "translation m15=1",
+            [
+                1.0, 0.0, 0.0, 3.0, 0.0, 1.0, 0.0, -4.0, 0.0, 0.0, 1.0, 5.0, 0.0, 0.0, 0.0, 1.0f64,
+            ],
+        ),
     ] {
         let t = Transform::from_matrix(m).expect("build");
         let opts = PK_TRANSF_classify_o_t {
@@ -168,12 +189,20 @@ fn main() {
             diagnostics: PK_TRANSF_diagnostics_all_c,
         };
         let mut buf = [0u8; 256];
-        let rc =
-            unsafe { PK_TRANSF_classify(t.tag(), &opts, buf.as_mut_ptr() as *mut PK_TRANSF_classify_r_t) };
+        let rc = unsafe {
+            PK_TRANSF_classify(
+                t.tag(),
+                &opts,
+                buf.as_mut_ptr() as *mut PK_TRANSF_classify_r_t,
+            )
+        };
         println!("  {label}  (rc={rc})");
         for row in 0..8 {
             let off = row * 16;
-            let hex: Vec<String> = buf[off..off + 16].iter().map(|b| format!("{b:02x}")).collect();
+            let hex: Vec<String> = buf[off..off + 16]
+                .iter()
+                .map(|b| format!("{b:02x}"))
+                .collect();
             // Annotate as both i32 lanes and f64 lanes so a misplaced field shows up.
             let i0 = i32::from_le_bytes(buf[off..off + 4].try_into().unwrap());
             let f0 = f64::from_le_bytes(buf[off..off + 8].try_into().unwrap());

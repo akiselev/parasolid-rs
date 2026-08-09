@@ -92,7 +92,7 @@ pub const PK_TRANSF_diagnostics_none_c: PK_TRANSF_diagnostics_t = 25300;
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TRANSF_classify_o_t {
-    pub o_t_version: c_int,                  // @0
+    pub o_t_version: c_int,                   // @0
     pub diagnostics: PK_TRANSF_diagnostics_t, // @4
 }
 
@@ -129,13 +129,13 @@ impl Default for PK_TRANSF_classify_o_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TRANSF_classify_r_t {
-    pub matrix_type: PK_matrix_type_t,        // @0
-    pub determinant: c_double,                // @8
-    pub unit_rows_deviations: PK_VECTOR_t,    // @16
-    pub orthog_rows_deviations: PK_VECTOR_t,  // @40
-    pub translation: PK_VECTOR_t,             // @64
-    pub perspective: PK_VECTOR_t,             // @88
-    pub scale: c_double,                      // @112
+    pub matrix_type: PK_matrix_type_t,       // @0
+    pub determinant: c_double,               // @8
+    pub unit_rows_deviations: PK_VECTOR_t,   // @16
+    pub orthog_rows_deviations: PK_VECTOR_t, // @40
+    pub translation: PK_VECTOR_t,            // @64
+    pub perspective: PK_VECTOR_t,            // @88
+    pub scale: c_double,                     // @112
 }
 
 const _: () = {
@@ -150,11 +150,11 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_GEOM_transform_o_t {
-    pub o_t_version: c_int,          // @0
-    pub tolerance: c_double,         // @8
-    pub modify: c_int,               // @16
+    pub o_t_version: c_int,           // @0
+    pub tolerance: c_double,          // @8
+    pub modify: c_int,                // @16
     pub want_out_geoms: PK_LOGICAL_t, // @20
-    pub want_exact: PK_LOGICAL_t,    // @21
+    pub want_exact: PK_LOGICAL_t,     // @21
 }
 
 /// Options for `PK_TRANSF_transform_2`.

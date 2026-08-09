@@ -56,8 +56,7 @@ fn probe(label: &str, trigger: impl FnOnce() -> PK_ERROR_code_t) {
 
     let mut buf = [0u8; BUF];
     let mut was_error: PK_LOGICAL_t = PK_LOGICAL_false;
-    let ask =
-        unsafe { PK_ERROR_ask_last(&mut was_error, buf.as_mut_ptr() as *mut PK_ERROR_sf_t) };
+    let ask = unsafe { PK_ERROR_ask_last(&mut was_error, buf.as_mut_ptr() as *mut PK_ERROR_sf_t) };
     println!("  PK_ERROR_ask_last rc   = {ask}, was_error = {was_error}");
     if ask != PK_ERROR_no_errors || was_error != PK_LOGICAL_true {
         println!("  (no error record available)");
@@ -81,7 +80,10 @@ fn probe(label: &str, trigger: impl FnOnce() -> PK_ERROR_code_t) {
         if tail_nonzero.is_empty() {
             "none (consistent with size 116)".to_string()
         } else {
-            format!("{:?} (layout may be larger)", &tail_nonzero[..tail_nonzero.len().min(16)])
+            format!(
+                "{:?} (layout may be larger)",
+                &tail_nonzero[..tail_nonzero.len().min(16)]
+            )
         }
     );
 
@@ -95,10 +97,13 @@ fn main() {
     unsafe { PK_SESSION_set_check_arguments(PK_LOGICAL_true) };
 
     // 1. Negative dimension -> a value error on a specific argument.
-    probe("negative block dimension (expect distance_le_0 = 502)", || {
-        let mut body: PK_BODY_t = 0;
-        unsafe { PK_BODY_create_solid_block(-1.0, 1.0, 1.0, std::ptr::null(), &mut body) }
-    });
+    probe(
+        "negative block dimension (expect distance_le_0 = 502)",
+        || {
+            let mut body: PK_BODY_t = 0;
+            unsafe { PK_BODY_create_solid_block(-1.0, 1.0, 1.0, std::ptr::null(), &mut body) }
+        },
+    );
 
     // 2. Bogus tag -> an entity error; `entity` should carry the tag.
     probe("ask class of a bogus tag (expect not_an_entity)", || {
@@ -107,51 +112,58 @@ fn main() {
     });
 
     // 3. Wrong entity class for the call.
-    probe("ask faces of a non-body tag (expect wrong entity type)", || {
-        let mut n: i32 = 0;
-        let mut faces: *mut PK_FACE_t = std::ptr::null_mut();
-        unsafe { PK_BODY_ask_faces(999_999, &mut n, &mut faces) }
-    });
+    probe(
+        "ask faces of a non-body tag (expect wrong entity type)",
+        || {
+            let mut n: i32 = 0;
+            let mut faces: *mut PK_FACE_t = std::ptr::null_mut();
+            unsafe { PK_BODY_ask_faces(999_999, &mut n, &mut faces) }
+        },
+    );
 
     // 4. Bad option-struct version -> exercises the o_t_version path and should
     //    name the offending *field* rather than a positional argument.
-    probe("mass props with o_t_version = 99 (expect 5022/5043)", || {
-        let mut body: PK_BODY_t = 0;
-        let rc = unsafe { PK_BODY_create_solid_block(1.0, 1.0, 1.0, std::ptr::null(), &mut body) };
-        assert_eq!(rc, PK_ERROR_no_errors, "setup block must succeed");
+    probe(
+        "mass props with o_t_version = 99 (expect 5022/5043)",
+        || {
+            let mut body: PK_BODY_t = 0;
+            let rc =
+                unsafe { PK_BODY_create_solid_block(1.0, 1.0, 1.0, std::ptr::null(), &mut body) };
+            assert_eq!(rc, PK_ERROR_no_errors, "setup block must succeed");
 
-        #[repr(C)]
-        struct MassOpts {
-            o_t_version: i32,
-            mass: i32,
-            periphery: i32,
-            bound: i32,
-            single: u8,
-        }
-        let opts = MassOpts {
-            o_t_version: 99,
-            mass: 0x36b4,
-            periphery: 0x36b6,
-            bound: 0x36b7,
-            single: 1,
-        };
-        let (mut amount, mut mass, mut periphery) = (0.0f64, 0.0f64, 0.0f64);
-        let mut c_of_g = [0.0f64; 3];
-        let mut m_of_i = [0.0f64; 9];
-        unsafe {
-            PK_TOPOL_eval_mass_props(
-                1,
-                &body,
-                0.99,
-                &opts as *const MassOpts as *const PK_TOPOL_eval_mass_props_o_t,
-                &mut amount,
-                &mut mass,
-                &mut c_of_g,
-                &mut m_of_i,
-                &mut periphery,
-            )
-        }
-    });
+            #[repr(C)]
+            struct MassOpts {
+                o_t_version: i32,
+                mass: i32,
+                periphery: i32,
+                bound: i32,
+                single: u8,
+            }
+            let opts = MassOpts {
+                o_t_version: 99,
+                mass: 0x36b4,
+                periphery: 0x36b6,
+                bound: 0x36b7,
+                single: 1,
+            };
+            let (mut amount, mut mass, mut periphery) = (0.0f64, 0.0f64, 0.0f64);
+            let mut c_of_g = [0.0f64; 3];
+            let mut m_of_i = [0.0f64; 9];
+            unsafe {
+                PK_TOPOL_eval_mass_props(
+                    1,
+                    &body,
+                    0.99,
+                    &opts as *const MassOpts as *const PK_TOPOL_eval_mass_props_o_t,
+                    &mut amount,
+                    &mut mass,
+                    &mut c_of_g,
+                    &mut m_of_i,
+                    &mut periphery,
+                )
+            }
+        },
+    );
 
     // 5. Does the record survive a *successful* call, or is it cleared?
     //    Determines whether `query_last_error` may be called unconditionally.

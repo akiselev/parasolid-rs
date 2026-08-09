@@ -261,10 +261,7 @@ pub struct PK_BSURF_splinewise_sf_t {
 pub struct PK_CURVE_embed_in_surf_o_t {
     _private: [u8; 0],
 }
-#[repr(C)]
-pub struct PK_CURVE_find_box_o_t {
-    _private: [u8; 0],
-}
+// PK_CURVE_find_box_o_t: real layout defined in enquiry.rs (decompile-recovered).
 #[repr(C)]
 pub struct PK_CURVE_find_vectors_r_t {
     _private: [u8; 0],
@@ -680,10 +677,7 @@ pub struct PK_SESSION_set_err_reports_o_t {
 pub struct PK_SURF_create_blend_o_t {
     _private: [u8; 0],
 }
-#[repr(C)]
-pub struct PK_SURF_find_box_o_t {
-    _private: [u8; 0],
-}
+// PK_SURF_find_box_o_t: real layout defined in enquiry.rs (decompile-recovered).
 #[repr(C)]
 pub struct PK_SURF_find_vectors_r_t {
     _private: [u8; 0],

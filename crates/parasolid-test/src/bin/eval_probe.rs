@@ -121,7 +121,11 @@ fn probe_surface(
     };
     println!(
         "\n-- {label}  n_u={n_u} n_v={n_v} {}  (rc={rc}, {count} slots)",
-        if triangular { "TRIANGULAR" } else { "rectangular" }
+        if triangular {
+            "TRIANGULAR"
+        } else {
+            "rectangular"
+        }
     );
     if rc != PK_ERROR_no_errors {
         println!("   call failed");
@@ -233,7 +237,11 @@ fn main() {
         println!(
             "   [{k}] {} = d{k}/dt{}  ({})",
             fmt(got),
-            if close(got, want, 1e-9) { "" } else { " MISMATCH" },
+            if close(got, want, 1e-9) {
+                ""
+            } else {
+                " MISMATCH"
+            },
             fmt(want)
         );
     }
@@ -264,7 +272,11 @@ fn curvature_and_singularities() {
         c.principal_curvature_1,
         c.principal_curvature_2,
         outward_dot,
-        if outward_dot > 0.0 { "OUTWARD" } else { "INWARD" }
+        if outward_dot > 0.0 {
+            "OUTWARD"
+        } else {
+            "INWARD"
+        }
     );
     println!(
         "                1/r = {:.6}; sign of k vs outward normal tells the convention",
@@ -292,7 +304,10 @@ fn curvature_and_singularities() {
     // Torus: outer equator is convex both ways; inner equator is a saddle. The
     // sign difference between them is the sharpest test of the convention.
     let tor = Surf::torus(basis, 5.0, 1.5).expect("torus");
-    for (label, v) in [("outer equator (v=0)", 0.0), ("inner equator (v=pi)", std::f64::consts::PI)] {
+    for (label, v) in [
+        ("outer equator (v=0)", 0.0),
+        ("inner equator (v=pi)", std::f64::consts::PI),
+    ] {
         let c = tor.eval_curvature(0.0, v).expect("torus curvature");
         println!(
             "   torus {label}: k1={:+.6} k2={:+.6}  (gauss = {:+.6})",
@@ -308,8 +323,10 @@ fn curvature_and_singularities() {
     match sph.eval_jet(0.0, pole_v, 1, 1, false) {
         Ok(j) => println!(
             "   sphere pole eval_jet: ok; |du|={:.3e} |dv|={:.3e} unit_normal={:?}",
-            (j.du().unwrap().x.powi(2) + j.du().unwrap().y.powi(2) + j.du().unwrap().z.powi(2)).sqrt(),
-            (j.dv().unwrap().x.powi(2) + j.dv().unwrap().y.powi(2) + j.dv().unwrap().z.powi(2)).sqrt(),
+            (j.du().unwrap().x.powi(2) + j.du().unwrap().y.powi(2) + j.du().unwrap().z.powi(2))
+                .sqrt(),
+            (j.dv().unwrap().x.powi(2) + j.dv().unwrap().y.powi(2) + j.dv().unwrap().z.powi(2))
+                .sqrt(),
             j.unit_normal().map(|n| (n.x, n.y, n.z))
         ),
         Err(e) => println!("   sphere pole eval_jet: ERROR {e}"),
