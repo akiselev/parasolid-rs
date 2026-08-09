@@ -46,16 +46,29 @@ pub struct CurveParam {
 
 /// Extent of a parameter range (`PK_PARAM_sf_t::extent` / `::form`).
 ///
-/// `Periodic` and [`Periodicity::Periodic`] are two views of one fact — the
-/// kernel derives the periodicity token from this one.
+/// # `Periodic` here does NOT imply periodicity
+///
+/// An earlier note claimed `extent == Periodic` and `periodic == yes` were two
+/// views of one fact. They are not: a **closed but non-periodic** B-curve (its
+/// control polygon returning to its start) reports `extent = 18003` with
+/// `periodic = 18020`. The kernel computes periodicity from the raw
+/// classification codes and then lets an independent closure detector overwrite
+/// the extent token. Always read [`CurveParam::periodic`] for periodicity;
+/// reducing a parameter modulo a "period" implied by this field silently
+/// corrupts closed splines.
+///
+/// The token→meaning map also differs between curves and surfaces, so treat
+/// these as a decoded summary rather than a raw kernel code.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ParamExtent {
     /// Unbounded in this direction.
     Infinite,
-    /// Wraps around; the direction is periodic.
+    /// Wraps around. **Not the same as periodic** — see the note below.
     Periodic,
-    /// Bounded.
+    /// Bounded analytic range (e.g. a sphere's v).
     Bounded,
+    /// Bounded by a knot vector — what every B-curve and B-surface reports.
+    KnotBounded,
     /// A token in the band that no analytic family produced here (18001 /
     /// 18002 are reachable in the kernel's mapping but were never observed),
     /// or an unknown value. Carried through rather than guessed at.
@@ -68,13 +81,21 @@ impl ParamExtent {
             PK_PARAM_extent_infinite_c => ParamExtent::Infinite,
             PK_PARAM_extent_periodic_c => ParamExtent::Periodic,
             PK_PARAM_extent_bounded_c => ParamExtent::Bounded,
+            PK_PARAM_extent_knot_bounded_c => ParamExtent::KnotBounded,
             other => ParamExtent::Other(other),
         }
     }
 
     /// Whether the range is finite in this direction.
+    ///
+    /// Includes `KnotBounded`: every B-curve and B-surface reports 18001, and
+    /// omitting it made this return `false` for all bounded spline geometry —
+    /// the most common non-analytic geometry in a real model.
     pub fn is_bounded(&self) -> bool {
-        matches!(self, ParamExtent::Bounded | ParamExtent::Periodic)
+        matches!(
+            self,
+            ParamExtent::Bounded | ParamExtent::Periodic | ParamExtent::KnotBounded
+        )
     }
 }
 
@@ -105,9 +126,18 @@ impl ParamCurveClass {
 pub struct BCurveData {
     pub degree: i32,
     pub n_vertices: i32,
-    /// Control points (x,y,z); for a rational curve the weight is dropped here.
+    /// Control points in **Cartesian** `(x, y, z)`.
+    ///
+    /// For a rational curve the kernel stores homogeneous `(x·w, y·w, z·w, w)`;
+    /// these have been divided through by `w`, so they are directly comparable
+    /// with evaluated positions. The weights are in [`BCurveData::weights`].
     pub control_points: Vec<Vec3>,
+    /// Per-control-point weights, or empty for a non-rational curve.
+    pub weights: Vec<f64>,
     pub knots: Vec<f64>,
+    /// Knot multiplicities, parallel to `knots` — required to rebuild the curve
+    /// via [`Curve::bcurve`].
+    pub knot_mult: Vec<i32>,
     pub is_rational: bool,
 }
 
@@ -385,14 +415,38 @@ impl Curve {
         let mut sf = unsafe { std::mem::zeroed::<PK_BCURVE_sf_t>() };
         pk_call!(PK_BCURVE_ask(self.tag, &mut sf));
         let dim = sf.vertex_dim.max(1) as usize;
+        // A rational curve stores HOMOGENEOUS vertices (x*w, y*w, z*w, w).
+        // Returning those raw gives plausible-looking but wrong control points
+        // — a weight of 4 moved a control point 4x off. Divide through, and
+        // surface the weights separately so nothing is lost.
+        let mut weights: Vec<f64> = Vec::new();
         let control_points: Vec<Vec3> = if sf.vertices.is_null() {
             Vec::new()
         } else {
             let slice =
                 unsafe { std::slice::from_raw_parts(sf.vertices, sf.n_vertices as usize * dim) };
             (0..sf.n_vertices as usize)
-                .map(|i| Vec3::new(slice[i * dim], slice[i * dim + 1], slice[i * dim + 2]))
+                .map(|i| {
+                    let base = i * dim;
+                    if dim >= 4 {
+                        let w = slice[base + 3];
+                        weights.push(w);
+                        if w != 0.0 {
+                            return Vec3::new(
+                                slice[base] / w,
+                                slice[base + 1] / w,
+                                slice[base + 2] / w,
+                            );
+                        }
+                    }
+                    Vec3::new(slice[base], slice[base + 1], slice[base + 2])
+                })
                 .collect()
+        };
+        let knot_mult: Vec<i32> = if sf.knot_mult.is_null() {
+            Vec::new()
+        } else {
+            unsafe { std::slice::from_raw_parts(sf.knot_mult, sf.n_knots as usize) }.to_vec()
         };
         let knots: Vec<f64> = if sf.knots.is_null() {
             Vec::new()
@@ -414,7 +468,9 @@ impl Curve {
             degree: sf.degree,
             n_vertices: sf.n_vertices,
             control_points,
+            weights,
             knots,
+            knot_mult,
             is_rational: sf.is_rational == PK_LOGICAL_true,
         })
     }

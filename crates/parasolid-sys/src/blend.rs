@@ -305,7 +305,7 @@ pub const PK_blend_output_sheet_yes_c: PK_blend_output_sheet_t = 22721;
 /// Create preview sheet only if blend would fail.
 pub const PK_blend_output_sheet_on_fail_c: PK_blend_output_sheet_t = 22722;
 // [re-abi] appended 1 missing member(s) from pk-enums.h
-pub const PK_blend_fault_no_fault_c: PK_blend_output_sheet_t = 18391;
+pub const PK_blend_fault_no_fault_c: PK_blend_fault_t = 18391;
 
 // =============================================================================
 // Suggest limit — PK_blend_suggest_limit_t

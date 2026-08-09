@@ -567,10 +567,20 @@ impl Session {
     }
 
     /// Returns the total memory used by model data structures, in bytes.
-    pub fn memory_usage(&self) -> PsResult<i32> {
-        let mut n_bytes = 0;
-        pk_call!(PK_SESSION_ask_memory_usage(&mut n_bytes));
-        Ok(n_bytes)
+    /// Total memory occupied by the model, in bytes.
+    ///
+    /// See [`Session::memory_usage_detail`] for the free-space figure the
+    /// kernel returns alongside it.
+    pub fn memory_usage(&self) -> PsResult<usize> {
+        Ok(self.memory_usage_detail()?.0)
+    }
+
+    /// `(total, free)` memory in bytes (`PK_SESSION_ask_memory_usage`).
+    pub fn memory_usage_detail(&self) -> PsResult<(usize, usize)> {
+        let mut total: usize = 0;
+        let mut free: usize = 0;
+        pk_call!(PK_SESSION_ask_memory_usage(&mut total, &mut free));
+        Ok((total, free))
     }
 
     /// Returns the number of entity tags remaining before the limit.

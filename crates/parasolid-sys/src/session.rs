@@ -624,7 +624,17 @@ unsafe extern "C" {
     // =========================================================================
 
     /// Returns the amount of memory occupied by the model data structure.
-    pub fn PK_SESSION_ask_memory_usage(n_bytes: *mut c_int) -> PK_ERROR_code_t;
+    ///
+    /// **Two** outputs, both `size_t` (8 bytes on Win64) — the reference is
+    /// `(size_t *const total, size_t *const free)`, and the disassembly writes
+    /// both as qwords (`MOV qword ptr [RDI],RAX` / `MOV qword ptr [RSI],RAX`).
+    /// The previous binding declared a single `*mut c_int`, so the kernel wrote
+    /// 8 bytes into a 4-byte slot AND stored 8 more bytes through whatever
+    /// happened to be in RDX — memory corruption reachable from safe Rust.
+    pub fn PK_SESSION_ask_memory_usage(
+        total: *mut usize,
+        free: *mut usize,
+    ) -> PK_ERROR_code_t;
 
     /// Returns the amount of memory occupied by a body's data structures.
     // Full vendor form (pk-reference.tsv): the returned `total` output was

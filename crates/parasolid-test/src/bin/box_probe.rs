@@ -159,7 +159,12 @@ fn main() {
     match circ.find_oriented_box((0.0, std::f64::consts::TAU)) {
         Ok(ob) => println!(
             "  circle: dimension={} widths=({:.4},{:.4},{:.4}) centre=({:.4},{:.4},{:.4})",
-            ob.dimension, ob.widths[0], ob.widths[1], ob.widths[2], ob.centre.x, ob.centre.y,
+            ob.dimension,
+            ob.widths[0],
+            ob.widths[1],
+            ob.widths[2],
+            ob.centre.x,
+            ob.centre.y,
             ob.centre.z
         ),
         Err(e) => println!("  circle obox ERROR: {e}"),
@@ -189,10 +194,19 @@ fn main() {
         match sph.range_to_point(p) {
             Ok(r) => println!(
                 "  sphere r=4 vs ({:.0},{:.0},{:.0}): status={:?} distance={:.6} witness=({:.4},{:.4},{:.4})",
-                p.x, p.y, p.z, r.status, r.distance,
-                r.witness_1.position.x, r.witness_1.position.y, r.witness_1.position.z
+                p.x,
+                p.y,
+                p.z,
+                r.status,
+                r.distance,
+                r.witness_1.position.x,
+                r.witness_1.position.y,
+                r.witness_1.position.z
             ),
-            Err(e) => println!("  sphere range vs ({:.0},{:.0},{:.0}) ERROR: {e}", p.x, p.y, p.z),
+            Err(e) => println!(
+                "  sphere range vs ({:.0},{:.0},{:.0}) ERROR: {e}",
+                p.x, p.y, p.z
+            ),
         }
     }
 

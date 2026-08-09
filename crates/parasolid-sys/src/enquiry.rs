@@ -312,8 +312,21 @@ pub struct PK_SURF_find_vectors_o_t {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_BODY_find_extreme_o_t {
+    /// **Required.** Omitting this field made every non-NULL options struct
+    /// fail immediately with `PK_ERROR_o_t_version_unknown` (5022).
+    pub o_t_version: c_int,
     pub have_transf: PK_LOGICAL_t,
     pub transf: PK_TRANSF_t,
+}
+
+impl Default for PK_BODY_find_extreme_o_t {
+    fn default() -> Self {
+        Self {
+            o_t_version: 1,
+            have_transf: PK_LOGICAL_false,
+            transf: PK_ENTITY_null,
+        }
+    }
 }
 
 /// Options for PK_FACE_find_extreme.

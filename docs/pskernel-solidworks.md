@@ -853,3 +853,545 @@ self-then-other order confirmed), `is_equal`, and `apply`/`apply_direction`
   (the field @72 vs Rust's @68 for `keep_coi_faces` hints the layout is off);
   needs `PKU_journal_BODY_make_section_o` decompiled. `section_with_surf`
   (split-in-place) already covers the section oracle.
+
+## Stage 0 — the trust boundary (2026-08-09)
+
+Closes Stage 0 of [`CADABRA3-PRIORITIES.md`](../CADABRA3-PRIORITIES.md). Two of
+the four items listed there were already done before this pass (see "stale
+status" below); what follows is the new work.
+
+### `PK_ERROR_sf_t` — 116-byte layout confirmed at runtime
+
+The journal-derived layout in `parasolid-sys` was correct but unused: the
+wrapper still read a raw buffer and trusted only `function` and `code`, guessing
+severity from the code. `crates/parasolid-test/src/bin/error_probe.rs` raised
+four distinct kinds of error and dumped the buffer; every field reads coherently
+and **no byte at or past offset 116 is ever written**:
+
+| offset | field | observed |
+|---:|---|---|
+| 0 | `function` (inline `char[32]`) | `"PK_BODY_create_solid_block"` |
+| 32 | `code` | 15 |
+| 36 | `code_token` (inline `char[32]`) | `"PK_ERROR_distance_le_0"` |
+| 68 | `severity` | 1 (mild) |
+| 72 | `argument_number` | 1 |
+| 76 | `argument_name` (inline `char[32]`) | `"x"` |
+| 108 | `argument_index` | 0 (`-1` when not an array) |
+| 112 | `entity` | 999999 for a bogus-tag error |
+
+`query_last_error` now reads the typed struct and reports real severity, the
+kernel's own code token, the named bad argument, and the offending entity.
+
+Two behavioural findings:
+
+- **The record is not cleared by a successful call.** After a failure, a
+  subsequent successful call leaves `was_error` true and the old record intact.
+  Anything reading `PK_ERROR_ask_last` unconditionally will misattribute it, so
+  `query_last_error` takes the expected code and drops a record that disagrees.
+- **`PK_THREAD_ask_last_error` works.** The previous "faults inside the kernel"
+  verdict was an artifact of the old pointer-based struct, not the function. It
+  returns the same record as `PK_ERROR_ask_last` for the same signature.
+
+### `PK_ERROR_*` code table — the whole thing was wrong
+
+`PK_ERROR_raise` accepts a `PK_ERROR_sf_t` carrying a bare numeric code, and the
+kernel **canonicalizes** it: `PK_ERROR_ask_last` then reports the official
+`code_token` for that code. Sweeping 0..=9000
+(`crates/parasolid-test/src/bin/error_table_probe.rs`) recovered **631 codes**,
+now generated into `parasolid-sys/src/error_codes.rs` and marked `[probed]`.
+
+Every one of the 22 previously hand-written constants that could be checked
+disagreed with the kernel, and two pairs collided outright
+(`system_error`/`modeller_not_started` both 2; `not_implemented`/
+`cant_heal_wound` both 600). Examples:
+
+| constant | was | actually |
+|---|---:|---:|
+| `PK_ERROR_distance_le_0` | 502 | **15** |
+| `PK_ERROR_not_an_entity` | 504 | **22** |
+| `PK_ERROR_cant_be_aborted` | 7 | **965** |
+| `PK_ERROR_fatal_error` | 3 | **948** |
+| `PK_ERROR_not_implemented` | 600 | **5000** |
+
+Two live bugs followed from this:
+
+1. `pk_check` treated code **7** as a success synonym for `cant_be_aborted`,
+   silently swallowing every `PK_ERROR_has_no_name` (which really is 7).
+2. `PsError::from_code` dispatched `NotAnEntity` on 504 — a code the kernel
+   never emits — so that arm could never fire.
+
+Cross-validation: the raised-code path and real triggered errors agree on
+`distance_le_0`=15, `not_an_entity`=22, `o_t_version_unknown`=5022,
+`field_of_wrong_type`=5014, `o_t_version_incorrect`=5043 and `not_general`=5064,
+the last three matching earlier independent findings.
+
+**Caveat: the sweep proves nothing about severity.** The probe supplies severity
+on the raised struct and the kernel echoes it back. Severity must be read from
+offset 68 of a *real* error. Every real error observed so far is mild (1);
+serious and fatal remain unobserved.
+
+### Newly bound functions
+
+- `PK_boolean_r_f` — was referenced in a comment but never declared. The wrapper
+  freed only the `bodies` array and leaked the rest of the result struct; it now
+  copies the tags out and frees through the matching API.
+- `PK_ENTITY_track_r_f` — partner of `PK_ENTITY_track_r_t` outputs already
+  produced by `bgeom.rs`/`enquiry.rs`.
+- `PK_TRANSF_classify_r_f`; `PK_TRANSF_classify`'s `options` corrected to
+  `*const`.
+- The five `PK_LATTICE_*` functions with **no documented prototype in any
+  reference** — recovered by decompiling the exports plus their journal helpers:
+
+  ```
+  PK_LATTICE_ask_core         @1803466c0  (lattice, options, results)
+  PK_LATTICE_ask_form         @180347260  (lattice, options, results)
+  PK_LATTICE_ask_connectivity @180345ed0  (lattice, options, results)
+  PK_LATTICE_ask_regions      @180348eb0  (lattice, options, results)
+  PK_LATTICE_create_by_core   @18034b980  (options, results)   <- 2 args
+  ```
+
+  `PK_LATTICE_ask_regions_r_t` is **fully mapped** from
+  `PKU_journal_LATTICE_ask_regions_r`: `{r_t_version@0, n_regions@4,
+  regions@8, senses@16, frames@24}`, where `senses` is byte-indexed (one-byte
+  logicals) while `regions`/`frames` are 4-byte tag arrays. The other option and
+  result structs keep opaque bodies on purpose — the journal names their leading
+  fields but not the full union tails, and inventing the rest is exactly what
+  produced the wrong error table.
+
+### The `o_t_version` protocol
+
+Written up as [`docs/option-version-protocol.md`](option-version-protocol.md),
+with `crates/parasolid-test/src/bin/option_version_probe.rs` implementing the
+sweep step. Reproduced on demand: mass props accepts **1..=7**, `boolean_2`
+accepts **2..=19** with version 1 reported `incorrect` — matching the values
+recorded during the original boolean investigation.
+
+### Stale status corrected
+
+`TODO.md` predates several commits and understated the position. Already done
+before this pass: `PK_PARAM_sf_t` (40-byte layout decompiled from
+`PK_CURVE_ask_param`, wrapped as `Curve::param`/`Surf::params`, tested) and
+`PK_BODY_boolean_2` (unblocked and volume-validated). Both were listed as
+blockers in the first cut of `CADABRA3-PRIORITIES.md`.
+
+Suite: **137 passed, 0 failed, 1 skipped** (was 133 before this pass).
+
+## Stages 1–2 — numerics, frames, transforms (2026-08-09)
+
+Suite: **148 passed, 0 failed, 1 skipped** (137 → 148).
+
+### Stage 1 — the numeric contract
+
+- **Create→ask is bit-exact.** Authored `f64` values with full mantissas
+  (radius `3.7000000000000004`, origin components `1.2345678901234567`,
+  `-9.876543210987654`) survive `PK_SPHERE_create` / `PK_CYL_create` /
+  `PK_CIRCLE_create` / `PK_POINT_create` and come back with **identical bit
+  patterns**. Verified by `to_bits()` comparison, not an epsilon.
+- **Exactness holds across the scale ladder** 1e-6 … 1e8 for both radii and
+  origins.
+- **Storage is independent of session precision.** The same surface built under
+  precision 1e-9 and 1e-5 reads back bit-identically, so an oracle value does
+  not depend on a session setting. This is what lets CADabra's comparator use
+  **exact relations** rather than bands for authored analytic parameters.
+- **Precision set/readback/restore round-trips exactly** (1e-7, 1e-6, 1e-9),
+  and the default linear/angular precisions are asserted to be in the expected
+  sub-1e-6 range.
+- **Degenerate input is rejected, not repaired**, and now that the error table
+  is probed the tests assert *which* failure: zero and negative radii both give
+  `PK_ERROR_radius_le_0`; a zero-length axis is a distinct, separately-coded
+  failure.
+
+### Stage 2 — classification and validation
+
+Layouts recovered by the journal method and confirmed against raw result bytes:
+
+```text
+PK_TRANSF_classify_o_t   { o_t_version@0, diagnostics@4 }
+PK_TRANSF_classify_r_t   120 bytes, gapless:
+  @0   matrix_type            @8   determinant
+  @16  unit_rows_deviations   @40  orthog_rows_deviations
+  @64  translation            @88  perspective
+  @112 scale
+PK_GEOM_transform_o_t    { o_t_version@0, tolerance@8, modify@16,
+                           want_out_geoms@20, want_exact@21 }
+PK_TRANSF_transform_o_t  { o_t_version@0, operation_1@4, operation_2@8,
+                           modify@12 }
+```
+
+`PK_TRANSF_check_o_t { o_t_version, max_faults }` was already modelled and the
+decompile independently confirms it.
+
+- **`PK_matrix_type_*` tokens are correct** — all five observed at runtime:
+  identity 25290, rotation 25291, reflection 25292, general 25293,
+  unclassified 25294.
+- **`PK_TRANSF_diagnostics_t` has exactly two members** — `none` = 25300
+  (the default the kernel writes into its own options) and `all` = 25301;
+  `PK_TRANSF_classify` validates against `{0x62d4, 0x62d5}`. `none_c` was not
+  previously bound.
+- **Trap: `matrix_type` is not a rigid-motion predicate.** The kernel stores
+  `unclassified` up front and only overwrites it for recognised cases. A pure
+  translation with unit `matrix[3][3]` classifies **`Unclassified`**, while the
+  *identical* translation with a global scale classifies `Identity`. Pinned by
+  `stage2_classify_lattice` so it cannot change silently. CADabra must test the
+  linear part directly rather than trusting this token for translations.
+- **Shear has unit determinant**, so determinant alone cannot detect it — only
+  `orthog_rows_deviations` does. Non-uniform scale shows up in
+  `unit_rows_deviations` and a determinant of 24 for diag(2,3,4).
+- **`PK_TRANSF_create_rotation` requires a unit axis**: `(1,1,1)`, `(0,0,2)` and
+  the zero vector are all rejected with `PK_ERROR_not_a_unit_vector`. A
+  precondition for CADabra's type system, not a runtime discovery.
+- **Orphan geometry can be placed obliquely** via `PK_GEOM_transform_2`, wrapped
+  as `Surf::transformed` / `Curve::transformed`, which also return the kernel's
+  **`exact`** flag — a rigid motion of an analytic sphere is achieved exactly.
+  This is what stops later SSI fixtures from being axis-aligned-only.
+
+### Deliberately not done
+
+`PK_TRANSF_transform_2` and `PK_BODY_transform_2` stay unwrapped. Their
+capabilities are already covered by the validated non-`_2` forms
+(`Transform::then`, `Body::transform`), and the `_2` variants add only option
+fields whose tokens (`operation_1`/`operation_2`, `modify`) are not probed.
+Binding them now would mean passing NULL options — i.e. the same behaviour with
+more surface area. Their option layouts are recorded above for when a case needs
+them.
+
+## Stage 3 — evaluation and jets (2026-08-09)
+
+Suite: **155 passed, 0 failed, 1 skipped** (148 → 155). New module
+`crates/parasolid/src/jet.rs`; probe
+`crates/parasolid-test/src/bin/eval_probe.rs`.
+
+### Derivative array layout — measured, not assumed
+
+`PK_SURF_eval` writes ∂^(i+j)R/∂u^i∂v^j with **u varying fastest**. Recovered by
+evaluating a **torus**, whose mixed partials are all nonzero so no ordering can
+hide behind a zero, and matching every slot against closed form:
+
+```text
+rectangular, n_u = n_v = 2                 index = j*(n_u+1) + i
+  [0]=(0,0) [1]=(1,0) [2]=(2,0)            slots = (n_u+1)*(n_v+1)
+  [3]=(0,1) [4]=(1,1) [5]=(2,1)
+  [6]=(0,2) [7]=(1,2) [8]=(2,2)
+
+triangular, order 2                        index = j*(n+1) - j*(j-1)/2 + i
+  [0]=(0,0) [1]=(1,0) [2]=(2,0)            slots = (n+1)*(n+2)/2
+  [3]=(0,1) [4]=(1,1)
+  [5]=(0,2)
+```
+
+Triangular is the *same* ordering with each row truncated to `i+j <= n`. The
+asymmetric case `n_u=3, n_v=1` confirms the `n_u+1` stride. `PK_CURVE_eval` is
+the trivial case: slot `k` is d^k/dt^k. All verified against closed form, and
+the two surface packings are cross-checked against each other.
+
+Wrapped as `Surf::eval_jet` → `SurfJet` and `Curve::eval_jet` → `CurveJet`,
+indexed by `(i, j)` / `k` rather than by raw slot. Out-of-table requests return
+`None` instead of a plausible neighbour.
+
+### Curvature sign convention
+
+- The reported normal is **outward** on a sphere, and both principal curvatures
+  are **+1/r**. So **positive curvature means the surface bends away from the
+  normal**.
+- `principal_curvature_1` pairs with `principal_direction_1`; the pairing is the
+  meaning, not any magnitude ordering. On a cylinder, `k1 = 0` with
+  `direction_1` along the axis and `k2 = 1/r` around the hoop.
+- Torus confirms the convention end to end: outer equator
+  `k1 = +1/(MAJ+MIN)` with positive Gaussian curvature, inner equator
+  `k1 = −1/(MAJ−MIN)` with negative Gaussian curvature (a saddle).
+
+### Parametric singularity is not geometric singularity
+
+At a sphere pole the **chart** degenerates — `|∂R/∂u|` is 2.4e-16, so no normal
+can be formed — but `PK_SURF_eval` **still succeeds and raises no error**. A
+caller that ignored the degenerate cross product would propagate a garbage
+direction silently. `SurfJet::unit_normal` returns `None` there and
+`is_singular()` is true; `None` is a geometric statement, not an error.
+
+Meanwhile `PK_SURF_eval_curvature` at that same pole returns the correct
+**1/r** — the surface is perfectly smooth, only the parameterisation is not.
+Conflating the two is a modelling error, so the API keeps them separate. A cone
+apex is singular in both senses.
+
+### Minimum radius of curvature
+
+`PK_CURVE_find_min_radius` and `PK_SURF_find_min_radii` were already declared in
+`enquiry.rs` (correct by-value → `*const` convention for `PK_INTERVAL_t` /
+`PK_UVBOX_t`); now wrapped and validated:
+
+- circle r=3 → 3.0; **straight line → `n_radii = 0`**, surfaced as `None` rather
+  than infinity or an error;
+- torus (MAJ=5, MIN=1.5) → **two signed radii, `3.5` and `−1.5`** — the sign
+  follows the curvature convention, so a caller taking absolute values loses
+  information;
+- plane → no minima at all.
+
+The surface form writes **up to two** entries into each of three buffers, so all
+three must have room for 2 regardless of the returned count.
+
+### Handed evaluation
+
+`PK_HAND_left_c` / `_right_c` (32760 / 32761) were unexercised constants; both
+are accepted, and on a smooth circle the left, right and two-sided jets agree
+exactly at every order. Wrapped as `Curve::eval_jet_handed`.
+
+## Stage 4 — domains: intervals, uv-boxes, periodicity, seams (2026-08-09)
+
+Suite: **161 passed, 0 failed, 1 skipped** (155 → 161). Probe
+`crates/parasolid-test/src/bin/domain_probe.rs`.
+
+Every Stage 4 call was already bound and wrapped, so this stage was entirely
+about semantics — and about the information the existing wrappers were throwing
+away.
+
+### `PK_PARAM_sf_t` — the three undecoded fields
+
+`extent` / `form` / (formerly) `convexity` carried tokens present in **no**
+catalog, and their journal strings are absent from this build. Recovered by
+decompiling `PK_CURVE_ask_param` and cross-checking every analytic family at
+runtime:
+
+- **`extent` / `form`** — the kernel maps an internal 0..3 code onto tokens in
+  *descending* order (`0 → 18003`, `1 → 18002`, `2 → 18001`, `3 → 18000`);
+  `PK_SURF_ask_params` also emits `18004`. Observed: **18000** on unbounded
+  ranges (line, plane, cylinder v), **18003** on periodic ranges, **18004** on
+  bounded ranges (sphere v, cone v). `18001`/`18002` are reachable in the
+  mapping but no analytic family produced them, so they are left **unnamed**
+  rather than guessed. `extent` and `form` agree everywhere except a
+  half-bounded range: a cone's v is `extent = 18004` but `form = 18000`.
+- **`periodic`** is *derived*, not independent: the decompile shows extent code
+  0 (token 18003) selects yes/seamed and everything else selects no. So
+  `extent == Periodic` and `periodic == yes` are two views of one fact.
+- **`convexity` was a misnomer.** The field is computed from the underlying
+  iso-curve's internal class tag: `30 → 18040`, `31 → 18041`, anything else
+  `→ 18042`. Renamed **`curve_class`**, with observed values straight (line,
+  plane, cylinder v), circular (circle, cylinder u, torus), other (ellipse,
+  sphere v). It is a representation fact, not a geometric measurement.
+
+Exposed as `ParamExtent` / `ParamCurveClass`, both of which carry an
+`Other(i32)` arm so an unobserved token passes through instead of being
+coerced into a wrong name.
+
+### Seams are exact identifications; poles are not seams
+
+- Across a seam, `u` and `u + period` agree in **position and in every first
+  derivative** to ~1e-15 on cylinder, sphere and torus (and in v as well for the
+  torus). Position agreement alone would still permit a kink; derivative
+  agreement is what licenses treating the domain as a quotient.
+- A **pole** is a different animal: at a sphere's `v` extremes the entire `u`
+  fibre collapses to one point (spread ~4e-16 across `u = 0, 2, 5`) and
+  `|∂R/∂u|` vanishes. So the domain type cannot simply be "wrapped interval" —
+  seam identification and fibre collapse are distinct boundary phenomena.
+
+### Face uv-boxes are conservative; `is_uvbox` is one-sided
+
+Measured on a cylinder body:
+
+- The planar cap face is a **disc of radius 2**, whose exact box is `[-2,2]²`.
+  `PK_FACE_find_uvbox` reports `[-2.024, 2.024]²` — **padded by ~1.2%**. It is a
+  superset, safe for exclusion tests and wrong for anything that needs
+  tightness.
+- The cylindrical wall reports `[0, 2π] × [0, 6]` — **exact**, and
+  `PK_FACE_is_uvbox` confirms it is a parametric rectangle and hands back that
+  rectangle.
+- The vendor reference states `PK_FACE_is_uvbox` "does not guarantee to detect
+  that a face is parametrically rectangular but will never claim a face is
+  parametrically rectangular when it is not". So **`true` is trustworthy;
+  `false` means "not established", not "definitely not"**. Wrapped as
+  `Face::as_uvbox() -> Option<UvBox>` so the exact box comes back with the
+  verdict.
+
+`Face::is_periodic` collapsed the kernel's three-way answer into a bool, losing
+the **seamed** case — a periodic direction that has been cut, so the face has a
+real edge where the parameterisation wraps. Added `Face::periodicity()`
+returning the full `Periodicity` per direction.
+
+### Arc length carries a conservative enclosure
+
+`PK_CURVE_find_length` has a fourth output — a **range bounding the true arc
+length** — that the wrapper was discarding:
+
+- circle (r=3): length `6π`, enclosure width **exactly 0** — analytically exact;
+- ellipse (5×2): length ≈ 23.013113, enclosure `[23.013111, 23.013114]`, width
+  **3.06e-6** — no closed form, and the kernel says how well it knows the answer.
+
+Added `Curve::length_with_bounds`. Anywhere a length feeds a tolerance decision,
+the plain `length()` is the wrong call.
+
+## Stage 5 — inversion, distance, extrema (2026-08-09)
+
+Suite: **167 passed, 0 failed, 1 skipped** (161 → 167). Probe
+`crates/parasolid-test/src/bin/range_probe.rs`. This stage leaned heavily on the
+`parasolid-re` Ghidra bridge — three separate struct recoveries below.
+
+### The result contract: status + witness
+
+`RangeResult` carried only `{distance, point_1, point_2}` and threw away both
+the `PK_range_result_t` status and the per-end witness, which the kernel
+populates fully. Rebuilt to carry `RangeStatus` plus a `RangeWitness`
+(`entity`, `sub_entity`, `position`, `parameters`) per end. Validated on a block:
+a probe point above a face witnesses a **FACE**, beyond a vertical edge an
+**EDGE**, beyond a corner a **VERTEX** — and the witness position is exactly the
+reported distance from the probe.
+
+**`Found` does not mean unique.** A point on a cylinder's axis is equidistant
+from every point of the wall, and the kernel still answers `Found` with one
+arbitrary (though deterministic) witness. `RangeStatus::Found` asserts "a
+minimum was located", never "the minimum is unique"; nothing in the result
+carries multiplicity. This is the single most important thing for CADabra to
+encode here.
+
+### Inversion is not projection
+
+`PK_SURF_parameterise_vector` / `PK_CURVE_parameterise_vector` **reject**
+off-surface points rather than returning a nearest point:
+`PK_ERROR_not_on_surface` (915) and `PK_ERROR_not_on_curve` (67). A sphere's
+centre is refused too. So these are strict inversions; treating them as
+projections would silently convert "nowhere near" into a plausible `(u,v)`.
+
+A point on a seam inverts to **one** representative (`u = 0`, not `2π`), so
+periodic equivalence remains the caller's to canonicalize — exactly the
+Stage 4 result.
+
+### `PK_TOPOL_clash` was never frustrum-blocked
+
+It had been recorded as permanently deferred, "needs a fuller frustrum", on the
+strength of a mild **9999**. With the Stage 0 error work in place the kernel
+says precisely what is wrong: **bad argument #3, `tf1`**. Two real bugs:
+
+1. **The transform arrays are mandatory.** The reference's "substitutes an
+   identity transform internally" means a per-entity array whose *entries* may
+   be `PK_ENTITY_null` — not a null array pointer. Passing NULL is rejected.
+2. **`PK_TOPOL_clash_o_t` was wrong.** Recovered from
+   `PKU_journal_TOPOL_clash_o`: it omitted the three leading exception-list
+   fields (`n_op_ex`, `op_ex1`, `op_ex2`) entirely and modelled four logicals as
+   4-byte ints when the kernel packs them as **single bytes at 24..27**. Every
+   field after `o_t_version` sat at the wrong offset. Real size 56 bytes.
+
+`PK_TOPOL_clash_t` was also a bare `c_int` typedef, so the returned array could
+not be read at all. The journalling loop in the real export (@18043f9a0) walks
+it with a stride of **5 ints** — `{target, target_index, tool, tool_index,
+clash_type}`, 20 bytes — now bound as `PK_TOPOL_clash_rec_t` and surfaced as
+`Entity::clash_records`.
+
+**The clash-type tokens were fabricated too.** The bindings claimed 0..4;
+probing known configurations gives:
+
+| configuration | token |
+|---|---:|
+| identical blocks / partial overlap | **7** (interfere) |
+| blocks sharing exactly one face | **4** (abut) |
+| small block strictly inside a large one | **2** (contained) |
+| disjoint blocks | *no records* |
+
+Constants replaced with these `[probed]` values. Containment was not probed in
+both directions, so no separate `b_in_a` constant is claimed.
+
+### `PK_ENTITY_range` multi-solution structs
+
+`PK_ENTITY_range_r_t` was an opaque stub, so the **multiple** solutions this
+call exists to return could not be read. Recovered from
+`PKU_journal_ENTITY_range_r`:
+
+```text
+@0 r_t_version   @4 n_results
+@8 results  (PK_range_result_t*, per-solution status)
+@16 distances (double*)
+@24 ends_1  @32 ends_2   (PK_ENTITY_range_end_t*)
+```
+
+with `PK_ENTITY_range_end_t` from `PKU_journal_ENTITY_range_end` — a 64-byte
+record that, unlike the simpler `PK_range_end_t`, carries a trailing **`inside`**
+classification. Both are decompile-derived and **not yet runtime-validated**:
+the multi-solution call is bound but not wrapped, and the structs say so.
+
+### Also
+
+`Body::find_extreme` wrapped: the three directions act as ordered tie-breakers,
+and the returned topology says whether a vertex, edge or face realised the
+extreme. Three independent directions pin a vertex on a block.
+
+`PK_CURVE_project` is **not** part of this stage despite the plan listing it
+here — it projects curves onto target bodies with tracking and an opaque result
+struct, which is Stage 12 arrangement work.
+
+## Stage 6 — ranges and conservative enclosures (2026-08-09)
+
+Suite: **172 passed, 0 failed, 1 skipped** (167 → 172). New module
+`crates/parasolid/src/enclosure.rs`; probe
+`crates/parasolid-test/src/bin/box_probe.rs`. Ghidra did most of the work here —
+**five** struct layouts were wrong.
+
+### Enclosures are tight, not padded
+
+Measured against analytically exact boxes (sphere, torus, cylinder, circle,
+block), `PK_SURF_find_box` / `PK_CURVE_find_box` / `PK_TOPOL_find_box` return the
+**exact** extent, slack 0.0 on every face. That is the opposite of the
+parameter-space `PK_FACE_find_uvbox` measured in Stage 4, which is padded ~1.2%.
+The two must not be reasoned about together.
+
+**Tightness removes the safety margin.** A quarter arc of a circle touches x=0
+exactly, and the reported box `min.x` comes back at **+1.8e-16 — inward by about
+one ULP**. Any exclusion test using exact comparison could therefore reject a
+point genuinely on the boundary. Exclusion must use a tolerance; the enclosure
+is *not* a guaranteed superset at the bit level.
+
+An unbounded carrier is refused rather than approximated: an unrestricted
+`PK_SURF_find_box` on a plane gives `PK_ERROR_unsuitable_entity` (914). Callers
+must pass the uv restriction.
+
+### `widths` are half-widths
+
+`PK_SURF_find_non_aligned_box` / `PK_CURVE_find_non_aligned_box` return what the
+vendor reference calls "box width in each axis direction", but the measured
+values are **semi-extents**: a circle of radius 3 reports 3.0, a sphere of
+radius 4 reports 4.0, a line over [0,10] reports 5.0. Treating them as full
+widths would inflate every enclosure by 2×.
+
+`dimension` is genuinely useful and correct: **1** for a straight line, **2** for
+a planar circle, **3** for a sphere. A caller assuming 3 mis-handles degenerate
+geometry.
+
+### Five wrong struct layouts, all recovered from the journal helpers
+
+1. **`PK_range_bound_t` had upper and lower swapped.** The decompile of
+   `PKU_journal_range_bound` gives `{have_upper_bound@0, upper_bound@8,
+   have_lower_bound@16, lower_bound@24}`; the binding had lower first. A caller
+   setting a lower bound would have set an upper one. Unnoticed because every
+   existing call passes defaults (all zero).
+2. **`PK_range_param_bound_t` was the wrong shape and size.** It modelled
+   `{interval, uvbox}` side by side (48 bytes). Real form is 40 bytes:
+   `{have_param_bound@0, param_bound_class@4, union{interval|uvbox}@8}`, with
+   class `0x204` selecting the interval form.
+3. **`PK_GEOM_range_vector_o_t` had its fields in the wrong order** (`opt_level`
+   before `guess`) and carried a `param_bound` the kernel does not read here.
+   Real layout matches `PK_TOPOL_range_vector_o_t` minus `param_entity`.
+4. **`PK_GEOM_range_o_t` likewise** — real 240-byte layout is
+   `{o_t_version, have_tolerance, tolerance, bound@16, guesses[2]@48,
+   range_type@144, param_bound[2]@152, opt_level@232}`.
+5. **`PK_CURVE_find_box_o_t` / `PK_SURF_find_box_o_t` were opaque stubs.**
+   Recovered from how the functions read them: `{o_t_version@0,
+   have_interval@4, interval@8}` (24 B) and `{o_t_version@0, have_uvbox@4,
+   uvbox@8}` (40 B).
+
+`PK_TOPOL_range_vector_o_t` was checked against the decompile and is **correct**
+— which is what makes the GEOM discrepancies credible rather than a decoding
+error on my part.
+
+### Zeroed enum fields are not valid options
+
+`PK_GEOM_range_vector` rejected a zeroed options struct with
+`PK_ERROR_field_of_wrong_type` (5014) naming `local_opts`. The cause is not a
+layout error: **0 is not a legal token** for `guess_type` or `opt_level`, which
+need `PK_range_guess_no_c` (18260) and `PK_range_opt_accuracy_c` (23761). A
+`Default` that zeroes an options struct is wrong whenever it contains enum
+fields — worth remembering for every future option struct.
+
+### Inversion vs projection, settled
+
+With the options fixed, `PK_GEOM_range_vector` works and is a genuine **global**
+projection (the vendor reference says so explicitly for the array form):
+`(10,0,0)` against a sphere of radius 4 gives distance 6 and witness `(4,0,0)`;
+`(0,0,100)` gives 96 and the north pole. Contrast `PK_SURF_parameterise_vector`,
+which *refuses* off-surface points (Stage 5). The two are not interchangeable
+and are now wrapped separately: `Surf::range_to_point` vs `Surf::parameterise`.

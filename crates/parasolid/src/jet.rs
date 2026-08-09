@@ -50,10 +50,15 @@ pub struct SurfJet {
 
 impl SurfJet {
     /// Number of slots a table of this shape occupies.
+    /// Slots the kernel writes for a table of this shape.
+    ///
+    /// Decompiled from `PK_SURF_eval`:
+    /// `triangular ? ((n_u+2)*(n_u+1))/2 : (n_v+1)*(n_u+1)` — the triangular
+    /// size uses **`n_u` alone**. That is only well-defined because triangular
+    /// requires `n_u == n_v` (enforced in `eval_jet`).
     fn slot_count(n_u: usize, n_v: usize, triangular: bool) -> usize {
         if triangular {
-            let n = n_u.max(n_v);
-            (n + 1) * (n + 2) / 2
+            (n_u + 2) * (n_u + 1) / 2
         } else {
             (n_u + 1) * (n_v + 1)
         }
@@ -63,7 +68,8 @@ impl SurfJet {
     /// that derivative.
     fn index_of(&self, i: usize, j: usize) -> Option<usize> {
         if self.triangular {
-            let n = self.n_u.max(self.n_v);
+            // n_u == n_v is guaranteed by eval_jet's precondition.
+            let n = self.n_u;
             if i + j > n {
                 return None;
             }
@@ -142,8 +148,10 @@ impl crate::surf::Surf {
     ///
     /// `n_u` / `n_v` are the highest derivative orders wanted in each
     /// direction. `triangular` selects the packed table that omits terms with
-    /// `i + j > max(n_u, n_v)` — cheaper, and the natural shape when only total
-    /// order matters.
+    /// `i + j > n` — cheaper, and the natural shape when only total order
+    /// matters. **Triangular requires `n_u == n_v`**; anything else is rejected
+    /// here because the kernel aborts the process rather than erroring when
+    /// argument checking is off.
     pub fn eval_jet(
         &self,
         u: f64,
@@ -243,14 +251,26 @@ impl crate::curve::Curve {
 // =============================================================================
 
 /// A minimum of the radius of curvature, located in parameter space.
+///
+/// # `position` and `param` may disagree
+///
+/// For `PK_SURF_find_min_radii` the kernel does **not** keep the two in step:
+/// on a torus the second entry's `positions[1]` is a verbatim copy of
+/// `positions[0]` while `parms[1]` names a different point, so
+/// `surf.eval(param)` can be several units away from `position`. Reproduced on
+/// two tori. Treat `param` as authoritative and re-evaluate if you need the
+/// point; `position` is only trustworthy for the first entry.
+///
+/// The radii are **signed**, following the curvature sign convention.
 #[derive(Debug, Clone, Copy)]
 pub struct MinRadius {
-    /// The minimum radius of curvature.
+    /// The minimum radius of curvature (signed).
     pub radius: f64,
-    /// Where on the geometry it occurs.
+    /// Where on the geometry it occurs — see the struct note; may disagree with
+    /// `param` for surface entries after the first.
     pub position: Vec3,
     /// The parameter at which it occurs — `t` for a curve, `(u, v)` for a
-    /// surface.
+    /// surface. Authoritative.
     pub param: (f64, f64),
 }
 

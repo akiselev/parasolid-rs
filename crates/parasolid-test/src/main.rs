@@ -5770,6 +5770,263 @@ fn main() {
     });
 
     // =========================================================================
+    // Adversarial-review regressions (2026-08-09)
+    //
+    // Each of these pins a defect found by independent review of Stages 1-6.
+    // They exist because the original stage tests asserted too little.
+    // =========================================================================
+
+    test!("regress_distance_to_second_witness_is_valid", {
+        let _session = Session::start(test_config())?;
+
+        // `PK_range_end_t` was declared 48 bytes when it is 56 (it carries
+        // trailing `region`/`negative` logicals), which put `end_2` at @56
+        // instead of @64 and under-sized `PK_range_2_r_t` by 16 bytes. The
+        // kernel therefore overran the caller's stack, and `point_2` /
+        // `witness_2` were read out of the middle of `end_1`.
+        //
+        // The old distance_to test asserted `distance` and `point_1` only, so
+        // it stayed green throughout.
+        let a = Body::create_solid_block(4.0, 4.0, 4.0)?;
+        let b = Body::create_solid_block(4.0, 4.0, 4.0)?;
+        b.transform(&Transform::translation(20.0, 0.0, 0.0)?)?;
+
+        let r = a.entity().distance_to(b.entity())?;
+        assert_eq!(r.status, RangeStatus::Found);
+        assert!(
+            (r.distance - 16.0).abs() < 1e-9,
+            "gap between the blocks should be 16, got {}",
+            r.distance
+        );
+
+        // The decisive check: the two witness points must be `distance` apart.
+        let (p, q) = (r.point_1, r.point_2);
+        let span = ((p.x - q.x).powi(2) + (p.y - q.y).powi(2) + (p.z - q.z).powi(2)).sqrt();
+        assert!(
+            (span - r.distance).abs() < 1e-9,
+            "|point_1 - point_2| = {span} but distance = {} — end_2 is misaligned",
+            r.distance
+        );
+
+        // And the second witness must name real entities, not garbage tags.
+        let w2 = r.witness_2.expect("a two-entity range has a second witness");
+        assert!(
+            w2.entity.class().is_ok(),
+            "witness_2.entity {} is not a valid tag",
+            w2.entity.tag()
+        );
+        let sub = w2.sub_entity.expect("second witness sub-entity");
+        assert!(
+            matches!(sub.class()?, PkClass::Face | PkClass::Edge | PkClass::Vertex),
+            "witness_2 sub-entity should be face/edge/vertex, got {:?}",
+            sub.class()?
+        );
+    });
+
+    test!("regress_triangular_jet_rejects_unequal_orders", {
+        let _session = Session::start(test_config())?;
+
+        // The kernel requires n_u == n_v for a triangular table but only
+        // CHECKS it when argument checking is on; with checking off it
+        // terminates the process. The wrapper now rejects it up front so safe
+        // Rust cannot abort the host.
+        let basis = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let sph = Surf::sphere(basis, 4.0)?;
+
+        assert!(
+            sph.eval_jet(0.3, 0.2, 3, 1, true).is_err(),
+            "triangular with n_u != n_v must be rejected by the wrapper"
+        );
+        assert!(
+            sph.eval_jet(0.3, 0.2, 1, 3, true).is_err(),
+            "...in either direction"
+        );
+        // Symmetric triangular and any rectangular shape still work.
+        assert!(sph.eval_jet(0.3, 0.2, 2, 2, true).is_ok());
+        assert!(sph.eval_jet(0.3, 0.2, 3, 1, false).is_ok());
+    });
+
+    test!("regress_range_options_are_actually_read", {
+        let _session = Session::start(test_config())?;
+
+        // With `o_t_version: 1` the kernel's migration overwrote `range_type`
+        // and `opt_level` with its own defaults, so asking for the MAXIMUM
+        // distance silently returned the MINIMUM and an illegal `opt_level`
+        // was accepted without complaint. The defaults now stamp the highest
+        // version each entry point accepts.
+        let a = Body::create_solid_block(4.0, 4.0, 4.0)?;
+        let b = Body::create_solid_block(4.0, 4.0, 4.0)?;
+        b.transform(&Transform::translation(20.0, 0.0, 0.0)?)?;
+
+        let min_r = a.entity().distance_to(b.entity())?;
+
+        // Ask for the maximum via the raw call with the crate's default options.
+        let mut opts = PK_TOPOL_range_o_t {
+            range_type: PK_range_type_maximum_c,
+            ..PK_TOPOL_range_o_t::default()
+        };
+        let mut status: PK_range_result_t = 0;
+        let mut r: PK_range_2_r_t = unsafe { std::mem::zeroed() };
+        let rc = unsafe {
+            PK_TOPOL_range(a.tag(), b.tag(), &mut opts, &mut status, &mut r)
+        };
+        assert_eq!(rc, PK_ERROR_no_errors, "maximum-range call failed");
+        assert!(
+            r.distance > min_r.distance + 1.0,
+            "range_type=maximum returned {} but the minimum is {} — the field \
+             is being ignored again",
+            r.distance,
+            min_r.distance
+        );
+
+        // An illegal opt_level must now be REJECTED rather than silently dropped.
+        let mut bad = PK_TOPOL_range_o_t {
+            opt_level: 12345,
+            ..PK_TOPOL_range_o_t::default()
+        };
+        let mut st2: PK_range_result_t = 0;
+        let mut r2: PK_range_2_r_t = unsafe { std::mem::zeroed() };
+        let rc2 = unsafe {
+            PK_TOPOL_range(a.tag(), b.tag(), &mut bad, &mut st2, &mut r2)
+        };
+        assert_ne!(
+            rc2, PK_ERROR_no_errors,
+            "an illegal opt_level should be rejected, proving the field is read"
+        );
+    });
+
+    test!("regress_rational_bcurve_control_points_are_cartesian", {
+        let _session = Session::start(test_config())?;
+
+        // The kernel stores rational vertices as homogeneous (x*w, y*w, z*w, w).
+        // Returning them raw gave plausible-looking but WRONG control points —
+        // a weight of 4 displaced the middle point by 4x.
+        let pts = [
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(1.0, 1.0, 0.0),
+            Vec3::new(2.0, 0.0, 0.0),
+        ];
+        let weights = [1.0, 4.0, 1.0];
+        let knots = [0.0, 1.0];
+        let mults = [3, 3];
+
+        let c = Curve::bcurve_rational(2, &pts, &weights, &knots, &mults)?;
+        let data = c.ask_bcurve()?;
+        assert!(data.is_rational, "curve should report as rational");
+        assert_eq!(data.control_points.len(), 3);
+
+        for (i, want) in pts.iter().enumerate() {
+            let got = data.control_points[i];
+            assert!(
+                (got.x - want.x).abs() < 1e-9
+                    && (got.y - want.y).abs() < 1e-9
+                    && (got.z - want.z).abs() < 1e-9,
+                "control point {i} = ({:.4},{:.4},{:.4}), authored ({:.4},{:.4},{:.4}) \
+                 — weights not divided out",
+                got.x, got.y, got.z, want.x, want.y, want.z
+            );
+        }
+        assert_eq!(data.weights.len(), 3, "weights must be surfaced, not dropped");
+        assert!(
+            (data.weights[1] - 4.0).abs() < 1e-9,
+            "middle weight should be 4, got {}",
+            data.weights[1]
+        );
+        // knot_mult is needed to rebuild the curve; it used to be freed unread.
+        assert_eq!(data.knot_mult, vec![3, 3], "knot multiplicities must survive");
+    });
+
+    test!("regress_nurbs_domain_is_bounded", {
+        let _session = Session::start(test_config())?;
+
+        // Every B-curve/B-surface reports extent token 18001, which used to
+        // decode to Other(18001) and make is_bounded() false for ALL bounded
+        // spline geometry.
+        let pts = [
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(1.0, 2.0, 0.0),
+            Vec3::new(3.0, -1.0, 0.0),
+            Vec3::new(4.0, 0.0, 0.0),
+        ];
+        let knots = [0.0, 1.0];
+        let mults = [4, 4];
+        let c = Curve::bcurve(3, &pts, &knots, &mults)?;
+
+        let p = c.param()?;
+        assert_eq!(
+            p.extent,
+            ParamExtent::KnotBounded,
+            "a clamped B-curve should report the knot-bounded extent"
+        );
+        assert!(
+            p.extent.is_bounded(),
+            "a clamped B-curve has a finite domain and must report as bounded"
+        );
+        assert!(
+            p.range.1 > p.range.0,
+            "knot-bounded range should be non-empty: {:?}",
+            p.range
+        );
+    });
+
+    test!("regress_error_table_has_invalid_object", {
+        let _session = Session::start(test_config())?;
+
+        // 9999 sits outside the 0..=9000 sweep that produced the table, so it
+        // was missing even though the kernel raises it.
+        assert_eq!(PK_ERROR_invalid_object, 9999);
+
+        let mut sf = [0u8; 116];
+        sf[32..36].copy_from_slice(&PK_ERROR_invalid_object.to_le_bytes());
+        sf[68..72].copy_from_slice(&PK_ERROR_mild.to_le_bytes());
+        unsafe { PK_ERROR_raise(sf.as_ptr() as *const PK_ERROR_sf_t) };
+
+        let mut back: PK_ERROR_sf_t = unsafe { std::mem::zeroed() };
+        let mut was_error: PK_LOGICAL_t = PK_LOGICAL_false;
+        unsafe { PK_ERROR_ask_last(&mut was_error, &mut back) };
+        let bytes: Vec<u8> = back.code_token.iter().map(|&c| c as u8).collect();
+        let end = bytes.iter().position(|&b| b == 0).unwrap_or(bytes.len());
+        assert_eq!(
+            String::from_utf8_lossy(&bytes[..end]),
+            "PK_ERROR_invalid_object",
+            "kernel token for 9999"
+        );
+        let mut cleared: PK_LOGICAL_t = PK_LOGICAL_false;
+        unsafe { PK_ERROR_clear_last(&mut cleared) };
+    });
+
+    test!("regress_serious_errors_require_rollback", {
+        let _session = Session::start(test_config())?;
+
+        // Severity 2 is easy to provoke and used to be reported as Mild
+        // whenever the record could not be read, so `requires_rollback()`
+        // answered false for a failure that destroys the target body.
+        let body = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        // wall_thickness is negated internally, so 20.0 shells INWARD by 20 on
+        // a 10-cube — geometrically impossible.
+        let err = body
+            .hollow(20.0)
+            .expect_err("an over-large inward hollow must fail");
+
+        let d = err.details().expect("details");
+        assert_eq!(
+            d.severity,
+            Severity::Serious,
+            "hollow(-20) on a 10-cube is a serious error, got {:?} (token {:?})",
+            d.severity,
+            d.code_token
+        );
+        assert!(
+            err.requires_rollback(),
+            "a serious error must report requires_rollback()"
+        );
+    });
+
+    // =========================================================================
     // Summary
     // =========================================================================
 

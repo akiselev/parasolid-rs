@@ -90,30 +90,59 @@ pub struct PK_range_param_bound_t {
     pub have_param_bound: PK_LOGICAL_t, // @0
     pub param_bound_class: c_int,       // @4
     /// Union storage; interpret per `param_bound_class`.
-    pub bound: [c_double; 4],           // @8 (32 bytes, the larger member)
+    pub bound: [c_double; 4], // @8 (32 bytes, the larger member)
 }
 
 /// `param_bound_class` value selecting the interval (curve) form. [probed]
 pub const PK_range_param_bound_class_interval_c: c_int = 0x204;
 
-/// Details of one endpoint in a range result.
+/// Details of one endpoint in a range result — **56 bytes**.
+///
+/// **[journal-recovered]** from `PKU_journal_range_end` (V37.01.243). The
+/// previous binding stopped after `parameters` and declared 48 bytes, missing
+/// the two trailing logicals. That under-sized every enclosing result struct
+/// and put `PK_range_2_r_t::end_2` at the wrong offset.
+///
+/// ```text
+/// @0  entity        @4  sub_entity
+/// @8  position      (PK_VECTOR_t, 24B)
+/// @32 parameters[0] @40 parameters[1]
+/// @48 region        (PK_LOGICAL_t, 1 byte)
+/// @49 negative      (PK_LOGICAL_t, 1 byte)
+/// ```
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_range_end_t {
     /// Entity tag at this endpoint.
-    pub entity: PK_ENTITY_t,
-    /// Sub-entity tag (edge/vertex on which the closest point lies).
-    pub sub_entity: PK_ENTITY_t,
+    pub entity: PK_ENTITY_t, // @0
+    /// Sub-entity tag (face/edge/vertex on which the closest point lies).
+    pub sub_entity: PK_ENTITY_t, // @4
     /// Position of the endpoint.
-    pub position: PK_VECTOR_t,
-    /// Parameter values at the endpoint (1 for curve, 2 for surface).
-    pub parameters: [c_double; 2],
+    pub position: PK_VECTOR_t, // @8
+    /// Parameter values at the endpoint (1 for curve/edge, 2 for surface/face).
+    pub parameters: [c_double; 2], // @32
+    /// Whether the endpoint lies in a region rather than on a boundary.
+    /// **Single byte** — the journal reads it at 0x30.
+    pub region: u8, // @48
+    /// Whether the reported distance is negative (inside).
+    /// **Single byte** — the journal reads it at 0x31.
+    pub negative: u8, // @49
+    _pad: [u8; 6], // @50 — pad to the 8-byte alignment of the doubles above
 }
 
-/// Result of a range computation between two entities.
+const _: () = {
+    assert!(core::mem::size_of::<PK_range_end_t>() == 56);
+};
+
+/// Result of a range computation between two entities — **120 bytes**.
 ///
 /// NOTE (decompile-verified): the r_t does **not** carry a status field — the
 /// status is the separate `range_result` out-param. `distance` is at offset 0.
+///
+/// `end_2` sits at **@64**, not @56: `PKU_journal_range_2_r` walks an
+/// `undefined8*` and reads `ends[0]` at `param_1 + 1` (byte 8) and `ends[1]` at
+/// `param_1 + 8` (byte 64). With the old 48-byte `PK_range_end_t` the whole
+/// struct was 104 bytes and the kernel overran the caller's stack by 16.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_range_2_r_t {
@@ -121,12 +150,16 @@ pub struct PK_range_2_r_t {
     pub distance: c_double, // @0
     /// Details for the first entity endpoint.
     pub end_1: PK_range_end_t, // @8
-    /// Details for the second entity endpoint.
-    pub end_2: PK_range_end_t, // @56
+    /// Details for the second entity endpoint. 8 + 56 = 64, no padding.
+    pub end_2: PK_range_end_t, // @64
 }
 
-/// Result of a range computation between an entity and a position vector.
-/// `distance` is at offset 0 (no status field — see [`PK_range_2_r_t`]).
+const _: () = {
+    assert!(core::mem::size_of::<PK_range_2_r_t>() == 120);
+};
+
+/// Result of a range computation between an entity and a position vector —
+/// **64 bytes** (the kernel writes 64; the old declaration claimed 56).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_range_1_r_t {
@@ -135,6 +168,10 @@ pub struct PK_range_1_r_t {
     /// Details for the entity endpoint.
     pub end: PK_range_end_t, // @8
 }
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_range_1_r_t>() == 64);
+};
 
 // =============================================================================
 // Range options structures
@@ -154,6 +191,33 @@ pub struct PK_range_bound_t {
     pub have_lower_bound: PK_LOGICAL_t, // @16
     pub lower_bound: c_double,          // @24
 } // 32 bytes
+
+// =============================================================================
+// o_t_version and DEAD FIELDS
+//
+// The kernel migrates a caller's options struct from the stamped `o_t_version`
+// into its current internal form, copying ONLY the fields that version defines
+// and overwriting the rest with hard-coded defaults. Stamping version 1 on
+// these structs therefore makes several fields **silently unread**:
+//
+//   PK_TOPOL_range_o_t / PK_GEOM_range_o_t
+//     v1: range_type and opt_level forced (minimum, performance)
+//     v2: adds range_type;  v3: adds opt_level + param_bound
+//   PK_TOPOL_range_vector_o_t
+//     v1: opt_level and param_entity forced
+//     v2: adds opt_level;   v3: adds param_entity
+//   PK_GEOM_range_vector_o_t   (max version 2)
+//     v1: opt_level forced; v2: adds opt_level
+//
+// Measured consequence of the old `o_t_version: 1`: asking for
+// PK_range_type_maximum_c silently returned the MINIMUM distance with no error,
+// an illegal opt_level token was accepted without complaint, and a supplied
+// param_bound was ignored while the call still reported `found`.
+//
+// The defaults below stamp the HIGHEST version each entry point accepts, so
+// every field these structs expose is actually read. Verified by sweeping
+// accepted versions at runtime; see docs/option-version-protocol.md.
+// =============================================================================
 
 impl Default for PK_range_bound_t {
     fn default() -> Self {
@@ -187,7 +251,7 @@ pub struct PK_TOPOL_range_o_t {
 impl Default for PK_TOPOL_range_o_t {
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 3,
             have_tolerance: PK_LOGICAL_false,
             tolerance: 0.0,
             bound: PK_range_bound_t::default(),
@@ -222,7 +286,7 @@ pub struct PK_TOPOL_range_vector_o_t {
 impl Default for PK_TOPOL_range_vector_o_t {
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 3,
             have_tolerance: PK_LOGICAL_false,
             tolerance: 0.0,
             bound: PK_range_bound_t::default(),
@@ -258,15 +322,15 @@ const _: () = {
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_GEOM_range_o_t {
-    pub o_t_version: c_int,                     // @0
-    pub have_tolerance: PK_LOGICAL_t,           // @4
-    pub tolerance: c_double,                    // @8
-    pub bound: PK_range_bound_t,                // @16
-    pub guesses: [PK_range_guess_s_t; 2],       // @48
-    pub range_type: PK_range_type_t,            // @144
-    _pad: c_int,                                // @148
+    pub o_t_version: c_int,                       // @0
+    pub have_tolerance: PK_LOGICAL_t,             // @4
+    pub tolerance: c_double,                      // @8
+    pub bound: PK_range_bound_t,                  // @16
+    pub guesses: [PK_range_guess_s_t; 2],         // @48
+    pub range_type: PK_range_type_t,              // @144
+    _pad: c_int,                                  // @148
     pub param_bound: [PK_range_param_bound_t; 2], // @152
-    pub opt_level: PK_range_opt_t,              // @232
+    pub opt_level: PK_range_opt_t,                // @232
 }
 
 const _: () = {
@@ -286,7 +350,7 @@ impl Default for PK_GEOM_range_o_t {
             bound: [0.0; 4],
         };
         Self {
-            o_t_version: 1,
+            o_t_version: 3,
             have_tolerance: PK_LOGICAL_false,
             tolerance: 0.0,
             bound: PK_range_bound_t::default(),
@@ -331,7 +395,7 @@ impl Default for PK_GEOM_range_vector_o_t {
         // them zeroed makes the kernel reject the whole struct with
         // PK_ERROR_field_of_wrong_type (5014) naming `local_opts`.
         Self {
-            o_t_version: 1,
+            o_t_version: 2,
             have_tolerance: PK_LOGICAL_false,
             tolerance: 0.0,
             bound: PK_range_bound_t::default(),

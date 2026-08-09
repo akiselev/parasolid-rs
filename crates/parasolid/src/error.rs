@@ -355,6 +355,19 @@ fn default_severity(code: PK_ERROR_code_t) -> Severity {
     match code {
         PK_ERROR_fatal_error | PK_ERROR_unhandleable_condition => Severity::Fatal,
         PK_ERROR_system_error | PK_ERROR_run_time_error | PK_ERROR_fru_error => Severity::Serious,
-        _ => Severity::Mild,
+        // Anything else: assume SERIOUS, not mild.
+        //
+        // This fallback only runs when the kernel's own severity could not be
+        // read (no record, or a record whose code disagrees with the returned
+        // one). Severity 2 is easy to provoke — `PK_BODY_hollow_2` with an
+        // over-large inward offset yields `PK_ERROR_boolean_failure` (1058)
+        // severity 2, and `PK_BODY_offset` yields `PK_ERROR_face_check_fails`
+        // (5035) severity 2 — and in both cases the target body is left
+        // destroyed. Defaulting those to `Mild` made `requires_rollback()`
+        // answer `false` for a failure that genuinely requires a rollback.
+        //
+        // Guessing "serious" can only cost an unnecessary rollback; guessing
+        // "mild" can leave a corrupt model in use. Prefer the recoverable error.
+        _ => Severity::Serious,
     }
 }

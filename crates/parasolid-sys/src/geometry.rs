@@ -229,6 +229,9 @@ pub const PK_PARAM_extent_infinite_c: PK_PARAM_extent_t = 18000;
 pub const PK_PARAM_extent_periodic_c: PK_PARAM_extent_t = 18003;
 /// Range is bounded. [probed] (emitted by `PK_SURF_ask_params`.)
 pub const PK_PARAM_extent_bounded_c: PK_PARAM_extent_t = 18004;
+/// Range is bounded by a knot vector — reported by **every** B-curve and
+/// B-surface. [probed]
+pub const PK_PARAM_extent_knot_bounded_c: PK_PARAM_extent_t = 18001;
 
 /// Token band of `PK_PARAM_sf_t::curve_class`, derived from the iso-curve's
 /// internal class tag.

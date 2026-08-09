@@ -280,14 +280,28 @@ pub const PK_surf_extend_update_default_c: PK_surf_extend_update_t = 0;
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_track_r_t {
-    /// Number of original entities tracked.
-    pub n_original_topols: c_int,
-    /// Array of original entity tags.
-    pub original_topols: *const PK_TOPOL_t,
-    /// Number of product entities.
-    pub n_product_topols: c_int,
-    /// Array of product entity tags.
-    pub product_topols: *const PK_TOPOL_t,
+    /// Opaque 40-byte body. **The previous field names were fiction.**
+    ///
+    /// `PK_TOPOL_track_r_f` (@180256e50, shared with `PK_ENTITY_track_r_f` and
+    /// `PK_MTOPOL_map_r_f`) dereferences and frees pointers at **+0x8, +0x10,
+    /// +0x18 and +0x20**, then writes back at +0x20 — so the struct is at least
+    /// 40 bytes, and the old 32-byte `{n_original_topols, original_topols,
+    /// n_product_topols, product_topols}` declaration was both wrongly named
+    /// and 8 bytes short, giving the free routine an out-of-bounds write.
+    ///
+    /// The real shape is a count plus a `track_records` array. Left opaque
+    /// rather than guessed; tracking data is not yet read by this crate.
+    _opaque: [u8; 40],
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_TOPOL_track_r_t>() == 40);
+};
+
+impl Default for PK_TOPOL_track_r_t {
+    fn default() -> Self {
+        Self { _opaque: [0; 40] }
+    }
 }
 
 // =============================================================================

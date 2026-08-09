@@ -891,9 +891,13 @@ impl crate::body::Body {
     ///
     /// The three directions are applied in order as tie-breakers: `direction_1`
     /// selects the extreme, then `direction_2` and `direction_3` resolve
-    /// remaining ties. Three independent directions pin a vertex on a block;
-    /// fewer would leave a whole face or edge extremal, and the returned
-    /// topology says which happened.
+    /// remaining ties.
+    ///
+    /// All three are **required and must be linearly independent** — repeating
+    /// a direction gives `PK_ERROR_coplanar` (952), so you cannot "supply
+    /// fewer". The returned topology says what realised the extreme: three
+    /// independent directions pin a vertex on a block, while curved geometry
+    /// can still yield an edge (a cylinder's rim in +Z).
     pub fn find_extreme(
         &self,
         direction_1: Vec3,

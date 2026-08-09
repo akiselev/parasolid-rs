@@ -9,6 +9,18 @@
 //! then reports the official `code_token` string for that code. Sweeping
 //! 0..=9000 recovered 631 codes.
 //!
+//! # Coverage limits
+//!
+//! The sweep covered 0..=9000. One code above that range exists and is defined
+//! separately below: `PK_ERROR_invalid_object` = 9999. Codes **15000..=15999**
+//! have no individual names at all — `PKU_error_code_mnemonic` short-circuits
+//! the whole band to the literal string `"$PF_ERROR"`.
+//!
+//! A static reconstruction of the kernel's complete code→token map (the switch
+//! in `PKU_error_code_mnemonic` plus the `KI_*` mnemonic array) was diffed
+//! against this file: **0 value mismatches, 0 spurious entries**, and the one
+//! missing code noted above.
+//!
 //! Cross-validated against real (non-raised) errors: `distance_le_0` = 15 from a
 //! negative block dimension, `not_an_entity` = 22 from a bogus tag,
 //! `o_t_version_unknown` = 5022 from a bad option version, `field_of_wrong_type`
@@ -38,6 +50,18 @@ use crate::PK_ERROR_code_t;
 
 /// No error. Returned by every successful PK call.
 pub const PK_ERROR_no_errors: PK_ERROR_code_t = 0;
+
+/// Generic "the object is not valid for this operation". **[probed]**
+///
+/// Outside the 0..=9000 sweep that produced the rest of this table, and so
+/// missing from it until a static reconstruction of the kernel's whole
+/// code→token map (the 327-entry switch in `PKU_error_code_mnemonic` plus the
+/// 322-entry `KI_*` array) turned up exactly one code the sweep had missed.
+/// `PKU_error_code_mnemonic` maps it explicitly:
+/// `if (code == 9999) strcpy_s(buf, n, "PK_ERROR_invalid_object")`.
+///
+/// It is not obscure — `PK_TOPOL_clash` and `PK_BODY_taper` both raise it.
+pub const PK_ERROR_invalid_object: PK_ERROR_code_t = 9999;
 
 pub const PK_ERROR_bad_angle: PK_ERROR_code_t = 1;
 pub const PK_ERROR_buffer_overflow: PK_ERROR_code_t = 2;

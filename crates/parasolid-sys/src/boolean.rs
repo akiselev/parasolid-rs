@@ -15,7 +15,7 @@
 #![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 
 use crate::*;
-use std::os::raw::{c_double, c_int};
+use std::os::raw::{c_double, c_int, c_void};
 
 // =============================================================================
 // Boolean function enum
@@ -712,16 +712,25 @@ impl Default for PK_FACE_boolean_o_t {
 pub struct PK_boolean_r_t {
     /// Overall boolean status (@0) — e.g. `PK_boolean_result_success_c` (21650).
     /// The old struct put this field last, so `n_bodies` read the success token
-    /// (21650) instead of the real count.
+    /// (21650) instead of the real body count.
     pub result: PK_boolean_result_t, // @0
     /// Number of resulting bodies (@4).
     pub n_bodies: c_int, // @4
     /// Array of resulting body tags (@8) — includes the (replaced) target body.
     pub bodies: *mut PK_BODY_t, // @8
-    /// Reserved — the kernel's results struct carries further fields (freed via
-    /// `PK_boolean_r_f`); kept zeroed so the allocation is not undersized.
-    pub _reserved: [u8; 8], // @16
+    /// Number of faults (@16).
+    pub n_faults: c_int, // @16
+    /// Array of faults (@24), each with its own sub-allocation.
+    pub faults: *mut c_void, // @24
 }
+
+const _: () = {
+    // PK_boolean_r_f (@1804a1360) reads n_faults at [r+0x10] and the faults
+    // array at [r+0x18], frees a per-fault sub-allocation at [fault+8], then
+    // unconditionally writes both back. A 24-byte struct made that a read of
+    // uninitialised stack (a free() of junk) plus an 8-byte out-of-bounds write.
+    assert!(core::mem::size_of::<PK_boolean_r_t>() == 32);
+};
 
 // =============================================================================
 // Imprint option structures

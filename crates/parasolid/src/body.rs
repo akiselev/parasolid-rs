@@ -320,6 +320,31 @@ impl Body {
         unsafe {
             let _ = PkArray::from_raw(blends, n_blends);
             let _ = PkArray::from_raw(topols, n_blends);
+            // `unders` was previously never freed at all. Release the outer
+            // array here.
+            //
+            // KNOWN RESIDUAL LEAK: each element is a `PK_FACE_array_t` that
+            // owns an inner face array. `PK_FACE_array_t` is still an opaque
+            // stub in parasolid-sys, so freeing the inner arrays would mean
+            // guessing its layout — and freeing a wrong pointer is far worse
+            // than leaking. Materialise that struct, then free the inner arrays
+            // here.
+            if !unders.is_null() {
+                let _ = PK_MEMORY_free(unders as *mut std::os::raw::c_void);
+            }
+        }
+
+        // The kernel reports a FAILED blend through `fault`, not through the
+        // return code: PK_BODY_fix_blends answers PK_ERROR_no_errors for a
+        // geometrically impossible blend and names the offending edge. Reporting
+        // that as Ok(0) told the caller "no error, nothing filleted" when the
+        // kernel knew exactly which edge defeated it.
+        if fault != PK_blend_fault_no_fault_c {
+            return Err(crate::error::PsError::Session(format!(
+                "fillet failed: blend fault {fault} on edge {fault_edge} \
+                 ({n_set} of {} edges marked, {n_blends} blends produced)",
+                edge_tags.len()
+            )));
         }
         Ok(n_blends)
     }

@@ -50,22 +50,25 @@ runtime-tested · `[ ]` unaudited / untested · `[!]` known-wrong or suspect.
 - [x] `PK_BODY_type_t` values solid/sheet/wire/minimum (probed). **Gap:**
       acorn/empty/general/compound/unspecified are `[guess]` — probe via
       multi-vertex body, empty body, and a non-manifold body.
-- [~] **Error code values** (`error.rs`): audit the full `PK_ERROR_*` numeric
-      table against docs; several are needed to interpret oracle failures
-      (`PK_ERROR_missing_geom`, `_bad_topology`, `_not_a_*`, …).
-      **Fixed so far (probed under Wine):** the error-inquiry path used to
-      *crash the process on any PK error*. Two bugs: (a) `PK_ERROR_sf_t.function`
-      / `bad_arg_names` are **inline char arrays**, not `*const char` — the old
-      code dereferenced ASCII bytes as a pointer and page-faulted; (b)
-      `PK_THREAD_ask_last_error` faults inside the kernel. `query_last_error`
-      now reads a raw buffer via `PK_ERROR_ask_last` and extracts only the
-      confirmed fields: function name (inline, bytes 0..32) and code (i32 @32).
-      Confirmed codes: `field_of_wrong_type`=5014, `o_t_version_unknown`=5022.
-      **Remaining:** the real `PK_ERROR_sf_t` is larger and carries extra inline
-      string fields (error-name, bad-field name); severity / n_bad_args /
-      bad_args / entity offsets are still unknown — needs a header audit before
-      `bad_args` can be surfaced. `PK_THREAD_ask_last_error` needs a
-      signature/threading audit.
+- [x] **Error code values + `PK_ERROR_sf_t`** — **DONE 2026-08-09** (Stage 0 of
+      `CADABRA3-PRIORITIES.md`; full write-up in `docs/pskernel-solidworks.md`).
+      The hand-written `PK_ERROR_*` table was **entirely wrong** — all 22
+      checkable constants disagreed with the kernel and two pairs collided.
+      Recovered the real table by exploiting `PK_ERROR_raise`, which
+      *canonicalizes* a bare numeric code so `PK_ERROR_ask_last` reports its
+      official `code_token`: sweeping 0..=9000 yielded **631 codes**, now
+      generated into `parasolid-sys/src/error_codes.rs` `[probed]`.
+      Two live bugs fixed: `pk_check` swallowed `PK_ERROR_has_no_name` (7) as a
+      success synonym for `cant_be_aborted` (really 965), and `NotAnEntity`
+      dispatched on 504 — a code the kernel never emits (really 22).
+      `PK_ERROR_sf_t`'s 116-byte layout is runtime-confirmed (function@0,
+      code@32, code_token@36, severity@68, argument_number@72,
+      argument_name@76, argument_index@108, entity@112) and the wrapper now
+      reports real severity, the code token, the named bad argument and the
+      offending entity. `PK_THREAD_ask_last_error` **works** — the old "faults
+      in the kernel" verdict was the old pointer-based struct.
+      **Remaining:** severity is only ever observed *mild*; serious/fatal are
+      unexercised, so `PsError`'s rollback/restart paths are untested.
 - [x] `PK_SESSION_set_check_arguments(true)` on by default in tests, so the
       kernel validates our FFI arguments and surfaces mismatches early. Done via
       a `test_config()` helper used by every test.

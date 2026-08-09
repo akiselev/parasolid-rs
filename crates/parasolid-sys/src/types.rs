@@ -207,7 +207,7 @@ pub const PK_CLASS_part: PK_CLASS_t = 5012; // [probed] superclass of body & ass
 // (entity subclasses); names below are NOT yet matched to values. Do not use
 // for dispatch until verified.
 pub const PK_CLASS_attrib: PK_CLASS_t = -2; // [unknown]
-pub const PK_CLASS_attdef: PK_CLASS_t = -3; // [unknown]
+pub const PK_CLASS_attdef: PK_CLASS_t = 6003; // [probed] PK_ENTITY_ask_class on a real attdef; superclass 1000
 pub const PK_CLASS_group: PK_CLASS_t = -4; // [unknown]
 pub const PK_CLASS_partition: PK_CLASS_t = -5; // [unknown]
 pub const PK_CLASS_mark: PK_CLASS_t = -6; // [unknown]
