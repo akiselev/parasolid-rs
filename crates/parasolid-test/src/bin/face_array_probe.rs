@@ -79,10 +79,7 @@ fn raw_pass(n_edges: usize, radius: f64, do_free: bool) {
         let descs = std::slice::from_raw_parts(unders, n_blends as usize);
         for (i, d) in descs.iter().enumerate() {
             // Raw words of the 16-byte descriptor, before any interpretation.
-            let words = std::slice::from_raw_parts(
-                (d as *const PK_FACE_array_t) as *const u32,
-                4,
-            );
+            let words = std::slice::from_raw_parts((d as *const PK_FACE_array_t) as *const u32, 4);
             eprintln!(
                 "  unders[{i}] raw = [{:08x} {:08x} {:08x} {:08x}]  -> array={:p} length={} pad={}",
                 words[0], words[1], words[2], words[3], d.array, d.length, d._padding
@@ -112,7 +109,10 @@ fn raw_pass(n_edges: usize, radius: f64, do_free: bool) {
 
         // Free inner arrays first (guarded on length > 0), then the outer block —
         // the order PK_BODY_find_facesets_r_f (0x18012d7d0) uses.
-        if !do_free { eprintln!("  [marker] skipping all frees"); return; }
+        if !do_free {
+            eprintln!("  [marker] skipping all frees");
+            return;
+        }
         for d in descs {
             if d.length > 0 && !d.array.is_null() {
                 let e = PK_MEMORY_free(d.array as *mut c_void);
@@ -125,7 +125,10 @@ fn raw_pass(n_edges: usize, radius: f64, do_free: bool) {
         let _ = PK_MEMORY_free(blends as *mut c_void);
         let _ = PK_MEMORY_free(topols as *mut c_void);
     }
-    eprintln!("  freed inner+outer cleanly; faces now = {}", block.faces().unwrap().len());
+    eprintln!(
+        "  freed inner+outer cleanly; faces now = {}",
+        block.faces().unwrap().len()
+    );
 }
 
 fn wrapper_pass(n_edges: usize, radius: f64) {
@@ -143,8 +146,11 @@ fn wrapper_pass(n_edges: usize, radius: f64) {
             .iter()
             .map(|f| f.entity().class().expect("class"))
             .collect();
-        eprintln!("  blend[{i}] tag={} class={bc:?}  unders={:?} classes={ucs:?}",
-                 b.tag(), u.iter().map(|f| f.tag()).collect::<Vec<_>>());
+        eprintln!(
+            "  blend[{i}] tag={} class={bc:?}  unders={:?} classes={ucs:?}",
+            b.tag(),
+            u.iter().map(|f| f.tag()).collect::<Vec<_>>()
+        );
     }
     eprintln!("  faces now = {}", block.faces().unwrap().len());
 }
@@ -153,10 +159,22 @@ fn main() {
     let mode = std::env::args().nth(1).unwrap_or_else(|| "all".to_string());
     let _session = Session::start(SessionConfig::new().check_arguments(true)).expect("session");
     match mode.as_str() {
-        "raw" => { raw_pass(1, 1.0, true); raw_pass(3, 0.5, true); }
-        "rawnofree" => { raw_pass(1, 1.0, false); raw_pass(3, 0.5, false); }
-        "wrapper" => { wrapper_pass(1, 1.0); }
-        "wrapper3" => { wrapper_pass(1, 1.0); wrapper_pass(3, 0.5); wrapper_pass(12, 0.25); }
+        "raw" => {
+            raw_pass(1, 1.0, true);
+            raw_pass(3, 0.5, true);
+        }
+        "rawnofree" => {
+            raw_pass(1, 1.0, false);
+            raw_pass(3, 0.5, false);
+        }
+        "wrapper" => {
+            wrapper_pass(1, 1.0);
+        }
+        "wrapper3" => {
+            wrapper_pass(1, 1.0);
+            wrapper_pass(3, 0.5);
+            wrapper_pass(12, 0.25);
+        }
         _ => {
             raw_pass(1, 1.0, true);
             raw_pass(3, 0.5, true);

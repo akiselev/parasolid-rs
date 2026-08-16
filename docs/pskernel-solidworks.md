@@ -1322,7 +1322,7 @@ Suite: **172 passed, 0 failed, 1 skipped** (167 → 172). New module
 `crates/parasolid-test/src/bin/box_probe.rs`. Ghidra did most of the work here —
 **five** struct layouts were wrong.
 
-### Enclosures are tight, not padded
+### Enclosures are tight, not padded — **CORRECTED, see below**
 
 Measured against analytically exact boxes (sphere, torus, cylinder, circle,
 block), `PK_SURF_find_box` / `PK_CURVE_find_box` / `PK_TOPOL_find_box` return the
@@ -1597,3 +1597,220 @@ makes the kernel read more fields, all of which then need legal enum defaults
   leaks a `PK_PLANE_t` per call, `PK_TOPOL_local_r_f`/`PK_section_r_f` are
   undeclared so local-op status is discarded).
 - `PK_BODY_imprint_body(t, t)` page-faults — no self-imprint guard.
+
+## Tracking the latest API — option-struct version sweep (2026-08-09)
+
+Policy is now in `CLAUDE.md` ("Track the latest API — always"). Every option
+struct the wrapper uses was swept for its accepted `o_t_version` ceiling and for
+whether that version actually READS its late fields. Suite: **198 passed,
+0 failed, 1 skipped**.
+
+**Raised** (previously version-gated into inertness):
+
+| struct | was | now | what was dead |
+|---|---:|---:|---|
+| `PK_BODY_extrude_o_t` | 1 | 6 | `side`, `extruded_body`, `allow_disjoint`, `consistent_params`, pline angle — **all** silently ignored |
+| `PK_BODY_section_o_t` | 1 | 5 | `check_fa` (v3+), `keep_as_facet` (v5) |
+| `PK_PART_transmit_o_t` | 1 | 3 | `transmit_nmnl_geometry` (v2+) |
+| `PK_TOPOL_find_nabox_o_t` | 2 | 3 | `quality` (v3) |
+| `PK_EDGE_optimise_o_t` | 1 | 2 | `set_max_dev`, `optimise_short` |
+| `PK_FACE_intersect_surf_o_t` | 1 | 2 | `mixed_curve_category` |
+| `PK_TOPOL_eval_mass_props_o_t` | 1 | 2 | (v2 ≡ v1; raised for consistency) |
+
+The extrude and nabox raises are backed by decompilation rather than return
+codes alone: `FUN_180121ac0` and `FUN_18045b090` copy the caller's struct at
+**fixed int indices that never shift between versions** — a higher version only
+makes *more* fields live, it never re-interprets existing ones. That is what
+makes those raises safe.
+
+**Deliberately left low**, each with the reason recorded in-place:
+
+- `PK_BODY_boolean_o_t` — band is 2..=19, but v3+ returns `not_a_logical` (908)
+  on a legal call: v3's migration reads a LOGICAL past our 32-byte struct.
+  Needs `FUN_18049b860` decompiled first.
+- `PK_PART_receive_o_t` — v2..=8 all return 5014 even with legal tokens.
+- `PK_TOPOL_eval_mass_props_o_t` beyond 2 — v3..=7 return 5014 even from a
+  256-byte **zeroed** buffer, proving a missing-field error rather than an
+  overread.
+- `PK_TOPOL_find_nabox_o_t` beyond 3 — v4 copies 24 bytes past our struct.
+- `PK_EDGE_optimise_o_t` beyond 2 — v3+ are accepted but the fields go *dead
+  again*, i.e. v3 reads a different larger layout with no error to warn us.
+
+`PK_CURVE_find_box_o_t`, `PK_SURF_find_box_o_t` and `PK_EDGE_make_wire_body_o_t`
+have **no version dispatch at all** — every version is accepted and the fields
+are always live.
+
+### Two findings outside the version work
+
+- **`Body::imprint_body` hard-crashes the kernel.** `PK_BODY_imprint_body` on a
+  straddling block pair segfaults the process **even with NULL options**, so it
+  cannot be version-swept. It has no test coverage. Separate investigation.
+- **`PK_extrude_keep_as_facet_no_c`/`_yes_c` = 0/1 are almost certainly wrong** —
+  PK token families are never 0/1, and the kernel's own default is `0x67fc`
+  (26620). Harmless today because the field is only read at v7. Annotated.
+
+## Stage 7 — surface/surface intersection (2026-08-09)
+
+Suite: **201 passed, 0 failed, 1 skipped**. Adversarially reviewed. Probes:
+`ssi_probe.rs`, `ssi_matrix.rs`, `review_ssi_probe.rs`.
+
+### The option struct had the Stage 6 disease
+
+`mixed_curve_category` is **ignored at `o_t_version` 1 and read from 2** — so it
+had never been live. The wrapper now stamps 2 with `PK_mixed_intersection_
+classic_c`, and a test asserts a garbage token is *rejected*, which is the only
+way to prove the field is read. Ceiling is 2 (3 = `not_implemented`, 4+
+unknown). Struct offsets confirmed against the decompile.
+
+**But the token is behaviourally inert**: `classic` / `pline` / `both` give
+bit-identical results on every analytic and B-surface pair tried, and no
+configuration produced a pline. The v2 bump buys type-checking, not behaviour —
+the original rationale claiming otherwise was falsified and has been corrected.
+The sibling `tolerance` field is neither validated nor effective (even
+`tolerance = 1.0` on a radius-5 sphere is accepted and changes nothing).
+
+### The analytic pair matrix is exact
+
+Every branch checked by **independent algebraic residual**, never via the
+kernel — `range_to_point` snaps to exactly 0.0 below 1e-8, so any residual
+assertion built on it is vacuous in the range it claims to police. True
+residuals are ~1e-15.
+
+| pair | result |
+|---|---|
+| cyl × plane | circle r=5, exact |
+| sphere × plane | circle r=4 (= √(25−9)) |
+| sphere × sphere | circle r=4 at z=3 |
+| torus × equatorial plane | two circles, R−r and R+r |
+| cone × ⊥ plane | circle of radius `base + z·tan(semi)` |
+| cone × plane through axis | two straight rulings |
+| **cyl × cyl equal radius** | **four ellipse arcs, four distinct tags** |
+| cyl × cyl unequal | two B-curves (a genuine quartic) |
+| cyl × cyl parallel tangent | one tangential line |
+| **Villarceau bitangent plane** | total arc length = 4πR, nothing dropped |
+
+The Steinmetz "four arcs" is a correct decomposition, not a double count: each
+of the two ellipses is split at the two singular crossings at (0, ±5, 0), and
+the arcs carry distinct curve tags. Coverage was independently verified against
+800 analytically generated points to 2.8e-14.
+
+### Three limitations CADabra must design around
+
+1. **Branch collapse at ~1e-3 model units** — five orders of magnitude *above*
+   the 1e-8 linear precision. A true intersection circle of radius 3.2e-4 is
+   discarded and returned as an isolated **point**; two torus circles 3.5e-4
+   apart are **fused into one curve mislabelled `Tangential`**. So
+   `IntersectionKind::Tangential` means "tangential **or within ~1e-3 of it**".
+   Pinned by `stage7_ssi_collapses_near_tangential_branches`.
+2. **Coincidence is indistinguishable from disjointness** — both return empty.
+   This holds far more broadly than first thought: identical planes, reversed
+   normals, rotated reference directions, shifted in-plane origins, the same tag
+   passed twice, coincidence *across representations* (analytic cylinder vs
+   spun-line surface), and partial coincidence (a bounded B-surface patch lying
+   in an infinite plane). No option makes it detectable.
+3. **The returned curves are caller-owned orphan geometry.** Nothing deleted
+   them — 200 calls left 200 live circles. Added
+   `SurfIntersection::delete_curves()`; an oracle looping over face pairs must
+   call it or grow without bound.
+
+### Closed positively
+
+`PK_intersect_curve_t` is a **complete two-member set** — `simple` 14651 and
+`tangent` 14652 — confirmed by the RE catalog and a 15-configuration runtime
+scan (tangent planes, torus crown, cone-sphere tangency, saddle B-surfaces,
+offset B-surfaces, spun/swept surfaces, Villarceau, lemon/apple/horn tori, cone
+apex, seam planes). `IntersectionKind::Other` is dead code.
+
+Degenerate tori behave correctly: the lemon's "missing" inner branch is genuinely
+not part of the surface (the kernel restricts the v-range and
+`range_to_point` confirms the distance), and the apple correctly returns its
+circle *plus* the degenerate origin point.
+
+**Minor, recorded:** `IntersectionCurve::bounds` can exceed the curve's natural
+interval (5π/2 > 2π on a periodic curve), so a consumer clamping to the natural
+interval would truncate a branch. `PK_FACE_intersect_face_o_t` can never use v2
+(the code path is `not_implemented`), so its `mixed_curve_category` is
+permanently unreachable.
+
+
+## Corrections from the CADabra3 oracle suite (2026-08-09)
+
+Expanding the cadabra3 differential suite from 6 to 49 tests falsified three
+claims recorded above. All three were verified independently here before being
+accepted.
+
+### 1. `PK_CURVE_find_box` is NOT tight for obliquely placed geometry
+
+Stage 6 recorded "boxes are tight, not padded — slack exactly 0.0 on every
+face". That was an artifact of **axis-aligned fixtures**, which is precisely the
+trap Stage 2 warned about and this document then fell into.
+
+Placing a radius-5.25 circle on the exactly-orthonormal rational rotation
+`(1/9)[[7,-4,4],[4,8,1],[-4,1,8]]` and comparing against closed form:
+
+```
+axis   reported      tight r*sqrt(1-Zi^2)   L1 hull r*(|Xi|+|Yi|)   ratio
+x      6.416666667   4.702983687            6.416666667             1.3644
+y      7.000000000   5.217491947            7.000000000             1.3416
+z      2.916666667   2.405144948            2.916666667             1.2127
+```
+
+The reported value equals the **L1 / control-parallelogram hull to 9e-16**, not
+the tight extent. Ellipses follow the same rule with `r1·|X_i| + r2·|Y_i|`. The
+two formulas coincide exactly when at most one in-plane axis contributes to a
+coordinate — true of every axis-aligned case.
+
+Still a conservative superset, so exclusion/pruning remains sound; anything
+relying on tightness is not. `find_oriented_box` **is** tight (widths
+5.25/5.25/0, dimension 2) and recovers the lost precision.
+
+### 2. Cone `semi_angle` drift reaches a fixed point after one round trip
+
+Stage 1 recorded the drift as "monotonic with no fixed point", extrapolated from
+a 40-iteration run on a single value. Measured across 14 angles: **10 are
+bit-exact**, and the 4 that move do so by exactly ±1 ULP on the *first* round
+trip and are then stable (0.3 → −1 ULP, then five further round trips
+bit-identical). The defensible claim is **total excursion ≤ 1 ULP**, not
+unbounded drift. A tolerance band is still required; an accumulating-error model
+is not.
+
+### 3. `closed_raw` is anti-correlated with closure, not merely uninformative
+
+Stage 7 recorded it as always 1 and therefore carrying no information. Worse
+than that: a clamped quadratic B-spline whose first and last control points
+coincide — geometrically closed, `eval(0)` and `eval(3)` bit-identical — reports
+`closed_raw = 0`, while an infinite straight line reports `1`. Reading it as a
+closure test gives the **opposite** of the truth on both. Its removal from the
+public API was correct.
+
+### Also recorded
+
+Parasolid pairs `principal_curvature_1 = 0` with a cylinder's **axial**
+direction; CADabra declares the circumferential pair first. Index-by-index
+curvature comparison passes spuriously on any fixture where the two curvatures
+coincide — compare as an unordered set or match by direction.
+
+`Curve` has no global projection wrapper: `PK_TOPOL_range_vector` rejects orphan
+geometry with `wrong_entity`, so there is no curve equivalent of
+`Surf::range_to_point`. A wrapper gap, recorded not fixed.
+
+### Correction 4 — at an umbilic point the principal DIRECTIONS are arbitrary
+
+The rule recorded above — "compare curvatures as an unordered set or match by
+direction" — needs a caveat found while building CADabra's `Sphere3` against the
+oracle.
+
+On a sphere every tangent direction is principal, so
+`PK_SURF_eval_curvature`'s `principal_direction_1` / `_2` match **neither** the
+chart's longitudinal nor its meridional direction. They are always a valid
+orthonormal tangent pair — that much is assertable — but *which* pair is
+arbitrary, as it must be when the two curvatures coincide.
+
+So: **where `k1 == k2`, neither index-matching nor direction-matching carries
+information. Only the values do.** A comparator that tries to align directions
+at an umbilic will fail spuriously; one that aligns by index will pass
+spuriously. Both are wrong for the same reason.
+
+This is the umbilic case of the same hazard as the cylinder ordering already
+recorded (Parasolid puts the axial direction first): direction/index pairing is
+only meaningful when the curvatures are distinct.

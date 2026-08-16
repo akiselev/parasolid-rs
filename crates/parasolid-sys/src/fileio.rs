@@ -135,9 +135,28 @@ pub struct PK_PART_transmit_o_t {
 }
 
 impl Default for PK_PART_transmit_o_t {
+    /// `o_t_version = 3` — the highest version this build accepts *for this
+    /// layout*. Measured by `version_upgrade_probe` on V37.01.243:
+    ///
+    /// | version | legal tokens | garbage `transmit_user_fields` | garbage `transmit_nmnl_geometry` | garbage `transmit_meshes` |
+    /// |---|---|---|---|---|
+    /// | 1     | rc 0   | 908 (read) | rc 0 (**ignored**) | rc 0 |
+    /// | 2     | rc 0   | 908        | **908 (read)**     | rc 0 |
+    /// | **3** | rc 0   | 908        | 908                | rc 0 |
+    /// | 4     | **5014** | —        | —                  | 5014 |
+    /// | 5+    | 5022   | —          | —                  | —    |
+    ///
+    /// v4 returns `field_of_wrong_type` on the *legal-token* call, i.e. it
+    /// reads a field this binding does not supply, so 3 is the ceiling we can
+    /// safely stamp. v2 is the first version that reads
+    /// `transmit_nmnl_geometry` — at the previous `o_t_version = 1` that field
+    /// was silently dead and the kernel used its own default.
+    ///
+    /// `transmit_meshes` is still not read at v3 (only v4 reads it); getting it
+    /// live would need the v4 layout recovered first.
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 3,
             transmit_format: 0, // 0 = frustrum/kernel default
             transmit_user_fields: PK_LOGICAL_false,
             transmit_version: 0,
@@ -188,6 +207,15 @@ pub struct PK_PART_receive_o_t {
 }
 
 impl Default for PK_PART_receive_o_t {
+    /// `o_t_version = 1` — deliberately NOT raised, unlike its transmit
+    /// counterpart. `version_upgrade_probe` finds no 5022 ceiling below 8, but
+    /// **every version from 2 upwards returns `field_of_wrong_type` (5014) on
+    /// the legal-token call**: the v2+ migration reads fields past the end of
+    /// this binding, and a zeroed slot is not a legal token for them.
+    ///
+    /// To raise this: recover the v2 layout (which fields v2 adds and their
+    /// legal tokens) from the `PK_PART_receive` migration routine, extend the
+    /// struct, then re-sweep. Until then v1 is the only usable version.
     fn default() -> Self {
         Self {
             o_t_version: 1,

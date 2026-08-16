@@ -40,7 +40,11 @@ fn cmp3(label: &str, want: Vec3, got: Vec3) -> bool {
 fn cmp_axis2(label: &str, want: Axis2, got: Axis2) -> bool {
     let a = cmp3(&format!("{label}.origin"), want.origin, got.origin);
     let b = cmp3(&format!("{label}.axis"), want.axis, got.axis);
-    let c = cmp3(&format!("{label}.ref_dir"), want.ref_direction, got.ref_direction);
+    let c = cmp3(
+        &format!("{label}.ref_dir"),
+        want.ref_direction,
+        got.ref_direction,
+    );
     a && b && c
 }
 
@@ -412,9 +416,15 @@ fn exp3_adversarial_scalars() {
         ("1e-6", 1e-6),
         ("0.1", 0.1),
         ("pi/4", std::f64::consts::FRAC_PI_4),
-        ("pi/2-1ulp", f64::from_bits(std::f64::consts::FRAC_PI_2.to_bits() - 1)),
+        (
+            "pi/2-1ulp",
+            f64::from_bits(std::f64::consts::FRAC_PI_2.to_bits() - 1),
+        ),
         ("pi/2", std::f64::consts::FRAC_PI_2),
-        ("pi/2+1ulp", f64::from_bits(std::f64::consts::FRAC_PI_2.to_bits() + 1)),
+        (
+            "pi/2+1ulp",
+            f64::from_bits(std::f64::consts::FRAC_PI_2.to_bits() + 1),
+        ),
         ("2.0 (>pi/2)", 2.0),
         ("0.0", 0.0),
         ("-0.3", -0.3),
@@ -497,7 +507,9 @@ fn exp3_adversarial_scalars() {
 
 /// Experiment 4: NaN / infinity — rejected, or silently stored?
 fn exp4_nan_inf(check_args: bool) {
-    banner(&format!("EXP4  NaN / Inf inputs (check_arguments = {check_args})"));
+    banner(&format!(
+        "EXP4  NaN / Inf inputs (check_arguments = {check_args})"
+    ));
 
     let basis = Axis2::new(
         Vec3::zero(),
@@ -620,7 +632,10 @@ fn exp5_degenerate_tokens() {
     p!("torus min=0", Surf::torus(basis, 1.0, 0.0).map(|_| ()));
     p!("plane null axis", Surf::plane(nullaxis).map(|_| ()));
     p!("sphere null axis", Surf::sphere(nullaxis, 1.0).map(|_| ()));
-    p!("line zero direction", Curve::line(Vec3::zero(), Vec3::zero()).map(|_| ()));
+    p!(
+        "line zero direction",
+        Curve::line(Vec3::zero(), Vec3::zero()).map(|_| ())
+    );
     p!(
         "circle ref parallel to axis",
         Curve::circle(
@@ -674,7 +689,11 @@ fn exp6_precision(session: &Session) {
             "  set {req:>12.3e} -> code {code:<6} readback {:.17e} [{}] {}",
             actual,
             h(actual),
-            if exact { "EXACT" } else { "*** CLAMPED/CHANGED ***" }
+            if exact {
+                "EXACT"
+            } else {
+                "*** CLAMPED/CHANGED ***"
+            }
         );
         unsafe { PK_SESSION_set_precision(default_linear) };
     }
@@ -823,7 +842,10 @@ fn exp7_precision_independence(session: &Session) {
 fn exp8_check_arguments(session: &Session) {
     banner("EXP8  check_arguments readback and effect");
 
-    println!("  check_arguments readback = {:?}", session.check_arguments());
+    println!(
+        "  check_arguments readback = {:?}",
+        session.check_arguments()
+    );
 }
 
 /// Experiment 9: characterise the cone semi_angle round-trip loss.
@@ -876,7 +898,9 @@ fn exp9_cone_semi_angle_sweep() {
     for i in 0..40 {
         let s = Surf::cone(basis, 1.0, v).unwrap();
         let out = s.ask_cone().unwrap().semi_angle;
-        if i % 5 == 0 || i > 34 { println!("    iter {i}: {} -> {} ({:.17e})", h(v), h(out), out); }
+        if i % 5 == 0 || i > 34 {
+            println!("    iter {i}: {} -> {} ({:.17e})", h(v), h(out), out);
+        }
         v = out;
     }
 
@@ -925,25 +949,21 @@ fn exp10_unit_nonperp_ref() {
 
     let s = std::f64::consts::FRAC_1_SQRT_2;
     for (name, axis, refd) in [
-        ("ref 45deg off axis", Vec3::new(0.0, 0.0, 1.0), Vec3::new(s, 0.0, s)),
         (
-            "ref 1e-9 off perpendicular",
+            "ref 45deg off axis",
             Vec3::new(0.0, 0.0, 1.0),
-            {
-                let e = 1e-9f64;
-                let n = (1.0 + e * e).sqrt();
-                Vec3::new(1.0 / n, 0.0, e / n)
-            },
+            Vec3::new(s, 0.0, s),
         ),
-        (
-            "ref 1e-13 off perpendicular",
-            Vec3::new(0.0, 0.0, 1.0),
-            {
-                let e = 1e-13f64;
-                let n = (1.0 + e * e).sqrt();
-                Vec3::new(1.0 / n, 0.0, e / n)
-            },
-        ),
+        ("ref 1e-9 off perpendicular", Vec3::new(0.0, 0.0, 1.0), {
+            let e = 1e-9f64;
+            let n = (1.0 + e * e).sqrt();
+            Vec3::new(1.0 / n, 0.0, e / n)
+        }),
+        ("ref 1e-13 off perpendicular", Vec3::new(0.0, 0.0, 1.0), {
+            let e = 1e-13f64;
+            let n = (1.0 + e * e).sqrt();
+            Vec3::new(1.0 / n, 0.0, e / n)
+        }),
     ] {
         let b = Axis2::new(Vec3::zero(), axis, refd);
         print!("  {name:<30} ");
@@ -955,7 +975,11 @@ fn exp10_unit_nonperp_ref() {
                     && d.basis.ref_direction.z.to_bits() == refd.z.to_bits();
                 println!(
                     "ACCEPTED, ref back {} ({},{},{})",
-                    if same { "bit-identical" } else { "*** RE-ORTHOGONALISED ***" },
+                    if same {
+                        "bit-identical"
+                    } else {
+                        "*** RE-ORTHOGONALISED ***"
+                    },
                     h(d.basis.ref_direction.x),
                     h(d.basis.ref_direction.y),
                     h(d.basis.ref_direction.z)
@@ -1087,17 +1111,40 @@ fn exp12_point_limit(session: &Session) {
         let (mut lo, mut hi) = (0.0f64, 1.0e30f64);
         for _ in 0..300 {
             let mid = 0.5 * (lo + hi);
-            if mid <= lo || mid >= hi { break; }
-            if Point::create(Vec3::new(mid, 0.0, 0.0)).is_ok() { lo = mid; } else { hi = mid; }
+            if mid <= lo || mid >= hi {
+                break;
+            }
+            if Point::create(Vec3::new(mid, 0.0, 0.0)).is_ok() {
+                lo = mid;
+            } else {
+                hi = mid;
+            }
         }
-        println!("  precision {p:.1e}: max |x| accepted by PK_POINT_create ~= {lo:.9e} [{}]", h(lo));
+        println!(
+            "  precision {p:.1e}: max |x| accepted by PK_POINT_create ~= {lo:.9e} [{}]",
+            h(lo)
+        );
         // and the same bound for sphere origin
         let (mut lo2, mut hi2) = (0.0f64, 1.0e300f64);
         for _ in 0..400 {
             let mid = 0.5 * (lo2 + hi2);
-            if mid <= lo2 || mid >= hi2 { break; }
-            let ok = Surf::sphere(Axis2::new(Vec3::new(mid,0.0,0.0), Vec3::new(0.0,0.0,1.0), Vec3::new(1.0,0.0,0.0)), 1.0).is_ok();
-            if ok { lo2 = mid; } else { hi2 = mid; }
+            if mid <= lo2 || mid >= hi2 {
+                break;
+            }
+            let ok = Surf::sphere(
+                Axis2::new(
+                    Vec3::new(mid, 0.0, 0.0),
+                    Vec3::new(0.0, 0.0, 1.0),
+                    Vec3::new(1.0, 0.0, 0.0),
+                ),
+                1.0,
+            )
+            .is_ok();
+            if ok {
+                lo2 = mid;
+            } else {
+                hi2 = mid;
+            }
         }
         println!("  precision {p:.1e}: max |x| accepted as sphere origin ~= {lo2:.9e}");
     }

@@ -36,6 +36,15 @@ pub const PK_PARTITION_copy_deltas_curr_c: PK_partition_copy_deltas_t = 23313;
 // PK_PARTITION_create options + results
 // =============================================================================
 
+/// `o_t_version = 1` is already the ceiling: `version_upgrade_probe` on
+/// V37.01.243 gets `o_t_version_unknown` (5022) for v2 and above, while at v1 a
+/// garbage `allow_partial_pmarks` returns `PK_ERROR_not_a_logical` (908) — so
+/// v1 reads the whole struct. Nothing to raise.
+///
+/// (The v1 legal-token call returns 5048 `rollback_not_started` unless the
+/// session has rollback enabled; that is a session-state error, not a version
+/// error, and does not affect the ceiling measurement.)
+///
 /// Options for `PK_PARTITION_create`. Layout `o_t_version@0,
 /// allow_partial_pmarks@4` (8 bytes) per the V35 docs / RE catalog.
 #[repr(C)]

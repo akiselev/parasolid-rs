@@ -72,7 +72,18 @@ impl crate::curve::Curve {
     /// Axis-aligned enclosure of this curve, optionally restricted to a
     /// parameter interval (`PK_CURVE_find_box`).
     ///
-    /// The result is a **conservative superset**, not a tight box.
+    /// **Conservative superset, NOT tight.** For an obliquely placed conic the
+    /// kernel returns the **L1 / control-parallelogram hull**
+    /// `r·(|X_i| + |Y_i|)` (ellipse: `r1·|X_i| + r2·|Y_i|`), not the true
+    /// half-extent `r·√(1 − Z_i²)`. Measured on a radius-5.25 circle placed by
+    /// an exactly-orthonormal rational rotation: **1.364× / 1.342× / 1.213×**
+    /// the tight value, matching the L1 formula to 9e-16.
+    ///
+    /// The two coincide exactly when at most one in-plane axis contributes to a
+    /// given coordinate — which is true of *every axis-aligned fixture*, and is
+    /// why this looked tight until an oblique frame was tried. Safe for
+    /// pruning; unusable where tightness matters. [`Curve::find_oriented_box`]
+    /// *is* tight and recovers what this loses.
     pub fn find_box(&self, interval: Option<(f64, f64)>) -> PsResult<Aabb> {
         let opts = match interval {
             Some((low, high)) => PK_CURVE_find_box_o_t {

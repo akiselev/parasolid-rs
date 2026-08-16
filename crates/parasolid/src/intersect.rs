@@ -99,6 +99,10 @@ impl Curve {
         other: &Curve,
         other_interval: (f64, f64),
     ) -> PsResult<Vec<CurveCurveHit>> {
+        // `o_t_version = 1` is already the ceiling: v2+ return
+        // `o_t_version_unknown` (5022). `have_box` is live at v1 (a garbage
+        // token gives `PK_ERROR_not_a_logical`, 908), so the whole struct is
+        // already being read.
         let opts = PK_CURVE_intersect_curve_o_t {
             o_t_version: 1,
             have_box: PK_LOGICAL_false,
@@ -156,6 +160,12 @@ impl Surf {
         interval: (f64, f64),
     ) -> PsResult<Vec<SurfCurveHit>> {
         // Full documented v1 layout, zero-initialised (have_box = false).
+        //
+        // `o_t_version = 1` is already the ceiling: `version_upgrade_probe` on
+        // V37.01.243 gets `o_t_version_unknown` (5022) for v2 and every value
+        // above it, so there is no later version to adopt. Unlike its
+        // surf/surf sibling this entry point never gained a v2, so it has no
+        // `mixed_curve_category` to keep alive.
         let mut opts: PK_SURF_intersect_curve_o_t = unsafe { std::mem::zeroed() };
         opts.o_t_version = 1;
         let iv = PK_INTERVAL_t {
@@ -301,13 +311,31 @@ impl Face {
 // zero-initialised, version-1 instance means "no restriction". `mem::zeroed`
 // then setting o_t_version is the least error-prone way to build them without
 // hard-coding every (still-unverified) trailing field.
+/// `o_t_version = 1` — deliberately NOT raised. `PK_FACE_intersect_face` is
+/// the odd one out of the intersection family: its measured ceiling is **1**
+/// (v2 and v3 both return `PK_ERROR_not_implemented` 5000, v4+ return
+/// `o_t_version_unknown` 5022), so the v2 treatment applied to
+/// `PK_SURF_intersect_surf` and `PK_FACE_intersect_surf` is not available here.
+///
+/// Consequence / residual risk: `mixed_curve_category` is not read at v1, so
+/// face/face intersections fall back to the kernel's own default mixed-curve
+/// category and cannot be pinned the way SSI now is. Revisit if a later
+/// Parasolid build implements v2 for this entry point.
 fn face_intersect_face_opts() -> PK_FACE_intersect_face_o_t {
     let mut o = unsafe { std::mem::zeroed::<PK_FACE_intersect_face_o_t>() };
     o.o_t_version = 1;
     o
 }
+/// `o_t_version = 2` — the highest version `PK_FACE_intersect_surf` accepts
+/// (v3 returns `PK_ERROR_not_implemented` 5000, v4+ `o_t_version_unknown`
+/// 5022). Measured by `version_upgrade_probe`: a garbage `mixed_curve_category`
+/// is *ignored* at v1 but returns `field_of_wrong_type` (5014) at v2, so v2 is
+/// the first version that actually reads it. This is the same defect already
+/// fixed for `PK_SURF_intersect_surf_o_t` — at v1 the mixed-dimension category
+/// was silently dead and the kernel used its own default.
 fn face_intersect_surf_opts() -> PK_FACE_intersect_surf_o_t {
     let mut o = unsafe { std::mem::zeroed::<PK_FACE_intersect_surf_o_t>() };
-    o.o_t_version = 1;
+    o.o_t_version = 2;
+    o.mixed_curve_category = PK_mixed_intersection_classic_c;
     o
 }

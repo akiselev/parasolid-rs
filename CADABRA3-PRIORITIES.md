@@ -430,7 +430,7 @@ Tests: `stage6_boxes_are_tight_not_padded`,
 
 ---
 
-## Stage 7 — Surface/surface intersection
+## Stage 7 — Surface/surface intersection ✅ **COMPLETE** (2026-08-09)
 
 **Building:** CADabra's central algorithm, on analytic pairs first.
 
@@ -453,8 +453,33 @@ plus the `bounds` array correspondence and isolated-point handling. Coincident
 planes yielding *no* data and tangent spheres yielding a single point are already
 confirmed and are the shape of the answer we want everywhere else.
 
-**Done when:** branches match as unordered semantic sets with explicit gauge
-normalization, and a missing branch is not rescued by matching samples.
+**Verdict.** The full analytic matrix is exact, verified by **independent
+algebraic residuals** (~1e-15) rather than by the kernel's own projection —
+which snaps to 0.0 below 1e-8 and would have made the check vacuous. Villarceau
+and Steinmetz both pass completeness: total Villarceau arc length is 4πR, and
+the Steinmetz "four arcs" are two ellipses correctly split at their singular
+crossings, with distinct tags.
+
+Three limitations CADabra must design around, all pinned by tests:
+
+1. **Branch collapse at ~1e-3** — five orders above the 1e-8 precision. A
+   3.2e-4-radius circle is returned as a *point*; two circles 3.5e-4 apart fuse
+   into one curve **mislabelled `Tangential`**.
+2. **Coincidence ≡ disjoint** — both empty, across every representation tried.
+3. **Returned curves are caller-owned and leaked** until
+   `SurfIntersection::delete_curves()` is called.
+
+`PK_intersect_curve_t` is a closed two-member set. The `mixed_curve_category`
+option is type-checked at v2 but behaviourally inert.
+
+Tests: `stage7_ssi_options_read_the_late_fields`,
+`stage7_ssi_analytic_pairs_are_exact`, `stage7_ssi_distinguishes_tangency`,
+`stage7_ssi_cylinder_cylinder_strata`, `stage7_ssi_cone_conic_ladder`,
+`stage7_ssi_villarceau_bitangent_plane`,
+`stage7_ssi_cannot_distinguish_coincident_from_disjoint`,
+`stage7_ssi_survives_oblique_placement`,
+`stage7_ssi_collapses_near_tangential_branches`,
+`stage7_ssi_curves_are_caller_owned`.
 
 ---
 

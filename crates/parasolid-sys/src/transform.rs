@@ -97,6 +97,10 @@ pub struct PK_TRANSF_classify_o_t {
 }
 
 impl Default for PK_TRANSF_classify_o_t {
+    /// `o_t_version = 1` — already the ceiling. `version_upgrade_probe` on
+    /// V37.01.243: v1 returns rc 0 and a garbage `diagnostics` returns
+    /// `field_of_wrong_type` (5014), so v1 reads the whole struct; v2 and above
+    /// return `o_t_version_unknown` (5022). Nothing to raise.
     fn default() -> Self {
         PK_TRANSF_classify_o_t {
             o_t_version: 1,

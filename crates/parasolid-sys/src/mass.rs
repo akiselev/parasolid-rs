@@ -1,6 +1,33 @@
 //! Mass properties evaluation.
 //!
 //! Bindings for `PK_TOPOL_eval_mass_props` and related option types (Chapter 25).
+//!
+//! # Option-struct version
+//!
+//! **`o_t_version` ceiling is 7** (measured; 8 gives `o_t_version_unknown`),
+//! but the **highest usable version for this binding is 2**, which is what the
+//! struct now stamps.
+//!
+//! Sweep on V37.01.243 (`version_upgrade_probe mass`), 5-field layout, legal
+//! tokens throughout:
+//!
+//! | version | rc |
+//! |---|---|
+//! | 1, **2** | 0 |
+//! | 3..=7 | 5014 `field_of_wrong_type` |
+//! | 8+ | 5022 `o_t_version_unknown` |
+//!
+//! v3+ reads further fields (`use_facets`, `facet_tol`, densities, `transfs`,
+//! scale controls) that this 5-field struct does not supply, and a zeroed slot
+//! is not a legal token for them — the 5014 is emitted even when the struct is
+//! backed by a 256-byte zeroed buffer, so it is a missing-field error and not a
+//! read off the end of the allocation. Raising past 2 needs the full v7 layout
+//! recovered first; see docs/option-version-protocol.md.
+//!
+//! v2 is stamped rather than v1 per the "track the latest API" policy. It is
+//! numerically a no-op on this build — a 10×10×10 block returns bit-identical
+//! `amount`/`mass`/`periphery`/`c_of_g`/`m_of_i` at v1 and v2 — which is the
+//! evidence that v2's user struct is the same 5 fields as v1's.
 
 #![allow(non_camel_case_types, non_snake_case, non_upper_case_globals)]
 
@@ -90,13 +117,14 @@ pub const PK_REPORT_3_mass_eq_0_c: c_int = 25636;
 /// The public kernel struct has *more* fields at higher `o_t_version`s
 /// (`single`/`use_facets`/`facet_tol`/`same_dim_density`/`lower_dim_density`/
 /// `n_transfs`/`transfs`/`mass_eq_0`/scale controls/`local_opts`). Those are not
-/// modelled here — set `o_t_version = 1` and the kernel migrates this struct to
+/// modelled here — set `o_t_version` to 1 or 2 and the kernel migrates this struct to
 /// its internal latest form, applying documented defaults for the rest. Using a
 /// higher version requires the full layout from a header audit.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_eval_mass_props_o_t {
-    /// Structure version. Must be `1` for this layout.
+    /// Structure version. Must be `1` or `2` for this 5-field layout;
+    /// 3..=7 are accepted by the entry point but read fields not modelled here.
     pub o_t_version: c_int,
     /// What mass data to compute (`PK_mass_*_c`).
     pub mass: PK_mass_t,
@@ -109,11 +137,13 @@ pub struct PK_TOPOL_eval_mass_props_o_t {
 }
 
 impl Default for PK_TOPOL_eval_mass_props_o_t {
-    /// Version-1 defaults matching the kernel's own initialisation: compute
-    /// everything (`m_of_i`), include periphery, no error bounds.
+    /// Defaults matching the kernel's own initialisation: compute everything
+    /// (`m_of_i`), include periphery, no error bounds. `o_t_version = 2` — the
+    /// highest version this 5-field layout can supply legally; see the module
+    /// docs for the sweep.
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 2,
             mass: PK_mass_m_of_i_c,
             periphery: PK_mass_periphery_yes_c,
             bound: PK_mass_bound_no_c,
@@ -137,7 +167,7 @@ unsafe extern "C" {
     /// [documented] by the PK reference and [probed] against pskernel.dll
     /// V37.01.243: the `options` pointer is the 4th argument, before the five
     /// output pointers. `options` must point at a valid, version-tagged
-    /// [`PK_TOPOL_eval_mass_props_o_t`] — pass `o_t_version = 1` and the crate's
+    /// [`PK_TOPOL_eval_mass_props_o_t`] — pass `o_t_version = 2` and the crate's
     /// version-1 struct. Validated end-to-end (amount / mass / c_of_g / m_of_i /
     /// periphery) against closed-form values with `check_arguments` on.
     ///

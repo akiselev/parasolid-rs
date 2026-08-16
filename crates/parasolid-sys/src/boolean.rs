@@ -575,6 +575,26 @@ pub struct PK_BODY_boolean_o_t {
 }
 
 impl Default for PK_BODY_boolean_o_t {
+    /// `o_t_version = 2` — deliberately NOT raised despite the accepted band
+    /// being 2..=19.
+    ///
+    /// `version_upgrade_probe` on V37.01.243, with this 32-byte v2 layout:
+    ///
+    /// | version | legal tokens | garbage `fence` |
+    /// |---|---|---|
+    /// | 1     | 5043 `o_t_version_incorrect` | 5043 |
+    /// | **2** | rc 0 | 5014 (`fence` is read) |
+    /// | 3..=16| **908 `not_a_logical`** | 5014 |
+    ///
+    /// v3 and above are *accepted* but immediately fail with `not_a_logical`:
+    /// the v3 migration reads a LOGICAL field past the end of this 32-byte
+    /// struct. So 2 is the highest version this binding can supply, and it is
+    /// already complete at v2 — the garbage-`fence` 5014 proves the kernel
+    /// reads through to the last field.
+    ///
+    /// To go higher, recover the v3+ user layout from the boolean migration
+    /// routine (`FUN_18049b860`) and extend this struct first. (Versions 17+
+    /// hard-crash the probe process, so sweep them in an isolated run.)
     fn default() -> Self {
         Self {
             o_t_version: 2,
@@ -1274,9 +1294,25 @@ pub struct PK_BODY_section_o_t {
 } // 48 bytes
 
 impl Default for PK_BODY_section_o_t {
+    /// `o_t_version = 5` — the highest version this build accepts (v6 gives
+    /// `PK_ERROR_o_t_version_unknown` 5022).
+    ///
+    /// Measured with `version_upgrade_probe` on V37.01.243, garbage token in
+    /// one field at a time:
+    ///
+    /// - `check_fa`: ignored at v1/v2, `field_of_wrong_type` (5014) at v3, v4
+    ///   and v5 — so v3+ genuinely reads it.
+    /// - `keep_as_facet` (the last field of this binding): ignored at v1..v4,
+    ///   5014 at **v5** only.
+    ///
+    /// A 5014 on the garbage call *combined with* rc 0 on the legal-token call
+    /// at the same version is what makes v5 safe to stamp: it proves the kernel
+    /// reads through to the end of this struct and finds our offsets valid.
+    /// At the previous `o_t_version = 1` everything from `check_fa` onwards was
+    /// silently dead.
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 5,
             fence: PK_section_fence_both_c,
             matched_region: std::ptr::null(),
             merge_imprinted: 0,

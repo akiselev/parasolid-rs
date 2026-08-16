@@ -35,7 +35,12 @@ impl Periodicity {
 pub struct CurveParam {
     pub range: (f64, f64),
     pub periodic: Periodicity,
-    pub closed: bool,
+    /// Raw `PK_PARAM_sf_t.closed` byte. **Do not use as a closedness test.**
+    /// Measured as `1` for every curve kind on V37.01.243 (line, circle,
+    /// ellipse), and the kernel writes the field with an 8-byte store whose
+    /// upper 7 bytes are uninitialised stack. Kept only so the raw record is
+    /// not silently dropped; `periodic` is the validated field.
+    pub closed_raw: u8,
     /// Extent of the parameter range: unbounded, periodic, or bounded.
     /// See [`ParamExtent`].
     pub extent: ParamExtent,
@@ -516,16 +521,18 @@ impl Curve {
         Ok(CurveParam {
             range: (sf.range.low, sf.range.high),
             periodic: Periodicity::from_token(sf.periodic),
-            closed: (sf.closed & 0xff) != 0,
+            closed_raw: (sf.closed & 0xff) as u8,
             extent: ParamExtent::from_token(sf.extent),
             curve_class: ParamCurveClass::from_token(sf.curve_class),
         })
     }
 
-    /// Whether the curve is closed.
-    pub fn is_closed(&self) -> PsResult<bool> {
-        Ok(self.param()?.closed)
-    }
+    // `is_closed()` REMOVED. `PK_PARAM_sf_t.closed` reads back as 1 for every
+    // curve kind on V37.01.243 — line, circle and ellipse alike — so the
+    // accessor could only ever answer `true` and was worse than useless: a
+    // caller asking "is this closed?" got a confident yes about a straight
+    // line. Use `param().periodic` (validated) or compare the interval
+    // endpoints. See `CurveParam::closed_raw`.
 
     /// Whether the curve is periodic (periodic or seamed).
     pub fn is_periodic(&self) -> PsResult<bool> {

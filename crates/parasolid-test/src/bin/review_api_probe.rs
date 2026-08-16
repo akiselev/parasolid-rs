@@ -24,8 +24,14 @@ fn dump(label: &str, buf: &[u8; PAD], claimed: usize) {
             last = i + 1;
         }
     }
-    println!("    -> highest non-zero byte offset written = {last} (Rust struct claims {claimed} bytes){}",
-        if last > claimed { "   <<< OUT OF BOUNDS" } else { "" });
+    println!(
+        "    -> highest non-zero byte offset written = {last} (Rust struct claims {claimed} bytes){}",
+        if last > claimed {
+            "   <<< OUT OF BOUNDS"
+        } else {
+            ""
+        }
+    );
 }
 
 fn main() {
@@ -194,7 +200,6 @@ fn main() {
         println!("     {n} sentinel = {v}");
     }
 
-
     // ---------------------------------------------------------------
     // 6. BodyType catch-all collapses minimum/compound/unspecified -> General
     // ---------------------------------------------------------------
@@ -202,39 +207,58 @@ fn main() {
     let minb = Body::create_minimum(Vec3::new(0.0, 0.0, 0.0)).expect("min body");
     let mut raw: PK_BODY_type_t = -1;
     unsafe { PK_BODY_ask_type(minb.tag(), &mut raw) };
-    println!("  minimum body: raw PK_BODY_ask_type = {raw} (5603=minimum), wrapper says {:?}", minb.body_type());
-    let wire = Body::create_solid_block(1.0,1.0,1.0).expect("b");
+    println!(
+        "  minimum body: raw PK_BODY_ask_type = {raw} (5603=minimum), wrapper says {:?}",
+        minb.body_type()
+    );
+    let wire = Body::create_solid_block(1.0, 1.0, 1.0).expect("b");
     let mut raw2: PK_BODY_type_t = -1;
     unsafe { PK_BODY_ask_type(wire.tag(), &mut raw2) };
-    println!("  solid  body: raw = {raw2}, wrapper says {:?}", wire.body_type());
+    println!(
+        "  solid  body: raw = {raw2}, wrapper says {:?}",
+        wire.body_type()
+    );
 
     // ---------------------------------------------------------------
     // 7. Body::hollow / section drop kernel status + leak results
     // ---------------------------------------------------------------
     println!("\n== Body::hollow with an impossible wall thickness ==");
     let hb = Body::create_solid_block(2.0, 2.0, 2.0).expect("hb");
-    println!("  Body::hollow(wall=5.0 on a 2-cube) -> {:?}", hb.hollow(5.0));
+    println!(
+        "  Body::hollow(wall=5.0 on a 2-cube) -> {:?}",
+        hb.hollow(5.0)
+    );
     let mut trk2 = [0u8; PAD];
     let mut loc2 = [0u8; PAD];
     let hb2 = Body::create_solid_block(2.0, 2.0, 2.0).expect("hb2");
     let hc2 = unsafe {
-        PK_BODY_hollow_2(hb2.tag(), -5.0, 1.0e-6, std::ptr::null(),
+        PK_BODY_hollow_2(
+            hb2.tag(),
+            -5.0,
+            1.0e-6,
+            std::ptr::null(),
             trk2.as_mut_ptr() as *mut PK_TOPOL_track_r_t,
-            loc2.as_mut_ptr() as *mut PK_TOPOL_local_r_t)
+            loc2.as_mut_ptr() as *mut PK_TOPOL_local_r_t,
+        )
     };
     let st2 = unsafe { *(loc2.as_ptr() as *const c_int) };
     let n2 = unsafe { *(loc2.as_ptr().add(4) as *const c_int) };
     let p2 = unsafe { *(loc2.as_ptr().add(8) as *const usize) };
-    println!("  raw PK_BODY_hollow_2 -> err {hc2}, local status={st2} (21450=ok,21452=fail,21456=cant_offset), n={n2}, ptr={p2:#x}");
+    println!(
+        "  raw PK_BODY_hollow_2 -> err {hc2}, local status={st2} (21450=ok,21452=fail,21456=cant_offset), n={n2}, ptr={p2:#x}"
+    );
     unsafe { PK_TOPOL_track_r_f(trk2.as_mut_ptr() as *mut PK_TOPOL_track_r_t) };
-
 
     // ---------------------------------------------------------------
     // 8. ask_bcurve returns homogeneous coords for rational curves
     // ---------------------------------------------------------------
     println!("\n== Curve::ask_bcurve on a RATIONAL b-curve ==");
-    let cps = [Vec3::new(0.0,0.0,0.0), Vec3::new(1.0,1.0,0.0), Vec3::new(2.0,0.0,0.0)];
-    let ws  = [1.0, 4.0, 1.0];
+    let cps = [
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(1.0, 1.0, 0.0),
+        Vec3::new(2.0, 0.0, 0.0),
+    ];
+    let ws = [1.0, 4.0, 1.0];
     let knots = [0.0, 1.0];
     let mults = [3, 3];
     match Curve::bcurve_rational(2, &cps, &ws, &knots, &mults) {
@@ -244,7 +268,10 @@ fn main() {
                 println!("  input weights         : {:?}", ws);
                 println!("  is_rational           : {}", d.is_rational);
                 println!("  ask_bcurve returns    : {:?}", d.control_points);
-                println!("  knots returned        : {:?} (input distinct knots {:?}, mults {:?} DROPPED)", d.knots, knots, mults);
+                println!(
+                    "  knots returned        : {:?} (input distinct knots {:?}, mults {:?} DROPPED)",
+                    d.knots, knots, mults
+                );
             }
             Err(e) => println!("  ask_bcurve err {e:?}"),
         },
@@ -264,9 +291,12 @@ fn main() {
         unsafe { PK_EDGE_is_planar(ce[0].tag(), PK_LOGICAL_true, &mut ip, &mut pl) };
         plane_tags.push(pl);
     }
-    println!("  5 raw PK_EDGE_is_planar(want_plane=true) calls returned plane tags: {plane_tags:?}");
-    println!("  -> distinct non-null tags means each call creates a NEW orphan PK_PLANE_t that is_planar() never deletes");
-
+    println!(
+        "  5 raw PK_EDGE_is_planar(want_plane=true) calls returned plane tags: {plane_tags:?}"
+    );
+    println!(
+        "  -> distinct non-null tags means each call creates a NEW orphan PK_PLANE_t that is_planar() never deletes"
+    );
 
     // ---------------------------------------------------------------
     // 10. PK_SESSION_ask_memory_usage really takes TWO qword out-params
@@ -279,15 +309,24 @@ fn main() {
     // Give each out-param a padded, poisoned buffer so we can see the real width.
     let mut buf_a = [0xAAu8; 32];
     let mut buf_b = [0xBBu8; 32];
-    let e = unsafe { mem_usage_2(buf_a.as_mut_ptr() as *mut u64, buf_b.as_mut_ptr() as *mut u64) };
+    let e = unsafe {
+        mem_usage_2(
+            buf_a.as_mut_ptr() as *mut u64,
+            buf_b.as_mut_ptr() as *mut u64,
+        )
+    };
     let a0 = u64::from_le_bytes(buf_a[0..8].try_into().unwrap());
     let a1 = u64::from_le_bytes(buf_a[8..16].try_into().unwrap());
     let b0 = u64::from_le_bytes(buf_b[0..8].try_into().unwrap());
     let b1 = u64::from_le_bytes(buf_b[8..16].try_into().unwrap());
     println!("  err={e}");
-    println!("  arg1 buffer: [0..8]={a0} (0x{a0:x})   [8..16]=0x{a1:x} (unchanged poison 0xAAAA.. means 8 bytes written)");
+    println!(
+        "  arg1 buffer: [0..8]={a0} (0x{a0:x})   [8..16]=0x{a1:x} (unchanged poison 0xAAAA.. means 8 bytes written)"
+    );
     println!("  arg2 buffer: [0..8]={b0} (0x{b0:x})   [8..16]=0x{b1:x}");
-    println!("  parasolid-sys declares: PK_SESSION_ask_memory_usage(n_bytes: *mut c_int) -- ONE 4-byte out-param");
+    println!(
+        "  parasolid-sys declares: PK_SESSION_ask_memory_usage(n_bytes: *mut c_int) -- ONE 4-byte out-param"
+    );
     println!("  Session::memory_usage() passes &mut i32 (4 bytes) and NOTHING for arg2.");
 
     // ---------------------------------------------------------------
@@ -308,8 +347,14 @@ fn main() {
     let mut n_set: c_int = 0;
     let mut set_edges: *mut PK_EDGE_t = std::ptr::null_mut();
     let sc = unsafe {
-        PK_EDGE_set_blend_constant(tags.len() as c_int, tags.as_ptr(), 6.0,
-            std::ptr::null(), &mut n_set, &mut set_edges)
+        PK_EDGE_set_blend_constant(
+            tags.len() as c_int,
+            tags.as_ptr(),
+            6.0,
+            std::ptr::null(),
+            &mut n_set,
+            &mut set_edges,
+        )
     };
     println!("  PK_EDGE_set_blend_constant -> {sc}, n_set={n_set}");
     let mut n_blends: c_int = 0;
@@ -320,12 +365,21 @@ fn main() {
     let mut fault_edge: PK_EDGE_t = PK_ENTITY_null;
     let mut fault_topol: PK_ENTITY_t = PK_ENTITY_null;
     let fc = unsafe {
-        PK_BODY_fix_blends(blk3.tag(), std::ptr::null(), &mut n_blends, &mut blends,
-            &mut unders, &mut topols, &mut fault, &mut fault_edge, &mut fault_topol)
+        PK_BODY_fix_blends(
+            blk3.tag(),
+            std::ptr::null(),
+            &mut n_blends,
+            &mut blends,
+            &mut unders,
+            &mut topols,
+            &mut fault,
+            &mut fault_edge,
+            &mut fault_topol,
+        )
     };
-    println!("  PK_BODY_fix_blends -> err {fc}, n_blends={n_blends}, fault={fault} (18391=no_fault), fault_edge={fault_edge}, unders={unders:p}");
-
-
+    println!(
+        "  PK_BODY_fix_blends -> err {fc}, n_blends={n_blends}, fault={fault} (18391=no_fault), fault_edge={fault_edge}, unders={unders:p}"
+    );
 
     println!("\ndone");
 }

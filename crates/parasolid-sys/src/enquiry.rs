@@ -232,11 +232,36 @@ pub struct PK_TOPOL_find_nabox_o_t {
 impl Default for PK_TOPOL_find_nabox_o_t {
     fn default() -> Self {
         // Even when have_axis*=false the kernel validates axis1/axis2 as real
-        // axes (PKU_check_AXIS*_sf), so supply valid orthonormal frames. The
-        // two-axis 144-byte layout is the o_t_version=2 form (v1 in FUN_18045b090
-        // reads a different, smaller layout).
+        // axes (PKU_check_AXIS*_sf), so supply valid orthonormal frames.
+        //
+        // `o_t_version = 3` — the highest version this binding can supply in
+        // full. The migration routine `FUN_18045b090` copies the caller's
+        // struct at these int indices, identically for v2/v3/v4:
+        //
+        //   [1] have_axis1 (byte) · [2..=0xd] axis1 (48 B) ·
+        //   [0xe] have_axis2 (byte) · [0x10..=0x21] axis2 (72 B)
+        //   v3 adds [0x22] -> `quality` (byte offset 136 — exactly where this
+        //           struct has it)
+        //   v4 adds [0x23], [0x24..=0x25], [0x26..=0x27] — 24 bytes PAST the
+        //           end of this 140-byte struct, so v4 is NOT safe
+        //   v5 returns the caller's struct AS the internal one; measured
+        //           `field_of_wrong_type` (5014) even from a zeroed 512-byte
+        //           buffer, and v6 gives `o_t_version_unknown` (5022).
+        //
+        // v1 is a *different, smaller* layout (it reads [1] as have_axis2 and
+        // [2..] as axis2), which is why stamping 1 returns
+        // `PK_ERROR_not_a_unit_vector` (5019) with this struct.
+        //
+        // At the previous v2, `quality` was silently dead. Raising to v3 is a
+        // behavioural no-op today because `PK_NABOX_quality_standard_c`
+        // (26470) is byte-for-byte the kernel's own default (0x6766 in the
+        // NULL-options arm above) — but it does mean `quality` is now honoured,
+        // so `PK_NABOX_quality_improved_c` would take effect if requested.
+        //
+        // Corroboration: a garbage `quality` token is ignored at v2 but
+        // hard-crashes the kernel at v3, i.e. v3 really does consume that slot.
         Self {
-            o_t_version: 2,
+            o_t_version: 3,
             have_axis1: PK_LOGICAL_false,
             axis1: crate::PK_AXIS1_sf_t {
                 location: [0.0; 3],
@@ -716,6 +741,16 @@ const _: () = {
 };
 
 impl Default for PK_CURVE_find_box_o_t {
+    /// `o_t_version = 1` — correct, and there is nothing to raise.
+    ///
+    /// `version_upgrade_probe` swept 1..=40 on V37.01.243: **every** value
+    /// returns rc 0, so `PK_CURVE_find_box` does not range-check or dispatch on
+    /// `o_t_version` at all — this struct is not version-migrated. A garbage
+    /// `have_interval` returns `PK_ERROR_not_a_logical` (908) at every version
+    /// including v1, confirming the field is already live at v1.
+    ///
+    /// Because there is no ceiling, a higher number would be accepted but would
+    /// be meaningless; 1 is kept as the honest value.
     fn default() -> Self {
         Self {
             o_t_version: 1,
@@ -745,6 +780,11 @@ const _: () = {
 };
 
 impl Default for PK_SURF_find_box_o_t {
+    /// `o_t_version = 1` — correct, and there is nothing to raise. Same result
+    /// as [`PK_CURVE_find_box_o_t`]: swept 1..=40, every value returns rc 0
+    /// (no version dispatch), and a garbage `have_uvbox` returns
+    /// `PK_ERROR_not_a_logical` (908) at every version, so the field is already
+    /// live at v1.
     fn default() -> Self {
         Self {
             o_t_version: 1,

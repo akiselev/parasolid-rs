@@ -249,6 +249,11 @@ pub struct PK_TOPOL_range_o_t {
 } // 152 bytes
 
 impl Default for PK_TOPOL_range_o_t {
+    /// `o_t_version = 3` — confirmed still the ceiling by
+    /// `version_upgrade_probe` on V37.01.243: v1..=3 return rc 0, v4+ return
+    /// `o_t_version_unknown` (5022), and a garbage `opt_level` (the last field
+    /// of this struct) returns `field_of_wrong_type` (5014) at v3 only. So v3
+    /// reads through to the end of this layout and nothing higher exists.
     fn default() -> Self {
         Self {
             o_t_version: 3,
@@ -284,6 +289,8 @@ pub struct PK_TOPOL_range_vector_o_t {
 } // 104 bytes
 
 impl Default for PK_TOPOL_range_vector_o_t {
+    /// `o_t_version = 3` — confirmed the ceiling: v1..=3 rc 0, v4+ 5022, and a
+    /// garbage `param_entity` (last field) gives 5014 at v3 only.
     fn default() -> Self {
         Self {
             o_t_version: 3,
@@ -338,6 +345,8 @@ const _: () = {
 };
 
 impl Default for PK_GEOM_range_o_t {
+    /// `o_t_version = 3` — confirmed the ceiling: v1..=3 rc 0, v4+ 5022, and a
+    /// garbage `opt_level` (last field) gives 5014 at v3 only.
     fn default() -> Self {
         let no_guess = PK_range_guess_s_t {
             guess_type: PK_range_guess_no_c,
@@ -390,6 +399,10 @@ const _: () = {
 };
 
 impl Default for PK_GEOM_range_vector_o_t {
+    /// `o_t_version = 2` — confirmed the ceiling: v1/v2 rc 0, v3+ 5022, and a
+    /// garbage `opt_level` (last field) gives 5014 at v2 only. Note this
+    /// family member tops out one lower than the three `range`/`range_vector`
+    /// siblings above, which reach 3.
     fn default() -> Self {
         // Zero is NOT a valid token for `guess_type` or `opt_level`; leaving
         // them zeroed makes the kernel reject the whole struct with
@@ -516,9 +529,18 @@ const _: () = {
 };
 
 impl Default for PK_TOPOL_clash_o_t {
+    /// `o_t_version = 3` — confirmed the ceiling: v1..=3 return rc 0 and v4+
+    /// return `o_t_version_unknown` (5022).
+    ///
+    /// Unlike the range family there is no positive "last field is read" proof
+    /// here: the trailing fields are a count and two pointers, and an
+    /// out-of-range `n_parts_with_scales` is not type-checked (it is an int,
+    /// not an enum token), so no garbage value produces 5014. The ceiling
+    /// itself is solid; the completeness of the tail is inferred from the
+    /// struct being accepted at the top of the band.
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 3,
             n_op_ex: 0,
             op_ex1: core::ptr::null(),
             op_ex2: core::ptr::null(),
@@ -628,6 +650,21 @@ pub struct PK_FACE_intersect_face_o_t {
     pub _use_reserved: c_int,
 }
 
+/// Which curve representation the intersector may produce for mixed-dimension
+/// results (`PK_SURF_intersect_surf_o_t::mixed_curve_category` and friends).
+///
+/// **Zero is not a legal value.** The field is version-gated, so a zeroed
+/// options struct is accepted at low `o_t_version` and rejected once the kernel
+/// starts reading the field — the same trap that made `range_type` a dead field
+/// in Stage 6. Values from `parasolid-re/catalog/pk-enums.h`.
+pub type PK_mixed_intersection_t = c_int;
+/// Produce pline (polyline) curves for mixed-dimension intersections.
+pub const PK_mixed_intersection_pline_c: PK_mixed_intersection_t = 26650;
+/// Produce classic (analytic/spline) curves.
+pub const PK_mixed_intersection_classic_c: PK_mixed_intersection_t = 26651;
+/// Produce both representations.
+pub const PK_mixed_intersection_both_c: PK_mixed_intersection_t = 26652;
+
 /// Options for `PK_SURF_intersect_surf`.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
@@ -653,14 +690,16 @@ pub struct PK_SURF_intersect_surf_o_t {
     pub _use_reserved: c_int,
 }
 
-// Intersection classification tokens. Each family has its own value range;
-// only the base "simple/transversal" token of each is confirmed so far.
-// [dynamic-observed] — the values are computed deep in the internal intersection
-// engine (not read out of the public wrapper or its immediate callees, so a
-// static enumeration would need several layers of stripped-function tracing);
-// tangential / coincident / etc. tokens need tangency & overlap fixtures, which
-// in turn need standalone-surface creation (`PK_PLANE_create` &c., not yet
-// wrapped). Treat any value other than the `*_simple_c` below as opaque.
+// Intersection classification tokens.
+//
+// `PK_intersect_curve_t` is now a CLOSED, fully enumerated set: the RE catalog
+// (`pk-enums.h`) defines exactly two members, `simple` 14651 and `tangent`
+// 14652, and a 15-configuration runtime scan — analytic pairs, tangent
+// plane/cylinder, torus crown, cone-sphere tangency, saddle B-surface planes,
+// offset B-surfaces, spun and swept surfaces, the Villarceau bitangent plane,
+// lemon/apple/horn tori, cone apex and seam planes — produced nothing else.
+// The earlier "treat other values as opaque" hedge can be retired for this
+// type. (The sibling `PK_intersect_fc_t` has 13 members and is NOT closed.)
 
 /// Type of an intersection curve from the surf/face intersection functions
 /// (`PK_intersect_curve_t`).

@@ -742,13 +742,22 @@ fn case(st: &mut Stats, label: &str, expect_fn: &str, trigger: impl FnOnce() -> 
     let expect_tok = table_name(r.code);
     println!(
         "    rc={rc} code={} token={:?} sev={} fn={:?} arg#{} name={:?} idx={} entity={}",
-        r.code, r.code_token, r.severity, r.function, r.argument_number, r.argument_name,
-        r.argument_index, r.entity
+        r.code,
+        r.code_token,
+        r.severity,
+        r.function,
+        r.argument_number,
+        r.argument_name,
+        r.argument_index,
+        r.entity
     );
     match expect_tok {
         Some(t) if t == r.code_token => println!("    table: OK ({t} = {})", r.code),
         Some(t) => {
-            let m = format!("code {} kernel token {:?} but error_codes.rs says {:?}", r.code, r.code_token, t);
+            let m = format!(
+                "code {} kernel token {:?} but error_codes.rs says {:?}",
+                r.code, r.code_token, t
+            );
             println!("    table: *** MISMATCH *** {m}");
             st.token_mismatch.push(format!("{label}: {m}"));
         }
@@ -769,14 +778,19 @@ fn case(st: &mut Stats, label: &str, expect_fn: &str, trigger: impl FnOnce() -> 
         st.fn_mismatch.push(format!("{label}: {m}"));
     }
     if !r.tail_written.is_empty() {
-        let m = format!("bytes written past 116: {:?}", &r.tail_written[..r.tail_written.len().min(24)]);
+        let m = format!(
+            "bytes written past 116: {:?}",
+            &r.tail_written[..r.tail_written.len().min(24)]
+        );
         println!("    *** LAYOUT *** {m}");
         st.tail_writes.push(format!("{label}: {m}"));
     }
     *st.severities.entry(r.severity).or_insert(0) += 1;
 }
 
-fn tag_of(b: &Body) -> i32 { b.tag() }
+fn tag_of(b: &Body) -> i32 {
+    b.tag()
+}
 
 fn main() {
     let mut out = std::io::stdout();
@@ -796,107 +810,210 @@ fn main() {
     println!("== error_codes.rs table has {} entries ==", TABLE.len());
 
     // ---------------------------------------------------------------- arg errors
-    case(&mut st, "block with negative x", "PK_BODY_create_solid_block", || {
-        let mut b: PK_BODY_t = 0;
-        unsafe { PK_BODY_create_solid_block(-1.0, 1.0, 1.0, std::ptr::null(), &mut b) }
-    });
-    case(&mut st, "block with zero z", "PK_BODY_create_solid_block", || {
-        let mut b: PK_BODY_t = 0;
-        unsafe { PK_BODY_create_solid_block(1.0, 1.0, 0.0, std::ptr::null(), &mut b) }
-    });
-    case(&mut st, "ask class of bogus tag", "PK_ENTITY_ask_class", || {
-        let mut c: PK_CLASS_t = -1;
-        unsafe { PK_ENTITY_ask_class(999_999, &mut c) }
-    });
-    case(&mut st, "ask faces of bogus tag", "PK_BODY_ask_faces", || {
-        let mut n = 0;
-        let mut f: *mut PK_FACE_t = std::ptr::null_mut();
-        unsafe { PK_BODY_ask_faces(999_999, &mut n, &mut f) }
-    });
+    case(
+        &mut st,
+        "block with negative x",
+        "PK_BODY_create_solid_block",
+        || {
+            let mut b: PK_BODY_t = 0;
+            unsafe { PK_BODY_create_solid_block(-1.0, 1.0, 1.0, std::ptr::null(), &mut b) }
+        },
+    );
+    case(
+        &mut st,
+        "block with zero z",
+        "PK_BODY_create_solid_block",
+        || {
+            let mut b: PK_BODY_t = 0;
+            unsafe { PK_BODY_create_solid_block(1.0, 1.0, 0.0, std::ptr::null(), &mut b) }
+        },
+    );
+    case(
+        &mut st,
+        "ask class of bogus tag",
+        "PK_ENTITY_ask_class",
+        || {
+            let mut c: PK_CLASS_t = -1;
+            unsafe { PK_ENTITY_ask_class(999_999, &mut c) }
+        },
+    );
+    case(
+        &mut st,
+        "ask faces of bogus tag",
+        "PK_BODY_ask_faces",
+        || {
+            let mut n = 0;
+            let mut f: *mut PK_FACE_t = std::ptr::null_mut();
+            unsafe { PK_BODY_ask_faces(999_999, &mut n, &mut f) }
+        },
+    );
     case(&mut st, "sphere radius 0", "PK_SPHERE_create", || {
         let sf = PK_SPHERE_sf_t {
-            basis_set: PK_AXIS2_sf_t { location: [0.0; 3], axis: [0.0, 0.0, 1.0], ref_direction: [1.0, 0.0, 0.0] },
+            basis_set: PK_AXIS2_sf_t {
+                location: [0.0; 3],
+                axis: [0.0, 0.0, 1.0],
+                ref_direction: [1.0, 0.0, 0.0],
+            },
             radius: 0.0,
         };
         let mut s: PK_SPHERE_t = 0;
         unsafe { PK_SPHERE_create(&sf, &mut s) }
     });
-    case(&mut st, "sphere radius negative", "PK_SPHERE_create", || {
-        let sf = PK_SPHERE_sf_t {
-            basis_set: PK_AXIS2_sf_t { location: [0.0; 3], axis: [0.0, 0.0, 1.0], ref_direction: [1.0, 0.0, 0.0] },
-            radius: -3.0,
-        };
-        let mut s: PK_SPHERE_t = 0;
-        unsafe { PK_SPHERE_create(&sf, &mut s) }
-    });
+    case(
+        &mut st,
+        "sphere radius negative",
+        "PK_SPHERE_create",
+        || {
+            let sf = PK_SPHERE_sf_t {
+                basis_set: PK_AXIS2_sf_t {
+                    location: [0.0; 3],
+                    axis: [0.0, 0.0, 1.0],
+                    ref_direction: [1.0, 0.0, 0.0],
+                },
+                radius: -3.0,
+            };
+            let mut s: PK_SPHERE_t = 0;
+            unsafe { PK_SPHERE_create(&sf, &mut s) }
+        },
+    );
     case(&mut st, "sphere zero axis", "PK_SPHERE_create", || {
         let sf = PK_SPHERE_sf_t {
-            basis_set: PK_AXIS2_sf_t { location: [0.0; 3], axis: [0.0; 3], ref_direction: [1.0, 0.0, 0.0] },
+            basis_set: PK_AXIS2_sf_t {
+                location: [0.0; 3],
+                axis: [0.0; 3],
+                ref_direction: [1.0, 0.0, 0.0],
+            },
             radius: 1.0,
         };
         let mut s: PK_SPHERE_t = 0;
         unsafe { PK_SPHERE_create(&sf, &mut s) }
     });
-    case(&mut st, "sphere non-orthogonal ref_direction", "PK_SPHERE_create", || {
-        let sf = PK_SPHERE_sf_t {
-            basis_set: PK_AXIS2_sf_t { location: [0.0; 3], axis: [0.0, 0.0, 1.0], ref_direction: [0.0, 0.0, 1.0] },
-            radius: 1.0,
-        };
-        let mut s: PK_SPHERE_t = 0;
-        unsafe { PK_SPHERE_create(&sf, &mut s) }
-    });
-    case(&mut st, "rotation about non-unit axis", "PK_TRANSF_create_rotation", || {
-        let p: PK_VECTOR_t = [0.0; 3];
-        let d: PK_VECTOR_t = [1.0, 1.0, 1.0];
-        let mut t: PK_TRANSF_t = 0;
-        unsafe { PK_TRANSF_create_rotation(&p, &d, 0.5, &mut t) }
-    });
-    case(&mut st, "rotation about zero axis", "PK_TRANSF_create_rotation", || {
-        let p: PK_VECTOR_t = [0.0; 3];
-        let d: PK_VECTOR_t = [0.0; 3];
-        let mut t: PK_TRANSF_t = 0;
-        unsafe { PK_TRANSF_create_rotation(&p, &d, 0.5, &mut t) }
-    });
-    case(&mut st, "negative session precision", "PK_SESSION_set_precision", || unsafe {
-        PK_SESSION_set_precision(-1.0)
-    });
-    case(&mut st, "session precision 0", "PK_SESSION_set_precision", || unsafe {
-        PK_SESSION_set_precision(0.0)
-    });
-    case(&mut st, "curve eval on non-curve tag", "PK_CURVE_eval", || {
-        let mut pos = [0.0f64; 12];
-        unsafe { PK_CURVE_eval(999_999, 0.0, 1, pos.as_mut_ptr()) }
-    });
-    case(&mut st, "entity_delete of bogus tag", "PK_ENTITY_delete", || {
-        let t: PK_ENTITY_t = 999_998;
-        unsafe { PK_ENTITY_delete(1, &t) }
-    });
-    case(&mut st, "PART_receive with nonexistent key", "PK_PART_receive", || {
-        let key = std::ffi::CString::new("no_such_key_xyzzy").unwrap();
-        let mut o = PK_PART_receive_o_t::default();
-        o.transmit_format = PK_transmit_format_text_c;
-        let mut n = 0;
-        let mut p: *mut PK_PART_t = std::ptr::null_mut();
-        unsafe { PK_PART_receive(key.as_ptr(), &o, &mut n, &mut p) }
-    });
+    case(
+        &mut st,
+        "sphere non-orthogonal ref_direction",
+        "PK_SPHERE_create",
+        || {
+            let sf = PK_SPHERE_sf_t {
+                basis_set: PK_AXIS2_sf_t {
+                    location: [0.0; 3],
+                    axis: [0.0, 0.0, 1.0],
+                    ref_direction: [0.0, 0.0, 1.0],
+                },
+                radius: 1.0,
+            };
+            let mut s: PK_SPHERE_t = 0;
+            unsafe { PK_SPHERE_create(&sf, &mut s) }
+        },
+    );
+    case(
+        &mut st,
+        "rotation about non-unit axis",
+        "PK_TRANSF_create_rotation",
+        || {
+            let p: PK_VECTOR_t = [0.0; 3];
+            let d: PK_VECTOR_t = [1.0, 1.0, 1.0];
+            let mut t: PK_TRANSF_t = 0;
+            unsafe { PK_TRANSF_create_rotation(&p, &d, 0.5, &mut t) }
+        },
+    );
+    case(
+        &mut st,
+        "rotation about zero axis",
+        "PK_TRANSF_create_rotation",
+        || {
+            let p: PK_VECTOR_t = [0.0; 3];
+            let d: PK_VECTOR_t = [0.0; 3];
+            let mut t: PK_TRANSF_t = 0;
+            unsafe { PK_TRANSF_create_rotation(&p, &d, 0.5, &mut t) }
+        },
+    );
+    case(
+        &mut st,
+        "negative session precision",
+        "PK_SESSION_set_precision",
+        || unsafe { PK_SESSION_set_precision(-1.0) },
+    );
+    case(
+        &mut st,
+        "session precision 0",
+        "PK_SESSION_set_precision",
+        || unsafe { PK_SESSION_set_precision(0.0) },
+    );
+    case(
+        &mut st,
+        "curve eval on non-curve tag",
+        "PK_CURVE_eval",
+        || {
+            let mut pos = [0.0f64; 12];
+            unsafe { PK_CURVE_eval(999_999, 0.0, 1, pos.as_mut_ptr()) }
+        },
+    );
+    case(
+        &mut st,
+        "entity_delete of bogus tag",
+        "PK_ENTITY_delete",
+        || {
+            let t: PK_ENTITY_t = 999_998;
+            unsafe { PK_ENTITY_delete(1, &t) }
+        },
+    );
+    case(
+        &mut st,
+        "PART_receive with nonexistent key",
+        "PK_PART_receive",
+        || {
+            let key = std::ffi::CString::new("no_such_key_xyzzy").unwrap();
+            let mut o = PK_PART_receive_o_t::default();
+            o.transmit_format = PK_transmit_format_text_c;
+            let mut n = 0;
+            let mut p: *mut PK_PART_t = std::ptr::null_mut();
+            unsafe { PK_PART_receive(key.as_ptr(), &o, &mut n, &mut p) }
+        },
+    );
 
     // ---------------------------------------------------------------- option-struct errors
-    case(&mut st, "mass props o_t_version = 99", "PK_TOPOL_eval_mass_props", || {
-        let mut body: PK_BODY_t = 0;
-        let rc = unsafe { PK_BODY_create_solid_block(1.0, 1.0, 1.0, std::ptr::null(), &mut body) };
-        assert_eq!(rc, 0);
-        #[repr(C)]
-        struct MassOpts { v: i32, mass: i32, periphery: i32, bound: i32, single: u8 }
-        let o = MassOpts { v: 99, mass: 0x36b4, periphery: 0x36b6, bound: 0x36b7, single: 1 };
-        let (mut a, mut m, mut p) = (0.0f64, 0.0f64, 0.0f64);
-        let mut cg = [0.0f64; 3];
-        let mut mi = [0.0f64; 9];
-        unsafe {
-            PK_TOPOL_eval_mass_props(1, &body, 0.99,
-                &o as *const MassOpts as *const PK_TOPOL_eval_mass_props_o_t,
-                &mut a, &mut m, &mut cg, &mut mi, &mut p)
-        }
-    });
+    case(
+        &mut st,
+        "mass props o_t_version = 99",
+        "PK_TOPOL_eval_mass_props",
+        || {
+            let mut body: PK_BODY_t = 0;
+            let rc =
+                unsafe { PK_BODY_create_solid_block(1.0, 1.0, 1.0, std::ptr::null(), &mut body) };
+            assert_eq!(rc, 0);
+            #[repr(C)]
+            struct MassOpts {
+                v: i32,
+                mass: i32,
+                periphery: i32,
+                bound: i32,
+                single: u8,
+            }
+            let o = MassOpts {
+                v: 99,
+                mass: 0x36b4,
+                periphery: 0x36b6,
+                bound: 0x36b7,
+                single: 1,
+            };
+            let (mut a, mut m, mut p) = (0.0f64, 0.0f64, 0.0f64);
+            let mut cg = [0.0f64; 3];
+            let mut mi = [0.0f64; 9];
+            unsafe {
+                PK_TOPOL_eval_mass_props(
+                    1,
+                    &body,
+                    0.99,
+                    &o as *const MassOpts as *const PK_TOPOL_eval_mass_props_o_t,
+                    &mut a,
+                    &mut m,
+                    &mut cg,
+                    &mut mi,
+                    &mut p,
+                )
+            }
+        },
+    );
 
     // ---------------------------------------------------------------- topology / geometry failures
     let blk = Body::create_solid_block(10.0, 10.0, 10.0).expect("block");
@@ -906,78 +1023,144 @@ fn main() {
     let face_tag = faces[0].tag();
     let edge_tag = edges[0].tag();
 
-    case(&mut st, "delete_acorn on a non-acorn vertex", "PK_VERTEX_delete_acorn", || {
-        let vs = blk.vertices().expect("verts");
-        let v = vs[0].tag();
-        unsafe { PK_VERTEX_delete_acorn(1, &v) }
-    });
-    case(&mut st, "ask faces of a FACE tag (wrong class)", "PK_BODY_ask_faces", || {
-        let mut n = 0;
-        let mut f: *mut PK_FACE_t = std::ptr::null_mut();
-        unsafe { PK_BODY_ask_faces(face_tag, &mut n, &mut f) }
-    });
-    case(&mut st, "curve eval on a FACE tag (wrong class)", "PK_CURVE_eval", || {
-        let mut pos = [0.0f64; 12];
-        unsafe { PK_CURVE_eval(face_tag, 0.0, 1, pos.as_mut_ptr()) }
-    });
-    case(&mut st, "hollow with wall thicker than the block", "PK_BODY_hollow_2", || {
-        let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
-        let mut rs: PK_TOPOL_local_r_t = unsafe { std::mem::zeroed() };
-        unsafe { PK_BODY_hollow_2(blk_tag, -20.0, 1.0e-6, std::ptr::null(), &mut tr, &mut rs) }
-    });
-    case(&mut st, "offset that collapses the body", "PK_BODY_offset_2", || {
-        let mut o: PK_BODY_offset_o_t = Default::default();
-        let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
-        let mut rs: PK_TOPOL_local_r_t = unsafe { std::mem::zeroed() };
-        unsafe { PK_BODY_offset_2(blk_tag, -50.0, 1.0e-6, &mut o, &mut tr, &mut rs) }
-    });
-    case(&mut st, "offset with negative tolerance", "PK_BODY_offset_2", || {
-        let mut o: PK_BODY_offset_o_t = Default::default();
-        let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
-        let mut rs: PK_TOPOL_local_r_t = unsafe { std::mem::zeroed() };
-        unsafe { PK_BODY_offset_2(blk_tag, 1.0, -1.0, &mut o, &mut tr, &mut rs) }
-    });
-    case(&mut st, "blend radius far larger than the body", "PK_EDGE_set_blend_constant", || {
-        let mut n = 0;
-        let mut be: *mut PK_EDGE_t = std::ptr::null_mut();
-        unsafe { PK_EDGE_set_blend_constant(1, &edge_tag, 1000.0, std::ptr::null(), &mut n, &mut be) }
-    });
-    case(&mut st, "blend radius 0", "PK_EDGE_set_blend_constant", || {
-        let mut n = 0;
-        let mut be: *mut PK_EDGE_t = std::ptr::null_mut();
-        unsafe { PK_EDGE_set_blend_constant(1, &edge_tag, 0.0, std::ptr::null(), &mut n, &mut be) }
-    });
-    case(&mut st, "blend on a FACE tag", "PK_EDGE_set_blend_constant", || {
-        let mut n = 0;
-        let mut be: *mut PK_EDGE_t = std::ptr::null_mut();
-        unsafe { PK_EDGE_set_blend_constant(1, &face_tag, 1.0, std::ptr::null(), &mut n, &mut be) }
-    });
-    case(&mut st, "delete every face of a solid", "PK_FACE_delete_2", || {
-        let ft: Vec<PK_FACE_t> = faces.iter().map(|f| f.tag()).collect();
-        let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
-        unsafe { PK_FACE_delete_2(ft.len() as i32, ft.as_ptr(), std::ptr::null(), &mut tr) }
-    });
+    case(
+        &mut st,
+        "delete_acorn on a non-acorn vertex",
+        "PK_VERTEX_delete_acorn",
+        || {
+            let vs = blk.vertices().expect("verts");
+            let v = vs[0].tag();
+            unsafe { PK_VERTEX_delete_acorn(1, &v) }
+        },
+    );
+    case(
+        &mut st,
+        "ask faces of a FACE tag (wrong class)",
+        "PK_BODY_ask_faces",
+        || {
+            let mut n = 0;
+            let mut f: *mut PK_FACE_t = std::ptr::null_mut();
+            unsafe { PK_BODY_ask_faces(face_tag, &mut n, &mut f) }
+        },
+    );
+    case(
+        &mut st,
+        "curve eval on a FACE tag (wrong class)",
+        "PK_CURVE_eval",
+        || {
+            let mut pos = [0.0f64; 12];
+            unsafe { PK_CURVE_eval(face_tag, 0.0, 1, pos.as_mut_ptr()) }
+        },
+    );
+    case(
+        &mut st,
+        "hollow with wall thicker than the block",
+        "PK_BODY_hollow_2",
+        || {
+            let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+            let mut rs: PK_TOPOL_local_r_t = unsafe { std::mem::zeroed() };
+            unsafe { PK_BODY_hollow_2(blk_tag, -20.0, 1.0e-6, std::ptr::null(), &mut tr, &mut rs) }
+        },
+    );
+    case(
+        &mut st,
+        "offset that collapses the body",
+        "PK_BODY_offset_2",
+        || {
+            let mut o: PK_BODY_offset_o_t = Default::default();
+            let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+            let mut rs: PK_TOPOL_local_r_t = unsafe { std::mem::zeroed() };
+            unsafe { PK_BODY_offset_2(blk_tag, -50.0, 1.0e-6, &mut o, &mut tr, &mut rs) }
+        },
+    );
+    case(
+        &mut st,
+        "offset with negative tolerance",
+        "PK_BODY_offset_2",
+        || {
+            let mut o: PK_BODY_offset_o_t = Default::default();
+            let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+            let mut rs: PK_TOPOL_local_r_t = unsafe { std::mem::zeroed() };
+            unsafe { PK_BODY_offset_2(blk_tag, 1.0, -1.0, &mut o, &mut tr, &mut rs) }
+        },
+    );
+    case(
+        &mut st,
+        "blend radius far larger than the body",
+        "PK_EDGE_set_blend_constant",
+        || {
+            let mut n = 0;
+            let mut be: *mut PK_EDGE_t = std::ptr::null_mut();
+            unsafe {
+                PK_EDGE_set_blend_constant(1, &edge_tag, 1000.0, std::ptr::null(), &mut n, &mut be)
+            }
+        },
+    );
+    case(
+        &mut st,
+        "blend radius 0",
+        "PK_EDGE_set_blend_constant",
+        || {
+            let mut n = 0;
+            let mut be: *mut PK_EDGE_t = std::ptr::null_mut();
+            unsafe {
+                PK_EDGE_set_blend_constant(1, &edge_tag, 0.0, std::ptr::null(), &mut n, &mut be)
+            }
+        },
+    );
+    case(
+        &mut st,
+        "blend on a FACE tag",
+        "PK_EDGE_set_blend_constant",
+        || {
+            let mut n = 0;
+            let mut be: *mut PK_EDGE_t = std::ptr::null_mut();
+            unsafe {
+                PK_EDGE_set_blend_constant(1, &face_tag, 1.0, std::ptr::null(), &mut n, &mut be)
+            }
+        },
+    );
+    case(
+        &mut st,
+        "delete every face of a solid",
+        "PK_FACE_delete_2",
+        || {
+            let ft: Vec<PK_FACE_t> = faces.iter().map(|f| f.tag()).collect();
+            let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+            unsafe { PK_FACE_delete_2(ft.len() as i32, ft.as_ptr(), std::ptr::null(), &mut tr) }
+        },
+    );
 
     // boolean with the same body as target and tool
-    case(&mut st, "boolean unite body with itself", "PK_BODY_boolean_2", || {
-        let mut o: PK_BODY_boolean_o_t = Default::default();
-        o.function = 15903;
-        let mut r: PK_boolean_r_t = unsafe { std::mem::zeroed() };
-        let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
-        unsafe { PK_BODY_boolean_2(blk_tag, 1, &blk_tag, &mut o, &mut tr, &mut r) }
-    });
+    case(
+        &mut st,
+        "boolean unite body with itself",
+        "PK_BODY_boolean_2",
+        || {
+            let mut o: PK_BODY_boolean_o_t = Default::default();
+            o.function = 15903;
+            let mut r: PK_boolean_r_t = unsafe { std::mem::zeroed() };
+            let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+            unsafe { PK_BODY_boolean_2(blk_tag, 1, &blk_tag, &mut o, &mut tr, &mut r) }
+        },
+    );
     // boolean with an o_t_version the kernel rejects
-    case(&mut st, "boolean with o_t_version = 1", "PK_BODY_boolean_2", || {
-        let other = Body::create_solid_block(2.0, 2.0, 2.0).expect("b2");
-        let ot = other.tag();
-        let mut o: PK_BODY_boolean_o_t = Default::default();
-        o.o_t_version = 1;
-        o.function = 15903;
-        let mut r: PK_boolean_r_t = unsafe { std::mem::zeroed() };
-        let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
-        std::mem::forget(other);
-        unsafe { PK_BODY_boolean_2(blk_tag, 1, &ot, &mut o, &mut tr, &mut r) }
-    });
+    case(
+        &mut st,
+        "boolean with o_t_version = 1",
+        "PK_BODY_boolean_2",
+        || {
+            let other = Body::create_solid_block(2.0, 2.0, 2.0).expect("b2");
+            let ot = other.tag();
+            let mut o: PK_BODY_boolean_o_t = Default::default();
+            o.o_t_version = 1;
+            o.function = 15903;
+            let mut r: PK_boolean_r_t = unsafe { std::mem::zeroed() };
+            let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+            std::mem::forget(other);
+            unsafe { PK_BODY_boolean_2(blk_tag, 1, &ot, &mut o, &mut tr, &mut r) }
+        },
+    );
 
     let _ = out.flush();
 
@@ -992,15 +1175,24 @@ fn main() {
             Ok(()) => {
                 // find the file the frustrum produced
                 let mut found = None;
-                for cand in [format!("{key}.x_t"), format!("{key}.xmt_txt"), format!("{key}")] {
-                    if std::path::Path::new(&cand).exists() { found = Some(cand); break; }
+                for cand in [
+                    format!("{key}.x_t"),
+                    format!("{key}.xmt_txt"),
+                    format!("{key}"),
+                ] {
+                    if std::path::Path::new(&cand).exists() {
+                        found = Some(cand);
+                        break;
+                    }
                 }
                 println!("  transmitted, file = {found:?} (tmp={})", dir.display());
                 if let Some(p) = found {
                     let mut data = std::fs::read(&p).unwrap();
                     // Corrupt the middle of the body data, past the header.
                     let n = data.len();
-                    for i in (n / 2)..(n / 2 + 64).min(n) { data[i] = b'Z'; }
+                    for i in (n / 2)..(n / 2 + 64).min(n) {
+                        data[i] = b'Z';
+                    }
                     std::fs::write(&p, &data).unwrap();
                     case(&mut st, "receive a corrupted XT file", "", || {
                         let ck = std::ffi::CString::new(key).unwrap();
@@ -1029,11 +1221,16 @@ fn main() {
     let _ = out.flush();
 
     // ---------------------------------------------------------------- partition / session errors
-    case(&mut st, "delete the current partition", "PK_PARTITION_delete", || {
-        let mut part: PK_PARTITION_t = 0;
-        unsafe { PK_SESSION_ask_curr_partition(&mut part) };
-        unsafe { PK_PARTITION_delete(part, std::ptr::null()) }
-    });
+    case(
+        &mut st,
+        "delete the current partition",
+        "PK_PARTITION_delete",
+        || {
+            let mut part: PK_PARTITION_t = 0;
+            unsafe { PK_SESSION_ask_curr_partition(&mut part) };
+            unsafe { PK_PARTITION_delete(part, std::ptr::null()) }
+        },
+    );
 
     // ---------------------------------------------------------------- CLAIM 3: severity field
     println!("\n=== CLAIM 3 — severity at offset 68 for values other than 1");
@@ -1045,8 +1242,10 @@ fn main() {
         sf[108..112].copy_from_slice(&(-1i32).to_le_bytes());
         unsafe { PK_ERROR_raise(sf.as_ptr() as *const PK_ERROR_sf_t) };
         if let Some(r) = read_rec(0) {
-            println!("  raised severity {sev} -> readback severity {} token {:?} (echo only, NOT a real error)",
-                     r.severity, r.code_token);
+            println!(
+                "  raised severity {sev} -> readback severity {} token {:?} (echo only, NOT a real error)",
+                r.severity, r.code_token
+            );
         }
     }
 
@@ -1056,11 +1255,16 @@ fn main() {
     let mut b: PK_BODY_t = 0;
     let rc1 = unsafe { PK_BODY_create_solid_block(-1.0, 1.0, 1.0, std::ptr::null(), &mut b) };
     let r1 = read_rec(rc1).unwrap();
-    println!("  after failing call:  rc={rc1} was_error={} fn={:?} code={}", r1.was_error, r1.function, r1.code);
+    println!(
+        "  after failing call:  rc={rc1} was_error={} fn={:?} code={}",
+        r1.was_error, r1.function, r1.code
+    );
     let rc2 = unsafe { PK_BODY_create_solid_block(1.0, 1.0, 1.0, std::ptr::null(), &mut b) };
     let r2 = read_rec(rc2).unwrap();
-    println!("  after SUCCESSFUL call: rc={rc2} was_error={} fn={:?} code={}  <-- record survives success",
-             r2.was_error, r2.function, r2.code);
+    println!(
+        "  after SUCCESSFUL call: rc={rc2} was_error={} fn={:?} code={}  <-- record survives success",
+        r2.was_error, r2.function, r2.code
+    );
 
     // Same-code-different-function hazard: two different functions both fail with the
     // same code. If the second one does NOT refresh the record, query_last_error
@@ -1073,10 +1277,18 @@ fn main() {
     let mut ff: *mut PK_FACE_t = std::ptr::null_mut();
     let rc_b = unsafe { PK_BODY_ask_faces(999_998, &mut nn, &mut ff) };
     let rb = read_rec(rc_b).unwrap();
-    println!("  A: PK_ENTITY_ask_class rc={rc_a} rec.fn={:?} rec.code={} entity={}", ra.function, ra.code, ra.entity);
-    println!("  B: PK_BODY_ask_faces   rc={rc_b} rec.fn={:?} rec.code={} entity={}", rb.function, rb.code, rb.entity);
+    println!(
+        "  A: PK_ENTITY_ask_class rc={rc_a} rec.fn={:?} rec.code={} entity={}",
+        ra.function, ra.code, ra.entity
+    );
+    println!(
+        "  B: PK_BODY_ask_faces   rc={rc_b} rec.fn={:?} rec.code={} entity={}",
+        rb.function, rb.code, rb.entity
+    );
     if rc_a == rc_b && rb.function == ra.function {
-        println!("  *** STALE-ACCEPT: B did not refresh the record and the codes agree, so the guard passes a record belonging to A");
+        println!(
+            "  *** STALE-ACCEPT: B did not refresh the record and the codes agree, so the guard passes a record belonging to A"
+        );
     }
 
     // PK_THREAD_ask_last_error cross-check
@@ -1085,12 +1297,20 @@ fn main() {
     let rcx = unsafe { PK_BODY_create_solid_block(-2.0, 1.0, 1.0, std::ptr::null(), &mut b) };
     let mut tbuf = [POISON; BUF];
     let mut twas: PK_LOGICAL_t = PK_LOGICAL_false;
-    let trc = unsafe { PK_THREAD_ask_last_error(&mut twas, tbuf.as_mut_ptr() as *mut PK_ERROR_sf_t) };
-    println!("  trigger rc={rcx}; THREAD rc={trc} was_error={twas} fn={:?} code={} token={:?} sev={}",
-             inline_str(&tbuf, 0, 32), i32_at(&tbuf, 32), inline_str(&tbuf, 36, 32), i32_at(&tbuf, 68));
+    let trc =
+        unsafe { PK_THREAD_ask_last_error(&mut twas, tbuf.as_mut_ptr() as *mut PK_ERROR_sf_t) };
+    println!(
+        "  trigger rc={rcx}; THREAD rc={trc} was_error={twas} fn={:?} code={} token={:?} sev={}",
+        inline_str(&tbuf, 0, 32),
+        i32_at(&tbuf, 32),
+        inline_str(&tbuf, 36, 32),
+        i32_at(&tbuf, 68)
+    );
     let ttail: Vec<usize> = (116..BUF).filter(|&i| tbuf[i] != POISON).collect();
-    println!("  THREAD bytes past 116 written: {:?}", &ttail[..ttail.len().min(16)]);
-
+    println!(
+        "  THREAD bytes past 116 written: {:?}",
+        &ttail[..ttail.len().min(16)]
+    );
 
     // ------------------------------------------------- SEVERITY BATTERY (isolated bodies)
     println!("\n=== SEVERITY BATTERY — every case gets its own fresh body");
@@ -1098,91 +1318,192 @@ fn main() {
     {
         let mut run = |st: &mut Stats, label: &str, f: &mut dyn FnMut() -> (i32, i32)| {
             clear();
-            let (_body, rc) = { let (t, rc) = f(); (t, rc) };
+            let (_body, rc) = {
+                let (t, rc) = f();
+                (t, rc)
+            };
             st.cases += 1;
-            if rc == 0 { println!("  {label}: rc=0 (no failure)"); return; }
+            if rc == 0 {
+                println!("  {label}: rc=0 (no failure)");
+                return;
+            }
             if let Some(r) = read_rec(rc) {
-                println!("  {label}: rc={rc} code={} token={:?} SEV={} fn={:?}", r.code, r.code_token, r.severity, r.function);
+                println!(
+                    "  {label}: rc={rc} code={} token={:?} SEV={} fn={:?}",
+                    r.code, r.code_token, r.severity, r.function
+                );
                 if table_name(r.code) != Some(r.code_token.as_str()) {
-                    st.token_mismatch.push(format!("{label}: code {} kernel {:?} table {:?}", r.code, r.code_token, table_name(r.code)));
+                    st.token_mismatch.push(format!(
+                        "{label}: code {} kernel {:?} table {:?}",
+                        r.code,
+                        r.code_token,
+                        table_name(r.code)
+                    ));
                 }
-                if r.rc != r.code { st.rc_vs_code_mismatch.push(format!("{label}: rc={} code={}", r.rc, r.code)); }
+                if r.rc != r.code {
+                    st.rc_vs_code_mismatch
+                        .push(format!("{label}: rc={} code={}", r.rc, r.code));
+                }
                 *st.severities.entry(r.severity).or_insert(0) += 1;
                 sev_hits.push((label.to_string(), r.severity, r.code, r.code_token.clone()));
             }
         };
 
-        for (label, thick) in [("hollow -20 on 10-cube", -20.0f64), ("hollow -5.0 on 10-cube", -5.0), ("hollow -4.999", -4.999), ("hollow +20 outward", 20.0)] {
+        for (label, thick) in [
+            ("hollow -20 on 10-cube", -20.0f64),
+            ("hollow -5.0 on 10-cube", -5.0),
+            ("hollow -4.999", -4.999),
+            ("hollow +20 outward", 20.0),
+        ] {
             let b = Body::create_solid_block(10.0, 10.0, 10.0).expect("blk");
             let t = b.tag();
             std::mem::forget(b);
             run(&mut st, label, &mut || {
                 let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
                 let mut buf = [0u8; 128];
-                (t, unsafe { PK_BODY_hollow_2(t, thick, 1.0e-6, std::ptr::null(), &mut tr, buf.as_mut_ptr() as *mut PK_TOPOL_local_r_t) })
+                (t, unsafe {
+                    PK_BODY_hollow_2(
+                        t,
+                        thick,
+                        1.0e-6,
+                        std::ptr::null(),
+                        &mut tr,
+                        buf.as_mut_ptr() as *mut PK_TOPOL_local_r_t,
+                    )
+                })
             });
         }
-        for (label, off) in [("PK_BODY_offset(v1) -50", -50.0f64), ("PK_BODY_offset(v1) -5.0", -5.0), ("PK_BODY_offset(v1) -4.9", -4.9)] {
+        for (label, off) in [
+            ("PK_BODY_offset(v1) -50", -50.0f64),
+            ("PK_BODY_offset(v1) -5.0", -5.0),
+            ("PK_BODY_offset(v1) -4.9", -4.9),
+        ] {
             let b = Body::create_solid_block(10.0, 10.0, 10.0).expect("blk");
             let t = b.tag();
             std::mem::forget(b);
-            run(&mut st, label, &mut || (t, unsafe { PK_BODY_offset(t, off, 1.0e-6, PK_LOGICAL_false) }));
+            run(&mut st, label, &mut || {
+                (t, unsafe {
+                    PK_BODY_offset(t, off, 1.0e-6, PK_LOGICAL_false)
+                })
+            });
         }
         // sheet body thicken failures
-        for (label, th) in [("thicken_3 huge on sheet", 1.0e6f64), ("thicken_3 zero", 0.0)] {
-            let b = Body::create_sheet_rectangle(10.0, 10.0, Axis2::new(Vec3::new(0.0,0.0,0.0), Vec3::new(0.0,0.0,1.0), Vec3::new(1.0,0.0,0.0))).or_else(|_| Body::create_solid_block(10.0,10.0,10.0)).expect("sheet");
+        for (label, th) in [
+            ("thicken_3 huge on sheet", 1.0e6f64),
+            ("thicken_3 zero", 0.0),
+        ] {
+            let b = Body::create_sheet_rectangle(
+                10.0,
+                10.0,
+                Axis2::new(
+                    Vec3::new(0.0, 0.0, 0.0),
+                    Vec3::new(0.0, 0.0, 1.0),
+                    Vec3::new(1.0, 0.0, 0.0),
+                ),
+            )
+            .or_else(|_| Body::create_solid_block(10.0, 10.0, 10.0))
+            .expect("sheet");
             let t = b.tag();
             std::mem::forget(b);
             run(&mut st, label, &mut || {
                 let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
                 let mut buf = [0u8; 128];
-                (t, unsafe { PK_BODY_thicken_3(t, th, th, 1.0e-6, std::ptr::null_mut(), &mut tr, buf.as_mut_ptr() as *mut PK_TOPOL_local_r_t) })
+                (t, unsafe {
+                    PK_BODY_thicken_3(
+                        t,
+                        th,
+                        th,
+                        1.0e-6,
+                        std::ptr::null_mut(),
+                        &mut tr,
+                        buf.as_mut_ptr() as *mut PK_TOPOL_local_r_t,
+                    )
+                })
             });
         }
         // imprint a body with itself / disjoint
         {
             let a = Body::create_solid_block(10.0, 10.0, 10.0).expect("a");
-            let ta = a.tag(); std::mem::forget(a);
-            println!("  imprint body with itself: SKIPPED — PK_BODY_imprint_body(t,t,..) page-faults inside the kernel (observed twice, with NULL and with default options)");
+            let ta = a.tag();
+            std::mem::forget(a);
+            println!(
+                "  imprint body with itself: SKIPPED — PK_BODY_imprint_body(t,t,..) page-faults inside the kernel (observed twice, with NULL and with default options)"
+            );
             let _ = ta;
         }
         // boolean subtract producing an empty result then reuse of the dead tag
         {
             let a = Body::create_solid_block(4.0, 4.0, 4.0).expect("a");
-            let ta = a.tag(); std::mem::forget(a);
+            let ta = a.tag();
+            std::mem::forget(a);
             let bb = Body::create_solid_block(10.0, 10.0, 10.0).expect("b");
-            let tb = bb.tag(); std::mem::forget(bb);
-            run(&mut st, "subtract bigger from smaller (empty result)", &mut || {
-                let mut o: PK_BODY_boolean_o_t = Default::default();
-                o.function = 15902;
-                let mut r: PK_boolean_r_t = unsafe { std::mem::zeroed() };
-                let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
-                (ta, unsafe { PK_BODY_boolean_2(ta, 1, &tb, &mut o, &mut tr, &mut r) })
-            });
-            run(&mut st, "use the consumed target tag afterwards", &mut || {
-                let mut n = 0; let mut f: *mut PK_FACE_t = std::ptr::null_mut();
-                (ta, unsafe { PK_BODY_ask_faces(ta, &mut n, &mut f) })
-            });
+            let tb = bb.tag();
+            std::mem::forget(bb);
+            run(
+                &mut st,
+                "subtract bigger from smaller (empty result)",
+                &mut || {
+                    let mut o: PK_BODY_boolean_o_t = Default::default();
+                    o.function = 15902;
+                    let mut r: PK_boolean_r_t = unsafe { std::mem::zeroed() };
+                    let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+                    (ta, unsafe {
+                        PK_BODY_boolean_2(ta, 1, &tb, &mut o, &mut tr, &mut r)
+                    })
+                },
+            );
+            run(
+                &mut st,
+                "use the consumed target tag afterwards",
+                &mut || {
+                    let mut n = 0;
+                    let mut f: *mut PK_FACE_t = std::ptr::null_mut();
+                    (ta, unsafe { PK_BODY_ask_faces(ta, &mut n, &mut f) })
+                },
+            );
         }
         // delete a face from a solid via the sheet-only entry point
         {
             let a = Body::create_solid_block(6.0, 6.0, 6.0).expect("a");
             let fs = a.faces().expect("f");
             let ft = fs[0].tag();
-            let ta = a.tag(); std::mem::forget(a);
-            run(&mut st, "PK_FACE_delete_from_sheet_body on a solid face", &mut || (ta, unsafe { PK_FACE_delete_from_sheet_body(ft) }));
+            let ta = a.tag();
+            std::mem::forget(a);
+            run(
+                &mut st,
+                "PK_FACE_delete_from_sheet_body on a solid face",
+                &mut || (ta, unsafe { PK_FACE_delete_from_sheet_body(ft) }),
+            );
         }
         // taper with an absurd angle
         {
             let a = Body::create_solid_block(6.0, 6.0, 6.0).expect("a");
             let es = a.edges().expect("e");
             let et = es[0].tag();
-            let ta = a.tag(); std::mem::forget(a);
+            let ta = a.tag();
+            std::mem::forget(a);
             run(&mut st, "taper 89.9 degrees", &mut || {
                 let dir = [0.0f64, 0.0, 1.0];
                 let mut status: PK_local_status_t = 0;
-                let mut n_err = 0; let mut errs: *mut PK_TOPOL_t = std::ptr::null_mut();
-                (ta, unsafe { PK_BODY_taper(ta, 0, 1, &et, 0, std::ptr::null(), 1.5697, 0.0, dir.as_ptr(), std::ptr::null(), &mut status, &mut n_err, &mut errs) })
+                let mut n_err = 0;
+                let mut errs: *mut PK_TOPOL_t = std::ptr::null_mut();
+                (ta, unsafe {
+                    PK_BODY_taper(
+                        ta,
+                        0,
+                        1,
+                        &et,
+                        0,
+                        std::ptr::null(),
+                        1.5697,
+                        0.0,
+                        dir.as_ptr(),
+                        std::ptr::null(),
+                        &mut status,
+                        &mut n_err,
+                        &mut errs,
+                    )
+                })
             });
         }
     }
@@ -1195,24 +1516,108 @@ fn main() {
         std::mem::forget(b);
         let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
         let mut buf = [0u8; 128];
-        let rc = unsafe { PK_BODY_hollow_2(t, -20.0, 1.0e-6, std::ptr::null(), &mut tr, buf.as_mut_ptr() as *mut PK_TOPOL_local_r_t) };
+        let rc = unsafe {
+            PK_BODY_hollow_2(
+                t,
+                -20.0,
+                1.0e-6,
+                std::ptr::null(),
+                &mut tr,
+                buf.as_mut_ptr() as *mut PK_TOPOL_local_r_t,
+            )
+        };
         println!("    seed serious rc={rc}");
         for (label, mut f) in [
-            ("check the wounded body", Box::new(move || { let mut n = 0; let mut fl: *mut PK_check_fault_t = std::ptr::null_mut(); unsafe { PK_BODY_check(t, std::ptr::null_mut(), &mut n, &mut fl) } }) as Box<dyn FnMut() -> i32>),
-            ("hollow the wounded body again", Box::new(move || { let mut tr2: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() }; let mut b2 = [0u8; 128]; unsafe { PK_BODY_hollow_2(t, -20.0, 1.0e-6, std::ptr::null(), &mut tr2, b2.as_mut_ptr() as *mut PK_TOPOL_local_r_t) } })),
-            ("offset the wounded body", Box::new(move || unsafe { PK_BODY_offset(t, -5.0, 1.0e-6, PK_LOGICAL_false) })),
-            ("mass props of the wounded body", Box::new(move || { #[repr(C)] struct M { v: i32, mass: i32, per: i32, bnd: i32, single: u8 } let o = M { v: 1, mass: 0x36b4, per: 0x36b6, bnd: 0x36b7, single: 1 }; let (mut a, mut m, mut pp) = (0.0f64, 0.0, 0.0); let mut cg = [0.0f64; 3]; let mut mi = [0.0f64; 9]; unsafe { PK_TOPOL_eval_mass_props(1, &t, 0.99, &o as *const M as *const PK_TOPOL_eval_mass_props_o_t, &mut a, &mut m, &mut cg, &mut mi, &mut pp) } })),
+            (
+                "check the wounded body",
+                Box::new(move || {
+                    let mut n = 0;
+                    let mut fl: *mut PK_check_fault_t = std::ptr::null_mut();
+                    unsafe { PK_BODY_check(t, std::ptr::null_mut(), &mut n, &mut fl) }
+                }) as Box<dyn FnMut() -> i32>,
+            ),
+            (
+                "hollow the wounded body again",
+                Box::new(move || {
+                    let mut tr2: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+                    let mut b2 = [0u8; 128];
+                    unsafe {
+                        PK_BODY_hollow_2(
+                            t,
+                            -20.0,
+                            1.0e-6,
+                            std::ptr::null(),
+                            &mut tr2,
+                            b2.as_mut_ptr() as *mut PK_TOPOL_local_r_t,
+                        )
+                    }
+                }),
+            ),
+            (
+                "offset the wounded body",
+                Box::new(move || unsafe { PK_BODY_offset(t, -5.0, 1.0e-6, PK_LOGICAL_false) }),
+            ),
+            (
+                "mass props of the wounded body",
+                Box::new(move || {
+                    #[repr(C)]
+                    struct M {
+                        v: i32,
+                        mass: i32,
+                        per: i32,
+                        bnd: i32,
+                        single: u8,
+                    }
+                    let o = M {
+                        v: 1,
+                        mass: 0x36b4,
+                        per: 0x36b6,
+                        bnd: 0x36b7,
+                        single: 1,
+                    };
+                    let (mut a, mut m, mut pp) = (0.0f64, 0.0, 0.0);
+                    let mut cg = [0.0f64; 3];
+                    let mut mi = [0.0f64; 9];
+                    unsafe {
+                        PK_TOPOL_eval_mass_props(
+                            1,
+                            &t,
+                            0.99,
+                            &o as *const M as *const PK_TOPOL_eval_mass_props_o_t,
+                            &mut a,
+                            &mut m,
+                            &mut cg,
+                            &mut mi,
+                            &mut pp,
+                        )
+                    }
+                }),
+            ),
         ] {
             clear();
             let rc = f();
-            if rc == 0 { println!("    {label}: rc=0"); continue; }
+            if rc == 0 {
+                println!("    {label}: rc=0");
+                continue;
+            }
             if let Some(r) = read_rec(rc) {
-                println!("    {label}: rc={rc} code={} token={:?} SEV={} fn={:?}", r.code, r.code_token, r.severity, r.function);
+                println!(
+                    "    {label}: rc={rc} code={} token={:?} SEV={} fn={:?}",
+                    r.code, r.code_token, r.severity, r.function
+                );
                 *st.severities.entry(r.severity).or_insert(0) += 1;
                 sev_hits.push((label.to_string(), r.severity, r.code, r.code_token.clone()));
-                if r.rc != r.code { st.rc_vs_code_mismatch.push(format!("{label}: rc={} code={}", r.rc, r.code)); }
+                if r.rc != r.code {
+                    st.rc_vs_code_mismatch
+                        .push(format!("{label}: rc={} code={}", r.rc, r.code));
+                }
                 if table_name(r.code) != Some(r.code_token.as_str()) {
-                    st.token_mismatch.push(format!("{label}: code {} kernel {:?} table {:?}", r.code, r.code_token, table_name(r.code)));
+                    st.token_mismatch.push(format!(
+                        "{label}: code {} kernel {:?} table {:?}",
+                        r.code,
+                        r.code_token,
+                        table_name(r.code)
+                    ));
                 }
             }
         }
@@ -1227,15 +1632,31 @@ fn main() {
     println!("\n================ SUMMARY ================");
     println!("cases run: {}", st.cases);
     println!("severity histogram (REAL errors only): {:?}", st.severities);
-    println!("token mismatches vs error_codes.rs: {}", st.token_mismatch.len());
-    for m in &st.token_mismatch { println!("   {m}"); }
+    println!(
+        "token mismatches vs error_codes.rs: {}",
+        st.token_mismatch.len()
+    );
+    for m in &st.token_mismatch {
+        println!("   {m}");
+    }
     println!("rc != record.code: {}", st.rc_vs_code_mismatch.len());
-    for m in &st.rc_vs_code_mismatch { println!("   {m}"); }
-    println!("record function != called function: {}", st.fn_mismatch.len());
-    for m in &st.fn_mismatch { println!("   {m}"); }
+    for m in &st.rc_vs_code_mismatch {
+        println!("   {m}");
+    }
+    println!(
+        "record function != called function: {}",
+        st.fn_mismatch.len()
+    );
+    for m in &st.fn_mismatch {
+        println!("   {m}");
+    }
     println!("writes past offset 116: {}", st.tail_writes.len());
-    for m in &st.tail_writes { println!("   {m}"); }
+    for m in &st.tail_writes {
+        println!("   {m}");
+    }
     println!("failing calls with NO record: {}", st.no_record.len());
-    for m in &st.no_record { println!("   {m}"); }
+    for m in &st.no_record {
+        println!("   {m}");
+    }
     let _ = out.flush();
 }

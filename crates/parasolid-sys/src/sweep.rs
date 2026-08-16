@@ -232,8 +232,19 @@ pub const PK_bound_side_both_c: PK_bound_side_t = 22980;
 // Extrusion: keep_as_facet for extrusion
 // =============================================================================
 
+/// **These two token values are `[guess]` and are almost certainly wrong.**
+/// The extrude option-migration routine (`FUN_180121ac0`) initialises the
+/// internal struct's `keep_as_facet` slot (int index 0x18) to `0x67fc` =
+/// 26620, and PK token families are never 0/1 — so the real `_no_c` is
+/// probably 26620 with `_yes_c` adjacent.
+///
+/// This is currently harmless: `keep_as_facet` is copied out of the caller's
+/// struct only at `o_t_version = 7`, and `PK_BODY_extrude_o_t` stamps 6 (v7
+/// returns `field_of_wrong_type`). Probe both tokens before raising to 7.
 pub type PK_extrude_keep_as_facet_t = c_int;
+/// [guess — see the type docs; likely 26620]
 pub const PK_extrude_keep_as_facet_no_c: PK_extrude_keep_as_facet_t = 0;
+/// [guess — see the type docs]
 pub const PK_extrude_keep_as_facet_yes_c: PK_extrude_keep_as_facet_t = 1;
 
 // =============================================================================

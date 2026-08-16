@@ -414,9 +414,7 @@ fn probe_eval(tor: &Surf, u: f64, v: f64, maj: f64, min: f64, n_u: i32, n_v: i32
     let cap = 400usize;
     let mut p = vec![SENT; cap * 3];
     let uv = [u, v];
-    println!(
-        "\n>> about to call PK_SURF_eval(n_u={n_u}, n_v={n_v}, triangular={tri}) ..."
-    );
+    println!("\n>> about to call PK_SURF_eval(n_u={n_u}, n_v={n_v}, triangular={tri}) ...");
     use std::io::Write;
     std::io::stdout().flush().ok();
     let rc = unsafe {
@@ -425,7 +423,11 @@ fn probe_eval(tor: &Surf, u: f64, v: f64, maj: f64, min: f64, n_u: i32, n_v: i32
             uv.as_ptr(),
             n_u,
             n_v,
-            if tri { PK_LOGICAL_true } else { PK_LOGICAL_false },
+            if tri {
+                PK_LOGICAL_true
+            } else {
+                PK_LOGICAL_false
+            },
             p.as_mut_ptr(),
         )
     };
@@ -656,7 +658,10 @@ fn stage3_min_radii() {
 
     let surfaces: Vec<(&str, Surf)> = vec![
         ("torus 5/1.5", Surf::torus(basis, 5.0, 1.5).unwrap()),
-        ("torus 2/1.9 (near-degenerate)", Surf::torus(basis, 2.0, 1.9).unwrap()),
+        (
+            "torus 2/1.9 (near-degenerate)",
+            Surf::torus(basis, 2.0, 1.9).unwrap(),
+        ),
         ("sphere r=4", Surf::sphere(basis, 4.0).unwrap()),
         ("cylinder r=2", Surf::cylinder(basis, 2.0).unwrap()),
         ("cone", Surf::cone(basis, 3.0, 0.5).unwrap()),
@@ -682,7 +687,11 @@ fn stage3_min_radii() {
                 parms.as_mut_ptr(),
             )
         };
-        let r_written = radii.iter().rposition(|&x| !is_sent(x)).map(|k| k + 1).unwrap_or(0);
+        let r_written = radii
+            .iter()
+            .rposition(|&x| !is_sent(x))
+            .map(|k| k + 1)
+            .unwrap_or(0);
         let p_written = positions
             .iter()
             .rposition(|v| v.iter().any(|&x| !is_sent(x)))
@@ -726,7 +735,11 @@ fn stage3_min_radii() {
                         Ok(p) => format!("({:.4},{:.4},{:.4})", p.x, p.y, p.z),
                         Err(er) => format!("{er:?}"),
                     },
-                    if agree { "consistent" } else { "*** position/param DISAGREE ***" }
+                    if agree {
+                        "consistent"
+                    } else {
+                        "*** position/param DISAGREE ***"
+                    }
                 );
             }
         }
@@ -766,7 +779,10 @@ fn main() {
     let tor2 = Surf::torus(basis, 5.0, 1.5).expect("torus");
     println!(">> sanity: symmetric triangular first");
     std::io::stdout().flush().ok();
-    println!("   n_u=n_v=2 tri -> {:?}", tor2.eval_jet(0.6, 0.9, 2, 2, true).map(|j| j.shape()));
+    println!(
+        "   n_u=n_v=2 tri -> {:?}",
+        tor2.eval_jet(0.6, 0.9, 2, 2, true).map(|j| j.shape())
+    );
     println!(">> now Surf::eval_jet(0.6, 0.9, n_u=3, n_v=1, triangular=true) with checking OFF");
     std::io::stdout().flush().ok();
     match tor2.eval_jet(0.6, 0.9, 3, 1, true) {

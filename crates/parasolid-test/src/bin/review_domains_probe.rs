@@ -96,7 +96,11 @@ fn dump_curve(label: &str, c: &Curve) {
 }
 
 struct SurfTag(i32);
-impl SurfTag { fn tag(&self)->i32{self.0} }
+impl SurfTag {
+    fn tag(&self) -> i32 {
+        self.0
+    }
+}
 
 fn dump_curve_tag(label: &str, tag: i32) {
     let c = SurfTag(tag);
@@ -226,7 +230,10 @@ fn periodic_bsurf() -> Option<i32> {
 fn families() {
     println!("\n== CLAIM 2/3: extent/form/class across families (hunting 18001/18002/18043) ==");
     let b = basis();
-    dump_curve("line", &Curve::line(Vec3::new(0., 0., 0.), Vec3::new(1., 0., 0.)).unwrap());
+    dump_curve(
+        "line",
+        &Curve::line(Vec3::new(0., 0., 0.), Vec3::new(1., 0., 0.)).unwrap(),
+    );
     dump_curve("circle", &Curve::circle(b, 3.0).unwrap());
     dump_curve("ellipse 5x2", &Curve::ellipse(b, 5.0, 2.0).unwrap());
     dump_curve("bcurve open deg3", &open_bcurve());
@@ -330,14 +337,26 @@ fn seams() {
     let b = basis();
     let tau = std::f64::consts::TAU;
     let cases: Vec<(&str, Surf, Vec<f64>)> = vec![
-        ("cylinder", Surf::cylinder(b, 2.0).unwrap(), vec![-3.0, 0.0, 7.5]),
+        (
+            "cylinder",
+            Surf::cylinder(b, 2.0).unwrap(),
+            vec![-3.0, 0.0, 7.5],
+        ),
         (
             "sphere",
             Surf::sphere(b, 4.0).unwrap(),
             vec![-1.5707, -1.5, 0.0, 1.5, 1.5707],
         ),
-        ("torus", Surf::torus(b, 5.0, 1.5).unwrap(), vec![0.0, 1.0, 3.0]),
-        ("cone", Surf::cone(b, 3.0, 0.5).unwrap(), vec![-1.0, 0.0, 2.0]),
+        (
+            "torus",
+            Surf::torus(b, 5.0, 1.5).unwrap(),
+            vec![0.0, 1.0, 3.0],
+        ),
+        (
+            "cone",
+            Surf::cone(b, 3.0, 0.5).unwrap(),
+            vec![-1.0, 0.0, 2.0],
+        ),
     ];
     for (label, s, vs) in cases {
         for v in vs {
@@ -414,22 +433,42 @@ fn seams() {
         (
             "sheet cyl full",
             Surf::cylinder(b, 2.0).unwrap(),
-            UvBox { u_min: 0.0, v_min: 0.0, u_max: tau, v_max: 3.0 },
+            UvBox {
+                u_min: 0.0,
+                v_min: 0.0,
+                u_max: tau,
+                v_max: 3.0,
+            },
         ),
         (
             "sheet cyl half",
             Surf::cylinder(b, 2.0).unwrap(),
-            UvBox { u_min: 0.0, v_min: 0.0, u_max: tau / 2.0, v_max: 3.0 },
+            UvBox {
+                u_min: 0.0,
+                v_min: 0.0,
+                u_max: tau / 2.0,
+                v_max: 3.0,
+            },
         ),
         (
             "sheet sphere full",
             Surf::sphere(b, 4.0).unwrap(),
-            UvBox { u_min: 0.0, v_min: -1.5707963267948966, u_max: tau, v_max: 1.5707963267948966 },
+            UvBox {
+                u_min: 0.0,
+                v_min: -1.5707963267948966,
+                u_max: tau,
+                v_max: 1.5707963267948966,
+            },
         ),
         (
             "sheet torus full",
             Surf::torus(b, 5.0, 1.5).unwrap(),
-            UvBox { u_min: 0.0, v_min: 0.0, u_max: tau, v_max: tau },
+            UvBox {
+                u_min: 0.0,
+                v_min: 0.0,
+                u_max: tau,
+                v_max: tau,
+            },
         ),
     ] {
         match s.make_sheet_body(ub) {
@@ -472,22 +511,42 @@ fn uvboxes() {
         (
             "sheet sphere sub",
             Surf::sphere(b, 4.0).unwrap(),
-            UvBox { u_min: 0.3, v_min: -0.4, u_max: 2.1, v_max: 0.9 },
+            UvBox {
+                u_min: 0.3,
+                v_min: -0.4,
+                u_max: 2.1,
+                v_max: 0.9,
+            },
         ),
         (
             "sheet cyl sub",
             Surf::cylinder(b, 2.0).unwrap(),
-            UvBox { u_min: 0.25, v_min: -1.0, u_max: 2.75, v_max: 4.0 },
+            UvBox {
+                u_min: 0.25,
+                v_min: -1.0,
+                u_max: 2.75,
+                v_max: 4.0,
+            },
         ),
         (
             "sheet plane sub",
             Surf::plane(b).unwrap(),
-            UvBox { u_min: -1.0, v_min: -2.0, u_max: 3.0, v_max: 5.0 },
+            UvBox {
+                u_min: -1.0,
+                v_min: -2.0,
+                u_max: 3.0,
+                v_max: 5.0,
+            },
         ),
         (
             "sheet torus sub",
             Surf::torus(b, 5.0, 1.5).unwrap(),
-            UvBox { u_min: 0.1, v_min: 0.2, u_max: 1.1, v_max: 4.2 },
+            UvBox {
+                u_min: 0.1,
+                v_min: 0.2,
+                u_max: 1.1,
+                v_max: 4.2,
+            },
         ),
     ] {
         match s.make_sheet_body(ub) {
@@ -508,9 +567,14 @@ fn uvboxes() {
                             println!(
                                 "  {:18} is     [{:.6},{:.6}]x[{:.6},{:.6}]  err_u=({:.3e},{:.3e}) err_v=({:.3e},{:.3e})",
                                 "",
-                                e.u_min, e.u_max, e.v_min, e.v_max,
-                                e.u_min - ub.u_min, e.u_max - ub.u_max,
-                                e.v_min - ub.v_min, e.v_max - ub.v_max
+                                e.u_min,
+                                e.u_max,
+                                e.v_min,
+                                e.v_max,
+                                e.u_min - ub.u_min,
+                                e.u_max - ub.u_max,
+                                e.v_min - ub.v_min,
+                                e.v_max - ub.v_max
                             );
                             let sup = found.u_min <= e.u_min
                                 && found.u_max >= e.u_max
@@ -519,8 +583,10 @@ fn uvboxes() {
                             println!(
                                 "  {:18} find superset of is? {sup}   slack u=({:.3e},{:.3e}) v=({:.3e},{:.3e})",
                                 "",
-                                e.u_min - found.u_min, found.u_max - e.u_max,
-                                e.v_min - found.v_min, found.v_max - e.v_max
+                                e.u_min - found.u_min,
+                                found.u_max - e.u_max,
+                                e.v_min - found.v_min,
+                                found.v_max - e.v_max
                             );
                         }
                         None => println!("  {:18} is_uvbox = false", ""),
@@ -602,7 +668,11 @@ fn uvboxes() {
             println!(
                 "  {lbl:9} face{i} {:?}: box u[{:.5},{:.5}] v[{:.5},{:.5}] samples={} worst_outside={worst:.3e} is_uvbox={}",
                 f.surface_type().unwrap(),
-                found.u_min, found.u_max, found.v_min, found.v_max, n,
+                found.u_min,
+                found.u_max,
+                found.v_min,
+                found.v_max,
+                n,
                 f.as_uvbox().map(|x| x.is_some()).unwrap_or(false)
             );
         }
@@ -646,7 +716,10 @@ fn arclength() {
     let circ = Curve::circle(b, 3.0).unwrap();
     let (len, lo, hi) = circ.length_with_bounds((0.0, tau)).unwrap();
     let truth = 6.0 * std::f64::consts::PI;
-    println!("  circle r=3: len={len:.17} lo={lo:.17} hi={hi:.17} width={:.3e}", hi - lo);
+    println!(
+        "  circle r=3: len={len:.17} lo={lo:.17} hi={hi:.17} width={:.3e}",
+        hi - lo
+    );
     println!(
         "    truth 6pi = {truth:.17}  len-truth={:.3e}  truth inside [lo,hi]? {}",
         len - truth,
@@ -676,7 +749,10 @@ fn arclength() {
     tr *= h;
     let ell = Curve::ellipse(b, 5.0, 2.0).unwrap();
     let (len, lo, hi) = ell.length_with_bounds((0.0, tau)).unwrap();
-    println!("  ellipse 5x2: len={len:.17} lo={lo:.17} hi={hi:.17} width={:.3e}", hi - lo);
+    println!(
+        "  ellipse 5x2: len={len:.17} lo={lo:.17} hi={hi:.17} width={:.3e}",
+        hi - lo
+    );
     println!("    simpson(1e6)={p1:.17}  simpson(2e6)={p2:.17}  trapz_periodic={tr:.17}");
     println!(
         "    truth inside enclosure? {}   len-truth={:.3e}   lo-truth={:.3e} hi-truth={:.3e}",
@@ -686,7 +762,13 @@ fn arclength() {
         hi - tr
     );
     // partial arcs of the ellipse
-    for (t0, t1) in [(0.0, 1.0), (0.0, 0.5), (1.0, 2.0), (0.0, tau / 4.0), (2.5, 6.0)] {
+    for (t0, t1) in [
+        (0.0, 1.0),
+        (0.0, 0.5),
+        (1.0, 2.0),
+        (0.0, tau / 4.0),
+        (2.5, 6.0),
+    ] {
         let (l, lo, hi) = ell.length_with_bounds((t0, t1)).unwrap();
         let truth = simpson(f, t0, t1, 2_000_000);
         println!(
@@ -718,7 +800,6 @@ fn arclength() {
         l - truth
     );
 }
-
 
 // ------------------------------------------------- extra: Seamed (18022) hunt
 fn seamed_hunt() {
@@ -765,14 +846,18 @@ fn seamed_hunt() {
         let mut raw = vec![0xEEu8; 96];
         let rc2 = unsafe { PK_CURVE_ask_param(tag, raw.as_mut_ptr() as *mut PK_PARAM_sf_t) };
         let lastw = (0..96).rev().find(|&i| raw[i] != 0xEE);
-        println!("    ask_param rc={rc2} last byte written={lastw:?} bytes32_39={:02x?}", &raw[32..40]);
+        println!(
+            "    ask_param rc={rc2} last byte written={lastw:?} bytes32_39={:02x?}",
+            &raw[32..40]
+        );
         let mut p0 = [0.0f64; 3];
         let mut p1 = [0.0f64; 3];
         unsafe {
             PK_CURVE_eval(tag, 0.0, 0, p0.as_mut_ptr());
             PK_CURVE_eval(tag, 1.0, 0, p1.as_mut_ptr());
         }
-        let dd = ((p0[0]-p1[0]).powi(2)+(p0[1]-p1[1]).powi(2)+(p0[2]-p1[2]).powi(2)).sqrt();
+        let dd =
+            ((p0[0] - p1[0]).powi(2) + (p0[1] - p1[1]).powi(2) + (p0[2] - p1[2]).powi(2)).sqrt();
         println!("    |R(0)-R(1)| = {dd:.3e}  (0 => geometrically closed)");
     }
     // b-surface closed (not periodic) in u
@@ -823,7 +908,9 @@ fn seamed_hunt() {
         }
         dump_surf_tag(&format!("bsurf seam {lbl}"), tag);
         // and as a face
-        let ub = PK_UVBOX_t { param: [0.0, 0.0, 1.0, 1.0] };
+        let ub = PK_UVBOX_t {
+            param: [0.0, 0.0, 1.0, 1.0],
+        };
         let mut body: PK_BODY_t = PK_ENTITY_null;
         let rc = unsafe { PK_SURF_make_sheet_body(tag, ub, &mut body) };
         if rc != PK_ERROR_no_errors {

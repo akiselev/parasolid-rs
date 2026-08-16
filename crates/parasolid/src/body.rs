@@ -436,8 +436,31 @@ impl Body {
             nth_division: 0,
             side: PK_bound_side_both_c,
         };
+        // `o_t_version = 6` — the highest version usable with this binding.
+        //
+        // The migration routine `FUN_180121ac0` (reached from PK_BODY_extrude)
+        // was decompiled: it switches on the version and copies the caller's
+        // struct field by field at *fixed* int indices that never move between
+        // versions — each version simply copies more of them. That is what
+        // makes the raise safe: a higher version can only make more fields
+        // live, never re-interpret the ones already there.
+        //
+        //   v1 → both bounds except `side`; everything after them is DEAD
+        //   v2 → + extruded_body (idx 0x12)
+        //   v3 → + allow_disjoint (idx 0x13)
+        //   v4 → + both `side` fields (idx 0x9, 0x11)
+        //   v5 → + consistent_params (idx 0x14)
+        //   v6 → + have_pline_angle (0x15) and pline_angle (0x16..0x17)
+        //   v7 → returns the caller's struct AS the internal struct; measured
+        //        `field_of_wrong_type` (5014), so it needs fields we do not
+        //        model (and `keep_as_facet`, idx 0x18, whose token constants
+        //        are still a guess — see PK_extrude_keep_as_facet_t).
+        //
+        // Sweep agrees: v1..=6 return rc 0, v7 → 5014, v8 → 5022.
+        // At the previous v1, `side`, `extruded_body`, `allow_disjoint`,
+        // `consistent_params` and the pline angle were all silently ignored.
         let opts = PK_BODY_extrude_o_t {
-            o_t_version: 1,
+            o_t_version: 6,
             start_bound: mk_bound(0.0),
             end_bound: mk_bound(dist),
             extruded_body: PK_ENTITY_null,

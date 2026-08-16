@@ -29,11 +29,7 @@ fn status_name(t: i32) -> &'static str {
 // ---------------------------------------------------------------------------
 // 1. PK_range_bound_t field order, at runtime.
 // ---------------------------------------------------------------------------
-fn topol_range(
-    a: i32,
-    b: i32,
-    mutate: impl FnOnce(&mut PK_TOPOL_range_o_t),
-) -> (i32, i32, f64) {
+fn topol_range(a: i32, b: i32, mutate: impl FnOnce(&mut PK_TOPOL_range_o_t)) -> (i32, i32, f64) {
     let mut opts = PK_TOPOL_range_o_t::default();
     mutate(&mut opts);
     let mut status: PK_range_result_t = -1;
@@ -53,7 +49,10 @@ fn test_range_bound() {
     let (a, bb) = (b1.tag(), b2.tag());
 
     let (e, s, d) = topol_range(a, bb, |_| {});
-    println!("  defaults           : err={e} status={s} ({}) dist={d:.6}", status_name(s));
+    println!(
+        "  defaults           : err={e} status={s} ({}) dist={d:.6}",
+        status_name(s)
+    );
 
     // Struct-named upper bound of 1.0 (true distance is 5).  If the binding is
     // right this must come back `upper` (18272).
@@ -61,32 +60,54 @@ fn test_range_bound() {
         o.bound.have_upper_bound = PK_LOGICAL_true;
         o.bound.upper_bound = 1.0;
     });
-    println!("  have_upper=1 up=1.0: err={e} status={s} ({}) dist={d:.6}   [expect upper/18272]", status_name(s));
+    println!(
+        "  have_upper=1 up=1.0: err={e} status={s} ({}) dist={d:.6}   [expect upper/18272]",
+        status_name(s)
+    );
 
     // Struct-named lower bound of 10.0 (true distance is 5) => `lower` (18271).
     let (e, s, d) = topol_range(a, bb, |o| {
         o.bound.have_lower_bound = PK_LOGICAL_true;
         o.bound.lower_bound = 10.0;
     });
-    println!("  have_lower=1 lo=10 : err={e} status={s} ({}) dist={d:.6}   [expect lower/18271]", status_name(s));
+    println!(
+        "  have_lower=1 lo=10 : err={e} status={s} ({}) dist={d:.6}   [expect lower/18271]",
+        status_name(s)
+    );
 
     // Controls: bounds that do NOT cut should leave `found`.
     let (e, s, d) = topol_range(a, bb, |o| {
         o.bound.have_upper_bound = PK_LOGICAL_true;
         o.bound.upper_bound = 100.0;
     });
-    println!("  have_upper=1 up=100: err={e} status={s} ({}) dist={d:.6}   [expect found]", status_name(s));
+    println!(
+        "  have_upper=1 up=100: err={e} status={s} ({}) dist={d:.6}   [expect found]",
+        status_name(s)
+    );
     let (e, s, d) = topol_range(a, bb, |o| {
         o.bound.have_lower_bound = PK_LOGICAL_true;
         o.bound.lower_bound = 0.1;
     });
-    println!("  have_lower=1 lo=0.1: err={e} status={s} ({}) dist={d:.6}   [expect found]", status_name(s));
+    println!(
+        "  have_lower=1 lo=0.1: err={e} status={s} ({}) dist={d:.6}   [expect found]",
+        status_name(s)
+    );
 
     // Raw-byte cross-check: write the flag/double pairs by offset directly so the
     // Rust field names cannot mask a swap.
     for (flag_off, val_off, val, label) in [
-        (0usize, 8usize, 1.0f64, "@0 flag,@8 val = 1.0 (claimed UPPER)"),
-        (16usize, 24usize, 10.0f64, "@16 flag,@24 val = 10.0 (claimed LOWER)"),
+        (
+            0usize,
+            8usize,
+            1.0f64,
+            "@0 flag,@8 val = 1.0 (claimed UPPER)",
+        ),
+        (
+            16usize,
+            24usize,
+            10.0f64,
+            "@16 flag,@24 val = 10.0 (claimed LOWER)",
+        ),
     ] {
         let mut opts = PK_TOPOL_range_o_t::default();
         unsafe {
@@ -97,7 +118,11 @@ fn test_range_bound() {
         let mut status: PK_range_result_t = -1;
         let mut r: PK_range_2_r_t = unsafe { std::mem::zeroed() };
         let err = unsafe { PK_TOPOL_range(a, bb, &mut opts, &mut status, &mut r) };
-        println!("  raw {label:38}: err={err} status={status} ({}) dist={:.6}", status_name(status), r.distance);
+        println!(
+            "  raw {label:38}: err={err} status={status} ({}) dist={:.6}",
+            status_name(status),
+            r.distance
+        );
     }
     println!();
 }
@@ -120,8 +145,14 @@ fn geom_range(
 
 fn test_geom_range() {
     println!("== 2/3. PK_GEOM_range and PK_range_param_bound_t ==");
-    println!("  sizeof(PK_GEOM_range_o_t)      = {}", std::mem::size_of::<PK_GEOM_range_o_t>());
-    println!("  sizeof(PK_range_param_bound_t) = {}", std::mem::size_of::<PK_range_param_bound_t>());
+    println!(
+        "  sizeof(PK_GEOM_range_o_t)      = {}",
+        std::mem::size_of::<PK_GEOM_range_o_t>()
+    );
+    println!(
+        "  sizeof(PK_range_param_bound_t) = {}",
+        std::mem::size_of::<PK_range_param_bound_t>()
+    );
 
     let b = basis();
     // Sphere radius 4 at origin vs sphere radius 1 at (20,0,0): distance 15.
@@ -135,9 +166,14 @@ fn test_geom_range() {
     let (e, s, r) = geom_range(s1.tag(), s2.tag(), |_| {});
     println!(
         "  sphere(4)@0 vs sphere(1)@20: err={e} status={s} ({}) dist={:.6} p1=({:.4},{:.4},{:.4}) p2=({:.4},{:.4},{:.4})  [expect 15]",
-        status_name(s), r.distance,
-        r.end_1.position[0], r.end_1.position[1], r.end_1.position[2],
-        r.end_2.position[0], r.end_2.position[1], r.end_2.position[2]
+        status_name(s),
+        r.distance,
+        r.end_1.position[0],
+        r.end_1.position[1],
+        r.end_1.position[2],
+        r.end_2.position[0],
+        r.end_2.position[1],
+        r.end_2.position[2]
     );
 
     // Line along +x through origin vs a point at (100, 5, 0).
@@ -146,8 +182,11 @@ fn test_geom_range() {
     let (e, s, r) = geom_range(line.tag(), pt.tag(), |_| {});
     println!(
         "  line(+x) vs point(100,5,0)  : err={e} status={s} ({}) dist={:.6} p1=({:.4},{:.4},{:.4})  [expect 5, p1=(100,0,0)]",
-        status_name(s), r.distance,
-        r.end_1.position[0], r.end_1.position[1], r.end_1.position[2]
+        status_name(s),
+        r.distance,
+        r.end_1.position[0],
+        r.end_1.position[1],
+        r.end_1.position[2]
     );
 
     // Now restrict the LINE (geom_1) to parameter [0,10].  Closest point should
@@ -160,8 +199,11 @@ fn test_geom_range() {
     });
     println!(
         "  + param_bound[0]=[0,10]     : err={e} status={s} ({}) dist={:.6} p1=({:.4},{:.4},{:.4})  [expect {expect:.6}, p1=(10,0,0)]",
-        status_name(s), r.distance,
-        r.end_1.position[0], r.end_1.position[1], r.end_1.position[2]
+        status_name(s),
+        r.distance,
+        r.end_1.position[0],
+        r.end_1.position[1],
+        r.end_1.position[2]
     );
 
     // And the mirror: restrict to [-10,0] => closest at (0,0,0), dist sqrt(100^2+25).
@@ -173,8 +215,11 @@ fn test_geom_range() {
     });
     println!(
         "  + param_bound[0]=[-10,0]    : err={e} status={s} ({}) dist={:.6} p1=({:.4},{:.4},{:.4})  [expect {expect2:.6}, p1=(0,0,0)]",
-        status_name(s), r.distance,
-        r.end_1.position[0], r.end_1.position[1], r.end_1.position[2]
+        status_name(s),
+        r.distance,
+        r.end_1.position[0],
+        r.end_1.position[1],
+        r.end_1.position[2]
     );
 
     // Wrong class value: does the kernel actually validate 0x204?
@@ -185,7 +230,8 @@ fn test_geom_range() {
     });
     println!(
         "  + class=0 (illegal?)        : err={e} status={s} ({}) dist={:.6}",
-        status_name(s), r.distance
+        status_name(s),
+        r.distance
     );
 
     // uvbox param bound on a surface: sphere restricted to the +x/+y/+z octant.
@@ -199,8 +245,11 @@ fn test_geom_range() {
     let (e, s, r) = geom_range(sph.tag(), far.tag(), |_| {});
     println!(
         "  sphere vs point(-100,0,0)   : err={e} status={s} ({}) dist={:.6} p1=({:.4},{:.4},{:.4})  [expect 96]",
-        status_name(s), r.distance,
-        r.end_1.position[0], r.end_1.position[1], r.end_1.position[2]
+        status_name(s),
+        r.distance,
+        r.end_1.position[0],
+        r.end_1.position[1],
+        r.end_1.position[2]
     );
     // Restrict u to [0, pi/2] (the +x/+y quarter) — closest point to (-100,0,0)
     // should move away from (-4,0,0).
@@ -211,8 +260,11 @@ fn test_geom_range() {
     });
     println!(
         "  + uvbox u[0,pi/2]           : err={e} status={s} ({}) dist={:.6} p1=({:.4},{:.4},{:.4})  [expect >96 if honoured]",
-        status_name(s), r.distance,
-        r.end_1.position[0], r.end_1.position[1], r.end_1.position[2]
+        status_name(s),
+        r.distance,
+        r.end_1.position[0],
+        r.end_1.position[1],
+        r.end_1.position[2]
     );
     println!();
 }
@@ -320,7 +372,10 @@ fn test_boxes() {
 
     // Ellipse (asymmetric) restricted.
     let ell = Curve::ellipse(b, 6.0, 2.0).unwrap();
-    for (t0, t1, name) in [(0.0, FRAC_PI_2, "ellipse 6x2 quarter"), (0.7, 2.4, "ellipse 6x2 [0.7,2.4]")] {
+    for (t0, t1, name) in [
+        (0.0, FRAC_PI_2, "ellipse 6x2 quarter"),
+        (0.7, 2.4, "ellipse 6x2 [0.7,2.4]"),
+    ] {
         match ell.find_box(Some((t0, t1))) {
             Ok(bx) => {
                 let (lo, hi) = sample_curve_box(&ell, t0, t1, 4000);
@@ -351,11 +406,21 @@ fn test_boxes() {
     for (uv, name) in [
         (tuv, "torus full uvbox"),
         (
-            UvBox { u_min: 0.0, u_max: FRAC_PI_2, v_min: tuv.v_min, v_max: tuv.v_max },
+            UvBox {
+                u_min: 0.0,
+                u_max: FRAC_PI_2,
+                v_min: tuv.v_min,
+                v_max: tuv.v_max,
+            },
             "torus u[0,pi/2]",
         ),
         (
-            UvBox { u_min: 0.4, u_max: 2.2, v_min: 0.3, v_max: 1.9 },
+            UvBox {
+                u_min: 0.4,
+                u_max: 2.2,
+                v_min: 0.3,
+                v_max: 1.9,
+            },
             "torus partial u+v",
         ),
     ] {
@@ -369,7 +434,12 @@ fn test_boxes() {
     }
 
     let cone = Surf::cone(b, 2.0, 0.4).unwrap();
-    let cuv = UvBox { u_min: 0.0, u_max: TAU, v_min: 0.0, v_max: 4.0 };
+    let cuv = UvBox {
+        u_min: 0.0,
+        u_max: TAU,
+        v_min: 0.0,
+        v_max: 4.0,
+    };
     match cone.find_box(Some(cuv)) {
         Ok(bx) => {
             let (lo, hi) = sample_surf_box(&cone, cuv, 400);
@@ -377,7 +447,12 @@ fn test_boxes() {
         }
         Err(e) => println!("  cone: ERROR {e}"),
     }
-    let cuv2 = UvBox { u_min: 0.5, u_max: 2.0, v_min: 1.0, v_max: 3.0 };
+    let cuv2 = UvBox {
+        u_min: 0.5,
+        u_max: 2.0,
+        v_min: 1.0,
+        v_max: 3.0,
+    };
     match cone.find_box(Some(cuv2)) {
         Ok(bx) => {
             let (lo, hi) = sample_surf_box(&cone, cuv2, 400);
@@ -391,7 +466,12 @@ fn test_boxes() {
     let prof = Curve::line(Vec3::new(3.0, 0.0, 0.0), Vec3::new(0.3 / n, 0.0, 1.0 / n)).unwrap();
     match Surf::spun(&prof, Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0)) {
         Ok(sp) => {
-            let uv = UvBox { u_min: 0.0, u_max: 2.0, v_min: 0.0, v_max: 5.0 };
+            let uv = UvBox {
+                u_min: 0.0,
+                u_max: 2.0,
+                v_min: 0.0,
+                v_max: 5.0,
+            };
             match sp.find_box(Some(uv)) {
                 Ok(bx) => {
                     let (lo, hi) = sample_surf_box(&sp, uv, 400);
@@ -406,7 +486,12 @@ fn test_boxes() {
     // Swept surface.
     match Surf::swept(&circ, Vec3::new(0.0, 0.0, 7.0)) {
         Ok(sw) => {
-            let uv = UvBox { u_min: 0.2, u_max: 2.5, v_min: 1.0, v_max: 6.0 };
+            let uv = UvBox {
+                u_min: 0.2,
+                u_max: 2.5,
+                v_min: 1.0,
+                v_max: 6.0,
+            };
             match sw.find_box(Some(uv)) {
                 Ok(bx) => {
                     let (lo, hi) = sample_surf_box(&sw, uv, 400);
@@ -425,13 +510,22 @@ fn test_boxes() {
         for j in 0..4 {
             let x = i as f64;
             let y = j as f64;
-            let z = if (i == 1 || i == 2) && (j == 1 || j == 2) { 4.0 } else { 0.0 };
+            let z = if (i == 1 || i == 2) && (j == 1 || j == 2) {
+                4.0
+            } else {
+                0.0
+            };
             cps.push(Vec3::new(x, y, z));
         }
     }
     match Surf::bsurf(3, 3, 4, 4, &cps, &[0.0, 1.0], &[4, 4], &[0.0, 1.0], &[4, 4]) {
         Ok(bs) => {
-            let uv = bs.uvbox().unwrap_or(UvBox { u_min: 0.0, u_max: 1.0, v_min: 0.0, v_max: 1.0 });
+            let uv = bs.uvbox().unwrap_or(UvBox {
+                u_min: 0.0,
+                u_max: 1.0,
+                v_min: 0.0,
+                v_max: 1.0,
+            });
             match bs.find_box(Some(uv)) {
                 Ok(bx) => {
                     let (lo, hi) = sample_surf_box(&bs, uv, 300);
@@ -439,7 +533,12 @@ fn test_boxes() {
                 }
                 Err(e) => println!("  bsurf: ERROR {e}"),
             }
-            let uv2 = UvBox { u_min: 0.2, u_max: 0.6, v_min: 0.1, v_max: 0.9 };
+            let uv2 = UvBox {
+                u_min: 0.2,
+                u_max: 0.6,
+                v_min: 0.1,
+                v_max: 0.9,
+            };
             match bs.find_box(Some(uv2)) {
                 Ok(bx) => {
                     let (lo, hi) = sample_surf_box(&bs, uv2, 300);
@@ -472,7 +571,12 @@ fn test_boxes() {
     .unwrap();
     match cyl.transformed(&tf) {
         Ok((rc, exact)) => {
-            let uv = UvBox { u_min: 0.3, u_max: 3.1, v_min: -1.0, v_max: 5.0 };
+            let uv = UvBox {
+                u_min: 0.3,
+                u_max: 3.1,
+                v_min: -1.0,
+                v_max: 5.0,
+            };
             match rc.find_box(Some(uv)) {
                 Ok(bx) => {
                     let (lo, hi) = sample_surf_box(&rc, uv, 400);
@@ -534,12 +638,19 @@ fn obb_check(label: &str, ob: &OrientedBox, pts: &[Vec3]) {
     println!("  {label}");
     println!(
         "    dim={} widths=({:.6},{:.6},{:.6}) centre=({:.6},{:.6},{:.6})",
-        ob.dimension, ob.widths[0], ob.widths[1], ob.widths[2],
-        ob.centre.x, ob.centre.y, ob.centre.z
+        ob.dimension,
+        ob.widths[0],
+        ob.widths[1],
+        ob.widths[2],
+        ob.centre.x,
+        ob.centre.y,
+        ob.centre.z
     );
     println!(
         "    max|proj| = ({:.6},{:.6},{:.6})   ratio width/maxproj = ({:.4},{:.4},{:.4})",
-        max_proj[0], max_proj[1], max_proj[2],
+        max_proj[0],
+        max_proj[1],
+        max_proj[2],
         ob.widths[0] / max_proj[0].max(1e-300),
         ob.widths[1] / max_proj[1].max(1e-300),
         ob.widths[2] / max_proj[2].max(1e-300),
@@ -591,7 +702,12 @@ fn test_widths() {
 
     // Half a cylinder: strongly asymmetric surface.
     let cyl = Surf::cylinder(b, 2.0).unwrap();
-    let uv = UvBox { u_min: 0.0, u_max: PI, v_min: 0.0, v_max: 6.0 };
+    let uv = UvBox {
+        u_min: 0.0,
+        u_max: PI,
+        v_min: 0.0,
+        v_max: 6.0,
+    };
     let mut pts = Vec::new();
     for i in 0..=100 {
         for j in 0..=40 {
@@ -625,9 +741,15 @@ fn test_defaults() {
     println!("== 7. Default option-struct byte images ==");
     dump("PK_range_bound_t", &PK_range_bound_t::default());
     dump("PK_TOPOL_range_o_t", &PK_TOPOL_range_o_t::default());
-    dump("PK_TOPOL_range_vector_o_t", &PK_TOPOL_range_vector_o_t::default());
+    dump(
+        "PK_TOPOL_range_vector_o_t",
+        &PK_TOPOL_range_vector_o_t::default(),
+    );
     dump("PK_GEOM_range_o_t", &PK_GEOM_range_o_t::default());
-    dump("PK_GEOM_range_vector_o_t", &PK_GEOM_range_vector_o_t::default());
+    dump(
+        "PK_GEOM_range_vector_o_t",
+        &PK_GEOM_range_vector_o_t::default(),
+    );
     dump("PK_CURVE_find_box_o_t", &PK_CURVE_find_box_o_t::default());
     dump("PK_SURF_find_box_o_t", &PK_SURF_find_box_o_t::default());
     println!();
@@ -649,7 +771,10 @@ fn test_versions() {
             o.o_t_version = v;
             o.opt_level = 12345; // not a legal PK_range_opt_t
         });
-        println!("  TOPOL_range v{v} opt_level=12345 : err={e} status={s} ({}) dist={d:.6}", status_name(s));
+        println!(
+            "  TOPOL_range v{v} opt_level=12345 : err={e} status={s} ({}) dist={d:.6}",
+            status_name(s)
+        );
     }
     // (b) range_type = maximum: v1 cannot carry it, v2/v3 can.
     for v in [1, 2, 3] {
@@ -657,7 +782,10 @@ fn test_versions() {
             o.o_t_version = v;
             o.range_type = PK_range_type_maximum_c;
         });
-        println!("  TOPOL_range v{v} range_type=MAX  : err={e} status={s} ({}) dist={d:.6}  [min=5]", status_name(s));
+        println!(
+            "  TOPOL_range v{v} range_type=MAX  : err={e} status={s} ({}) dist={d:.6}  [min=5]",
+            status_name(s)
+        );
     }
 
     // (c) GEOM_range param_bound at o_t_version = 3.
@@ -673,8 +801,11 @@ fn test_versions() {
         });
         println!(
             "  GEOM_range v{v} pbound[0,10]      : err={e} status={s} ({}) dist={:.6} p1=({:.4},{:.4},{:.4})  [expect {expect:.6}]",
-            status_name(s), r.distance,
-            r.end_1.position[0], r.end_1.position[1], r.end_1.position[2]
+            status_name(s),
+            r.distance,
+            r.end_1.position[0],
+            r.end_1.position[1],
+            r.end_1.position[2]
         );
     }
     // illegal class at v3 -> should be rejected if 0x204 is really validated
@@ -684,7 +815,11 @@ fn test_versions() {
         o.param_bound[0].param_bound_class = 999;
         o.param_bound[0].bound = [0.0, 10.0, 0.0, 0.0];
     });
-    println!("  GEOM_range v3 class=999           : err={e} status={s} ({}) dist={:.6}", status_name(s), r.distance);
+    println!(
+        "  GEOM_range v3 class=999           : err={e} status={s} ({}) dist={:.6}",
+        status_name(s),
+        r.distance
+    );
     // uvbox form at v3 on a sphere
     let b = basis();
     let sph = Surf::sphere(b, 4.0).unwrap();
@@ -699,8 +834,11 @@ fn test_versions() {
         });
         println!(
             "  GEOM_range v3 uvbox class={class:#x}      : err={e} status={s} ({}) dist={:.6} p1=({:.4},{:.4},{:.4})  [96 = ignored]",
-            status_name(s), r.distance,
-            r.end_1.position[0], r.end_1.position[1], r.end_1.position[2]
+            status_name(s),
+            r.distance,
+            r.end_1.position[0],
+            r.end_1.position[1],
+            r.end_1.position[2]
         );
     }
 
@@ -713,7 +851,10 @@ fn test_versions() {
         let mut status: PK_range_result_t = -1;
         let mut r: PK_range_1_r_t = unsafe { std::mem::zeroed() };
         let e = unsafe { PK_GEOM_range_vector(sph.tag(), &vpos, &mut opts, &mut status, &mut r) };
-        println!("  GEOM_range_vector v{v} opt=12345  : err={e} status={status} dist={:.6}", r.distance);
+        println!(
+            "  GEOM_range_vector v{v} opt=12345  : err={e} status={status} dist={:.6}",
+            r.distance
+        );
     }
     // (e) TOPOL_range_vector param_entity: illegal token accepted at v1?
     for v in [1, 2, 3] {
@@ -724,7 +865,10 @@ fn test_versions() {
         let mut status: PK_range_result_t = -1;
         let mut r: PK_range_1_r_t = unsafe { std::mem::zeroed() };
         let e = unsafe { PK_TOPOL_range_vector(b1.tag(), &vpos, &mut opts, &mut status, &mut r) };
-        println!("  TOPOL_range_vector v{v} pe=12345  : err={e} status={status} dist={:.6}", r.distance);
+        println!(
+            "  TOPOL_range_vector v{v} pe=12345  : err={e} status={status} dist={:.6}",
+            r.distance
+        );
     }
     println!();
 }

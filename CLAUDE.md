@@ -99,3 +99,44 @@ before relying on a constant.
   Wine binary. Keep that single-binary runner; group new tests by P-level.
 - `Session` is a runtime singleton and `!Send`/`!Sync`. Tests start/stop a
   fresh session per case.
+
+## Track the latest API — always
+
+**Policy: this crate targets the newest behaviour and the newest option-struct
+version the installed kernel accepts.** We do not care about reproducing older
+Parasolid releases. Siemens keeps those paths for customers who need
+bit-identical output for parts designed decades ago; we are building an oracle
+and want the current algorithms.
+
+Two independent mechanisms control this — do not confuse them:
+
+1. **Session behaviour** — `PK_SESSION_set_behaviour`. A session that never sets
+   it reports `Unset`, meaning "use the original system switches", i.e. the
+   legacy path. `SessionConfig` therefore defaults to `Behaviour::Latest`, and
+   the call's `status` output is checked (the kernel can decline or clamp a
+   request and still return no error).
+2. **`o_t_version`** — the first field of each individual `PK_*_o_t` options
+   struct, stamped by the caller. There is no global switch: it is per struct.
+
+### Rules for `o_t_version`
+
+- **Stamp the highest version the entry point accepts**, never 1 by default.
+- **Fields are version-gated.** The kernel migrates your struct from the stamped
+  version, copying only that version's prefix and overwriting the rest with its
+  own defaults. Stamping too low makes later fields **silently dead** — measured
+  cases: `range_type` was ignored so "give me the maximum distance" returned the
+  *minimum* with no error, and `mixed_curve_category` was ignored in SSI.
+- **Too high is an error, not a clamp** — `PK_ERROR_o_t_version_unknown` (5022).
+  Some versions are known but unimplemented (5000). So the ceiling must be
+  *probed*, per struct.
+- **A higher version means the kernel reads more fields**, so every one of them
+  needs a legal value. `0` is not a legal token for most enum fields and gives
+  `PK_ERROR_field_of_wrong_type` (5014). **Never `mem::zeroed()` an options
+  struct that contains enum fields and expect it to work at a high version.**
+- The sweep procedure and worked examples are in
+  [`docs/option-version-protocol.md`](docs/option-version-protocol.md). Use it
+  before trusting any recovered layout — journal helpers describe the kernel's
+  *post-migration* struct, not the caller's.
+
+A quick way to tell whether a field is live: set it to a garbage token. If the
+call still succeeds, the kernel is not reading it and your version is too low.

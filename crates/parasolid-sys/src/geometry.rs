@@ -358,12 +358,31 @@ const _: () = {
 };
 
 impl Default for PK_EDGE_optimise_o_t {
-    /// Mirror of `PK_EDGE_optimise_o_m`: version 1 [probed: accepted by
-    /// V37.01.243 under argument checking], edge-tolerance upper bound, short
-    /// edges not optimised.
+    /// `o_t_version = 2`, edge-tolerance upper bound, short edges not
+    /// optimised.
+    ///
+    /// **This entry point does not range-check `o_t_version` at all** —
+    /// `version_upgrade_probe` swept 1..=40 on V37.01.243 and every value
+    /// returned rc 0; there is no 5022 ceiling to find. The version is still
+    /// live, though, because it selects which fields the migration reads:
+    ///
+    /// | version | garbage `set_max_dev` | garbage `optimise_short` |
+    /// |---|---|---|
+    /// | 1       | rc 0 (ignored)        | rc 0 (ignored)           |
+    /// | **2**   | **5014**              | **5014**                 |
+    /// | 3..=40  | rc 0 (ignored)        | rc 0 (ignored)           |
+    ///
+    /// So v2 is the *only* version that reads this 4-field layout. At the
+    /// previous `o_t_version = 1` both `set_max_dev` and `optimise_short` were
+    /// silently dead, which meant `Edge::optimise(Some(bound), true)` was
+    /// quietly equivalent to `Edge::optimise(None, false)`.
+    ///
+    /// v3+ is NOT adopted despite being accepted: the fields going dead again
+    /// says the v3 migration reads a *different, larger* layout, so our bytes
+    /// would land at the wrong offsets with no error to warn us.
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 2,
             max_dev: 0.0,
             set_max_dev: PK_EDGE_max_dev_edge_tol_c,
             optimise_short: PK_EDGE_optimise_short_no_c,

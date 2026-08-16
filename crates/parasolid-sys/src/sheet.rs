@@ -362,6 +362,13 @@ pub struct PK_EDGE_make_wire_body_o_t {
 }
 
 impl Default for PK_EDGE_make_wire_body_o_t {
+    /// `o_t_version = 1` — correct, and there is nothing to raise.
+    ///
+    /// `version_upgrade_probe` swept 1..=40 on V37.01.243: every value returns
+    /// rc 0, so `PK_EDGE_make_wire_body` does not dispatch on `o_t_version`. A
+    /// garbage `allow_disjoint` returns `PK_ERROR_not_a_logical` (908) at
+    /// **every** version including v1, so the whole struct is already live at
+    /// v1 and a higher stamp would gain nothing.
     fn default() -> Self {
         Self {
             o_t_version: 1,

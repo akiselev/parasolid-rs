@@ -5584,6 +5584,62 @@ fn main() {
         );
     });
 
+    test!("stage6_oblique_box_is_the_l1_hull_not_tight", {
+        let _session = Session::start(test_config())?;
+
+        // CORRECTION to `stage6_boxes_are_tight_not_padded`: that test uses only
+        // AXIS-ALIGNED fixtures, where the L1 hull and the tight extent happen
+        // to coincide. On an oblique frame they do not, and the kernel returns
+        // the L1 / control-parallelogram hull — up to 1.36x the true extent.
+        //
+        // Exactly-orthonormal rational rotation (1/9)[[7,-4,4],[4,8,1],[-4,1,8]]
+        // — no zero components, so no axis can hide.
+        let n = 1.0 / 9.0;
+        let x_axis = Vec3::new(7.0 * n, 4.0 * n, -4.0 * n);
+        let y_axis = Vec3::new(-4.0 * n, 8.0 * n, 1.0 * n);
+        let z_axis = Vec3::new(4.0 * n, 1.0 * n, 8.0 * n);
+        let r = 5.25_f64;
+
+        let circle = Curve::circle(Axis2::new(Vec3::new(0.0, 0.0, 0.0), z_axis, x_axis), r)?;
+        let bx = circle.find_box(None)?;
+
+        let got = [bx.max.x, bx.max.y, bx.max.z];
+        let xs = [x_axis.x, x_axis.y, x_axis.z];
+        let ys = [y_axis.x, y_axis.y, y_axis.z];
+        let zs = [z_axis.x, z_axis.y, z_axis.z];
+
+        for i in 0..3 {
+            let tight = r * (1.0 - zs[i] * zs[i]).sqrt();
+            let l1 = r * (xs[i].abs() + ys[i].abs());
+            assert!(
+                (got[i] - l1).abs() < 1e-12,
+                "axis {i}: reported {} should equal the L1 hull {l1}",
+                got[i]
+            );
+            assert!(
+                got[i] > tight * 1.2,
+                "axis {i}: reported {} should be well ABOVE the tight extent {tight} \
+                 — if this fails the kernel became tight and the docs need updating",
+                got[i]
+            );
+            // Conservative is the property that actually matters for pruning.
+            assert!(
+                got[i] >= tight,
+                "axis {i}: the box must still CONTAIN the circle"
+            );
+        }
+
+        // The oriented box, by contrast, IS tight and recovers the precision.
+        let ob = circle.find_oriented_box((0.0, std::f64::consts::TAU))?;
+        assert_eq!(ob.dimension, 2, "a planar circle is 2-dimensional");
+        assert!(
+            (ob.widths[0] - r).abs() < 1e-9 && (ob.widths[1] - r).abs() < 1e-9,
+            "oriented half-widths should be the radius, got {:?}",
+            ob.widths
+        );
+        assert!(ob.widths[2].abs() < 1e-12, "and no thickness out of plane");
+    });
+
     test!("stage6_tight_boxes_can_be_one_ulp_inward", {
         let _session = Session::start(test_config())?;
         let b = Axis2::new(
@@ -5809,7 +5865,9 @@ fn main() {
         );
 
         // And the second witness must name real entities, not garbage tags.
-        let w2 = r.witness_2.expect("a two-entity range has a second witness");
+        let w2 = r
+            .witness_2
+            .expect("a two-entity range has a second witness");
         assert!(
             w2.entity.class().is_ok(),
             "witness_2.entity {} is not a valid tag",
@@ -5817,7 +5875,10 @@ fn main() {
         );
         let sub = w2.sub_entity.expect("second witness sub-entity");
         assert!(
-            matches!(sub.class()?, PkClass::Face | PkClass::Edge | PkClass::Vertex),
+            matches!(
+                sub.class()?,
+                PkClass::Face | PkClass::Edge | PkClass::Vertex
+            ),
             "witness_2 sub-entity should be face/edge/vertex, got {:?}",
             sub.class()?
         );
@@ -5871,9 +5932,7 @@ fn main() {
         };
         let mut status: PK_range_result_t = 0;
         let mut r: PK_range_2_r_t = unsafe { std::mem::zeroed() };
-        let rc = unsafe {
-            PK_TOPOL_range(a.tag(), b.tag(), &mut opts, &mut status, &mut r)
-        };
+        let rc = unsafe { PK_TOPOL_range(a.tag(), b.tag(), &mut opts, &mut status, &mut r) };
         assert_eq!(rc, PK_ERROR_no_errors, "maximum-range call failed");
         assert!(
             r.distance > min_r.distance + 1.0,
@@ -5890,9 +5949,7 @@ fn main() {
         };
         let mut st2: PK_range_result_t = 0;
         let mut r2: PK_range_2_r_t = unsafe { std::mem::zeroed() };
-        let rc2 = unsafe {
-            PK_TOPOL_range(a.tag(), b.tag(), &mut bad, &mut st2, &mut r2)
-        };
+        let rc2 = unsafe { PK_TOPOL_range(a.tag(), b.tag(), &mut bad, &mut st2, &mut r2) };
         assert_ne!(
             rc2, PK_ERROR_no_errors,
             "an illegal opt_level should be rejected, proving the field is read"
@@ -5927,17 +5984,30 @@ fn main() {
                     && (got.z - want.z).abs() < 1e-9,
                 "control point {i} = ({:.4},{:.4},{:.4}), authored ({:.4},{:.4},{:.4}) \
                  — weights not divided out",
-                got.x, got.y, got.z, want.x, want.y, want.z
+                got.x,
+                got.y,
+                got.z,
+                want.x,
+                want.y,
+                want.z
             );
         }
-        assert_eq!(data.weights.len(), 3, "weights must be surfaced, not dropped");
+        assert_eq!(
+            data.weights.len(),
+            3,
+            "weights must be surfaced, not dropped"
+        );
         assert!(
             (data.weights[1] - 4.0).abs() < 1e-9,
             "middle weight should be 4, got {}",
             data.weights[1]
         );
         // knot_mult is needed to rebuild the curve; it used to be freed unread.
-        assert_eq!(data.knot_mult, vec![3, 3], "knot multiplicities must survive");
+        assert_eq!(
+            data.knot_mult,
+            vec![3, 3],
+            "knot multiplicities must survive"
+        );
     });
 
     test!("regress_nurbs_domain_is_bounded", {
@@ -6050,6 +6120,1023 @@ fn main() {
             s2.behaviour()?,
             Behaviour::Unset,
             "an explicit behaviour request must override the default"
+        );
+    });
+
+    // =========================================================================
+    // Stage 7 — surface/surface intersection (SSI)
+    // =========================================================================
+
+    /// Worst distance from sampled points on an intersection curve to each of
+    /// the two surfaces, measured by an INDEPENDENT implicit equation rather
+    /// than by the kernel.
+    ///
+    /// `Surf::range_to_point` cannot be used for this: it snaps to exactly 0.0
+    /// for anything closer than 1e-8 (bisected), so a `< 1e-9` assertion
+    /// written against it is really `<= 1e-8` and can never fail in the range
+    /// it claims to police. Evaluating the algebraic form directly gives the
+    /// true residual — measured ~1e-15 on the analytic pairs.
+    fn implicit_residual(c: &IntersectionCurve, checks: &[&dyn Fn(Vec3) -> f64]) -> f64 {
+        let (lo, hi) = c.bounds;
+        let mut worst: f64 = 0.0;
+        for k in 0..=40 {
+            let t = lo + (hi - lo) * (k as f64) / 40.0;
+            let Ok(p) = c.curve.eval(t) else { continue };
+            for f in checks {
+                worst = worst.max(f(p).abs());
+            }
+        }
+        worst
+    }
+
+    test!("stage7_ssi_options_read_the_late_fields", {
+        let _session = Session::start(test_config())?;
+
+        // `mixed_curve_category` is IGNORED at o_t_version 1 and READ from 2 —
+        // the same version-gating that made `range_type` inert in Stage 6. The
+        // wrapper now stamps 2, so a garbage token must be rejected. If this
+        // starts passing a garbage value again, the version has regressed.
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let cyl = Surf::cylinder(b, 5.0)?;
+        let pl = Surf::plane(Axis2::new(
+            Vec3::new(0.0, 0.0, 3.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+
+        let probe = |version: i32, token: i32| -> i32 {
+            let mut o: PK_SURF_intersect_surf_o_t = unsafe { std::mem::zeroed() };
+            o.o_t_version = version;
+            o.mixed_curve_category = token;
+            let (mut nv, mut nc) = (0, 0);
+            let (mut a, mut c, mut d, mut e) = (
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+                std::ptr::null_mut(),
+            );
+            let rc = unsafe {
+                PK_SURF_intersect_surf(
+                    cyl.tag(),
+                    pl.tag(),
+                    &o,
+                    &mut nv,
+                    &mut a,
+                    &mut nc,
+                    &mut c,
+                    &mut d,
+                    &mut e,
+                )
+            };
+            unsafe {
+                for p in [
+                    a as *mut std::os::raw::c_void,
+                    c as *mut _,
+                    d as *mut _,
+                    e as *mut _,
+                ] {
+                    if !p.is_null() {
+                        let _ = PK_MEMORY_free(p);
+                    }
+                }
+            }
+            rc
+        };
+
+        assert_eq!(probe(1, 12345), PK_ERROR_no_errors, "v1 ignores the field");
+        assert_ne!(
+            probe(2, 12345),
+            PK_ERROR_no_errors,
+            "v2 must READ the field"
+        );
+        assert_eq!(
+            probe(2, PK_mixed_intersection_classic_c),
+            PK_ERROR_no_errors,
+            "v2 with a legal token must succeed"
+        );
+        assert_ne!(probe(2, 0), PK_ERROR_no_errors, "zero is not a legal token");
+        // 3 is known but unimplemented, 4+ unknown — 2 is the ceiling.
+        assert_ne!(
+            probe(4, PK_mixed_intersection_classic_c),
+            PK_ERROR_no_errors
+        );
+    });
+
+    test!("stage7_ssi_analytic_pairs_are_exact", {
+        let _session = Session::start(test_config())?;
+        let at = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let origin = Vec3::new(0.0, 0.0, 0.0);
+
+        // Each case asserts the CLOSED-FORM answer, not merely "a curve came
+        // back", and every curve is checked to lie on BOTH surfaces.
+        let cyl = Surf::cylinder(at(origin), 5.0)?;
+        let plane_z3 = Surf::plane(at(Vec3::new(0.0, 0.0, 3.0)))?;
+        let r = cyl.intersect(&plane_z3)?;
+        assert_eq!(r.curves.len(), 1, "cylinder x plane is one circle");
+        assert!(r.points.is_empty());
+        let c = r.curves[0];
+        assert_eq!(c.classify(), IntersectionKind::Transversal);
+        let circle = c.curve.ask_circle()?;
+        assert!(
+            (circle.radius - 5.0).abs() < 1e-12,
+            "cyl(5) x plane gives r=5, got {}",
+            circle.radius
+        );
+        assert!(
+            (circle.basis.origin.z - 3.0).abs() < 1e-12,
+            "circle should sit at z=3"
+        );
+        // Independent algebraic check: on the cylinder x^2+y^2=25, on the
+        // plane z=3. The kernel is not consulted, so this cannot be floored.
+        let resid = implicit_residual(
+            &c,
+            &[&|p: Vec3| p.x * p.x + p.y * p.y - 25.0, &|p: Vec3| {
+                p.z - 3.0
+            }],
+        );
+        assert!(
+            resid < 1e-12,
+            "intersection curve must satisfy both implicit equations, worst {resid:.3e}"
+        );
+
+        // Sphere x plane: r = sqrt(5^2 - 3^2) = 4.
+        let sph = Surf::sphere(at(origin), 5.0)?;
+        let r = sph.intersect(&plane_z3)?;
+        assert_eq!(r.curves.len(), 1);
+        assert!(
+            (r.curves[0].curve.ask_circle()?.radius - 4.0).abs() < 1e-12,
+            "sphere(5) cut at z=3 gives r=4"
+        );
+
+        // Sphere x sphere, centres 6 apart, equal radii 5 -> r=4 at z=3.
+        let sph_b = Surf::sphere(at(Vec3::new(0.0, 0.0, 6.0)), 5.0)?;
+        let r = sph.intersect(&sph_b)?;
+        assert_eq!(r.curves.len(), 1);
+        let ci = r.curves[0].curve.ask_circle()?;
+        assert!(
+            (ci.radius - 4.0).abs() < 1e-12 && (ci.basis.origin.z - 3.0).abs() < 1e-12,
+            "sphere-sphere circle should be r=4 at z=3, got r={} z={}",
+            ci.radius,
+            ci.basis.origin.z
+        );
+
+        // Torus x its own equatorial plane: TWO concentric circles.
+        let (maj, min) = (5.0, 1.5);
+        let tor = Surf::torus(at(origin), maj, min)?;
+        let r = tor.intersect(&Surf::plane(at(origin))?)?;
+        assert_eq!(r.curves.len(), 2, "torus equator plane gives two circles");
+        let mut radii: Vec<f64> = r
+            .curves
+            .iter()
+            .map(|c| c.curve.ask_circle().map(|x| x.radius).unwrap_or(f64::NAN))
+            .collect();
+        radii.sort_by(|a, b| a.partial_cmp(b).unwrap());
+        assert!(
+            (radii[0] - (maj - min)).abs() < 1e-12 && (radii[1] - (maj + min)).abs() < 1e-12,
+            "torus radii should be {} and {}, got {radii:?}",
+            maj - min,
+            maj + min
+        );
+    });
+
+    test!("stage7_ssi_distinguishes_tangency", {
+        let _session = Session::start(test_config())?;
+        let at = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let origin = Vec3::new(0.0, 0.0, 0.0);
+
+        // A torus cut at z = minor_radius touches along a circle — TANGENTIAL,
+        // and the kind token is the only thing that says so.
+        let tor = Surf::torus(at(origin), 5.0, 1.5)?;
+        let r = tor.intersect(&Surf::plane(at(Vec3::new(0.0, 0.0, 1.5)))?)?;
+        assert_eq!(r.curves.len(), 1);
+        assert_eq!(
+            r.curves[0].classify(),
+            IntersectionKind::Tangential,
+            "a plane touching the torus crown is tangential, not transversal"
+        );
+        assert!(
+            (r.curves[0].curve.ask_circle()?.radius - 5.0).abs() < 1e-9,
+            "tangential circle sits at the major radius"
+        );
+
+        // Two spheres touching externally give a single POINT, no curve.
+        let sph = Surf::sphere(at(origin), 5.0)?;
+        let touching = Surf::sphere(at(Vec3::new(0.0, 0.0, 10.0)), 5.0)?;
+        let r = sph.intersect(&touching)?;
+        assert_eq!(r.curves.len(), 0, "tangent spheres give no curve");
+        assert_eq!(r.points.len(), 1, "tangent spheres give one point");
+        let p = r.points[0];
+        assert!(
+            p.x.abs() < 1e-9 && p.y.abs() < 1e-9 && (p.z - 5.0).abs() < 1e-9,
+            "tangency point should be (0,0,5), got ({},{},{})",
+            p.x,
+            p.y,
+            p.z
+        );
+
+        // Parallel cylinders touching along a line: tangential line.
+        let cyl = Surf::cylinder(at(origin), 5.0)?;
+        let cyl_touch = Surf::cylinder(at(Vec3::new(10.0, 0.0, 0.0)), 5.0)?;
+        let r = cyl.intersect(&cyl_touch)?;
+        assert_eq!(r.curves.len(), 1);
+        assert_eq!(
+            r.curves[0].classify(),
+            IntersectionKind::Tangential,
+            "touching parallel cylinders meet tangentially"
+        );
+    });
+
+    test!("stage7_ssi_cannot_distinguish_coincident_from_disjoint", {
+        let _session = Session::start(test_config())?;
+        let at = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let origin = Vec3::new(0.0, 0.0, 0.0);
+
+        // A limitation CADabra must design around: SSI returns EMPTY for two
+        // fully coincident surfaces, exactly as it does for disjoint ones. The
+        // caller cannot tell "same surface" from "no intersection" by counting
+        // results — coincidence needs a separate test.
+        let cases: Vec<(&str, Surf, Surf)> = vec![
+            (
+                "coincident cylinders",
+                Surf::cylinder(at(origin), 5.0)?,
+                Surf::cylinder(at(origin), 5.0)?,
+            ),
+            (
+                "coincident planes",
+                Surf::plane(at(origin))?,
+                Surf::plane(at(origin))?,
+            ),
+            (
+                "coincident spheres",
+                Surf::sphere(at(origin), 5.0)?,
+                Surf::sphere(at(origin), 5.0)?,
+            ),
+        ];
+        for (label, a, b) in cases {
+            let r = a.intersect(&b)?;
+            assert!(
+                r.curves.is_empty() && r.points.is_empty(),
+                "{label}: SSI reports nothing for coincident surfaces (got {} curves, {} points)",
+                r.curves.len(),
+                r.points.len()
+            );
+        }
+
+        // ...and genuinely disjoint surfaces are reported identically.
+        let disjoint =
+            Surf::plane(at(origin))?.intersect(&Surf::plane(at(Vec3::new(0.0, 0.0, 9.0)))?)?;
+        assert!(disjoint.curves.is_empty() && disjoint.points.is_empty());
+    });
+
+    test!("stage7_ssi_survives_oblique_placement", {
+        let _session = Session::start(test_config())?;
+        let at = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let origin = Vec3::new(0.0, 0.0, 0.0);
+
+        // The Stage 2 payoff: an axis-aligned SSI fixture can hide frame bugs.
+        // Place both surfaces at an arbitrary oblique pose and require the same
+        // exact answer.
+        let cyl = Surf::cylinder(at(origin), 5.0)?;
+        let plane = Surf::plane(at(Vec3::new(0.0, 0.0, 3.0)))?;
+
+        let s3 = 1.0 / 3.0_f64.sqrt();
+        let oblique = Transform::rotation(origin, Vec3::new(s3, s3, s3), 0.9)?
+            .then(&Transform::translation(2.0, -3.0, 1.0)?)?;
+        let (cyl_o, exact_1) = cyl.transformed(&oblique)?;
+        let (plane_o, exact_2) = plane.transformed(&oblique)?;
+        assert!(exact_1 && exact_2, "a rigid motion must place both exactly");
+
+        let r = cyl_o.intersect(&plane_o)?;
+        assert_eq!(r.curves.len(), 1, "still exactly one circle when oblique");
+        let c = r.curves[0];
+        assert_eq!(c.classify(), IntersectionKind::Transversal);
+        assert!(
+            (c.curve.ask_circle()?.radius - 5.0).abs() < 1e-9,
+            "radius is invariant under a rigid motion, got {}",
+            c.curve.ask_circle()?.radius
+        );
+        // Independent check under the oblique frame: every sampled point must
+        // be 5.0 from the transformed axis and on the transformed plane. Build
+        // both from the transform itself rather than trusting the kernel.
+        let axis_pt = oblique.apply(Vec3::new(0.0, 0.0, 0.0))?;
+        let axis_dir = oblique.apply_direction(Vec3::new(0.0, 0.0, 1.0))?;
+        let plane_pt = oblique.apply(Vec3::new(0.0, 0.0, 3.0))?;
+        let resid = implicit_residual(
+            &c,
+            &[
+                &|p: Vec3| {
+                    let d = Vec3::new(p.x - axis_pt.x, p.y - axis_pt.y, p.z - axis_pt.z);
+                    let along = d.x * axis_dir.x + d.y * axis_dir.y + d.z * axis_dir.z;
+                    let perp = Vec3::new(
+                        d.x - along * axis_dir.x,
+                        d.y - along * axis_dir.y,
+                        d.z - along * axis_dir.z,
+                    );
+                    (perp.x * perp.x + perp.y * perp.y + perp.z * perp.z).sqrt() - 5.0
+                },
+                &|p: Vec3| {
+                    let d = Vec3::new(p.x - plane_pt.x, p.y - plane_pt.y, p.z - plane_pt.z);
+                    d.x * axis_dir.x + d.y * axis_dir.y + d.z * axis_dir.z
+                },
+            ],
+        );
+        assert!(
+            resid < 1e-9,
+            "oblique intersection curve must satisfy both implicit forms, worst {resid:.3e}"
+        );
+    });
+
+    test!("stage7_ssi_cylinder_cylinder_strata", {
+        let _session = Session::start(test_config())?;
+        let z_axis = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let x_axis = |o: Vec3| Axis2::new(o, Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0));
+        let origin = Vec3::new(0.0, 0.0, 0.0);
+        let cyl_z = Surf::cylinder(z_axis(origin), 5.0)?;
+
+        // EQUAL RADIUS, perpendicular axes — the Steinmetz solid. The classical
+        // answer is two ellipses; the kernel returns FOUR arcs because each
+        // ellipse is split at the two singular crossing points (0, +-5, 0)
+        // where the two ellipses meet. That is a correct decomposition, not a
+        // double count: the four arcs carry four DISTINCT curve tags.
+        let cyl_x = Surf::cylinder(x_axis(origin), 5.0)?;
+        let r = cyl_z.intersect(&cyl_x)?;
+        assert_eq!(r.curves.len(), 4, "Steinmetz gives four arcs");
+        let mut tags: Vec<i32> = r.curves.iter().map(|c| c.curve.tag()).collect();
+        tags.sort_unstable();
+        tags.dedup();
+        assert_eq!(
+            tags.len(),
+            4,
+            "the four arcs are distinct curves, not repeats"
+        );
+        for c in &r.curves {
+            assert_eq!(
+                c.curve.curve_type()?,
+                CurveType::Ellipse,
+                "each Steinmetz branch is an ellipse"
+            );
+            // Independent implicit check on BOTH cylinders.
+            let resid = implicit_residual(
+                c,
+                &[&|p: Vec3| p.x * p.x + p.y * p.y - 25.0, &|p: Vec3| {
+                    p.y * p.y + p.z * p.z - 25.0
+                }],
+            );
+            assert!(
+                resid < 1e-9,
+                "Steinmetz arc must satisfy both cylinder equations, worst {resid:.3e}"
+            );
+        }
+
+        // UNEQUAL RADIUS — the intersection is a genuine quartic, so the kernel
+        // must fall back to spline curves rather than an exact conic.
+        let cyl_x3 = Surf::cylinder(x_axis(origin), 3.0)?;
+        let r = cyl_z.intersect(&cyl_x3)?;
+        assert_eq!(r.curves.len(), 2, "unequal cylinders give two branches");
+        for c in &r.curves {
+            assert_eq!(
+                c.curve.curve_type()?,
+                CurveType::Bcurve,
+                "a quartic intersection cannot be an exact conic"
+            );
+            let resid = implicit_residual(
+                c,
+                &[&|p: Vec3| p.x * p.x + p.y * p.y - 25.0, &|p: Vec3| {
+                    p.y * p.y + p.z * p.z - 9.0
+                }],
+            );
+            assert!(resid < 1e-9, "quartic branch residual {resid:.3e}");
+        }
+
+        // PARALLEL, disjoint / tangent — the two degenerate strata.
+        let far = Surf::cylinder(z_axis(Vec3::new(12.0, 0.0, 0.0)), 5.0)?;
+        let r = cyl_z.intersect(&far)?;
+        assert!(
+            r.curves.is_empty() && r.points.is_empty(),
+            "parallel disjoint cylinders do not intersect"
+        );
+
+        let touching = Surf::cylinder(z_axis(Vec3::new(10.0, 0.0, 0.0)), 5.0)?;
+        let r = cyl_z.intersect(&touching)?;
+        assert_eq!(r.curves.len(), 1, "parallel tangent cylinders share a line");
+        assert_eq!(r.curves[0].curve.curve_type()?, CurveType::Line);
+        assert_eq!(
+            r.curves[0].classify(),
+            IntersectionKind::Tangential,
+            "and it is correctly reported tangential"
+        );
+    });
+
+    test!("stage7_ssi_cone_conic_ladder", {
+        let _session = Session::start(test_config())?;
+        let at = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let origin = Vec3::new(0.0, 0.0, 0.0);
+
+        // A cone cut by planes at different attitudes walks the conic ladder.
+        // Base radius 3 at z=0, half-angle 0.5 rad, widening toward +z, so the
+        // radius at height z is 3 + z*tan(0.5).
+        let semi = 0.5_f64;
+        let cone = Surf::cone(at(origin), 3.0, semi)?;
+
+        // Perpendicular cut -> circle of the exact expected radius.
+        let z = 3.0;
+        let r = cone.intersect(&Surf::plane(at(Vec3::new(0.0, 0.0, z)))?)?;
+        assert_eq!(r.curves.len(), 1, "a perpendicular cut gives one circle");
+        let circle = r.curves[0].curve.ask_circle()?;
+        let expected = 3.0 + z * semi.tan();
+        assert!(
+            (circle.radius - expected).abs() < 1e-9,
+            "cone radius at z={z} should be {expected}, got {}",
+            circle.radius
+        );
+
+        // Plane CONTAINING the axis -> the two rulings, meeting at the apex.
+        let through_axis = Surf::plane(Axis2::new(
+            origin,
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+        ))?;
+        let r = cone.intersect(&through_axis)?;
+        assert_eq!(
+            r.curves.len(),
+            2,
+            "a plane through the axis cuts two rulings"
+        );
+        for c in &r.curves {
+            assert_eq!(
+                c.curve.curve_type()?,
+                CurveType::Line,
+                "rulings of a cone are straight"
+            );
+        }
+
+        // Apex behaviour: the apex sits where the radius vanishes.
+        let v_apex = -3.0 / semi.tan();
+        let apex = cone.eval(0.0, v_apex)?;
+        assert!(
+            (apex.x.abs() < 1e-9) && (apex.y.abs() < 1e-9),
+            "apex should be on the axis, got ({},{},{})",
+            apex.x,
+            apex.y,
+            apex.z
+        );
+    });
+
+    test!("stage7_ssi_villarceau_bitangent_plane", {
+        let _session = Session::start(test_config())?;
+        let at = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let origin = Vec3::new(0.0, 0.0, 0.0);
+
+        // The classical trap: a plane through the torus centre, inclined so it
+        // is BITANGENT, cuts two circles of the MAJOR radius (the Villarceau
+        // circles) rather than the obvious equatorial pair. A branch-dropping
+        // intersector fails here, so it is the strongest completeness check in
+        // the analytic matrix.
+        let (maj, min) = (5.0_f64, 1.5_f64);
+        let tor = Surf::torus(at(origin), maj, min)?;
+
+        // Bitangent plane: contains the y axis, inclined by asin(min/maj).
+        let alpha = (min / maj).asin();
+        let normal = Vec3::new(alpha.sin(), 0.0, alpha.cos());
+        let plane = Surf::plane(Axis2::new(origin, normal, Vec3::new(0.0, 1.0, 0.0)))?;
+
+        let r = tor.intersect(&plane)?;
+        assert!(
+            !r.curves.is_empty(),
+            "the bitangent plane must intersect the torus"
+        );
+
+        // Every sampled point must satisfy the torus implicit equation
+        //   (sqrt(x^2+y^2) - R)^2 + z^2 = r^2
+        // and lie in the plane. Checked algebraically, never via the kernel.
+        for c in &r.curves {
+            let resid = implicit_residual(
+                c,
+                &[
+                    &|p: Vec3| {
+                        let q = (p.x * p.x + p.y * p.y).sqrt() - maj;
+                        q * q + p.z * p.z - min * min
+                    },
+                    &|p: Vec3| p.x * normal.x + p.y * normal.y + p.z * normal.z,
+                ],
+            );
+            assert!(
+                resid < 1e-9,
+                "Villarceau branch must lie on both torus and plane, worst {resid:.3e}"
+            );
+        }
+
+        // Completeness: the total arc length must account for TWO circles of
+        // the major radius (4*pi*R), not one. A dropped branch halves this.
+        let total: f64 = r
+            .curves
+            .iter()
+            .map(|c| {
+                c.curve
+                    .length_with_bounds(c.bounds)
+                    .map(|(l, _, _)| l)
+                    .unwrap_or(0.0)
+            })
+            .sum();
+        let expected = 4.0 * std::f64::consts::PI * maj;
+        assert!(
+            (total - expected).abs() / expected < 1e-3,
+            "total Villarceau arc length should be ~4*pi*R = {expected:.4}, got {total:.4} \
+             — a shortfall means a dropped branch"
+        );
+    });
+
+    test!("stage7_ssi_collapses_near_tangential_branches", {
+        let _session = Session::start(test_config())?;
+        let at = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+
+        // THE most important SSI limitation for CADabra. The kernel merges or
+        // drops intersection branches whose separation falls below roughly
+        // **1e-3 model units** — five orders of magnitude ABOVE the 1e-8 linear
+        // precision — and flips the kind token to `tangent` as a side effect.
+        //
+        // Consequence: `IntersectionKind::Tangential` means "tangential OR
+        // within ~1e-3 of it", and a real intersection circle can be reported
+        // as an isolated point. Any arrangement built on branch counts must
+        // keep features away from this band or verify independently.
+        let sph = Surf::sphere(at(Vec3::new(0.0, 0.0, 0.0)), 5.0)?;
+
+        // A plane 1e-8 below the tangent height cuts a TRUE circle of radius
+        // sqrt(5^2 - (5-1e-8)^2) ~= 3.16e-4. The kernel discards the circle.
+        let near = Surf::plane(at(Vec3::new(0.0, 0.0, 5.0 - 1.0e-8)))?;
+        let r = sph.intersect(&near)?;
+        assert_eq!(
+            (r.points.len(), r.curves.len()),
+            (1, 0),
+            "a 3.2e-4-radius circle is collapsed to a POINT, not returned as a curve"
+        );
+
+        // Move the plane far enough out and the same configuration yields the
+        // curve, proving this is a threshold and not a modelling error.
+        let further = Surf::plane(at(Vec3::new(0.0, 0.0, 5.0 - 1.0e-7)))?;
+        let r2 = sph.intersect(&further)?;
+        assert_eq!(
+            (r2.points.len(), r2.curves.len()),
+            (0, 1),
+            "at a 1e-3 radius the circle IS returned"
+        );
+        let radius = r2.curves[0].curve.ask_circle()?.radius;
+        assert!(
+            (radius - 1.0e-3).abs() < 1e-5,
+            "recovered circle radius should be ~1e-3, got {radius:e}"
+        );
+
+        // And the token flip: two torus/plane circles 3.5e-4 apart fuse into a
+        // single curve reported TANGENTIAL, though neither is tangent.
+        let tor = Surf::torus(at(Vec3::new(0.0, 0.0, 0.0)), 5.0, 1.5)?;
+        let fused = tor.intersect(&Surf::plane(at(Vec3::new(0.0, 0.0, 1.5 - 1.0e-8)))?)?;
+        assert_eq!(fused.curves.len(), 1, "the two circles are fused into one");
+        assert_eq!(
+            fused.curves[0].classify(),
+            IntersectionKind::Tangential,
+            "the fused pair is mislabelled tangential"
+        );
+
+        let split = tor.intersect(&Surf::plane(at(Vec3::new(0.0, 0.0, 1.5 - 1.0e-6)))?)?;
+        assert_eq!(
+            split.curves.len(),
+            2,
+            "further out the two circles are reported separately"
+        );
+        assert!(
+            split
+                .curves
+                .iter()
+                .all(|c| c.classify() == IntersectionKind::Transversal),
+            "and both are then correctly transversal"
+        );
+    });
+
+    test!("stage7_ssi_curves_are_caller_owned", {
+        let session = Session::start(test_config())?;
+        let at = |o: Vec3| Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0));
+        let cyl = Surf::cylinder(at(Vec3::new(0.0, 0.0, 0.0)), 5.0)?;
+        let pl = Surf::plane(at(Vec3::new(0.0, 0.0, 3.0)))?;
+
+        // The returned curves are NEW orphan geometry owned by the caller.
+        // Nothing in the wrapper deletes them, so an oracle looping over many
+        // surface pairs leaks one entity per branch. `delete_curves` is the
+        // release valve; verify it actually invalidates the tags.
+        let r = cyl.intersect(&pl)?;
+        assert_eq!(r.curves.len(), 1);
+        let tag = r.curves[0].curve.entity();
+        assert!(tag.class().is_ok(), "the curve is a live entity");
+
+        r.delete_curves()?;
+        assert!(
+            tag.class().is_err(),
+            "after delete_curves the tag must be dead — otherwise it leaked"
+        );
+
+        // And the leak is real if you do not call it: repeated intersections
+        // consume tags monotonically.
+        let before = session.tags_remaining()?;
+        for _ in 0..20 {
+            let _ = cyl.intersect(&pl)?;
+        }
+        let after = session.tags_remaining()?;
+        assert!(
+            after < before,
+            "20 un-freed intersections should consume tags ({before} -> {after})"
+        );
+    });
+
+    // =========================================================================
+    // High-level API layer
+    //
+    // The raw-FFI tests above prove things about the DLL. These prove things
+    // about the API CADabra will actually consume. Every wrapper that returns a
+    // value gets that value pinned here — the Stage 5 lesson was that
+    // `Entity::distance_to` returned garbage for its whole existence because
+    // the only test asserted the two fields that happened to be right.
+    // =========================================================================
+
+    test!("api_session_readbacks_and_memory", {
+        let session = Session::start(test_config())?;
+
+        // memory_usage_detail: both halves, not just the total. The old
+        // single-i32 binding corrupted memory; assert the pair is sane.
+        let (total, free) = session.memory_usage_detail()?;
+        assert!(total > 0, "total memory should be positive, got {total}");
+        assert!(free <= total, "free ({free}) cannot exceed total ({total})");
+        assert_eq!(
+            session.memory_usage()?,
+            total,
+            "memory_usage() must agree with the total from memory_usage_detail()"
+        );
+
+        // Allocating a body should not shrink the reported total.
+        let _b = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        let (total_2, _) = session.memory_usage_detail()?;
+        assert!(
+            total_2 >= total,
+            "total memory should not decrease after allocating ({total} -> {total_2})"
+        );
+    });
+
+    test!("api_error_severity_predicates", {
+        let _session = Session::start(test_config())?;
+
+        // A mild error: severity() is Some(Mild), and neither recovery
+        // predicate fires.
+        let mild = Surf::sphere(
+            Axis2::new(
+                Vec3::new(0.0, 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 1.0),
+                Vec3::new(1.0, 0.0, 0.0),
+            ),
+            -1.0,
+        )
+        .expect_err("negative radius must fail");
+        assert_eq!(mild.severity(), Some(Severity::Mild));
+        assert!(!mild.requires_rollback(), "a mild error needs no rollback");
+        assert!(!mild.requires_restart(), "a mild error needs no restart");
+
+        // A serious error: rollback yes, restart no. This is the predicate pair
+        // a caller keys recovery off, so pin both.
+        let body = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        let serious = body.hollow(20.0).expect_err("impossible hollow must fail");
+        assert_eq!(serious.severity(), Some(Severity::Serious));
+        assert!(serious.requires_rollback());
+        assert!(
+            !serious.requires_restart(),
+            "serious is recoverable by rollback; only fatal needs a restart"
+        );
+    });
+
+    test!("api_jet_shape_and_unnormalised_normal", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+        let sph = Surf::sphere(b, 4.0)?;
+
+        let jet = sph.eval_jet(0.4, 0.3, 2, 1, false)?;
+        assert_eq!(
+            jet.shape(),
+            (2, 1, false),
+            "shape() must report back what was requested"
+        );
+
+        // The UNnormalised normal carries magnitude, which is the signal that
+        // distinguishes a regular point from a parametric singularity. The unit
+        // normal deliberately throws that away.
+        let n = jet
+            .normal_unnormalised()
+            .expect("a regular point has a normal");
+        let len = (n.x * n.x + n.y * n.y + n.z * n.z).sqrt();
+        assert!(
+            len > 1e-6,
+            "at a regular point the unnormalised normal has real magnitude, got {len}"
+        );
+        let u = jet.unit_normal().expect("unit normal");
+        assert!(
+            ((u.x * len - n.x).abs() < 1e-9)
+                && ((u.y * len - n.y).abs() < 1e-9)
+                && ((u.z * len - n.z).abs() < 1e-9),
+            "unit_normal must be normal_unnormalised scaled by 1/|n|"
+        );
+
+        // At a pole the magnitude collapses — the distinction the two accessors exist for.
+        let pole = sph.eval_jet(0.0, std::f64::consts::FRAC_PI_2, 1, 1, false)?;
+        let pn = pole.normal_unnormalised().expect("still computable");
+        let plen = (pn.x * pn.x + pn.y * pn.y + pn.z * pn.z).sqrt();
+        assert!(plen < 1e-12, "pole normal magnitude collapses, got {plen}");
+        assert!(pole.unit_normal().is_none(), "and no unit normal exists");
+    });
+
+    test!("api_range_status_predicate", {
+        let _session = Session::start(test_config())?;
+        let a = Body::create_solid_block(4.0, 4.0, 4.0)?;
+        let b = Body::create_solid_block(4.0, 4.0, 4.0)?;
+        b.transform(&Transform::translation(20.0, 0.0, 0.0)?)?;
+
+        let r = a.entity().distance_to(b.entity())?;
+        assert!(
+            r.status.is_found(),
+            "a plain distance query should report found"
+        );
+        assert!(!RangeStatus::NotFound.is_found());
+        assert!(
+            !RangeStatus::BoundedAbove.is_found(),
+            "a bounded-out answer is not a located minimum"
+        );
+    });
+
+    test!("api_fin_navigation_and_unreachable_param_maps", {
+        let _session = Session::start(test_config())?;
+
+        // FINDING: `Fin::interval` / `surf_params` / `curve_param` are
+        // effectively UNREACHABLE with the geometry this crate can build. They
+        // need a fin carrying an explicit SP-curve, and every configuration
+        // tried reports a clean mild PK_ERROR_missing_geom (96):
+        //   - analytic primitive faces (block, cylinder) store fin geometry
+        //     implicitly;
+        //   - a B-surface sheet face does NOT produce SP-curve fins either,
+        //     contradicting the note left on `fin_parameter_maps_abi`.
+        // SP-curve fins appear to require an imprint (Stage 12), so these three
+        // wrappers stay UNVALIDATED until then. Pinning the current behaviour
+        // so the day they start working is visible.
+        let block = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        let analytic_fin = block.faces()?[0].loops()?[0].first_fin()?;
+        assert!(
+            analytic_fin.interval().is_err(),
+            "analytic-face fins expose no SP-curve interval"
+        );
+
+        let pts = [
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(1.0, 0.0, 0.5),
+            Vec3::new(2.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.5),
+            Vec3::new(1.0, 1.0, 1.0),
+            Vec3::new(2.0, 1.0, 0.5),
+            Vec3::new(0.0, 2.0, 0.0),
+            Vec3::new(1.0, 2.0, 0.5),
+            Vec3::new(2.0, 2.0, 0.0),
+        ];
+        let bs = Surf::bsurf(2, 2, 3, 3, &pts, &[0.0, 1.0], &[3, 3], &[0.0, 1.0], &[3, 3])?;
+        let sheet = bs.make_sheet_body(UvBox {
+            u_min: 0.0,
+            u_max: 1.0,
+            v_min: 0.0,
+            v_max: 1.0,
+        })?;
+        let sheet_fins: Vec<Fin> = sheet.faces()?[0]
+            .loops()?
+            .iter()
+            .flat_map(|l| l.fins().unwrap_or_default())
+            .collect();
+        assert!(!sheet_fins.is_empty(), "the sheet face has fins");
+        assert!(
+            sheet_fins.iter().all(|f| f.interval().is_err()),
+            "B-surface sheet fins ALSO carry no SP-curve — the maps are unreachable here"
+        );
+
+        // Fin NAVIGATION, by contrast, works and is worth pinning: stepping
+        // radially twice around a manifold edge returns to the start.
+        let fin = analytic_fin;
+        let prev = fin.previous_of_edge()?;
+        let prev2 = prev.previous_of_edge()?;
+        assert_eq!(
+            prev2.tag(),
+            fin.tag(),
+            "two radial steps on a manifold edge return to the start"
+        );
+        assert_ne!(
+            prev.tag(),
+            fin.tag(),
+            "a manifold edge has two distinct fins"
+        );
+    });
+
+    test!("api_curve_closed_and_edge_curve_tag", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // `Curve::is_closed()` was REMOVED: PK_PARAM_sf_t.closed reads back as
+        // 1 for every curve kind, so it could only ever answer "true" — it
+        // called a straight line closed. Pin that degeneracy so nobody
+        // reintroduces the accessor, and use `periodic` (validated) instead.
+        let circ = Curve::circle(b, 3.0)?;
+        let line = Curve::line(Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0))?;
+        assert_eq!(
+            circ.param()?.closed_raw,
+            line.param()?.closed_raw,
+            "the raw `closed` byte does not discriminate a circle from a line"
+        );
+        assert!(circ.param()?.periodic.is_periodic(), "a circle is periodic");
+        assert!(
+            !line.param()?.periodic.is_periodic(),
+            "a line is not periodic — this is the field that actually works"
+        );
+
+        // curve_tag exposes the underlying geometry tag of an edge; it must
+        // agree with the Curve the typed accessor hands back.
+        let cyl = Body::create_solid_cylinder(5.0, 10.0)?;
+        let edge = cyl.edges()?[0];
+        assert_eq!(
+            edge.curve_tag()?,
+            edge.curve()?.tag(),
+            "curve_tag() must match the typed curve accessor"
+        );
+    });
+
+    test!("api_shell_wireframe_and_partition_current", {
+        // PK_PARTITION_create needs partitioned rollback registered before the
+        // session starts, else it fails with PK_ERROR_rollback_not_started.
+        let _session = Session::start(test_config().rollback(true))?;
+
+        // A solid block has no wireframe (dangling) edges.
+        let block = Body::create_solid_block(4.0, 4.0, 4.0)?;
+        let shell = block.shells()?[0];
+        assert!(
+            shell.wireframe_edges()?.is_empty(),
+            "a closed solid shell has no wireframe edges"
+        );
+
+        // set_current on the partition that is ALREADY current must be a
+        // successful no-op. (A *second* partition can be created but cannot be
+        // made current under the minimal in-memory delta frustrum — the kernel
+        // rejects it with wrong_entity, which the partition tests already pin.)
+        let session = Session::start(test_config().rollback(true));
+        drop(session);
+        let cur = _session.current_partition()?;
+        cur.set_current()?;
+        let inside = Body::create_solid_block(2.0, 2.0, 2.0)?;
+        assert!(
+            cur.bodies()?.iter().any(|b| b.tag() == inside.tag()),
+            "a body created afterwards should live in the current partition"
+        );
+    });
+
+    test!("api_offset_surface_roundtrip", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // The kernel REFUSES to build an offset of an analytic surface
+        // (PK_ERROR_cant_offset, 1037) — it expects the caller to construct the
+        // offset analytic form directly. Pin that, then exercise ask_offset on
+        // a B-surface, where the offset representation is genuine.
+        let analytic = Surf::cylinder(b, 5.0)?;
+        let refused = Surf::offset_surface(&analytic, 1.5)
+            .expect_err("offsetting an analytic cylinder is refused");
+        assert_eq!(
+            refused
+                .details()
+                .and_then(|d| d.code_token.clone())
+                .as_deref(),
+            Some("PK_ERROR_cant_offset"),
+            "analytic offset should be refused with cant_offset"
+        );
+
+        let pts = [
+            Vec3::new(0.0, 0.0, 0.0),
+            Vec3::new(1.0, 0.0, 0.5),
+            Vec3::new(2.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.5),
+            Vec3::new(1.0, 1.0, 1.0),
+            Vec3::new(2.0, 1.0, 0.5),
+            Vec3::new(0.0, 2.0, 0.0),
+            Vec3::new(1.0, 2.0, 0.5),
+            Vec3::new(2.0, 2.0, 0.0),
+        ];
+        let base = Surf::bsurf(2, 2, 3, 3, &pts, &[0.0, 1.0], &[3, 3], &[0.0, 1.0], &[3, 3])?;
+        let off = Surf::offset_surface(&base, 1.5)?;
+        let data = off.ask_offset()?;
+        assert_eq!(
+            data.basis_surf.tag(),
+            base.tag(),
+            "ask_offset should name the base surface it was built on"
+        );
+        assert!(
+            (data.distance - 1.5).abs() < 1e-12,
+            "offset distance should round-trip exactly, got {}",
+            data.distance
+        );
+
+        // And geometrically: the offset surface sits `distance` from the base
+        // along the base normal.
+        let (u, v) = (0.5, 0.5);
+        let base_p = base.eval(u, v)?;
+        let off_p = off.eval(u, v)?;
+        let sep = ((off_p.x - base_p.x).powi(2)
+            + (off_p.y - base_p.y).powi(2)
+            + (off_p.z - base_p.z).powi(2))
+        .sqrt();
+        assert!(
+            (sep - 1.5).abs() < 1e-6,
+            "offset surface should sit 1.5 from the base, got {sep}"
+        );
+    });
+
+    test!("api_compare_surface_params_facade", {
+        let _session = Session::start(test_config())?;
+        let b = Axis2::new(
+            Vec3::new(1.0, 2.0, 3.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        );
+
+        // extract_surface_params is the comparison facade CADabra's testkit
+        // calls — it must recover the authored analytic parameters.
+        let sph = Surf::sphere(b, 4.25)?;
+        let p = extract_surface_params(&sph)?;
+        let text = format!("{p:?}");
+        assert!(
+            text.contains("4.25"),
+            "extracted params should carry the radius: {text}"
+        );
+        let cyl = Surf::cylinder(b, 2.5)?;
+        let pc = extract_surface_params(&cyl)?;
+        assert!(
+            format!("{pc:?}").contains("2.5"),
+            "cylinder params should carry its radius: {pc:?}"
+        );
+    });
+
+    test!("api_fillet_detailed_reports_under_faces", {
+        let _session = Session::start(test_config())?;
+
+        // fillet_edges_detailed surfaces the under-face lineage that the plain
+        // count-returning form throws away.
+        let block = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        let edges = block.edges()?;
+        let r = block.fillet_edges_detailed(&edges[0..1], 1.0)?;
+
+        assert!(!r.blends.is_empty(), "one edge should produce a blend face");
+        assert_eq!(
+            r.blends.len(),
+            r.unders.len(),
+            "blends and unders are parallel: {} vs {}",
+            r.blends.len(),
+            r.unders.len()
+        );
+        for (i, u) in r.unders.iter().enumerate() {
+            assert!(!u.is_empty(), "blend {i} should name the faces it consumed");
+            for f in u {
+                assert_eq!(
+                    f.entity().class()?,
+                    PkClass::Face,
+                    "every under entry must be a real face"
+                );
+            }
+        }
+    });
+
+    test!("api_transmit_with_format_roundtrip", {
+        let _session = Session::start(test_config())?;
+        let block = Body::create_solid_block(6.0, 8.0, 10.0)?;
+        let before = block.mass_props()?.amount;
+
+        // transmit_with_format is the explicit-format entry point; the default
+        // receive() reads text, so a text round-trip must survive.
+        fileio::transmit_with_format(&[block], "api_fmt_roundtrip", fileio::TransmitFormat::Text)?;
+        let read = fileio::receive("api_fmt_roundtrip")?;
+        assert_eq!(read.len(), 1, "one body written, one body read");
+        let after = read[0].mass_props()?.amount;
+        assert!(
+            (after - before).abs() / before < 1e-12,
+            "volume must survive a text round-trip: {before} -> {after}"
         );
     });
 

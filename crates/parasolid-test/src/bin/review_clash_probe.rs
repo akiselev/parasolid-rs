@@ -298,7 +298,10 @@ fn probe_wrapper_distance_to() {
         + (r.point_1.y - r.point_2.y).powi(2)
         + (r.point_1.z - r.point_2.z).powi(2))
     .sqrt();
-    println!("  |point_1 - point_2| = {d}  (must equal distance {})", r.distance);
+    println!(
+        "  |point_1 - point_2| = {d}  (must equal distance {})",
+        r.distance
+    );
 }
 
 fn probe_range_type() {
@@ -344,11 +347,20 @@ fn probe_range_type() {
         let mut st: PK_range_result_t = 0;
         let mut buf = [SENT; 512];
         let rc = unsafe {
-            PK_TOPOL_range(a.tag(), b.tag(), &mut o, &mut st, buf.as_mut_ptr() as *mut PK_range_2_r_t)
+            PK_TOPOL_range(
+                a.tag(),
+                b.tag(),
+                &mut o,
+                &mut st,
+                buf.as_mut_ptr() as *mut PK_range_2_r_t,
+            )
         };
         let mut d = [0u8; 8];
         d.copy_from_slice(&buf[0..8]);
-        println!("  o_t_version={ver} range_type=maximum -> rc={rc} status={st} dist={:.6}", f64::from_le_bytes(d));
+        println!(
+            "  o_t_version={ver} range_type=maximum -> rc={rc} status={st} dist={:.6}",
+            f64::from_le_bytes(d)
+        );
     }
     for ver in 0..8 {
         let mut o = PK_TOPOL_range_o_t::default();
@@ -357,7 +369,13 @@ fn probe_range_type() {
         let mut st: PK_range_result_t = 0;
         let mut buf = [SENT; 512];
         let rc = unsafe {
-            PK_TOPOL_range(a.tag(), b.tag(), &mut o, &mut st, buf.as_mut_ptr() as *mut PK_range_2_r_t)
+            PK_TOPOL_range(
+                a.tag(),
+                b.tag(),
+                &mut o,
+                &mut st,
+                buf.as_mut_ptr() as *mut PK_range_2_r_t,
+            )
         };
         println!("  o_t_version={ver} range_type=GARBAGE -> rc={rc} (5014 = validated)");
     }
@@ -371,7 +389,11 @@ fn probe_range_type() {
         ] {
             let mut o = PK_TOPOL_range_vector_o_t::default();
             o.o_t_version = ver;
-            if mk == 0 { o.opt_level = 999; } else { o.param_entity = 999; }
+            if mk == 0 {
+                o.opt_level = 999;
+            } else {
+                o.param_entity = 999;
+            }
             let mut st: PK_range_result_t = 0;
             let mut r: PK_range_1_r_t = unsafe { std::mem::zeroed() };
             let rc = unsafe { PK_TOPOL_range_vector(a.tag(), &vv, &mut o, &mut st, &mut r) };
@@ -479,7 +501,11 @@ fn probe_clash() {
     sm2.transform(&Transform::translation(0.0, 0.0, 9.0).unwrap())
         .unwrap();
     let (rc, recs, _) = clash_raw(&mut [big20.tag()], &mut [sm2.tag()], 1, 1);
-    show("range_probe's 'strictly inside' (20-cube, 2-cube @z=9)", rc, &recs);
+    show(
+        "range_probe's 'strictly inside' (20-cube, 2-cube @z=9)",
+        rc,
+        &recs,
+    );
     let bb = big20.bounding_box().unwrap();
     let sb = sm2.bounding_box().unwrap();
     println!(
@@ -496,7 +522,11 @@ fn probe_clash() {
     sm2b.transform(&Transform::translation(0.0, 0.0, 5.0).unwrap())
         .unwrap();
     let (rc, recs, _) = clash_raw(&mut [big20b.tag()], &mut [sm2b.tag()], 1, 1);
-    show("TRULY strict containment (2-cube @z=5 inside 20-cube)", rc, &recs);
+    show(
+        "TRULY strict containment (2-cube @z=5 inside 20-cube)",
+        rc,
+        &recs,
+    );
     let (rc, recs, _) = clash_raw(&mut [sm2b.tag()], &mut [big20b.tag()], 1, 1);
     show("TRULY strict containment, reversed", rc, &recs);
 
@@ -505,41 +535,53 @@ fn probe_clash() {
     println!("\n  -- find_intersect=0 token across configurations --");
     {
         let pairs: Vec<(&str, i32, i32)> = vec![
-            ("overlap", {
-                let x = mk(4.0, 0.0, 0.0, 0.0);
-                let t = x.tag();
-                std::mem::forget(x);
-                t
-            }, {
-                let y = mk(4.0, 2.0, 0.0, 0.0);
-                let t = y.tag();
-                std::mem::forget(y);
-                t
-            }),
-            ("abut", {
-                let x = mk(4.0, 0.0, 0.0, 0.0);
-                let t = x.tag();
-                std::mem::forget(x);
-                t
-            }, {
-                let y = mk(4.0, 4.0, 0.0, 0.0);
-                let t = y.tag();
-                std::mem::forget(y);
-                t
-            }),
-            ("containment", {
-                let x = Body::create_solid_block(20.0, 20.0, 20.0).unwrap();
-                let t = x.tag();
-                std::mem::forget(x);
-                t
-            }, {
-                let y = Body::create_solid_block(2.0, 2.0, 2.0).unwrap();
-                y.transform(&Transform::translation(5.0, 5.0, 5.0).unwrap())
-                    .unwrap();
-                let t = y.tag();
-                std::mem::forget(y);
-                t
-            }),
+            (
+                "overlap",
+                {
+                    let x = mk(4.0, 0.0, 0.0, 0.0);
+                    let t = x.tag();
+                    std::mem::forget(x);
+                    t
+                },
+                {
+                    let y = mk(4.0, 2.0, 0.0, 0.0);
+                    let t = y.tag();
+                    std::mem::forget(y);
+                    t
+                },
+            ),
+            (
+                "abut",
+                {
+                    let x = mk(4.0, 0.0, 0.0, 0.0);
+                    let t = x.tag();
+                    std::mem::forget(x);
+                    t
+                },
+                {
+                    let y = mk(4.0, 4.0, 0.0, 0.0);
+                    let t = y.tag();
+                    std::mem::forget(y);
+                    t
+                },
+            ),
+            (
+                "containment",
+                {
+                    let x = Body::create_solid_block(20.0, 20.0, 20.0).unwrap();
+                    let t = x.tag();
+                    std::mem::forget(x);
+                    t
+                },
+                {
+                    let y = Body::create_solid_block(2.0, 2.0, 2.0).unwrap();
+                    y.transform(&Transform::translation(5.0, 5.0, 5.0).unwrap())
+                        .unwrap();
+                    let t = y.tag();
+                    std::mem::forget(y);
+                    t
+                },
+            ),
         ];
         for (label, a, b) in pairs {
             let (rc, recs, _) = clash_raw(&mut [a], &mut [b], 1, 0);
@@ -547,12 +589,18 @@ fn probe_clash() {
             toks.sort_unstable();
             toks.dedup();
             let cl: Vec<String> = recs.iter().take(1).map(|r| cls(r.target)).collect();
-            println!("    {label:<14} find_intersect=0 rc={rc} n={} tokens={toks:?} first target class={cl:?}", recs.len());
+            println!(
+                "    {label:<14} find_intersect=0 rc={rc} n={} tokens={toks:?} first target class={cl:?}",
+                recs.len()
+            );
             let (rc, recs, _) = clash_raw(&mut [a], &mut [b], 1, 1);
             let mut toks: Vec<i32> = recs.iter().map(|r| r.clash_type).collect();
             toks.sort_unstable();
             toks.dedup();
-            println!("    {label:<14} find_intersect=1 rc={rc} n={} tokens={toks:?}", recs.len());
+            println!(
+                "    {label:<14} find_intersect=1 rc={rc} n={} tokens={toks:?}",
+                recs.len()
+            );
         }
     }
 
@@ -772,7 +820,10 @@ fn probe_extreme() {
     let mut ex: PK_VECTOR_t = [0.0; 3];
     let mut topol: PK_TOPOL_t = 0;
     let rc = unsafe { PK_BODY_find_extreme(blk.tag(), &d1, &d2, &d3, &mut o, &mut ex, &mut topol) };
-    println!("  explicit options struct: rc={rc} topol={topol}({})", cls(topol));
+    println!(
+        "  explicit options struct: rc={rc} topol={topol}({})",
+        cls(topol)
+    );
 
     // Does a 3-int options struct with a leading o_t_version work?
     #[repr(C)]
@@ -799,13 +850,26 @@ fn probe_extreme() {
             &mut topol,
         )
     };
-    println!("  {{o_t_version=1, have_transf, transf}}: rc={rc} topol={topol}({})", cls(topol));
+    println!(
+        "  {{o_t_version=1, have_transf, transf}}: rc={rc} topol={topol}({})",
+        cls(topol)
+    );
 
     // can a FACE or EDGE ever be the extreme topology?
     let cyl = Body::create_solid_cylinder(5.0, 10.0).unwrap();
     for (label, a, b, c) in [
-        ("cyl d1=+Z d2=+X d3=+Y", [0.0, 0.0, 1.0], [1.0, 0.0, 0.0], [0.0, 1.0, 0.0]),
-        ("cyl d1=+X d2=+Z d3=+Y", [1.0, 0.0, 0.0], [0.0, 0.0, 1.0], [0.0, 1.0, 0.0]),
+        (
+            "cyl d1=+Z d2=+X d3=+Y",
+            [0.0, 0.0, 1.0],
+            [1.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0],
+        ),
+        (
+            "cyl d1=+X d2=+Z d3=+Y",
+            [1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0],
+            [0.0, 1.0, 0.0],
+        ),
         (
             "cyl d1=+Z d2=(1,1,0) d3=(1,-1,0)",
             [0.0, 0.0, 1.0],
@@ -852,7 +916,10 @@ fn probe_extreme() {
             &mut topol,
         )
     };
-    println!("  non-unit d1=(0,0,2): rc={rc} topol={topol}({})", cls(topol));
+    println!(
+        "  non-unit d1=(0,0,2): rc={rc} topol={topol}({})",
+        cls(topol)
+    );
 }
 
 fn main() {

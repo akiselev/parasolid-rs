@@ -26,7 +26,9 @@ pub struct SurfCurvature {
 pub struct SurfDirParam {
     pub range: (f64, f64),
     pub periodic: crate::curve::Periodicity,
-    pub closed: bool,
+    /// Raw `closed` byte — see [`crate::CurveParam::closed_raw`]; not a
+    /// closedness test.
+    pub closed_raw: u8,
     /// Extent of this direction's range.
     pub extent: crate::curve::ParamExtent,
     /// Class of the iso-curve along this direction.
@@ -367,7 +369,7 @@ impl Surf {
         let mk = |p: &PK_PARAM_sf_t| SurfDirParam {
             range: (p.range.low, p.range.high),
             periodic: crate::curve::Periodicity::from_token(p.periodic),
-            closed: (p.closed & 0xff) != 0,
+            closed_raw: (p.closed & 0xff) as u8,
             extent: crate::curve::ParamExtent::from_token(p.extent),
             curve_class: crate::curve::ParamCurveClass::from_token(p.curve_class),
         };
@@ -498,11 +500,29 @@ impl Surf {
     /// its parameter bounds and raw `PK_intersect_curve_t` kind). Fully
     /// coincident surfaces yield no intersection data.
     pub fn intersect(&self, other: &Surf) -> PsResult<SurfIntersection> {
-        // Full documented v1 layout (192 bytes), zero-initialised so every
-        // `have_*` flag is false — the kernel reads the whole v1 struct, so a
-        // truncated struct would make it read past the allocation.
+        // 192-byte layout, offsets confirmed against the decompile of
+        // PK_SURF_intersect_surf (o_t_version@0, have_box@4, box@8,
+        // have_uvbox_1@56, uvbox_1@64, have_uvbox_2@96, uvbox_2@104,
+        // have_vector@136, vector@144, mixed_curve_category@168,
+        // tolerance@176). Zero-initialised so every `have_*` flag is false.
+        //
+        // Version 2, not 1. `mixed_curve_category` is **ignored at v1** and
+        // **read from v2** (measured: garbage token accepted at v1, rejected
+        // with field_of_wrong_type at v2), so v1 left the field dead — the same
+        // class of bug that made `range_type` inert in the range options. 2 is
+        // the highest usable version: 3 is known but returns not_implemented,
+        // and 4+ are unknown.
+        //
+        // Zero is not a legal `PK_mixed_intersection_t`. NOTE: `classic`,
+        // `pline` and `both` were measured to give **bit-identical** results on
+        // every analytic and B-surface pair tried, including cases returning
+        // bcurves — no configuration produced a pline. So the token is
+        // type-checked at v2 but behaviourally inert here; `classic` is chosen
+        // as the conservative "no polyline approximation" request rather than
+        // because it was observed to change anything.
         let mut opts: PK_SURF_intersect_surf_o_t = unsafe { std::mem::zeroed() };
-        opts.o_t_version = 1;
+        opts.o_t_version = 2;
+        opts.mixed_curve_category = PK_mixed_intersection_classic_c;
         let mut n_vectors: c_int = 0;
         let mut vectors = std::ptr::null_mut();
         let mut n_curves: c_int = 0;
@@ -562,7 +582,17 @@ pub struct IntersectionCurve {
 }
 
 impl IntersectionCurve {
-    /// Classify the intersection as transversal / tangential (known kind codes).
+    /// Classify the intersection as transversal or tangential.
+    ///
+    /// # `Tangential` does not mean geometrically tangential
+    ///
+    /// The kernel merges intersection branches that come within roughly
+    /// **1e-3 model units** of each other — five orders of magnitude above the
+    /// 1e-8 linear precision — and flips the kind token to `tangent` as a side
+    /// effect. Measured: two torus/plane circles 3.5e-4 apart are fused into a
+    /// single curve reported `Tangential`; at 3.5e-3 they come back as two
+    /// separate `Transversal` circles. So this answers "tangential, or within
+    /// ~1e-3 of it". Do not use it as a proof of exact tangency near that band.
     pub fn classify(&self) -> IntersectionKind {
         match self.kind {
             PK_intersect_curve_simple_c => IntersectionKind::Transversal,
@@ -573,10 +603,41 @@ impl IntersectionCurve {
 }
 
 /// Result of intersecting two surfaces.
+///
+/// # Ownership: the curves are yours to delete
+///
+/// Each [`IntersectionCurve::curve`] is **newly created orphan geometry owned
+/// by the caller**, not a session-interned entity. `Surf::intersect` frees the
+/// kernel's *array* blocks, but nothing deletes the curve entities — measured,
+/// 200 wrapper calls leave 200 live circles behind. An oracle looping over
+/// thousands of surface pairs in one session will grow without bound.
+///
+/// Call [`SurfIntersection::delete_curves`] when you are done with the result,
+/// or keep the curves deliberately if you intend to go on using them.
 #[derive(Debug, Clone)]
 pub struct SurfIntersection {
     /// Isolated point (tangential/degenerate) intersections.
     pub points: Vec<Vec3>,
     /// Intersection curves.
     pub curves: Vec<IntersectionCurve>,
+}
+
+impl SurfIntersection {
+    /// Delete the orphan curve entities this result owns.
+    ///
+    /// Consumes the result, since the curve tags are invalid afterwards.
+    /// Errors on individual deletions are collected rather than short-circuited
+    /// so one bad tag cannot strand the rest.
+    pub fn delete_curves(self) -> PsResult<()> {
+        let mut first_err = None;
+        for c in self.curves {
+            if let Err(e) = c.curve.entity().delete() {
+                first_err.get_or_insert(e);
+            }
+        }
+        match first_err {
+            Some(e) => Err(e),
+            None => Ok(()),
+        }
+    }
 }
