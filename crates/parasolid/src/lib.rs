@@ -39,6 +39,7 @@ mod intersect;
 mod jet;
 mod mass;
 mod memory;
+mod modeling_ext;
 pub mod oracle;
 mod partition;
 mod point;
