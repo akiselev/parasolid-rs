@@ -970,9 +970,9 @@ unsafe extern "C" {
     /// Attach rubber faces to closed wire loops (wire -> sheet conversion).
     pub fn PK_EDGE_make_faces_from_wire(
         n_edges: c_int,
-        edges: *mut PK_EDGE_t,
-        senses: *mut PK_LOGICAL_t,
-        shared_loop: *mut c_int,
+        edges: *const PK_EDGE_t,
+        senses: *const PK_LOGICAL_t,
+        shared_loop: *const c_int,
         new_faces: *mut PK_FACE_t,
     ) -> PK_ERROR_code_t;
 

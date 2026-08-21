@@ -1224,11 +1224,11 @@ unsafe extern "C" {
     /// Sets a chamfer (face offset) blend on an edge.
     pub fn PK_EDGE_set_blend_chamfer(
         n_edges: c_int,
-        edges: *mut PK_EDGE_t,
+        edges: *const PK_EDGE_t,
         range_2: c_double,
         range_1: c_double,
-        faces: *mut PK_FACE_t,
-        options: *mut PK_EDGE_set_blend_chamfer_o_t,
+        faces: *const PK_FACE_t,
+        options: *const PK_EDGE_set_blend_chamfer_o_t,
         n_blend_edges: *mut c_int,
         blend_edges: *mut *mut PK_EDGE_t,
     ) -> PK_ERROR_code_t;

@@ -1033,9 +1033,9 @@ unsafe extern "C" {
     /// Attach surfaces to faces (batch).
     pub fn PK_FACE_attach_surfs(
         n_faces: c_int,
-        faces: *mut PK_FACE_t,
-        surfs: *mut PK_SURF_t,
-        senses: *mut PK_LOGICAL_t,
+        faces: *const PK_FACE_t,
+        surfs: *const PK_SURF_t,
+        senses: *const PK_LOGICAL_t,
     ) -> PK_ERROR_code_t;
 
     /// Create and attach a fitted surface to a face.
