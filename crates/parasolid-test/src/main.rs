@@ -1,7 +1,7 @@
 //! Integration tests for parasolid-sys and parasolid crates.
 //!
 //! Build: cargo build -p parasolid-test --target x86_64-pc-windows-gnu
-//! Run:   WINEPATH=/path/to/SOLIDWORKS cargo run -p parasolid-test --target x86_64-pc-windows-gnu
+//! Run:   WINEPATH=/path/to/SOLIDWORKS cargo run -p parasolid-test --bin parasolid-test --target x86_64-pc-windows-gnu
 
 use parasolid::*;
 use parasolid_sys::*;

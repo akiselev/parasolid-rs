@@ -1,8 +1,10 @@
 # Running parasolid-rs against the SOLIDWORKS pskernel.dll
 
-Status (2026-07-14): **all 73 integration tests pass** against the
-`pskernel.dll` shipped with SOLIDWORKS 2025 (Parasolid V37.01.243), with
-`PK_SESSION_set_check_arguments(true)` enabled for every test.
+Revalidated 2026-08-21: **202 integration tests pass, 0 fail, and 1 is
+explicitly skipped** against the `pskernel.dll` shipped with SOLIDWORKS 2025
+(Parasolid V37.01.243), with `PK_SESSION_set_check_arguments(true)` enabled.
+The skipped mesh-construction case records its PSM 5241 blocker rather than
+silently disappearing.
 `lib/pskernel.dll` in this repo is byte-identical (SHA-256) to
 `C:\Program Files\SOLIDWORKS Corp\SOLIDWORKS\pskernel.dll`.
 
@@ -324,7 +326,7 @@ before the owning function can be *called* with non-default options.
 ## RE-ABI correction pass (2026-07-14, from `parasolid-re`)
 
 Correcting `parasolid-sys` against the reverse-engineered authoritative ABI in
-`/home/dev/projects/parasolid-re/catalog` (see `re.md`). All items below keep
+the sibling `parasolid-re/catalog` (see `re.md`). All items below keep
 the suite at **44 passed, 0 failed**.
 
 ### Enum constants — DONE, fully reconciled

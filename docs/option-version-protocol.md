@@ -91,10 +91,10 @@ Find the routine that switches on `o_t_version` — for mass props it is
 the offsets you need and writes the internal one. Its `switch (version)` arms
 tell you exactly which fields each version added.
 
-With the ghidra-cli bridge in `~/projects/parasolid-re`:
+With the ghidra-cli bridge in the sibling `parasolid-re` repository:
 
 ```bash
-export GHIDRA_PROJECT_DIR=$PWD/work/ghidra-projects
+export GHIDRA_PROJECT_DIR="${SINBAD_WORKSPACE:?set SINBAD_WORKSPACE}/parasolid-re/work/ghidra-projects"
 ghidra start --project parasolid-c900fa3f430f --program pskernel.dll
 ghidra decompile <FUN_or_symbol> --project parasolid-c900fa3f430f --program pskernel.dll
 ```

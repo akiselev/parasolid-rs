@@ -10,7 +10,7 @@ plain TSV/`.h` files — you almost never need to open Ghidra).
 
 ## Where the authoritative data lives
 
-Repo: **`/home/dev/projects/parasolid-re`** (binary `pskernel.dll`,
+Repo: the sibling **`parasolid-re`** repository (binary `pskernel.dll`,
 Parasolid **V37.01.243**, V35-era tokens — the SAME DLL as `parasolid-rs/lib/pskernel.dll`,
 SHA-256 `c900fa3f430fe67c2adb15a50f9604d9812ed81a02c5006b66689dac28263073`).
 
@@ -29,7 +29,8 @@ Read `parasolid-re/catalog/README.md` first. The files you need (no Ghidra requi
 Provenance (why to trust it): enum values come from Siemens' own **"PK Token Codes
 (Numeric)"** V35 appendix (`parasolid-re/artifacts/enum-values/pk-tokens-v35-qsolid.tsv`)
 **cross-validated** against `ThraceShah/PKToy`'s C# binding
-(`/home/dev/projects/solidworks-notes/headers/pktoy-binding/parasolid.g.cs`) AND against
+(`solidworks-notes/headers/pktoy-binding/parasolid.g.cs` in the sibling
+repository) AND against
 16 value bands recovered directly from the binary — three independent sources, **zero
 conflicts**. Signatures are the vendor reference, binary-confirmed 18/18 on a sample.
 
@@ -64,7 +65,8 @@ Work module-by-module in `crates/parasolid-sys/src/*.rs`. For each:
 ## Validate (dynamic — the real ground truth)
 
 Do NOT trust static data blindly for the last mile: run the existing harness against
-the real kernel. `cargo run -p parasolid-test --target x86_64-pc-windows-gnu` (Wine +
+the real kernel. `cargo run -p parasolid-test --bin parasolid-test --target
+x86_64-pc-windows-gnu` (Wine +
 `lib/pskernel.dll`; see `docs/pskernel-solidworks.md`). A corrected enum/signature is
 confirmed when a closed-form primitive test (block/sphere/cyl/cone/torus mass/box)
 returns the documented value. Fold confirmed fixes back as `dynamic-observed`.
@@ -74,7 +76,7 @@ returns the documented value. Fold confirmed fixes back as `dynamic-observed`.
 Only to disambiguate one value/signature the tables can't settle. Minimal invocation:
 
 ```bash
-export GHIDRA_PROJECT_DIR=/home/dev/projects/parasolid-re/work/ghidra-projects
+export GHIDRA_PROJECT_DIR="${SINBAD_WORKSPACE:?set SINBAD_WORKSPACE}/parasolid-re/work/ghidra-projects"
 ghidra decompile PK_TOPOL_find_box --project parasolid-c900fa3f430f --program pskernel.dll --json
 ```
 

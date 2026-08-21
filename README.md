@@ -32,7 +32,7 @@ In short:
 ```bash
 cargo build --workspace --target x86_64-pc-windows-gnu
 # ensure lib/pskernel.dll is next to the test exe or on PATH/WINEPATH
-cargo run -p parasolid-test --target x86_64-pc-windows-gnu
+cargo run -p parasolid-test --bin parasolid-test --target x86_64-pc-windows-gnu
 ```
 
 ## Validation status
