@@ -11,7 +11,7 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
-use parasolid::{BodyType, FrustrumConfig, Session, SessionConfig, fileio};
+use parasolid::{Behaviour, BodyType, FrustrumConfig, Session, SessionConfig, fileio};
 use serde::Serialize;
 use sha2::{Digest, Sha256};
 
@@ -231,6 +231,7 @@ fn run(args: &Args) -> Result<Report, String> {
 
     let session = match Session::start(
         SessionConfig::new()
+            .behaviour(Behaviour::Latest)
             .frustrum(FrustrumConfig::new().base_dir(&staging))
             .check_arguments(true)
             .general_topology(true),
