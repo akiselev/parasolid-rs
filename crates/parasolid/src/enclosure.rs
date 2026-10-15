@@ -204,3 +204,65 @@ impl crate::surf::Surf {
         Ok(crate::entity::RangeResult::from_range_1(&r, status, point))
     }
 }
+
+/// Batched global closest approach from one curve or surface to many points
+/// (`PK_GEOM_range_vector_many`). `o_t_version` is exposed so the accepted
+/// window can be probed from a test; ordinary callers use
+/// [`range_to_points`].
+pub fn range_to_points_with_version(
+    tag: i32,
+    points: &[Vec3],
+    o_t_version: i32,
+) -> PsResult<Vec<crate::entity::RangeResult>> {
+    let mut vectors: Vec<PK_VECTOR_t> = points.iter().map(|p| [p.x, p.y, p.z]).collect();
+    let mut opts = PK_GEOM_range_vector_many_o_t {
+        o_t_version,
+        ..PK_GEOM_range_vector_many_o_t::default()
+    };
+    let mut statuses: Vec<PK_range_result_t> = vec![0; points.len()];
+    let mut ranges: Vec<PK_range_1_r_t> = (0..points.len())
+        .map(|_| unsafe { std::mem::zeroed() })
+        .collect();
+    pk_call!(PK_GEOM_range_vector_many(
+        tag,
+        points.len() as c_int,
+        vectors.as_mut_ptr(),
+        &mut opts,
+        statuses.as_mut_ptr(),
+        ranges.as_mut_ptr(),
+    ));
+    Ok(ranges
+        .iter()
+        .zip(statuses.iter())
+        .zip(points.iter())
+        .map(|((r, s), p)| crate::entity::RangeResult::from_range_1(r, *s, *p))
+        .collect())
+}
+
+/// Batched global closest approach from a geometry tag to many points.
+pub fn range_to_points(tag: i32, points: &[Vec3]) -> PsResult<Vec<crate::entity::RangeResult>> {
+    range_to_points_with_version(tag, points, 1)
+}
+
+impl crate::curve::Curve {
+    /// Global closest approach to each point (`PK_GEOM_range_vector_many`).
+    pub fn range_to_points(&self, points: &[Vec3]) -> PsResult<Vec<crate::entity::RangeResult>> {
+        range_to_points(self.tag(), points)
+    }
+
+    /// As [`Curve::range_to_points`] with an explicit `o_t_version`.
+    pub fn range_to_points_with_version(
+        &self,
+        points: &[Vec3],
+        o_t_version: i32,
+    ) -> PsResult<Vec<crate::entity::RangeResult>> {
+        range_to_points_with_version(self.tag(), points, o_t_version)
+    }
+}
+
+impl crate::surf::Surf {
+    /// Global closest approach to each point (`PK_GEOM_range_vector_many`).
+    pub fn range_to_points(&self, points: &[Vec3]) -> PsResult<Vec<crate::entity::RangeResult>> {
+        range_to_points(self.tag(), points)
+    }
+}

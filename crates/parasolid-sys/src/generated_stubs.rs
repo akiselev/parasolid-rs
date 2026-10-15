@@ -455,10 +455,6 @@ pub struct PK_GEOM_range_local_vector_o_t {
     _private: [u8; 0],
 }
 #[repr(C)]
-pub struct PK_GEOM_range_vector_many_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
 pub struct PK_GEOM_render_line_o_t {
     _private: [u8; 0],
 }

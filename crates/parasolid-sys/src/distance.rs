@@ -308,6 +308,49 @@ impl Default for PK_TOPOL_range_vector_o_t {
     }
 }
 
+/// Options for `PK_GEOM_range_vector_many`.
+///
+/// Layout follows the single-vector sibling above with the per-call `guess`
+/// replaced by a pointer to an array of per-vector guesses (`guesses`, null
+/// for none). Evidence grade: documented field order only; the catalog's
+/// 40-byte layout assumed a smaller `bound`, which was wrong for every sibling
+/// measured so far.
+///
+/// dynamic-observed (CADabra3 oracle probe `range_vector_many_version_window`,
+/// Parasolid 37.01): `o_t_version` 1 is accepted and 0 and 2..=6 are all
+/// `PK_ERROR_o_t_version_unknown` (5022), so the window is exactly `[1, 1]`.
+/// Acceptance does not by itself prove the layout beyond the fields v1 reads;
+/// results for the batched call matched the single-vector `PK_GEOM_range_vector`
+/// and `PK_*_parameterise_vector` answers on line, circle, plane, cylinder,
+/// sphere, cone and torus fixtures.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_GEOM_range_vector_many_o_t {
+    pub o_t_version: c_int,                 // @0
+    pub have_tolerance: PK_LOGICAL_t,       // @4
+    pub tolerance: c_double,                // @8
+    pub bound: PK_range_bound_t,            // @16 (32B)
+    pub guesses: *const PK_range_guess_s_t, // @48
+    pub opt_level: PK_range_opt_t,          // @56
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_GEOM_range_vector_many_o_t>() == 64);
+};
+
+impl Default for PK_GEOM_range_vector_many_o_t {
+    fn default() -> Self {
+        Self {
+            o_t_version: 1,
+            have_tolerance: PK_LOGICAL_false,
+            tolerance: 0.0,
+            bound: PK_range_bound_t::default(),
+            guesses: core::ptr::null(),
+            opt_level: PK_range_opt_accuracy_c,
+        }
+    }
+}
+
 const _: () = {
     assert!(core::mem::size_of::<PK_range_bound_t>() == 32);
     assert!(core::mem::size_of::<PK_range_guess_s_t>() == 48);
