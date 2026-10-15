@@ -60,7 +60,7 @@ pub use curve::{
     BCurveData, CurveCurvature, CurveParam, ParamCurveClass, ParamExtent, Periodicity,
 };
 pub use curve::{CircleData, Curve, CurveType, EllipseData, LineData};
-pub use edge::{Edge, EdgeType};
+pub use edge::{DeviationSample, Edge, EdgeType};
 pub use enclosure::OrientedBox;
 pub use entity::{
     ClashRecord, Entity, GeomCategory, Obb, PkClass, RangeResult, RangeStatus, RangeWitness,

@@ -1391,6 +1391,43 @@ fn main() {
         );
     });
 
+    test!("edge_find_deviation_offset_blocks", {
+        let _session = Session::start(test_config())?;
+        // Blocks are centred on the z axis with their base on z = 0. The top
+        // +y edge along x sits at (y, z) = (half_y, height); widening the second
+        // block by 2^-9 moves that edge by exactly 2^-10 in y.
+        let a = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let b = Body::create_solid_block(10.0, 20.001953125, 30.0)?;
+        let top_edge = |body: &Body, y: f64| -> Result<Edge, Box<dyn std::error::Error>> {
+            for e in body.edges()? {
+                let ((sp, _), (ep, _)) = e.end_tangents()?;
+                let on = |p: Vec3| (p.y - y).abs() < 1e-9 && (p.z - 30.0).abs() < 1e-9;
+                if on(sp) && on(ep) {
+                    return Ok(e);
+                }
+            }
+            Err("top edge not found".into())
+        };
+        let ea = top_edge(&a, 10.0)?;
+        let eb = top_edge(&b, 10.0009765625)?;
+        let samples = ea.find_deviation(&eb, 5)?;
+        assert!(!samples.is_empty(), "find_deviation returned no samples");
+        for sample in &samples {
+            assert!(
+                (sample.distance - 0.0009765625).abs() < 1e-12,
+                "sample distance {}",
+                sample.distance
+            );
+            assert!(
+                (sample.on_self.y - 10.0).abs() < 1e-9
+                    && (sample.on_other.y - 10.0009765625).abs() < 1e-9,
+                "sample points {:?} {:?}",
+                sample.on_self,
+                sample.on_other
+            );
+        }
+    });
+
     test!("edge_make_wire_body", {
         let _session = Session::start(test_config())?;
         let body = Body::create_solid_block(10.0, 20.0, 30.0)?;

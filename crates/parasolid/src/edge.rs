@@ -11,6 +11,18 @@ use crate::vertex::Vertex;
 use parasolid_sys::*;
 use std::os::raw::c_int;
 
+/// One `PK_EDGE_find_deviation` sample: a distance and the corresponding
+/// points on each edge.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct DeviationSample {
+    /// Distance between the two edge geometries at this sample.
+    pub distance: f64,
+    /// Sample point on the edge `find_deviation` was called on.
+    pub on_self: Vec3,
+    /// Corresponding point on the other edge.
+    pub on_other: Vec3,
+}
+
 /// The type of an edge as reported by `PK_EDGE_ask_type` — the edge's
 /// vertex-topology (open/closed/ring). The manifold family
 /// (wireframe/laminar/normal/general) shares the `PK_EDGE_type_t` enum but is a
@@ -319,6 +331,44 @@ impl Edge {
         pk_call!(PK_EDGE_set_precision(self.tag, precision, &mut n, &mut ptr));
         let array = unsafe { PkArray::from_raw(ptr, n) };
         Ok(array.iter().map(|&t| Edge::from_tag(t)).collect())
+    }
+
+    /// Distance samples between this edge and `other` (`PK_EDGE_find_deviation`).
+    ///
+    /// `how_many` is the number of samples requested; the kernel reports how
+    /// many it returned. Each sample is the distance between the two edge
+    /// geometries with the corresponding point on each edge. The prototype is
+    /// header-documented
+    /// (`PK_EDGE_find_deviation(edge1, edge2, how_many, n_distances,
+    /// distances, edge1_vecs, edge2_vecs)`). Distances are between the edge
+    /// geometries and do not subtract either edge's local precision.
+    pub fn find_deviation(&self, other: &Edge, how_many: i32) -> PsResult<Vec<DeviationSample>> {
+        let mut n: c_int = 0;
+        let mut distances: *mut f64 = std::ptr::null_mut();
+        let mut vecs1: *mut PK_VECTOR_t = std::ptr::null_mut();
+        let mut vecs2: *mut PK_VECTOR_t = std::ptr::null_mut();
+        pk_call!(PK_EDGE_find_deviation(
+            self.tag,
+            other.tag,
+            how_many,
+            &mut n,
+            &mut distances,
+            &mut vecs1,
+            &mut vecs2
+        ));
+        let distances = unsafe { PkArray::from_raw(distances, n) };
+        let on_self = unsafe { PkArray::from_raw(vecs1, n) };
+        let on_other = unsafe { PkArray::from_raw(vecs2, n) };
+        Ok(distances
+            .iter()
+            .zip(on_self.iter())
+            .zip(on_other.iter())
+            .map(|((&distance, &p), &q)| DeviationSample {
+                distance,
+                on_self: Vec3::from_pk(p),
+                on_other: Vec3::from_pk(q),
+            })
+            .collect())
     }
 
     /// Remove local precision from this tolerant edge, restoring exact geometry.
