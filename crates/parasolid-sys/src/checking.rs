@@ -33,7 +33,9 @@ pub const PK_check_returns_latest_c: PK_check_returns_t = 23660;
 pub type PK_check_extra_faults_t = c_int;
 pub const PK_check_extra_faults_0_c: PK_check_extra_faults_t = 24720;
 pub const PK_check_extra_faults_1_c: PK_check_extra_faults_t = 24721;
-pub const PK_check_extra_faults_latest_c: PK_check_extra_faults_t = PK_check_extra_faults_1_c;
+/// Distinct token 24722 (vendor numeric table; static band 0x6090..=0x6092 in
+/// the binary). Previously aliased to `_1_c`, which was a transcription guess.
+pub const PK_check_extra_faults_latest_c: PK_check_extra_faults_t = 24722;
 
 // =============================================================================
 // Attribute checking constants
@@ -376,90 +378,225 @@ pub const PK_LATTICE_state_short_lrod_c: PK_check_state_t = 26772;
 pub const PK_ASSEMBLY_state_invalid_id_c: PK_check_state_t = 26773;
 
 // =============================================================================
-// Check option structs
+// Check option tokens
+//
+// Every check-option field after `max_faults` is a 4-byte enum token, not a
+// `PK_LOGICAL_t`. Values: vendor numeric token table (parasolid-re
+// `catalog/pk-enum-values.tsv`), static bands confirmed in the binary, and the
+// defaults below are the ones the kernel's option-migration routines write for
+// NULL options (parasolid-re `artifacts/port/oracle/runner/src/pkcheck.rs`,
+// `catalog/pk-validated-abi.md`). Grade: documented + static-observed +
+// dynamic-observed (all five entry points called with explicit options in
+// parasolid-re run `20261016T084310Z-p9`, and here in `check_*` tests).
 // =============================================================================
 
-/// Options for `PK_BODY_check`. Controls which checks are performed and
-/// how results are reported.
+pub type PK_check_geom_t = c_int;
+pub const PK_check_geom_no_c: PK_check_geom_t = 18280;
+pub const PK_check_geom_basic_c: PK_check_geom_t = 18281;
+pub const PK_check_geom_lazy_c: PK_check_geom_t = 18282;
+pub const PK_check_geom_full_c: PK_check_geom_t = 18283;
+pub const PK_check_geom_yes_c: PK_check_geom_t = 18284;
+
+pub type PK_check_bgeom_t = c_int;
+pub const PK_check_bgeom_no_c: PK_check_bgeom_t = 18290;
+pub const PK_check_bgeom_yes_c: PK_check_bgeom_t = 18291;
+
+pub type PK_check_mesh_t = c_int;
+pub const PK_check_mesh_no_c: PK_check_mesh_t = 25940;
+pub const PK_check_mesh_basic_c: PK_check_mesh_t = 25941;
+pub const PK_check_mesh_yes_c: PK_check_mesh_t = 25942;
+
+pub type PK_check_top_geo_t = c_int;
+pub const PK_check_top_geo_no_c: PK_check_top_geo_t = 18300;
+pub const PK_check_top_geo_edge_c: PK_check_top_geo_t = 18301;
+pub const PK_check_top_geo_face_c: PK_check_top_geo_t = 18302;
+pub const PK_check_top_geo_yes_c: PK_check_top_geo_t = 18303;
+
+pub type PK_check_size_box_t = c_int;
+pub const PK_check_size_box_no_c: PK_check_size_box_t = 18310;
+pub const PK_check_size_box_yes_c: PK_check_size_box_t = 18311;
+
+pub type PK_check_fa_x_t = c_int;
+pub const PK_check_fa_X_no_c: PK_check_fa_x_t = 18320;
+pub const PK_check_fa_X_yes_c: PK_check_fa_x_t = 18321;
+
+pub type PK_check_loops_t = c_int;
+pub const PK_check_loops_no_c: PK_check_loops_t = 18330;
+pub const PK_check_loops_yes_c: PK_check_loops_t = 18331;
+
+pub type PK_check_fa_fa_t = c_int;
+pub const PK_check_fa_fa_no_c: PK_check_fa_fa_t = 18340;
+pub const PK_check_fa_fa_yes_c: PK_check_fa_fa_t = 18341;
+
+pub type PK_check_sh_t = c_int;
+pub const PK_check_sh_no_c: PK_check_sh_t = 18350;
+pub const PK_check_sh_yes_c: PK_check_sh_t = 18351;
+
+pub type PK_check_corrupt_t = c_int;
+pub const PK_check_corrupt_no_c: PK_check_corrupt_t = 18360;
+pub const PK_check_corrupt_yes_c: PK_check_corrupt_t = 18361;
+
+pub type PK_check_nmnl_geom_t = c_int;
+pub const PK_check_nmnl_geom_no_c: PK_check_nmnl_geom_t = 23650;
+pub const PK_check_nmnl_geom_yes_c: PK_check_nmnl_geom_t = 23651;
+
+// =============================================================================
+// Check option structs
+//
+// Current versions (next version returns 5022 `o_t_version_unknown`,
+// dynamic-observed in parasolid-re `abi-versions`): BODY 5, FACE 4, EDGE 3,
+// GEOM 3, FACE pair 1. `Default` reproduces the kernel's NULL-options defaults
+// at the current version, so `Default` and NULL request the same checks.
+//
+// The previous bindings typed every flag `PK_LOGICAL_t` and put GEOM's
+// `extra_faults` before `attribs`; with a 4-byte logical the BODY/FACE/EDGE
+// sizes happened to match, but no non-NULL struct was ever passed.
+// =============================================================================
+
+/// Options for `PK_BODY_check`, version 5, 64 bytes (16 ints; migrate
+/// `FUN_18010a0a0`).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_BODY_check_o_t {
-    /// Structure version marker (set via `PK_BODY_check_o_m`).
     pub o_t_version: c_int,
-    /// Maximum number of faults to return (0 = no limit).
+    /// Maximum number of faults returned. Kernel default 10.
     pub max_faults: c_int,
-    /// Check geometry validity.
-    pub geom: PK_LOGICAL_t,
-    /// Check B-geometry continuity.
-    pub bgeom: PK_LOGICAL_t,
-    /// Check mesh data.
-    pub mesh: PK_LOGICAL_t,
-    /// Check topology-geometry consistency.
-    pub top_geo: PK_LOGICAL_t,
-    /// Check for size box violations.
-    pub size_box: PK_LOGICAL_t,
-    /// Check for face self-intersections.
-    pub fa_x: PK_LOGICAL_t,
-    /// Check for loop consistency.
-    pub loops: PK_LOGICAL_t,
-    /// Check for face-face inconsistencies.
-    pub fa_fa: PK_LOGICAL_t,
-    /// Check for inside-out or inconsistent shells.
-    pub sh: PK_LOGICAL_t,
-    /// Check for corrupt data structures and identifiers.
-    pub corrupt: PK_LOGICAL_t,
-    /// Check for nominal geometry errors.
-    pub nmnl_geom: PK_LOGICAL_t,
-    /// Control level of information returned.
+    pub geom: PK_check_geom_t,
+    pub bgeom: PK_check_bgeom_t,
+    pub mesh: PK_check_mesh_t,
+    pub top_geo: PK_check_top_geo_t,
+    pub size_box: PK_check_size_box_t,
+    pub fa_x: PK_check_fa_x_t,
+    pub loops: PK_check_loops_t,
+    pub fa_fa: PK_check_fa_fa_t,
+    pub sh: PK_check_sh_t,
+    pub corrupt: PK_check_corrupt_t,
+    pub nmnl_geom: PK_check_nmnl_geom_t,
     pub returns: PK_check_returns_t,
-    /// Additional corrupt data structure info.
     pub extra_faults: PK_check_extra_faults_t,
-    /// Check system attribute validity.
     pub attribs: PK_check_attribs_t,
 }
 
-/// Options for `PK_EDGE_check`.
+impl Default for PK_BODY_check_o_t {
+    fn default() -> Self {
+        Self {
+            o_t_version: 5,
+            max_faults: 10,
+            geom: PK_check_geom_yes_c,
+            bgeom: PK_check_bgeom_yes_c,
+            mesh: PK_check_mesh_yes_c,
+            top_geo: PK_check_top_geo_yes_c,
+            size_box: PK_check_size_box_yes_c,
+            fa_x: PK_check_fa_X_yes_c,
+            loops: PK_check_loops_yes_c,
+            fa_fa: PK_check_fa_fa_yes_c,
+            sh: PK_check_sh_yes_c,
+            corrupt: PK_check_corrupt_yes_c,
+            nmnl_geom: PK_check_nmnl_geom_yes_c,
+            returns: PK_check_returns_0_c,
+            extra_faults: PK_check_extra_faults_0_c,
+            attribs: PK_check_attribs_no_c,
+        }
+    }
+}
+
+/// Options for `PK_EDGE_check`, version 3, 36 bytes (9 ints; inline migration
+/// in `PK_EDGE_check` @0x180230b40). Note the default `top_geo` is `edge`, not
+/// `yes`.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_EDGE_check_o_t {
     pub o_t_version: c_int,
+    /// Kernel default 5.
     pub max_faults: c_int,
-    pub geom: PK_LOGICAL_t,
-    pub bgeom: PK_LOGICAL_t,
-    pub top_geo: PK_LOGICAL_t,
-    pub size_box: PK_LOGICAL_t,
-    pub nmnl_geom: PK_LOGICAL_t,
+    pub geom: PK_check_geom_t,
+    pub bgeom: PK_check_bgeom_t,
+    pub top_geo: PK_check_top_geo_t,
+    pub size_box: PK_check_size_box_t,
+    pub nmnl_geom: PK_check_nmnl_geom_t,
     pub returns: PK_check_returns_t,
     pub attribs: PK_check_attribs_t,
 }
 
-/// Options for `PK_FACE_check`.
+impl Default for PK_EDGE_check_o_t {
+    fn default() -> Self {
+        Self {
+            o_t_version: 3,
+            max_faults: 5,
+            geom: PK_check_geom_yes_c,
+            bgeom: PK_check_bgeom_yes_c,
+            top_geo: PK_check_top_geo_edge_c,
+            size_box: PK_check_size_box_yes_c,
+            nmnl_geom: PK_check_nmnl_geom_yes_c,
+            returns: PK_check_returns_0_c,
+            attribs: PK_check_attribs_no_c,
+        }
+    }
+}
+
+/// Options for `PK_FACE_check`, version 4, 48 bytes (12 ints; migrate
+/// `FUN_1802874b0`).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_FACE_check_o_t {
     pub o_t_version: c_int,
+    /// Kernel default 5.
     pub max_faults: c_int,
-    pub geom: PK_LOGICAL_t,
-    pub bgeom: PK_LOGICAL_t,
-    pub mesh: PK_LOGICAL_t,
-    pub top_geo: PK_LOGICAL_t,
-    pub size_box: PK_LOGICAL_t,
-    pub fa_x: PK_LOGICAL_t,
-    pub loops: PK_LOGICAL_t,
-    pub nmnl_geom: PK_LOGICAL_t,
+    pub geom: PK_check_geom_t,
+    pub bgeom: PK_check_bgeom_t,
+    pub mesh: PK_check_mesh_t,
+    pub top_geo: PK_check_top_geo_t,
+    pub size_box: PK_check_size_box_t,
+    pub fa_x: PK_check_fa_x_t,
+    pub loops: PK_check_loops_t,
+    pub nmnl_geom: PK_check_nmnl_geom_t,
     pub returns: PK_check_returns_t,
     pub attribs: PK_check_attribs_t,
 }
 
-/// Options for `PK_GEOM_check`.
+impl Default for PK_FACE_check_o_t {
+    fn default() -> Self {
+        Self {
+            o_t_version: 4,
+            max_faults: 5,
+            geom: PK_check_geom_yes_c,
+            bgeom: PK_check_bgeom_yes_c,
+            mesh: PK_check_mesh_yes_c,
+            top_geo: PK_check_top_geo_yes_c,
+            size_box: PK_check_size_box_yes_c,
+            fa_x: PK_check_fa_X_yes_c,
+            loops: PK_check_loops_yes_c,
+            nmnl_geom: PK_check_nmnl_geom_yes_c,
+            returns: PK_check_returns_0_c,
+            attribs: PK_check_attribs_no_c,
+        }
+    }
+}
+
+/// Options for `PK_GEOM_check`, version 3, 20 bytes (5 ints; inline in
+/// `PK_GEOM_check` @0x18031e7d0). Field order is `geom, attribs,
+/// extra_faults` (the old binding had the last two swapped).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_GEOM_check_o_t {
     pub o_t_version: c_int,
+    /// Kernel default 1.
     pub max_faults: c_int,
-    pub geom: PK_LOGICAL_t,
-    pub extra_faults: PK_check_extra_faults_t,
+    pub geom: PK_check_geom_t,
     pub attribs: PK_check_attribs_t,
+    pub extra_faults: PK_check_extra_faults_t,
+}
+
+impl Default for PK_GEOM_check_o_t {
+    fn default() -> Self {
+        Self {
+            o_t_version: 3,
+            max_faults: 1,
+            geom: PK_check_geom_yes_c,
+            attribs: PK_check_attribs_no_c,
+            extra_faults: PK_check_extra_faults_0_c,
+        }
+    }
 }
 
 /// Options for `PK_TRANSF_check`.
@@ -478,28 +615,57 @@ pub struct PK_ENTITY_check_attribs_o_t {
     pub max_faults: c_int,
 }
 
-/// Options for `PK_FACE_check_pair`.
+/// Options for `PK_FACE_check_pair`, version 1, 8 bytes (inline in
+/// `PK_FACE_check_pair` @0x180288120).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_FACE_check_pair_o_t {
     pub o_t_version: c_int,
+    /// Kernel default 1.
     pub max_faults: c_int,
 }
+
+impl Default for PK_FACE_check_pair_o_t {
+    fn default() -> Self {
+        Self { o_t_version: 1, max_faults: 1 }
+    }
+}
+
+const _: () = {
+    use core::mem::{offset_of, size_of};
+    assert!(size_of::<PK_BODY_check_o_t>() == 64);
+    assert!(size_of::<PK_FACE_check_o_t>() == 48);
+    assert!(size_of::<PK_EDGE_check_o_t>() == 36);
+    assert!(size_of::<PK_GEOM_check_o_t>() == 20);
+    assert!(offset_of!(PK_GEOM_check_o_t, extra_faults) == 16);
+    assert!(size_of::<PK_FACE_check_pair_o_t>() == 8);
+    assert!(size_of::<PK_check_fault_t>() == 40);
+    assert!(offset_of!(PK_check_fault_t, position) == 16);
+};
 
 // =============================================================================
 // Check result structures
 // =============================================================================
 
-/// A single fault returned by a check function.
+/// A single fault returned by a check function, 40 bytes:
+/// `{state, entity_1, entity_2, position}`.
+///
+/// Grade: documented (header `pk_check_fault_t.html`) + dynamic-observed
+/// (parasolid-re harness `runner/src/abi.rs` `CheckFault`; runtime test
+/// `check_fault_is_40_bytes`). The previous 12-byte `{entity, state,
+/// entity_2}` binding misread every fault after the first and swapped
+/// `state`/`entity` on the first.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_check_fault_t {
-    /// The entity where the fault was found.
-    pub entity: PK_ENTITY_t,
     /// Fault state token (one of the `PK_*_state_*_c` constants).
     pub state: PK_check_state_t,
+    /// The entity where the fault was found (may be `PK_ENTITY_null`).
+    pub entity_1: PK_ENTITY_t,
     /// Secondary entity related to the fault (or `PK_ENTITY_null`).
     pub entity_2: PK_ENTITY_t,
+    /// A position associated with the fault, where the checker gives one.
+    pub position: PK_VECTOR_t,
 }
 
 // =============================================================================

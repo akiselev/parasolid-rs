@@ -333,16 +333,7 @@ impl Transform {
         let mut n_faults: std::os::raw::c_int = 0;
         let mut faults: *mut PK_check_fault_t = std::ptr::null_mut();
         pk_call!(PK_TRANSF_check(self.tag, &opts, &mut n_faults, &mut faults));
-        let array = unsafe { PkArray::from_raw(faults, n_faults) };
-        Ok(array
-            .iter()
-            .map(|f| crate::check::CheckFault {
-                entity: crate::entity::Entity::from_tag(f.entity),
-                state: f.state,
-                entity_2: (f.entity_2 != PK_ENTITY_null)
-                    .then(|| crate::entity::Entity::from_tag(f.entity_2)),
-            })
-            .collect())
+        Ok(crate::check::collect_faults(faults, n_faults))
     }
 }
 

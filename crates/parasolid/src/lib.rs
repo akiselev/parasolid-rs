@@ -23,7 +23,7 @@ mod error;
 mod attrib;
 mod body;
 pub mod boolean;
-mod check;
+pub mod check;
 mod compare;
 mod create;
 mod curve;
@@ -54,7 +54,10 @@ mod vertex;
 pub use attrib::{ATTRIB_COLOUR, AttribDef};
 pub use body::{Body, BodyType};
 pub use boolean::{BooleanOp, BooleanOptions};
-pub use check::CheckFault;
+pub use check::{
+    BodyCheckOptions, CheckFault, EdgeCheckOptions, FaceCheckOptions, FacePairCheckOptions,
+    GeomCheckOptions, check_geom,
+};
 pub use compare::{SamplePoint, SurfaceParams, extract_surface_params};
 pub use curve::{
     BCurveData, CurveCurvature, CurveParam, ParamCurveClass, ParamExtent, Periodicity,
