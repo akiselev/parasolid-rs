@@ -734,3 +734,61 @@ pub fn boolean_options_v19_default_tol() -> R {
     assert!((vm - vr).abs() < 1e-9 * vr, "volume {vm} vs {vr}");
     Ok(())
 }
+
+// -----------------------------------------------------------------------------
+// BooleanOptions merge_imprinted @32 / selective_merge @41 (v19)
+// -----------------------------------------------------------------------------
+
+/// parasolid-re item n. The wrapper did not expose the two merge flags; with
+/// them, measured live (2026-10-16, DLL c900fa3f…63073), on 10×10×10 blocks:
+/// - default Booleans keep coplanar regions as separate faces: abutting
+///   blocks unite to F=10, half-overlapping ones to F=14;
+/// - `merge_imprinted` merges them to the 6-face box;
+/// - it merges only seams the Boolean imprinted: in `(A ∪ B) ∪ C` the A|B
+///   seams made by the first (unmerged) Boolean survive (F=10);
+/// - `selective_merge` matters only when the new imprint lies on such a
+///   pre-existing seam (C spans x 5..25 over the A|B seam at x=5):
+///   `merge_imprinted` alone also merges it (F=6), with `selective_merge` it
+///   survives (F=10); without `merge_imprinted` it changes nothing.
+/// Every result checks clean.
+pub fn boolean_options_merge_flags() -> R {
+    let _s = Session::start(cfg())?;
+    let block = |dx: f64, w: f64| -> Result<Body, Box<dyn Error>> {
+        let b = Body::create_solid_block(w, 10.0, 10.0)?;
+        translate(&b, dx, 0.0, 0.0)?;
+        Ok(b)
+    };
+    let unite = |t: Body, tool: Body, m: bool, s: bool| -> Result<usize, Box<dyn Error>> {
+        let o = BooleanOptions::new().merge_imprinted(m).selective_merge(s);
+        let out = boolean_detailed(t, vec![tool], BooleanOp::Unite, &o)?;
+        assert_eq!(out.result, BooleanResult::Success);
+        assert_eq!(out.bodies.len(), 1);
+        assert!(out.bodies[0].check()?.is_empty(), "m={m} s={s}: body check");
+        Ok(out.bodies[0].faces()?.len())
+    };
+    // (A ∪ B) with the A|B seam at x=5 left unmerged.
+    let seamed = || -> Result<Body, Box<dyn Error>> {
+        let p = parasolid::boolean::boolean(
+            block(0.0, 10.0)?,
+            vec![block(10.0, 10.0)?],
+            BooleanOp::Unite,
+            &BooleanOptions::new(),
+        )?;
+        Ok(p.into_iter().next().unwrap())
+    };
+    for (m, s, abut, overlap, chain, on_seam) in [
+        (false, false, 10, 14, 14, 14),
+        (true, false, 6, 6, 10, 6),
+        (false, true, 10, 14, 14, 14),
+        (true, true, 6, 6, 10, 10),
+    ] {
+        let got = (
+            unite(block(0.0, 10.0)?, block(10.0, 10.0)?, m, s)?,
+            unite(block(0.0, 10.0)?, block(5.0, 10.0)?, m, s)?,
+            unite(seamed()?, block(20.0, 10.0)?, m, s)?,
+            unite(seamed()?, block(15.0, 20.0)?, m, s)?,
+        );
+        assert_eq!(got, (abut, overlap, chain, on_seam), "merge_imprinted={m} selective_merge={s}");
+    }
+    Ok(())
+}

@@ -25,6 +25,8 @@ pub enum BooleanOp {
 pub struct BooleanOptions {
     pub(crate) tracking: bool,
     pub(crate) default_tol: Option<f64>,
+    pub(crate) merge_imprinted: bool,
+    pub(crate) selective_merge: bool,
 }
 
 impl Default for BooleanOptions {
@@ -32,6 +34,8 @@ impl Default for BooleanOptions {
         Self {
             tracking: false,
             default_tol: None,
+            merge_imprinted: false,
+            selective_merge: false,
         }
     }
 }
@@ -49,6 +53,20 @@ impl BooleanOptions {
     /// (the default) keeps the kernel's 1e-5.
     pub fn default_tol(mut self, tol: f64) -> Self {
         self.default_tol = Some(tol);
+        self
+    }
+    /// Merge the mergeable edges the Boolean imprinted on the result
+    /// (`merge_imprinted` @32 of the v19 options). Default `false`: the
+    /// kernel keeps coplanar regions as separate faces with imprinted edges.
+    pub fn merge_imprinted(mut self, enable: bool) -> Self {
+        self.merge_imprinted = enable;
+        self
+    }
+    /// With [`Self::merge_imprinted`], leave alone edges that were already
+    /// mergeable before the Boolean (`selective_merge` @41 of the v19
+    /// options). Default `false`.
+    pub fn selective_merge(mut self, enable: bool) -> Self {
+        self.selective_merge = enable;
         self
     }
 }
@@ -161,6 +179,8 @@ pub fn boolean_detailed(
         default_tol: options
             .default_tol
             .unwrap_or(PK_BODY_boolean_o_t::default().default_tol),
+        merge_imprinted: options.merge_imprinted as PK_LOGICAL_t,
+        selective_merge: options.selective_merge as PK_LOGICAL_t,
         ..PK_BODY_boolean_o_t::default()
     };
 

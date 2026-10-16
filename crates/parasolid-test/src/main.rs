@@ -7369,6 +7369,9 @@ fn main() {
     test!("boolean_options_v19_default_tol", {
         abi_audit::boolean_options_v19_default_tol()?;
     });
+    test!("boolean_options_merge_flags", {
+        abi_audit::boolean_options_merge_flags()?;
+    });
     // PK_CURVE_intersect_curve returns no vectors and no error when its solver
     // gives up, and reports tangencies as simple_c (parasolid-re P1 B12). The
     // checked call must tell a genuine miss from a silent one and mark tangency.
