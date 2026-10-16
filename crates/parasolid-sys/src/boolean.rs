@@ -756,32 +756,45 @@ const _: () = {
 // Imprint option structures
 // =============================================================================
 
-/// Options for `PK_BODY_imprint_body`.
+/// Options for `PK_BODY_imprint_body`, current version **5**, 48 bytes.
 ///
-/// Authoritative 56-byte layout (pk-option-structs.md): the complete/extend
-/// fields are paired per target/tool, `update`@40 precedes have_tolerance/
-/// tolerance. The old binding interleaved complete/extend and put `update` after
-/// tolerance (48 B) with `update=0` (an INVALID token).
+/// Field order: header `pk_body_imprint_o_t.html` (documented). Offsets, size
+/// 0x30, the current version and the defaults: static-observed in the
+/// option-migration routine FUN_1804a3490 called by `PK_BODY_imprint_body`
+/// @0x1801446e0 (parasolid-re `artifacts/port/oracle/README.md` "ABI basis").
+/// The earlier 56-byte binding came from a catalog that assumed 4-byte
+/// `PK_LOGICAL_t`; with the real 1-byte logical the header order gives this
+/// layout.
+///
+/// **Versions.** 2..=5 work; 6 returns 5022. **NULL options and version 1
+/// crash the kernel** (null read at DLL+0x49a66d in FUN_18049a660): for NULL or
+/// v1 the migration returns before building the default `matched_region`
+/// struct, which is then dereferenced (parasolid-re fixture
+/// `repro-imprint-body-v1-options`, dynamic-observed). Never pass either.
+/// `Default` stamps 5 with the kernel's own defaults.
 #[repr(C)]
 pub struct PK_BODY_imprint_o_t {
-    pub o_t_version: c_int,                           // @0
-    pub imprint_tool: PK_LOGICAL_t,                   // @4
-    pub imprint_overlapping: PK_LOGICAL_t,            // @8
-    pub matched_region: *const PK_boolean_match_o_t,  // @16
-    pub imprint_complete_targ: PK_imprint_complete_t, // @24
-    pub imprint_extend_targ: PK_imprint_extend_t,     // @28
-    pub imprint_complete_tool: PK_imprint_complete_t, // @32
-    pub imprint_extend_tool: PK_imprint_extend_t,     // @36
-    pub update: PK_boolean_update_t,                  // @40
-    pub have_tolerance: PK_LOGICAL_t,                 // @44
-    pub tolerance: c_double,                          // @48
-} // 56 bytes
+    pub o_t_version: c_int,                           // @0  = 5
+    pub imprint_tool: PK_LOGICAL_t,                   // @4  default true
+    pub imprint_overlapping: PK_LOGICAL_t,            // @5  default false
+    pub matched_region: *const PK_boolean_match_o_t,  // @8  NULL -> kernel default (v>=2 only)
+    pub imprint_complete_targ: PK_imprint_complete_t, // @16
+    pub imprint_extend_targ: PK_imprint_extend_t,     // @20
+    pub imprint_complete_tool: PK_imprint_complete_t, // @24
+    pub imprint_extend_tool: PK_imprint_extend_t,     // @28
+    pub update: PK_boolean_update_t,                  // @32
+    pub have_tolerance: PK_LOGICAL_t,                 // @36
+    pub tolerance: c_double,                          // @40
+} // 48 bytes
+
+/// Highest `PK_BODY_imprint_o_t` version this kernel accepts (6 -> 5022).
+pub const PK_BODY_imprint_o_t_VERSION: c_int = 5;
 
 impl Default for PK_BODY_imprint_o_t {
     fn default() -> Self {
         Self {
-            o_t_version: 1,
-            imprint_tool: PK_LOGICAL_false,
+            o_t_version: PK_BODY_imprint_o_t_VERSION,
+            imprint_tool: PK_LOGICAL_true,
             imprint_overlapping: PK_LOGICAL_false,
             matched_region: std::ptr::null(),
             imprint_complete_targ: PK_imprint_complete_no_c,
@@ -796,7 +809,13 @@ impl Default for PK_BODY_imprint_o_t {
 }
 
 const _: () = {
-    assert!(core::mem::size_of::<PK_BODY_imprint_o_t>() == 56);
+    use core::mem::{offset_of, size_of};
+    assert!(size_of::<PK_BODY_imprint_o_t>() == 48);
+    assert!(offset_of!(PK_BODY_imprint_o_t, imprint_overlapping) == 5);
+    assert!(offset_of!(PK_BODY_imprint_o_t, matched_region) == 8);
+    assert!(offset_of!(PK_BODY_imprint_o_t, update) == 32);
+    assert!(offset_of!(PK_BODY_imprint_o_t, have_tolerance) == 36);
+    assert!(offset_of!(PK_BODY_imprint_o_t, tolerance) == 40);
 };
 
 /// Options for `PK_BODY_imprint_faces_2`.
@@ -1384,11 +1403,46 @@ pub struct PK_FACE_imprint_o_t {
     _private: [u8; 0],
 }
 
-/// Results from face imprint operations.
+/// `PK_EDGE_array_t` — `{array*, length}`, 16 bytes (header `pk_edge_array_t.html`;
+/// same shape as [`crate::PK_FACE_array_t`]). Kernel-allocated `array`.
 #[repr(C)]
-pub struct PK_imprint_r_t {
-    _bytes: [u8; 128],
+#[derive(Debug, Clone, Copy)]
+pub struct PK_EDGE_array_t {
+    pub array: *mut PK_EDGE_t,
+    pub length: c_int,
 }
+
+/// `PK_VERTEX_array_t` — `{array*, length}`, 16 bytes (header `pk_vertex_array_t.html`).
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_VERTEX_array_t {
+    pub array: *mut PK_VERTEX_t,
+    pub length: c_int,
+}
+
+/// Results from `PK_BODY_imprint_body` / `PK_*_imprint_faces_2`: the paired
+/// imprinted edges and vertices, 64 bytes. `target_edges.array[i]` pairs with
+/// `tool_edges.array[i]` (both arrays have the same length), likewise for
+/// vertices. Free with `PK_imprint_r_f`.
+///
+/// Grade: documented (header `pk_imprint_r_t.html`) + static-observed
+/// (`PK_imprint_r_f` @1804a3da0 frees four `{ptr,len}` pairs) + dynamic-observed
+/// (parasolid-re oracle harness `runner/src/abi.rs` `ImprintR`; runtime test
+/// `imprint_body_v5_pairs_edges`). Previously an opaque 128-byte buffer.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_imprint_r_t {
+    pub target_edges: PK_EDGE_array_t,
+    pub tool_edges: PK_EDGE_array_t,
+    pub target_vertices: PK_VERTEX_array_t,
+    pub tool_vertices: PK_VERTEX_array_t,
+}
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_EDGE_array_t>() == 16);
+    assert!(core::mem::size_of::<PK_imprint_r_t>() == 64);
+    assert!(core::mem::offset_of!(PK_imprint_r_t, tool_vertices) == 48);
+};
 
 /// Results from `PK_FACE_pattern`.
 #[repr(C)]

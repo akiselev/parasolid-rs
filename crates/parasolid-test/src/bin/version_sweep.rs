@@ -111,7 +111,7 @@ fn main() {
     sweep("PK_SURF_intersect_curve_o_t", 6, |v, garbage| {
         let mut o: PK_SURF_intersect_curve_o_t = unsafe { std::mem::zeroed() };
         o.o_t_version = v;
-        o.have_box = if garbage { 12345 } else { PK_LOGICAL_false };
+        o.have_box = if garbage { 0xAB } else { PK_LOGICAL_false };
         let mut nv = 0;
         let (mut a, mut c, mut d, mut e) = (
             std::ptr::null_mut(),
@@ -154,7 +154,7 @@ fn main() {
     sweep("PK_CURVE_intersect_curve_o_t", 6, |v, garbage| {
         let mut o: PK_CURVE_intersect_curve_o_t = unsafe { std::mem::zeroed() };
         o.o_t_version = v;
-        o.have_box = if garbage { 12345 } else { PK_LOGICAL_false };
+        o.have_box = if garbage { 0xAB } else { PK_LOGICAL_false };
         let mut nv = 0;
         let (mut a, mut c, mut d, mut e) = (
             std::ptr::null_mut(),
@@ -208,7 +208,7 @@ fn main() {
         }
         let o = O {
             ver: v,
-            mass: if garbage { 12345 } else { 0x36b4 },
+            mass: if garbage { 0xAB } else { 0x36b4 },
             periphery: 0x36b6,
             bound: 0x36b7,
             single: 1,
@@ -269,7 +269,7 @@ fn main() {
     sweep("PK_CURVE_find_box_o_t", 6, |v, garbage| {
         let o = PK_CURVE_find_box_o_t {
             o_t_version: v,
-            have_interval: if garbage { 12345 } else { PK_LOGICAL_false },
+            have_interval: if garbage { 0xAB } else { PK_LOGICAL_false },
             interval: PK_INTERVAL_t {
                 low: 0.0,
                 high: 1.0,
@@ -282,7 +282,7 @@ fn main() {
     sweep("PK_SURF_find_box_o_t", 6, |v, garbage| {
         let o = PK_SURF_find_box_o_t {
             o_t_version: v,
-            have_uvbox: if garbage { 12345 } else { PK_LOGICAL_true },
+            have_uvbox: if garbage { 0xAB } else { PK_LOGICAL_true },
             uvbox: PK_UVBOX_t {
                 param: [0.0, 0.0, 6.28, 6.0],
             },

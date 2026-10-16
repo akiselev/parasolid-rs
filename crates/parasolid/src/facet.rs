@@ -14,7 +14,7 @@
 //! `PK_TOPOL_facet_2` accepts option `o_t_version` **5** on this kernel
 //! (V37.01.243): 1..4 return 5022 (`o_t_version_unknown`), 6+ return 5014
 //! (`field_of_wrong_type`). The `PK_TOPOL_facet_mesh_2_o_t` (384 B) and
-//! `PK_TOPOL_facet_choice_2_o_t` (144 B) layouts are locked by compile-time
+//! `PK_TOPOL_facet_choice_2_o_t` (72 B with 1-byte logicals) layouts are locked by compile-time
 //! offset assertions in `parasolid-sys` (they previously omitted `o_t_version`
 //! and, for choice, all 23 table-selection flags — never runtime-validated, so
 //! the bugs survived). At version 5 the control struct matches the catalog only

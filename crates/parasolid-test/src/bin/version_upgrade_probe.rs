@@ -25,6 +25,8 @@ use parasolid_sys::*;
 use std::os::raw::{c_int, c_void};
 
 const GARBAGE: c_int = 987654;
+/// Garbage for a 1-byte `PK_LOGICAL_t` field (any value > 1 is not a logical).
+const GARBAGE_LOGICAL: PK_LOGICAL_t = 0xAB;
 
 fn ax(o: Vec3) -> Axis2 {
     Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0))
@@ -212,7 +214,7 @@ fn group_intersect() {
         let circ2 = Curve::circle(ax(Vec3::new(1.0, 0.0, 0.0)), 3.0).unwrap();
         let o = PK_CURVE_intersect_curve_o_t {
             o_t_version: v,
-            have_box: if g { GARBAGE } else { PK_LOGICAL_false },
+            have_box: if g { GARBAGE_LOGICAL } else { PK_LOGICAL_false },
             r#box: PK_BOX_t { coord: [0.0; 6] },
             common_surf: PK_ENTITY_null,
         };
@@ -400,7 +402,7 @@ fn group_range() {
         let circ = Curve::circle(ax(Vec3::new(0.0, 0.0, 0.0)), 3.0).unwrap();
         let o = PK_CURVE_find_box_o_t {
             o_t_version: v,
-            have_interval: if g { GARBAGE } else { PK_LOGICAL_false },
+            have_interval: if g { GARBAGE_LOGICAL } else { PK_LOGICAL_false },
             interval: PK_INTERVAL_t {
                 low: 0.0,
                 high: 1.0,
@@ -414,7 +416,7 @@ fn group_range() {
         let cyl = Surf::cylinder(ax(Vec3::new(0.0, 0.0, 0.0)), 5.0).unwrap();
         let o = PK_SURF_find_box_o_t {
             o_t_version: v,
-            have_uvbox: if g { GARBAGE } else { PK_LOGICAL_true },
+            have_uvbox: if g { GARBAGE_LOGICAL } else { PK_LOGICAL_true },
             uvbox: PK_UVBOX_t {
                 param: [0.0, 0.0, 6.28, 6.0],
             },
@@ -486,7 +488,9 @@ fn group_mass() {
             mass: PK_mass_m_of_i_c,
             periphery: PK_mass_periphery_yes_c,
             bound: PK_mass_bound_no_c,
-            single: if g { GARBAGE } else { PK_LOGICAL_false },
+            single: if g { GARBAGE_LOGICAL } else { PK_LOGICAL_false },
+            use_facets: PK_LOGICAL_false,
+            _pad: [0; 2],
         };
         let (mut amount, mut mass, mut per) = (0.0, 0.0, 0.0);
         let (mut cg, mut mi) = ([0.0; 3], [0.0; 9]);
@@ -518,7 +522,7 @@ fn group_mass() {
             *p.add(1) = PK_mass_m_of_i_c;
             *p.add(2) = PK_mass_periphery_yes_c;
             *p.add(3) = PK_mass_bound_no_c;
-            *p.add(4) = if g { GARBAGE } else { PK_LOGICAL_false };
+            *p.add(4) = if g { GARBAGE } else { 0 };
         }
         let (mut amount, mut mass, mut per) = (0.0, 0.0, 0.0);
         let (mut cg, mut mi) = ([0.0; 3], [0.0; 9]);
@@ -811,7 +815,7 @@ fn group_misc() {
             o_t_version: v,
             ..Default::default()
         };
-        o.use_nmnl_geom = if g { GARBAGE } else { PK_LOGICAL_false };
+        o.use_nmnl_geom = if g { GARBAGE_LOGICAL } else { PK_LOGICAL_false };
         let mut body: PK_BODY_t = PK_ENTITY_null;
         let mut tracking: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
         let rc = unsafe {
@@ -878,7 +882,7 @@ fn group_refine() {
                 o_t_version: v,
                 ..Default::default()
             };
-            o.allow_disjoint = if g { GARBAGE } else { PK_LOGICAL_false };
+            o.allow_disjoint = if g { GARBAGE_LOGICAL } else { PK_LOGICAL_false };
             let mut body: PK_BODY_t = PK_ENTITY_null;
             let mut tracking: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
             let rc = unsafe {
@@ -907,8 +911,8 @@ fn group_refine() {
             };
             if g {
                 match which {
-                    0 => o.transmit_user_fields = GARBAGE,
-                    1 => o.transmit_nmnl_geometry = GARBAGE,
+                    0 => o.transmit_user_fields = GARBAGE_LOGICAL,
+                    1 => o.transmit_nmnl_geometry = GARBAGE_LOGICAL,
                     _ => o.transmit_meshes = GARBAGE,
                 }
             }
@@ -1031,6 +1035,8 @@ fn group_refine() {
             periphery: PK_mass_periphery_yes_c,
             bound: PK_mass_bound_no_c,
             single: PK_LOGICAL_false,
+            use_facets: PK_LOGICAL_false,
+            _pad: [0; 2],
         };
         let (mut amount, mut mass, mut per) = (0.0, 0.0, 0.0);
         let (mut cg, mut mi) = ([0.0; 3], [0.0; 9]);
@@ -1097,7 +1103,7 @@ fn group_dormant() {
     sweep("PK_PARTITION_create_o_t", 8, |v, g| {
         let o = PK_PARTITION_create_o_t {
             o_t_version: v,
-            allow_partial_pmarks: if g { GARBAGE } else { PK_LOGICAL_false },
+            allow_partial_pmarks: if g { GARBAGE_LOGICAL } else { PK_LOGICAL_false },
         };
         let mut r = PK_PARTITION_create_r_t {
             partition: PK_ENTITY_null,
@@ -1119,7 +1125,7 @@ fn group_dormant() {
         let p = r.partition;
         let d = PK_PARTITION_delete_o_t {
             o_t_version: v,
-            delete_non_empty: if g { GARBAGE } else { PK_LOGICAL_false },
+            delete_non_empty: if g { GARBAGE_LOGICAL } else { PK_LOGICAL_false },
         };
         unsafe { PK_PARTITION_delete(p, &d) }
     });

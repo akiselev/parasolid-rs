@@ -2271,7 +2271,15 @@ const _: () = {
     assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, facet_tables_cb) == 24);
     assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, facet_tables_context) == 32);
     assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, thread_safe) == 40);
+    // `PK_LOGICAL_t` is 1 byte (see `types.rs`), so the 23 table flags pack into
+    // bytes 48..=70. The catalog's 136/144 assumed 4-byte logicals.
+    // RESIDUAL RISK: parasolid-re's v26 recovery (`runner/src/abi.rs` `FacetO`,
+    // migrate FUN_180447e00) puts enum tokens at choice+8 (0x57e4) and
+    // choice+12 (0x57ee) and sizes the v26 choice struct at 0x50 bytes, so the
+    // header field order below is not the V37 order past `o_t_version`. Only the
+    // version-5 prefix is exercised (`facet_block_triangles`).
+    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, split_strips) == 8);
     assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, facet_fin) == 48);
-    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, incr_faces) == 136);
-    assert!(size_of::<PK_TOPOL_facet_choice_2_o_t>() == 144);
+    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, incr_faces) == 70);
+    assert!(size_of::<PK_TOPOL_facet_choice_2_o_t>() == 72);
 };

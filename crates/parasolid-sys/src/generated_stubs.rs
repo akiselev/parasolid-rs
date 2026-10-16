@@ -20,7 +20,6 @@ pub type PK_CURVE_make_bcurve_res_t = c_int;
 pub type PK_CURVE_make_bcurve_t = c_int;
 pub type PK_DEBUG_check_fault_t = c_int;
 pub type PK_DEBUG_data_t = c_int;
-pub type PK_EDGE_array_t = c_int;
 pub type PK_EDGE_ask_type_t = c_int;
 pub type PK_EDGE_optimise_result_t = c_int;
 pub type PK_GROUP_closure_t = c_int;

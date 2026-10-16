@@ -132,9 +132,24 @@ pub struct PK_TOPOL_eval_mass_props_o_t {
     pub periphery: PK_mass_periphery_t,
     /// Error bound mode (`PK_mass_bound_*_c`).
     pub bound: PK_mass_bound_t,
-    /// Treat an array of faces / sheet bodies as a single solid.
+    /// Treat an array of faces / sheet bodies as a single solid. @16
     pub single: PK_LOGICAL_t,
+    /// `use_facets` @17 (1-byte logical), read by the migration routine
+    /// (`FUN_180441cd0`) from version 2 on. With the old 4-byte `PK_LOGICAL_t`
+    /// this byte was the zeroed upper part of `single`; once `single` became one
+    /// byte it was uninitialised padding and the kernel rejected the struct with
+    /// 908 `not_a_logical` (bad argument `local_opts`). Keep it `false`: the
+    /// facet-based path is not validated.
+    pub use_facets: PK_LOGICAL_t,
+    /// Explicit zeroed padding to the 20-byte size, so no uninitialised byte
+    /// reaches the kernel.
+    pub _pad: [u8; 2],
 }
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_TOPOL_eval_mass_props_o_t>() == 20);
+    assert!(core::mem::offset_of!(PK_TOPOL_eval_mass_props_o_t, use_facets) == 17);
+};
 
 impl Default for PK_TOPOL_eval_mass_props_o_t {
     /// Defaults matching the kernel's own initialisation: compute everything
@@ -148,6 +163,8 @@ impl Default for PK_TOPOL_eval_mass_props_o_t {
             periphery: PK_mass_periphery_yes_c,
             bound: PK_mass_bound_no_c,
             single: PK_LOGICAL_false,
+            use_facets: PK_LOGICAL_false,
+            _pad: [0; 2],
         }
     }
 }

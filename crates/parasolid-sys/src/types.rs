@@ -91,7 +91,19 @@ pub type PK_APPITEM_t = PK_ENTITY_t;
 // Logical type
 // =============================================================================
 
-pub type PK_LOGICAL_t = c_int;
+/// `PK_LOGICAL_t` is **one byte** in this binary (Parasolid V37.01.243, SHA-256
+/// `c900fa3f…63073`). The V35 header pages print `typedef int`, which is wrong for
+/// this build: the kernel's option-migration routines read and write logical fields
+/// as single bytes (parasolid-re `artifacts/port/oracle/README.md` "ABI basis",
+/// `catalog/pk-validated-abi.md`), a value above 1 is refused with
+/// `PK_ERROR_not_a_logical` (908), and `PK_SESSION_ask_check_arguments` writes only
+/// the low byte of its output (runtime test `abi_logical_is_one_byte`).
+/// Grade: static-observed + dynamic-observed.
+///
+/// Consequences of the old `c_int` declaration: struct fields after two adjacent
+/// logicals were mis-offset, and every logical *output* left three bytes of caller
+/// garbage that a `!= 0` test read as `true`.
+pub type PK_LOGICAL_t = u8;
 pub const PK_LOGICAL_true: PK_LOGICAL_t = 1;
 pub const PK_LOGICAL_false: PK_LOGICAL_t = 0;
 
