@@ -120,17 +120,8 @@ fn main() {
     });
 
     // --- Worked example 2: PK_BODY_boolean_2 --------------------------------
-    // The 32-byte v2 user struct, the case that motivated the protocol.
-    #[repr(C)]
-    struct BoolOpts {
-        o_t_version: i32,
-        function: i32,
-        configuration: *const std::ffi::c_void,
-        default_tol: f64,
-        flags: [u8; 3],
-        _pad: u8,
-        fence: i32,
-    }
+    // The full v19 user struct (parasolid-re catalog, FUN_18049b860); the
+    // earlier 32-byte stand-in was a v2 prefix, which only v2 may be given.
     // The version check happens before any modelling work, so the operands only
     // need to be *valid* — they must not be cheap to the point of erroring
     // first, nor expensive enough to matter. Fresh bodies per attempt, never
@@ -139,14 +130,10 @@ fn main() {
     sweep("PK_BODY_boolean_2_o_t", 0..=24, |v| {
         let target = Body::create_solid_block(10.0, 10.0, 10.0).expect("target");
         let tool = Body::create_solid_block(4.0, 4.0, 20.0).expect("tool");
-        let opts = BoolOpts {
+        let opts = PK_BODY_boolean_o_t {
             o_t_version: v,
             function: 15902, // subtract
-            configuration: std::ptr::null(),
-            default_tol: 0.0,
-            flags: [0; 3],
-            _pad: 0,
-            fence: 0,
+            ..Default::default()
         };
         let tool_tag = tool.tag();
         let mut results: [u8; 256] = [0; 256];
@@ -156,7 +143,7 @@ fn main() {
                 target.tag(),
                 1,
                 &tool_tag,
-                &opts as *const BoolOpts as *const PK_BODY_boolean_o_t,
+                &opts,
                 tracking.as_mut_ptr() as *mut PK_TOPOL_track_r_t,
                 results.as_mut_ptr() as *mut PK_boolean_r_t,
             )

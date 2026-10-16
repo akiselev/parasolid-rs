@@ -24,11 +24,15 @@ pub enum BooleanOp {
 /// Options for boolean operations.
 pub struct BooleanOptions {
     pub(crate) tracking: bool,
+    pub(crate) default_tol: Option<f64>,
 }
 
 impl Default for BooleanOptions {
     fn default() -> Self {
-        Self { tracking: false }
+        Self {
+            tracking: false,
+            default_tol: None,
+        }
     }
 }
 
@@ -38,6 +42,13 @@ impl BooleanOptions {
     }
     pub fn tracking(mut self, enable: bool) -> Self {
         self.tracking = enable;
+        self
+    }
+    /// Coincidence tolerance for the Boolean (`default_tol` @48 of the v19
+    /// options). Tolerant result edges carry exactly this value. `None`
+    /// (the default) keeps the kernel's 1e-5.
+    pub fn default_tol(mut self, tol: f64) -> Self {
+        self.default_tol = Some(tol);
         self
     }
 }
@@ -102,7 +113,7 @@ pub struct BooleanOutcome {
 
 /// Perform a boolean operation: `target OP tools`.
 ///
-/// Uses `PK_BODY_boolean_2` with the version-2 options struct (see
+/// Uses `PK_BODY_boolean_2` with the version-19 options struct (see
 /// [`PK_BODY_boolean_o_t`]). Returns the result bodies.
 ///
 /// **Errors** with [`crate::PsError::BooleanFailed`] when the kernel's result
@@ -137,7 +148,7 @@ pub fn boolean_detailed(
     target: Body,
     tools: Vec<Body>,
     op: BooleanOp,
-    _options: &BooleanOptions,
+    options: &BooleanOptions,
 ) -> PsResult<BooleanOutcome> {
     let tool_tags: Vec<PK_BODY_t> = tools.iter().map(|b| b.tag()).collect();
 
@@ -147,6 +158,9 @@ pub fn boolean_detailed(
             BooleanOp::Subtract => PK_boolean_subtract_c,
             BooleanOp::Intersect => PK_boolean_intersect_c,
         },
+        default_tol: options
+            .default_tol
+            .unwrap_or(PK_BODY_boolean_o_t::default().default_tol),
         ..PK_BODY_boolean_o_t::default()
     };
 

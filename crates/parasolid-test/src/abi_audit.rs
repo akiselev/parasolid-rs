@@ -607,3 +607,130 @@ pub fn ssi_delete_curves_ownership() -> R {
     assert_eq!(icurve, (false, false), "deleting icurves deletes orphan inputs");
     Ok(())
 }
+
+// -----------------------------------------------------------------------------
+// Defect 7 — PK_BODY_boolean_o_t is the 168-byte v19 layout, default_tol @48
+// -----------------------------------------------------------------------------
+
+/// parasolid-re C222 / catalog "PK_BODY_boolean_2 options". The old 32-byte
+/// struct named @16 `default_tol`; in v2 that offset is the `matched_region`
+/// pointer, so any non-zero tolerance was an access violation, and
+/// `size_of` was 32. With the v19 struct:
+/// - `size_of == 168`, `default_tol` at @48;
+/// - the P7 coaxial equal-overlap lateral band (fixtures
+///   `p9-boolean-dtol-coax-p1T-*`: two r=5 h=20 cylinders, B raised 10 and
+///   shifted ~1e-8 laterally, whole pair rotated/translated off-axis) unites
+///   to 5 faces / 4 edges with exactly one tolerant edge whose precision is
+///   exactly the option value (5e-6, 3e-5, and the kernel's 1e-5 default);
+/// - `Default` reproduces the kernel-default result (minimal v2 reference) on an ordinary
+///   Boolean.
+pub fn boolean_options_v19_default_tol() -> R {
+    assert_eq!(std::mem::size_of::<PK_BODY_boolean_o_t>(), 168);
+    assert_eq!(std::mem::offset_of!(PK_BODY_boolean_o_t, default_tol), 48);
+    let _s = Session::start(cfg())?;
+
+    let axis = Vec3::new(0.36, -0.48, 0.8);
+    let lat = Vec3::new(0.6, 0.8, 0.0);
+    let place = |b: &Body| -> Result<(), Box<dyn Error>> {
+        b.transform(&Transform::rotation(Vec3::zero(), axis, 0.723_1)?)?;
+        translate(b, 3.217, -1.843, 2.659)
+    };
+    let band = |tol: Option<f64>| -> Result<(usize, usize, Vec<f64>), Box<dyn Error>> {
+        let a = Body::create_solid_cylinder(5.0, 20.0)?;
+        place(&a)?;
+        let b = Body::create_solid_cylinder(5.0, 20.0)?;
+        translate(&b, 0.0, 0.0, 10.0)?;
+        // Out and back: the net lateral offset is ~1e-8, below session precision.
+        translate(&b, lat.x * 1.000_000_01, lat.y * 1.000_000_01, 0.0)?;
+        translate(&b, -lat.x, -lat.y, 0.0)?;
+        place(&b)?;
+        let mut o = BooleanOptions::new();
+        if let Some(t) = tol {
+            o = o.default_tol(t);
+        }
+        let out = boolean_detailed(a, vec![b], BooleanOp::Unite, &o)?;
+        assert_eq!(out.result, BooleanResult::Success, "tol {tol:?}");
+        assert_eq!(out.bodies.len(), 1);
+        let body = &out.bodies[0];
+        let mut tolerant = Vec::new();
+        for e in body.edges()? {
+            if let Ok(p) = e.precision() {
+                // Exact edges report half the session precision (5e-9).
+                if p > 1e-8 {
+                    tolerant.push(p);
+                }
+            }
+        }
+        Ok((body.faces()?.len(), body.edges()?.len(), tolerant))
+    };
+    for (tol, want) in [(None, 1e-5), (Some(5e-6), 5e-6), (Some(3e-5), 3e-5)] {
+        let (f, e, tolerant) = band(tol)?;
+        assert_eq!((f, e), (5, 4), "tol {tol:?}");
+        assert_eq!(tolerant, vec![want], "tol {tol:?}: tolerant edge precisions");
+    }
+
+    // Default == the kernel's defaults on an ordinary Boolean: compare against
+    // the minimal v2 struct (catalog: version 2 supplies only function,
+    // configuration, matched_region, three flags and fence; everything else
+    // comes from the kernel's own defaults). Raw NULL options crash this
+    // entry point, so v2 is the independent reference.
+    #[repr(C)]
+    struct V2 {
+        o_t_version: i32,
+        function: i32,
+        configuration: *const std::ffi::c_void,
+        matched_region: *const std::ffi::c_void,
+        flags: [u8; 3],
+        _pad: u8,
+        fence: i32,
+    }
+    assert_eq!(std::mem::size_of::<V2>(), 32);
+    let mk = || -> Result<(Body, Body), Box<dyn Error>> {
+        let a = Body::create_solid_block(40.0, 40.0, 20.0)?;
+        let b = Body::create_solid_cylinder(4.0, 40.0)?;
+        translate(&b, 0.0, 0.0, -10.0)?;
+        Ok((a, b))
+    };
+    let (a, b) = mk()?;
+    let mine = boolean_detailed(a, vec![b], BooleanOp::Subtract, &BooleanOptions::new())?;
+    let (a, b) = mk()?;
+    let tools = [b.tag()];
+    let v2 = V2 {
+        o_t_version: 2,
+        function: PK_boolean_subtract_c,
+        configuration: std::ptr::null(),
+        matched_region: std::ptr::null(),
+        flags: [0; 3],
+        _pad: 0,
+        fence: PK_boolean_fence_none_c,
+    };
+    let mut tr: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+    let mut r: PK_boolean_r_t = unsafe { std::mem::zeroed() };
+    let rc = unsafe {
+        PK_BODY_boolean_2(
+            a.tag(),
+            1,
+            tools.as_ptr(),
+            &v2 as *const V2 as *const PK_BODY_boolean_o_t,
+            &mut tr,
+            &mut r,
+        )
+    };
+    assert_eq!(rc, 0);
+    assert_eq!(r.n_bodies, 1);
+    let reference = Body::from_tag_checked(unsafe { *r.bodies })?;
+    let ref_result = r.result;
+    unsafe {
+        PK_TOPOL_track_r_f(&mut tr);
+        PK_boolean_r_f(&mut r);
+    }
+    assert_eq!(mine.result_raw, ref_result);
+    assert_eq!(mine.result, BooleanResult::Success);
+    assert_eq!(mine.bodies.len(), 1);
+    let m = &mine.bodies[0];
+    assert_eq!(m.faces()?.len(), reference.faces()?.len());
+    assert_eq!(m.edges()?.len(), reference.edges()?.len());
+    let (vm, vr) = (m.mass_props()?.amount, reference.mass_props()?.amount);
+    assert!((vm - vr).abs() < 1e-9 * vr, "volume {vm} vs {vr}");
+    Ok(())
+}

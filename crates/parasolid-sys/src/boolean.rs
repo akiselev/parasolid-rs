@@ -540,69 +540,165 @@ pub struct PK_boolean_config_o_t {
 
 /// Options for `PK_BODY_boolean_2` (global boolean).
 ///
-/// This is the **version-2 user struct (32 bytes)** — the minimal form the
-/// kernel's option-migration routine (`FUN_18049b860`, RE c900fa3f430f) reads.
-/// The previous 192-byte struct modelled the internal v19 layout and set
-/// `o_t_version = 1`, which the kernel rejects with `PK_ERROR_o_t_version_incorrect`
-/// (5043) — versions 2..=19 are accepted. For v2 the kernel copies only:
-/// `function@4`, `configuration@8` (ptr), `default_tol@16` (f64), three `u8`
-/// flags @24/25/26, and `fence@28`; every other option uses an internal default
-/// (e.g. tolerances ≈ 1e-8, `check_fa = yes`). A NULL `configuration` is
-/// auto-filled by the kernel, so no nested sub-struct is required.
+/// This is the **version-19 user struct (168 bytes)**, the current layout.
 ///
-/// Journal audit (PKU_journal_BODY_boolean_o): the journal dumps the FULL
-/// current-version layout (function@4, configuration@8 ptr, selected_topolset@16
-/// ptr, matched_region@24 ptr, byte flags @32+, fence@36, …, > 160 bytes). That
-/// diverges from this v2 layout after @16 (v2 has `default_tol` f64 @16 where the
-/// current version has a pointer) — exactly the version drift noted above. Kept
-/// as the runtime-validated v2 struct; do NOT expand to the journal layout.
+/// Evidence: parasolid-re `catalog/pk-validated-abi.md`, section
+/// "PK_BODY_boolean_2 options: `PK_BODY_boolean_o_t`" (grade: documented +
+/// static-observed + dynamic-observed). Static: the kernel's option-migration
+/// `FUN_18049b860` in pskernel.dll (SHA-256
+/// `c900fa3f430fe67c2adb15a50f9604d9812ed81a02c5006b66689dac28263073`), whose
+/// NULL branch fills a 0xa8-byte struct with version 19 and the defaults used
+/// by [`Default`]. Dynamic: the same layout ran 129 probes in the RE runner
+/// (`BooleanO19`, `pkcheck.rs`) without a crash; with `default_tol` 5e-6 and
+/// 3e-5 the tolerant result edges carry exactly the option value
+/// (fixtures `p9-boolean-dtol-coax-*`, case C222).
+///
+/// Accepted versions are 2..=19 (1 -> 5043); older versions are shorter
+/// prefixes-with-gaps of this layout, not this struct. **The old 32-byte "v2"
+/// definition here named @16 `default_tol`; in v2 that offset is the
+/// `matched_region` pointer**, so any non-zero value crashed the kernel
+/// (P7 B-RUN-1). `default_tol` lives at @48 in v19.
+///
+/// `PK_LOGICAL_t` fields are one byte. Sub-struct pointers default to NULL
+/// (the kernel substitutes its own defaults).
 #[repr(C)]
 pub struct PK_BODY_boolean_o_t {
-    /// Structure version — MUST be in `2..=19`. Version 1 → error 5043.
-    pub o_t_version: c_int, // @0
-    /// Boolean operation (unite/subtract/intersect).
-    pub function: PK_boolean_function_t, // @4
-    /// Performance sub-structure; NULL → kernel builds the default.
-    pub configuration: *const PK_boolean_config_o_t, // @8
-    /// Coincidence tolerance; `0.0` → kernel default (≈ 1e-8).
-    pub default_tol: c_double, // @16
-    /// Three v2 boolean flags at offsets 24/25/26 (default 0). Semantics not
-    /// individually confirmed — v2 exposes them as `u8`s; likely disjoint/prune
-    /// controls. All-zero reproduces the kernel's NULL-options defaults.
-    pub flags_v2: [u8; 3], // @24..27  (@27 = padding)
-    /// Fence behaviour (default `PK_boolean_fence_none_c`).
-    pub fence: PK_boolean_fence_t, // @28
+    /// Structure version, `2..=19`; [`Default`] uses 19. // @0
+    pub o_t_version: c_int,
+    /// Boolean operation (unite/subtract/intersect). // @4
+    pub function: PK_boolean_function_t,
+    /// Performance sub-structure; NULL -> kernel default. // @8
+    pub configuration: *const PK_boolean_config_o_t,
+    /// Selected topology set; NULL. // @16
+    pub selected_topolset: *const c_void,
+    /// Matched-region sub-structure; NULL -> kernel default. // @24
+    pub matched_region: *const PK_boolean_match_o_t,
+    /// Merge imprinted entities (default 0). // @32
+    pub merge_imprinted: PK_LOGICAL_t,
+    /// Prune in solid (default 0). // @33
+    pub prune_in_solid: PK_LOGICAL_t,
+    /// Prune in void (default 0). // @34
+    pub prune_in_void: PK_LOGICAL_t,
+    /// Fence behaviour (default `PK_boolean_fence_none_c`). // @36
+    pub fence: PK_boolean_fence_t,
+    /// Allow disjoint result (default 0). // @40
+    pub allow_disjoint: PK_LOGICAL_t,
+    /// Selective merge (default 0). // @41
+    pub selective_merge: PK_LOGICAL_t,
+    /// Face check (default `PK_boolean_check_fa_yes_c`). // @44
+    pub check_fa: PK_boolean_check_fa_t,
+    /// Coincidence tolerance; kernel default 1e-5. Tolerant result edges
+    /// carry exactly this value. // @48
+    pub default_tol: c_double,
+    /// Maximum tolerance (default 0). // @56
+    pub max_tol: c_double,
+    /// Tracking (default 0). // @64
+    pub tracking: PK_LOGICAL_t,
+    /// Merge attributes (default 0). // @65
+    pub merge_attributes: PK_LOGICAL_t,
+    /// Keep target edges (default 0). // @66
+    pub keep_target_edges: PK_LOGICAL_t,
+    /// Default `PK_imprint_complete_no_c`. // @68
+    pub imprint_complete_targ: PK_imprint_complete_t,
+    /// Default `PK_imprint_complete_no_c`. // @72
+    pub imprint_complete_tool: PK_imprint_complete_t,
+    /// Default `PK_boolean_material_default_c`. // @76
+    pub target_material_side: PK_boolean_material_t,
+    /// Default `PK_boolean_material_default_c`. // @80
+    pub tool_material_side: PK_boolean_material_t,
+    /// Default `PK_boolean_prefer_original_c`. // @84
+    pub resulting_body_type: PK_boolean_prefer_t,
+    /// Default `PK_boolean_no_effect_basic_c`. // @88
+    pub flag_no_effect: PK_boolean_no_effect_t,
+    /// Default `PK_nm_edge_repair_no_c`. // @92
+    pub nm_edge_repair: PK_nm_edge_repair_t,
+    /// Blend radius; kernel default 1e-5. // @96
+    pub blend_radius: c_double,
+    /// Default `PK_boolean_track_type_basic_c`. // @104
+    pub tracking_type: PK_boolean_track_type_t,
+    /// Region tracking token (default [`PK_boolean_track_regions_default_c`]). // @108
+    pub track_regions: c_int,
+    /// Target face overflow; NULL. // @112
+    pub target_face_overflow: *const c_void,
+    /// Tool face overflow; NULL. // @120
+    pub tool_face_overflow: *const c_void,
+    /// Imprint overlapping (default 0). // @128
+    pub imprint_overlapping: PK_LOGICAL_t,
+    /// Default `PK_boolean_update_default_c`. // @132
+    pub update: PK_boolean_update_t,
+    /// Merge in solid (default 0). // @136
+    pub merge_in_solid: PK_LOGICAL_t,
+    /// Default `PK_TOPOL_dimension_any_c`. // @140
+    pub merge_in_solid_dimension: c_int,
+    /// Merge in face (default 0). // @144
+    pub merge_in_face: PK_LOGICAL_t,
+    /// Default `PK_TOPOL_dimension_any_c`. // @148
+    pub merge_in_face_dimension: c_int,
+    /// Merge in edge (default 0). // @152
+    pub merge_in_edge: PK_LOGICAL_t,
+    /// Default [`PK_boolean_impose_bodies_default_c`]. // @156
+    pub impose_bodies: c_int,
+    /// Default [`PK_boolean_merge_tools_default_c`]. // @160
+    pub merge_tools: c_int,
 }
 
+/// `track_regions` default (0x6810), catalog "PK_BODY_boolean_o_t" table.
+pub const PK_boolean_track_regions_default_c: c_int = 26640;
+/// `impose_bodies` default (0x689c), catalog "PK_BODY_boolean_o_t" table.
+pub const PK_boolean_impose_bodies_default_c: c_int = 26780;
+/// `merge_tools` default (0x68a6), catalog "PK_BODY_boolean_o_t" table.
+pub const PK_boolean_merge_tools_default_c: c_int = 26790;
+
+const _: () = assert!(std::mem::size_of::<PK_BODY_boolean_o_t>() == 168);
+const _: () = assert!(std::mem::offset_of!(PK_BODY_boolean_o_t, matched_region) == 24);
+const _: () = assert!(std::mem::offset_of!(PK_BODY_boolean_o_t, default_tol) == 48);
+const _: () = assert!(std::mem::offset_of!(PK_BODY_boolean_o_t, blend_radius) == 96);
+const _: () = assert!(std::mem::offset_of!(PK_BODY_boolean_o_t, update) == 132);
+const _: () = assert!(std::mem::offset_of!(PK_BODY_boolean_o_t, merge_tools) == 160);
+
 impl Default for PK_BODY_boolean_o_t {
-    /// `o_t_version = 2` — deliberately NOT raised despite the accepted band
-    /// being 2..=19.
-    ///
-    /// `version_upgrade_probe` on V37.01.243, with this 32-byte v2 layout:
-    ///
-    /// | version | legal tokens | garbage `fence` |
-    /// |---|---|---|
-    /// | 1     | 5043 `o_t_version_incorrect` | 5043 |
-    /// | **2** | rc 0 | 5014 (`fence` is read) |
-    /// | 3..=16| **908 `not_a_logical`** | 5014 |
-    ///
-    /// v3 and above are *accepted* but immediately fail with `not_a_logical`:
-    /// the v3 migration reads a LOGICAL field past the end of this 32-byte
-    /// struct. So 2 is the highest version this binding can supply, and it is
-    /// already complete at v2 — the garbage-`fence` 5014 proves the kernel
-    /// reads through to the last field.
-    ///
-    /// To go higher, recover the v3+ user layout from the boolean migration
-    /// routine (`FUN_18049b860`) and extend this struct first. (Versions 17+
-    /// hard-crash the probe process, so sweep them in an isolated run.)
+    /// The kernel's NULL-options branch (`FUN_18049b860`): version 19, unite,
+    /// every sub-struct pointer NULL, every other field at the kernel default.
     fn default() -> Self {
         Self {
-            o_t_version: 2,
+            o_t_version: 19,
             function: PK_boolean_unite_c,
             configuration: std::ptr::null(),
-            default_tol: 0.0,
-            flags_v2: [0, 0, 0],
+            selected_topolset: std::ptr::null(),
+            matched_region: std::ptr::null(),
+            merge_imprinted: 0,
+            prune_in_solid: 0,
+            prune_in_void: 0,
             fence: PK_boolean_fence_none_c,
+            allow_disjoint: 0,
+            selective_merge: 0,
+            check_fa: PK_boolean_check_fa_yes_c,
+            default_tol: 1e-5,
+            max_tol: 0.0,
+            tracking: 0,
+            merge_attributes: 0,
+            keep_target_edges: 0,
+            imprint_complete_targ: PK_imprint_complete_no_c,
+            imprint_complete_tool: PK_imprint_complete_no_c,
+            target_material_side: PK_boolean_material_default_c,
+            tool_material_side: PK_boolean_material_default_c,
+            resulting_body_type: PK_boolean_prefer_original_c,
+            flag_no_effect: PK_boolean_no_effect_basic_c,
+            nm_edge_repair: PK_nm_edge_repair_no_c,
+            blend_radius: 1e-5,
+            tracking_type: PK_boolean_track_type_basic_c,
+            track_regions: PK_boolean_track_regions_default_c,
+            target_face_overflow: std::ptr::null(),
+            tool_face_overflow: std::ptr::null(),
+            imprint_overlapping: 0,
+            update: PK_boolean_update_default_c,
+            merge_in_solid: 0,
+            merge_in_solid_dimension: PK_TOPOL_dimension_any_c,
+            merge_in_face: 0,
+            merge_in_face_dimension: PK_TOPOL_dimension_any_c,
+            merge_in_edge: 0,
+            impose_bodies: PK_boolean_impose_bodies_default_c,
+            merge_tools: PK_boolean_merge_tools_default_c,
         }
     }
 }

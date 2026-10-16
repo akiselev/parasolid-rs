@@ -7225,6 +7225,9 @@ fn main() {
     test!("ssi_delete_curves_ownership", {
         abi_audit::ssi_delete_curves_ownership()?;
     });
+    test!("boolean_options_v19_default_tol", {
+        abi_audit::boolean_options_v19_default_tol()?;
+    });
 
     // =========================================================================
     // Summary

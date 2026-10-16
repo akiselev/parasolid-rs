@@ -550,8 +550,9 @@ fn group_mass() {
 fn group_boolean() {
     println!("\n=== group 4: boolean family ===");
 
-    // Capped at 16: v17+ hard-crashes the process (v3.. already read past our
-    // 32-byte v2 layout and return not_a_logical, so the band above is moot).
+    // Capped at 16: v17+ hard-crashes the process. The struct is the full
+    // 168-byte v19 layout; the earlier 32-byte struct made v3..16 return
+    // `not_a_logical` because the migration read LOGICALs past its end.
     sweep("PK_BODY_boolean_o_t", 16, |v, g| {
         let target = Body::create_solid_block(10.0, 10.0, 10.0).unwrap();
         let tool = Body::create_solid_block(4.0, 4.0, 4.0).unwrap();

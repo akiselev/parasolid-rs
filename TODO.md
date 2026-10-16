@@ -74,6 +74,12 @@ runtime-tested · `[ ]` unaudited / untested · `[!]` known-wrong or suspect.
       build stamp. `SurfIntersection` now documents that deleting icurves
       deletes their orphan input surfaces. Test: `kernel_version_is_36_bytes`,
       `ssi_delete_curves_ownership` (parasolid-re `port/REQUESTS.md` R-7).
+- [x] **`PK_BODY_boolean_o_t` is the 168-byte v19 layout** (2026-10-16; was a
+      32-byte "v2" struct naming @16 `default_tol`, which is really the
+      `matched_region` pointer, so any non-zero value crashed). `default_tol`
+      is @48; `BooleanOptions::default_tol` sets it. parasolid-re STATUS C222,
+      catalog "PK_BODY_boolean_2 options". Test:
+      `boolean_options_v19_default_tol`.
 - [x] **`PK_LOGICAL_t` is 1 byte** (2026-10-16; was `c_int`). Logical arrays
       and struct layouts with adjacent logicals were wrong; see
       `docs/pskernel-solidworks.md` "ABI audit from parasolid-re". Class tokens
