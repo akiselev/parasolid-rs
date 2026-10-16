@@ -788,7 +788,99 @@ pub fn boolean_options_merge_flags() -> R {
             unite(seamed()?, block(20.0, 10.0)?, m, s)?,
             unite(seamed()?, block(15.0, 20.0)?, m, s)?,
         );
-        assert_eq!(got, (abut, overlap, chain, on_seam), "merge_imprinted={m} selective_merge={s}");
+        assert_eq!(
+            got,
+            (abut, overlap, chain, on_seam),
+            "merge_imprinted={m} selective_merge={s}"
+        );
     }
+    Ok(())
+}
+
+// -----------------------------------------------------------------------------
+// BooleanOptions matched_region @24: PK_boolean_match_o_t is version 5
+// -----------------------------------------------------------------------------
+
+/// parasolid-re item n. The binding had the 48-byte match layout right (the
+/// journal `PKU_journal_boolean_match_o` @0x18049b3b0 reads exactly it), but
+/// it is **version 5**: a version-1 struct of this shape returns
+/// `PK_ERROR_system_error`, and with `auto_match` set versions 1..=4 fault.
+/// Measured live (2026-10-16, DLL c900fa3f…63073) on 10 mm blocks whose
+/// facing x faces are `gap` apart:
+/// - gap 5e-4: no options → `no_clash`, two bodies; a face/face overlap
+///   region with tolerance 1e-3 → one body, F=10, and its tolerant edges
+///   carry exactly 1e-3; tolerance 1e-4 → `no_clash`;
+/// - gap 2e-5: auto style alone → `no_clash`; auto with `auto_match_tol`
+///   1.5e-5 → `no_clash`; 2.5e-5 → one body, F=10.
+pub fn boolean_options_matched_region() -> R {
+    assert_eq!(std::mem::size_of::<PK_boolean_match_o_t>(), 48);
+    assert_eq!(PK_boolean_match_o_t::default().o_t_version, 5);
+    let _s = Session::start(cfg())?;
+    let pair = |gap: f64| -> Result<(Body, Body, i32, i32), Box<dyn Error>> {
+        let a = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        let b = Body::create_solid_block(10.0, 10.0, 10.0)?;
+        translate(&b, 10.0 + gap, 0.0, 0.0)?;
+        let face_at = |body: &Body, x: f64| -> Result<i32, Box<dyn Error>> {
+            for f in body.faces()? {
+                if let Ok(p) = f.surf()?.ask_plane() {
+                    if (p.basis.origin.x - x).abs() < 1e-9 && p.basis.axis.x.abs() > 0.5 {
+                        return Ok(f.tag());
+                    }
+                }
+            }
+            Err(format!("no x={x} face").into())
+        };
+        let (fa, fb) = (face_at(&a, 5.0)?, face_at(&b, 5.0 + gap)?);
+        Ok((a, b, fa, fb))
+    };
+    // (result, n_bodies, faces of the first body, largest edge precision)
+    type Row = (BooleanResult, usize, usize, f64);
+    let run = |gap: f64, o: BooleanOptions| -> Result<Row, Box<dyn Error>> {
+        let (a, b, _, _) = pair(gap)?;
+        summarise(boolean_detailed(a, vec![b], BooleanOp::Unite, &o)?)
+    };
+    fn summarise(out: BooleanOutcome) -> Result<Row, Box<dyn Error>> {
+        let mut maxp = 0.0f64;
+        for b in &out.bodies {
+            assert!(b.check()?.is_empty(), "body check");
+            for e in b.edges()? {
+                if let Ok(p) = e.precision() {
+                    maxp = maxp.max(p);
+                }
+            }
+        }
+        let f = match out.bodies.first() {
+            Some(b) => b.faces()?.len(),
+            None => 0,
+        };
+        Ok((out.result, out.bodies.len(), f, maxp))
+    }
+    let region = |gap: f64, tol: f64| -> Result<Row, Box<dyn Error>> {
+        let (a, b, fa, fb) = pair(gap)?;
+        let o = BooleanOptions::new().match_region(MatchedRegion {
+            target: fa,
+            tool: fb,
+            match_type: MatchType::Overlap,
+            tolerance: tol,
+        });
+        summarise(boolean_detailed(a, vec![b], BooleanOp::Unite, &o)?)
+    };
+    let apart = |r: Row| r.0 == BooleanResult::NoClash && r.1 == 2;
+    let united = |r: Row| r.0 == BooleanResult::Success && (r.1, r.2) == (1, 10);
+
+    let r = run(5e-4, BooleanOptions::new())?;
+    assert!(apart(r), "gap 5e-4, no options: {r:?}");
+    let r = region(5e-4, 1e-3)?;
+    assert!(united(r), "gap 5e-4, region 1e-3: {r:?}");
+    assert_eq!(r.3, 1e-3, "tolerant edges carry the region tolerance");
+    let r = region(5e-4, 1e-4)?;
+    assert!(apart(r), "gap 5e-4, region 1e-4: {r:?}");
+
+    let r = run(2e-5, BooleanOptions::new().auto_match(None))?;
+    assert!(apart(r), "gap 2e-5, auto: {r:?}");
+    let r = run(2e-5, BooleanOptions::new().auto_match(Some(1.5e-5)))?;
+    assert!(apart(r), "gap 2e-5, auto 1.5e-5: {r:?}");
+    let r = run(2e-5, BooleanOptions::new().auto_match(Some(2.5e-5)))?;
+    assert!(united(r), "gap 2e-5, auto 2.5e-5: {r:?}");
     Ok(())
 }

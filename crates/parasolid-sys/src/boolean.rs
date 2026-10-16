@@ -412,6 +412,11 @@ pub const PK_pattern_status_face_clash_c: PK_pattern_status_t = 21325;
 /// (stride 0x18 = 24 bytes). The journal reads a version tag at element offset 0
 /// (`FUN_180a74d60`) before the `regions[2]` pair — the old binding omitted it,
 /// so every element after the first was read one field early.
+///
+/// The only accepted `o_t_version` is **1** (0 and 2 give
+/// `PK_ERROR_o_t_version_unknown`, dynamic-observed 2026-10-16). With a
+/// face/face `overlap` pair the Boolean's tolerant edges carry exactly
+/// `tolerance` (parasolid-test `boolean_options_matched_region`).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_boolean_match_region_o_t {
@@ -427,10 +432,18 @@ pub struct PK_boolean_match_region_o_t {
 
 /// Matched-region sub-structure for booleans.
 ///
-/// layout: PKU_journal_boolean_match_o. The journal reads `o_t_version` @0
-/// (`FUN_180a74d60`) as the first field — the old binding omitted it, shifting
-/// every field down by one slot (kernel would read `match_style` as the version).
-/// `auto_match` is a 1-byte flag (`PKU_journal_LOGICAL` byte read @8).
+/// layout: PKU_journal_boolean_match_o @0x18049b3b0 (DLL c900fa3f…63073)
+/// reads @0 version, @4 int, @8 byte, @0x10 double, @0x18 int, @0x20 pointer
+/// (24-byte elements), @0x28 int. The old binding omitted `o_t_version`,
+/// shifting every field down by one slot.
+///
+/// **This layout is version 5**, the current one: `PK_BODY_boolean_2`'s
+/// NULL-options branch (`FUN_18049b860`) allocates 0x30 bytes and writes
+/// version 5 with the defaults in [`Default`]. Version 6 gives
+/// `PK_ERROR_o_t_version_unknown`. Versions 1..=4 are older layouts, not
+/// prefixes of this one: with this struct, version 1 returns
+/// `PK_ERROR_system_error` and versions 1..=4 with `auto_match` set fault on
+/// address 0x1 (dynamic-observed 2026-10-16).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_boolean_match_o_t {
@@ -449,6 +462,33 @@ pub struct PK_boolean_match_o_t {
     /// Version compatibility. // @40
     pub update: c_int,
 } // 48 bytes
+
+/// `update` default (0x5b5f), from `FUN_18049b860`.
+pub const PK_boolean_match_update_dflt_c: c_int = 23391;
+/// `update` value for the original behaviour (0x5b5e).
+pub const PK_boolean_match_update_0_c: c_int = 23390;
+
+const _: () = assert!(std::mem::size_of::<PK_boolean_match_o_t>() == 48);
+const _: () = assert!(std::mem::offset_of!(PK_boolean_match_o_t, auto_match_tol) == 16);
+const _: () = assert!(std::mem::offset_of!(PK_boolean_match_o_t, match_regions) == 32);
+const _: () = assert!(std::mem::size_of::<PK_boolean_match_region_o_t>() == 24);
+const _: () = assert!(std::mem::offset_of!(PK_boolean_match_region_o_t, tolerance) == 16);
+
+impl Default for PK_boolean_match_o_t {
+    /// The kernel's own default (`FUN_18049b860`): version 5, basic style, no
+    /// auto tolerance, no regions, `update` default.
+    fn default() -> Self {
+        Self {
+            o_t_version: 5,
+            match_style: PK_boolean_match_style_basic_c,
+            auto_match: 0,
+            auto_match_tol: 0.0,
+            n_match_regions: 0,
+            match_regions: std::ptr::null(),
+            update: PK_boolean_match_update_dflt_c,
+        }
+    }
+}
 
 // =============================================================================
 // Face overflow sub-structure

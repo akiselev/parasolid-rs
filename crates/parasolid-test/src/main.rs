@@ -7372,6 +7372,9 @@ fn main() {
     test!("boolean_options_merge_flags", {
         abi_audit::boolean_options_merge_flags()?;
     });
+    test!("boolean_options_matched_region", {
+        abi_audit::boolean_options_matched_region()?;
+    });
     // PK_CURVE_intersect_curve returns no vectors and no error when its solver
     // gives up, and reports tangencies as simple_c (parasolid-re P1 B12). The
     // checked call must tell a genuine miss from a silent one and mark tangency.
