@@ -7714,6 +7714,138 @@ fn main() {
         assert!(r.empty.is_none());
     });
 
+    // PK_SURF_intersect_curve drops a hit whose curve point lies more than
+    // max(1e-7, L) outside the size box on some axis, tested as
+    // (p - hi) > tol (parasolid-re P1 C478, fixtures p1-o1-*; artifacts
+    // rs/20261016T224413Z-margin). Plane z = 0, line along z through (X, 0, 0).
+    fn o1_plane_line(x_bits: u64) -> PsResult<(Surf, Curve)> {
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let pl = Surf::plane(Axis2::new(Vec3::zero(), z, Vec3::new(1.0, 0.0, 0.0)))?;
+        let line = Curve::line(Vec3::new(f64::from_bits(x_bits), 0.0, 0.0), z)?;
+        Ok((pl, line))
+    }
+    test!("surf_curve_checked_size_box_margin", {
+        let _s = Session::start(test_config())?;
+        let h = SurfIntersectOptions::default().search_region()?.max.x;
+        assert_eq!(h.to_bits(), 0x407f400000000001);
+        let iv = (-10.0, 10.0);
+        let chk = SurfCurveCheck::default();
+
+        // Beyond the box by 5e-8 and by 9.999996564e-8 (the last kept double),
+        // both in (L, 1e-7]: the kernel keeps the hit.
+        // p1-o1-pla-line-xhi-p0p5T, p1-o1-pla-line-xhi-edge-keep.
+        for bits in [0x407f4000000d6bfa, 0x407f4000001ad7f3] {
+            let (pl, line) = o1_plane_line(bits)?;
+            let r = pl.intersect_curve_checked(&line, iv, &chk)?;
+            assert_eq!(
+                r.hits.len(),
+                1,
+                "x {:e} beyond: {r:?}",
+                f64::from_bits(bits) - h
+            );
+            assert_eq!(r.hits[0].position.x.to_bits(), bits);
+            assert!(r.empty.is_none());
+        }
+
+        // The next double, 1.00000022e-7 beyond: dropped, and the witness is
+        // outside the region at the default margin 1e-7. Forming hi + 1e-7
+        // would round up past X and call it inside (Suspect).
+        // p1-o1-pla-line-xhi-edge-next-drop.
+        let (pl, line) = o1_plane_line(0x407f4000001ad7f4)?;
+        println!();
+        for c in [
+            chk,
+            SurfCurveCheck {
+                region_margin: Some(1e-7),
+                ..chk
+            },
+        ] {
+            let r = pl.intersect_curve_checked(&line, iv, &c)?;
+            println!("    next-drop, margin {:?}: {:?}", c.region_margin, r.empty);
+            assert!(r.hits.is_empty());
+            match r.empty {
+                Some(RangeCheck::OutsideRegion {
+                    min_distance,
+                    position,
+                }) => assert!(min_distance == 0.0 && position.x.to_bits() == 0x407f4000001ad7f4),
+                other => panic!("expected OutsideRegion, got {other:?}"),
+            }
+        }
+
+        // 2e-7 beyond: dropped, outside the region. p1-o1-pla-line-xhi-p2T.
+        let (pl, line) = o1_plane_line(0x407f40000035afe6)?;
+        let r = pl.intersect_curve_checked(&line, iv, &chk)?;
+        assert!(r.hits.is_empty());
+        assert!(matches!(r.empty, Some(RangeCheck::OutsideRegion { .. })));
+    });
+    test!("surf_curve_checked_tolerance_in_margin_band", {
+        // A line 5e-7 (50 L) beside the sphere of p1-o1-sph-line-xhi-p0p5T,
+        // whose near point is 5e-8 beyond the box. No hit at L; with the check
+        // tolerance 1e-6 they meet at a point where the kernel would have kept
+        // a hit, so the empty answer is not a region drop: Suspect (a
+        // tolerance disagreement). A margin of L called it OutsideRegion.
+        let _s = Session::start(test_config())?;
+        let iv = (-10.0, 10.0);
+        let chk = SurfCurveCheck::default();
+        let sp = Surf::sphere(
+            Axis2::new(
+                Vec3::new(f64::from_bits(0x407f5000000d6bfa), 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 1.0),
+                Vec3::new(1.0, 0.0, 0.0),
+            ),
+            1.0,
+        )?;
+        let near = f64::from_bits(0x407f5000000d6bfa) - 1.0;
+        let beside = Curve::line(Vec3::new(near - 5e-7, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0))?;
+        let wide = SurfCurveCheck {
+            tolerance: Some(1e-6),
+            ..chk
+        };
+        let r = sp.intersect_curve_checked(&beside, iv, &wide)?;
+        println!("\n    sphere 5e-7 aside, tolerance 1e-6: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        match r.empty {
+            Some(RangeCheck::Suspect {
+                min_distance,
+                position,
+                ..
+            }) => assert!(
+                (min_distance - 5e-7).abs() < 1e-12 && (position.x - near).abs() < 1e-9,
+                "{min_distance:e} at {position:?}"
+            ),
+            other => panic!("expected Suspect, got {other:?}"),
+        }
+    });
+    test!("surf_curve_checked_size_box_margin_follows_l", {
+        // At L = 1e-6 (h = 50000) the margin is L, not 1e-7.
+        let _s = Session::start(test_config().precision(1e-6))?;
+        let h = SurfIntersectOptions::default().search_region()?.max.x;
+        assert_eq!(h, 50000.0);
+        let iv = (-10.0, 10.0);
+        let chk = SurfCurveCheck::default();
+
+        // 5e-7 beyond: kept (a fixed 1e-7 would drop it).
+        // p1-o1-pla-line-xhi-p0p5T-L1e-6.
+        let (pl, line) = o1_plane_line(0x40e86a0000010c6f)?;
+        let r = pl.intersect_curve_checked(&line, iv, &chk)?;
+        assert_eq!(r.hits.len(), 1, "{r:?}");
+        assert!(r.empty.is_none());
+
+        // The first dropped double, 1.0000003e-6 beyond: outside the region.
+        // hi + L rounds up past X, so the widened-box form called it Suspect.
+        // p1-o1-pla-line-xhi-edge-next-drop-L1e-6.
+        let (pl, line) = o1_plane_line(0x40e86a00000218df)?;
+        let r = pl.intersect_curve_checked(&line, iv, &chk)?;
+        println!("\n    L 1e-6 next-drop: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        match r.empty {
+            Some(RangeCheck::OutsideRegion { position, .. }) => {
+                assert_eq!(position.x.to_bits(), 0x40e86a00000218df)
+            }
+            other => panic!("expected OutsideRegion, got {other:?}"),
+        }
+    });
+
     // =========================================================================
     // P1 budgets: a runaway PK call returns BudgetExceeded (parasolid-re B23)
     // =========================================================================

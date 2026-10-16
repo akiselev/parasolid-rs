@@ -114,7 +114,10 @@ pub struct CheckedCurveCurve {
 ///
 /// The search region is [`SurfIntersectOptions::search_region`]: the option
 /// box when one is given, else the session size box [-h, h]^3 with
-/// h = 0.5 * L / A, each side widened by the check's `region_margin`.
+/// h = 0.5 * L / A. A witness counts as inside it when it lies no more than
+/// the check's `region_margin` beyond it on every axis; the margin and the
+/// form of that test follow the kernel's own drop for each call (see
+/// [`SurfCurveCheck::region_margin`] and [`SurfSurfCheck::region_margin`]).
 /// parasolid-re `artifacts/rs/20261016T203058Z-empty-check` has the evidence.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum RangeCheck {
@@ -163,9 +166,9 @@ pub enum RangeCheck {
     /// curve or a patch that also crosses the region, the witness can still
     /// fall outside it, so this does not prove that nothing was missed inside
     /// the region. An oracle should accept it only when its own answer also
-    /// has no contact inside the region. On surf/curve the kernel keeps hits a
-    /// little further out than L (measured: up to 1e-7 beyond the size box at
-    /// L = 1e-8, none at 1.5e-7); raise `region_margin` to cover that band.
+    /// has no contact inside the region. On surf/curve the region is the size
+    /// box with the kernel's drop tolerance max(1e-7, L), not L
+    /// ([`SurfCurveCheck::region_margin`], parasolid-re P1 C478).
     OutsideRegion { min_distance: f64, position: Vec3 },
     /// `PK_GEOM_range` did not find a distance (raw `PK_range_result_t`), or
     /// it or `PK_SURF_ask_uvbox` failed with this PK error code (negated);
@@ -179,10 +182,34 @@ pub struct SurfCurveCheck {
     /// Distance at or below which the surface and curve count as meeting when
     /// an empty answer is checked. `None` = the session linear precision.
     pub tolerance: Option<f64>,
-    /// How far beyond the search region a witness may lie and still count as
-    /// inside it. `None` = the session linear precision.
+    /// How far beyond the size box a witness may lie, on any one axis, and
+    /// still count as inside it. `None` = max(1e-7, L), the tolerance of the
+    /// kernel's own drop (parasolid-re P1 C478).
+    ///
+    /// `PK_SURF_intersect_curve` drops a hit in `process_results` @0x1809641a0
+    /// when `COI_pvec_box` @0x180831b60 places its curve point outside the
+    /// size box, with tol = maxsd(1e-7 [0x183f5b9c0 = 0x3e7ad7f29abcaf48], L)
+    /// (asm 0x1809646aa-0x1809646ae). The point is outside iff one of
+    /// p.x - xhi, xlo - p.x, p.y - yhi, ylo - p.y, p.z - zhi, zlo - p.z is
+    /// greater than tol: each is one subtraction, then the compare, and no
+    /// widened box is formed (static-observed). The check tests the witness
+    /// the same way, so this margin is per axis, absolute, and not a
+    /// distance. Measured at the last kept double and the next one on all six
+    /// faces, at L = 1e-8, 1e-7 and 1e-6; at L = 1e-6 a hit 5e-7 out is kept
+    /// (dynamic-observed; fixtures `p1-o1-*`, parasolid-re
+    /// `artifacts/port/P1-ssi-dispatch/20261016T221723Z-o1o2`).
+    ///
+    /// The search region is always the size box here: the kernel ignores an
+    /// option box on this call. With `have_box` set it overwrites the box
+    /// with `QSU_box` of the surface (0x180418b7d), so a plane, cylinder or
+    /// cone drops nothing and a sphere or torus drops hits outside its own box
+    /// (parasolid-re P1 C479).
     pub region_margin: Option<f64>,
 }
+
+/// `COI_pvec_box`'s tolerance floor for `PK_SURF_intersect_curve` hits
+/// (`process_results`, .rdata 0x183f5b9c0; parasolid-re P1 C478).
+const PVEC_BOX_TOL_FLOOR: f64 = f64::from_bits(0x3e7ad7f29abcaf48);
 
 /// Result of [`Surf::intersect_curve_checked`].
 #[derive(Debug, Clone)]
@@ -201,6 +228,13 @@ pub struct SurfSurfCheck {
     /// How far beyond the search region a witness may lie and still count as
     /// inside it. `None` = the session linear precision, the margin of the
     /// kernel's own box tests (C467 `BOX_intersect_boxes`, C2 `COI_surface_box`).
+    ///
+    /// The witness is tested against the region widened by the margin,
+    /// lo - m <= p <= hi + m. That is C2's form: `COI_surface_box` widens the
+    /// box in place by L per side before evaluating the surface over it
+    /// (static-observed). C467 compares the surfaces' boxes, not a point.
+    /// Neither tests a point, so the witness test is a proxy for both; it is
+    /// not the surf/curve test ([`SurfCurveCheck::region_margin`]).
     pub region_margin: Option<f64>,
 }
 
@@ -257,15 +291,54 @@ fn own_uvbox(surf: PK_ENTITY_t) -> Result<ParamBound, i32> {
     }
 }
 
+/// How [`check_range`] places a witness against the search region.
+#[derive(Debug, Clone, Copy)]
+enum RegionTest {
+    /// `COI_pvec_box` @0x180831b60 (surf/curve, C478): outside iff some
+    /// p - hi or lo - p is greater than the margin.
+    PvecBox,
+    /// The region widened by the margin, lo - m <= p <= hi + m (surf/surf,
+    /// C2 `COI_surface_box`).
+    Widened,
+}
+
+impl RegionTest {
+    // The negated compares are the asm's: a NaN difference is not greater
+    // than the margin, so it counts as inside.
+    #[allow(clippy::neg_cmp_op_on_partial_ord)]
+    fn inside(self, p: Vec3, region: Aabb, m: f64) -> bool {
+        let (lo, hi) = (region.min, region.max);
+        match self {
+            // COI_pvec_box's order: x hi, x lo, y hi, y lo, z hi, z lo.
+            RegionTest::PvecBox => {
+                !(p.x - hi.x > m)
+                    && !(lo.x - p.x > m)
+                    && !(p.y - hi.y > m)
+                    && !(lo.y - p.y > m)
+                    && !(p.z - hi.z > m)
+                    && !(lo.z - p.z > m)
+            }
+            RegionTest::Widened => {
+                let w = |p: f64, lo: f64, hi: f64| p >= lo - m && p <= hi + m;
+                w(p.x, lo.x, hi.x) && w(p.y, lo.y, hi.y) && w(p.z, lo.z, hi.z)
+            }
+        }
+    }
+}
+
 /// Minimum distance between `g1` and `g2`, classified against `tol` and the
-/// search region widened by `margin`.
+/// search region with `margin` (placed by `test`).
 ///
 /// The first `PK_GEOM_range` uses `bounds`. With no parameter bound, the kernel
-/// sometimes cuts an unbounded surface to the session size box (a plane against
-/// a line: distance 1500 to a line crossing it at x = 2000) and sometimes not (a
-/// plane against a sphere, a cylinder against a plane), so a distance above `tol`
-/// is not yet a miss. It is repeated with `full` (every surface bounded by its
-/// own uvbox), which removes the cut; the smaller distance wins.
+/// confines each entity to a box when a curve is in the pair, and not for two
+/// surfaces (parasolid-re P1 C480, `artifacts/port/P1-ssi-dispatch/
+/// 20261016T221723Z-o1o2`): an unbounded plane or cylinder to the session size
+/// box, so a plane against a line crossing it at x = 2000 gives distance 1500,
+/// and a cylinder against such a line can give `PK_range_result_upper_c`
+/// instead of a distance. A distance above `tol` or a failed first pass is
+/// therefore not yet a miss. It is repeated with `full` (every surface bounded
+/// by its own uvbox), which removes the cut; the smaller distance wins.
+#[allow(clippy::too_many_arguments)]
 fn check_range(
     g1: PK_ENTITY_t,
     g2: PK_ENTITY_t,
@@ -274,6 +347,7 @@ fn check_range(
     tol: f64,
     region: Aabb,
     margin: f64,
+    test: RegionTest,
 ) -> RangeCheck {
     let first = geom_range(g1, g2, bounds);
     let r = match first {
@@ -293,12 +367,7 @@ fn check_range(
         };
     }
     let position = Vec3::from_pk(r.end_1.position);
-    let (lo, hi) = (region.min, region.max);
-    let inside = |p: f64, lo: f64, hi: f64| p >= lo - margin && p <= hi + margin;
-    if inside(position.x, lo.x, hi.x)
-        && inside(position.y, lo.y, hi.y)
-        && inside(position.z, lo.z, hi.z)
-    {
+    if test.inside(position, region, margin) {
         RangeCheck::Suspect {
             min_distance: r.distance,
             position,
@@ -329,7 +398,8 @@ impl SurfIntersectOptions {
     /// x = 700 that the default ±500 box drops; L = 1e-7 or A = 1e-10 moves the
     /// size box to ±5000 or ±50 (dynamic-observed; parasolid-re
     /// `artifacts/rs/20261016T203058Z-empty-check`). `PK_SURF_intersect_curve`
-    /// drops hits beyond the same size box.
+    /// drops hits beyond the same size box (with tolerance max(1e-7, L)), but
+    /// ignores an option box (P1 C479), so its region is always the size box.
     pub fn search_region(&self) -> PsResult<Aabb> {
         if let Some(b) = self.region {
             return Ok(b);
@@ -559,9 +629,11 @@ impl Surf {
     /// `PK_GEOM_range` (surface, curve over `interval`) ([`RangeCheck`]).
     ///
     /// The kernel returns nothing and no error for a curve that crosses the
-    /// surface outside the session size box (measured: a line crossing the
-    /// plane z = 0 at x = 2000), so an empty answer is not evidence of a miss.
-    /// The witness is placed against the size box; the surface comes first, so
+    /// surface more than max(1e-7, L) outside the session size box on some
+    /// axis (measured: a line crossing the plane z = 0 at x = 2000; P1 C478),
+    /// so an empty answer is not evidence of a miss. The witness is placed
+    /// against the size box by the kernel's own test
+    /// ([`SurfCurveCheck::region_margin`]); the surface comes first, so
     /// `params_1` are `(u, v)` and `params_2` is `[t, 0.0]`.
     pub fn intersect_curve_checked(
         &self,
@@ -584,7 +656,13 @@ impl Surf {
                 || Ok([own_uvbox(self.tag())?, bound]),
                 check.tolerance.unwrap_or(l),
                 region,
-                check.region_margin.unwrap_or(l),
+                // maxsd(1e-7, L), as at asm 0x1809646ae.
+                check.region_margin.unwrap_or(if PVEC_BOX_TOL_FLOOR > l {
+                    PVEC_BOX_TOL_FLOOR
+                } else {
+                    l
+                }),
+                RegionTest::PvecBox,
             ))
         } else {
             None
@@ -653,6 +731,7 @@ impl Surf {
                 check.tolerance.unwrap_or(l),
                 region,
                 check.region_margin.unwrap_or(l),
+                RegionTest::Widened,
             ))
         } else {
             None
