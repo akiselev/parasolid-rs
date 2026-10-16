@@ -178,11 +178,13 @@ impl Edge {
         Ok(array.iter().map(|&tag| crate::Fin::from_tag(tag)).collect())
     }
 
-    /// The manifold classification of this edge (wireframe/laminar/normal/general).
+    /// The vertex classification of this edge (open/closed/ring): the `vertex_type` field of
+    /// `PK_EDGE_ask_type_t`. The manifold classification (wireframe/laminar/normal/general) is its
+    /// `fins_type` field, which this method does not return.
     pub fn edge_type(&self) -> PsResult<EdgeType> {
-        let mut t: PK_EDGE_type_t = 0;
+        let mut t = PK_EDGE_ask_type_t::default();
         pk_call!(PK_EDGE_ask_type(self.tag, &mut t));
-        Ok(EdgeType::from_raw(t))
+        Ok(EdgeType::from_raw(t.vertex_type))
     }
 
     /// The first fin of this edge (cheaper than [`fins`](Self::fins) when only one is needed).

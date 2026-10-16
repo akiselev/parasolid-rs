@@ -75,6 +75,25 @@ pub const PK_LOOP_type_error_c: PK_LOOP_type_t = 5419;
 
 pub type PK_EDGE_type_t = c_int;
 
+/// Results of `PK_EDGE_ask_type`: three independent classifications (V35
+/// header `pk_edge_ask_type.html`: `vertex_type`, `enclosure`, `fins_type`).
+///
+/// The function writes all 12 bytes. Declaring the out-argument as a single
+/// `PK_EDGE_type_t` let the kernel overwrite 8 bytes of the caller's stack: in
+/// the release-profile harness the saved `rsi` of the caller became
+/// `0x00000E76_00001647` (`fins_type` 3702 normal, `enclosure` 5703 on) and the
+/// next call page-faulted (parasolid-re artifacts/rs/20261016T213201Z-budget, O3).
+#[repr(C)]
+#[derive(Debug, Clone, Copy, Default)]
+pub struct PK_EDGE_ask_type_t {
+    /// `PK_EDGE_type_open_c` / `_closed_c` / `_ring_c`.
+    pub vertex_type: PK_EDGE_type_t,
+    /// `PK_enclosure_inside_c` / `_outside_c` / `_on_c`.
+    pub enclosure: crate::PK_enclosure_t,
+    /// `PK_EDGE_type_wireframe_c` / `_laminar_c` / `_normal_c` / `_general_c`.
+    pub fins_type: PK_EDGE_type_t,
+}
+
 // Edge vertex-topology (what PK_EDGE_ask_type actually returns): open (distinct
 // end vertices, e.g. a block edge), closed (one shared vertex, e.g. a full
 // circle), ring (no vertices).
@@ -447,8 +466,12 @@ unsafe extern "C" {
     /// Return the first fin of an edge.
     pub fn PK_EDGE_ask_first_fin(edge: PK_EDGE_t, fin: *mut PK_FIN_t) -> PK_ERROR_code_t;
 
-    /// Return the edge type (wireframe/laminar/normal/general).
-    pub fn PK_EDGE_ask_type(edge: PK_EDGE_t, etype: *mut PK_EDGE_type_t) -> PK_ERROR_code_t;
+    /// Return the edge's vertex type, enclosure and fins type (a 12-byte
+    /// results structure, not a single token).
+    pub fn PK_EDGE_ask_type(
+        edge: PK_EDGE_t,
+        edge_types: *mut PK_EDGE_ask_type_t,
+    ) -> PK_ERROR_code_t;
 
     /// Return the curve attached to an edge.
     pub fn PK_EDGE_ask_curve(edge: PK_EDGE_t, curve: *mut PK_CURVE_t) -> PK_ERROR_code_t;
