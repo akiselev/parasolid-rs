@@ -2470,9 +2470,9 @@ fn main() {
     });
 
     test!("facet_block_triangles", {
-        // PK_TOPOL_facet_2 (option version 5): tessellate a block. A box has 6
-        // quad faces → 12 triangles, each with 3 fins = 36 fins. Validates both
-        // option sub-structs (control + choice) and the tabular result totals.
+        // PK_TOPOL_facet_2: tessellate a block. A box has 6 quad faces → 12
+        // triangles, each with 3 fins = 36 fins. The tables are checked in
+        // abi_audit::facet_block_tables.
         let _session = Session::start(test_config())?;
         let block = Body::create_solid_block(4.0, 4.0, 4.0)?;
         let mesh = block.facet()?;
@@ -7374,6 +7374,23 @@ fn main() {
     });
     test!("boolean_options_matched_region", {
         abi_audit::boolean_options_matched_region()?;
+    });
+    // PK_TOPOL_facet_2 at option version 26 with the real table ABI
+    // (parasolid-re B-P3-1, port/P3-faceting).
+    test!("facet_v26_layout", {
+        abi_audit::facet_v26_layout()?;
+    });
+    test!("facet_block_tables", {
+        abi_audit::facet_block_tables()?;
+    });
+    test!("facet_cylinder_default_16_chords", {
+        abi_audit::facet_cylinder_default_16_chords()?;
+    });
+    test!("facet_chord_angle_band", {
+        abi_audit::facet_chord_angle_band()?;
+    });
+    test!("facet_boundary_fins_on_edge_polylines", {
+        abi_audit::facet_boundary_fins_on_edge_polylines()?;
     });
     // PK_CURVE_intersect_curve returns no vectors and no error when its solver
     // gives up, and reports tangencies as simple_c (parasolid-re P1 B12). The

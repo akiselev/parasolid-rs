@@ -1,168 +1,583 @@
-//! Faceting / tessellation — `PK_TOPOL_facet_2`.
+//! Faceting / tessellation — `PK_TOPOL_facet_2` with the version-26 options.
 //!
-//! Produces a triangle mesh of a body's faces via Parasolid's tabular faceting
-//! API. This is the bridge to mesh-based validation (e.g. comparing against a
-//! reference mesh from a CAD dataset). [`Body::facet`] returns a [`Mesh`] with
-//! the vertex positions and the total facet (triangle) count.
+//! [`Body::facet_with`] and [`Face::facet_with`] return a [`Mesh`]: a shared point
+//! table, triangles as point indices, the face of each triangle, and one polyline
+//! per model edge (indices into the same point table, so a watertightness check
+//! can compare both sides of an edge). [`FacetOptions`] exposes the tolerances;
+//! [`Mesh::tolerances`] records the tolerances after the kernel's defaulting,
+//! computed by the recovered rule (the kernel has no query for them). Any
+//! non-zero return code is an error.
 //!
-//! The two option sub-structures (`control` = mesh generation, `choice` = which
-//! output tables) are initialised with the same defaults Parasolid's
-//! `PK_TOPOL_facet_2_o_m` macro would set — recovered from the RE enum catalog.
+//! # ABI (parasolid-re `port/P3-faceting`, pskernel.dll `c900fa3f…63073`)
 //!
-//! # Option versioning (recovered empirically)
-//!
-//! `PK_TOPOL_facet_2` accepts option `o_t_version` **5** on this kernel
-//! (V37.01.243): 1..4 return 5022 (`o_t_version_unknown`), 6+ return 5014
-//! (`field_of_wrong_type`). The `PK_TOPOL_facet_mesh_2_o_t` (384 B) and
-//! `PK_TOPOL_facet_choice_2_o_t` (72 B with 1-byte logicals) layouts are locked by compile-time
-//! offset assertions in `parasolid-sys` (they previously omitted `o_t_version`
-//! and, for choice, all 23 table-selection flags — never runtime-validated, so
-//! the bugs survived). At version 5 the control struct matches the catalog only
-//! through `wire_edges`; the `incremental_*` and later fields must stay zero
-//! (setting them returns 908, "bad option data"). See [`default_control`].
+//! Both option sub-structs are stamped version 26 (mesh 0x198 B, choice 0x50 B;
+//! see `parasolid_sys::PK_TOPOL_facet_mesh_2_o_t`). The result is 24 bytes
+//! `{n_facets, n_strips, n_fins, n_tables, tables*}`; each table entry is
+//! `{fctab, table*}` and each table `{data*, length}`. Until 2026-10-16 this module
+//! stamped version 5, whose prefix has no table flags, and read a fictional
+//! by-value table struct, so no vertex was ever returned.
 
+use std::collections::{BTreeMap, HashMap, HashSet};
 use std::os::raw::c_int;
 
 use parasolid_sys::*;
 
 use crate::body::Body;
+use crate::edge::Edge;
 use crate::entity::Entity;
 use crate::error::PsResult;
+use crate::face::Face;
 use crate::geom::Vec3;
 
-// --- PK_facet_* default enum tokens, per ch105 documented defaults -----------
-const PK_FACET_SHAPE_CONVEX_C: c_int = 20502;
-const PK_FACET_MATCH_TOPOL_C: c_int = 20522;
-const PK_FACET_DENSITY_NO_VIEW_C: c_int = 20540;
-const PK_FACET_CULL_NONE_C: c_int = 20560;
-const PK_FACET_WIRE_EDGES_NO_C: c_int = 22140;
-const PK_FACET_IGNORE_NO_C: c_int = 22111;
-const PK_FACET_IGNORE_SCOPE_GLOBAL_C: c_int = 22131;
-const PK_FACET_SMP_NO_C: c_int = 24110;
-const PK_FACET_CONSISTENT_PARMS_NO_C: c_int = 22510;
-const PK_FACET_PT_REPORT_NO_C: c_int = 24570;
+/// Default curve-chord and surface-plane angle (rad) the kernel applies when no
+/// tolerance of that group is given (`FCT_facet` @0x180e6d46e loads 0.4 from
+/// 0x183fd5188). Probed: a cylinder of any radius gets 16 chords per circle.
+pub const FACET_DEFAULT_ANGLE: f64 = 0.4;
 
-/// A triangle mesh produced by [`Body::facet`].
+/// How the meshes of neighbouring faces are joined (`match` field).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum FacetMatch {
+    /// One point set per model edge, shared by both faces, with co-fins across
+    /// faces (`PK_facet_match_topol_c`, the kernel default).
+    #[default]
+    Topology,
+    /// Shared points but no co-fins across faces (`PK_facet_match_geom_c`).
+    Geometry,
+    /// Separate points per face (`PK_facet_match_trimmed_c`; probed in
+    /// parasolid-re `port/P3-faceting` C15, the token's exact meaning is open).
+    Trimmed,
+}
+
+impl FacetMatch {
+    fn token(self) -> PK_facet_match_t {
+        match self {
+            FacetMatch::Topology => PK_facet_match_topol_c,
+            FacetMatch::Geometry => PK_facet_match_geom_c,
+            FacetMatch::Trimmed => PK_facet_match_trimmed_c,
+        }
+    }
+}
+
+/// Faceting tolerances. `None` leaves a field to the kernel (`is_X = false`).
+///
+/// Lengths are model units, angles radians. The kernel refuses (1043
+/// `PK_ERROR_bad_tolerance`) a length at or below session precision, a negative
+/// value, or an angle above π/2; it refuses widths at or below precision (5026)
+/// and `min_facet_width > max_facet_width` (5145).
+#[derive(Debug, Clone, Copy, PartialEq, Default)]
+pub struct FacetOptions {
+    /// Max distance from an edge chord to its curve.
+    pub curve_chord_tol: Option<f64>,
+    /// Max edge chord length.
+    pub curve_chord_max: Option<f64>,
+    /// Max chord angle: the sum of the two angles between a chord and the curve
+    /// tangents at its ends (the arc angle of a circle chord).
+    pub curve_chord_ang: Option<f64>,
+    /// Max distance from a facet to its surface.
+    pub surface_plane_tol: Option<f64>,
+    /// Max angle between facet and surface normals.
+    pub surface_plane_ang: Option<f64>,
+    /// Facets narrower than this are not refined further.
+    pub min_facet_width: Option<f64>,
+    /// Max facet side length.
+    pub max_facet_width: Option<f64>,
+    /// Matching between neighbouring faces.
+    pub facet_match: FacetMatch,
+}
+
+impl FacetOptions {
+    pub fn new() -> Self {
+        Self::default()
+    }
+    pub fn curve_chord_tol(mut self, v: f64) -> Self {
+        self.curve_chord_tol = Some(v);
+        self
+    }
+    pub fn curve_chord_max(mut self, v: f64) -> Self {
+        self.curve_chord_max = Some(v);
+        self
+    }
+    pub fn curve_chord_ang(mut self, v: f64) -> Self {
+        self.curve_chord_ang = Some(v);
+        self
+    }
+    pub fn surface_plane_tol(mut self, v: f64) -> Self {
+        self.surface_plane_tol = Some(v);
+        self
+    }
+    pub fn surface_plane_ang(mut self, v: f64) -> Self {
+        self.surface_plane_ang = Some(v);
+        self
+    }
+    pub fn min_facet_width(mut self, v: f64) -> Self {
+        self.min_facet_width = Some(v);
+        self
+    }
+    pub fn max_facet_width(mut self, v: f64) -> Self {
+        self.max_facet_width = Some(v);
+        self
+    }
+    pub fn facet_match(mut self, m: FacetMatch) -> Self {
+        self.facet_match = m;
+        self
+    }
+
+    fn to_pk(self) -> PK_TOPOL_facet_2_o_t {
+        let mut o = PK_TOPOL_facet_2_o_t::default();
+        let c = &mut o.control;
+        c.match_ = self.facet_match.token();
+        let set = |flag: &mut PK_LOGICAL_t, val: &mut f64, v: Option<f64>| {
+            if let Some(v) = v {
+                *flag = PK_LOGICAL_true;
+                *val = v;
+            }
+        };
+        set(
+            &mut c.is_min_facet_width,
+            &mut c.min_facet_width,
+            self.min_facet_width,
+        );
+        set(
+            &mut c.is_max_facet_width,
+            &mut c.max_facet_width,
+            self.max_facet_width,
+        );
+        set(
+            &mut c.is_curve_chord_tol,
+            &mut c.curve_chord_tol,
+            self.curve_chord_tol,
+        );
+        set(
+            &mut c.is_curve_chord_max,
+            &mut c.curve_chord_max,
+            self.curve_chord_max,
+        );
+        set(
+            &mut c.is_curve_chord_ang,
+            &mut c.curve_chord_ang,
+            self.curve_chord_ang,
+        );
+        set(
+            &mut c.is_surface_plane_tol,
+            &mut c.surface_plane_tol,
+            self.surface_plane_tol,
+        );
+        set(
+            &mut c.is_surface_plane_ang,
+            &mut c.surface_plane_ang,
+            self.surface_plane_ang,
+        );
+        let t = &mut o.choice;
+        t.facet_fin = PK_LOGICAL_true;
+        t.fin_data = PK_LOGICAL_true;
+        t.data_point_idx = PK_LOGICAL_true;
+        t.point_vec = PK_LOGICAL_true;
+        t.facet_face = PK_LOGICAL_true;
+        t.fin_edge = PK_LOGICAL_true;
+        t.error_object = PK_LOGICAL_true;
+        o
+    }
+
+    /// The tolerances the kernel uses for this request.
+    ///
+    /// Not read back from the kernel (it exposes no query): computed with the
+    /// rules recovered in parasolid-re `port/P3-faceting` (cases C2–C5):
+    /// - no curve tolerance given → `curve_chord_ang = 0.4` (tol and max off);
+    ///   no surface tolerance given → `surface_plane_ang = 0.4` (tol off).
+    ///   Giving any member of a group switches that group's default off
+    ///   (`FCT_facet` @0x180e6cdc0, current-version branch; probed);
+    /// - chord tol, chord max, surface tol and max width below 2 × session
+    ///   precision are raised to it; min width below 1 × precision is raised to it;
+    ///   angles below 2e-6 are raised to 2e-6 (`FUN_1814cedb0`, static only);
+    /// - a chord max longer than the model size (+ precision) is switched off
+    ///   (`FCT_facet`; behaviour-neutral, static only). The kernel's model size is
+    ///   the largest box diagonal; this uses the box of each faceted topology,
+    ///   which for a single face may be smaller than the kernel's.
+    fn effective(&self, precision: f64, model_size: f64) -> FacetTolerances {
+        let floor = |v: Option<f64>, f: f64| v.map(|x| if x > 0.0 && x < f { f } else { x });
+        let ang = |v: Option<f64>| v.map(|x| if x > 0.0 && x < 2e-6 { 2e-6 } else { x });
+        let mut t = FacetTolerances {
+            curve_chord_tol: floor(self.curve_chord_tol, 2.0 * precision),
+            curve_chord_max: floor(self.curve_chord_max, 2.0 * precision),
+            curve_chord_ang: ang(self.curve_chord_ang),
+            surface_plane_tol: floor(self.surface_plane_tol, 2.0 * precision),
+            surface_plane_ang: ang(self.surface_plane_ang),
+            min_facet_width: floor(self.min_facet_width, precision),
+            max_facet_width: floor(self.max_facet_width, 2.0 * precision),
+            facet_match: self.facet_match,
+        };
+        if self.curve_chord_tol.is_none()
+            && self.curve_chord_max.is_none()
+            && self.curve_chord_ang.is_none()
+        {
+            t.curve_chord_ang = Some(FACET_DEFAULT_ANGLE);
+        }
+        if self.surface_plane_tol.is_none() && self.surface_plane_ang.is_none() {
+            t.surface_plane_ang = Some(FACET_DEFAULT_ANGLE);
+        }
+        if let Some(m) = t.curve_chord_max {
+            if m - model_size > precision {
+                t.curve_chord_max = None;
+            }
+        }
+        t
+    }
+}
+
+/// The tolerances a faceting call used, after the kernel's defaulting. `None`
+/// means the control is off. See [`Mesh::tolerances`].
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct FacetTolerances {
+    pub curve_chord_tol: Option<f64>,
+    pub curve_chord_max: Option<f64>,
+    pub curve_chord_ang: Option<f64>,
+    pub surface_plane_tol: Option<f64>,
+    pub surface_plane_ang: Option<f64>,
+    pub min_facet_width: Option<f64>,
+    pub max_facet_width: Option<f64>,
+    pub facet_match: FacetMatch,
+}
+
+/// The facet points along one model edge, as indices into [`Mesh::points`].
+///
+/// Built from the fins of the first face (in `fin_edge` order) that lies on the
+/// edge. With [`FacetMatch::Topology`] the other face uses the same points.
+#[derive(Debug, Clone, PartialEq)]
+pub struct EdgePolyline {
+    pub edge: Edge,
+    /// Points in the sense of that face's fins along the edge. A closed edge (a
+    /// ring) does not repeat its first point.
+    pub points: Vec<u32>,
+    pub closed: bool,
+}
+
+/// One facet fin lying on a model edge: `points` are its tail and head.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct BoundaryFin {
+    pub edge: Edge,
+    pub face: Face,
+    pub points: [u32; 2],
+}
+
+/// A triangle mesh from `PK_TOPOL_facet_2`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Mesh {
-    /// Total number of facets (triangles) generated.
+    /// Facet count reported by the kernel (= `triangles.len()`).
     pub n_facets: usize,
-    /// Total number of facet strips.
     pub n_strips: usize,
-    /// Total number of fins (facet-boundary half-edges): `3 * n_facets` for a
-    /// pure-triangle mesh.
     pub n_fins: usize,
-    /// Vertex positions from the `point_vec` table.
-    ///
-    /// Currently empty: the tabular vertex table requires a facet option version
-    /// newer than the version-5 option layout this kernel accepts through
-    /// `PK_TOPOL_facet_2` (see the module docs). The topology totals above are
-    /// unaffected and validated.
-    pub vertices: Vec<Vec3>,
+    /// Shared point table.
+    pub points: Vec<Vec3>,
+    /// Triangles as indices into `points`, in fin order.
+    pub triangles: Vec<[u32; 3]>,
+    /// The face of each triangle (parallel to `triangles`).
+    pub facet_faces: Vec<Face>,
+    /// One polyline per model edge that has fins, in edge-tag order.
+    pub edges: Vec<EdgePolyline>,
+    /// Every fin on a model edge. With [`FacetMatch::Topology`] both faces'
+    /// fins on an edge use the points of that edge's polyline.
+    pub boundary_fins: Vec<BoundaryFin>,
+    /// `error_object` records `{error, object}`. Seen once in parasolid-re
+    /// `port/P3-faceting` (C18: a body beyond the size box returns no error
+    /// code, no facets and one row); the error values are not decoded.
+    pub faults: Vec<[i32; 2]>,
+    /// The tolerances used, after the kernel's defaulting (computed, see
+    /// [`FacetTolerances`]).
+    pub tolerances: FacetTolerances,
 }
 
-/// The kernel's accepted option version for `PK_TOPOL_facet_2` (V37.01.243).
+impl Mesh {
+    /// The polyline of `edge`, if any fin lies on it.
+    pub fn edge_polyline(&self, edge: Edge) -> Option<&EdgePolyline> {
+        self.edges
+            .binary_search_by_key(&edge.tag(), |p| p.edge.tag())
+            .ok()
+            .map(|i| &self.edges[i])
+    }
+}
+
+/// Copy the kernel's tables out of a facet result (records as flat `i32`/`f64`).
+struct RawTables {
+    ints: HashMap<PK_TOPOL_fctab_t, Vec<i32>>,
+    dbls: HashMap<PK_TOPOL_fctab_t, Vec<f64>>,
+}
+
+/// Ints / doubles per record for the tables this module requests.
+fn record_shape(fctab: PK_TOPOL_fctab_t) -> (usize, usize) {
+    match fctab {
+        PK_TOPOL_fctab_facet_fin_c | PK_TOPOL_fctab_fin_edge_c | PK_TOPOL_fctab_error_object_c => {
+            (2, 0)
+        }
+        PK_TOPOL_fctab_fin_data_c | PK_TOPOL_fctab_data_point_c | PK_TOPOL_fctab_facet_face_c => {
+            (1, 0)
+        }
+        PK_TOPOL_fctab_point_vec_c => (0, 3),
+        _ => (0, 0),
+    }
+}
+
+fn read_tables(r: &PK_TOPOL_facet_2_r_t) -> RawTables {
+    let mut out = RawTables {
+        ints: HashMap::new(),
+        dbls: HashMap::new(),
+    };
+    if r.tables.is_null() {
+        return out;
+    }
+    for i in 0..r.n_tables.max(0) as usize {
+        // SAFETY: the kernel allocated `n_tables` entries; each `table` points to
+        // a `{data*, length}` whose data holds `length` records of the shape the
+        // fctab token names (return_tables_2 @0x180458940).
+        unsafe {
+            let ent = &*r.tables.add(i);
+            if ent.table.is_null() {
+                continue;
+            }
+            let t = &*ent.table;
+            let (ni, nd) = record_shape(ent.fctab);
+            if t.data.is_null() || t.length <= 0 {
+                continue;
+            }
+            let n = t.length as usize;
+            if ni > 0 {
+                out.ints.insert(
+                    ent.fctab,
+                    std::slice::from_raw_parts(t.data as *const i32, n * ni).to_vec(),
+                );
+            } else if nd > 0 {
+                out.dbls.insert(
+                    ent.fctab,
+                    std::slice::from_raw_parts(t.data as *const f64, n * nd).to_vec(),
+                );
+            }
+        }
+    }
+    out
+}
+
+fn facet_topols(topols: &[i32], opts: &FacetOptions) -> PsResult<Mesh> {
+    let mut precision = 0.0;
+    pk_call!(PK_SESSION_ask_precision(&mut precision));
+    let mut model_size = 0.0f64;
+    for &t in topols {
+        let mut b = PK_BOX_t { coord: [0.0; 6] };
+        pk_call!(PK_TOPOL_find_box(t, &mut b));
+        let d = [
+            b.coord[3] - b.coord[0],
+            b.coord[4] - b.coord[1],
+            b.coord[5] - b.coord[2],
+        ];
+        model_size = model_size.max((d[0] * d[0] + d[1] * d[1] + d[2] * d[2]).sqrt());
+    }
+    let mut o = opts.to_pk();
+    let mut t = topols.to_vec();
+    // SAFETY: zeroed is a valid empty result (counts 0, null table pointer).
+    let mut r: PK_TOPOL_facet_2_r_t = unsafe { std::mem::zeroed() };
+    let code = unsafe {
+        PK_TOPOL_facet_2(
+            t.len() as c_int,
+            t.as_mut_ptr(),
+            std::ptr::null_mut(),
+            &mut o,
+            &mut r,
+        )
+    };
+    if code != 0 {
+        if !r.tables.is_null() {
+            // SAFETY: the kernel allocated these tables; free them before reporting.
+            unsafe { PK_TOPOL_facet_2_r_f(&mut r) };
+        }
+        return Err(crate::error::PsError::from_code(code));
+    }
+    let raw = read_tables(&r);
+    let (n_facets, n_strips, n_fins) = (
+        r.n_facets.max(0) as usize,
+        r.n_strips.max(0) as usize,
+        r.n_fins.max(0) as usize,
+    );
+    pk_call!(PK_TOPOL_facet_2_r_f(&mut r));
+
+    let empty = Vec::new();
+    let get = |k| raw.ints.get(&k).unwrap_or(&empty);
+    let (facet_fin, fin_data, data_point, facet_face, fin_edge) = (
+        get(PK_TOPOL_fctab_facet_fin_c),
+        get(PK_TOPOL_fctab_fin_data_c),
+        get(PK_TOPOL_fctab_data_point_c),
+        get(PK_TOPOL_fctab_facet_face_c),
+        get(PK_TOPOL_fctab_fin_edge_c),
+    );
+    let points: Vec<Vec3> = raw
+        .dbls
+        .get(&PK_TOPOL_fctab_point_vec_c)
+        .map(|v| {
+            v.chunks_exact(3)
+                .map(|c| Vec3::new(c[0], c[1], c[2]))
+                .collect()
+        })
+        .unwrap_or_default();
+    // Each fin's point, through fin -> data -> point. Checked once here so the
+    // assembly below can index freely.
+    let fin_point: Vec<u32> = (0..n_fins)
+        .map(|k| {
+            let d = *fin_data.get(k)?;
+            let p = *data_point.get(usize::try_from(d).ok()?)?;
+            usize::try_from(p).ok().filter(|&p| p < points.len()).map(|p| p as u32)
+        })
+        .collect::<Option<_>>()
+        .ok_or_else(|| {
+            crate::error::PsError::Session(format!(
+                "PK_TOPOL_facet_2 tables are inconsistent: {n_fins} fins, {} fin_data, {} data_point, {} points",
+                fin_data.len(),
+                data_point.len(),
+                points.len()
+            ))
+        })?;
+
+    // Fins of each facet in order, from the {facet, fin} lookup.
+    let mut facet_fins: Vec<Vec<usize>> = vec![Vec::new(); n_facets];
+    let mut fin_facet = vec![usize::MAX; n_fins];
+    for rec in facet_fin.chunks_exact(2) {
+        let (f, k) = (rec[0] as usize, rec[1] as usize);
+        if f < n_facets && k < n_fins {
+            facet_fins[f].push(k);
+            fin_facet[k] = f;
+        }
+    }
+    let face_of = |f: usize| Face::from_tag(facet_face.get(f).copied().unwrap_or(PK_ENTITY_null));
+    // max_facet_sides is 3, so every facet is a triangle; fan anything else.
+    let mut triangles = Vec::with_capacity(n_facets);
+    let mut facet_faces = Vec::with_capacity(n_facets);
+    for (f, fins) in facet_fins.iter().enumerate() {
+        for j in 1..fins.len().saturating_sub(1) {
+            triangles.push([
+                fin_point[fins[0]],
+                fin_point[fins[j]],
+                fin_point[fins[j + 1]],
+            ]);
+            facet_faces.push(face_of(f));
+        }
+    }
+    // A fin's point is its head: fin k runs from the head of the previous fin of
+    // its facet to its own head (parasolid-re port/P3-faceting probe; its edge
+    // chords measured on the curve to 2e-15).
+    let tail = |k: usize| {
+        let fins = &facet_fins[fin_facet[k]];
+        let i = fins.iter().position(|&x| x == k).unwrap_or(0);
+        fins[(i + fins.len() - 1) % fins.len()]
+    };
+    let mut boundary_fins = Vec::new();
+    for rec in fin_edge.chunks_exact(2) {
+        let k = rec[0] as usize;
+        if k >= n_fins || fin_facet[k] == usize::MAX {
+            continue;
+        }
+        boundary_fins.push(BoundaryFin {
+            edge: Edge::from_tag(rec[1]),
+            face: face_of(fin_facet[k]),
+            points: [fin_point[tail(k)], fin_point[k]],
+        });
+    }
+    let edges = edge_polylines(&boundary_fins);
+    let faults = get(PK_TOPOL_fctab_error_object_c)
+        .chunks_exact(2)
+        .map(|c| [c[0], c[1]])
+        .collect();
+    Ok(Mesh {
+        n_facets,
+        n_strips,
+        n_fins,
+        points,
+        triangles,
+        facet_faces,
+        edges,
+        boundary_fins,
+        faults,
+        tolerances: opts.effective(precision, model_size),
+    })
+}
+
+/// Chain the fins of the first face seen on each edge into a polyline.
 ///
-/// Found empirically under Wine: versions 1..4 return 5022
-/// (`o_t_version_unknown`), version 5 is accepted, 6+ return 5014
-/// (`field_of_wrong_type`). At version 5 the struct layout matches the catalog
-/// only THROUGH `wire_edges` — the `incremental_*` and later fields must be left
-/// zero (setting them to their v-latest enum tokens returns 908, "bad option
-/// data", because version 5's tail layout differs). A block faceted with the
-/// settings below yields exactly the expected 12 triangles / 8 vertices.
-const FACET_O_T_VERSION: c_int = 5;
-
-fn default_control() -> PK_TOPOL_facet_mesh_2_o_t {
-    // Zero-init (all `is_*` tolerance flags false → kernel default tolerances,
-    // all counts/pointers null) then set only the enum fields up to `wire_edges`
-    // to their documented default tokens (ch105). Fields after `wire_edges`
-    // (incremental_*, inflect, quality, sing_topol, respect_offset, scales,
-    // viewports) MUST stay zero at version 5 — see FACET_O_T_VERSION.
-    let mut c: PK_TOPOL_facet_mesh_2_o_t = unsafe { std::mem::zeroed() };
-    c.o_t_version = FACET_O_T_VERSION;
-    c.shape = PK_FACET_SHAPE_CONVEX_C;
-    c.match_ = PK_FACET_MATCH_TOPOL_C;
-    c.density = PK_FACET_DENSITY_NO_VIEW_C;
-    c.cull = PK_FACET_CULL_NONE_C;
-    c.max_facet_sides = 3; // triangles
-    c.ignore = PK_FACET_IGNORE_NO_C;
-    c.ignore_scope = PK_FACET_IGNORE_SCOPE_GLOBAL_C;
-    c.wire_edges = PK_FACET_WIRE_EDGES_NO_C;
-    c
-}
-
-fn default_choice() -> PK_TOPOL_facet_choice_2_o_t {
-    let mut c: PK_TOPOL_facet_choice_2_o_t = unsafe { std::mem::zeroed() };
-    c.o_t_version = FACET_O_T_VERSION;
-    c.smp = PK_FACET_SMP_NO_C;
-    c.consistent_parms = PK_FACET_CONSISTENT_PARMS_NO_C;
-    c.report_pts_off_topol = PK_FACET_PT_REPORT_NO_C;
-    // Request the vertex-coordinate table and facet→point index table. (At the
-    // version-5 option layout these flags do not yet take effect — the tabular
-    // output flags belong to a newer option version; the facet topology totals
-    // in the result structure are returned regardless.)
-    c.point_vec = PK_LOGICAL_true;
-    c.data_point_idx = PK_LOGICAL_true;
-    c
+/// The segments are walked as an undirected chain, so a face that has both fins
+/// of an edge still gives one polyline. The walk starts at the chain's lowest
+/// tail end (open) or at the first fin's tail, following its sense (closed).
+fn edge_polylines(fins: &[BoundaryFin]) -> Vec<EdgePolyline> {
+    let mut first_face: HashMap<i32, i32> = HashMap::new();
+    let mut segs: BTreeMap<i32, Vec<[u32; 2]>> = BTreeMap::new();
+    for b in fins {
+        let face = *first_face.entry(b.edge.tag()).or_insert(b.face.tag());
+        if face == b.face.tag() && b.points[0] != b.points[1] {
+            segs.entry(b.edge.tag()).or_default().push(b.points);
+        }
+    }
+    segs.into_iter()
+        .map(|(tag, segs)| {
+            let mut seen = HashSet::new();
+            let mut adj: HashMap<u32, Vec<u32>> = HashMap::new();
+            for &[a, b] in &segs {
+                if seen.insert((a.min(b), a.max(b))) {
+                    adj.entry(a).or_default().push(b);
+                    adj.entry(b).or_default().push(a);
+                }
+            }
+            let tails: HashSet<u32> = segs.iter().map(|s| s[0]).collect();
+            let ends: Vec<u32> = adj
+                .iter()
+                .filter(|(_, n)| n.len() == 1)
+                .map(|(&p, _)| p)
+                .collect();
+            let closed = ends.is_empty();
+            let start = (ends.iter().filter(|p| tails.contains(p)).min())
+                .or(ends.iter().min())
+                .copied()
+                .unwrap_or(segs[0][0]);
+            let mut points = vec![start];
+            let (mut prev, mut at) = (u32::MAX, start);
+            if closed {
+                (prev, at) = (start, segs[0][1]);
+                points.push(at);
+            }
+            while points.len() <= seen.len() {
+                let Some(&n) = adj[&at].iter().find(|&&n| n != prev) else {
+                    break;
+                };
+                if n == start {
+                    break;
+                }
+                points.push(n);
+                (prev, at) = (at, n);
+            }
+            EdgePolyline {
+                edge: Edge::from_tag(tag),
+                points,
+                closed,
+            }
+        })
+        .collect()
 }
 
 impl Body {
-    /// Tessellate this body into a triangle [`Mesh`].
-    ///
-    /// Returns the mesh topology totals (`n_facets`, `n_strips`, `n_fins`) from
-    /// the result structure, which are validated: a solid block yields 12
-    /// triangles and 36 fins. Vertex coordinates (`vertices`) are populated from
-    /// the `point_vec` table when available — see the note on [`Mesh::vertices`].
+    /// Facet this body with the kernel's default tolerances.
     pub fn facet(&self) -> PsResult<Mesh> {
-        let mut options = PK_TOPOL_facet_2_o_t {
-            control: default_control(),
-            choice: default_choice(),
-        };
-        let mut result: PK_TOPOL_facet_2_r_t = unsafe { std::mem::zeroed() };
-        let mut topol: PK_TOPOL_t = self.tag;
-        // A "mild" return from faceting means the mesh was produced but some
-        // faces raised faults; the tables are still valid. Only serious/fatal
-        // errors abort.
-        let code = unsafe {
-            PK_TOPOL_facet_2(
-                1,
-                &mut topol,
-                std::ptr::null_mut(),
-                &mut options,
-                &mut result,
-            )
-        };
-        if code != 0 {
-            match crate::error::PsError::from_code(code) {
-                crate::error::PsError::Mild(_) => {}
-                other => return Err(other),
-            }
-        }
+        self.facet_with(&FacetOptions::default())
+    }
 
-        // point_vec is a flat array of doubles (3 per vertex). Present only when
-        // the tabular vertex table is returned (see Mesh::vertices).
-        let n_doubles = result.tables.n_point_vec.max(0) as usize;
-        let vertices = if result.tables.point_vec.is_null() || n_doubles < 3 {
-            Vec::new()
-        } else {
-            let slice = unsafe { std::slice::from_raw_parts(result.tables.point_vec, n_doubles) };
-            slice
-                .chunks_exact(3)
-                .map(|c| Vec3::new(c[0], c[1], c[2]))
-                .collect()
-        };
-        let n_facets = result.n_facets.max(0) as usize;
-        let n_strips = result.n_strips.max(0) as usize;
-        let n_fins = result.n_fins.max(0) as usize;
+    /// Facet this body (`PK_TOPOL_facet_2`, options version 26).
+    pub fn facet_with(&self, opts: &FacetOptions) -> PsResult<Mesh> {
+        facet_topols(&[self.tag], opts)
+    }
+}
 
-        // Release the kernel-allocated tables.
-        pk_call!(PK_TOPOL_facet_2_r_f(&mut result));
-        Ok(Mesh {
-            n_facets,
-            n_strips,
-            n_fins,
-            vertices,
-        })
+impl Face {
+    /// Facet this face alone with the kernel's default tolerances.
+    pub fn facet(&self) -> PsResult<Mesh> {
+        self.facet_with(&FacetOptions::default())
+    }
+
+    /// Facet this face alone. Topology matching does not apply: its edges get
+    /// their own curve threads, without the neighbours' contributions.
+    pub fn facet_with(&self, opts: &FacetOptions) -> PsResult<Mesh> {
+        facet_topols(&[self.tag()], opts)
     }
 }
 

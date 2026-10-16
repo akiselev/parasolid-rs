@@ -1,44 +1,14 @@
 // Dynamic probe: pin faceting tolerance -> mesh-density behavior (FACETING.md [LOW]).
 use parasolid::*;
-use parasolid_sys::*;
 
 fn facet_n(tag: i32, s_tol: Option<f64>, s_ang: Option<f64>) -> (i32, i32) {
-    let mut c: PK_TOPOL_facet_mesh_2_o_t = unsafe { std::mem::zeroed() };
-    c.o_t_version = 5;
-    c.shape = 20502;
-    c.match_ = 20522;
-    c.density = 20540;
-    c.cull = 20560;
-    c.max_facet_sides = 3;
-    c.ignore = 22111;
-    c.ignore_scope = 22131;
-    c.wire_edges = 22140;
-    if let Some(t) = s_tol {
-        c.is_surface_plane_tol = 1;
-        c.surface_plane_tol = t;
+    let mut o = FacetOptions::new();
+    o.surface_plane_tol = s_tol;
+    o.surface_plane_ang = s_ang;
+    match Body::from_tag_checked(tag).and_then(|b| b.facet_with(&o)) {
+        Ok(m) => (0, m.n_facets as i32),
+        Err(e) => (e.details().map(|d| d.code).unwrap_or(-1), 0),
     }
-    if let Some(a) = s_ang {
-        c.is_surface_plane_ang = 1;
-        c.surface_plane_ang = a;
-    }
-    let mut ch: PK_TOPOL_facet_choice_2_o_t = unsafe { std::mem::zeroed() };
-    ch.o_t_version = 5;
-    ch.smp = 24110;
-    ch.consistent_parms = 22510;
-    ch.report_pts_off_topol = 24570;
-    let mut opts = PK_TOPOL_facet_2_o_t {
-        control: c,
-        choice: ch,
-    };
-    let mut result: PK_TOPOL_facet_2_r_t = unsafe { std::mem::zeroed() };
-    let mut topol = tag;
-    let code =
-        unsafe { PK_TOPOL_facet_2(1, &mut topol, std::ptr::null_mut(), &mut opts, &mut result) };
-    let n = result.n_facets;
-    unsafe {
-        let _ = PK_TOPOL_facet_2_r_f(&mut result);
-    }
-    (code, n)
 }
 
 fn main() {
@@ -54,7 +24,7 @@ fn main() {
     // sphere R=10: surface_plane_tol = max sagitta => max edge L≈√(8Rt) => tris ∝ 1/t
     println!("== sphere r=10, SURFACE_PLANE_TOL sweep (loose angle; expect n ∝ 1/tol) ==");
     for t in [4.0, 2.0, 1.0, 0.5, 0.25, 0.1, 0.05, 0.025, 0.01] {
-        let (code, n) = facet_n(tag, Some(t), Some(6.3));
+        let (code, n) = facet_n(tag, Some(t), Some(std::f64::consts::FRAC_PI_2));
         println!(
             "  surf_plane_tol={:7.3}  ->  {:7} tris   (n*tol={:.0})  code={}",
             t,

@@ -1131,8 +1131,8 @@ fn group_dormant() {
         unsafe { PK_PARTITION_delete(p, &d) }
     });
 
-    // Facet is already documented at version 5 in crates/parasolid/src/facet.rs;
-    // re-measure the control struct's ceiling to keep that note honest.
+    // Facet version sweep with zeroed options (no legal enum tokens). The
+    // binding stamps 26 with the kernel's defaults (crates/parasolid/src/facet.rs).
     sweep("PK_TOPOL_facet_2_o_t[control.o_t_version]", 9, |v, _g| {
         let b = Body::create_solid_block(10.0, 10.0, 10.0).unwrap();
         let mut o: PK_TOPOL_facet_2_o_t = unsafe { std::mem::zeroed() };

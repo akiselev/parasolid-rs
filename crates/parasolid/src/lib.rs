@@ -73,7 +73,9 @@ pub use entity::{
 };
 pub use error::{BadArg, ErrorDetails, PsError, PsResult, Severity};
 pub use face::{Coincidence, Face};
-pub use facet::{FacetMesh, Mesh};
+pub use facet::{
+    BoundaryFin, EdgePolyline, FACET_DEFAULT_ANGLE, FacetMatch, FacetMesh, FacetOptions, FacetTolerances, Mesh,
+};
 pub use frustrum::FrustrumConfig;
 pub use geom::{Axis2, Vec3};
 pub use intersect::{
