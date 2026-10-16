@@ -37,6 +37,67 @@ pub struct CurveCurveHit {
     pub kind: i32,
 }
 
+/// Options for [`Curve::intersect_curve_checked`].
+#[derive(Debug, Clone, Copy, Default)]
+pub struct CurveCurveCheck<'a> {
+    /// Common surface passed as `PK_CURVE_intersect_curve_o_t.common_surf`
+    /// (`None` = `PK_ENTITY_null`, as in [`Curve::intersect_curve`]).
+    pub common_surf: Option<&'a Surf>,
+    /// Distance at or below which two curves count as meeting when an empty
+    /// answer is checked. `None` = the session linear precision.
+    pub tolerance: Option<f64>,
+    /// Sine of the angle between the two tangents at or below which a hit is
+    /// reported as tangential. `None` = 1e-6. This is a heuristic on the hit
+    /// the kernel returned, not a kernel tolerance.
+    pub angle_tolerance: Option<f64>,
+}
+
+/// How an empty `PK_CURVE_intersect_curve` answer was checked.
+///
+/// The kernel returns no vectors **and no error** both for curves that do not
+/// meet and for curve pairs its solver gave up on (ICC status 3 or 4; parasolid-re
+/// P1 B12, `FUN_18095ea90`). An empty answer is therefore not evidence of a miss
+/// on its own; this records an independent `PK_GEOM_range` over the same intervals.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum EmptyCheck {
+    /// The curves stay further apart than the tolerance: a genuine miss.
+    Separated { min_distance: f64 },
+    /// The curves come within the tolerance, yet the kernel returned nothing.
+    /// Treat as an oracle failure (silent give-up or a tolerance disagreement),
+    /// never as agreement with an empty answer.
+    Suspect {
+        min_distance: f64,
+        position: Vec3,
+        t1: f64,
+        t2: f64,
+    },
+    /// `PK_GEOM_range` did not find a distance (raw `PK_range_result_t`), or
+    /// failed with this PK error code (negated); nothing can be concluded.
+    Unchecked { range_status: i32 },
+}
+
+/// A curve/curve hit with an independent tangency measure.
+#[derive(Debug, Clone, Copy)]
+pub struct CheckedHit {
+    /// The hit as the kernel reported it.
+    pub hit: CurveCurveHit,
+    /// |T1 × T2| / (|T1| |T2|) from `PK_CURVE_eval` at `t1` and `t2`; NaN when a
+    /// tangent is zero or the evaluation failed.
+    pub sin_angle: f64,
+    /// `sin_angle <= angle_tolerance`, for simple (non start/end) hits. The
+    /// kernel never reports `PK_intersect_vector_tangent_c` from this function:
+    /// a tangency arrives as `simple_c` (parasolid-re P1 B12).
+    pub tangential: bool,
+}
+
+/// Result of [`Curve::intersect_curve_checked`].
+#[derive(Debug, Clone)]
+pub struct CheckedCurveCurve {
+    pub hits: Vec<CheckedHit>,
+    /// `Some` exactly when the kernel returned no hits.
+    pub empty: Option<EmptyCheck>,
+}
+
 /// A point where a curve crosses a surface.
 #[derive(Debug, Clone, Copy)]
 pub struct SurfCurveHit {
@@ -93,11 +154,97 @@ impl Curve {
     /// Intersect a bounded region of this curve with a bounded region of
     /// another (`PK_CURVE_intersect_curve`). Intervals are `(low, high)`
     /// parameter ranges.
+    ///
+    /// An empty answer can also mean the kernel gave up (no error is raised);
+    /// oracle code should use [`Curve::intersect_curve_checked`].
     pub fn intersect_curve(
         &self,
         interval: (f64, f64),
         other: &Curve,
         other_interval: (f64, f64),
+    ) -> PsResult<Vec<CurveCurveHit>> {
+        self.intersect_curve_raw(interval, other, other_interval, PK_ENTITY_null)
+    }
+
+    /// [`Curve::intersect_curve`] with the two checks an oracle needs:
+    /// - an empty answer is re-examined with `PK_GEOM_range` over the same
+    ///   intervals ([`EmptyCheck`]), because the kernel returns nothing and no
+    ///   error when its solver gives up;
+    /// - every simple hit gets the angle between the two tangents, because the
+    ///   kernel reports tangencies as `simple_c`.
+    pub fn intersect_curve_checked(
+        &self,
+        interval: (f64, f64),
+        other: &Curve,
+        other_interval: (f64, f64),
+        check: &CurveCurveCheck,
+    ) -> PsResult<CheckedCurveCurve> {
+        let surf = check.common_surf.map_or(PK_ENTITY_null, |s| s.tag());
+        let raw = self.intersect_curve_raw(interval, other, other_interval, surf)?;
+        let ang = check.angle_tolerance.unwrap_or(1e-6);
+        let hits: Vec<CheckedHit> = raw
+            .into_iter()
+            .map(|hit| {
+                let sin_angle = match (self.eval_with_tangent(hit.t1), other.eval_with_tangent(hit.t2)) {
+                    (Ok((_, a)), Ok((_, b))) => sin_between(a, b),
+                    _ => f64::NAN,
+                };
+                let simple = hit.kind != PK_intersect_vector_start_c && hit.kind != PK_intersect_vector_end_c;
+                CheckedHit { hit, sin_angle, tangential: simple && sin_angle <= ang }
+            })
+            .collect();
+        let empty = if hits.is_empty() {
+            let tol = match check.tolerance {
+                Some(t) => t,
+                None => {
+                    let mut p = 0.0;
+                    pk_call!(PK_SESSION_ask_precision(&mut p));
+                    p
+                }
+            };
+            Some(self.check_empty(interval, other, other_interval, tol))
+        } else {
+            None
+        };
+        Ok(CheckedCurveCurve { hits, empty })
+    }
+
+    /// Minimum distance between the two bounded curves (`PK_GEOM_range`, both
+    /// intervals as parameter bounds), classified against `tol`.
+    fn check_empty(&self, interval: (f64, f64), other: &Curve, other_interval: (f64, f64), tol: f64) -> EmptyCheck {
+        let mut opts = PK_GEOM_range_o_t::default();
+        for (pb, iv) in opts.param_bound.iter_mut().zip([interval, other_interval]) {
+            pb.have_param_bound = PK_LOGICAL_true;
+            pb.param_bound_class = PK_range_param_bound_class_interval_c;
+            pb.bound = [iv.0, iv.1, 0.0, 0.0];
+        }
+        let mut status: PK_range_result_t = -1;
+        let mut r: PK_range_2_r_t = unsafe { std::mem::zeroed() };
+        let err = unsafe { PK_GEOM_range(self.tag, other.tag, &mut opts, &mut status, &mut r) };
+        if err != 0 {
+            return EmptyCheck::Unchecked { range_status: -err };
+        }
+        if status != PK_range_result_found_c {
+            return EmptyCheck::Unchecked { range_status: status };
+        }
+        if r.distance <= tol {
+            EmptyCheck::Suspect {
+                min_distance: r.distance,
+                position: Vec3::from_pk(r.end_1.position),
+                t1: r.end_1.parameters[0],
+                t2: r.end_2.parameters[0],
+            }
+        } else {
+            EmptyCheck::Separated { min_distance: r.distance }
+        }
+    }
+
+    fn intersect_curve_raw(
+        &self,
+        interval: (f64, f64),
+        other: &Curve,
+        other_interval: (f64, f64),
+        common_surf: PK_ENTITY_t,
     ) -> PsResult<Vec<CurveCurveHit>> {
         // `o_t_version = 1` is already the ceiling: v2+ return
         // `o_t_version_unknown` (5022). `have_box` is live at v1 (a garbage
@@ -107,7 +254,7 @@ impl Curve {
             o_t_version: 1,
             have_box: PK_LOGICAL_false,
             r#box: PK_BOX_t { coord: [0.0; 6] },
-            common_surf: PK_ENTITY_null,
+            common_surf,
         };
         let iv1 = PK_INTERVAL_t {
             low: interval.0,
@@ -149,6 +296,14 @@ impl Curve {
             })
             .collect())
     }
+}
+
+/// |a × b| / (|a| |b|); NaN when either vector is zero.
+fn sin_between(a: Vec3, b: Vec3) -> f64 {
+    let c = Vec3::new(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    let n = |v: Vec3| (v.x * v.x + v.y * v.y + v.z * v.z).sqrt();
+    let d = n(a) * n(b);
+    if d == 0.0 { f64::NAN } else { n(c) / d }
 }
 
 impl Surf {

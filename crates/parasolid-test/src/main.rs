@@ -7369,6 +7369,63 @@ fn main() {
     test!("boolean_options_v19_default_tol", {
         abi_audit::boolean_options_v19_default_tol()?;
     });
+    // PK_CURVE_intersect_curve returns no vectors and no error when its solver
+    // gives up, and reports tangencies as simple_c (parasolid-re P1 B12). The
+    // checked call must tell a genuine miss from a silent one and mark tangency.
+    test!("curve_curve_checked_empty_and_tangent", {
+        let _s = Session::start(test_config())?;
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let circle = Curve::circle(Axis2::new(Vec3::new(0.0, 0.0, 0.0), z, x), 1.0)?;
+        let full = (0.0, 2.0 * std::f64::consts::PI);
+        let chk = CurveCurveCheck::default();
+
+        // Tangent line y = 1: one hit, reported simple, measured tangential.
+        let tan = Curve::line(Vec3::new(0.0, 1.0, 0.0), x)?;
+        let r = tan.intersect_curve_checked((-2.0, 2.0), &circle, full, &chk)?;
+        println!("\n    tangent: {} hit(s), sin {:?}", r.hits.len(), r.hits.iter().map(|h| h.sin_angle).collect::<Vec<_>>());
+        assert_eq!(r.hits.len(), 1);
+        assert!(r.hits[0].tangential && r.hits[0].hit.kind == PK_intersect_vector_simple_c);
+        assert!(r.empty.is_none());
+
+        // Secant line y = 0: two transversal hits.
+        let sec = Curve::line(Vec3::new(0.0, 0.0, 0.0), x)?;
+        let r = sec.intersect_curve_checked((-2.0, 2.0), &circle, full, &chk)?;
+        assert_eq!(r.hits.len(), 2);
+        assert!(r.hits.iter().all(|h| !h.tangential && (h.sin_angle - 1.0).abs() < 1e-12));
+
+        // Skew lines 1 apart: a genuine miss.
+        let ya = Vec3::new(0.0, 1.0, 0.0);
+        let far = Curve::line(Vec3::new(0.0, 0.0, 1.0), ya)?;
+        let r = sec.intersect_curve_checked((-2.0, 2.0), &far, (-2.0, 2.0), &chk)?;
+        println!("    skew 1: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        assert!(matches!(r.empty, Some(EmptyCheck::Separated { min_distance }) if (min_distance - 1.0).abs() < 1e-12));
+
+        // Skew lines 0.5e-8 apart (inside the 1e-8 precision). Non-coplanar
+        // lines leave the analytic lane with status 0 (B12, 0x181dd6a11), so an
+        // empty answer here must be flagged Suspect rather than taken as a miss.
+        let near = Curve::line(Vec3::new(0.0, 0.0, 0.5e-8), ya)?;
+        let r = sec.intersect_curve_checked((-2.0, 2.0), &near, (-2.0, 2.0), &chk)?;
+        println!("    skew 0.5e-8: {} hit(s), empty {:?}", r.hits.len(), r.empty);
+        assert!(!r.hits.is_empty() || matches!(r.empty, Some(EmptyCheck::Suspect { .. })));
+
+        // Skew lines 1.5e-8 apart (fixture p1-icc-line-line-near-miss, P1 B15):
+        // the kernel returns nothing. Checked at a 2e-8 tolerance, the empty
+        // answer must come back Suspect with the true gap and closest points.
+        let gap = Curve::line(Vec3::new(0.0, 0.0, 1.5e-8), ya)?;
+        let wide = CurveCurveCheck { tolerance: Some(2e-8), ..Default::default() };
+        let r = sec.intersect_curve_checked((-2.0, 2.0), &gap, (-2.0, 2.0), &wide)?;
+        println!("    skew 1.5e-8 at tol 2e-8: {} hit(s), empty {:?}", r.hits.len(), r.empty);
+        if r.hits.is_empty() {
+            match r.empty {
+                Some(EmptyCheck::Suspect { min_distance, t1, t2, .. }) => {
+                    assert!((min_distance - 1.5e-8).abs() < 1e-12 && t1.abs() < 1e-6 && t2.abs() < 1e-6)
+                }
+                other => panic!("expected Suspect, got {other:?}"),
+            }
+        }
+    });
 
     // =========================================================================
     // Summary

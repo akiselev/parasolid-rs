@@ -75,7 +75,9 @@ pub use face::{Coincidence, Face};
 pub use facet::{FacetMesh, Mesh};
 pub use frustrum::FrustrumConfig;
 pub use geom::{Axis2, Vec3};
-pub use intersect::{CurveCurveHit, FaceCurveHit, SurfCurveHit};
+pub use intersect::{
+    CheckedCurveCurve, CheckedHit, CurveCurveCheck, CurveCurveHit, EmptyCheck, FaceCurveHit, SurfCurveHit,
+};
 pub use jet::{CurveJet, Hand, MinRadius, SurfJet};
 pub use mass::{DEFAULT_MASS_ACCURACY, MassProps};
 pub use memory::PkArray;
