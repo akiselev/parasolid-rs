@@ -510,3 +510,100 @@ pub fn transform_snaps_tiny_motions() -> R {
     assert_ne!(ymin_after(1e-9)?, y0, "1e-9 rad rotation applied");
     Ok(())
 }
+
+// -----------------------------------------------------------------------------
+// Defect 8 — PK_SESSION_kernel_version_t is 36 bytes (parasolid-re REQUESTS R-7)
+// -----------------------------------------------------------------------------
+
+/// `PK_SESSION_ask_kernel_version` @0x1803f7400 stores major/minor/build at
+/// +0/+4/+8, then scans the embedded build stamp with `"%d-%d-%d %d:%d:%d"`
+/// (format @0x183fb50f8) into six more ints at +0xc..+0x20: nine ints, 36
+/// bytes (static-observed, objdump of DLL c900fa3f…63073). The old 32-byte
+/// struct let the kernel write 4 bytes past a stack allocation, which
+/// corrupted the caller's saved registers (cadabra3
+/// `docs/plan/rethink-2026-10/parasolid-baseline.md`).
+pub fn kernel_version_is_36_bytes() -> R {
+    let s = Session::start(cfg())?;
+    let mut buf = [0xAAu8; 256];
+    let rc = unsafe {
+        PK_SESSION_ask_kernel_version(buf.as_mut_ptr().cast::<PK_SESSION_kernel_version_t>())
+    };
+    assert_eq!(rc, 0);
+    let written = buf.iter().rposition(|&b| b != 0xAA).map_or(0, |i| i + 1);
+    assert_eq!(written, 36, "kernel writes nine ints: {:x?}", &buf[..48]);
+    assert_eq!(std::mem::size_of::<PK_SESSION_kernel_version_t>(), 36);
+    assert_eq!(s.kernel_version()?, (37, 1, 243));
+    let v = s.kernel_version_info()?;
+    assert_eq!(
+        (v.year, v.month, v.day, v.hour, v.minute, v.second),
+        (2025, 8, 14, 22, 57, 46),
+        "build stamp of 37.01.243"
+    );
+    Ok(())
+}
+
+// -----------------------------------------------------------------------------
+// Probe — what SurfIntersection::delete_curves takes with it (REQUESTS R-7)
+// -----------------------------------------------------------------------------
+
+/// Records which SSI results share structure with their input surfaces: after
+/// `delete_curves()`, are the two inputs still entities?
+pub fn ssi_delete_curves_ownership() -> R {
+    let _s = Session::start(cfg())?;
+    let x_axis = Axis2::new(Vec3::zero(), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0));
+    // Analytic result: plane through a cylinder's axis gives two lines.
+    let cyl = Surf::cylinder(z_basis(Vec3::zero()), 5.0)?;
+    let pln = Surf::plane(x_axis)?;
+    let ssi = cyl.intersect(&pln)?;
+    let classes: Vec<i32> = ssi
+        .curves
+        .iter()
+        .map(|c| c.curve.entity().class().map(|k| k.to_raw()))
+        .collect::<Result<_, _>>()?;
+    ssi.delete_curves()?;
+    let analytic = (cyl.entity().is_valid()?, pln.entity().is_valid()?);
+    println!("    plane x cylinder: classes {classes:?}, inputs alive after delete {analytic:?}");
+    // Intersection-curve result: unequal perpendicular cylinders.
+    let c1 = Surf::cylinder(z_basis(Vec3::zero()), 5.0)?;
+    let c2 = Surf::cylinder(x_axis, 3.0)?;
+    let ssi = c1.intersect(&c2)?;
+    let classes: Vec<i32> = ssi
+        .curves
+        .iter()
+        .map(|c| c.curve.entity().class().map(|k| k.to_raw()))
+        .collect::<Result<_, _>>()?;
+    ssi.delete_curves()?;
+    let icurve = (c1.entity().is_valid()?, c2.entity().is_valid()?);
+    println!("    cylinder x cylinder: classes {classes:?}, inputs alive after delete {icurve:?}");
+    // The same pair on surfaces that faces of two bodies use.
+    let b1 = Body::create_solid_cylinder(5.0, 20.0)?;
+    let b2 = Body::create_solid_cylinder(3.0, 20.0)?;
+    b2.transform(&Transform::rotation(
+        Vec3::new(0.0, 0.0, 10.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        std::f64::consts::FRAC_PI_2,
+    )?)?;
+    let side = |b: &Body| -> Result<Surf, Box<dyn Error>> {
+        for f in b.faces()? {
+            let s = f.surf()?;
+            if s.surf_type()? == SurfType::Cylinder {
+                return Ok(s);
+            }
+        }
+        Err("no cylindrical face".into())
+    };
+    let (f1, f2) = (side(&b1)?, side(&b2)?);
+    let refused = f1.intersect(&f2);
+    println!("    face surfaces: {:?}", refused.as_ref().map(|r| r.curves.len()));
+    assert!(
+        matches!(&refused, Err(PsError::Mild(d)) if d.code == PK_ERROR_bad_shared_entity),
+        "PK_SURF_intersect_surf refuses surfaces used by faces (PK_ERROR_bad_shared_entity)"
+    );
+    assert_eq!((b1.check()?.len(), b2.check()?.len()), (0, 0));
+    // dynamic-observed 2026-10-16, DLL c900fa3f…63073: an icurve result owns
+    // its orphan input surfaces; analytic results own nothing; surfaces used
+    // by faces never reach PK_SURF_intersect_surf.
+    assert_eq!(analytic, (true, true), "analytic SSI curves own nothing");
+    assert_eq!(icurve, (false, false), "deleting icurves deletes orphan inputs");
+    Ok(())
+}

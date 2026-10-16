@@ -7219,6 +7219,12 @@ fn main() {
     test!("transform_snaps_tiny_motions", {
         abi_audit::transform_snaps_tiny_motions()?;
     });
+    test!("kernel_version_is_36_bytes", {
+        abi_audit::kernel_version_is_36_bytes()?;
+    });
+    test!("ssi_delete_curves_ownership", {
+        abi_audit::ssi_delete_curves_ownership()?;
+    });
 
     // =========================================================================
     // Summary

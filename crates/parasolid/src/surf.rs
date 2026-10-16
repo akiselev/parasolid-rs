@@ -614,6 +614,20 @@ impl IntersectionCurve {
 ///
 /// Call [`SurfIntersection::delete_curves`] when you are done with the result,
 /// or keep the curves deliberately if you intend to go on using them.
+///
+/// # An intersection curve takes its input surfaces with it
+///
+/// `PK_SURF_intersect_surf` accepts only orphan surfaces (surfaces used by
+/// faces fail with `PK_ERROR_bad_shared_entity`, 916). When it returns
+/// intersection curves (`PK_CLASS_icurve`, 3004; e.g. unequal perpendicular
+/// cylinders), each icurve references both input surfaces: deleting the
+/// surfaces first fails with `PK_ERROR_still_referenced`, and deleting the
+/// icurves deletes **both input surfaces** too, so their tags are
+/// `NotAnEntity` afterwards. Analytic results (lines, circles, ellipses) own
+/// nothing and leave the inputs alive. Finish every use of the input surfaces
+/// before calling `delete_curves`. dynamic-observed 2026-10-16, DLL
+/// c900fa3f…63073, `parasolid-test` `ssi_delete_curves_ownership`
+/// (parasolid-re `port/REQUESTS.md` R-7).
 #[derive(Debug, Clone)]
 pub struct SurfIntersection {
     /// Isolated point (tangential/degenerate) intersections.
@@ -625,8 +639,9 @@ pub struct SurfIntersection {
 impl SurfIntersection {
     /// Delete the orphan curve entities this result owns.
     ///
-    /// Consumes the result, since the curve tags are invalid afterwards.
-    /// Errors on individual deletions are collected rather than short-circuited
+    /// Consumes the result, since the curve tags are invalid afterwards. If
+    /// any curve is an icurve, the two input surfaces are deleted as well
+    /// (see [`SurfIntersection`]). Errors on individual deletions are collected rather than short-circuited
     /// so one bad tag cannot strand the rest.
     pub fn delete_curves(self) -> PsResult<()> {
         let mut first_err = None;

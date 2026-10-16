@@ -554,6 +554,14 @@ impl Session {
         Ok((info.major, info.minor, info.build))
     }
 
+    /// Returns the full kernel version record, including the build stamp
+    /// (`year`..`second`) the kernel embeds next to the version number.
+    pub fn kernel_version_info(&self) -> PsResult<PK_SESSION_kernel_version_t> {
+        let mut info = PK_SESSION_kernel_version_t::default();
+        pk_call!(PK_SESSION_ask_kernel_version(&mut info));
+        Ok(info)
+    }
+
     /// Returns the Parasolid schema version.
     pub fn schema_version(&self) -> PsResult<i32> {
         let mut version = 0;

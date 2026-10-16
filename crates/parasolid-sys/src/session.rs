@@ -304,17 +304,31 @@ pub const PK_REPORT_1_osthread_ok_c: c_int = 23902;
 // extern "C" blocks
 // =============================================================================
 
-/// Kernel version returned by `PK_SESSION_ask_kernel_version`. The first three
-/// ints are major/minor/build; the tail is reserved so the kernel never writes
-/// past the allocation.
+/// Kernel version returned by `PK_SESSION_ask_kernel_version` (and the
+/// `PK_*_receive_version*` family): nine ints, 36 bytes.
+///
+/// Layout static-observed in `PK_SESSION_ask_kernel_version` @0x1803f7400 of
+/// DLL c900fa3f…63073 (37.01.243): major/minor/build at +0/+4/+8, then six
+/// ints at +0xc..+0x20 scanned with `"%d-%d-%d %d:%d:%d"` (@0x183fb50f8) from
+/// the embedded stamp `"2025-08-14 22:57:46"`. The field names of that tail are
+/// inferred from the format; the vendor header names are not available. A
+/// canary run measured exactly 36 bytes written; the former 32-byte layout
+/// overran the caller's stack (parasolid-re `port/REQUESTS.md` R-7).
 #[repr(C)]
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct PK_SESSION_kernel_version_t {
     pub major: c_int,
     pub minor: c_int,
     pub build: c_int,
-    pub _reserved: [c_int; 5],
+    pub year: c_int,
+    pub month: c_int,
+    pub day: c_int,
+    pub hour: c_int,
+    pub minute: c_int,
+    pub second: c_int,
 }
+
+const _: () = assert!(std::mem::size_of::<PK_SESSION_kernel_version_t>() == 36);
 
 /// SMP configuration returned by `PK_SESSION_ask_smp`.
 #[repr(C)]
