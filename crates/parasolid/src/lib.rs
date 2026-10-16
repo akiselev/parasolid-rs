@@ -85,7 +85,7 @@ pub use point::Point;
 pub use range::{Aabb, Enclosure};
 pub use session::{Behaviour, Mark, Session, SessionConfig, SmpInfo};
 pub use surf::{ConeData, CylinderData, PlaneData, SphereData, Surf, SurfType, TorusData, UvBox};
-pub use surf::{IntersectionCurve, IntersectionKind, SurfIntersection};
+pub use surf::{IntersectionCurve, IntersectionKind, SurfIntersectOptions, SurfIntersection};
 pub use surf::{OffsetData, SpunData, SurfCurvature, SurfDirParam, SweptData};
 pub use topology::{Fin, FinType, Loop, LoopType, Region, RegionType, Shell, ShellSign, ShellType};
 pub use transform::{Classification, MatrixType, Transform};

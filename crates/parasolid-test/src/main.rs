@@ -995,6 +995,120 @@ fn main() {
         );
     });
 
+    // `Surf::intersect_with` region of interest (parasolid-re item h, probe-h-uvbox). The
+    // uv boxes act as the model-space box of the patch, not as parametric trims.
+    test!("ssi_region_of_interest", {
+        let _session = Session::start(test_config())?;
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        let (ex, ey, ez) = (
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+        );
+        let pz = Surf::plane(Axis2::new(o, ez, ex))?; // z = 0, (u, v) = (x, y)
+        let px = Surf::plane(Axis2::new(o, ex, ey))?; // x = 0
+        let uv = |a, b, c, d| UvBox {
+            u_min: a,
+            v_min: b,
+            u_max: c,
+            v_max: d,
+        };
+        let bx = |a: [f64; 6]| Aabb {
+            min: Vec3::new(a[0], a[1], a[2]),
+            max: Vec3::new(a[3], a[4], a[5]),
+        };
+        let opt = |r: Option<Aabb>, u1: Option<UvBox>, u2: Option<UvBox>| SurfIntersectOptions {
+            region: r,
+            uvbox_1: u1,
+            uvbox_2: u2,
+        };
+        let bounds = |r: &SurfIntersection| r.curves.iter().map(|c| c.bounds).collect::<Vec<_>>();
+
+        // Unrestricted: the line x = z = 0 spans the session size box.
+        let r = pz.intersect(&px)?;
+        let b = bounds(&r);
+        assert!(
+            b.len() == 1 && (b[0].0 + 500.0).abs() < 1e-9 && (b[0].1 - 500.0).abs() < 1e-9,
+            "default line bounds {b:?}"
+        );
+        let _ = r.delete_curves();
+        // uvbox_1 / uvbox_2 trim an open curve to the patch's model-space box.
+        for (o_, want) in [
+            (opt(None, Some(uv(-1.0, -1.0, 1.0, 1.0)), None), (-1.0, 1.0)),
+            (opt(None, Some(uv(-1.0, 2.0, 1.0, 3.0)), None), (2.0, 3.0)),
+            (opt(None, None, Some(uv(-1.0, -1.0, 1.0, 1.0))), (-1.0, 1.0)),
+            (
+                opt(Some(bx([-1.0, 2.0, -1.0, 1.0, 3.0, 1.0])), None, None),
+                (2.0, 3.0),
+            ),
+        ] {
+            let r = pz.intersect_with(&px, &o_)?;
+            assert_eq!(r.curves.len(), 1, "{o_:?}");
+            let (lo, hi) = r.curves[0].bounds;
+            assert!(
+                (lo - want.0).abs() < 1e-9 && (hi - want.1).abs() < 1e-9,
+                "{o_:?}: bounds {lo} {hi}"
+            );
+            let _ = r.delete_curves();
+        }
+        // A region that misses the intersection: no curves, no error.
+        for o_ in [
+            opt(None, Some(uv(10.0, 10.0, 11.0, 11.0)), None),
+            opt(Some(bx([5.0, -1.0, -1.0, 6.0, 1.0, 1.0])), None, None),
+        ] {
+            let r = pz.intersect_with(&px, &o_)?;
+            assert!(r.curves.is_empty() && r.points.is_empty(), "{o_:?}");
+        }
+        // A box that does not overlap the uv patch's box is bad option data (907).
+        let e = pz
+            .intersect_with(
+                &px,
+                &opt(
+                    Some(bx([-1.0, 2.0, -1.0, 1.0, 3.0, 1.0])),
+                    Some(uv(-1.0, -1.0, 1.0, 1.0)),
+                    None,
+                ),
+            )
+            .expect_err("disjoint box and uvbox must be rejected");
+        assert_eq!(e.details().map(|d| d.code), Some(907), "{e}");
+
+        // Closed analytic curves are not trimmed: a half-cylinder patch keeps the whole ellipse,
+        // and a circle entirely outside the patch's box is dropped.
+        let cy = Surf::cylinder(Axis2::new(o, ez, ex), 1.0)?;
+        let k = 1.25f64.sqrt();
+        let pob = Surf::plane(Axis2::new(
+            o,
+            Vec3::new(-0.5 / k, 0.0, 1.0 / k),
+            Vec3::new(1.0 / k, 0.0, 0.5 / k),
+        ))?;
+        let r = cy.intersect_with(
+            &pob,
+            &opt(None, Some(uv(0.0, -2.0, std::f64::consts::PI, 2.0)), None),
+        )?;
+        assert_eq!(r.curves.len(), 1);
+        assert_eq!(r.curves[0].curve.curve_type()?, CurveType::Ellipse);
+        let (lo, hi) = r.curves[0].bounds;
+        assert!(
+            (hi - lo - std::f64::consts::TAU).abs() < 1e-9,
+            "ellipse should be whole: {lo} {hi}"
+        );
+        let _ = r.delete_curves();
+        let p5 = Surf::plane(Axis2::new(Vec3::new(0.0, 0.0, 5.0), ez, ex))?;
+        assert_eq!(
+            cy.intersect(&p5)?.curves.len(),
+            1,
+            "control: circle at z = 5"
+        );
+        let r = cy.intersect_with(
+            &p5,
+            &opt(None, Some(uv(0.0, -1.0, std::f64::consts::TAU, 1.0)), None),
+        )?;
+        assert!(
+            r.curves.is_empty(),
+            "circle outside the patch box must be dropped"
+        );
+    });
+
     test!("ssi_plane_plane_line", {
         let _session = Session::start(test_config())?;
         let blk = Body::create_solid_block(10.0, 20.0, 30.0)?;
