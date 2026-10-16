@@ -69,6 +69,10 @@ runtime-tested · `[ ]` unaudited / untested · `[!]` known-wrong or suspect.
       in the kernel" verdict was the old pointer-based struct.
       **Remaining:** severity is only ever observed *mild*; serious/fatal are
       unexercised, so `PsError`'s rollback/restart paths are untested.
+- [x] **`PK_LOGICAL_t` is 1 byte** (2026-10-16; was `c_int`). Logical arrays
+      and struct layouts with adjacent logicals were wrong; see
+      `docs/pskernel-solidworks.md` "ABI audit from parasolid-re". Class tokens
+      3004..3009 / 4007..4011 corrected to the vendor table at the same time.
 - [x] `PK_SESSION_set_check_arguments(true)` on by default in tests, so the
       kernel validates our FFI arguments and surfaces mismatches early. Done via
       a `test_config()` helper used by every test.
@@ -255,16 +259,21 @@ when CADabra's Boolean path needs oracling.
       0/1/2). Blocked on mapping the nested versioned sub-structs (`configuration`,
       `local_opts`) in the migration routine `FUN_18049b860`. Wrapper marked
       not-working; returns the kernel error rather than a wrong result.
-- [ ] `PK_FACE_imprint_*` / `PK_BODY_imprint_*` — imprint oracle for CADabra's
-      imprint→arrangement stage.
+- [~] `PK_FACE_imprint_*` / `PK_BODY_imprint_*` — `PK_BODY_imprint_body` **fixed
+      2026-10-16**: v5 48-byte options (v1/NULL crash the kernel), paired
+      `PK_imprint_r_t` returned (`imprint_body_v5_pairs_edges`). Face imprint
+      forms still unaudited. `PK_BODY_boolean_2` failed-result token is now an
+      error (`PsError::BooleanFailed`).
 - [ ] Local ops (blends `blend.rs`, sweeps `sweep.rs`, offsets `offset.rs`,
       euler `euler.rs`) — defer; not on CADabra's near-term path.
 
 ## P8 — Checking (oracle self-trust)
 
-- [ ] `PK_BODY_check` / `PK_ENTITY_check` — audit result structs
-      (`checking.rs`); run on every oracle-produced body so we never compare
-      against a body Parasolid itself considers invalid.
+- [x] `PK_BODY_check`, `PK_FACE_check`, `PK_EDGE_check`, `PK_FACE_check_pair`,
+      `PK_GEOM_check` — **2026-10-16**: `PK_check_fault_t` is 40 bytes (was 12),
+      option fields are enum tokens with kernel defaults, full option structs
+      wrapped (`check_with`). See `docs/pskernel-solidworks.md` "ABI audit from
+      parasolid-re". `PK_ENTITY_check_attribs` still unaudited.
 - [ ] `PK_SESSION_set_check_continuity` / self-intersection checks on.
 
 ## P9 — Determinism & precision hygiene

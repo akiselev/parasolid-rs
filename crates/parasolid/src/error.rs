@@ -161,6 +161,18 @@ pub enum PsError {
 
     /// Session lifecycle error (not started, already active, etc.).
     Session(String),
+
+    /// `PK_BODY_boolean_2` returned `PK_ERROR_no_errors` but its result token
+    /// was `PK_boolean_result_failed_c` (21653): the Boolean did not happen.
+    /// The target may still have been modified (e.g. left imprinted —
+    /// parasolid-re observation 5). Before 2026-10-16 this was reported as
+    /// success with the unchanged target as the "result".
+    BooleanFailed {
+        /// The raw `PK_boolean_result_t` token.
+        result: i32,
+        /// The kernel's reports: `(PK_boolean_report_t token, entity tags)`.
+        reports: Vec<(i32, Vec<i32>)>,
+    },
 }
 
 /// Convenience alias for `Result<T, PsError>`.
@@ -233,6 +245,14 @@ impl fmt::Display for PsError {
             PsError::NotAnEntity { tag } => write!(f, "invalid entity tag {tag}"),
             PsError::Aborted => f.write_str("operation aborted by user interrupt"),
             PsError::Session(msg) => write!(f, "session error: {msg}"),
+            PsError::BooleanFailed { result, reports } => write!(
+                f,
+                "boolean failed (PK_boolean_result_t {result}); reports: {:?}",
+                reports
+                    .iter()
+                    .map(|(r, e)| (*r, e.len()))
+                    .collect::<Vec<_>>()
+            ),
         }
     }
 }

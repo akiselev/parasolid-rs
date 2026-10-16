@@ -9,6 +9,17 @@ use crate::vertex::Vertex;
 use parasolid_sys::*;
 use std::os::raw::c_int;
 
+/// Paired topology created or matched by [`Body::imprint_body`]
+/// (`PK_imprint_r_t`). Index `i` of each target array pairs with index `i` of
+/// the matching tool array.
+#[derive(Debug, Clone, Default)]
+pub struct ImprintResult {
+    pub target_edges: Vec<crate::edge::Edge>,
+    pub tool_edges: Vec<crate::edge::Edge>,
+    pub target_vertices: Vec<crate::vertex::Vertex>,
+    pub tool_vertices: Vec<crate::vertex::Vertex>,
+}
+
 /// The type of a body (dimensionality).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum BodyType {
@@ -42,6 +53,18 @@ pub struct Body {
 impl Body {
     pub(crate) fn from_tag(tag: PK_BODY_t) -> Self {
         Self { tag }
+    }
+
+    /// Wrap a raw tag obtained from a raw `parasolid-sys` call, after checking
+    /// with `PK_ENTITY_ask_class` that it is a live body.
+    pub fn from_tag_checked(tag: PK_BODY_t) -> PsResult<Self> {
+        let class = Entity::from_tag(tag).class()?;
+        if class != crate::entity::PkClass::Body {
+            return Err(crate::error::PsError::Session(format!(
+                "tag {tag} is a {class:?}, not a body"
+            )));
+        }
+        Ok(Self::from_tag(tag))
     }
     pub fn tag(&self) -> i32 {
         self.tag
@@ -557,21 +580,76 @@ impl Body {
     }
 
     /// Mutual imprint of this (target) body and `tool` where their boundaries
-    /// intersect: records the intersection as shared edges / split faces on this
-    /// body (arrangement only — no material change; `tool` is left unmodified).
-    /// The created-topology graph comes back through an opaque result struct, so
-    /// this mutates in place — observe the effect via the body's topology counts.
-    /// Wraps `PK_BODY_imprint_body`.
-    pub fn imprint_body(&self, tool: &Body) -> PsResult<()> {
-        let mut opts = PK_BODY_imprint_o_t::default();
-        // PK_imprint_r_t (64 B) is filled unconditionally — pass a real buffer.
+    /// intersect (`PK_BODY_imprint_body`, options version 5, kernel defaults).
+    /// Arrangement only — no material change. With the kernel default
+    /// `imprint_tool = true` **both** bodies are imprinted.
+    ///
+    /// Returns the paired imprinted edges and vertices: `target_edges[i]` lies
+    /// on `tool_edges[i]`, likewise for vertices.
+    ///
+    /// History: until 2026-10-16 this passed a 56-byte options struct stamped
+    /// version 1. With NULL or v1 options the kernel dereferences a null
+    /// `matched_region` default and crashes (parasolid-re fixture
+    /// `repro-imprint-body-v1-options`), so this wrapper could never succeed.
+    pub fn imprint_body(&self, tool: &Body) -> PsResult<ImprintResult> {
+        self.imprint_body_with(tool, &PK_BODY_imprint_o_t::default())
+    }
+
+    /// [`Body::imprint_body`] with an explicit options struct.
+    ///
+    /// Refuses (without calling the kernel) an `o_t_version` below 2, since the
+    /// kernel crashes on version 1, and above [`PK_BODY_imprint_o_t_VERSION`].
+    /// `matched_region` must be NULL: the match sub-struct is not modelled.
+    pub fn imprint_body_with(
+        &self,
+        tool: &Body,
+        options: &PK_BODY_imprint_o_t,
+    ) -> PsResult<ImprintResult> {
+        if !(2..=PK_BODY_imprint_o_t_VERSION).contains(&options.o_t_version)
+            || !options.matched_region.is_null()
+        {
+            return Err(crate::error::PsError::Session(format!(
+                "PK_BODY_imprint_o_t: o_t_version {} outside 2..={} or non-null \
+                 matched_region (version 1 / NULL crash the kernel)",
+                options.o_t_version, PK_BODY_imprint_o_t_VERSION
+            )));
+        }
+        let mut opts = PK_BODY_imprint_o_t { ..*options };
         let mut results: PK_imprint_r_t = unsafe { std::mem::zeroed() };
         let rc = unsafe { PK_BODY_imprint_body(self.tag, tool.tag, &mut opts, &mut results) };
+        let copy = |a: *mut i32, n: i32| -> Vec<i32> {
+            if a.is_null() || n <= 0 {
+                Vec::new()
+            } else {
+                unsafe { std::slice::from_raw_parts(a, n as usize) }.to_vec()
+            }
+        };
+        let out = ImprintResult {
+            target_edges: copy(results.target_edges.array, results.target_edges.length)
+                .into_iter()
+                .map(crate::edge::Edge::from_tag)
+                .collect(),
+            tool_edges: copy(results.tool_edges.array, results.tool_edges.length)
+                .into_iter()
+                .map(crate::edge::Edge::from_tag)
+                .collect(),
+            target_vertices: copy(
+                results.target_vertices.array,
+                results.target_vertices.length,
+            )
+            .into_iter()
+            .map(crate::vertex::Vertex::from_tag)
+            .collect(),
+            tool_vertices: copy(results.tool_vertices.array, results.tool_vertices.length)
+                .into_iter()
+                .map(crate::vertex::Vertex::from_tag)
+                .collect(),
+        };
         unsafe {
             let _ = PK_imprint_r_f(&mut results);
         }
         crate::error::pk_check(rc)?;
-        Ok(())
+        Ok(out)
     }
 
     /// **Revolve** (spin) this wire/sheet profile about an axis, turning it into a

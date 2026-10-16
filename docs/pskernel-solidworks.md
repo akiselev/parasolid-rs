@@ -1816,3 +1816,36 @@ spuriously. Both are wrong for the same reason.
 This is the umbilic case of the same hazard as the cylinder ordering already
 recorded (Parasolid puts the axial direction first): direction/index pairing is
 only meaningful when the curvatures are distinct.
+
+## ABI audit from parasolid-re (2026-10-16)
+
+Source: the sibling RE repo's oracle harness, which drove the same DLL
+(SHA-256 `c900fa3f…63073`) through raw FFI with layouts recovered from the
+kernel's own option-migration routines (`parasolid-re/artifacts/port/oracle/README.md`
+"ABI basis", `catalog/pk-validated-abi.md`, `cadabra-HANDOFF.md` §3). Every fix
+below has a regression test in `crates/parasolid-test/src/abi_audit.rs` that
+would have failed (or crashed) against the old bindings.
+
+| defect | fix | test | residual risk |
+|---|---|---|---|
+| `PK_LOGICAL_t` declared `c_int` | now `u8` (static: migrate routines read bytes; dynamic: the kernel writes 1 byte through `PK_LOGICAL_t *`) | `abi_logical_is_one_byte`, `abi_logical_array_shell_orientations` (the void shell's all-true orientation array read as all-false before) | Struct fields that the kernel reads but the bindings never modelled used to sit in the zeroed upper bytes of a 4-byte logical; they are now padding. Found one (`PK_TOPOL_eval_mass_props_o_t.use_facets` @17, v2 → 908 `not_a_logical`); others may exist in unexercised structs. Rust struct literals do not zero padding. |
+| `PK_check_fault_t` 12 bytes | 40 bytes `{state, entity_1, entity_2, position}` | `check_fault_is_40_bytes` (two faults, both naming the line) | `position` is meaningful only for some states. |
+| check option structs typed as logicals; GEOM field order | all fields are enum tokens; BODY v5/FACE v4/EDGE v3/GEOM v3/pair v1 with the kernel's NULL defaults as `Default`; GEOM is `geom, attribs, extra_faults`; `PK_check_extra_faults_latest_c` = 24722 (was aliased to `_1_c`) | `check_option_structs_round_trip` (version+1 → 5022; `geom = 1` refused) | Behavioural meaning of `returns` / `extra_faults` levels unprobed. |
+| `PK_BODY_imprint_o_t` 56 B, `Body::imprint_body` v1 | 48 B v5 layout (= header order with 1-byte logicals); wrapper stamps 5, returns the paired `PK_imprint_r_t` (now a real 64-byte struct), and `imprint_body_with` refuses versions < 2 because NULL/v1 null-deref the kernel | `imprint_body_v5_pairs_edges` (r1-blind-hole: 7/13/8 and 4/3/0, one paired circle), `imprint_body_refuses_crashing_versions` | `matched_region` must be NULL (sub-struct unmodelled). Effects of the other option fields on which arrays come back are untraced. Imprinting a body with itself page-faults (older observation, not re-tested). |
+| `PK_BODY_sew_bodies` declared with 3 args | 10-arg header prototype (also seen in the decompiled entry @0x1800edd50); `PK_BODY_sew_bodies_o_t` rebuilt as the v8 48-byte layout from the migration `FUN_1800ea810` (adds `set_global_tolerance`, reorders the four trailing enums, `assembly_sewing` default `no`) | `sew_bodies_ten_args` (two quads → one 2/7/6 sheet) | **NULL options crash** (no NULL branch in the migration). No safe wrapper. `PK_BODY_problem_group_t` opaque; problem groups are not freed. Only the default option values were exercised. |
+| `PK_CLASS_*` tokens | curve band 3004..3009 and surfaces 4007/4008/4011 corrected to the vendor numeric table (3004 icurve, 3005 bcurve, 3006 spcurve, 3007 fcurve, 3008 cpcurve, 3009 trcurve; 4007 blendsf, 4008 offset, 4011 fsurf); also 500/501/502, item 523, attrib 1003, group 6005, ki_list 6002, mesh/lattice 1000xx | `classes_are_vendor_tokens` (bcurve 3005, icurve 3004, ellipse, spun 4010, offset 4008), and the SSI cylinder test now asserts `Icurve` — it used to assert `Bcurve` on raw 3004 | fcurve/cpcurve/trcurve/blendsf/fsurf have vendor values but no live construction here; `PK_CLASS_instance`/`assembly` remain guesses. |
+| `boolean()` reported `PK_boolean_result_failed_c` as success | `PsError::BooleanFailed { result, reports }`; new `boolean_detailed()` returns the token, bodies and decoded `PK_boolean_report_r_t` reports | `boolean_failed_is_an_error` (internal-tangent subtract → failed + 2 `non_manifold`) | `no_clash`/`no_effect`/`not_solid`/`imprint` are still passed through as `Ok` by `boolean()`; use `boolean_detailed()` to see them. A failed Boolean may leave the target imprinted. |
+
+Also corrected while auditing: the `PK_TOPOL_facet_choice_2_o_t` assertions
+assumed 4-byte logicals (now 72 B). parasolid-re's v26 recovery disagrees with
+the header field order past `o_t_version`, so that struct remains suspect; only
+its version-5 prefix is exercised.
+
+### `PK_BODY_transform` ignores tiny motions
+
+Dynamic-observed in parasolid-re (`specs/repro/repro-transform-snap.json`) and
+here (`transform_snaps_tiny_motions`): `PK_BODY_transform` leaves the body
+unchanged, with no error, for a pure translation of magnitude <= 1e-8 (session
+precision) or a rotation of angle <= 1e-11 rad (angular precision); 2e-8 and
+1e-9 rad are applied. Never sweep a small transform around a zero nominal. Use a
+large lever (move by `L + kT`, then by `-L`) or perturb a primitive dimension.

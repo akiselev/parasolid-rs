@@ -139,6 +139,11 @@ impl Transform {
 impl Body {
     /// Transform this body in place by the given [`Transform`].
     ///
+    /// **Tiny motions are silently dropped**: a pure translation of magnitude
+    /// <= 1e-8 or a rotation of <= 1e-11 rad leaves the body unchanged and
+    /// returns no error (test `transform_snaps_tiny_motions`; parasolid-re
+    /// `specs/repro/repro-transform-snap.json`).
+    ///
     /// Rigid motions and uniform scales are applied exactly. `PK_BODY_transform`
     /// writes its `n_replaces`/`replaces`/`exact` outputs unconditionally, so we
     /// pass real buffers and release the kernel-allocated arrays.

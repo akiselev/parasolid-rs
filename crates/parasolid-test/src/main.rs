@@ -3,6 +3,8 @@
 //! Build: cargo build -p parasolid-test --target x86_64-pc-windows-gnu
 //! Run:   WINEPATH=/path/to/SOLIDWORKS cargo run -p parasolid-test --bin parasolid-test --target x86_64-pc-windows-gnu
 
+mod abi_audit;
+
 use parasolid::*;
 use parasolid_sys::*;
 
@@ -6530,16 +6532,19 @@ fn main() {
         }
 
         // UNEQUAL RADIUS — the intersection is a genuine quartic, so the kernel
-        // must fall back to spline curves rather than an exact conic.
+        // returns intersection curves (PK_CLASS_icurve, raw 3004) rather than an
+        // exact conic. (Before the 2026-10-16 class-token fix this asserted
+        // `Bcurve`, because the bindings mislabelled 3004 as the b-curve class.)
         let cyl_x3 = Surf::cylinder(x_axis(origin), 3.0)?;
         let r = cyl_z.intersect(&cyl_x3)?;
         assert_eq!(r.curves.len(), 2, "unequal cylinders give two branches");
         for c in &r.curves {
             assert_eq!(
                 c.curve.curve_type()?,
-                CurveType::Bcurve,
-                "a quartic intersection cannot be an exact conic"
+                CurveType::Icurve,
+                "a quartic intersection is returned as an intersection curve"
             );
+            assert_eq!(c.curve.entity().class()?.to_raw(), 3004, "raw class token");
             let resid = implicit_residual(
                 c,
                 &[&|p: Vec3| p.x * p.x + p.y * p.y - 25.0, &|p: Vec3| {
@@ -7175,6 +7180,44 @@ fn main() {
             (after - before).abs() / before < 1e-12,
             "volume must survive a text round-trip: {before} -> {after}"
         );
+    });
+
+    // =========================================================================
+    // ABI audit 2026-10-16 (parasolid-re cadabra-HANDOFF §3) — see abi_audit.rs
+    // =========================================================================
+
+    test!("abi_logical_is_one_byte", {
+        abi_audit::abi_logical_is_one_byte()?;
+    });
+    test!("abi_logical_array_shell_orientations", {
+        abi_audit::abi_logical_array_shell_orientations()?;
+    });
+    test!("abi_mass_props_v2_reads_use_facets", {
+        abi_audit::abi_mass_props_v2_reads_use_facets()?;
+    });
+    test!("check_fault_is_40_bytes", {
+        abi_audit::check_fault_is_40_bytes()?;
+    });
+    test!("check_option_structs_round_trip", {
+        abi_audit::check_option_structs_round_trip()?;
+    });
+    test!("imprint_body_v5_pairs_edges", {
+        abi_audit::imprint_body_v5_pairs_edges()?;
+    });
+    test!("imprint_body_refuses_crashing_versions", {
+        abi_audit::imprint_body_refuses_crashing_versions()?;
+    });
+    test!("sew_bodies_ten_args", {
+        abi_audit::sew_bodies_ten_args()?;
+    });
+    test!("classes_are_vendor_tokens", {
+        abi_audit::classes_are_vendor_tokens()?;
+    });
+    test!("boolean_failed_is_an_error", {
+        abi_audit::boolean_failed_is_an_error()?;
+    });
+    test!("transform_snaps_tiny_motions", {
+        abi_audit::transform_snaps_tiny_motions()?;
     });
 
     // =========================================================================

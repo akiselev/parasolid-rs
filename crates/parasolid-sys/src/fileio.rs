@@ -618,11 +618,32 @@ unsafe extern "C" {
         state: *mut PK_check_state_t,
     ) -> PK_ERROR_code_t;
 
-    /// Sew sheet bodies together to complete recreation of imported data.
+    /// Sew sheet bodies together along edges that meet within
+    /// `gap_width_bound`.
+    ///
+    /// **10 arguments** (header `pk_body_sew_bodies.html`, documented; entry
+    /// @0x1800edd50 → `SEW_bodies` @0x180b76800, static-observed in parasolid-re
+    /// `docs/SEWING_HEALING.md`). The old 3-argument declaration
+    /// `(n_bodies, bodies, *result)` made the kernel read `gap_width_bound` from
+    /// a pointer register and write six outputs through uninitialised argument
+    /// slots.
+    ///
+    /// Arity: also static-observed in the decompiled entry (10 parameters).
+    /// **NULL options crash** (the option migration `FUN_1800ea810` has no NULL
+    /// branch); pass `PK_BODY_sew_bodies_o_t::default()` (v8). Runtime test:
+    /// `sew_bodies_ten_args`. `PK_BODY_problem_group_t` is opaque: when
+    /// `n_problem_groups > 0` its nested arrays are not freed here.
     pub fn PK_BODY_sew_bodies(
         n_bodies: c_int,
         bodies: *const PK_BODY_t,
-        result_body: *mut PK_BODY_t,
+        gap_width_bound: c_double,
+        options: *const PK_BODY_sew_bodies_o_t,
+        n_sewn_bodies: *mut c_int,
+        sewn_bodies: *mut *mut PK_BODY_t,
+        n_unsewn_bodies: *mut c_int,
+        unsewn_bodies: *mut *mut PK_BODY_t,
+        n_problem_groups: *mut c_int,
+        problem_groups: *mut *mut PK_BODY_problem_group_t,
     ) -> PK_ERROR_code_t;
 
     /// Simplify geometry on a body.

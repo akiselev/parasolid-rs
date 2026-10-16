@@ -52,8 +52,10 @@ mod transform;
 mod vertex;
 
 pub use attrib::{ATTRIB_COLOUR, AttribDef};
-pub use body::{Body, BodyType};
-pub use boolean::{BooleanOp, BooleanOptions};
+pub use body::{Body, BodyType, ImprintResult};
+pub use boolean::{
+    BooleanOp, BooleanOptions, BooleanOutcome, BooleanReport, BooleanResult, boolean_detailed,
+};
 pub use check::{
     BodyCheckOptions, CheckFault, EdgeCheckOptions, FaceCheckOptions, FacePairCheckOptions,
     GeomCheckOptions, check_geom,

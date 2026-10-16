@@ -101,6 +101,7 @@ pub const PK_EDGE_reduce_tol_yes_c: PK_EDGE_reduce_tol_t = 26451;
 /// Assembly sewing method.
 pub type PK_BODY_sewing_assy_t = c_int;
 /// Use face orientation to determine piece parts.
+pub const PK_BODY_sewing_assy_no_c: PK_BODY_sewing_assy_t = 24190;
 pub const PK_BODY_sewing_assy_orient_c: PK_BODY_sewing_assy_t = 24191;
 /// Also examine shared laminar edges.
 pub const PK_BODY_sewing_assy_extend_c: PK_BODY_sewing_assy_t = 24192;
@@ -478,51 +479,71 @@ pub struct PK_BODY_knit_pattern_t {
     pub reversals: *const PK_BODY_t,
 }
 
-/// Options for `PK_BODY_sew_bodies`.
+/// `PK_BODY_problem_group_t` — one group of problem edges reported by
+/// `PK_BODY_sew_bodies`. Layout not audited; opaque.
+#[repr(C)]
+pub struct PK_BODY_problem_group_t {
+    _private: [u8; 0],
+}
+
+/// Options for `PK_BODY_sew_bodies`, version **8**, 48 bytes.
+///
+/// Field order: header (`pk_body_sew_bodies_o_t.html`, documented). Offsets,
+/// size, version range 1..=8 and defaults: static-observed in the option
+/// migration `FUN_1800ea810` called from `PK_BODY_sew_bodies` @0x1800edd50
+/// (read-only Ghidra, project `parasolid-c900fa3f430f`): it writes the v8
+/// defaults below, copies the caller's prefix per version, and raises 5022 for
+/// any other version. It dereferences the caller's pointer **without a NULL
+/// check**, so NULL options crash the kernel (dynamic-observed here: null read
+/// under Wine). Always pass a struct.
+///
+/// The previous binding lacked `set_global_tolerance`, put the four trailing
+/// enums in the wrong order and defaulted `assembly_sewing` to `orient` (the
+/// kernel default is `no`).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_BODY_sew_bodies_o_t {
-    /// Version tag for structure compatibility.
-    pub o_t_version: c_int,
-    /// Allow disjoint composite sheets (default: false).
-    pub allow_disjoint_result: PK_LOGICAL_t,
-    /// Assume manifold result intent (default: true).
-    pub treat_as_manifold: PK_LOGICAL_t,
-    /// Preference for result body type.
-    pub prefered_body_type: PK_BODY_sewing_t,
-    /// Duplicate sheet removal strategy.
-    pub duplicate_removal: PK_BODY_sewing_remove_t,
-    /// Sew edges in same inner loop.
-    pub sew_up_inner_loops: PK_LOOP_sew_up_t,
-    /// Attempt to reduce sewn edge tolerance.
-    pub reduce_edge_tolerance: PK_EDGE_reduce_tol_t,
-    /// Number of incremental sewing passes (default: 1).
-    pub number_of_iterations: c_int,
-    /// Array of gap-width bounds for incremental sewing (NULL for single pass).
-    pub iteration_bounds: *const c_double,
-    /// Assembly sewing method.
-    pub assembly_sewing: PK_BODY_sewing_assy_t,
-    /// General topology sewing mode.
-    pub general_sewing: PK_BODY_sewing_gen_t,
+    pub o_t_version: c_int,                          // @0  8
+    pub set_global_tolerance: PK_LOGICAL_t,          // @4  false
+    pub allow_disjoint_result: PK_LOGICAL_t,         // @5  false
+    pub treat_as_manifold: PK_LOGICAL_t,             // @6  true
+    pub prefered_body_type: PK_BODY_sewing_t,        // @8  any
+    pub duplicate_removal: PK_BODY_sewing_remove_t,  // @12 none
+    pub number_of_iterations: c_int,                 // @16 1
+    pub iteration_bounds: *const c_double,           // @24 NULL
+    pub assembly_sewing: PK_BODY_sewing_assy_t,      // @32 no
+    pub general_sewing: PK_BODY_sewing_gen_t,        // @36 no
+    pub sew_up_inner_loops: PK_LOOP_sew_up_t,        // @40 loop
+    pub reduce_edge_tolerance: PK_EDGE_reduce_tol_t, // @44 no
 }
 
 impl Default for PK_BODY_sew_bodies_o_t {
+    /// The kernel's own v8 defaults.
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 8,
+            set_global_tolerance: PK_LOGICAL_false,
             allow_disjoint_result: PK_LOGICAL_false,
             treat_as_manifold: PK_LOGICAL_true,
             prefered_body_type: PK_BODY_sewing_any_c,
             duplicate_removal: PK_BODY_sewing_remove_none_c,
-            sew_up_inner_loops: PK_LOOP_sew_up_loop_c,
-            reduce_edge_tolerance: PK_EDGE_reduce_tol_no_c,
             number_of_iterations: 1,
             iteration_bounds: std::ptr::null(),
-            assembly_sewing: PK_BODY_sewing_assy_orient_c,
+            assembly_sewing: PK_BODY_sewing_assy_no_c,
             general_sewing: PK_BODY_sewing_gen_no_c,
+            sew_up_inner_loops: PK_LOOP_sew_up_loop_c,
+            reduce_edge_tolerance: PK_EDGE_reduce_tol_no_c,
         }
     }
 }
+
+const _: () = {
+    use core::mem::{offset_of, size_of};
+    assert!(size_of::<PK_BODY_sew_bodies_o_t>() == 48);
+    assert!(offset_of!(PK_BODY_sew_bodies_o_t, treat_as_manifold) == 6);
+    assert!(offset_of!(PK_BODY_sew_bodies_o_t, iteration_bounds) == 24);
+    assert!(offset_of!(PK_BODY_sew_bodies_o_t, reduce_edge_tolerance) == 44);
+};
 
 /// Options for `PK_BODY_apply_knit_pattern`.
 #[repr(C)]

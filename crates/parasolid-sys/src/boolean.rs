@@ -738,13 +738,44 @@ pub struct PK_boolean_r_t {
     pub n_bodies: c_int, // @4
     /// Array of resulting body tags (@8) — includes the (replaced) target body.
     pub bodies: *mut PK_BODY_t, // @8
-    /// Number of faults (@16).
+    /// Number of reports (@16). The header calls this `n_reports`.
     pub n_faults: c_int, // @16
-    /// Array of faults (@24), each with its own sub-allocation.
+    /// Array of `n_faults` [`PK_boolean_report_r_t`] (@24), each with its own
+    /// `entities` sub-allocation. The header calls this `reports`. Kept as
+    /// `c_void` for source compatibility; cast to `*mut PK_boolean_report_r_t`.
     pub faults: *mut c_void, // @24
 }
 
+/// One Boolean report (`PK_boolean_report_r_t`), 16 bytes:
+/// `{report, n_entities, entities*}`. Header `pk_boolean_report_r_t.html`
+/// (documented); `PK_boolean_r_f` frees `[report + 8]` (static-observed); decoded
+/// live by the parasolid-re oracle harness (`BooleanReport`, dynamic-observed:
+/// two `non_manifold` reports on the internal-tangent subtract).
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_boolean_report_r_t {
+    pub report: PK_boolean_report_t,
+    pub n_entities: c_int,
+    pub entities: *mut PK_ENTITY_t,
+}
+
+/// `PK_boolean_report_t` — vendor numeric table, band 0x5460..=0x546a confirmed
+/// in the binary (parasolid-re `catalog/pk-enum-values.tsv`).
+pub type PK_boolean_report_t = c_int;
+pub const PK_boolean_report_failure_c: PK_boolean_report_t = 21600;
+pub const PK_boolean_report_opposed_sheets_c: PK_boolean_report_t = 21601;
+pub const PK_boolean_report_solid_has_void_c: PK_boolean_report_t = 21602;
+pub const PK_boolean_report_partial_coi_c: PK_boolean_report_t = 21603;
+pub const PK_boolean_report_t_sheet_c: PK_boolean_report_t = 21604;
+pub const PK_boolean_report_non_manifold_c: PK_boolean_report_t = 21605;
+pub const PK_boolean_report_invalid_match_c: PK_boolean_report_t = 21606;
+pub const PK_boolean_report_imprint_fail_c: PK_boolean_report_t = 21607;
+pub const PK_boolean_report_intersect_fail_c: PK_boolean_report_t = 21608;
+pub const PK_boolean_report_invalid_face_c: PK_boolean_report_t = 21609;
+pub const PK_boolean_report_inside_out_c: PK_boolean_report_t = 21610;
+
 const _: () = {
+    assert!(core::mem::size_of::<PK_boolean_report_r_t>() == 16);
     // PK_boolean_r_f (@1804a1360) reads n_faults at [r+0x10] and the faults
     // array at [r+0x18], frees a per-fault sub-allocation at [fault+8], then
     // unconditionally writes both back. A 24-byte struct made that a read of

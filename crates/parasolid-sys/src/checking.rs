@@ -401,10 +401,7 @@ pub type PK_check_bgeom_t = c_int;
 pub const PK_check_bgeom_no_c: PK_check_bgeom_t = 18290;
 pub const PK_check_bgeom_yes_c: PK_check_bgeom_t = 18291;
 
-pub type PK_check_mesh_t = c_int;
-pub const PK_check_mesh_no_c: PK_check_mesh_t = 25940;
-pub const PK_check_mesh_basic_c: PK_check_mesh_t = 25941;
-pub const PK_check_mesh_yes_c: PK_check_mesh_t = 25942;
+// (defined in facet.rs; same values)
 
 pub type PK_check_top_geo_t = c_int;
 pub const PK_check_top_geo_no_c: PK_check_top_geo_t = 18300;
@@ -424,9 +421,7 @@ pub type PK_check_loops_t = c_int;
 pub const PK_check_loops_no_c: PK_check_loops_t = 18330;
 pub const PK_check_loops_yes_c: PK_check_loops_t = 18331;
 
-pub type PK_check_fa_fa_t = c_int;
-pub const PK_check_fa_fa_no_c: PK_check_fa_fa_t = 18340;
-pub const PK_check_fa_fa_yes_c: PK_check_fa_fa_t = 18341;
+// (defined in editing.rs; same values)
 
 pub type PK_check_sh_t = c_int;
 pub const PK_check_sh_no_c: PK_check_sh_t = 18350;
@@ -627,7 +622,10 @@ pub struct PK_FACE_check_pair_o_t {
 
 impl Default for PK_FACE_check_pair_o_t {
     fn default() -> Self {
-        Self { o_t_version: 1, max_faults: 1 }
+        Self {
+            o_t_version: 1,
+            max_faults: 1,
+        }
     }
 }
 

@@ -46,17 +46,99 @@ impl BooleanOptions {
 // boolean
 // =============================================================================
 
+/// `PK_boolean_result_t` — the outcome token `PK_BODY_boolean_2` writes even
+/// when it returns `PK_ERROR_no_errors`. Values: vendor table, band
+/// 0x5492..=0x5499 confirmed in the binary; `Success`, `Failed` and `NoClash`
+/// dynamic-observed (parasolid-re oracle runs; `boolean_failed_is_an_error`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum BooleanResult {
+    Success,
+    NoClash,
+    NoEffect,
+    Failed,
+    NotSolid,
+    Imprint,
+    /// Deprecated in the kernel.
+    Multiple,
+    Unknown(i32),
+}
+
+impl BooleanResult {
+    pub fn from_raw(raw: i32) -> Self {
+        match raw {
+            PK_boolean_result_success_c => Self::Success,
+            PK_boolean_result_no_clash_c => Self::NoClash,
+            PK_boolean_result_no_effect_c => Self::NoEffect,
+            PK_boolean_result_failed_c => Self::Failed,
+            PK_boolean_result_not_solid_c => Self::NotSolid,
+            PK_boolean_result_imprint_c => Self::Imprint,
+            PK_boolean_result_multiple_c => Self::Multiple,
+            other => Self::Unknown(other),
+        }
+    }
+}
+
+/// One `PK_boolean_report_r_t`: the report token and the entities it names.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct BooleanReport {
+    /// `PK_boolean_report_t` token (e.g. 21605 `non_manifold`).
+    pub report: i32,
+    /// Entity tags named by the report (may no longer exist after the call).
+    pub entities: Vec<i32>,
+}
+
+/// The whole `PK_boolean_r_t`, copied out before `PK_boolean_r_f`.
+#[derive(Debug, Clone)]
+pub struct BooleanOutcome {
+    /// The raw result token, decoded.
+    pub result: BooleanResult,
+    /// The raw `PK_boolean_result_t` value.
+    pub result_raw: i32,
+    /// Result bodies (the target is replaced in place and listed here).
+    pub bodies: Vec<Body>,
+    /// The kernel's reports.
+    pub reports: Vec<BooleanReport>,
+}
+
 /// Perform a boolean operation: `target OP tools`.
 ///
 /// Uses `PK_BODY_boolean_2` with the version-2 options struct (see
-/// [`PK_BODY_boolean_o_t`]). Tracking data is always requested through the
-/// `tracking` output argument and freed before returning.
+/// [`PK_BODY_boolean_o_t`]). Returns the result bodies.
+///
+/// **Errors** with [`crate::PsError::BooleanFailed`] when the kernel's result
+/// token is `PK_boolean_result_failed_c`, even though the call itself returned
+/// no error. Other non-success tokens (`no_clash`, `no_effect`, `not_solid`,
+/// `imprint`) are *not* errors here: the bodies the kernel returned are passed
+/// through. Use [`boolean_detailed`] to see the token and reports.
 pub fn boolean(
     target: Body,
     tools: Vec<Body>,
     op: BooleanOp,
-    _options: &BooleanOptions,
+    options: &BooleanOptions,
 ) -> PsResult<Vec<Body>> {
+    let outcome = boolean_detailed(target, tools, op, options)?;
+    if outcome.result == BooleanResult::Failed {
+        return Err(crate::error::PsError::BooleanFailed {
+            result: outcome.result_raw,
+            reports: outcome
+                .reports
+                .into_iter()
+                .map(|r| (r.report, r.entities))
+                .collect(),
+        });
+    }
+    Ok(outcome.bodies)
+}
+
+/// `PK_BODY_boolean_2` returning the raw result token, bodies and reports.
+/// Only a non-zero `PK_ERROR_code_t` is an `Err`; a `failed` result token is
+/// returned as data.
+pub fn boolean_detailed(
+    target: Body,
+    tools: Vec<Body>,
+    op: BooleanOp,
+    _options: &BooleanOptions,
+) -> PsResult<BooleanOutcome> {
     let tool_tags: Vec<PK_BODY_t> = tools.iter().map(|b| b.tag()).collect();
 
     let opts = PK_BODY_boolean_o_t {
@@ -86,25 +168,48 @@ pub fn boolean(
     // populated it before returning an error code.
     unsafe { PK_TOPOL_track_r_f(&mut tracking) };
 
-    // Copy the tags out before freeing: `bodies` is kernel-allocated and
-    // `PK_boolean_r_f` releases it along with whatever else the result struct
-    // owns. Body is a plain tag, so the copy outlives the free.
-    let result_bodies: Vec<Body> = if results.bodies.is_null() || results.n_bodies <= 0 {
+    // Copy everything out before freeing: `bodies` and the report entity
+    // arrays are kernel-allocated and `PK_boolean_r_f` releases them.
+    let bodies: Vec<Body> = if results.bodies.is_null() || results.n_bodies <= 0 {
         Vec::new()
     } else {
         (0..results.n_bodies as usize)
             .map(|i| Body::from_tag(unsafe { *results.bodies.add(i) }))
             .collect()
     };
+    let reports: Vec<BooleanReport> = if results.faults.is_null() || results.n_faults <= 0 {
+        Vec::new()
+    } else {
+        let rs = unsafe {
+            std::slice::from_raw_parts(
+                results.faults as *const PK_boolean_report_r_t,
+                results.n_faults as usize,
+            )
+        };
+        rs.iter()
+            .map(|r| BooleanReport {
+                report: r.report,
+                entities: if r.entities.is_null() || r.n_entities <= 0 {
+                    Vec::new()
+                } else {
+                    unsafe { std::slice::from_raw_parts(r.entities, r.n_entities as usize) }
+                        .to_vec()
+                },
+            })
+            .collect()
+    };
+    let result_raw = results.result;
 
-    // Free the whole result struct through its matching API rather than just
-    // the `bodies` array — the struct carries further kernel allocations that a
-    // bare array free leaks.
     unsafe { PK_boolean_r_f(&mut results) };
 
-    // Check the boolean result code only after both frees, so an error path
-    // cannot leak either allocation.
+    // Check the error code only after both frees, so an error path cannot leak
+    // either allocation.
     crate::error::pk_check(code)?;
 
-    Ok(result_bodies)
+    Ok(BooleanOutcome {
+        result: BooleanResult::from_raw(result_raw),
+        result_raw,
+        bodies,
+        reports,
+    })
 }
