@@ -7450,6 +7450,270 @@ fn main() {
         }
     });
 
+    // PK_SURF_intersect_surf / PK_SURF_intersect_curve return nothing and no
+    // error for disjoint inputs, for contacts outside the search region and
+    // for coincident surfaces. The checked calls must tell these apart
+    // (parasolid-re artifacts/rs/20261016T203058Z-empty-check).
+    test!("ssi_checked_separated", {
+        let _s = Session::start(test_config())?;
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let a = Surf::sphere(Axis2::new(Vec3::new(0.0, 0.0, 0.0), z, x), 1.0)?;
+        let b = Surf::sphere(Axis2::new(Vec3::new(5.0, 0.0, 0.0), z, x), 1.0)?;
+        let r = a.intersect_with_checked(
+            &b,
+            &SurfIntersectOptions::default(),
+            &SurfSurfCheck::default(),
+        )?;
+        println!("\n    spheres 3 apart: {:?}", r.empty);
+        assert!(r.result.points.is_empty() && r.result.curves.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Separated { min_distance }) if (min_distance - 3.0).abs() < 1e-12)
+        );
+    });
+    test!("ssi_checked_outside_region", {
+        let _s = Session::start(test_config())?;
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let chk = SurfSurfCheck::default();
+        let none = SurfIntersectOptions::default();
+        let size = none.search_region()?;
+        assert!((size.min.x + 500.0).abs() < 1e-9 && (size.max.z - 500.0).abs() < 1e-9);
+
+        // p1-s2-cbwc-pla-sph-circle-far-x2000: the circle at x = 2000 is dropped (C467).
+        let pl = Surf::plane(Axis2::new(Vec3::new(2000.0, 0.0, 0.5), z, x))?;
+        let sp = Surf::sphere(Axis2::new(Vec3::new(2000.0, 0.0, 0.0), z, x), 1.0)?;
+        let r = pl.intersect_with_checked(&sp, &none, &chk)?;
+        println!("\n    far x2000: {:?}", r.empty);
+        assert!(r.result.curves.is_empty());
+        match r.empty {
+            Some(RangeCheck::OutsideRegion {
+                min_distance,
+                position,
+            }) => {
+                assert!(
+                    min_distance <= 1e-8
+                        && (position.x - 2000.0).abs() <= 1.0
+                        && (position.z - 0.5).abs() < 1e-9
+                )
+            }
+            other => panic!("expected OutsideRegion, got {other:?}"),
+        }
+
+        // At x = 700 the default box drops the circle; an option box ±1000
+        // replaces the size box (it is not intersected with it) and keeps it.
+        let pl = Surf::plane(Axis2::new(Vec3::new(700.0, 0.0, 0.5), z, x))?;
+        let sp = Surf::sphere(Axis2::new(Vec3::new(700.0, 0.0, 0.0), z, x), 1.0)?;
+        let r = pl.intersect_with_checked(&sp, &none, &chk)?;
+        assert!(matches!(r.empty, Some(RangeCheck::OutsideRegion { .. })));
+        let big = SurfIntersectOptions {
+            region: Some(Aabb {
+                min: Vec3::new(-1000.0, -1000.0, -1000.0),
+                max: Vec3::new(1000.0, 1000.0, 1000.0),
+            }),
+            ..Default::default()
+        };
+        assert_eq!(big.search_region()?.max.x, 1000.0);
+        let r = pl.intersect_with_checked(&sp, &big, &chk)?;
+        println!(
+            "    x700 with box ±1000: {} curve(s), empty {:?}",
+            r.result.curves.len(),
+            r.empty
+        );
+        assert_eq!(r.result.curves.len(), 1);
+        assert!(r.empty.is_none());
+        r.result.delete_curves()?;
+    });
+    test!("ssi_checked_size_box_follows_angle_precision", {
+        let s = Session::start(test_config().angle_precision(1e-10))?;
+        assert_eq!(s.angle_precision()?, 1e-10);
+        let region = SurfIntersectOptions::default().search_region()?;
+        println!("\n    A = 1e-10: region {:?}", region);
+        assert!((region.max.x - 50.0).abs() < 1e-9 && (region.min.y + 50.0).abs() < 1e-9);
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let pl = Surf::plane(Axis2::new(Vec3::new(100.0, 0.0, 0.5), z, x))?;
+        let sp = Surf::sphere(Axis2::new(Vec3::new(100.0, 0.0, 0.0), z, x), 1.0)?;
+        let r = pl.intersect_with_checked(
+            &sp,
+            &SurfIntersectOptions::default(),
+            &SurfSurfCheck::default(),
+        )?;
+        assert!(r.result.curves.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::OutsideRegion { position, .. }) if (position.x - 100.0).abs() <= 1.0)
+        );
+    });
+    // Coincident surfaces come back empty by design (C1): the check must say
+    // Coincident, with the sense, and must not call a pair just outside the
+    // C1 band coincident (fixtures p1-rq1-*).
+    test!("ssi_checked_coincident", {
+        let _s = Session::start(test_config())?;
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let y = Vec3::new(0.0, 1.0, 0.0);
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let s1 = Surf::plane(Axis2::new(Vec3::new(0.0, 0.0, 3.0), z, x))?;
+        let none = SurfIntersectOptions::default();
+        let chk = SurfSurfCheck::default();
+        let check = |o: Vec3, n: Vec3, r: Vec3| -> PsResult<(bool, Option<RangeCheck>)> {
+            let s2 = Surf::plane(Axis2::new(o, n, r))?;
+            let c = s1.intersect_with_checked(&s2, &none, &chk)?;
+            assert!(c.result.points.is_empty() && c.result.curves.is_empty());
+            Ok((s1.is_coincident(&s2)?, c.empty))
+        };
+
+        // Same plane, same normal.
+        let r = check(Vec3::new(0.0, 0.0, 3.0), z, x)?;
+        println!("\n    same: {r:?}");
+        assert_eq!(
+            r,
+            (
+                true,
+                Some(RangeCheck::Coincident {
+                    same_sense: Some(true)
+                })
+            )
+        );
+        // p1-rq1-pla-pla-antiparallel-coincident: opposite normal.
+        let r = check(Vec3::new(1.0, 2.0, 3.0), Vec3::new(0.0, 0.0, -1.0), x)?;
+        println!("    anti-parallel: {r:?}");
+        assert_eq!(
+            r,
+            (
+                true,
+                Some(RangeCheck::Coincident {
+                    same_sense: Some(false)
+                })
+            )
+        );
+        // Tilt 0.5A, offset 0.4L: 0.9L, inside the band.
+        let r = check(
+            Vec3::new(0.0, 0.0, 3.0 + 4e-9),
+            Vec3::new(5e-12, 0.0, 1.0),
+            y,
+        )?;
+        println!("    tilt 0.5A offset 0.4L: {r:?}");
+        assert_eq!(
+            r,
+            (
+                true,
+                Some(RangeCheck::Coincident {
+                    same_sense: Some(true)
+                })
+            )
+        );
+
+        // p1-rq1-pla-pla-tilt0p5A-offset0p6L: 1.1L, just outside the band. The
+        // kernel treats it as parallel and disjoint (C11), yet the planes are
+        // within L everywhere in the size box: Suspect, not Coincident.
+        let r = check(
+            Vec3::new(0.0, 0.0, 3.0 + 6e-9),
+            Vec3::new(5e-12, 0.0, 1.0),
+            y,
+        )?;
+        println!("    tilt 0.5A offset 0.6L: {r:?}");
+        assert!(!r.0);
+        match r.1 {
+            Some(RangeCheck::Suspect {
+                min_distance,
+                position,
+                ..
+            }) => {
+                assert!(
+                    min_distance <= 1e-8 && position.x.abs() <= 500.0 && position.y.abs() <= 500.0
+                )
+            }
+            other => panic!("expected Suspect, got {other:?}"),
+        }
+        // p1-rq1-pla-pla-antiparallel-offset-1p1L: outside the band and 1.1L apart.
+        let r = check(
+            Vec3::new(1.0, 2.0, 3.0 + 1.1e-8),
+            Vec3::new(0.0, 0.0, -1.0),
+            x,
+        )?;
+        println!("    anti-parallel offset 1.1L: {r:?}");
+        assert!(!r.0);
+        assert!(
+            matches!(r.1, Some(RangeCheck::Separated { min_distance }) if (min_distance - 1.1e-8).abs() < 1e-14)
+        );
+    });
+    test!("ssi_checked_uvbox_bound", {
+        let _s = Session::start(test_config())?;
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        let a = Surf::plane(Axis2::new(
+            o,
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let b = Surf::plane(Axis2::new(
+            o,
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ))?;
+        // The patch u in [10, 20] of z = 0 (u = x) misses the plane x = 0 by 10.
+        let opts = SurfIntersectOptions {
+            uvbox_1: Some(UvBox {
+                u_min: 10.0,
+                v_min: -1.0,
+                u_max: 20.0,
+                v_max: 1.0,
+            }),
+            ..Default::default()
+        };
+        let r = a.intersect_with_checked(&b, &opts, &SurfSurfCheck::default())?;
+        println!("\n    patch 10 from x = 0: {:?}", r.empty);
+        assert!(r.result.curves.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Separated { min_distance }) if (min_distance - 10.0).abs() < 1e-12)
+        );
+    });
+    test!("surf_curve_checked_empty", {
+        let _s = Session::start(test_config())?;
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let chk = SurfCurveCheck::default();
+        let sp = Surf::sphere(Axis2::new(o, z, x), 1.0)?;
+
+        // Line 1e-6 off the sphere: a genuine miss.
+        let miss = Curve::line(Vec3::new(-2.0, 1.0 + 1e-6, 0.0), x)?;
+        let r = sp.intersect_curve_checked(&miss, (0.0, 4.0), &chk)?;
+        println!("\n    miss 1e-6: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Separated { min_distance }) if (min_distance - 1e-6).abs() < 1e-12)
+        );
+
+        // A line crossing z = 0 at x = 2000, outside the size box: the kernel
+        // returns nothing and no error.
+        let pl = Surf::plane(Axis2::new(o, z, x))?;
+        let far = Curve::line(Vec3::new(2000.0, 0.0, 5.0), z)?;
+        let r = pl.intersect_curve_checked(&far, (-10.0, 10.0), &chk)?;
+        println!("    crossing at x = 2000: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        match r.empty {
+            Some(RangeCheck::OutsideRegion {
+                min_distance,
+                position,
+            }) => {
+                assert!(
+                    min_distance == 0.0
+                        && (position.x - 2000.0).abs() < 1e-9
+                        && position.z.abs() < 1e-9
+                )
+            }
+            other => panic!("expected OutsideRegion, got {other:?}"),
+        }
+
+        // Touching within L (0.5e-8): the kernel reports the hit, so there is
+        // nothing to check. No surf/curve touch within L that comes back empty
+        // was found (sphere/line, plane/circle, cylinder/line; 0.5e-8 and 0.9e-8).
+        let touch = Curve::line(Vec3::new(-2.0, 1.0 + 0.5e-8, 0.0), x)?;
+        let r = sp.intersect_curve_checked(&touch, (0.0, 4.0), &chk)?;
+        assert_eq!(r.hits.len(), 1);
+        assert!(r.empty.is_none());
+    });
+
     // =========================================================================
     // Summary
     // =========================================================================

@@ -79,7 +79,9 @@ pub use facet::{
 pub use frustrum::FrustrumConfig;
 pub use geom::{Axis2, Vec3};
 pub use intersect::{
-    CheckedCurveCurve, CheckedHit, CurveCurveCheck, CurveCurveHit, EmptyCheck, FaceCurveHit, SurfCurveHit,
+    CheckedCurveCurve, CheckedHit, CheckedSurfCurve, CheckedSurfSurf, CurveCurveCheck,
+    CurveCurveHit, EmptyCheck, FaceCurveHit, RangeCheck, SurfCurveCheck, SurfCurveHit,
+    SurfSurfCheck,
 };
 pub use jet::{CurveJet, Hand, MinRadius, SurfJet};
 pub use mass::{DEFAULT_MASS_ACCURACY, MassProps};

@@ -621,7 +621,9 @@ pub enum IntersectionKind {
 /// exposed: their effect has not been measured.
 #[derive(Debug, Clone, Copy, Default, PartialEq)]
 pub struct SurfIntersectOptions {
-    /// Model-space box of interest (`have_box` / `box`).
+    /// Model-space box of interest (`have_box` / `box`). It **replaces** the
+    /// session size box rather than narrowing it (see
+    /// [`SurfIntersectOptions::search_region`]).
     pub region: Option<crate::Aabb>,
     /// Parameter patch of the receiver (`have_uvbox_1` / `uvbox_1`). Used as the
     /// model-space box of that patch, not as a parametric trim.
