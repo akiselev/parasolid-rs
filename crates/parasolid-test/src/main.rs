@@ -7715,6 +7715,267 @@ fn main() {
     });
 
     // =========================================================================
+    // P1 budgets: a runaway PK call returns BudgetExceeded (parasolid-re B23)
+    // =========================================================================
+
+    // p1-r8-c27-pla-cyl-fp-a-r2e-6-{p1p5L,m1p5L,p3L} (bit-exact): plane z = 0
+    // against a cylinder of radius ~2e-6 whose axis is tilted 3e-8 out of the
+    // plane. PK_SURF_intersect_surf never returns and grows memory at about
+    // 70 MB/s (B23). Only the radius differs between the three fixtures.
+    const B23_P1P5L: u64 = 0x3ec0e72df709365f;
+    const B23_M1P5L: u64 = 0x3ec0a6c14a62a4bb;
+    const B23_P3L: u64 = 0x3ec107644d5c7f32;
+    const MB: usize = 1024 * 1024;
+    fn b23_pair(radius_bits: u64) -> PsResult<(Surf, Surf)> {
+        let plane = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let axis = Vec3::new(
+            f64::from_bits(0x3feffffffffffffc),
+            0.0,
+            f64::from_bits(0x3e601b2b29a4692b),
+        );
+        let cyl = Surf::cylinder(
+            Axis2::new(Vec3::zero(), axis, Vec3::new(0.0, 1.0, 0.0)),
+            f64::from_bits(radius_bits),
+        )?;
+        Ok((plane, cyl))
+    }
+    /// Plane/plane: z = 0 against x = 0 meets in one line.
+    fn plane_plane_lines() -> PsResult<usize> {
+        let a = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let b = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ))?;
+        Ok(a.intersect_with(&b, &SurfIntersectOptions::default())?
+            .curves
+            .len())
+    }
+    fn b23_time(radius_bits: u64) -> Result<(), Box<dyn std::error::Error>> {
+        let session = Session::start(test_config())?;
+        let (p, c) = b23_pair(radius_bits)?;
+        let before = session.budget_stats();
+        let r = session.with_budget(Budget::time(std::time::Duration::from_secs(3)), || {
+            p.intersect_with(&c, &SurfIntersectOptions::default())
+        });
+        let after = session.budget_stats();
+        match r.map(|_| ()) {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Time,
+                pk_code,
+                elapsed,
+                live_bytes,
+            }) => {
+                println!(
+                    "\n    pk_code {pk_code}, elapsed {:.3} s, live at abort {:.1} MB, live after {:.2} MB (entry {:.2} MB), aborts landed {} missed {}, drains {}",
+                    elapsed.as_secs_f64(),
+                    live_bytes as f64 / MB as f64,
+                    after.live_bytes as f64 / MB as f64,
+                    before.live_bytes as f64 / MB as f64,
+                    after.aborts_landed - before.aborts_landed,
+                    after.aborts_missed - before.aborts_missed,
+                    after.drains - before.drains,
+                );
+                assert!(pk_code == PK_ERROR_aborted || pk_code == PK_ERROR_system_error);
+                assert!(elapsed.as_secs_f64() >= 3.0 && elapsed.as_secs_f64() < 10.0);
+                assert!(
+                    live_bytes > before.live_bytes + 50 * MB,
+                    "the march was growing"
+                );
+            }
+            other => panic!("expected BudgetExceeded{{Time}}, got {other:?}"),
+        }
+        assert_eq!(after.aborts_landed - before.aborts_landed, 1);
+        // The kernel released the march's memory and the session still works.
+        assert!(
+            after.live_bytes <= before.live_bytes + 4 * MB,
+            "live bytes {} after vs {} at entry",
+            after.live_bytes,
+            before.live_bytes
+        );
+        assert_eq!(plane_plane_lines()?, 1);
+        Ok(())
+    }
+
+    test!("budget_time_b23_p1p5L", { b23_time(B23_P1P5L)? });
+    test!("budget_time_b23_m1p5L", { b23_time(B23_M1P5L)? });
+    test!("budget_time_b23_p3L", { b23_time(B23_P3L)? });
+
+    test!("budget_memory_b23", {
+        let session = Session::start(test_config())?;
+        let (p, c) = b23_pair(B23_P1P5L)?;
+        let before = session.budget_stats();
+        let r = session.with_budget(Budget::memory(200 * MB), || {
+            p.intersect_with(&c, &SurfIntersectOptions::default())
+        });
+        let after = session.budget_stats();
+        match r.map(|_| ()) {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Memory,
+                pk_code,
+                elapsed,
+                live_bytes,
+            }) => {
+                println!(
+                    "\n    pk_code {pk_code}, elapsed {:.3} s, live at refusal entry+{:.3} MB, refusals {}, live after {:.2} MB (entry {:.2} MB)",
+                    elapsed.as_secs_f64(),
+                    live_bytes.saturating_sub(before.live_bytes) as f64 / MB as f64,
+                    after.refusals - before.refusals,
+                    after.live_bytes as f64 / MB as f64,
+                    before.live_bytes as f64 / MB as f64,
+                );
+                assert_eq!(pk_code, PK_ERROR_memory_full);
+                assert!(live_bytes <= before.live_bytes + 200 * MB);
+                assert!(live_bytes + MB > before.live_bytes + 200 * MB);
+            }
+            other => panic!("expected BudgetExceeded{{Memory}}, got {other:?}"),
+        }
+        assert!(after.refusals > before.refusals);
+        assert!(after.live_bytes <= before.live_bytes + 4 * MB);
+        assert_eq!(plane_plane_lines()?, 1);
+    });
+
+    test!("budget_fast_call", {
+        let session = Session::start(test_config())?;
+        let before = session.budget_stats();
+        let budget = Budget::time(std::time::Duration::from_secs(3)).with_memory(200 * MB);
+        let n = session.with_budget(budget, plane_plane_lines)?;
+        assert_eq!(n, 1);
+        // Nested scopes are refused, not silently merged.
+        let nested = session.with_budget(budget, || session.with_budget(budget, plane_plane_lines));
+        assert!(matches!(nested, Err(PsError::Session(_))), "{nested:?}");
+        let after = session.budget_stats();
+        assert_eq!(after.aborts_landed, before.aborts_landed);
+        assert_eq!(after.drains, before.drains);
+        // No stray abort on the next, unbudgeted calls.
+        for _ in 0..5 {
+            assert_eq!(plane_plane_lines()?, 1);
+        }
+    });
+
+    // The stale-flag hazard (B23 stage `stale`): an abort that lands in a
+    // call that never reaches a poll point stays pending and would abort the
+    // next allocating call. Stale-tag calls fail argument checking without
+    // allocating, so the 5 ms watchdog lands in one of them; the guard must
+    // drain the flag at once.
+    test!("budget_drain_stale_flag", {
+        let session = Session::start(test_config())?;
+        let x = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ))?;
+        let stale = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let tag = stale.tag();
+        assert_eq!(unsafe { PK_ENTITY_delete(1, &tag) }, PK_ERROR_no_errors);
+        let before = session.budget_stats();
+        let mut n_failed = 0u64;
+        let r = session.with_budget(Budget::time(std::time::Duration::from_millis(5)), || {
+            let t = std::time::Instant::now();
+            while t.elapsed() < std::time::Duration::from_secs(5) {
+                match stale.intersect_with(&x, &SurfIntersectOptions::default()) {
+                    Err(PsError::NotAnEntity { .. }) => n_failed += 1,
+                    Err(e) => return Err(e),
+                    Ok(_) => panic!("intersection with a deleted plane succeeded"),
+                }
+            }
+            Ok(())
+        });
+        let after = session.budget_stats();
+        println!(
+            "\n    {n_failed} failing calls; result {r:?}; aborts landed {} missed {}; drains {}, flags drained {}",
+            after.aborts_landed - before.aborts_landed,
+            after.aborts_missed - before.aborts_missed,
+            after.drains - before.drains,
+            after.drained_flags - before.drained_flags,
+        );
+        match r {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Time,
+                pk_code,
+                ..
+            }) => assert!(pk_code == PK_ERROR_not_an_entity || pk_code == PK_ERROR_aborted),
+            other => panic!("expected BudgetExceeded{{Time}}, got {other:?}"),
+        }
+        assert_eq!(after.aborts_landed - before.aborts_landed, 1);
+        // The next allocating calls see no stale abort.
+        for _ in 0..3 {
+            assert_eq!(plane_plane_lines()?, 1);
+        }
+    });
+
+    test!("budget_default_covers_runaway", {
+        let three = Budget::time(std::time::Duration::from_secs(3));
+        let session = Session::start(test_config().default_budget(three))?;
+        assert_eq!(session.default_budget(), Some(three));
+        // Ordinary calls under the per-call default budget are unaffected.
+        let before = session.budget_stats();
+        for _ in 0..200 {
+            assert_eq!(plane_plane_lines()?, 1);
+        }
+        assert_eq!(session.budget_stats().aborts_landed, before.aborts_landed);
+        // A plain wrapper call, no with_budget: the default budget stops it.
+        let (p, c) = b23_pair(B23_P1P5L)?;
+        match p
+            .intersect_with(&c, &SurfIntersectOptions::default())
+            .map(|_| ())
+        {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Time,
+                pk_code,
+                elapsed,
+                live_bytes,
+            }) => {
+                println!(
+                    "\n    pk_code {pk_code}, elapsed {:.3} s, live at abort {:.1} MB",
+                    elapsed.as_secs_f64(),
+                    live_bytes as f64 / MB as f64
+                );
+                assert!(pk_code == PK_ERROR_aborted || pk_code == PK_ERROR_system_error);
+            }
+            other => panic!("expected BudgetExceeded{{Time}}, got {other:?}"),
+        }
+        assert_eq!(plane_plane_lines()?, 1);
+        session.set_default_budget(None);
+        assert_eq!(session.default_budget(), None);
+    });
+
+    test!("budget_rollback_session", {
+        let session = Session::start(test_config().rollback(true))?;
+        let part = session.current_partition()?;
+        let (p, c) = b23_pair(B23_P1P5L)?;
+        let n_bodies = part.bodies()?.len();
+        let r = session.with_budget(Budget::time(std::time::Duration::from_secs(3)), || {
+            let _block = Body::create_solid_block(1.0, 1.0, 1.0)?;
+            assert_eq!(part.bodies()?.len(), n_bodies + 1);
+            p.intersect_with(&c, &SurfIntersectOptions::default())
+        });
+        match r.map(|_| ()) {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Time,
+                pk_code,
+                ..
+            }) => println!("\n    pk_code {pk_code}"),
+            other => panic!("expected BudgetExceeded{{Time}}, got {other:?}"),
+        }
+        // Rolled back to the pmark taken on entry: the block is gone.
+        assert_eq!(part.bodies()?.len(), n_bodies);
+        assert_eq!(plane_plane_lines()?, 1);
+    });
+
+    // =========================================================================
     // Summary
     // =========================================================================
 

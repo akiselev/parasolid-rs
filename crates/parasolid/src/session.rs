@@ -9,6 +9,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use parasolid_sys::*;
 
+use crate::budget::{self, Budget, BudgetStats};
 use crate::error::{PsError, PsResult};
 use crate::frustrum::{self, FrustrumConfig};
 use crate::memory::PkArray;
@@ -213,6 +214,9 @@ pub struct SessionConfig {
     pub(crate) angle_precision: Option<f64>,
     pub(crate) err_reports: Option<bool>,
     pub(crate) smp_threads: Option<i32>,
+
+    /// Session-wide default [`Budget`] (see [`Session::set_default_budget`]).
+    pub(crate) default_budget: Option<Budget>,
 }
 
 impl SessionConfig {
@@ -242,6 +246,7 @@ impl SessionConfig {
             angle_precision: None,
             err_reports: None,
             smp_threads: None,
+            default_budget: None,
         }
     }
 
@@ -338,6 +343,14 @@ impl SessionConfig {
     /// Set the number of SMP worker threads. 0 = disable SMP.
     pub fn smp_threads(mut self, n: i32) -> Self {
         self.smp_threads = Some(n);
+        self
+    }
+
+    /// Start the session with a default [`Budget`] on every wrapper PK call
+    /// (see [`Session::set_default_budget`]). It takes effect after the
+    /// session parameters are applied.
+    pub fn default_budget(mut self, budget: Budget) -> Self {
+        self.default_budget = Some(budget);
         self
     }
 }
@@ -455,6 +468,7 @@ impl Session {
         // If apply_config fails, Session::Drop will call PK_SESSION_stop
         // and reset SESSION_ACTIVE.
         session.apply_config(&config)?;
+        budget::session_started(config.rollback, config.default_budget);
         Ok(session)
     }
 
@@ -692,6 +706,72 @@ impl Session {
     }
 
     // =========================================================================
+    // Budgets
+    // =========================================================================
+
+    /// Run `f` under a time and memory [`Budget`]. A PK call that exceeds it
+    /// returns [`PsError::BudgetExceeded`] instead of running on (parasolid-re
+    /// B23: a runaway `PK_SURF_intersect_surf` stops about 0.1 s after the
+    /// deadline, with its memory released).
+    ///
+    /// Unset fields of `budget` fall back to the session's default budget. The
+    /// watchdog and the memory limit span the whole closure, so raw
+    /// `parasolid_sys` calls inside it are covered too.
+    ///
+    /// - Time: the deadline counts from entry. Once the watchdog's abort has
+    ///   landed, the scope is over: wrapper calls made after that return the
+    ///   same `BudgetExceeded` without entering the kernel, and so does
+    ///   `with_budget`, even if `f` swallowed the error.
+    /// - Memory: kernel memory may grow by `memory_bytes` over what was live at
+    ///   entry; the refused allocation makes the call return
+    ///   `PK_ERROR_memory_full`, reported as `BudgetExceeded { kind: Memory }`.
+    /// - Any other error, and every result of a call that finished in budget,
+    ///   passes through unchanged.
+    /// - With partitioned rollback ([`SessionConfig::rollback`]) a pmark is
+    ///   taken on entry and the session is rolled back to it after a budget
+    ///   error.
+    ///
+    /// Not re-entrant: a nested call returns [`PsError::Session`]. Single
+    /// thread only: `f` must make its PK calls on this thread. A kernel loop
+    /// that never allocates cannot be interrupted, so keep a process-level
+    /// timeout as a backstop.
+    pub fn with_budget<T>(&self, budget: Budget, f: impl FnOnce() -> PsResult<T>) -> PsResult<T> {
+        budget::with_budget(budget, f)
+    }
+
+    /// Set (or with `None` clear) the session-wide default [`Budget`].
+    ///
+    /// It applies **per PK call** to every wrapper call made outside
+    /// [`Session::with_budget`] on this thread: each call gets the full
+    /// budget, counted from its own entry. A call that runs over returns
+    /// [`PsError::BudgetExceeded`]; calls that finish in budget are
+    /// unaffected (an abort that lands after a call's last poll point is
+    /// drained before the call returns). Inside `with_budget` it fills the
+    /// fields the explicit budget leaves unset.
+    ///
+    /// Coverage: wrapper calls that go through the crate's `pk_call!` macro,
+    /// plus `PK_BODY_boolean_2`, `PK_BODY_imprint_body` and `PK_TOPOL_facet_2`.
+    /// Raw `parasolid_sys` calls, and the few wrapper calls that call the
+    /// kernel directly (for example the `PK_GEOM_range` classification in the
+    /// checked intersections), are covered only inside `with_budget`. No
+    /// pmark is taken per call, even in a rollback session. Cleared when the
+    /// session stops.
+    pub fn set_default_budget(&self, budget: Option<Budget>) {
+        budget::set_default(budget);
+    }
+
+    /// The session-wide default budget, if any.
+    pub fn default_budget(&self) -> Option<Budget> {
+        budget::default_budget()
+    }
+
+    /// Budget counters: live kernel (`FMALLO`) bytes, aborts, refusals and
+    /// drains. Process-wide and cumulative, except `live_bytes`.
+    pub fn budget_stats(&self) -> BudgetStats {
+        budget::stats()
+    }
+
+    // =========================================================================
     // Mark access
     // =========================================================================
 
@@ -750,6 +830,7 @@ impl Drop for Session {
             let _ = PK_SESSION_stop();
         }
         frustrum::reset();
+        budget::session_stopped();
         SESSION_ACTIVE.store(false, Ordering::SeqCst);
     }
 }

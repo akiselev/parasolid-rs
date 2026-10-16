@@ -4,7 +4,8 @@
 //! provide memory management and file I/O callbacks before starting a session.
 //!
 //! This module provides sensible defaults:
-//! - **Memory**: uses `std::alloc` with 16-byte alignment.
+//! - **Memory**: uses `std::alloc` with 16-byte alignment, counts live bytes,
+//!   and enforces a [`Budget`](crate::Budget)'s memory limit.
 //! - **File I/O**: uses `std::fs` with guise-based file extensions per PK §6.4.2.
 //!
 //! Custom callbacks can be supplied by building a `PK_SESSION_frustrum_t`
@@ -346,6 +347,14 @@ unsafe extern "C" fn default_fmallo(
             *ifail = FR_no_errors;
             return;
         }
+        // A memory budget refuses with FR_memory_full, which the kernel treats
+        // as a quiet NULL and unwinds to PK_ERROR_memory_full (parasolid-re B23).
+        if !crate::budget::admit(size) {
+            trace!("FMALLO: {size} bytes refused by the memory budget");
+            *memory = std::ptr::null_mut();
+            *ifail = FR_memory_full;
+            return;
+        }
         let layout = std::alloc::Layout::from_size_align(size, ALLOC_ALIGN)
             .expect("invalid allocation layout");
         let ptr = std::alloc::alloc_zeroed(layout);
@@ -353,6 +362,7 @@ unsafe extern "C" fn default_fmallo(
             trace!("FMALLO: alloc FAILED for {size} bytes");
             *ifail = FR_memory_full;
         } else {
+            crate::budget::note_alloc(size);
             *memory = ptr as *mut c_char;
             *ifail = FR_no_errors;
         }
@@ -387,6 +397,7 @@ unsafe extern "C" fn default_fmfree(
         let layout = std::alloc::Layout::from_size_align(size, ALLOC_ALIGN)
             .expect("invalid deallocation layout");
         std::alloc::dealloc(ptr as *mut u8, layout);
+        crate::budget::note_free(size);
         *memory = std::ptr::null_mut();
         *ifail = FR_no_errors;
     }));

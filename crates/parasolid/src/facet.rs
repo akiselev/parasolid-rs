@@ -373,7 +373,7 @@ fn facet_topols(topols: &[i32], opts: &FacetOptions) -> PsResult<Mesh> {
     let mut t = topols.to_vec();
     // SAFETY: zeroed is a valid empty result (counts 0, null table pointer).
     let mut r: PK_TOPOL_facet_2_r_t = unsafe { std::mem::zeroed() };
-    let code = unsafe {
+    let code = crate::budget::guard(|| unsafe {
         PK_TOPOL_facet_2(
             t.len() as c_int,
             t.as_mut_ptr(),
@@ -381,6 +381,16 @@ fn facet_topols(topols: &[i32], opts: &FacetOptions) -> PsResult<Mesh> {
             &mut o,
             &mut r,
         )
+    });
+    let code = match code {
+        Ok(code) => code,
+        Err(budget) => {
+            if !r.tables.is_null() {
+                // SAFETY: the kernel allocated these tables; free them before reporting.
+                unsafe { PK_TOPOL_facet_2_r_f(&mut r) };
+            }
+            return Err(budget);
+        }
     };
     if code != 0 {
         if !r.tables.is_null() {

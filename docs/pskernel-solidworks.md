@@ -1843,3 +1843,44 @@ unchanged, with no error, for a pure translation of magnitude <= 1e-8 (session
 precision) or a rotation of angle <= 1e-11 rad (angular precision); 2e-8 and
 1e-9 rad are applied. Never sweep a small transform around a zero nominal. Use a
 large lever (move by `L + kT`, then by `-L`) or perturb a primitive dimension.
+
+## Budgets for runaway PK calls (parasolid-re B23, 2026-10-16)
+
+`Session::with_budget(Budget { time, memory_bytes }, f)` and a session-wide
+default (`Session::set_default_budget`, `SessionConfig::default_budget`) turn a
+call that never returns into `PsError::BudgetExceeded { kind, pk_code, elapsed,
+live_bytes }`. Time: a parked watchdog thread calls
+`PK_SESSION_abort(PK_abort_user_interrupt_c)`; the kernel services the flag at
+its next DS-allocator poll and returns 945 (rarely 900). Memory: the default
+`FMALLO` counts live bytes and refuses with `FR_memory_full`, giving 901. Wine
+tests `budget_*` (B23 fixtures p1p5L/m1p5L/p3L: 945 about 3.1 s in, memory back
+to the pre-call level; 901 at entry + 200 MB; the rollback session is rolled
+back to its entry pmark).
+
+Residual risk:
+- A kernel loop that never allocates never polls, so it cannot be interrupted.
+  Keep a process timeout or cgroup as the backstop.
+- An abort that lands after a call's last poll leaves the flag set, and the next
+  allocating call would fail with 945. The guard drains it with a sacrificial
+  `PK_PLANE_create`. If a *lightweight* PK function (one with no ERR frame)
+  ever picked up the flag, `ERR__vreport` would call `exit(1)` (static-observed
+  in B23, never triggered).
+- The per-call default budget covers `pk_call!` sites plus `PK_BODY_boolean_2`,
+  `PK_BODY_imprint_body` and `PK_TOPOL_facet_2`; other raw calls are covered
+  only inside `with_budget`. Single-threaded sessions only; SMP is untested.
+
+### `PK_EDGE_ask_type` writes a 12-byte struct
+
+`PK_EDGE_ask_type` returns `PK_EDGE_ask_type_t { vertex_type, enclosure,
+fins_type }` (V35 header), not one token. The old 4-byte out-argument let the
+kernel overwrite 8 bytes of the caller's stack. Debug builds survived by
+layout luck; the release harness page-faulted in `spine_type_queries_block`
+(the clobbered saved `rsi` read `0x00000E76_00001647` = normal 3702, on 5703).
+
+### Open: `PK_PARTITION_create` returns 5022 in release builds only
+
+`partition_bodies_and_geoms` fails with `PK_ERROR_o_t_version_unknown` in the
+release profile and passes in dev, at 80d08ff and before. The release code
+stores `o_t_version = 1` and the one-byte logical, leaving three padding bytes
+of the 8-byte `PK_PARTITION_create_o_t` uninitialised. The real option layout
+is unverified; run the option-version sweep on it.

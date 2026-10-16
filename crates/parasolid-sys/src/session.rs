@@ -749,8 +749,19 @@ unsafe extern "C" {
     /// Registers session (general registration call).
     pub fn PK_SESSION_register(code: c_int, data: PK_POINTER_t) -> PK_ERROR_code_t;
 
-    /// Registers a polling callback for long operations.
-    pub fn PK_SESSION_register_polling_cb(callback: *const c_void) -> PK_ERROR_code_t;
+    /// Registers a polling callback for long operations and returns the
+    /// previous one through `old_callback` (written only when non-null).
+    ///
+    /// Two arguments, not one: the export moves `rcx` (callback) to `rsi` and
+    /// `rdx` (out-pointer) to `rdi`, stores the new callback and writes the old
+    /// one with `test %rdi,%rdi; je; mov %rax,(%rdi)` @0x1803e9be2 (parasolid-re
+    /// B23, static-observed on 37.01.243). The DS allocator's poll sites call
+    /// the callback with no arguments. ch009 lists the function as
+    /// undocumented; nothing in this crate calls it.
+    pub fn PK_SESSION_register_polling_cb(
+        callback: *const c_void,
+        old_callback: *mut *const c_void,
+    ) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Kernel state queries

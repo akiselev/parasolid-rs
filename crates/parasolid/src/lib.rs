@@ -23,6 +23,7 @@ mod error;
 mod attrib;
 mod body;
 pub mod boolean;
+mod budget;
 pub mod check;
 mod compare;
 mod create;
@@ -57,6 +58,7 @@ pub use boolean::{
     BooleanOp, BooleanOptions, BooleanOutcome, BooleanReport, BooleanResult, MatchType,
     MatchedRegion, boolean_detailed,
 };
+pub use budget::{Budget, BudgetKind, BudgetStats};
 pub use check::{
     BodyCheckOptions, CheckFault, EdgeCheckOptions, FaceCheckOptions, FacePairCheckOptions,
     GeomCheckOptions, check_geom,

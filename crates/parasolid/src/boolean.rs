@@ -273,7 +273,7 @@ pub fn boolean_detailed(
     let mut tracking: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
     let mut results: PK_boolean_r_t = unsafe { std::mem::zeroed() };
 
-    let code = unsafe {
+    let code = crate::budget::guard(|| unsafe {
         PK_BODY_boolean_2(
             target.tag(),
             tool_tags.len() as c_int,
@@ -282,7 +282,7 @@ pub fn boolean_detailed(
             &mut tracking,
             &mut results,
         )
-    };
+    });
 
     // Always free tracking data, even on error — PK may have partially
     // populated it before returning an error code.
@@ -324,7 +324,7 @@ pub fn boolean_detailed(
 
     // Check the error code only after both frees, so an error path cannot leak
     // either allocation.
-    crate::error::pk_check(code)?;
+    crate::error::pk_check(code?)?;
 
     Ok(BooleanOutcome {
         result: BooleanResult::from_raw(result_raw),
