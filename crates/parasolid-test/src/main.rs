@@ -1109,6 +1109,33 @@ fn main() {
         );
     });
 
+    // Coincident sheets are imprinted only with `imprint_overlapping` (parasolid-re item i).
+    test!("imprint_overlapping_coincident_sheets", {
+        let _session = Session::start(test_config())?;
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        let pl = Surf::plane(Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0)))?;
+        let uv = |a, b, c, d| UvBox { u_min: a, v_min: b, u_max: c, v_max: d };
+        let sheets = || -> PsResult<(Body, Body)> {
+            Ok((pl.make_sheet_body(uv(0.0, 0.0, 2.0, 2.0))?, pl.make_sheet_body(uv(1.0, 1.0, 3.0, 3.0))?))
+        };
+        let (a, b) = sheets()?;
+        let fa = a.faces()?[0];
+        let fb = b.faces()?[0];
+        let (coi, _) = fa.is_coincident(fb, 1e-8)?;
+        assert!(!coi.is_coincident(), "partial overlap is not 'yes': {coi:?}");
+        let r = a.imprint_body(&b)?;
+        assert!(r.target_edges.is_empty() && r.tool_edges.is_empty(), "defaults imprint nothing: {r:?}");
+        assert_eq!(a.faces()?.len(), 1);
+
+        let (a, b) = sheets()?;
+        let opts = PK_BODY_imprint_o_t { imprint_overlapping: PK_LOGICAL_true, ..PK_BODY_imprint_o_t::default() };
+        let r = a.imprint_body_with(&b, &opts)?;
+        assert_eq!(r.target_edges.len(), 4, "overlap square [1,2]^2 on A: {r:?}");
+        assert_eq!(r.tool_edges.len(), 4, "overlap square [1,2]^2 on B: {r:?}");
+        assert_eq!(a.faces()?.len(), 2, "A split into overlap and remainder");
+        assert_eq!(b.faces()?.len(), 2, "B split into overlap and remainder");
+    });
+
     test!("ssi_plane_plane_line", {
         let _session = Session::start(test_config())?;
         let blk = Body::create_solid_block(10.0, 20.0, 30.0)?;

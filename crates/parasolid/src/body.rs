@@ -591,6 +591,17 @@ impl Body {
     /// version 1. With NULL or v1 options the kernel dereferences a null
     /// `matched_region` default and crashes (parasolid-re fixture
     /// `repro-imprint-body-v1-options`), so this wrapper could never succeed.
+    ///
+    /// Coincident (overlapping) faces are **not** imprinted with the defaults: the
+    /// call succeeds and returns nothing, even for coplanar plane sheets. Set
+    /// `imprint_overlapping = PK_LOGICAL_true` through [`Body::imprint_body_with`]
+    /// to get the overlap region: `target_edges` is then the complete closed
+    /// boundary of the shared region on this body, and `tool_edges` the same on
+    /// `tool`. Measured on 37.01.243 for planes, cylinders, spheres and their
+    /// B-surface twins (parasolid-test `imprint_overlapping_coincident_sheets`;
+    /// parasolid-re `artifacts/port/item-i-coincident/`). The vertex arrays stay
+    /// empty even when new vertices are made, and imprinted edges keep the curve
+    /// class of the boundary they came from.
     pub fn imprint_body(&self, tool: &Body) -> PsResult<ImprintResult> {
         self.imprint_body_with(tool, &PK_BODY_imprint_o_t::default())
     }
