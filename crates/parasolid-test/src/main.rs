@@ -7445,6 +7445,89 @@ fn main() {
     });
     // PK_TOPOL_facet_2 at option version 26 with the real table ABI
     // (parasolid-re B-P3-1, port/P3-faceting).
+    // PK_facet_local_tolerances_t is seven doubles (0x38): a tight local
+    // tolerance on one face of a cylinder adds facets to that face only.
+    test!("facet_local_tolerances_layout", {
+        let _s = Session::start(test_config())?;
+        let cyl = Body::create_solid_cylinder(10.0, 20.0)?;
+        let faces = cyl.faces()?;
+        assert_eq!(faces.len(), 3);
+        let run = |side: i32,
+                   lt: Option<PK_facet_local_tolerances_t>|
+         -> PsResult<(i32, std::collections::BTreeMap<i32, usize>)> {
+            let mut o = PK_TOPOL_facet_2_o_t::default();
+            o.choice.facet_face = PK_LOGICAL_true;
+            let lts = lt.map(|l| [l]);
+            let topols = [side];
+            let idx = [0i32];
+            if let Some(l) = &lts {
+                o.control.n_local_tols = 1;
+                o.control.local_tols = l.as_ptr();
+                o.control.n_topols_with_local_tols = 1;
+                o.control.topols_with_local_tols = topols.as_ptr();
+                o.control.local_tols_for_topols = idx.as_ptr();
+            }
+            let mut tag = cyl.tag();
+            let mut r: PK_TOPOL_facet_2_r_t = unsafe { std::mem::zeroed() };
+            let code =
+                unsafe { PK_TOPOL_facet_2(1, &mut tag, std::ptr::null_mut(), &mut o, &mut r) };
+            let mut per_face = std::collections::BTreeMap::new();
+            if code == 0 {
+                for i in 0..r.n_tables.max(0) as usize {
+                    let tb = unsafe { &*r.tables.add(i) };
+                    if tb.fctab == PK_TOPOL_fctab_facet_face_c {
+                        let t = unsafe { &*tb.table };
+                        let d = unsafe {
+                            std::slice::from_raw_parts(t.data as *const i32, t.length as usize)
+                        };
+                        for &f in d {
+                            *per_face.entry(f).or_insert(0) += 1;
+                        }
+                    }
+                }
+            }
+            if !r.tables.is_null() {
+                unsafe { PK_TOPOL_facet_2_r_f(&mut r) };
+            }
+            Ok((code, per_face))
+        };
+        let (c0, base) = run(0, None)?;
+        assert_eq!(c0, 0);
+        // The side face is the curved one: it has the most facets by default.
+        let s = *base.iter().max_by_key(|(_, n)| **n).unwrap().0;
+        let zero = run(s, Some(PK_facet_local_tolerances_t::default()))?;
+        let tight = PK_facet_local_tolerances_t {
+            surface_plane_tol: 1e-3,
+            ..Default::default()
+        };
+        let (c1, fine) = run(s, Some(tight))?;
+        // A face-only cap at the last field (+0x30) refines the side face too.
+        let wide = PK_facet_local_tolerances_t {
+            max_facet_width: 1.0,
+            ..Default::default()
+        };
+        let (c2, narrow) = run(s, Some(wide))?;
+        println!("\n    base {base:?}\n    zeroed local {zero:?}\n    surface_plane_tol 1e-3: {c1} {fine:?}\n    max_facet_width 1.0: {c2} {narrow:?}");
+        assert_eq!(
+            zero,
+            (0, base.clone()),
+            "an all-zero local tolerance (every field unset) changes nothing"
+        );
+        assert_eq!((c1, c2), (0, 0), "0x38-byte local tolerances are accepted");
+        assert!(
+            fine[&s] > base[&s],
+            "surface_plane_tol (+0x18) refines the face it is attached to: {} vs {}",
+            fine[&s],
+            base[&s]
+        );
+        assert!(
+            narrow[&s] > base[&s],
+            "max_facet_width (+0x30) refines the face it is attached to: {} vs {}",
+            narrow[&s],
+            base[&s]
+        );
+        // The flat caps share the side face's circular edges, so their facets follow the refined edge points.
+    });
     test!("facet_v26_layout", {
         abi_audit::facet_v26_layout()?;
     });

@@ -770,21 +770,35 @@ pub type PK_MESH_normal_type_t = c_int;
 // Local tolerance specification
 // =============================================================================
 
-/// Per-entity tolerance override for faceting.
+/// Per-entity tolerance override for faceting (`local_tols` in
+/// [`PK_TOPOL_facet_mesh_o_t`] and `PK_TOPOL_facet_mesh_2_o_t`): seven doubles,
+/// 0x38 bytes.
+///
+/// Evidence (pskernel.dll c900fa3f...3073): both journal printers walk the
+/// array with a 0x38-byte stride and print seven doubles at +0x00..+0x30 with no
+/// logicals: PKU_journal_TOPOL_facet_mesh_o @0x1814cad10 (v1) and FUN_1814cb3c0
+/// (mesh_2) (static-observed; parasolid-re artifacts/rs/20261021T031234Z-prs-render
+/// and 20261021T031231Z-prs-mesh/raw/decomp/FUN_1814cb3c0.c). Live: a tight
+/// local tolerance on one face changes only that face's facets (harness test
+/// `facet_local_tolerances_layout`). Replaces an unverified 5 logical/double-pair
+/// layout (80 bytes) that matched neither printer.
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct PK_facet_local_tolerances_t {
-    pub is_curve_chord_tol: PK_LOGICAL_t,
-    pub curve_chord_tol: c_double,
-    pub is_curve_chord_max: PK_LOGICAL_t,
-    pub curve_chord_max: c_double,
-    pub is_curve_chord_ang: PK_LOGICAL_t,
-    pub curve_chord_ang: c_double,
-    pub is_surface_plane_tol: PK_LOGICAL_t,
-    pub surface_plane_tol: c_double,
-    pub is_surface_plane_ang: PK_LOGICAL_t,
-    pub surface_plane_ang: c_double,
+    pub curve_chord_tol: c_double,   // @0x00
+    pub curve_chord_max: c_double,   // @0x08
+    pub curve_chord_ang: c_double,   // @0x10
+    pub surface_plane_tol: c_double, // @0x18
+    pub surface_plane_ang: c_double, // @0x20
+    pub min_facet_width: c_double,   // @0x28
+    pub max_facet_width: c_double,   // @0x30
 }
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_facet_local_tolerances_t>() == 0x38);
+    assert!(core::mem::offset_of!(PK_facet_local_tolerances_t, surface_plane_tol) == 0x18);
+    assert!(core::mem::offset_of!(PK_facet_local_tolerances_t, max_facet_width) == 0x30);
+};
 
 // =============================================================================
 // PK_TOPOL_render_facet options (GO facet output)
@@ -817,8 +831,7 @@ pub const PK_TOPOL_render_facet_o_t_version: c_int = 20;
 /// `local_tols` points at an array the kernel reads with a 0x38-byte stride
 /// (7 doubles: curve_chord_tol, curve_chord_max, curve_chord_ang,
 /// surface_plane_tol, surface_plane_ang, min_facet_width, max_facet_width,
-/// per the journal printer). That does not match the current
-/// `PK_facet_local_tolerances_t`; leave `n_local_tols` at 0.
+/// per the journal printer), which is `PK_facet_local_tolerances_t`.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_facet_mesh_o_t {
@@ -856,7 +869,7 @@ pub struct PK_TOPOL_facet_mesh_o_t {
     pub n_view_directions: c_int,
     pub view_directions: *const PK_VECTOR1_t,
     pub n_local_tols: c_int,
-    /// Element layout not verified (see the struct doc); keep `n_local_tols` 0.
+    /// Array of `n_local_tols` [`PK_facet_local_tolerances_t`] (0x38 each; a zero field is unset).
     pub local_tols: *const PK_facet_local_tolerances_t,
     pub n_topols_with_local_tols: c_int,
     pub topols_with_local_tols: *const PK_TOPOL_t,
