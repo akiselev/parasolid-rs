@@ -4,6 +4,7 @@
 //! Run:   WINEPATH=/path/to/SOLIDWORKS cargo run -p parasolid-test --bin parasolid-test --target x86_64-pc-windows-gnu
 
 mod abi_audit;
+mod mesh_options_tests;
 mod render_go;
 
 use parasolid::*;
@@ -3966,6 +3967,42 @@ fn main() {
             }
         }
     }
+
+    // =========================================================================
+    // Convergent modeling: verified mesh option structs (parasolid-re B-R45-1)
+    // — see mesh_options_tests.rs
+    // =========================================================================
+
+    test!("mesh_option_versions", {
+        mesh_options_tests::mesh_option_versions()?;
+    });
+    test!("mesh_make_facet_body_block", {
+        mesh_options_tests::mesh_make_facet_body_block()?;
+    });
+    test!("mesh_fin_mtopols_8_byte_handles", {
+        mesh_options_tests::mesh_fin_mtopols_8_byte_handles()?;
+    });
+    test!("mesh_store_normals_sharp_features", {
+        mesh_options_tests::mesh_store_normals_sharp_features()?;
+    });
+    test!("mesh_find_fix_defects_degenerate", {
+        mesh_options_tests::mesh_find_fix_defects_degenerate()?;
+    });
+    test!("mesh_make_meshes_bodies_surf", {
+        mesh_options_tests::mesh_make_meshes_bodies_surf()?;
+    });
+    test!("mesh_fill_holes_tube", {
+        mesh_options_tests::mesh_fill_holes_tube()?;
+    });
+    test!("mesh_imprint_and_partition_enquiry", {
+        mesh_options_tests::mesh_imprint_and_partition_enquiry()?;
+    });
+    test!("mesh_pick_topols_block", {
+        mesh_options_tests::mesh_pick_topols_block()?;
+    });
+    test!("mesh_find_perimeters_options", {
+        mesh_options_tests::mesh_find_perimeters_options()?;
+    });
 
     // =========================================================================
     // Geometry simplification + tolerant-edge optimisation

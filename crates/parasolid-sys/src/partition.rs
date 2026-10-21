@@ -801,10 +801,24 @@ unsafe extern "C" {
         options: *mut PK_PARTITION_reset_attribs_o_t,
     ) -> PK_ERROR_code_t;
 
-    /// Ask whether partition has facet geometry.
+    /// Categorise a partition's geometry, and optionally list its parts and
+    /// orphan geometries that carry facet geometry.
+    ///
+    /// Signature per the V35 header and the wrapper @0x180396970, which journals
+    /// `*partition_category`, `n_parts`, `parts`, `part_categories`, `n_geoms` and
+    /// `geoms`. The previous two-argument declaration was wrong. The categories are
+    /// `PK_GEOM_category_*_c` tokens (`PK_geom_category_t`). The arrays are
+    /// returned only when `want_parts` / `want_geoms` are set; free them with
+    /// `PK_MEMORY_free`.
     pub fn PK_PARTITION_ask_facet_geom(
         partition: PK_PARTITION_t,
-        has_facet_geom: *mut PK_LOGICAL_t,
+        options: *const PK_PARTITION_ask_facet_geom_o_t,
+        partition_category: *mut PK_geom_category_t,
+        n_parts: *mut c_int,
+        parts: *mut *mut PK_PART_t,
+        part_categories: *mut *mut PK_geom_category_t,
+        n_geoms: *mut c_int,
+        geoms: *mut *mut PK_GEOM_t,
     ) -> PK_ERROR_code_t;
 
     /// Ask whether partition contains lattices.

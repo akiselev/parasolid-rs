@@ -67,10 +67,39 @@ pub type PK_BB_t = PK_ENTITY_t;
 
 // Convergent modeling tags
 pub type PK_MESH_t = PK_ENTITY_t;
-pub type PK_MFACET_t = PK_ENTITY_t;
-pub type PK_MFIN_t = PK_ENTITY_t;
-pub type PK_MVERTEX_t = PK_ENTITY_t;
-pub type PK_MTOPOL_t = PK_ENTITY_t;
+
+/// A mesh-topology handle (mfacet, mfin or mvertex): **8 bytes, passed by
+/// value**, not a 4-byte entity tag. Mesh topology is not made of nodes, so it
+/// has no tag of its own.
+///
+/// Evidence (V37.01.243, static-observed):
+/// - `PK_MESH_find_sharp_mvxs` @0x180374990 and `PK_MESH_find_sharp_mfins`
+///   @0x180373b70 allocate `n << 3` bytes for their output arrays and store one
+///   `u64` per element: the low word is `DS_tag_of_node(...)` and the high word a
+///   negated index;
+/// - `PK_MVERTEX_ask_position` @0x180390fc0 reads the full 64-bit `RCX`
+///   (`CONCAT44(in_register_0000000c, mvertex)`);
+/// - the kernel's defect-details printer strides `mtopols` arrays by 8.
+///
+/// Documented: the V35 manual (ch084) says to "use `PK_MTOPOL_null_m` to create a
+/// null `PK_MTOPOL_t`" (a macro value, which fits a struct, not a tag).
+///
+/// Live (dynamic-observed): handles returned by `PK_MESH_find_sharp_mvxs` give
+/// correct positions from `PK_MVERTEX_ask_position` (test
+/// `mesh_sharp_mvxs_and_mfins`). Evidence: parasolid-re
+/// `artifacts/rs/20261021T031231Z-prs-mesh/`.
+///
+/// The words stay opaque because their meaning is only partly established. The
+/// value of `PK_MTOPOL_null_m` is not known, so there is no null constant.
+#[repr(C)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub struct PK_MTOPOL_t {
+    pub words: [c_int; 2],
+}
+const _: () = assert!(core::mem::size_of::<PK_MTOPOL_t>() == 8);
+pub type PK_MFACET_t = PK_MTOPOL_t;
+pub type PK_MFIN_t = PK_MTOPOL_t;
+pub type PK_MVERTEX_t = PK_MTOPOL_t;
 
 // SP-curve (surface-parametric curve) tag
 pub type PK_SPCURVE_t = PK_ENTITY_t;

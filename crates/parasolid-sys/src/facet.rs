@@ -1703,76 +1703,17 @@ impl Default for PK_GEOM_render_o_t {
 // Picking option/result structs
 // =============================================================================
 
-/// Options for PK_BODY_pick_topols.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_BODY_pick_topols_o_t {
-    pub max_faces: c_int,
-    pub max_edges: c_int,
-    pub max_vertices: c_int,
-    pub max_edge_dist: c_double,
-    pub max_vertex_dist: c_double,
-    pub ignore_excess_entities: PK_LOGICAL_t,
-    pub method: PK_BODY_pick_method_t,
-    pub ratio: c_double,
-    pub ignore_back_faces: PK_LOGICAL_t,
-    pub pick_approx: PK_pick_approximate_t,
-    pub location: PK_VECTOR_t,
-    pub direction: PK_VECTOR_t,
-}
+// `PK_BODY_pick_topols_o_t`: moved to `mesh_options.rs` (layout verified).
 
-/// Result structure from PK_BODY_pick_topols.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_BODY_pick_topols_r_t {
-    pub n_faces: c_int,
-    pub faces: *mut PK_FACE_t,
-    pub n_edges: c_int,
-    pub edges: *mut PK_EDGE_t,
-    pub n_vertices: c_int,
-    pub vertices: *mut PK_VERTEX_t,
-    pub e_faces: c_int,
-    pub e_edges: c_int,
-    pub e_vertices: c_int,
-    pub face_points: *mut PK_VECTOR_t,
-    pub edge_points: *mut PK_VECTOR_t,
-    pub vertex_points: *mut PK_VECTOR_t,
-    pub face_distances: *mut c_double,
-    pub edge_distances: *mut c_double,
-    pub vertex_distances: *mut c_double,
-}
+// `PK_BODY_pick_topols_r_t`: moved to `mesh_options.rs` (layout verified).
 
 // =============================================================================
 // Facet body conversion option structs
 // =============================================================================
 
-/// Options for PK_BODY_make_facet_body.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_BODY_make_facet_body_o_t {
-    pub is_max_facet_width: PK_LOGICAL_t,
-    pub max_facet_width: c_double,
-    pub is_distance_tolerance: PK_LOGICAL_t,
-    pub distance_tolerance: c_double,
-    pub is_angular_tolerance: PK_LOGICAL_t,
-    pub angular_tolerance: c_double,
-    pub is_max_chord_length: PK_LOGICAL_t,
-    pub max_chord_length: c_double,
-    pub retain_attributes: PK_LOGICAL_t,
-    pub retain_groups: PK_LOGICAL_t,
-    pub track_faces: PK_LOGICAL_t,
-    pub track_edges: PK_track_edges_t,
-    pub return_redundant: PK_LOGICAL_t,
-}
+// `PK_BODY_make_facet_body_o_t`: moved to `mesh_options.rs` (layout verified).
 
-/// Options for PK_MESH_make_bodies.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_make_bodies_o_t {
-    pub vertex_angle: c_double,
-    pub allow_disjoint: PK_LOGICAL_t,
-    pub preferred_body_type: PK_BODY_type_t,
-}
+// `PK_MESH_make_bodies_o_t`: moved to `mesh_options.rs` (layout verified).
 
 /// Callback type for propagation from seed mtopol (PK_MTOPOL_make_meshes).
 pub type PK_MTOPOL_select_cb_t =
@@ -1789,38 +1730,9 @@ pub type PK_MTOPOL_map_cb_f_t = Option<
     ),
 >;
 
-/// Options for PK_MTOPOL_make_meshes.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MTOPOL_make_meshes_o_t {
-    pub allow_disjoint: PK_LOGICAL_t,
-    pub select_cb: PK_MTOPOL_select_cb_t,
-    pub select_data: *mut c_void,
-    pub select_mtopol_class: PK_CLASS_t,
-    pub select_type: PK_selector_type_t,
-    pub map_mfacets: PK_MFACET_map_t,
-    pub map_mvertices: PK_MVERTEX_map_t,
-    pub map_cb: PK_MTOPOL_map_cb_f_t,
-    pub map_data: *mut c_void,
-    pub n_max_cb_mtopol: c_int,
-    pub n_faces: c_int,
-    pub faces: *const PK_FACE_t,
-    pub senses: *const PK_LOGICAL_t,
-    pub contributions: *const c_int,
-}
+// `PK_MTOPOL_make_meshes_o_t`: moved to `mesh_options.rs` (layout verified).
 
-/// Options for PK_MESH_make_surf_trimmed.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_make_surf_trimmed_o_t {
-    pub fitting_tolerance: c_double,
-    pub have_bdry_tolerance: PK_LOGICAL_t,
-    pub bdry_tolerance: c_double,
-    pub bdry_mvertex_angle: c_double,
-    pub fit_normals: PK_LOGICAL_t,
-    pub have_normal_tolerance: PK_LOGICAL_t,
-    pub normal_tolerance: c_double,
-}
+// `PK_MESH_make_surf_trimmed_o_t`: moved to `mesh_options.rs` (layout verified).
 
 // =============================================================================
 // PSM import structs
@@ -1948,110 +1860,37 @@ pub struct PK_MESH_create_from_facets_o_t {
 // Mesh checking/defect structs
 // =============================================================================
 
-/// Options for PK_MESH_find_defects.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_find_defects_o_t {
-    pub have_tolerance: PK_LOGICAL_t,
-    pub tolerance: c_double,
-    pub have_height_tolerance: PK_LOGICAL_t,
-    pub height_tolerance: c_double,
-    pub have_degen_tolerance: PK_LOGICAL_t,
-    pub degen_tolerance: c_double,
-    pub have_slit_tolerance: PK_LOGICAL_t,
-    pub slit_tolerance: c_double,
-}
+// `PK_MESH_find_defects_o_t`: moved to `mesh_options.rs` (layout verified).
 
-/// Options for PK_MESH_fix_defects.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_fix_defects_o_t {
-    pub have_tolerance: PK_LOGICAL_t,
-    pub tolerance: c_double,
-    pub have_height_tolerance: PK_LOGICAL_t,
-    pub height_tolerance: c_double,
-    pub have_degen_tolerance: PK_LOGICAL_t,
-    pub degen_tolerance: c_double,
-    pub have_slit_tolerance: PK_LOGICAL_t,
-    pub slit_tolerance: c_double,
-}
+// `PK_MESH_fix_defects_o_t`: moved to `mesh_options.rs` (layout verified).
 
-/// Structure containing defect information returned by PK_MESH_find_defects.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_defect_details_t {
-    pub n_defects: c_int,
-    pub defect_types: *mut PK_MESH_defect_t,
-    pub n_entities: c_int,
-    pub entities: *mut PK_MTOPOL_t,
-    pub entity_defect_indices: *mut c_int,
-}
+// `PK_MESH_defect_details_t`: moved to `mesh_options.rs` (layout verified).
 
 // =============================================================================
 // Mesh normal storage options
 // =============================================================================
 
-/// Options for PK_MESH_store_normals.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_store_normals_o_t {
-    pub replace: PK_MESH_replace_normal_t,
-    pub have_mesh_angle: PK_LOGICAL_t,
-    pub mesh_angle: c_double,
-    pub n_mtopols: c_int,
-    pub mtopols: *const PK_MTOPOL_t,
-    pub n_mtopol_normals: c_int,
-    pub mtopol_normals: *const c_double,
-    pub mtopol_normal_indices: *const c_int,
-}
+// `PK_MESH_store_normals_o_t`: moved to `mesh_options.rs` (layout verified).
 
 // =============================================================================
 // Mesh sharp feature options
 // =============================================================================
 
-/// Options for PK_MESH_find_sharp_mvxs.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_find_sharp_mvxs_o_t {
-    pub want_sharp_mvxs: PK_LOGICAL_t,
-}
+// `PK_MESH_find_sharp_mvxs_o_t`: moved to `mesh_options.rs` (layout verified).
 
-/// Options for PK_MESH_find_sharp_mfins.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_find_sharp_mfins_o_t {
-    pub want_sharp_mfins: PK_LOGICAL_t,
-    pub have_sharp_angle: PK_LOGICAL_t,
-    pub sharp_angle: c_double,
-}
+// `PK_MESH_find_sharp_mfins_o_t`: moved to `mesh_options.rs` (layout verified).
 
 // =============================================================================
 // Perimeter finding options
 // =============================================================================
 
-/// Options for PK_MFACET_find_perimeters.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MFACET_find_perimeters_o_t {
-    pub want_plines: PK_LOGICAL_t,
-    pub select_cb: PK_MTOPOL_select_cb_t,
-    pub select_data: *mut c_void,
-    pub select_mtopol_class: PK_CLASS_t,
-    pub select_wire_mfins: PK_selector_type_t,
-    pub min_n_mfacets: c_int,
-}
+// `PK_MFACET_find_perimeters_o_t`: moved to `mesh_options.rs` (layout verified).
 
 // =============================================================================
 // FIN_find_mtopols options
 // =============================================================================
 
-/// Options for PK_FIN_find_mtopols.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_FIN_find_mtopols_o_t {
-    pub want_mvertices: PK_LOGICAL_t,
-    pub want_mfins: PK_LOGICAL_t,
-}
+// `PK_FIN_find_mtopols_o_t`: moved to `mesh_options.rs` (layout verified).
 
 // =============================================================================
 // Polyline standard form
@@ -2069,13 +1908,7 @@ pub struct PK_PLINE_sf_t {
 // Partition facet geometry enquiry
 // =============================================================================
 
-/// Options for PK_PARTITION_ask_facet_geom.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_PARTITION_ask_facet_geom_o_t {
-    pub want_parts: PK_LOGICAL_t,
-    pub want_geoms: PK_LOGICAL_t,
-}
+// `PK_PARTITION_ask_facet_geom_o_t`: moved to `mesh_options.rs` (layout verified).
 
 /// Options for PK_TOPOL_categorise_geom.
 #[repr(C)]
@@ -2089,25 +1922,13 @@ pub struct PK_TOPOL_categorise_geom_o_t {
 // Mesh imprint options
 // =============================================================================
 
-/// Options for PK_MESH_imprint_vectors.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_imprint_vectors_o_t {
-    // Opaque -- details not documented in available notes.
-    _opaque: c_int,
-}
+// `PK_MESH_imprint_vectors_o_t`: moved to `mesh_options.rs` (layout verified).
 
 // =============================================================================
 // Mesh fill holes options
 // =============================================================================
 
-/// Options for PK_MESH_fill_holes.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_MESH_fill_holes_o_t {
-    // Opaque -- details not documented in available notes.
-    _opaque: c_int,
-}
+// `PK_MESH_fill_holes_o_t`: moved to `mesh_options.rs` (layout verified).
 
 // =============================================================================
 // Extern declarations
@@ -2273,12 +2094,17 @@ unsafe extern "C" {
     pub fn PK_MTOPOL_map_r_f(result: *mut c_void) -> PK_ERROR_code_t;
 
     /// Convert mesh to single trimmed classic surface.
+    ///
+    /// Argument order per the V35 header and the wrapper @0x1803791e0 (it journals
+    /// `*sense` before the trim data): `sense` comes before `trim_data`. The
+    /// previous declaration had them swapped. `PK_SURF_trim_data_t` is not
+    /// verified, so `trim_data` stays untyped.
     pub fn PK_MESH_make_surf_trimmed(
         mesh: PK_MESH_t,
         options: *const PK_MESH_make_surf_trimmed_o_t,
         surf: *mut PK_SURF_t,
-        trim_data: *mut c_void,
         sense: *mut PK_LOGICAL_t,
+        trim_data: *mut c_void,
     ) -> PK_ERROR_code_t;
 
     /// Create mixed body directly from existing classic body.

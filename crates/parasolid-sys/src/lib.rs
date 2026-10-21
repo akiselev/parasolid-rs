@@ -116,6 +116,10 @@ pub use editing::*;
 mod facet;
 pub use facet::*;
 
+// Verified option structs of the mesh (convergent modelling) entry points
+mod mesh_options;
+pub use mesh_options::*;
+
 // Attributes and application data
 mod attrib;
 pub use attrib::*;
