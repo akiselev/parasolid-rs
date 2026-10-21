@@ -26,13 +26,13 @@ pub struct SurfCurvature {
 pub struct SurfDirParam {
     pub range: (f64, f64),
     pub periodic: crate::curve::Periodicity,
-    /// Raw `closed` byte — see [`crate::CurveParam::closed_raw`]; not a
-    /// closedness test.
-    pub closed_raw: u8,
-    /// Extent of this direction's range.
-    pub extent: crate::curve::ParamExtent,
+    /// Raw `continuous` byte — see [`crate::CurveParam::continuous_raw`];
+    /// not a closedness test.
+    pub continuous_raw: u8,
+    /// How each end of this direction's range is limited: `[low, high]`.
+    pub bound: [crate::curve::ParamBound; 2],
     /// Class of the iso-curve along this direction.
-    pub curve_class: crate::curve::ParamCurveClass,
+    pub form: crate::curve::ParamForm,
 }
 
 /// Spun (surface of revolution) parameters (from [`Surf::ask_spun`]).
@@ -369,9 +369,12 @@ impl Surf {
         let mk = |p: &PK_PARAM_sf_t| SurfDirParam {
             range: (p.range.low, p.range.high),
             periodic: crate::curve::Periodicity::from_token(p.periodic),
-            closed_raw: (p.closed & 0xff) as u8,
-            extent: crate::curve::ParamExtent::from_token(p.extent),
-            curve_class: crate::curve::ParamCurveClass::from_token(p.curve_class),
+            continuous_raw: (p.continuous & 0xff) as u8,
+            bound: [
+                crate::curve::ParamBound::from_token(p.bound[0]),
+                crate::curve::ParamBound::from_token(p.bound[1]),
+            ],
+            form: crate::curve::ParamForm::from_token(p.form),
         };
         Ok((mk(&sf[0]), mk(&sf[1])))
     }

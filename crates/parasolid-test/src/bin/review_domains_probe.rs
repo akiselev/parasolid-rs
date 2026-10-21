@@ -48,8 +48,8 @@ fn stride_sentinel() {
     let recs = unsafe { std::slice::from_raw_parts(buf.as_ptr() as *const PK_PARAM_sf_t, 2) };
     for (k, r) in recs.iter().enumerate() {
         println!(
-            "  rec{k}: range=[{:.6},{:.6}] extent={} form={} periodic={} curve_class={} closed={:#x}",
-            r.range.low, r.range.high, r.extent, r.form, r.periodic, r.curve_class, r.closed
+            "  rec{k}: range=[{:.6},{:.6}] bound=[{},{}] periodic={} form={} continuous={:#x}",
+            r.range.low, r.range.high, r.bound[0], r.bound[1], r.periodic, r.form, r.continuous
         );
     }
     // also check what a stride-of-36 or 44 reading would give (sanity)
@@ -79,14 +79,14 @@ fn dump_surf_tag(label: &str, tag: i32) {
     }
     for (dir, p) in [("u", sf[0]), ("v", sf[1])] {
         println!(
-            "  {label:26} {dir}: range=[{:9.4},{:9.4}] extent={} form={} periodic={} class={} closed={}",
+            "  {label:26} {dir}: range=[{:9.4},{:9.4}] bound=[{},{}] periodic={} class={} closed={}",
             p.range.low,
             p.range.high,
-            p.extent,
-            p.form,
+            p.bound[0],
+            p.bound[1],
             p.periodic,
-            p.curve_class,
-            p.closed & 0xff
+            p.form,
+            p.continuous & 0xff
         );
     }
 }
@@ -111,14 +111,14 @@ fn dump_curve_tag(label: &str, tag: i32) {
         return;
     }
     println!(
-        "  {label:26}  : range=[{:9.4},{:9.4}] extent={} form={} periodic={} class={} closed={}",
+        "  {label:26}  : range=[{:9.4},{:9.4}] bound=[{},{}] periodic={} class={} closed={}",
         sf.range.low,
         sf.range.high,
-        sf.extent,
-        sf.form,
+        sf.bound[0],
+        sf.bound[1],
         sf.periodic,
-        sf.curve_class,
-        sf.closed & 0xff
+        sf.form,
+        sf.continuous & 0xff
     );
 }
 
@@ -149,7 +149,7 @@ fn periodic_bcurve() -> Option<i32> {
         vertex_dim: 3,
         is_rational: PK_LOGICAL_false,
         vertices: verts.as_ptr(),
-        _reserved_24: 0,
+        form: 0,
         n_knots: knots.len() as std::os::raw::c_int,
         knot_mult: mults.as_ptr(),
         knots: knots.as_ptr(),
@@ -612,12 +612,12 @@ fn uvboxes() {
             let (up, vp) = {
                 let (pu, pv) = s.params().unwrap();
                 (
-                    if pu.extent == ParamExtent::Periodic {
+                    if pu.bound[0] == ParamBound::Closed {
                         Some(pu.range.1 - pu.range.0)
                     } else {
                         None
                     },
-                    if pv.extent == ParamExtent::Periodic {
+                    if pv.bound[0] == ParamBound::Closed {
                         Some(pv.range.1 - pv.range.0)
                     } else {
                         None
@@ -825,7 +825,7 @@ fn seamed_hunt() {
             vertex_dim: 3,
             is_rational: PK_LOGICAL_false,
             vertices: verts.as_ptr(),
-            _reserved_24: 0,
+            form: 0,
             n_knots: knots.len() as std::os::raw::c_int,
             knot_mult: mults.as_ptr(),
             knots: knots.as_ptr(),

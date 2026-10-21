@@ -35,93 +35,97 @@ impl Periodicity {
 pub struct CurveParam {
     pub range: (f64, f64),
     pub periodic: Periodicity,
-    /// Raw `PK_PARAM_sf_t.closed` byte. **Do not use as a closedness test.**
-    /// Measured as `1` for every curve kind on V37.01.243 (line, circle,
-    /// ellipse), and the kernel writes the field with an 8-byte store whose
-    /// upper 7 bytes are uninitialised stack. Kept only so the raw record is
-    /// not silently dropped; `periodic` is the validated field.
-    pub closed_raw: u8,
-    /// Extent of the parameter range: unbounded, periodic, or bounded.
-    /// See [`ParamExtent`].
-    pub extent: ParamExtent,
+    /// Raw `PK_PARAM_sf_t.continuous` byte. Its meaning is not established
+    /// (1 on analytic curves, 0 on B-curves, SP-curves and polylines), and the
+    /// kernel writes the field with an 8-byte store whose upper 7 bytes are
+    /// uninitialised stack. Kept so the raw record is not dropped; it is **not**
+    /// a closedness test. Read `periodic` for periodicity.
+    pub continuous_raw: u8,
+    /// How each end of the range is limited: `[low end, high end]`.
+    /// See [`ParamBound`].
+    pub bound: [ParamBound; 2],
     /// Class of the underlying curve, as the kernel reports it in the
-    /// parameterisation record. See [`ParamCurveClass`].
-    pub curve_class: ParamCurveClass,
+    /// parameterisation record. See [`ParamForm`].
+    pub form: ParamForm,
 }
 
-/// Extent of a parameter range (`PK_PARAM_sf_t::extent` / `::form`).
+/// How one end of a parameter range is limited (`PK_PARAM_sf_t::bound[i]`,
+/// vendor tokens `PK_PARAM_bound_*_c`; parasolid-re R-37).
 ///
-/// # `Periodic` here does NOT imply periodicity
+/// # `Closed` does NOT imply periodicity
 ///
-/// An earlier note claimed `extent == Periodic` and `periodic == yes` were two
-/// views of one fact. They are not: a **closed but non-periodic** B-curve (its
-/// control polygon returning to its start) reports `extent = 18003` with
-/// `periodic = 18020`. The kernel computes periodicity from the raw
-/// classification codes and then lets an independent closure detector overwrite
-/// the extent token. Always read [`CurveParam::periodic`] for periodicity;
-/// reducing a parameter modulo a "period" implied by this field silently
-/// corrupts closed splines.
-///
-/// The token→meaning map also differs between curves and surfaces, so treat
-/// these as a decoded summary rather than a raw kernel code.
+/// A **closed but non-periodic** B-curve (its control polygon returning to its
+/// start) reports `Closed` with `periodic = no`. Always read
+/// [`CurveParam::periodic`] for periodicity; reducing a parameter modulo a
+/// "period" implied by this field silently corrupts closed splines.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ParamExtent {
-    /// Unbounded in this direction.
+pub enum ParamBound {
+    /// Unbounded at this end (line, plane, cylinder v). 18000.
     Infinite,
-    /// Wraps around. **Not the same as periodic** — see the note below.
-    Periodic,
-    /// Bounded analytic range (e.g. a sphere's v).
-    Bounded,
-    /// Bounded by a knot vector — what every B-curve and B-surface reports.
-    KnotBounded,
-    /// A token in the band that no analytic family produced here (18001 /
-    /// 18002 are reachable in the kernel's mapping but were never observed),
-    /// or an unknown value. Carried through rather than guessed at.
+    /// Extendable: every B-curve and B-surface. 18001.
+    Extendable,
+    /// A hard bound: SP-curves, polylines, B-curve profiles. 18002.
+    Bound,
+    /// The range is closed: periodic directions and closed curves. 18003.
+    Closed,
+    /// Degenerate end: a cone apex, sphere poles, apple/lemon torus v ends. 18004.
+    Degenerate,
+    /// A token outside the band; carried through rather than guessed at.
     Other(i32),
 }
 
-impl ParamExtent {
+impl ParamBound {
     pub(crate) fn from_token(t: i32) -> Self {
         match t {
-            PK_PARAM_extent_infinite_c => ParamExtent::Infinite,
-            PK_PARAM_extent_periodic_c => ParamExtent::Periodic,
-            PK_PARAM_extent_bounded_c => ParamExtent::Bounded,
-            PK_PARAM_extent_knot_bounded_c => ParamExtent::KnotBounded,
-            other => ParamExtent::Other(other),
+            PK_PARAM_bound_infinite_c => ParamBound::Infinite,
+            PK_PARAM_bound_extendable_c => ParamBound::Extendable,
+            PK_PARAM_bound_bound_c => ParamBound::Bound,
+            PK_PARAM_bound_closed_c => ParamBound::Closed,
+            PK_PARAM_bound_degenerate_c => ParamBound::Degenerate,
+            other => ParamBound::Other(other),
         }
     }
 
-    /// Whether the range is finite in this direction.
+    /// Whether the range is finite at this end: every known bound except
+    /// `Infinite`.
     ///
-    /// Includes `KnotBounded`: every B-curve and B-surface reports 18001, and
-    /// omitting it made this return `false` for all bounded spline geometry —
-    /// the most common non-analytic geometry in a real model.
-    pub fn is_bounded(&self) -> bool {
+    /// Includes `Extendable`: every B-curve and B-surface reports 18001, and
+    /// omitting it would make this `false` for all bounded spline geometry.
+    pub fn is_finite(&self) -> bool {
         matches!(
             self,
-            ParamExtent::Bounded | ParamExtent::Periodic | ParamExtent::KnotBounded
+            ParamBound::Extendable | ParamBound::Bound | ParamBound::Closed | ParamBound::Degenerate
         )
     }
 }
 
 /// Class of the iso-curve underlying a parameter direction
-/// (`PK_PARAM_sf_t::curve_class`).
+/// (`PK_PARAM_sf_t::form`, vendor tokens `PK_PARAM_form_*_c`).
 ///
 /// The kernel derives this from the curve's internal class tag, so it is a
 /// representation fact, not a geometric measurement.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ParamCurveClass {
-    Straight,
+pub enum ParamForm {
+    /// Straight iso-curve. 18040.
+    Linear,
+    /// Circular iso-curve. 18041.
     Circular,
+    /// Any other iso-curve class. 18042.
+    Any,
+    /// Mesh direction. 18043 (vendor table; not probed).
+    Mesh,
+    /// A token outside the band.
     Other(i32),
 }
 
-impl ParamCurveClass {
+impl ParamForm {
     pub(crate) fn from_token(t: i32) -> Self {
         match t {
-            PK_PARAM_curve_class_straight_c => ParamCurveClass::Straight,
-            PK_PARAM_curve_class_circular_c => ParamCurveClass::Circular,
-            other => ParamCurveClass::Other(other),
+            PK_PARAM_form_linear_c => ParamForm::Linear,
+            PK_PARAM_form_circular_c => ParamForm::Circular,
+            PK_PARAM_form_any_c => ParamForm::Any,
+            PK_PARAM_form_mesh_c => ParamForm::Mesh,
+            other => ParamForm::Other(other),
         }
     }
 }
@@ -356,7 +360,7 @@ impl Curve {
             vertex_dim: 3,
             is_rational: PK_LOGICAL_false,
             vertices: verts.as_ptr(),
-            _reserved_24: 0,
+            form: 0,
             n_knots: knots.len() as std::os::raw::c_int,
             knot_mult: multiplicities.as_ptr(),
             knots: knots.as_ptr(),
@@ -399,7 +403,7 @@ impl Curve {
             vertex_dim: 4,
             is_rational: PK_LOGICAL_true,
             vertices: verts.as_ptr(),
-            _reserved_24: 0,
+            form: 0,
             n_knots: knots.len() as std::os::raw::c_int,
             knot_mult: multiplicities.as_ptr(),
             knots: knots.as_ptr(),
@@ -521,18 +525,21 @@ impl Curve {
         Ok(CurveParam {
             range: (sf.range.low, sf.range.high),
             periodic: Periodicity::from_token(sf.periodic),
-            closed_raw: (sf.closed & 0xff) as u8,
-            extent: ParamExtent::from_token(sf.extent),
-            curve_class: ParamCurveClass::from_token(sf.curve_class),
+            continuous_raw: (sf.continuous & 0xff) as u8,
+            bound: [
+                ParamBound::from_token(sf.bound[0]),
+                ParamBound::from_token(sf.bound[1]),
+            ],
+            form: ParamForm::from_token(sf.form),
         })
     }
 
-    // `is_closed()` REMOVED. `PK_PARAM_sf_t.closed` reads back as 1 for every
+    // `is_closed()` REMOVED. `PK_PARAM_sf_t.continuous` (formerly `closed`) reads back as 1 for every
     // curve kind on V37.01.243 — line, circle and ellipse alike — so the
     // accessor could only ever answer `true` and was worse than useless: a
     // caller asking "is this closed?" got a confident yes about a straight
     // line. Use `param().periodic` (validated) or compare the interval
-    // endpoints. See `CurveParam::closed_raw`.
+    // endpoints. See `CurveParam::continuous_raw`.
 
     /// Whether the curve is periodic (periodic or seamed).
     pub fn is_periodic(&self) -> PsResult<bool> {

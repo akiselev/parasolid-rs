@@ -62,15 +62,15 @@ fn dump_curve_param(label: &str, c: &Curve) {
         }
     };
     println!(
-        "  {label:18} rc={rc} range=[{:.4},{:.4}] extent={} form={} periodic={}({}) curve_class={} closed={} len={len}",
+        "  {label:18} rc={rc} range=[{:.4},{:.4}] bound=[{},{}] periodic={}({}) form={} continuous={} len={len}",
         sf.range.low,
         sf.range.high,
-        sf.extent,
-        sf.form,
+        sf.bound[0],
+        sf.bound[1],
         sf.periodic,
         periodic_name(sf.periodic),
-        sf.curve_class,
-        sf.closed & 0xff
+        sf.form,
+        sf.continuous & 0xff
     );
 }
 
@@ -79,15 +79,15 @@ fn dump_surf_params(label: &str, s: &Surf) {
     let rc = unsafe { PK_SURF_ask_params(s.tag(), sf.as_mut_ptr()) };
     for (dir, p) in [("u", sf[0]), ("v", sf[1])] {
         println!(
-            "  {label:12} {dir}: rc={rc} range=[{:9.4},{:9.4}] extent={} form={} periodic={}({}) curve_class={} closed={}",
+            "  {label:12} {dir}: rc={rc} range=[{:9.4},{:9.4}] bound=[{},{}] periodic={}({}) form={} continuous={}",
             p.range.low,
             p.range.high,
-            p.extent,
-            p.form,
+            p.bound[0],
+            p.bound[1],
             p.periodic,
             periodic_name(p.periodic),
-            p.curve_class,
-            p.closed & 0xff
+            p.form,
+            p.continuous & 0xff
         );
     }
 }

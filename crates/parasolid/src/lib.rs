@@ -65,7 +65,7 @@ pub use check::{
 };
 pub use compare::{SamplePoint, SurfaceParams, extract_surface_params};
 pub use curve::{
-    BCurveData, CurveCurvature, CurveParam, ParamCurveClass, ParamExtent, Periodicity,
+    BCurveData, CurveCurvature, CurveParam, ParamBound, ParamForm, Periodicity,
 };
 pub use curve::{CircleData, Curve, CurveType, EllipseData, LineData};
 pub use edge::{DeviationSample, Edge, EdgeType};

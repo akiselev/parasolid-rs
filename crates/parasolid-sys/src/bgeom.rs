@@ -26,7 +26,9 @@ pub struct PK_BCURVE_sf_t {
     pub is_rational: PK_LOGICAL_t, // @12  (journal-confirmed: right after vertex_dim)
     /// Control vertices: length = `n_vertices * vertex_dim`.
     pub vertices: *const c_double, // @16
-    pub _reserved_24: c_int,       // @24  (unknown; set 0)
+    /// B-curve form (`PKU_journal_BCURVE_sf`, static-observed, parasolid-re
+    /// R-37). Callers here write 0; the form token values are not verified.
+    pub form: c_int, // @24
     /// Number of **distinct** knot values (validator reads this at @28).
     pub n_knots: c_int, // @28
     /// Multiplicity of each distinct knot (length `n_knots`). Parasolid uses

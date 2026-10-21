@@ -184,67 +184,68 @@ pub struct PK_SURF_param_t {
 /// Standard form of a single parametric direction (`PK_CURVE_ask_param` writes
 /// one; `PK_SURF_ask_params` writes two, u then v). 40 bytes.
 ///
-/// Layout and token semantics recovered by decompiling `PK_CURVE_ask_param`
-/// (V37.01.243) and cross-checked against every analytic family at runtime
-/// (`crates/parasolid-test/src/bin/domain_probe.rs`).
+/// Field names are the vendor's, read from `PKU_debug_PARAM_sf` @0x180a6ad50
+/// (static-observed, parasolid-re R-37 `port/geometry-classes/README.md` §2);
+/// the token names are the vendor table's. Layout recovered earlier by
+/// decompiling `PK_CURVE_ask_param` (V37.01.243) and checked at runtime
+/// (`crates/parasolid-test/src/bin/domain_probe.rs`). Renamed 2026-10-21 from
+/// `extent`/`form`/`curve_class`/`closed`, which were descriptive guesses.
 ///
-/// - `extent` / `form` @16/@20 — the kernel maps an internal 0..3 code onto
-///   tokens in **descending** order: `0 → 18003`, `1 → 18002`, `2 → 18001`,
-///   `3 → 18000`; `PK_SURF_ask_params` additionally emits `18004`. Observed:
-///   18000 on unbounded ranges (line, plane, cylinder v), 18003 on periodic
-///   ranges, 18004 on bounded ranges (sphere v, cone v). **18001 and 18002
-///   exist in the mapping but were not produced by any analytic family here**,
-///   so they are deliberately left unnamed rather than guessed.
-///   `extent` and `form` agree everywhere except a half-bounded range: a cone's
-///   v is `extent = 18004` (bounded) but `form = 18000` (infinite).
-/// - `periodic` @24 — `PK_PARAM_periodic_no_c` 18020 / `_yes_c` 18021 /
-///   `_seamed_c` 18022. The decompile shows this is *derived*: extent/form code
-///   0 (i.e. token 18003) selects yes/seamed, everything else selects no. So
-///   `extent == 18003` and periodicity are two views of one fact.
-/// - `curve_class` @28 — **not a convexity**, despite the name it was given
-///   before. The decompile takes the *underlying iso-curve's class tag* and
-///   maps `30 → 18040`, `31 → 18041`, anything else `→ 18042`. Observed
-///   accordingly: 18040 for straight directions (line, plane, cylinder v),
-///   18041 for circular ones (circle, cylinder u, torus), 18042 otherwise
-///   (ellipse, sphere v).
-/// - `closed` @32 — logical in the low byte.
+/// - `bound` @16/@20: how each end of the range is limited, low end then high
+///   end, `PK_PARAM_bound_*_c` (18000..18004). Observed: infinite on line,
+///   plane, cylinder v; extendable on every B-curve/B-surface; bound on
+///   SP-curves, polylines and B-curve profiles; closed on periodic directions
+///   and closed (even non-periodic) B-curves; degenerate at a cone apex, sphere
+///   poles, apple/lemon torus v ends. A cone's v is `[degenerate, infinite]`.
+/// - `periodic` @24: `PK_PARAM_periodic_no_c` 18020 / `_yes_c` 18021 /
+///   `_seamed_c` 18022. Read this for periodicity: a closed non-periodic
+///   B-curve has `bound = closed` with `periodic = no`.
+/// - `form` @28: class of the underlying iso-curve, `PK_PARAM_form_*_c`; the
+///   kernel maps internal class 30 to linear 18040, 31 to circular 18041,
+///   others to any 18042 (mesh 18043 per the vendor table).
+/// - `continuous` @32: logical in the low byte. Meaning not established
+///   (1 on analytic directions, 0 on B-geometry, SP-curves, polylines); the
+///   kernel writes it with an 8-byte store, so read only the low byte.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_PARAM_sf_t {
-    pub range: PK_INTERVAL_t, // @0
-    pub extent: c_int,        // @16  PK_PARAM_extent_*_c
-    pub form: c_int,          // @20  same token band as `extent`
-    pub periodic: c_int,      // @24  PK_PARAM_periodic_*_c
-    /// Class of the underlying iso-curve — see the struct docs. Formerly
-    /// mis-named `convexity`.
-    pub curve_class: c_int, // @28
-    pub closed: PK_LOGICAL_t, // @32 (value in low byte)
+    pub range: PK_INTERVAL_t,     // @0
+    pub bound: [c_int; 2],        // @16 low end, @20 high end: PK_PARAM_bound_*_c
+    pub periodic: c_int,          // @24 PK_PARAM_periodic_*_c
+    pub form: c_int,              // @28 PK_PARAM_form_*_c
+    pub continuous: PK_LOGICAL_t, // @32 (value in low byte)
 }
 
-/// Token band shared by `PK_PARAM_sf_t::extent` and `::form`.
-pub type PK_PARAM_extent_t = c_int;
-/// Range is unbounded in this direction. [probed]
-pub const PK_PARAM_extent_infinite_c: PK_PARAM_extent_t = 18000;
-/// Range wraps — this direction is periodic. [probed]
-pub const PK_PARAM_extent_periodic_c: PK_PARAM_extent_t = 18003;
-/// Range is bounded. [probed] (emitted by `PK_SURF_ask_params`.)
-pub const PK_PARAM_extent_bounded_c: PK_PARAM_extent_t = 18004;
-/// Range is bounded by a knot vector — reported by **every** B-curve and
-/// B-surface. [probed]
-pub const PK_PARAM_extent_knot_bounded_c: PK_PARAM_extent_t = 18001;
+/// Token band of `PK_PARAM_sf_t::bound`.
+pub type PK_PARAM_bound_t = c_int;
+/// This end of the range is unbounded. [probed]
+pub const PK_PARAM_bound_infinite_c: PK_PARAM_bound_t = 18000;
+/// This end can be extended (every B-curve and B-surface). [probed]
+pub const PK_PARAM_bound_extendable_c: PK_PARAM_bound_t = 18001;
+/// This end is a hard bound (SP-curve, polyline, B-curve profile). [probed]
+pub const PK_PARAM_bound_bound_c: PK_PARAM_bound_t = 18002;
+/// The range is closed (periodic, or a closed curve). [probed]
+pub const PK_PARAM_bound_closed_c: PK_PARAM_bound_t = 18003;
+/// This end is degenerate: an apex or pole. [probed]
+pub const PK_PARAM_bound_degenerate_c: PK_PARAM_bound_t = 18004;
 
-/// Token band of `PK_PARAM_sf_t::curve_class`, derived from the iso-curve's
-/// internal class tag.
-pub type PK_PARAM_curve_class_t = c_int;
+/// Token band of `PK_PARAM_sf_t::form`.
+pub type PK_PARAM_form_t = c_int;
 /// Underlying iso-curve is straight (internal class 30). [probed]
-pub const PK_PARAM_curve_class_straight_c: PK_PARAM_curve_class_t = 18040;
+pub const PK_PARAM_form_linear_c: PK_PARAM_form_t = 18040;
 /// Underlying iso-curve is circular (internal class 31). [probed]
-pub const PK_PARAM_curve_class_circular_c: PK_PARAM_curve_class_t = 18041;
+pub const PK_PARAM_form_circular_c: PK_PARAM_form_t = 18041;
 /// Any other iso-curve class. [probed]
-pub const PK_PARAM_curve_class_other_c: PK_PARAM_curve_class_t = 18042;
+pub const PK_PARAM_form_any_c: PK_PARAM_form_t = 18042;
+/// Mesh direction (vendor table; not probed).
+pub const PK_PARAM_form_mesh_c: PK_PARAM_form_t = 18043;
 
 const _: () = {
     assert!(core::mem::size_of::<PK_PARAM_sf_t>() == 40);
+    assert!(core::mem::offset_of!(PK_PARAM_sf_t, bound) == 16);
+    assert!(core::mem::offset_of!(PK_PARAM_sf_t, periodic) == 24);
+    assert!(core::mem::offset_of!(PK_PARAM_sf_t, form) == 28);
+    assert!(core::mem::offset_of!(PK_PARAM_sf_t, continuous) == 32);
 };
 
 // =============================================================================

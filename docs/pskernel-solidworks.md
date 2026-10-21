@@ -1164,6 +1164,10 @@ runtime:
   plane, cylinder v), circular (circle, cylinder u, torus), other (ellipse,
   sphere v). It is a representation fact, not a geometric measurement.
 
+> **Renamed 2026-10-21 (parasolid-re R-37):** the vendor field names are `bound[2]` (was `extent`/`form`), `form` (was `curve_class`) and
+> `continuous` (was `closed`); tokens 18000–18004 are infinite / extendable / bound / closed / degenerate. The wrapper types are now
+> `ParamBound` (field `bound: [ParamBound; 2]`) and `ParamForm`, and `closed_raw` is `continuous_raw`. The notes below keep the old names.
+
 Exposed as `ParamExtent` / `ParamCurveClass`, both of which carry an
 `Other(i32)` arm so an unobserved token passes through instead of being
 coerced into a wrong name.

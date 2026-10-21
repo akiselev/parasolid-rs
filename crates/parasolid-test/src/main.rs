@@ -5160,15 +5160,15 @@ fn main() {
         // the periodicity token from the extent code, so Periodic <=> periodic.
         let line = Curve::line(Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0))?;
         let p = line.param()?;
-        assert_eq!(p.extent, ParamExtent::Infinite, "a line is unbounded");
+        assert_eq!(p.bound[0], ParamBound::Infinite, "a line is unbounded");
         assert_eq!(p.periodic, Periodicity::NonPeriodic);
-        assert_eq!(p.curve_class, ParamCurveClass::Straight);
+        assert_eq!(p.form, ParamForm::Linear);
 
         let circ = Curve::circle(b, 3.0)?;
         let p = circ.param()?;
-        assert_eq!(p.extent, ParamExtent::Periodic, "a circle wraps");
+        assert_eq!(p.bound[0], ParamBound::Closed, "a circle wraps");
         assert_eq!(p.periodic, Periodicity::Periodic);
-        assert_eq!(p.curve_class, ParamCurveClass::Circular);
+        assert_eq!(p.form, ParamForm::Circular);
         assert!(
             (p.range.1 - p.range.0 - std::f64::consts::TAU).abs() < 1e-12,
             "circle period should be 2pi, got {}",
@@ -5179,35 +5179,36 @@ fn main() {
         // representation from periodicity.
         let ell = Curve::ellipse(b, 5.0, 2.0)?;
         let p = ell.param()?;
-        assert_eq!(p.extent, ParamExtent::Periodic);
+        assert_eq!(p.bound[0], ParamBound::Closed);
         assert!(
-            matches!(p.curve_class, ParamCurveClass::Other(18042)),
+            p.form == ParamForm::Any,
             "ellipse iso-class should be the 'other' token, got {:?}",
-            p.curve_class
+            p.form
         );
 
         // Surfaces: each direction is described independently.
         let cyl = Surf::cylinder(b, 2.0)?;
         let (u, v) = cyl.params()?;
-        assert_eq!(u.extent, ParamExtent::Periodic, "cylinder u wraps");
-        assert_eq!(u.curve_class, ParamCurveClass::Circular);
-        assert_eq!(v.extent, ParamExtent::Infinite, "cylinder v is unbounded");
-        assert_eq!(v.curve_class, ParamCurveClass::Straight);
+        assert_eq!(u.bound[0], ParamBound::Closed, "cylinder u wraps");
+        assert_eq!(u.form, ParamForm::Circular);
+        assert_eq!(v.bound[0], ParamBound::Infinite, "cylinder v is unbounded");
+        assert_eq!(v.form, ParamForm::Linear);
 
         let sph = Surf::sphere(b, 4.0)?;
         let (u, v) = sph.params()?;
-        assert_eq!(u.extent, ParamExtent::Periodic);
+        assert_eq!(u.bound[0], ParamBound::Closed);
         assert_eq!(
-            v.extent,
-            ParamExtent::Bounded,
-            "sphere v runs pole to pole and is bounded"
+            v.bound[0],
+            ParamBound::Degenerate,
+            "sphere v starts at a pole (degenerate end)"
         );
+        assert_eq!(v.bound[1], ParamBound::Degenerate, "sphere v ends at a pole");
         assert_eq!(v.periodic, Periodicity::NonPeriodic);
 
         let tor = Surf::torus(b, 5.0, 1.5)?;
         let (u, v) = tor.params()?;
-        assert_eq!(u.extent, ParamExtent::Periodic, "torus wraps in both");
-        assert_eq!(v.extent, ParamExtent::Periodic);
+        assert_eq!(u.bound[0], ParamBound::Closed, "torus wraps in both");
+        assert_eq!(v.bound[0], ParamBound::Closed);
     });
 
     test!("stage4_seam_is_an_exact_identification", {
@@ -6208,12 +6209,12 @@ fn main() {
 
         let p = c.param()?;
         assert_eq!(
-            p.extent,
-            ParamExtent::KnotBounded,
-            "a clamped B-curve should report the knot-bounded extent"
+            p.bound[0],
+            ParamBound::Extendable,
+            "a clamped B-curve should report an extendable low end"
         );
         assert!(
-            p.extent.is_bounded(),
+            p.bound[0].is_finite(),
             "a clamped B-curve has a finite domain and must report as bounded"
         );
         assert!(
@@ -7132,16 +7133,16 @@ fn main() {
             Vec3::new(1.0, 0.0, 0.0),
         );
 
-        // `Curve::is_closed()` was REMOVED: PK_PARAM_sf_t.closed reads back as
+        // `Curve::is_closed()` was REMOVED: PK_PARAM_sf_t.continuous (formerly `closed`) reads back as
         // 1 for every curve kind, so it could only ever answer "true" — it
         // called a straight line closed. Pin that degeneracy so nobody
         // reintroduces the accessor, and use `periodic` (validated) instead.
         let circ = Curve::circle(b, 3.0)?;
         let line = Curve::line(Vec3::new(0.0, 0.0, 0.0), Vec3::new(1.0, 0.0, 0.0))?;
         assert_eq!(
-            circ.param()?.closed_raw,
-            line.param()?.closed_raw,
-            "the raw `closed` byte does not discriminate a circle from a line"
+            circ.param()?.continuous_raw,
+            line.param()?.continuous_raw,
+            "the raw `continuous` byte does not discriminate a circle from a line"
         );
         assert!(circ.param()?.periodic.is_periodic(), "a circle is periodic");
         assert!(
