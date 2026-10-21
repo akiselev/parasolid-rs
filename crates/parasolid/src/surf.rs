@@ -140,6 +140,14 @@ impl Surf {
     pub(crate) fn from_tag(tag: PK_SURF_t) -> Self {
         Self { tag }
     }
+
+    /// Wrap a raw tag obtained from a raw `parasolid-sys` call, after checking with
+    /// `PK_ENTITY_ask_class` that it is a live surface (any class [`Surf::surf_type`] accepts).
+    pub fn from_tag_checked(tag: PK_SURF_t) -> PsResult<Self> {
+        let s = Self::from_tag(tag);
+        s.surf_type()?;
+        Ok(s)
+    }
     pub fn tag(&self) -> i32 {
         self.tag
     }
@@ -474,6 +482,71 @@ impl Surf {
             n_v_vertices: n_v,
             vertex_dim: 3,
             is_rational: PK_LOGICAL_false,
+            vertices: verts.as_ptr(),
+            _reserved_32: 0,
+            n_u_knots: u_knots.len() as c_int,
+            n_v_knots: v_knots.len() as c_int,
+            u_knot_mult: u_mults.as_ptr(),
+            v_knot_mult: v_mults.as_ptr(),
+            u_knots: u_knots.as_ptr(),
+            v_knots: v_knots.as_ptr(),
+            u_knot_type: PK_knot_non_uniform_c,
+            v_knot_type: PK_knot_non_uniform_c,
+            is_u_periodic: 0,
+            is_v_periodic: 0,
+            is_u_closed: 0,
+            is_v_closed: 0,
+            self_intersecting: 0,
+            convexity: 0,
+        };
+        let mut tag: PK_BSURF_t = PK_ENTITY_null;
+        pk_call!(PK_BSURF_create(&sf, &mut tag));
+        Ok(Surf::from_tag(tag))
+    }
+
+    /// Create a **rational** B-surface (`PK_BSURF_create`, `vertex_dim` 4, `is_rational` true).
+    ///
+    /// `vertices` are homogeneous `(x·w, y·w, z·w, w)`, row-major (`k = i·n_v + j`), passed to the
+    /// kernel as the exact doubles given (no reweighting), so a fixture's vertex list round-trips
+    /// bit for bit. Knots are distinct values with multiplicities, as in [`Surf::bsurf`];
+    /// non-periodic, non-uniform. Mismatched lengths are refused before the kernel is called; every
+    /// other check is the kernel's. Layout of the homogeneous form: dynamic-observed on 37.01.243
+    /// (parasolid-re `port/ssi-freeform/`, `rbcyl` scenes, `PK_SURF_eval` deviation ≤ 8.7e-15).
+    #[allow(clippy::too_many_arguments)]
+    pub fn bsurf_rational(
+        u_degree: i32,
+        v_degree: i32,
+        n_u: i32,
+        n_v: i32,
+        vertices: &[[f64; 4]],
+        u_knots: &[f64],
+        u_mults: &[i32],
+        v_knots: &[f64],
+        v_mults: &[i32],
+    ) -> PsResult<Surf> {
+        if n_u < 0 || n_v < 0 || vertices.len() != (n_u as usize) * (n_v as usize) {
+            return Err(crate::error::PsError::Session(format!(
+                "bsurf_rational: {} vertices for a {n_u} x {n_v} grid",
+                vertices.len()
+            )));
+        }
+        if u_knots.len() != u_mults.len() || v_knots.len() != v_mults.len() {
+            return Err(crate::error::PsError::Session(format!(
+                "bsurf_rational: knot/multiplicity lengths differ (u {}/{}, v {}/{})",
+                u_knots.len(),
+                u_mults.len(),
+                v_knots.len(),
+                v_mults.len()
+            )));
+        }
+        let verts: Vec<f64> = vertices.iter().flatten().copied().collect();
+        let sf = PK_BSURF_sf_t {
+            u_degree,
+            v_degree,
+            n_u_vertices: n_u,
+            n_v_vertices: n_v,
+            vertex_dim: 4,
+            is_rational: PK_LOGICAL_true,
             vertices: verts.as_ptr(),
             _reserved_32: 0,
             n_u_knots: u_knots.len() as c_int,

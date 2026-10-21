@@ -3894,6 +3894,97 @@ fn main() {
             "patch corner (u1,v1) = {c:?}"
         );
     });
+    test!("bsurf_rational_ssi_freeform_tilt", {
+        // parasolid-re port/ssi-freeform r82-bp-rbcyl-tilt (R-89): the rational half cylinder
+        // r=1 about z (y >= 0, z in [-1,1]) cut by the plane z = 0.3x through the origin.
+        // PK (fixture): one open icurve from (-1,0,-0.3) to (1,0,0.3), ends on the u boundaries.
+        let _session = Session::start(test_config())?;
+        let h = std::f64::consts::FRAC_1_SQRT_2;
+        let verts = [
+            [1.0, 0.0, -1.0, 1.0],
+            [1.0, 0.0, 1.0, 1.0],
+            [h, h, -h, h],
+            [h, h, h, h],
+            [0.0, 1.0, -1.0, 1.0],
+            [0.0, 1.0, 1.0, 1.0],
+            [-h, h, -h, h],
+            [-h, h, h, h],
+            [-1.0, 0.0, -1.0, 1.0],
+            [-1.0, 0.0, 1.0, 1.0],
+        ];
+        let bs = Surf::bsurf_rational(
+            2,
+            1,
+            5,
+            2,
+            &verts,
+            &[0.0, 1.0, 2.0],
+            &[3, 2, 3],
+            &[0.0, 1.0],
+            &[2, 2],
+        )?;
+        assert_eq!(bs.surf_type()?, SurfType::Bsurf);
+        // Fixture checks [u, v, x, y, z]: exact circle points.
+        for [u, v, x, y, z] in [
+            [0.0, 0.0, 1.0, 0.0, -1.0],
+            [1.0, 1.0, 0.0, 1.0, 1.0],
+            [2.0, 0.0, -1.0, 0.0, -1.0],
+            [0.5, 0.5, 0.7071067811865476, 0.7071067811865475, 0.0],
+        ] {
+            let p = bs.eval(u, v)?;
+            assert!(
+                (p.x - x).abs() < 1e-12 && (p.y - y).abs() < 1e-12 && (p.z - z).abs() < 1e-12,
+                "eval({u},{v}) = {p:?}"
+            );
+        }
+        // Raw-tag wrapper: a surface tag round-trips, a non-surface tag is refused.
+        assert_eq!(Surf::from_tag_checked(bs.tag())?, bs);
+        assert!(Surf::from_tag_checked(PK_ENTITY_null).is_err());
+        // Mismatched lengths are refused before the kernel is called.
+        assert!(Surf::bsurf_rational(
+            2,
+            1,
+            5,
+            2,
+            &verts[..9],
+            &[0.0, 1.0, 2.0],
+            &[3, 2, 3],
+            &[0.0, 1.0],
+            &[2, 2]
+        )
+        .is_err());
+
+        let n = Vec3::new(-0.2873478855663454, 0.0, 0.9578262852211513);
+        let pl = Surf::plane(Axis2::new(
+            Vec3::new(0.0, 0.0, 0.0),
+            n,
+            Vec3::new(0.0, 1.0, 0.0),
+        ))?;
+        let x = bs.intersect(&pl)?;
+        assert!(x.points.is_empty(), "points {:?}", x.points);
+        assert_eq!(x.curves.len(), 1, "one open icurve");
+        let c = &x.curves[0];
+        let (a, b) = (c.curve.eval(c.bounds.0)?, c.curve.eval(c.bounds.1)?);
+        let near = |p: Vec3, q: [f64; 3]| {
+            (p.x - q[0]).abs() < 1e-6 && (p.y - q[1]).abs() < 1e-6 && (p.z - q[2]).abs() < 1e-6
+        };
+        assert!(
+            (near(a, [-1.0, 0.0, -0.3]) && near(b, [1.0, 0.0, 0.3]))
+                || (near(a, [1.0, 0.0, 0.3]) && near(b, [-1.0, 0.0, -0.3])),
+            "ends {a:?} {b:?}"
+        );
+        // Interior samples lie on both surfaces.
+        for k in 1..8 {
+            let t = c.bounds.0 + (c.bounds.1 - c.bounds.0) * k as f64 / 8.0;
+            let p = c.curve.eval(t)?;
+            assert!(
+                (p.x * p.x + p.y * p.y - 1.0).abs() < 1e-6 && p.y >= -1e-9,
+                "off cylinder {p:?}"
+            );
+            assert!((p.z - 0.3 * p.x).abs() < 1e-6, "off plane {p:?}");
+        }
+    });
+
 
     // =========================================================================
     // Oracle facade — the validated-only comparison surface, end to end
