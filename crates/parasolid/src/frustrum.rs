@@ -39,18 +39,33 @@ pub struct FrustrumConfig {
     /// Base directory for resolving file keys. If `None`, keys are treated as
     /// absolute or relative to the current working directory.
     pub(crate) base_dir: Option<PathBuf>,
+    /// Register the GO capture callbacks (`crate::go`). Off by default.
+    pub(crate) capture_go: bool,
 }
 
 impl FrustrumConfig {
     /// Create a new config with defaults.
     pub fn new() -> Self {
-        FrustrumConfig { base_dir: None }
+        FrustrumConfig {
+            base_dir: None,
+            capture_go: false,
+        }
     }
 
     /// Set the base directory for file I/O. File keys passed by Parasolid will
     /// be resolved relative to this directory.
     pub fn base_dir(mut self, dir: impl Into<PathBuf>) -> Self {
         self.base_dir = Some(dir.into());
+        self
+    }
+
+    /// Register GO callbacks that record every GOOPSG / GOSGMT / GOCLSG call,
+    /// so the output of `PK_TOPOL_render_line`, `PK_TOPOL_render_facet` and
+    /// `PK_GEOM_render` can be read back with [`crate::go::take`]. Without it
+    /// no GO callback is registered (the kernel then fails a render with
+    /// ifail -1011).
+    pub fn capture_go(mut self) -> Self {
+        self.capture_go = true;
         self
     }
 }
@@ -126,9 +141,9 @@ pub(crate) fn build_frustrum(config: &FrustrumConfig) -> PK_SESSION_frustrum_t {
         fstop: Some(default_fstop),
         fmallo: Some(default_fmallo),
         fmfree: Some(default_fmfree),
-        gosgmt: None,
-        goopsg: None,
-        goclsg: None,
+        gosgmt: go_cb(config, crate::go::capture_gosgmt),
+        goopsg: go_cb(config, crate::go::capture_goopsg),
+        goclsg: go_cb(config, crate::go::capture_goclsg),
         gopixl: None,
         gooppx: None,
         goclpx: None,
@@ -148,6 +163,26 @@ pub(crate) fn build_frustrum(config: &FrustrumConfig) -> PK_SESSION_frustrum_t {
         fgprsu: None,
         ucoprd: None,
         ucopwr: None,
+    }
+}
+
+/// The GO capture callback when `capture_go` is set, else none.
+type GoFn = unsafe extern "C" fn(
+    *const c_int,
+    *const c_int,
+    *const c_int,
+    *const c_int,
+    *const std::os::raw::c_double,
+    *const c_int,
+    *const c_int,
+    *mut c_int,
+);
+fn go_cb(config: &FrustrumConfig, f: GoFn) -> Option<GoFn> {
+    if config.capture_go {
+        crate::go::clear();
+        Some(f)
+    } else {
+        None
     }
 }
 

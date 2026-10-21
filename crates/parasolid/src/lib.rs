@@ -36,6 +36,7 @@ mod facet;
 pub mod fileio;
 mod frustrum;
 mod geom;
+pub mod go;
 mod intersect;
 mod jet;
 mod mass;

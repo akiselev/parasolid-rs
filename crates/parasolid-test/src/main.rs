@@ -4,6 +4,7 @@
 //! Run:   WINEPATH=/path/to/SOLIDWORKS cargo run -p parasolid-test --bin parasolid-test --target x86_64-pc-windows-gnu
 
 mod abi_audit;
+mod render_go;
 
 use parasolid::*;
 use parasolid_sys::*;
@@ -8340,6 +8341,34 @@ fn main() {
         // Rolled back to the pmark taken on entry: the block is gone.
         assert_eq!(part.bodies()?.len(), n_bodies);
         assert_eq!(plane_plane_lines()?, 1);
+    });
+
+    // =========================================================================
+    // P3 rendering and GO capture (parasolid-re R-44 B-R44-1/B-R44-2):
+    // PK_TOPOL_render_line v25, PK_TOPOL_render_facet v20, PK_GEOM_render v5,
+    // 8-argument GOOPSG/GOSGMT/GOCLSG recorded by FrustrumConfig::capture_go.
+    // =========================================================================
+
+    test!("render_line_v25_layout", {
+        render_go::render_line_v25_layout()?;
+    });
+    test!("render_line_block_edges", {
+        render_go::render_line_block_edges()?;
+    });
+    test!("render_line_hidden_line", {
+        render_go::render_line_hidden_line()?;
+    });
+    test!("render_line_silhouette", {
+        render_go::render_line_silhouette()?;
+    });
+    test!("render_line_planar_hatch", {
+        render_go::render_line_planar_hatch()?;
+    });
+    test!("render_facet_v20", {
+        render_go::render_facet_v20()?;
+    });
+    test!("geom_render_v5", {
+        render_go::geom_render_v5()?;
     });
 
     // =========================================================================

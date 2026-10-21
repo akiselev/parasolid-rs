@@ -174,23 +174,84 @@ pub type PK_FMALLO_f_t =
 pub type PK_FMFREE_f_t =
     Option<unsafe extern "C" fn(nbytes: *const c_int, memory: *mut *mut c_char, ifail: *mut c_int)>;
 
+// -----------------------------------------------------------------------------
+// Graphical output (GO): GOOPSG / GOSGMT / GOCLSG
+//
+// Evidence (pskernel.dll SHA-256
+// c900fa3f430fe67c2adb15a50f9604d9812ed81a02c5006b66689dac28263073, grade
+// static-observed; parasolid-re artifacts/rs/20261021T031234Z-prs-render/notes.md §4,
+// and port/capability-map/display.md §5):
+// - The kernel dispatchers GOOPSG @0x183621930, GOSGMT @0x183621a70 and GOCLSG
+//   @0x1836217f0 forward 8 arguments (rcx, rdx, r8, r9 and four stack slots)
+//   to the frustrum slots +0x30 / +0x28 / +0x38, i.e. `goopsg` / `gosgmt` /
+//   `goclsg` of `PK_SESSION_frustrum_t`. With no callback registered they write
+//   -1011 to `*ifail`.
+// - At the call sites (REN_go_start_segment, REN_go_line, REN_go_stop_segment)
+//   every argument is an address except `geom`, which is a pointer to doubles.
+// - What `ngeom` counts depends on the segment. For lines and curves it counts
+//   doubles: a straight line is 9 (start, end, direction) and a circle 13
+//   (get_geometry @0x18237b460), a polyline 3 per point, a NURBS curve its
+//   vertices then knots; the open segment sends 6 or 18. For facets it counts
+//   3-vectors: REN_go_facet @0x182377660 sends vertex count x 1, 2, 3, 5, 6
+//   or 8 by output mode (live: line type 3007 = vertices, 3008 = vertices then
+//   normals). `parasolid::go` applies this rule when it copies `geom`.
+// - `*ifail` is preset to -1011 before the call and any nonzero value on
+//   return aborts the render ("Rendering aborted by GO."), so a callback must
+//   write 0 to continue.
+// - `segtyp` values are 2003..2040 and `lntp` codes 1001..1031, 3001..;
+//   their names (SGTP*, L3TP*, COD*) are in the Downward Interfaces manual,
+//   which was not supplied (parasolid-re B-R44-4). They are raw integers here.
+// -----------------------------------------------------------------------------
+
 /// GOOPSG — open a hierarchical graphical segment (optional).
 ///
-/// - `n_data`: number of integers in `data` array (input).
-/// - `data`: segment descriptor data (input).
-pub type PK_GOOPSG_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
+/// - `segtyp`: segment type (input).
+/// - `ntags`, `tags`: the entity tags of the segment (input; `ntags` 0 or 1 seen).
+/// - `ngeom`, `geom`: `ngeom` doubles of segment geometry (input).
+/// - `nlntp`, `lntp`: `nlntp` integers of line-type / occurrence data (input).
+/// - `ifail`: write 0 to continue; nonzero aborts rendering (output).
+pub type PK_GOOPSG_f_t = Option<
+    unsafe extern "C" fn(
+        segtyp: *const c_int,
+        ntags: *const c_int,
+        tags: *const c_int,
+        ngeom: *const c_int,
+        geom: *const c_double,
+        nlntp: *const c_int,
+        lntp: *const c_int,
+        ifail: *mut c_int,
+    ),
+>;
 
-/// GOSGMT — output a non-hierarchical (single-level) graphical segment (optional).
-///
-/// - `n_data`: number of integers in `data` array (input).
-/// - `data`: segment descriptor data (input).
-pub type PK_GOSGMT_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
+/// GOSGMT — output a single-level graphical segment (optional). Same arguments
+/// as [`PK_GOOPSG_f_t`].
+pub type PK_GOSGMT_f_t = Option<
+    unsafe extern "C" fn(
+        segtyp: *const c_int,
+        ntags: *const c_int,
+        tags: *const c_int,
+        ngeom: *const c_int,
+        geom: *const c_double,
+        nlntp: *const c_int,
+        lntp: *const c_int,
+        ifail: *mut c_int,
+    ),
+>;
 
-/// GOCLSG — close a hierarchical graphical segment (optional).
-///
-/// - `n_data`: number of integers in `data` array (input).
-/// - `data`: segment descriptor data (input).
-pub type PK_GOCLSG_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
+/// GOCLSG — close a hierarchical graphical segment (optional). Same arguments
+/// as [`PK_GOOPSG_f_t`].
+pub type PK_GOCLSG_f_t = Option<
+    unsafe extern "C" fn(
+        segtyp: *const c_int,
+        ntags: *const c_int,
+        tags: *const c_int,
+        ngeom: *const c_int,
+        geom: *const c_double,
+        nlntp: *const c_int,
+        lntp: *const c_int,
+        ifail: *mut c_int,
+    ),
+>;
 
 /// FFOPRB — open file for rollback reading (obsolete, use PK_DELTA instead).
 pub type PK_FFOPRB_f_t = Option<
@@ -247,12 +308,18 @@ pub type PK_UCOPWR_f_t = Option<
 >;
 
 /// GOOPPX — open pixel buffer for shaded images (obsolete).
+///
+/// `[unverified]`: this argument list was never checked against the DLL.
 pub type PK_GOOPPX_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
 
 /// GOPIXL — write pixel data for shaded images (obsolete).
+///
+/// `[unverified]`: this argument list was never checked against the DLL.
 pub type PK_GOPIXL_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
 
 /// GOCLPX — close pixel buffer for shaded images (obsolete).
+///
+/// `[unverified]`: this argument list was never checked against the DLL.
 pub type PK_GOCLPX_f_t = Option<unsafe extern "C" fn(n_data: *const c_int, data: *const c_int)>;
 
 // =============================================================================

@@ -787,18 +787,45 @@ pub struct PK_facet_local_tolerances_t {
 }
 
 // =============================================================================
-// Facet mesh generation options (GO-based: PK_TOPOL_render_facet)
+// PK_TOPOL_render_facet options (GO facet output)
+//
+// Evidence (pskernel.dll SHA-256
+// c900fa3f430fe67c2adb15a50f9604d9812ed81a02c5006b66689dac28263073, grade
+// static-observed; parasolid-re artifacts/rs/20261021T031234Z-prs-render/notes.md §2):
+// - PK_TOPOL_render_facet @0x18046f230 passes the options to the migration
+//   FUN_18046d000. The version it switches on is `control.o_t_version`:
+//   versions 1..19 are copied into a 0x1b0 buffer, version 20 is used as
+//   given, anything else is PK_ERROR_o_t_version_unknown (5022). Its NULL
+//   branch writes the defaults used by the `Default` impls below.
+// - Names and offsets: the journal printer PKU_journal_TOPOL_facet_mesh_o
+//   @0x1814cad10 (the `control` part) and the go_option prints in the wrapper
+//   (0x18046f861: `split_strips` at +0x1a8, `consistent_parms` at +0x1ac).
+// - The checkers take `options` (0x1814c9630) and `options + 0x188`
+//   (0x18046cec0), so `go_option` starts at 0x188.
 // =============================================================================
 
-/// Mesh generation options for PK_TOPOL_render_facet.
+/// The `o_t_version` of `PK_TOPOL_render_facet_o_t` (both parts) on V37.01.243.
+pub const PK_TOPOL_render_facet_o_t_version: c_int = 20;
+
+/// Mesh generation options of `PK_TOPOL_render_facet`: the **version-20 user
+/// struct (0x188 = 392 bytes)**. This is not the `PK_TOPOL_facet_2` mesh struct
+/// (`PK_TOPOL_facet_mesh_2_o_t`): the field order and set differ.
+///
+/// Version: `o_t_version` 20 is the only version used unmigrated; it must be
+/// stamped in `control.o_t_version` (see `PK_TOPOL_render_facet_o_t`).
+///
+/// `local_tols` points at an array the kernel reads with a 0x38-byte stride
+/// (7 doubles: curve_chord_tol, curve_chord_max, curve_chord_ang,
+/// surface_plane_tol, surface_plane_ang, min_facet_width, max_facet_width,
+/// per the journal printer). That does not match the current
+/// `PK_facet_local_tolerances_t`; leave `n_local_tols` at 0.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_facet_mesh_o_t {
+    pub o_t_version: c_int,
     pub shape: PK_facet_shape_t,
     pub match_: PK_facet_match_t,
     pub density: PK_facet_density_t,
-    pub n_view_directions: c_int,
-    pub view_directions: *const PK_VECTOR_t,
     pub cull: PK_facet_cull_t,
     pub n_loops: c_int,
     pub loops: *const PK_LOOP_t,
@@ -817,63 +844,181 @@ pub struct PK_TOPOL_facet_mesh_o_t {
     pub surface_plane_tol: c_double,
     pub is_surface_plane_ang: PK_LOGICAL_t,
     pub surface_plane_ang: c_double,
-    pub is_local_density_tol: PK_LOGICAL_t,
-    pub local_density_tol: c_double,
-    pub is_local_density_ang: PK_LOGICAL_t,
-    pub local_density_ang: c_double,
-    pub n_local_tols: c_int,
-    pub local_tols: *const PK_facet_local_tolerances_t,
-    pub n_topols_with_local_tols: c_int,
-    pub topols_with_local_tols: *const PK_TOPOL_t,
-    pub local_tols_for_topols: *const c_int,
-    pub degen: PK_facet_degen_t,
     pub is_facet_plane_tol: PK_LOGICAL_t,
     pub facet_plane_tol: c_double,
     pub is_facet_plane_ang: PK_LOGICAL_t,
     pub facet_plane_ang: c_double,
-    pub wire_edges: PK_facet_wire_edges_t,
+    pub is_local_density_tol: PK_LOGICAL_t,
+    pub local_density_tol: c_double,
+    pub is_local_density_ang: PK_LOGICAL_t,
+    pub local_density_ang: c_double,
+    pub degen: PK_facet_degen_t,
+    pub n_view_directions: c_int,
+    pub view_directions: *const PK_VECTOR1_t,
+    pub n_local_tols: c_int,
+    /// Element layout not verified (see the struct doc); keep `n_local_tols` 0.
+    pub local_tols: *const PK_facet_local_tolerances_t,
+    pub n_topols_with_local_tols: c_int,
+    pub topols_with_local_tols: *const PK_TOPOL_t,
+    pub local_tols_for_topols: *const c_int,
     pub ignore: PK_facet_ignore_t,
     pub ignore_value: c_double,
     pub ignore_scope: PK_facet_ignore_scope_t,
+    pub wire_edges: PK_facet_wire_edges_t,
     pub incremental_facetting: PK_facet_incr_t,
     pub incremental_method: PK_facet_incr_method_t,
+    pub incremental_propagation: PK_facet_incr_prop_t,
     pub incremental_transformation: PK_facet_incr_tf_t,
+    pub incremental_refinement: PK_facet_incr_refine_t,
+    pub incremental_report: PK_facet_incr_report_t,
     pub inflect: PK_facet_inflect_t,
     pub quality: PK_facet_quality_t,
     pub vertices_on_planar: PK_LOGICAL_t,
-    pub sing_topol: PK_facet_sing_topol_t,
     pub respect_offset: PK_facet_respect_t,
+    pub n_bodies_with_scales: c_int,
+    pub bodies_with_scales: *const PK_BODY_t,
+    pub scale_factors: *const PK_scale_factor_t,
+    pub output_scale_factor: PK_scale_factor_t,
+    pub n_viewports: c_int,
+    pub viewports: *const PK_NABOX_sf_t,
+    /// Token of an enum not in the V35 catalog; default 27460 (0x6b44).
+    pub facet_frames: c_int,
+    pub is_lattice_tol: PK_LOGICAL_t,
+    pub lattice_tol: c_double,
+    pub is_boundary_guise: PK_LOGICAL_t,
+    /// Token of an enum not in the V35 catalog; default 27110 (0x69e6).
+    pub boundary_guise: c_int,
 }
 
-// =============================================================================
-// GO output options for PK_TOPOL_render_facet
-// =============================================================================
+const _: () = {
+    use std::mem::{offset_of, size_of};
+    type M = PK_TOPOL_facet_mesh_o_t;
+    assert!(size_of::<M>() == 0x188);
+    assert!(offset_of!(M, cull) == 0x10);
+    assert!(offset_of!(M, loops) == 0x18);
+    assert!(offset_of!(M, max_facet_sides) == 0x20);
+    assert!(offset_of!(M, is_min_facet_width) == 0x24);
+    assert!(offset_of!(M, min_facet_width) == 0x28);
+    assert!(offset_of!(M, curve_chord_tol) == 0x48);
+    assert!(offset_of!(M, curve_chord_ang) == 0x68);
+    assert!(offset_of!(M, surface_plane_ang) == 0x88);
+    assert!(offset_of!(M, local_density_ang) == 0xc8);
+    assert!(offset_of!(M, degen) == 0xd0);
+    assert!(offset_of!(M, view_directions) == 0xd8);
+    assert!(offset_of!(M, local_tols) == 0xe8);
+    assert!(offset_of!(M, local_tols_for_topols) == 0x100);
+    assert!(offset_of!(M, ignore) == 0x108);
+    assert!(offset_of!(M, ignore_value) == 0x110);
+    assert!(offset_of!(M, ignore_scope) == 0x118);
+    assert!(offset_of!(M, incremental_report) == 0x134);
+    assert!(offset_of!(M, vertices_on_planar) == 0x140);
+    assert!(offset_of!(M, respect_offset) == 0x144);
+    assert!(offset_of!(M, bodies_with_scales) == 0x150);
+    assert!(offset_of!(M, output_scale_factor) == 0x160);
+    assert!(offset_of!(M, viewports) == 0x168);
+    assert!(offset_of!(M, facet_frames) == 0x170);
+    assert!(offset_of!(M, lattice_tol) == 0x178);
+    assert!(offset_of!(M, is_boundary_guise) == 0x180);
+    assert!(offset_of!(M, boundary_guise) == 0x184);
+};
 
-/// Controls what data is output through GO for PK_TOPOL_render_facet.
+impl Default for PK_TOPOL_facet_mesh_o_t {
+    /// The migration's NULL-branch defaults (FUN_18046d000), stamped at version 20.
+    fn default() -> Self {
+        // SAFETY: plain-data struct; null pointers, zero counts and
+        // false/zero tolerances are the kernel's own defaults.
+        let mut o: Self = unsafe { std::mem::zeroed() };
+        o.o_t_version = PK_TOPOL_render_facet_o_t_version;
+        o.shape = PK_facet_shape_convex_c;
+        o.match_ = PK_facet_match_topol_c;
+        o.density = PK_facet_density_no_view_c;
+        o.cull = PK_facet_cull_none_c;
+        o.max_facet_sides = 3;
+        o.degen = PK_facet_degen_multiple_vxs_c;
+        o.ignore = PK_facet_ignore_no_c;
+        o.ignore_scope = PK_facet_ignore_scope_global_c;
+        o.wire_edges = PK_facet_wire_edges_no_c;
+        o.incremental_facetting = PK_facet_incr_no_c;
+        o.incremental_method = PK_facet_incr_method_attrib_c;
+        // Migration defaults; the token names are not recovered.
+        o.incremental_propagation = 26560;
+        o.incremental_transformation = PK_facet_incr_tf_no_c;
+        o.incremental_refinement = 22570;
+        o.incremental_report = 22580;
+        o.inflect = PK_facet_inflect_no_c;
+        o.quality = PK_facet_quality_standard_c;
+        o.respect_offset = PK_facet_respect_no_c;
+        o.output_scale_factor = PK_scale_factor_1x_c;
+        o.facet_frames = 27460;
+        o.boundary_guise = 27110;
+        o
+    }
+}
+
+/// What `PK_TOPOL_render_facet` sends through GO: the **version-20 struct
+/// (0x28 = 40 bytes)**, at byte 0x188 of `PK_TOPOL_render_facet_o_t`.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_render_facet_go_o_t {
+    pub o_t_version: c_int,
     pub go_normals: PK_facet_go_normals_t,
     pub go_parameters: PK_facet_go_parameters_t,
     pub go_curvatures: PK_facet_go_curvatures_t,
     pub go_edges: PK_facet_go_edges_t,
     pub go_strips: PK_facet_go_strips_t,
-    pub go_interleaved: PK_facet_go_interleaved_t,
     pub go_max_facets_per_strip: c_int,
+    pub go_interleaved: PK_facet_go_interleaved_t,
+    pub split_strips: PK_facet_split_strip_t,
+    pub consistent_parms: PK_facet_consistent_parms_t,
 }
 
-// =============================================================================
-// Top-level option struct for PK_TOPOL_render_facet
-// =============================================================================
+const _: () = {
+    use std::mem::{offset_of, size_of};
+    type G = PK_TOPOL_render_facet_go_o_t;
+    assert!(size_of::<G>() == 0x28);
+    assert!(offset_of!(G, go_normals) == 4);
+    assert!(offset_of!(G, go_edges) == 0x10);
+    assert!(offset_of!(G, go_strips) == 0x14);
+    assert!(offset_of!(G, go_max_facets_per_strip) == 0x18);
+    assert!(offset_of!(G, go_interleaved) == 0x1c);
+    assert!(offset_of!(G, split_strips) == 0x20);
+    assert!(offset_of!(G, consistent_parms) == 0x24);
+};
 
-/// Top-level options for PK_TOPOL_render_facet.
-/// Contains mesh generation control and GO output options.
+impl Default for PK_TOPOL_render_facet_go_o_t {
+    /// The migration's NULL-branch defaults (FUN_18046d000), stamped at version 20.
+    fn default() -> Self {
+        Self {
+            o_t_version: PK_TOPOL_render_facet_o_t_version,
+            go_normals: PK_facet_go_normals_no_c,
+            go_parameters: PK_facet_go_parameters_no_c,
+            go_curvatures: PK_facet_go_curvatures_no_c,
+            go_edges: PK_facet_go_edges_no_c,
+            go_strips: PK_facet_go_strips_no_c,
+            go_max_facets_per_strip: 0,
+            go_interleaved: PK_facet_go_interleaved_no_c,
+            split_strips: PK_facet_split_strip_no_c,
+            consistent_parms: PK_facet_consistent_parms_no_c,
+        }
+    }
+}
+
+/// Options of `PK_TOPOL_render_facet` (0x1b0 = 432 bytes). There is no outer
+/// `o_t_version`: the kernel versions the whole struct by `control.o_t_version`
+/// (20 on V37.01.243; 21 is PK_ERROR_o_t_version_unknown). Stamp
+/// `go_option.o_t_version` with the same value.
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct PK_TOPOL_render_facet_o_t {
     pub control: PK_TOPOL_facet_mesh_o_t,
     pub go_option: PK_TOPOL_render_facet_go_o_t,
 }
+
+const _: () = {
+    use std::mem::{offset_of, size_of};
+    assert!(size_of::<PK_TOPOL_render_facet_o_t>() == 0x1b0);
+    assert!(offset_of!(PK_TOPOL_render_facet_o_t, go_option) == 0x188);
+};
 
 // =============================================================================
 // Facet mesh generation options (tabular: PK_TOPOL_facet_2)
@@ -1227,68 +1372,57 @@ pub struct PK_TOPOL_facet_2_r_t {
 // PK_TOPOL_render_line option struct
 // =============================================================================
 
-/// Options for PK_TOPOL_render_line.
+/// The `o_t_version` of `PK_TOPOL_render_line_o_t` on V37.01.243.
+pub const PK_TOPOL_render_line_o_t_version: c_int = 25;
+
+/// Options for `PK_TOPOL_render_line`: the **version-25 user struct
+/// (0x240 = 576 bytes)**, the current layout.
 ///
-/// Controls edge rendering, silhouettes, hidden-line removal, hatching,
-/// viewport, transparency, overlap detection, and more.
+/// Evidence (pskernel.dll SHA-256
+/// `c900fa3f430fe67c2adb15a50f9604d9812ed81a02c5006b66689dac28263073`, grade
+/// static-observed; parasolid-re `artifacts/rs/20261021T031234Z-prs-render/notes.md` §1):
+/// - PK_TOPOL_render_line @0x18047a790 passes `options` to the migration
+///   FUN_180472d80: versions 1..24 are copied into a 0x240 buffer, version 25
+///   is used as given, anything else is PK_ERROR_o_t_version_unknown (5022).
+///   Its NULL branch writes the defaults used by [`Default`].
+/// - Names and offsets: the journal printer candidate_pk_0x180472700 prints
+///   every field below by name at the asserted offset.
+/// - The checker FUN_1804718b0 reads the enum fields at the same offsets
+///   (5014 field_of_wrong_type on a bad token) and tests the logicals as bytes.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_render_line_o_t {
-    // --- Edge/silhouette ---
+    pub o_t_version: c_int,
     pub edge: PK_render_edge_t,
     pub silhouette: PK_render_silhouette_t,
-    pub mesh_normal_field: PK_MESH_normal_field_t,
+    pub sil_mesh_normal_field: PK_MESH_normal_field_t,
     pub sharp_mfins: PK_render_sharp_mfins_t,
-
-    // --- Visibility ---
-    pub vis: PK_render_vis_t,
+    pub visibility: PK_render_vis_t,
     pub invisible: PK_render_invisible_t,
     pub drafting: PK_render_drafting_t,
     pub self_hidden: PK_render_self_hidden_t,
-
-    // --- Smoothness ---
-    pub smooth: PK_render_smooth_t,
-    pub is_edge_smooth_tol: PK_LOGICAL_t,
-    pub edge_smooth_tol: c_double,
-
-    // --- Internal edges ---
-    pub internal: PK_render_internal_t,
-
-    // --- Missing geometry ---
-    pub ske_missing: PK_render_ske_missing_t,
-
-    // --- Ignore small features ---
-    pub ignore: PK_render_ignore_t,
-    pub ignore_value: c_double,
-
-    // --- Hierarchical output ---
-    pub hierarch: PK_render_hierarch_t,
-
-    // --- B-curve format ---
-    pub bcurve: PK_render_bcurve_t,
-
-    // --- Curve chord tolerances ---
     pub is_curve_chord_tol: PK_LOGICAL_t,
     pub curve_chord_tol: c_double,
     pub is_curve_chord_max: PK_LOGICAL_t,
     pub curve_chord_max: c_double,
     pub is_curve_chord_ang: PK_LOGICAL_t,
     pub curve_chord_ang: c_double,
-
-    // --- Memory target ---
+    pub smooth: PK_render_smooth_t,
+    pub is_edge_smooth_tol: PK_LOGICAL_t,
+    pub edge_smooth_tol: c_double,
+    pub internal: PK_render_internal_t,
+    pub ske_missing: PK_render_ske_missing_t,
+    pub ignore: PK_render_ignore_t,
+    pub ignore_value: c_double,
+    pub hierarch: PK_render_hierarch_t,
+    pub bcurve: PK_render_bcurve_t,
     pub memory_target: PK_render_memory_target_t,
-    pub memory_target_value: c_int,
-
-    // --- Report lines ---
-    pub report_line: PK_render_report_line_t,
-
-    // --- Planar hatching ---
+    /// `size_t` (the journal prints it with the 8-byte integer printer).
+    pub memory_target_value: usize,
+    pub report_lines: PK_render_report_line_t,
     pub planar: PK_render_planar_t,
-    pub planar_axis: PK_VECTOR_t,
     pub planar_spacing: c_double,
-    pub planar_location: PK_VECTOR_t,
-
-    // --- Radial hatching ---
+    pub planar_axis: PK_AXIS1_sf_t,
     pub radial: PK_render_radial_t,
     pub radial_around: c_double,
     pub radial_along: c_double,
@@ -1296,69 +1430,273 @@ pub struct PK_TOPOL_render_line_o_t {
     pub radial_around_start: c_double,
     pub radial_along_start: c_double,
     pub radial_about_start: c_double,
-
-    // --- Parametric hatching ---
     pub param: PK_render_param_t,
     pub param_u: c_double,
     pub param_v: c_double,
+    pub param_u_number: c_int,
+    pub param_v_number: c_int,
     pub param_u_start: c_double,
     pub param_v_start: c_double,
-
-    // --- Unfixed blends ---
     pub unfix: PK_render_unfix_t,
     pub unfix_spacing: c_double,
-
-    // --- Overlapping bodies ---
     pub overlap: PK_render_overlap_t,
-    pub n_overlap_indices1: c_int,
+    pub n_overlap_indices: c_int,
     pub overlap_indices1: *const c_int,
     pub n_overlap_indices2: c_int,
     pub overlap_indices2: *const c_int,
-
-    // --- Transparency ---
     pub transparent: PK_render_transparent_t,
     pub n_transparent_indices: c_int,
     pub transparent_indices: *const c_int,
-    pub transp_hid: PK_render_transp_hid_t,
-
-    // --- Suppressed hidden lines ---
+    pub transparent_hid: PK_render_transp_hid_t,
     pub n_suppressed_indices: c_int,
     pub suppressed_indices: *const c_int,
-
-    // --- Viewport ---
     pub viewport: PK_render_viewport_t,
     pub viewport_type: PK_render_viewport_type_t,
-    pub viewport_sf: PK_NABOX_sf_t,
     pub n_viewports: c_int,
+    /// Array of `n_viewports` boxes, read with a 0x78-byte stride.
     pub viewports: *const PK_NABOX_sf_t,
-    pub viewport_clip: PK_render_viewport_clip_t,
-
-    // --- Regional data ---
+    pub viewport_sf: PK_NABOX_sf_t,
+    pub viewport_clipping: PK_render_viewport_clip_t,
     pub region: PK_render_region_t,
+    pub n_bodies_with_scales: c_int,
+    pub bodies_with_scales: *const PK_BODY_t,
+    pub scale_factors: *const PK_scale_factor_t,
+    pub output_scale_factor: PK_scale_factor_t,
+}
+
+/// The "unset" double the kernel's option defaults use (-1e36,
+/// bits 0xc76812f9cf7920e3) for the hatch start positions.
+pub const PK_render_unset_double: c_double = -1.0e36;
+
+const _: () = {
+    use std::mem::{offset_of, size_of};
+    type L = PK_TOPOL_render_line_o_t;
+    assert!(size_of::<PK_AXIS1_sf_t>() == 48);
+    assert!(size_of::<PK_NABOX_sf_t>() == 0x78);
+    assert!(size_of::<L>() == 0x240);
+    assert!(offset_of!(L, edge) == 4);
+    assert!(offset_of!(L, silhouette) == 8);
+    assert!(offset_of!(L, visibility) == 0x14);
+    assert!(offset_of!(L, self_hidden) == 0x20);
+    assert!(offset_of!(L, is_curve_chord_tol) == 0x24);
+    assert!(offset_of!(L, curve_chord_tol) == 0x28);
+    assert!(offset_of!(L, curve_chord_ang) == 0x48);
+    assert!(offset_of!(L, smooth) == 0x50);
+    assert!(offset_of!(L, is_edge_smooth_tol) == 0x54);
+    assert!(offset_of!(L, edge_smooth_tol) == 0x58);
+    assert!(offset_of!(L, internal) == 0x60);
+    assert!(offset_of!(L, ignore) == 0x68);
+    assert!(offset_of!(L, ignore_value) == 0x70);
+    assert!(offset_of!(L, hierarch) == 0x78);
+    assert!(offset_of!(L, bcurve) == 0x7c);
+    assert!(offset_of!(L, memory_target) == 0x80);
+    assert!(offset_of!(L, memory_target_value) == 0x88);
+    assert!(offset_of!(L, report_lines) == 0x90);
+    assert!(offset_of!(L, planar) == 0x94);
+    assert!(offset_of!(L, planar_spacing) == 0x98);
+    assert!(offset_of!(L, planar_axis) == 0xa0);
+    assert!(offset_of!(L, radial) == 0xd0);
+    assert!(offset_of!(L, radial_around) == 0xd8);
+    assert!(offset_of!(L, radial_about_start) == 0x100);
+    assert!(offset_of!(L, param) == 0x108);
+    assert!(offset_of!(L, param_u) == 0x110);
+    assert!(offset_of!(L, param_u_number) == 0x120);
+    assert!(offset_of!(L, param_v_number) == 0x124);
+    assert!(offset_of!(L, param_u_start) == 0x128);
+    assert!(offset_of!(L, param_v_start) == 0x130);
+    assert!(offset_of!(L, unfix) == 0x138);
+    assert!(offset_of!(L, unfix_spacing) == 0x140);
+    assert!(offset_of!(L, overlap) == 0x148);
+    assert!(offset_of!(L, n_overlap_indices) == 0x14c);
+    assert!(offset_of!(L, overlap_indices1) == 0x150);
+    assert!(offset_of!(L, n_overlap_indices2) == 0x158);
+    assert!(offset_of!(L, overlap_indices2) == 0x160);
+    assert!(offset_of!(L, transparent) == 0x168);
+    assert!(offset_of!(L, transparent_indices) == 0x170);
+    assert!(offset_of!(L, transparent_hid) == 0x178);
+    assert!(offset_of!(L, n_suppressed_indices) == 0x17c);
+    assert!(offset_of!(L, suppressed_indices) == 0x180);
+    assert!(offset_of!(L, viewport) == 0x188);
+    assert!(offset_of!(L, viewport_type) == 0x18c);
+    assert!(offset_of!(L, n_viewports) == 0x190);
+    assert!(offset_of!(L, viewports) == 0x198);
+    assert!(offset_of!(L, viewport_sf) == 0x1a0);
+    assert!(offset_of!(L, viewport_clipping) == 0x218);
+    assert!(offset_of!(L, region) == 0x21c);
+    assert!(offset_of!(L, n_bodies_with_scales) == 0x220);
+    assert!(offset_of!(L, bodies_with_scales) == 0x228);
+    assert!(offset_of!(L, scale_factors) == 0x230);
+    assert!(offset_of!(L, output_scale_factor) == 0x238);
+};
+
+impl Default for PK_TOPOL_render_line_o_t {
+    /// The migration's NULL-branch defaults (FUN_180472d80), stamped at
+    /// version 25: edges only, no silhouettes, no hidden-line, no hatching.
+    fn default() -> Self {
+        // SAFETY: plain-data struct; null pointers, zero counts and
+        // false/zero tolerances are the kernel's own defaults.
+        let mut o: Self = unsafe { std::mem::zeroed() };
+        o.o_t_version = PK_TOPOL_render_line_o_t_version;
+        o.edge = PK_render_edge_yes_c;
+        o.silhouette = PK_render_silhouette_no_c;
+        o.sil_mesh_normal_field = PK_MESH_normal_field_mvertex_c;
+        o.sharp_mfins = PK_render_sharp_mfins_no_c;
+        o.visibility = PK_render_vis_no_c;
+        o.invisible = PK_render_invisible_no_c;
+        o.drafting = PK_render_drafting_no_c;
+        o.self_hidden = PK_render_self_hidden_no_c;
+        o.smooth = PK_render_smooth_no_c;
+        o.internal = PK_render_internal_no_c;
+        o.ske_missing = PK_render_ske_missing_no_c;
+        o.ignore = PK_render_ignore_no_c;
+        o.hierarch = PK_render_hierarch_no_c;
+        o.bcurve = PK_render_bcurve_polyline_c;
+        o.memory_target = PK_render_memory_target_no_c;
+        o.report_lines = PK_render_report_line_no_c;
+        o.planar = PK_render_planar_no_c;
+        o.radial = PK_render_radial_no_c;
+        o.radial_around_start = PK_render_unset_double;
+        o.radial_along_start = PK_render_unset_double;
+        o.radial_about_start = PK_render_unset_double;
+        o.param = PK_render_param_no_c;
+        o.param_u_start = PK_render_unset_double;
+        o.param_v_start = PK_render_unset_double;
+        o.unfix = PK_render_unfix_no_c;
+        o.overlap = PK_render_overlap_no_c;
+        o.transparent = PK_render_transparent_no_c;
+        o.transparent_hid = PK_render_transp_hid_no_c;
+        o.viewport = PK_render_viewport_no_c;
+        o.viewport_type = PK_render_viewport_type_3D_c;
+        o.viewport_clipping = PK_render_viewport_clip_no_c;
+        o.region = PK_render_region_no_c;
+        o.output_scale_factor = PK_scale_factor_1x_c;
+        o
+    }
 }
 
 // =============================================================================
 // PK_GEOM_render option struct
 // =============================================================================
 
-/// Options for PK_GEOM_render (geometry rendering).
+/// The `o_t_version` of `PK_GEOM_render_o_t` on V37.01.243.
+pub const PK_GEOM_render_o_t_version: c_int = 5;
+
+/// The `sdf_control` part of `PK_GEOM_render_o_t` (0x68 = 104 bytes), as
+/// printed by PKU_journal_render_sdf_control @0x1813388a0 (static-observed).
+/// The enum tokens are V37-only and their names are not recovered.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_render_sdf_control_t {
+    pub voxel_size: c_double,
+    pub max_n_voxels: [c_int; 3],
+    /// Default 27410 (0x6b12).
+    pub axes_type: c_int,
+    pub grid_axes: PK_AXIS2_sf_t,
+    /// Default 27420 (0x6b1c).
+    pub order: c_int,
+    /// Default 27430 (0x6b26).
+    pub position: c_int,
+}
+
+/// Options for `PK_GEOM_render`: the **version-5 user struct (0x110 = 272
+/// bytes)**. The geometry transforms are an argument of `PK_GEOM_render`, not
+/// part of this struct.
+///
+/// Evidence (same DLL, static-observed; notes.md §3): PK_GEOM_render
+/// @0x180335220 passes `options` to the migration FUN_180334a80 (version 5 used
+/// as given, 1..4 copied, else 5022; NULL branch = the defaults below); names
+/// and offsets from the journal printer candidate_pk_0x1803347e0.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_GEOM_render_o_t {
-    pub boundary: PK_render_boundary_t,
+    pub o_t_version: c_int,
     pub param: PK_render_param_t,
     pub param_u: c_double,
     pub param_v: c_double,
+    pub param_u_number: c_int,
+    pub param_v_number: c_int,
+    pub boundary: PK_render_boundary_t,
     pub bcurve: PK_render_bcurve_t,
+    /// Default 27400 (0x6b08); token name not recovered.
+    pub volume_method: c_int,
+    pub n_content_methods: c_int,
+    pub content_methods: *const c_int,
+    pub lattice_contents: *const c_int,
     pub lattice: PK_render_lattice_t,
-    pub n_geom_transfs: c_int,
-    pub geom_transfs: *const PK_TRANSF_t,
-    pub is_curve_chord_tol: PK_LOGICAL_t,
+    pub n_lattices_with_ijkboxes: c_int,
+    pub lattices_with_ijkboxes: *const PK_LATTICE_t,
+    /// Element type not recovered; leave null with a zero count.
+    pub ijkboxes: *const c_void,
+    pub sdf_control: PK_render_sdf_control_t,
+    pub have_curve_chord_tol: PK_LOGICAL_t,
     pub curve_chord_tol: c_double,
-    pub is_curve_chord_max: PK_LOGICAL_t,
+    pub have_curve_chord_max: PK_LOGICAL_t,
     pub curve_chord_max: c_double,
-    pub is_curve_chord_ang: PK_LOGICAL_t,
+    pub have_curve_chord_ang: PK_LOGICAL_t,
     pub curve_chord_ang: c_double,
+    pub n_entities_with_scales: c_int,
+    pub entities_with_scales: *const PK_ENTITY_t,
+    pub scale_factors: *const PK_scale_factor_t,
+    pub output_scale_factor: PK_scale_factor_t,
+}
+
+const _: () = {
+    use std::mem::{offset_of, size_of};
+    type S = PK_render_sdf_control_t;
+    assert!(size_of::<S>() == 0x68);
+    assert!(offset_of!(S, max_n_voxels) == 8);
+    assert!(offset_of!(S, axes_type) == 0x14);
+    assert!(offset_of!(S, grid_axes) == 0x18);
+    assert!(offset_of!(S, order) == 0x60);
+    assert!(offset_of!(S, position) == 0x64);
+    type G = PK_GEOM_render_o_t;
+    assert!(size_of::<G>() == 0x110);
+    assert!(offset_of!(G, param) == 4);
+    assert!(offset_of!(G, param_u) == 8);
+    assert!(offset_of!(G, param_v) == 0x10);
+    assert!(offset_of!(G, param_u_number) == 0x18);
+    assert!(offset_of!(G, boundary) == 0x20);
+    assert!(offset_of!(G, bcurve) == 0x24);
+    assert!(offset_of!(G, volume_method) == 0x28);
+    assert!(offset_of!(G, n_content_methods) == 0x2c);
+    assert!(offset_of!(G, content_methods) == 0x30);
+    assert!(offset_of!(G, lattice_contents) == 0x38);
+    assert!(offset_of!(G, lattice) == 0x40);
+    assert!(offset_of!(G, n_lattices_with_ijkboxes) == 0x44);
+    assert!(offset_of!(G, lattices_with_ijkboxes) == 0x48);
+    assert!(offset_of!(G, ijkboxes) == 0x50);
+    assert!(offset_of!(G, sdf_control) == 0x58);
+    assert!(offset_of!(G, have_curve_chord_tol) == 0xc0);
+    assert!(offset_of!(G, curve_chord_tol) == 0xc8);
+    assert!(offset_of!(G, have_curve_chord_max) == 0xd0);
+    assert!(offset_of!(G, curve_chord_ang) == 0xe8);
+    assert!(offset_of!(G, n_entities_with_scales) == 0xf0);
+    assert!(offset_of!(G, entities_with_scales) == 0xf8);
+    assert!(offset_of!(G, scale_factors) == 0x100);
+    assert!(offset_of!(G, output_scale_factor) == 0x108);
+};
+
+impl Default for PK_GEOM_render_o_t {
+    /// The migration's NULL-branch defaults (FUN_180334a80), stamped at version 5.
+    fn default() -> Self {
+        // SAFETY: plain-data struct; null pointers and zero counts are the
+        // kernel's own defaults.
+        let mut o: Self = unsafe { std::mem::zeroed() };
+        o.o_t_version = PK_GEOM_render_o_t_version;
+        o.param = PK_render_param_no_c;
+        o.boundary = PK_render_boundary_yes_c;
+        o.bcurve = PK_render_bcurve_polyline_c;
+        o.volume_method = 27400;
+        o.lattice = PK_render_lattice_line_c;
+        o.sdf_control.max_n_voxels = [256; 3];
+        o.sdf_control.axes_type = 27410;
+        o.sdf_control.grid_axes.axis = [0.0, 0.0, 1.0];
+        o.sdf_control.grid_axes.ref_direction = [1.0, 0.0, 0.0];
+        o.sdf_control.order = 27420;
+        o.sdf_control.position = 27430;
+        o.output_scale_factor = PK_scale_factor_1x_c;
+        o
+    }
 }
 
 // =============================================================================
