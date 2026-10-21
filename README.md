@@ -40,3 +40,9 @@ cargo run -p parasolid-test --bin parasolid-test --target x86_64-pc-windows-gnu
 The FFI surface is being validated incrementally against the real kernel — see
 `TODO.md` for the roadmap and current coverage. The end goal is to use Parasolid
 as a **golden oracle** for the CADabra geometric kernel.
+
+## Maintenance
+
+This repo is maintained only by the Parasolid RE session (`parasolid-re`). Consumers use it read-only and request changes
+as `R-n` items in `parasolid-re/port/REQUESTS.md`. See `CLAUDE.md` for the owner's rules: `master` always builds, changes
+land with Wine harness counts, and public API changes are announced first.

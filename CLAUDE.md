@@ -13,6 +13,25 @@ the CADabra geometric kernel — so every binding we rely on must be validated
 end-to-end against the real `pskernel.dll` (Parasolid **V37.01.243**,
 SOLIDWORKS 2025).
 
+## Ownership: the RE session only
+
+This repo is owned outright by the Parasolid RE session (`/projects/sinbad/parasolid-re`; the user's decision, 2026-10-21).
+Only that session edits it: fixes, new wrappers, renames, binding corrections, the Wine harness. The CADabra coding session,
+its lanes and every other consumer use it read-only and file an `R-n` request in `parasolid-re/port/REQUESTS.md` instead,
+even when no RE session is running.
+
+Rules the owner follows for every change:
+- **`master` is consumed unpinned.** cadabra3 builds this checkout by path, and its merge gate type-checks its oracle tests
+  against `master`. So the main checkout stays on `master`, clean and building at every commit. Do fix and API work in a
+  `git worktree` branch and land it on `master` only when its harness counts are recorded.
+- **Every fix or new API gets a Wine runtime test**, and each landing reports the harness as explicit counts
+  ("247 passed, 0 failed, 1 skipped"), never a bare "green".
+- **Public API changes are announced first**: send the coding session the planned shape (old name → new name, fields,
+  types, offsets) before landing, and the sha plus counts after. Prefer additive APIs with unchanged defaults.
+- **Never expose a struct whose layout is not verified** against the asm and a live probe. Unverified types stay unused,
+  hidden or opaque, with a comment saying so.
+- Format only the files you change (`rustfmt <file>`), not the whole workspace.
+
 ## Proprietary binary — never commit
 
 `pskernel.dll`, `libpskernel.a`, and the Parasolid headers are proprietary
