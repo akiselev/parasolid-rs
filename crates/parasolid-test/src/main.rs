@@ -1922,6 +1922,117 @@ fn main() {
         let _ = std::fs::remove_dir_all(out_dir);
     });
 
+    // XT through application memory (PK_PART_transmit_b / PK_PART_receive_b,
+    // parasolid-re R-49): bytes out, bytes back in, no frustrum file.
+    test!("xt_memory_roundtrip_text", {
+        let out_dir = "xt_memory_out";
+        let _ = std::fs::create_dir_all(out_dir);
+        let session =
+            Session::start(test_config().frustrum(FrustrumConfig::new().base_dir(out_dir)))?;
+        let block = Body::create_solid_block(10.0, 20.0, 30.0)?;
+        let mp0 = block.mass_props()?;
+
+        let bytes =
+            fileio::transmit_to_bytes(std::slice::from_ref(&block), fileio::TransmitFormat::Text)?;
+        // The kernel stream has no frustrum container header.
+        assert!(
+            bytes.starts_with(b"T51 : TRANSMIT FILE"),
+            "memory XT starts with the T51 marker"
+        );
+        assert!(bytes.ends_with(b"S0 1 0 \n"), "one-part trailer");
+
+        let text = std::str::from_utf8(&bytes)?;
+        let got = fileio::receive_from_str(text)?;
+        assert_eq!(got.len(), 1, "one part back");
+        let r = &got[0];
+        assert_eq!(r.body_type()?, BodyType::Solid);
+        assert_eq!(
+            (r.faces()?.len(), r.edges()?.len(), r.vertices()?.len()),
+            (6, 12, 8)
+        );
+        let mp1 = r.mass_props()?;
+        assert!(
+            rel_ok(mp1.amount, mp0.amount),
+            "volume {} vs {}",
+            mp1.amount,
+            mp0.amount
+        );
+        assert!(
+            rel_ok(mp1.periphery, mp0.periphery),
+            "area {} vs {}",
+            mp1.periphery,
+            mp0.periphery
+        );
+        assert!(
+            (mp1.center_of_gravity.z - 15.0).abs() < 1e-9,
+            "cog z {}",
+            mp1.center_of_gravity.z
+        );
+        assert!(r.check()?.is_empty(), "received body checks clean");
+
+        // A frustrum-written file (with its **...**END_OF_HEADER header) is
+        // accepted too: the header is stripped before PK_PART_receive_b.
+        fileio::transmit(std::slice::from_ref(&block), "mem_cmp")?;
+        let path = std::fs::read_dir(out_dir)?
+            .filter_map(|e| e.ok())
+            .map(|e| e.path())
+            .find(|p| {
+                p.file_name()
+                    .is_some_and(|n| n.to_string_lossy().starts_with("mem_cmp"))
+            })
+            .ok_or("frustrum file mem_cmp.* not written")?;
+        let file = std::fs::read(&path)?;
+        assert!(
+            file.starts_with(b"**ABCDEFGHIJ"),
+            "file carries the container header"
+        );
+        let from_file = fileio::receive_from_bytes(&file, fileio::TransmitFormat::Text)?;
+        assert_eq!(from_file.len(), 1);
+        assert!(rel_ok(from_file[0].mass_props()?.amount, mp0.amount));
+
+        drop(session);
+        let _ = std::fs::remove_dir_all(out_dir);
+    });
+
+    test!("xt_memory_roundtrip_binary_two_parts", {
+        let _s = Session::start(test_config())?;
+        let cyl = Body::create_solid_cylinder(5.0, 10.0)?;
+        let sph = Body::create_solid_sphere(3.0)?;
+        let v_cyl = cyl.mass_props()?.amount;
+        let v_sph = sph.mass_props()?.amount;
+        let bytes = fileio::transmit_to_bytes(&[cyl, sph], fileio::TransmitFormat::BareBinary)?;
+        assert!(
+            bytes.starts_with(b"B"),
+            "binary stream starts with the B guise byte"
+        );
+        let got = fileio::receive_from_bytes(&bytes, fileio::TransmitFormat::BareBinary)?;
+        assert_eq!(got.len(), 2, "both parts back");
+        let mut vols: Vec<f64> = got
+            .iter()
+            .map(|b| b.mass_props().map(|m| m.amount))
+            .collect::<Result<_, _>>()?;
+        vols.sort_by(f64::total_cmp);
+        assert!(
+            rel_ok(vols[0], v_sph) && rel_ok(vols[1], v_cyl),
+            "volumes {vols:?}"
+        );
+        for b in &got {
+            assert!(b.check()?.is_empty(), "received body checks clean");
+        }
+    });
+
+    test!("xt_memory_receive_rejects_bad_input", {
+        let _s = Session::start(test_config())?;
+        // Empty input never reaches the kernel.
+        assert!(fileio::receive_from_bytes(b"", fileio::TransmitFormat::Text).is_err());
+        // A header with nothing after it is empty input too.
+        let hdr_only = b"**ABC**\n**END_OF_HEADER*****\n";
+        assert!(fileio::receive_from_bytes(hdr_only, fileio::TransmitFormat::Text).is_err());
+        // Text that is not an XT stream is a kernel error, not a crash.
+        let e = fileio::receive_from_str("not an XT stream\n");
+        assert!(e.is_err(), "garbage text must not receive");
+    });
+
     // =========================================================================
     // Body booleans (PK_BODY_boolean_2) — the core solid-modelling operation.
     // A cylinder co-axial with a block gives clean, computable volumes.
@@ -7507,7 +7618,9 @@ fn main() {
             ..Default::default()
         };
         let (c2, narrow) = run(s, Some(wide))?;
-        println!("\n    base {base:?}\n    zeroed local {zero:?}\n    surface_plane_tol 1e-3: {c1} {fine:?}\n    max_facet_width 1.0: {c2} {narrow:?}");
+        println!(
+            "\n    base {base:?}\n    zeroed local {zero:?}\n    surface_plane_tol 1e-3: {c1} {fine:?}\n    max_facet_width 1.0: {c2} {narrow:?}"
+        );
         assert_eq!(
             zero,
             (0, base.clone()),

@@ -108,3 +108,109 @@ pub fn receive(key: &str) -> PsResult<Vec<Body>> {
     let parts = unsafe { PkArray::from_raw(parts_ptr, n_parts) };
     Ok(parts.iter().map(|&tag| Body::from_tag(tag)).collect())
 }
+
+// =============================================================================
+// transmit / receive through application memory (`_b` calls)
+// =============================================================================
+
+/// Transmit bodies to XT bytes in memory (`PK_PART_transmit_b`).
+///
+/// Returns the kernel's XT stream exactly as written: for
+/// [`TransmitFormat::Text`] it begins `T51 : TRANSMIT FILE created by …`.
+/// Unlike a file written through the frustrum it has **no** `**ABCDEF…` /
+/// `**END_OF_HEADER` container header; that header is a frustrum concern.
+/// A multi-link chain is concatenated in order. The kernel's chain is freed
+/// with `PK_MEMORY_block_f` before returning.
+pub fn transmit_to_bytes(bodies: &[Body], format: TransmitFormat) -> PsResult<Vec<u8>> {
+    let mut part_tags: Vec<PK_PART_t> = bodies.iter().map(|b| b.tag()).collect();
+    let mut opts = PK_PART_transmit_o_t::default();
+    opts.transmit_format = format.token();
+    let mut block = PK_MEMORY_block_t {
+        next: std::ptr::null_mut(),
+        n_bytes: 0,
+        bytes: std::ptr::null(),
+    };
+
+    pk_call!(PK_PART_transmit_b(
+        part_tags.len() as c_int,
+        part_tags.as_mut_ptr(),
+        &mut opts,
+        &mut block,
+    ));
+
+    let mut out = Vec::new();
+    let mut link: *const PK_MEMORY_block_t = &block;
+    while !link.is_null() {
+        // SAFETY: the kernel filled a well-formed chain (layout verified in
+        // parasolid-sys `PK_MEMORY_block_t`); each link owns `n_bytes` bytes.
+        let l = unsafe { &*link };
+        if l.n_bytes > 0 && !l.bytes.is_null() {
+            let s = unsafe { std::slice::from_raw_parts(l.bytes as *const u8, l.n_bytes as usize) };
+            out.extend_from_slice(s);
+        }
+        link = l.next;
+    }
+    pk_call!(PK_MEMORY_block_f(&mut block));
+    Ok(out)
+}
+
+/// The frustrum container header a file on disk starts with, if `data` has one:
+/// returns the bytes after the `**END_OF_HEADER…` line. Same rule as the
+/// frustrum's FFOPRD header skip: only when `data` starts with `**` and the
+/// marker line ends within the first 64 KiB; otherwise `data` is unchanged.
+fn strip_container_header(data: &[u8]) -> &[u8] {
+    const END: &[u8] = b"**END_OF_HEADER";
+    if !data.starts_with(b"**") {
+        return data;
+    }
+    let scan = &data[..data.len().min(65536)];
+    let Some(pos) = scan.windows(END.len()).position(|w| w == END) else {
+        return data;
+    };
+    match data[pos..].iter().position(|&b| b == b'\n') {
+        Some(nl) => &data[pos + nl + 1..],
+        None => &data[data.len()..],
+    }
+}
+
+/// Receive bodies from XT bytes in memory (`PK_PART_receive_b`).
+///
+/// `data` is either the bare kernel stream (as from [`transmit_to_bytes`]) or
+/// the content of an `.x_t`/`.xmt_txt` file with its `**…**END_OF_HEADER`
+/// container header, which is stripped first: `PK_PART_receive_b` itself
+/// rejects the header with `PK_ERROR_corrupt_file` (922, parasolid-re R-49).
+///
+/// `format` must name the encoding: `PK_transmit_format_t` 0 is not a legal
+/// token for this call (5014 `field_of_wrong_type`, R-49). Empty input is
+/// refused without calling the kernel.
+pub fn receive_from_bytes(data: &[u8], format: TransmitFormat) -> PsResult<Vec<Body>> {
+    let stream = strip_container_header(data);
+    if stream.is_empty() {
+        return Err(PsError::Session("receive_from_bytes: no XT data".into()));
+    }
+    let block = PK_MEMORY_block_t {
+        next: std::ptr::null_mut(),
+        n_bytes: stream.len() as u64,
+        bytes: stream.as_ptr() as *const std::os::raw::c_char,
+    };
+    let mut opts = PK_PART_receive_o_t::default();
+    opts.transmit_format = format.token();
+    let mut n_parts: c_int = 0;
+    let mut parts_ptr: *mut PK_PART_t = std::ptr::null_mut();
+
+    pk_call!(PK_PART_receive_b(
+        block,
+        &opts,
+        &mut n_parts,
+        &mut parts_ptr
+    ));
+
+    let parts = unsafe { PkArray::from_raw(parts_ptr, n_parts) };
+    Ok(parts.iter().map(|&tag| Body::from_tag(tag)).collect())
+}
+
+/// Receive bodies from XT text in memory: [`receive_from_bytes`] with
+/// [`TransmitFormat::Text`].
+pub fn receive_from_str(text: &str) -> PsResult<Vec<Body>> {
+    receive_from_bytes(text.as_bytes(), TransmitFormat::Text)
+}

@@ -1,6 +1,6 @@
 //! Primitive types used throughout the Parasolid API.
 
-use std::os::raw::{c_double, c_int};
+use std::os::raw::{c_char, c_double, c_int};
 
 // =============================================================================
 // Tag types — opaque integer handles to Parasolid entities
@@ -313,13 +313,29 @@ pub const PK_TOPOL_sense_none_c: PK_TOPOL_sense_t = 18540;
 // Memory block — opaque transmit/receive buffer
 // =============================================================================
 
-/// Opaque memory block used by PK_PARTITION_transmit_b / PK_PART_transmit_b.
+/// One link of a chain of XT bytes, used by the `_b` (memory) transmit and
+/// receive calls (`PK_PART_transmit_b`, `PK_PART_receive_b`, …).
+///
+/// Layout verified on V37.01.243 (parasolid-re R-49,
+/// `artifacts/port/r49-xt-receive/20261021T043038Z-r49/`), 24 bytes:
+/// - static: `PK_MEMORY_block_f` (0x18036aa50) walks the chain through @0,
+///   frees @0x10 when the qword @8 is non-zero, then zeroes all three qwords;
+/// - live: `PK_PART_transmit_b` of a block body filled `next = null`,
+///   `n_bytes = 3281`, `bytes` → text starting `T51 : TRANSMIT FILE`;
+///   `PK_PART_receive_b` reads all 8 bytes of `n_bytes` (garbage in the upper
+///   32 bits made it read past the buffer), so it is an 8-byte count.
+///
+/// The earlier binding (`data@0, length@8 (int), next@0x10`) had the two
+/// pointers swapped; nothing used it.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_MEMORY_block_t {
-    pub data: *mut u8,
-    pub length: c_int,
+    /// Next link of the chain, or null. @0
     pub next: *mut PK_MEMORY_block_t,
+    /// Number of bytes at `bytes` (8-byte count; signedness not observed). @8
+    pub n_bytes: u64,
+    /// The XT bytes of this link. @0x10
+    pub bytes: *const c_char,
 }
 
 // =============================================================================
