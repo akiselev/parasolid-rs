@@ -134,10 +134,13 @@ pub enum RangeCheck {
     /// RQ-1 fixtures `p1-rq1-*`).
     ///
     /// The kernel collapses the sense (COI class 0 or 1) into one logical, so
-    /// `same_sense` is computed here: the normal of the first surface at the
-    /// middle of its uv box against the second surface's normal at the same
-    /// point (`Some(true)` when they agree). `None` when that evaluation
-    /// failed.
+    /// `same_sense` is computed here: the normal of the first surface at an
+    /// interior point of its uv box against the second surface's normal at the
+    /// same point (`Some(true)` when they agree). The middle of the uv box is
+    /// tried first, then a few off-centre points, so a pole or seam of either
+    /// surface at the middle does not lose the answer (two coincident spheres
+    /// on different axes, parasolid-re R-51 `r51-ss-coi-reparam`, RQ-48).
+    /// `None` only when no sample point gave two usable normals.
     Coincident { same_sense: Option<bool> },
     /// The inputs stay further apart than the tolerance over their whole
     /// parameter boxes (or the caller's uv boxes and curve interval): a
@@ -776,15 +779,51 @@ impl Surf {
         Ok(c == PK_LOGICAL_true)
     }
 
-    /// Whether `other`'s normal agrees with this surface's normal at the
-    /// middle of this surface's uv box.
+    /// Whether `other`'s normal agrees with this surface's normal at an
+    /// interior point of this surface's uv box.
+    ///
+    /// Samples the middle of the uv box first, then off-centre points. A sample
+    /// counts only when both normals evaluate and are near-parallel
+    /// (|cos| > 0.5), which skips poles and seams of either surface, where an
+    /// evaluation fails or gives no usable normal. Coincident surfaces have
+    /// parallel normals everywhere, so any accepted sample gives the sense.
     fn same_sense(&self, other: &Surf) -> PsResult<bool> {
+        const SAMPLES: [(f64, f64); 5] = [
+            (0.5, 0.5),
+            (0.3, 0.35),
+            (0.7, 0.65),
+            (0.4, 0.8),
+            (0.15, 0.2),
+        ];
         let b = self.uvbox()?;
-        let (p, n1) =
-            self.eval_with_normal(0.5 * (b.u_min + b.u_max), 0.5 * (b.v_min + b.v_max))?;
-        let (u, v) = other.parameterise(p)?;
-        let (_, n2) = other.eval_with_normal(u, v)?;
-        Ok(n1.x * n2.x + n1.y * n2.y + n1.z * n2.z > 0.0)
+        let mut last_err = None;
+        for (fu, fv) in SAMPLES {
+            let u1 = b.u_min + fu * (b.u_max - b.u_min);
+            let v1 = b.v_min + fv * (b.v_max - b.v_min);
+            let sample = (|| -> PsResult<Option<bool>> {
+                let (p, n1) = self.eval_with_normal(u1, v1)?;
+                let (u, v) = other.parameterise(p)?;
+                let (_, n2) = other.eval_with_normal(u, v)?;
+                let dot = n1.x * n2.x + n1.y * n2.y + n1.z * n2.z;
+                let len = (n1.x * n1.x + n1.y * n1.y + n1.z * n1.z).sqrt()
+                    * (n2.x * n2.x + n2.y * n2.y + n2.z * n2.z).sqrt();
+                if len.is_finite() && len > 0.0 && dot.abs() > 0.5 * len {
+                    Ok(Some(dot > 0.0))
+                } else {
+                    Ok(None)
+                }
+            })();
+            match sample {
+                Ok(Some(sense)) => return Ok(sense),
+                Ok(None) => {}
+                Err(e) => last_err = Some(e),
+            }
+        }
+        Err(last_err.unwrap_or_else(|| {
+            crate::error::PsError::Session(
+                "same_sense: no sample point gave two usable normals".into(),
+            )
+        }))
     }
 
     /// Intersect this surface with a bounded region of a curve

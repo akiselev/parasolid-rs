@@ -8106,6 +8106,46 @@ fn main() {
             matches!(r.1, Some(RangeCheck::Separated { min_distance }) if (min_distance - 1.1e-8).abs() < 1e-14)
         );
     });
+    // RQ-48 (parasolid-re R-51 r51-ss-coi-reparam): two coincident unit spheres on
+    // different axes. The middle of s1's uv box, (pi, 0), lands on a pole of s2,
+    // where the old single-point sense test failed and gave None.
+    test!("ssi_checked_coincident_sphere_reparam_sense", {
+        let _s = Session::start(test_config())?;
+        let o = Vec3::zero();
+        let s1 = Surf::sphere(
+            Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0)),
+            1.0,
+        )?;
+        let s2 = Surf::sphere(
+            Axis2::new(o, Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0)),
+            1.0,
+        )?;
+        let c = s1.intersect_with_checked(
+            &s2,
+            &SurfIntersectOptions::default(),
+            &SurfSurfCheck::default(),
+        )?;
+        println!("\n    reparam spheres: {:?}", c.empty);
+        assert!(c.result.points.is_empty() && c.result.curves.is_empty());
+        assert_eq!(
+            c.empty,
+            Some(RangeCheck::Coincident {
+                same_sense: Some(true)
+            })
+        );
+        // The other order: s2's middle (pi, 0) is (0, -1, 0), on s1's equator (no pole).
+        let c = s2.intersect_with_checked(
+            &s1,
+            &SurfIntersectOptions::default(),
+            &SurfSurfCheck::default(),
+        )?;
+        assert_eq!(
+            c.empty,
+            Some(RangeCheck::Coincident {
+                same_sense: Some(true)
+            })
+        );
+    });
     test!("ssi_checked_uvbox_bound", {
         let _s = Session::start(test_config())?;
         let o = Vec3::new(0.0, 0.0, 0.0);

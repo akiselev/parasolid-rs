@@ -651,13 +651,17 @@ impl IntersectionCurve {
     ///
     /// # `Tangential` does not mean geometrically tangential
     ///
-    /// The kernel merges intersection branches that come within roughly
-    /// **1e-3 model units** of each other — five orders of magnitude above the
-    /// 1e-8 linear precision — and flips the kind token to `tangent` as a side
-    /// effect. Measured: two torus/plane circles 3.5e-4 apart are fused into a
-    /// single curve reported `Tangential`; at 3.5e-3 they come back as two
-    /// separate `Transversal` circles. So this answers "tangential, or within
-    /// ~1e-3 of it". Do not use it as a proof of exact tangency near that band.
+    /// The kernel merges two intersection branches into one curve reported
+    /// `tangent` when the surfaces overlap or miss by no more than the session
+    /// linear precision L (1e-8 by default) at the near-tangency, and returns
+    /// them as separate `simple` curves beyond it (parasolid-re R-51,
+    /// `port/ssi-shapes/`, dynamic-observed on all 11 tangent-curve families:
+    /// one `tangent` curve at ±0.5 L, two curves or nothing at ±2 L; the
+    /// merge-threshold sweep splits plane/cylinder and plane/torus already at a
+    /// float gap of 1.000000005e-8, cylinder/sphere at 1.25 L). So this answers
+    /// "tangential within L". An earlier version of this note said branches
+    /// merge within about 1e-3; that measurement was wrong (torus/plane circles
+    /// 3.5e-4 apart come back as two circles, R-51 `mt-pt-*`).
     pub fn classify(&self) -> IntersectionKind {
         match self.kind {
             PK_intersect_curve_simple_c => IntersectionKind::Transversal,

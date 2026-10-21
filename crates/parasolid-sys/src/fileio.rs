@@ -177,7 +177,9 @@ impl Default for PK_PART_transmit_o_t {
 #[derive(Debug, Clone)]
 pub struct PK_PART_receive_o_t {
     pub o_t_version: c_int, // @0
-    /// Expected transmit format (0 = auto-detect).
+    /// Expected transmit format: a `PK_transmit_format_t` token. The default
+    /// 0 is not a legal token for `PK_PART_receive_b` (5014
+    /// `field_of_wrong_type`, parasolid-re R-49); set it explicitly.
     pub transmit_format: PK_transmit_format_t, // @4
     /// Whether to receive user fields.
     pub receive_user_fields: PK_LOGICAL_t, // @8
@@ -219,7 +221,7 @@ impl Default for PK_PART_receive_o_t {
     fn default() -> Self {
         Self {
             o_t_version: 1,
-            transmit_format: 0, // 0 = auto-detect
+            transmit_format: 0, // not auto-detect: receive_b refuses 0 (5014, R-49)
             receive_user_fields: PK_LOGICAL_false,
             attdef_mismatch: PK_ATTDEF_mismatch_fail_c,
             part_index: 0,
