@@ -109,7 +109,8 @@ fn set(ty: i32, value: i32) {
     };
     let mut p = s;
     let mut st: sys::PK_behaviour_status_t = -1;
-    let rc = unsafe { sys::PK_SESSION_set_behaviour(req, std::ptr::null(), &mut s, &mut p, &mut st) };
+    let rc =
+        unsafe { sys::PK_SESSION_set_behaviour(req, std::ptr::null(), &mut s, &mut p, &mut st) };
     println!(
         "set_behaviour(type={ty}, value={value}) -> rc={rc} set=({},{}) previous=({},{}) status={st}",
         s.behaviour_type, s.behaviour_value, p.behaviour_type, p.behaviour_value
@@ -145,21 +146,30 @@ fn battery(tag: &str) {
     let x = Vec3::new(1.0, 0.0, 0.0);
     let y = Vec3::new(0.0, 1.0, 0.0);
     let pairs: Vec<(&str, PsResult<SurfIntersection>)> = vec![
-        ("cyl(Z,5) x cyl(X,4)", (|| {
-            let a = Surf::cylinder(Axis2::new(o, z, x), 5.0)?;
-            let b = Surf::cylinder(Axis2::new(o, x, y), 4.0)?;
-            a.intersect(&b)
-        })()),
-        ("cyl(Z,5) x cyl(X,5)", (|| {
-            let a = Surf::cylinder(Axis2::new(o, z, x), 5.0)?;
-            let b = Surf::cylinder(Axis2::new(o, x, y), 5.0)?;
-            a.intersect(&b)
-        })()),
-        ("sphere(8) x cyl(X,3) offset", (|| {
-            let a = Surf::sphere(Axis2::new(o, z, x), 8.0)?;
-            let b = Surf::cylinder(Axis2::new(Vec3::new(0.0, 0.0, 6.0), x, y), 3.0)?;
-            a.intersect(&b)
-        })()),
+        (
+            "cyl(Z,5) x cyl(X,4)",
+            (|| {
+                let a = Surf::cylinder(Axis2::new(o, z, x), 5.0)?;
+                let b = Surf::cylinder(Axis2::new(o, x, y), 4.0)?;
+                a.intersect(&b)
+            })(),
+        ),
+        (
+            "cyl(Z,5) x cyl(X,5)",
+            (|| {
+                let a = Surf::cylinder(Axis2::new(o, z, x), 5.0)?;
+                let b = Surf::cylinder(Axis2::new(o, x, y), 5.0)?;
+                a.intersect(&b)
+            })(),
+        ),
+        (
+            "sphere(8) x cyl(X,3) offset",
+            (|| {
+                let a = Surf::sphere(Axis2::new(o, z, x), 8.0)?;
+                let b = Surf::cylinder(Axis2::new(Vec3::new(0.0, 0.0, 6.0), x, y), 3.0)?;
+                a.intersect(&b)
+            })(),
+        ),
     ];
     for (l, r) in pairs {
         match r {
@@ -169,7 +179,12 @@ fn battery(tag: &str) {
                     .iter()
                     .map(|c| format!("{:?}", c.curve.curve_type()))
                     .collect();
-                println!("    {l}: {} pts {} curves {:?}", si.points.len(), si.curves.len(), types);
+                println!(
+                    "    {l}: {} pts {} curves {:?}",
+                    si.points.len(),
+                    si.curves.len(),
+                    types
+                );
             }
             Err(e) => println!("    {l}: ERR {e}"),
         }
@@ -181,7 +196,10 @@ fn battery(tag: &str) {
         let n = b.fillet_edges(&e[..1], 2.0)?;
         Ok::<_, PsError>((n, b.volume()?, b.faces()?.len()))
     })();
-    println!("    fillet 1 edge r=2 of 10^3 block: {:?}", r.map(|(n, v, f)| format!("rc/n={n} vol={v:.15} faces={f}")));
+    println!(
+        "    fillet 1 edge r=2 of 10^3 block: {:?}",
+        r.map(|(n, v, f)| format!("rc/n={n} vol={v:.15} faces={f}"))
+    );
     // 4. containment band
     if let Ok(b) = Body::create_solid_block(10.0, 20.0, 30.0) {
         for k in [3e-9, 5e-9, -9e-9, -1e-8] {
@@ -210,18 +228,26 @@ fn main() {
         let hash = std::fs::read(&path)
             .map(|b| format!("{:x}", Sha256::digest(&b)))
             .unwrap_or_else(|e| format!("<{e}>"));
-        println!("loaded pskernel.dll: {path}\n  sha256 {hash}\n  base {:#x}", base());
+        println!(
+            "loaded pskernel.dll: {path}\n  sha256 {hash}\n  base {:#x}",
+            base()
+        );
     }
     println!("kernel version: {:?}", s.kernel_version());
     let mut lat = sys::PK_SESSION_behaviour_t::default();
     let rc = unsafe { sys::PK_SESSION_ask_latest_behaviour(&mut lat) };
-    println!("ask_latest_behaviour rc={rc} type={} value={}", lat.behaviour_type, lat.behaviour_value);
+    println!(
+        "ask_latest_behaviour rc={rc} type={} value={}",
+        lat.behaviour_type, lat.behaviour_value
+    );
 
     println!("\n== A. wrapper session (Session::start applied set_behaviour(latest)) ==");
     ask("A");
     mem("A");
 
-    println!("\n== B. raw PK_SESSION_stop + PK_SESSION_start(NULL): fresh session, no set_behaviour ==");
+    println!(
+        "\n== B. raw PK_SESSION_stop + PK_SESSION_start(NULL): fresh session, no set_behaviour =="
+    );
     let rc1 = unsafe { sys::PK_SESSION_stop() };
     let rc2 = unsafe { sys::PK_SESSION_start(std::ptr::null()) };
     println!("stop rc={rc1} start rc={rc2}");
@@ -280,7 +306,11 @@ fn main() {
     println!("\n== D. unset + original-system switches ==");
     set(25840, 0);
     mem("unset");
-    for (t, n) in [(5200, "pre_v281_switch_0"), (5400, "pre_v301_switch_0"), (5100, "pre_v271_switch_0")] {
+    for (t, n) in [
+        (5200, "pre_v281_switch_0"),
+        (5400, "pre_v301_switch_0"),
+        (5100, "pre_v271_switch_0"),
+    ] {
         set_swopt(t, n, 1);
         swopt(t, n);
         ask("after switch on");

@@ -94,7 +94,10 @@ impl ParamBound {
     pub fn is_finite(&self) -> bool {
         matches!(
             self,
-            ParamBound::Extendable | ParamBound::Bound | ParamBound::Closed | ParamBound::Degenerate
+            ParamBound::Extendable
+                | ParamBound::Bound
+                | ParamBound::Closed
+                | ParamBound::Degenerate
         )
     }
 }

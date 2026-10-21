@@ -550,7 +550,11 @@ pub fn kernel_version_is_36_bytes() -> R {
 /// `delete_curves()`, are the two inputs still entities?
 pub fn ssi_delete_curves_ownership() -> R {
     let _s = Session::start(cfg())?;
-    let x_axis = Axis2::new(Vec3::zero(), Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0));
+    let x_axis = Axis2::new(
+        Vec3::zero(),
+        Vec3::new(1.0, 0.0, 0.0),
+        Vec3::new(0.0, 1.0, 0.0),
+    );
     // Analytic result: plane through a cylinder's axis gives two lines.
     let cyl = Surf::cylinder(z_basis(Vec3::zero()), 5.0)?;
     let pln = Surf::plane(x_axis)?;
@@ -594,7 +598,10 @@ pub fn ssi_delete_curves_ownership() -> R {
     };
     let (f1, f2) = (side(&b1)?, side(&b2)?);
     let refused = f1.intersect(&f2);
-    println!("    face surfaces: {:?}", refused.as_ref().map(|r| r.curves.len()));
+    println!(
+        "    face surfaces: {:?}",
+        refused.as_ref().map(|r| r.curves.len())
+    );
     assert!(
         matches!(&refused, Err(PsError::Mild(d)) if d.code == PK_ERROR_bad_shared_entity),
         "PK_SURF_intersect_surf refuses surfaces used by faces (PK_ERROR_bad_shared_entity)"
@@ -604,7 +611,11 @@ pub fn ssi_delete_curves_ownership() -> R {
     // its orphan input surfaces; analytic results own nothing; surfaces used
     // by faces never reach PK_SURF_intersect_surf.
     assert_eq!(analytic, (true, true), "analytic SSI curves own nothing");
-    assert_eq!(icurve, (false, false), "deleting icurves deletes orphan inputs");
+    assert_eq!(
+        icurve,
+        (false, false),
+        "deleting icurves deletes orphan inputs"
+    );
     Ok(())
 }
 
@@ -666,7 +677,11 @@ pub fn boolean_options_v19_default_tol() -> R {
     for (tol, want) in [(None, 1e-5), (Some(5e-6), 5e-6), (Some(3e-5), 3e-5)] {
         let (f, e, tolerant) = band(tol)?;
         assert_eq!((f, e), (5, 4), "tol {tol:?}");
-        assert_eq!(tolerant, vec![want], "tol {tol:?}: tolerant edge precisions");
+        assert_eq!(
+            tolerant,
+            vec![want],
+            "tol {tol:?}: tolerant edge precisions"
+        );
     }
 
     // Default == the kernel's defaults on an ordinary Boolean: compare against

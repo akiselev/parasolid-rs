@@ -64,9 +64,7 @@ pub use check::{
     GeomCheckOptions, check_geom,
 };
 pub use compare::{SamplePoint, SurfaceParams, extract_surface_params};
-pub use curve::{
-    BCurveData, CurveCurvature, CurveParam, ParamBound, ParamForm, Periodicity,
-};
+pub use curve::{BCurveData, CurveCurvature, CurveParam, ParamBound, ParamForm, Periodicity};
 pub use curve::{CircleData, Curve, CurveType, EllipseData, LineData};
 pub use edge::{DeviationSample, Edge, EdgeType};
 pub use enclosure::OrientedBox;
@@ -76,14 +74,15 @@ pub use entity::{
 pub use error::{BadArg, ErrorDetails, PsError, PsResult, Severity};
 pub use face::{Coincidence, Face};
 pub use facet::{
-    BoundaryFin, EdgePolyline, FACET_DEFAULT_ANGLE, FacetMatch, FacetMesh, FacetOptions, FacetTolerances, Mesh,
+    BoundaryFin, EdgePolyline, FACET_DEFAULT_ANGLE, FacetMatch, FacetMesh, FacetOptions,
+    FacetTolerances, Mesh,
 };
 pub use frustrum::FrustrumConfig;
 pub use geom::{Axis2, Vec3};
 pub use intersect::{
-    CheckedCurveCurve, CheckedHit, CheckedSurfCurve, CheckedSurfSurf, CurveCurveCheck,
-    CurveCurveHit, EmptyCheck, FaceCurveHit, RangeCheck, SurfCurveCheck, SurfCurveHit,
-    SurfSurfCheck,
+    CheckedCurveCurve, CheckedFaceCurve, CheckedFaceIntersection, CheckedHit, CheckedSurfCurve,
+    CheckedSurfSurf, CurveCurveCheck, CurveCurveHit, EmptyCheck, FaceCheck, FaceCurveHit,
+    RangeCheck, SurfCurveCheck, SurfCurveHit, SurfSurfCheck,
 };
 pub use jet::{CurveJet, Hand, MinRadius, SurfJet};
 pub use mass::{DEFAULT_MASS_ACCURACY, MassProps};

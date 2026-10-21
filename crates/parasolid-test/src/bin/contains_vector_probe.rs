@@ -99,12 +99,14 @@ fn row(label: &str, b: i32, topo: &Topo, p: [f64; 3]) {
 }
 
 const KS: &[f64] = &[
-    1e-12, 1e-11, 1e-10, 3e-10, 1e-9, 3e-9, 5e-9, 9e-9, 1e-8, 1.1e-8, 2e-8, 5e-8, 1e-7, 1e-6,
-    1e-5,
+    1e-12, 1e-11, 1e-10, 3e-10, 1e-9, 3e-9, 5e-9, 9e-9, 1e-8, 1.1e-8, 2e-8, 5e-8, 1e-7, 1e-6, 1e-5,
 ];
 
 fn sweep(label: &str, b: i32, topo: &Topo, base: [f64; 3], dir: [f64; 3]) {
-    println!(" -- {label}: base=({},{},{}) dir=({:.6},{:.6},{:.6})", base[0], base[1], base[2], dir[0], dir[1], dir[2]);
+    println!(
+        " -- {label}: base=({},{},{}) dir=({:.6},{:.6},{:.6})",
+        base[0], base[1], base[2], dir[0], dir[1], dir[2]
+    );
     row("k=0", b, topo, base);
     for &k in KS {
         for s in [1.0f64, -1.0] {
@@ -113,7 +115,12 @@ fn sweep(label: &str, b: i32, topo: &Topo, base: [f64; 3], dir: [f64; 3]) {
                 base[1] + s * k * dir[1],
                 base[2] + s * k * dir[2],
             ];
-            row(&format!("k={}{:e}", if s > 0.0 { "+" } else { "-" }, k), b, topo, p);
+            row(
+                &format!("k={}{:e}", if s > 0.0 { "+" } else { "-" }, k),
+                b,
+                topo,
+                p,
+            );
         }
     }
 }
@@ -159,11 +166,41 @@ fn main() {
     row("vertex (-5,-10,0)", b, &bt, [-5.0, -10.0, 0.0]);
     let r2 = std::f64::consts::FRAC_1_SQRT_2;
     let r3 = 1.0 / 3.0f64.sqrt();
-    sweep("face +X along normal", b, &bt, [5.0, 1.3, 15.7], [1.0, 0.0, 0.0]);
-    sweep("face +X tangential (in-plane, toward edge)", b, &bt, [5.0, 10.0 - 1e-3, 15.7], [0.0, 1.0, 0.0]);
-    sweep("edge +X+Y along bisector", b, &bt, [5.0, 10.0, 15.7], [r2, r2, 0.0]);
-    sweep("edge +X+Y along +X only", b, &bt, [5.0, 10.0, 15.7], [1.0, 0.0, 0.0]);
-    sweep("vertex (5,10,30) along diagonal", b, &bt, [5.0, 10.0, 30.0], [r3, r3, r3]);
+    sweep(
+        "face +X along normal",
+        b,
+        &bt,
+        [5.0, 1.3, 15.7],
+        [1.0, 0.0, 0.0],
+    );
+    sweep(
+        "face +X tangential (in-plane, toward edge)",
+        b,
+        &bt,
+        [5.0, 10.0 - 1e-3, 15.7],
+        [0.0, 1.0, 0.0],
+    );
+    sweep(
+        "edge +X+Y along bisector",
+        b,
+        &bt,
+        [5.0, 10.0, 15.7],
+        [r2, r2, 0.0],
+    );
+    sweep(
+        "edge +X+Y along +X only",
+        b,
+        &bt,
+        [5.0, 10.0, 15.7],
+        [1.0, 0.0, 0.0],
+    );
+    sweep(
+        "vertex (5,10,30) along diagonal",
+        b,
+        &bt,
+        [5.0, 10.0, 30.0],
+        [r3, r3, r3],
+    );
 
     // ---------------- sphere r=10 (curved face) ----------------
     let sph = Body::create_solid_sphere(10.0).unwrap();
@@ -183,7 +220,13 @@ fn main() {
     let st = Topo::of(&sph);
     row("centre (0,0,0)", sph.tag(), &st, [0.0, 0.0, 0.0]);
     row("pole (0,0,10)", sph.tag(), &st, [0.0, 0.0, 10.0]);
-    sweep("sphere (6,0,8) radial", sph.tag(), &st, [6.0, 0.0, 8.0], [0.6, 0.0, 0.8]);
+    sweep(
+        "sphere (6,0,8) radial",
+        sph.tag(),
+        &st,
+        [6.0, 0.0, 8.0],
+        [0.6, 0.0, 0.8],
+    );
 
     // ---------------- cylinder r=5 h=10 (circular edge) ----------------
     let cyl = Body::create_solid_cylinder(5.0, 10.0).unwrap();
@@ -193,15 +236,38 @@ fn main() {
         cb.min.x, cb.min.y, cb.min.z, cb.max.x, cb.max.y, cb.max.z
     );
     let ct = Topo::of(&cyl);
-    sweep("cyl top circular edge (5,0,top) bisector", cyl.tag(), &ct, [5.0, 0.0, cb.max.z], [r2, 0.0, r2]);
-    row("cyl axis on top cap (0,0,top)", cyl.tag(), &ct, [0.0, 0.0, cb.max.z]);
+    sweep(
+        "cyl top circular edge (5,0,top) bisector",
+        cyl.tag(),
+        &ct,
+        [5.0, 0.0, cb.max.z],
+        [r2, 0.0, r2],
+    );
+    row(
+        "cyl axis on top cap (0,0,top)",
+        cyl.tag(),
+        &ct,
+        [0.0, 0.0, cb.max.z],
+    );
 
     // ---------------- precision dependence ----------------
     for p in [1e-6f64, 1e-10] {
         let rc = unsafe { sys::PK_SESSION_set_precision(p) };
         println!("\n== set_precision({p:e}) rc={rc}; block face +X sweep ==");
-        sweep("face +X along normal", b, &bt, [5.0, 1.3, 15.7], [1.0, 0.0, 0.0]);
-        sweep("sphere (6,0,8) radial", sph.tag(), &st, [6.0, 0.0, 8.0], [0.6, 0.0, 0.8]);
+        sweep(
+            "face +X along normal",
+            b,
+            &bt,
+            [5.0, 1.3, 15.7],
+            [1.0, 0.0, 0.0],
+        );
+        sweep(
+            "sphere (6,0,8) radial",
+            sph.tag(),
+            &st,
+            [6.0, 0.0, 8.0],
+            [0.6, 0.0, 0.8],
+        );
     }
     let rc = unsafe { sys::PK_SESSION_set_precision(1e-8) };
     println!("restore set_precision(1e-8) rc={rc}");
@@ -210,19 +276,34 @@ fn main() {
     let sheet = Body::create_sheet_rectangle(
         4.0,
         6.0,
-        Axis2::new(Vec3::new(20.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0)),
+        Axis2::new(
+            Vec3::new(20.0, 0.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ),
     )
     .unwrap();
     let sht = Topo::of(&sheet);
-    println!("\n== sheet rectangle 4x6 at z=0 centred (20,0,0): type={:?} ==", sheet.body_type());
+    println!(
+        "\n== sheet rectangle 4x6 at z=0 centred (20,0,0): type={:?} ==",
+        sheet.body_type()
+    );
     row("on sheet (20.5,0.5,0)", sheet.tag(), &sht, [20.5, 0.5, 0.0]);
     row("sheet +1e-9 z", sheet.tag(), &sht, [20.5, 0.5, 1e-9]);
     row("sheet +1e-7 z", sheet.tag(), &sht, [20.5, 0.5, 1e-7]);
-    row("off sheet (20.5,0.5,1)", sheet.tag(), &sht, [20.5, 0.5, 1.0]);
+    row(
+        "off sheet (20.5,0.5,1)",
+        sheet.tag(),
+        &sht,
+        [20.5, 0.5, 1.0],
+    );
     row("sheet edge (22,0.5,0)", sheet.tag(), &sht, [22.0, 0.5, 0.0]);
     let minb = Body::create_minimum(Vec3::new(0.0, 0.0, 50.0)).unwrap();
     let mt = Topo::of(&minb);
-    println!("\n== minimum body at (0,0,50): type={:?} ==", minb.body_type());
+    println!(
+        "\n== minimum body at (0,0,50): type={:?} ==",
+        minb.body_type()
+    );
     row("at the point", minb.tag(), &mt, [0.0, 0.0, 50.0]);
     row("1e-9 off", minb.tag(), &mt, [1e-9, 0.0, 50.0]);
     row("1e-7 off", minb.tag(), &mt, [1e-7, 0.0, 50.0]);

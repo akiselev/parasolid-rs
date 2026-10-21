@@ -503,12 +503,20 @@ impl Curve {
         let hits: Vec<CheckedHit> = raw
             .into_iter()
             .map(|hit| {
-                let sin_angle = match (self.eval_with_tangent(hit.t1), other.eval_with_tangent(hit.t2)) {
+                let sin_angle = match (
+                    self.eval_with_tangent(hit.t1),
+                    other.eval_with_tangent(hit.t2),
+                ) {
                     (Ok((_, a)), Ok((_, b))) => sin_between(a, b),
                     _ => f64::NAN,
                 };
-                let simple = hit.kind != PK_intersect_vector_start_c && hit.kind != PK_intersect_vector_end_c;
-                CheckedHit { hit, sin_angle, tangential: simple && sin_angle <= ang }
+                let simple = hit.kind != PK_intersect_vector_start_c
+                    && hit.kind != PK_intersect_vector_end_c;
+                CheckedHit {
+                    hit,
+                    sin_angle,
+                    tangential: simple && sin_angle <= ang,
+                }
             })
             .collect();
         let empty = if hits.is_empty() {
@@ -529,7 +537,13 @@ impl Curve {
 
     /// Minimum distance between the two bounded curves (`PK_GEOM_range`, both
     /// intervals as parameter bounds), classified against `tol`.
-    fn check_empty(&self, interval: (f64, f64), other: &Curve, other_interval: (f64, f64), tol: f64) -> EmptyCheck {
+    fn check_empty(
+        &self,
+        interval: (f64, f64),
+        other: &Curve,
+        other_interval: (f64, f64),
+        tol: f64,
+    ) -> EmptyCheck {
         let mut opts = PK_GEOM_range_o_t::default();
         for (pb, iv) in opts.param_bound.iter_mut().zip([interval, other_interval]) {
             pb.have_param_bound = PK_LOGICAL_true;
@@ -543,7 +557,9 @@ impl Curve {
             return EmptyCheck::Unchecked { range_status: -err };
         }
         if status != PK_range_result_found_c {
-            return EmptyCheck::Unchecked { range_status: status };
+            return EmptyCheck::Unchecked {
+                range_status: status,
+            };
         }
         if r.distance <= tol {
             EmptyCheck::Suspect {
@@ -553,7 +569,9 @@ impl Curve {
                 t2: r.end_2.parameters[0],
             }
         } else {
-            EmptyCheck::Separated { min_distance: r.distance }
+            EmptyCheck::Separated {
+                min_distance: r.distance,
+            }
         }
     }
 
@@ -618,7 +636,11 @@ impl Curve {
 
 /// |a × b| / (|a| |b|); NaN when either vector is zero.
 fn sin_between(a: Vec3, b: Vec3) -> f64 {
-    let c = Vec3::new(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    let c = Vec3::new(
+        a.y * b.z - a.z * b.y,
+        a.z * b.x - a.x * b.z,
+        a.x * b.y - a.y * b.x,
+    );
     let n = |v: Vec3| (v.x * v.x + v.y * v.y + v.z * v.z).sqrt();
     let d = n(a) * n(b);
     if d == 0.0 { f64::NAN } else { n(c) / d }
@@ -951,4 +973,268 @@ fn face_intersect_surf_opts() -> PK_FACE_intersect_surf_o_t {
     o.o_t_version = 2;
     o.mixed_curve_category = PK_mixed_intersection_classic_c;
     o
+}
+
+// =============================================================================
+// Checked Face intersections (parasolid-re R-48)
+// =============================================================================
+
+/// Options for [`Face::intersect_face_checked`], [`Face::intersect_surf_checked`]
+/// and [`Face::intersect_curve_checked`].
+#[derive(Debug, Clone, Copy, Default)]
+pub struct FaceCheck {
+    /// Distance at or below which the inputs count as meeting when an empty
+    /// answer is checked. `None` = the session linear precision.
+    pub tolerance: Option<f64>,
+}
+
+/// Result of [`Face::intersect_face_checked`] and [`Face::intersect_surf_checked`].
+///
+/// # What this can and cannot tell
+///
+/// `empty` is `Some` exactly when the kernel returned no points and no curves.
+/// `empty: None` with curves present does **not** rule out coincidence: when two
+/// faces overlap in a region and also cross elsewhere, the kernel returns the
+/// crossing curves and says nothing about the overlap ("No attempt is made to
+/// define surface regions of partial coincidence", manual ch054, documented). The
+/// kernel's internal status word, which marks partial coincidence (status 7), is
+/// dropped before the public call returns (parasolid-re R-35
+/// `port/ssi-result-shape/README.md` §2.3, static-observed), so no public answer
+/// proves or disproves partial coincidence. [`RangeCheck::Coincident`] means the
+/// carrier surfaces coincide as whole surfaces and the faces touch; a
+/// [`RangeCheck::Suspect`] is never a pass.
+#[derive(Debug, Clone)]
+pub struct CheckedFaceIntersection {
+    pub result: SurfIntersection,
+    /// `Some` exactly when the kernel returned no points and no curves.
+    pub empty: Option<RangeCheck>,
+}
+
+/// Result of [`Face::intersect_curve_checked`].
+#[derive(Debug, Clone)]
+pub struct CheckedFaceCurve {
+    pub hits: Vec<FaceCurveHit>,
+    /// `Some` exactly when the kernel returned no hits.
+    pub empty: Option<RangeCheck>,
+}
+
+/// Distance from `face` to `p` (`PK_TOPOL_range_vector`, trim-aware).
+fn face_point_distance(face: &Face, p: Vec3) -> Result<f64, i32> {
+    match Entity::from_tag(face.tag()).distance_to_point(p) {
+        Ok(r) if r.status == crate::entity::RangeStatus::Found => Ok(r.distance),
+        Ok(_) => Err(PK_range_result_not_found_c),
+        Err(e) => Err(-err_code(&e)),
+    }
+}
+
+/// The PK error code of `e`, or 0 when it carries none.
+fn err_code(e: &crate::error::PsError) -> i32 {
+    e.details().map(|d| d.code).unwrap_or(0)
+}
+
+/// Classify a carrier-surface range witness against the face itself.
+///
+/// `r` is a `PK_GEOM_range` result with the face's surface as the first
+/// entity. The surface is not trimmed, so a witness within `tol` is checked
+/// against the face: on the face (within `tol`) it is [`RangeCheck::Suspect`],
+/// off the face it is [`RangeCheck::OutsideRegion`] (the contact lies on the
+/// carrier outside the face's boundary). `PK_GEOM_range` returns one closest
+/// pair, so `OutsideRegion` does not prove that nothing was missed on the face
+/// (see the variant's docs).
+fn classify_on_face(face: &Face, r: &PK_range_2_r_t, tol: f64) -> RangeCheck {
+    if r.distance > tol {
+        return RangeCheck::Separated {
+            min_distance: r.distance,
+        };
+    }
+    let position = Vec3::from_pk(r.end_1.position);
+    match face_point_distance(face, position) {
+        Ok(d) if d <= tol => RangeCheck::Suspect {
+            min_distance: r.distance,
+            position,
+            params_1: r.end_1.parameters,
+            params_2: r.end_2.parameters,
+        },
+        Ok(_) => RangeCheck::OutsideRegion {
+            min_distance: r.distance,
+            position,
+        },
+        Err(s) => RangeCheck::Unchecked { range_status: s },
+    }
+}
+
+/// `PK_GEOM_range` between two geometries with optional bounds, retried with
+/// every surface bounded by its own uvbox when the first pass is above `tol`
+/// or fails (the size-box cut on unbounded surfaces, see [`check_range`]).
+fn geom_range_retry(
+    g1: PK_ENTITY_t,
+    g2: PK_ENTITY_t,
+    bounds: [ParamBound; 2],
+    full: impl FnOnce() -> Result<[ParamBound; 2], i32>,
+    tol: f64,
+) -> Result<PK_range_2_r_t, i32> {
+    let first = geom_range(g1, g2, bounds);
+    match first {
+        Ok(r) if r.distance <= tol => Ok(r),
+        _ => {
+            let second = full().and_then(|b| geom_range(g1, g2, b));
+            match (first, second) {
+                (_, Err(s)) => Err(s),
+                (Ok(a), Ok(b)) if a.distance <= b.distance => Ok(a),
+                (_, Ok(b)) => Ok(b),
+            }
+        }
+    }
+}
+
+impl Face {
+    /// [`Face::intersect_face`] with an independent check of an empty answer.
+    ///
+    /// When the kernel returns nothing:
+    /// 1. if the two carrier surfaces coincide (`PK_GEOM_is_coincident`), the
+    ///    faces themselves are ranged (`PK_TOPOL_range`, trim-aware): within
+    ///    the tolerance they are [`RangeCheck::Coincident`], otherwise
+    ///    [`RangeCheck::Separated`] (faces on one plane that do not touch);
+    /// 2. otherwise `PK_TOPOL_range` between the faces gives
+    ///    [`RangeCheck::Separated`] above the tolerance and
+    ///    [`RangeCheck::Suspect`] within it; a failed range is
+    ///    [`RangeCheck::Unchecked`].
+    ///
+    /// Faces are bounded, so no search-region step applies. See
+    /// [`CheckedFaceIntersection`] for what a non-empty answer cannot tell.
+    pub fn intersect_face_checked(
+        &self,
+        other: &Face,
+        check: &FaceCheck,
+    ) -> PsResult<CheckedFaceIntersection> {
+        let result = self.intersect_face(other)?;
+        if !(result.points.is_empty() && result.curves.is_empty()) {
+            return Ok(CheckedFaceIntersection {
+                result,
+                empty: None,
+            });
+        }
+        let tol = match check.tolerance {
+            Some(t) => t,
+            None => session_precision()?,
+        };
+        let (s1, s2) = (self.surf()?, other.surf()?);
+        let coincident = matches!(s1.is_coincident(&s2), Ok(true));
+        let empty = match Entity::from_tag(self.tag()).distance_to(Entity::from_tag(other.tag())) {
+            Err(e) => RangeCheck::Unchecked {
+                range_status: -err_code(&e),
+            },
+            Ok(r) if r.status != crate::entity::RangeStatus::Found => RangeCheck::Unchecked {
+                range_status: PK_range_result_not_found_c,
+            },
+            Ok(r) if r.distance > tol => RangeCheck::Separated {
+                min_distance: r.distance,
+            },
+            Ok(_) if coincident => RangeCheck::Coincident {
+                same_sense: s1.same_sense(&s2).ok(),
+            },
+            Ok(r) => {
+                let p1 = [r.witness_1.parameters.0, r.witness_1.parameters.1];
+                let p2 = r
+                    .witness_2
+                    .map(|w| [w.parameters.0, w.parameters.1])
+                    .unwrap_or([0.0; 2]);
+                RangeCheck::Suspect {
+                    min_distance: r.distance,
+                    position: r.point_1,
+                    params_1: p1,
+                    params_2: p2,
+                }
+            }
+        };
+        Ok(CheckedFaceIntersection {
+            result,
+            empty: Some(empty),
+        })
+    }
+
+    /// [`Face::intersect_surf`] with an independent check of an empty answer.
+    ///
+    /// When the kernel returns nothing: if the face's surface and `surf`
+    /// coincide (`PK_GEOM_is_coincident`), the face lies on `surf` and the
+    /// answer is [`RangeCheck::Coincident`]. Otherwise `PK_GEOM_range` between
+    /// the face's surface and `surf` (retried with own uvboxes, as in
+    /// [`Surf::intersect_with_checked`]) gives [`RangeCheck::Separated`] above
+    /// the tolerance; a witness within it is checked against the face
+    /// (`PK_TOPOL_range_vector`): on the face it is [`RangeCheck::Suspect`],
+    /// off it [`RangeCheck::OutsideRegion`]. See [`CheckedFaceIntersection`].
+    pub fn intersect_surf_checked(
+        &self,
+        surf: &Surf,
+        check: &FaceCheck,
+    ) -> PsResult<CheckedFaceIntersection> {
+        let result = self.intersect_surf(surf)?;
+        if !(result.points.is_empty() && result.curves.is_empty()) {
+            return Ok(CheckedFaceIntersection {
+                result,
+                empty: None,
+            });
+        }
+        let tol = match check.tolerance {
+            Some(t) => t,
+            None => session_precision()?,
+        };
+        let s1 = self.surf()?;
+        if let Ok(true) = s1.is_coincident(surf) {
+            return Ok(CheckedFaceIntersection {
+                result,
+                empty: Some(RangeCheck::Coincident {
+                    same_sense: s1.same_sense(surf).ok(),
+                }),
+            });
+        }
+        let full = || Ok([own_uvbox(s1.tag())?, own_uvbox(surf.tag())?]);
+        let empty = match geom_range_retry(s1.tag(), surf.tag(), [None, None], full, tol) {
+            Err(s) => RangeCheck::Unchecked { range_status: s },
+            Ok(r) => classify_on_face(self, &r, tol),
+        };
+        Ok(CheckedFaceIntersection {
+            result,
+            empty: Some(empty),
+        })
+    }
+
+    /// [`Face::intersect_curve`] with an independent check of an empty answer.
+    ///
+    /// When the kernel returns nothing, `PK_GEOM_range` between the face's
+    /// surface and the curve over `interval` (retried with the surface bounded
+    /// by its own uvbox) gives [`RangeCheck::Separated`] above the tolerance;
+    /// a witness within it is checked against the face
+    /// (`PK_TOPOL_range_vector`): on the face it is [`RangeCheck::Suspect`],
+    /// off it [`RangeCheck::OutsideRegion`]. A tangential touch that the
+    /// kernel does not report lands on `Suspect`.
+    pub fn intersect_curve_checked(
+        &self,
+        curve: &Curve,
+        interval: (f64, f64),
+        check: &FaceCheck,
+    ) -> PsResult<CheckedFaceCurve> {
+        let hits = self.intersect_curve(curve, interval)?;
+        if !hits.is_empty() {
+            return Ok(CheckedFaceCurve { hits, empty: None });
+        }
+        let tol = match check.tolerance {
+            Some(t) => t,
+            None => session_precision()?,
+        };
+        let s1 = self.surf()?;
+        let cb: ParamBound = Some((
+            PK_range_param_bound_class_interval_c,
+            [interval.0, interval.1, 0.0, 0.0],
+        ));
+        let full = || Ok([own_uvbox(s1.tag())?, cb]);
+        let empty = match geom_range_retry(s1.tag(), curve.tag(), [None, cb], full, tol) {
+            Err(s) => RangeCheck::Unchecked { range_status: s },
+            Ok(r) => classify_on_face(self, &r, tol),
+        };
+        Ok(CheckedFaceCurve {
+            hits,
+            empty: Some(empty),
+        })
+    }
 }

@@ -1113,24 +1113,49 @@ fn main() {
     test!("imprint_overlapping_coincident_sheets", {
         let _session = Session::start(test_config())?;
         let o = Vec3::new(0.0, 0.0, 0.0);
-        let pl = Surf::plane(Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0)))?;
-        let uv = |a, b, c, d| UvBox { u_min: a, v_min: b, u_max: c, v_max: d };
+        let pl = Surf::plane(Axis2::new(
+            o,
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let uv = |a, b, c, d| UvBox {
+            u_min: a,
+            v_min: b,
+            u_max: c,
+            v_max: d,
+        };
         let sheets = || -> PsResult<(Body, Body)> {
-            Ok((pl.make_sheet_body(uv(0.0, 0.0, 2.0, 2.0))?, pl.make_sheet_body(uv(1.0, 1.0, 3.0, 3.0))?))
+            Ok((
+                pl.make_sheet_body(uv(0.0, 0.0, 2.0, 2.0))?,
+                pl.make_sheet_body(uv(1.0, 1.0, 3.0, 3.0))?,
+            ))
         };
         let (a, b) = sheets()?;
         let fa = a.faces()?[0];
         let fb = b.faces()?[0];
         let (coi, _) = fa.is_coincident(fb, 1e-8)?;
-        assert!(!coi.is_coincident(), "partial overlap is not 'yes': {coi:?}");
+        assert!(
+            !coi.is_coincident(),
+            "partial overlap is not 'yes': {coi:?}"
+        );
         let r = a.imprint_body(&b)?;
-        assert!(r.target_edges.is_empty() && r.tool_edges.is_empty(), "defaults imprint nothing: {r:?}");
+        assert!(
+            r.target_edges.is_empty() && r.tool_edges.is_empty(),
+            "defaults imprint nothing: {r:?}"
+        );
         assert_eq!(a.faces()?.len(), 1);
 
         let (a, b) = sheets()?;
-        let opts = PK_BODY_imprint_o_t { imprint_overlapping: PK_LOGICAL_true, ..PK_BODY_imprint_o_t::default() };
+        let opts = PK_BODY_imprint_o_t {
+            imprint_overlapping: PK_LOGICAL_true,
+            ..PK_BODY_imprint_o_t::default()
+        };
         let r = a.imprint_body_with(&b, &opts)?;
-        assert_eq!(r.target_edges.len(), 4, "overlap square [1,2]^2 on A: {r:?}");
+        assert_eq!(
+            r.target_edges.len(),
+            4,
+            "overlap square [1,2]^2 on A: {r:?}"
+        );
         assert_eq!(r.tool_edges.len(), 4, "overlap square [1,2]^2 on B: {r:?}");
         assert_eq!(a.faces()?.len(), 2, "A split into overlap and remainder");
         assert_eq!(b.faces()?.len(), 2, "B split into overlap and remainder");
@@ -5202,7 +5227,11 @@ fn main() {
             ParamBound::Degenerate,
             "sphere v starts at a pole (degenerate end)"
         );
-        assert_eq!(v.bound[1], ParamBound::Degenerate, "sphere v ends at a pole");
+        assert_eq!(
+            v.bound[1],
+            ParamBound::Degenerate,
+            "sphere v ends at a pole"
+        );
         assert_eq!(v.periodic, Periodicity::NonPeriodic);
 
         let tor = Surf::torus(b, 5.0, 1.5)?;
@@ -7407,7 +7436,11 @@ fn main() {
         // Tangent line y = 1: one hit, reported simple, measured tangential.
         let tan = Curve::line(Vec3::new(0.0, 1.0, 0.0), x)?;
         let r = tan.intersect_curve_checked((-2.0, 2.0), &circle, full, &chk)?;
-        println!("\n    tangent: {} hit(s), sin {:?}", r.hits.len(), r.hits.iter().map(|h| h.sin_angle).collect::<Vec<_>>());
+        println!(
+            "\n    tangent: {} hit(s), sin {:?}",
+            r.hits.len(),
+            r.hits.iter().map(|h| h.sin_angle).collect::<Vec<_>>()
+        );
         assert_eq!(r.hits.len(), 1);
         assert!(r.hits[0].tangential && r.hits[0].hit.kind == PK_intersect_vector_simple_c);
         assert!(r.empty.is_none());
@@ -7416,7 +7449,11 @@ fn main() {
         let sec = Curve::line(Vec3::new(0.0, 0.0, 0.0), x)?;
         let r = sec.intersect_curve_checked((-2.0, 2.0), &circle, full, &chk)?;
         assert_eq!(r.hits.len(), 2);
-        assert!(r.hits.iter().all(|h| !h.tangential && (h.sin_angle - 1.0).abs() < 1e-12));
+        assert!(
+            r.hits
+                .iter()
+                .all(|h| !h.tangential && (h.sin_angle - 1.0).abs() < 1e-12)
+        );
 
         // Skew lines 1 apart: a genuine miss.
         let ya = Vec3::new(0.0, 1.0, 0.0);
@@ -7424,27 +7461,47 @@ fn main() {
         let r = sec.intersect_curve_checked((-2.0, 2.0), &far, (-2.0, 2.0), &chk)?;
         println!("    skew 1: {:?}", r.empty);
         assert!(r.hits.is_empty());
-        assert!(matches!(r.empty, Some(EmptyCheck::Separated { min_distance }) if (min_distance - 1.0).abs() < 1e-12));
+        assert!(
+            matches!(r.empty, Some(EmptyCheck::Separated { min_distance }) if (min_distance - 1.0).abs() < 1e-12)
+        );
 
         // Skew lines 0.5e-8 apart (inside the 1e-8 precision). Non-coplanar
         // lines leave the analytic lane with status 0 (B12, 0x181dd6a11), so an
         // empty answer here must be flagged Suspect rather than taken as a miss.
         let near = Curve::line(Vec3::new(0.0, 0.0, 0.5e-8), ya)?;
         let r = sec.intersect_curve_checked((-2.0, 2.0), &near, (-2.0, 2.0), &chk)?;
-        println!("    skew 0.5e-8: {} hit(s), empty {:?}", r.hits.len(), r.empty);
+        println!(
+            "    skew 0.5e-8: {} hit(s), empty {:?}",
+            r.hits.len(),
+            r.empty
+        );
         assert!(!r.hits.is_empty() || matches!(r.empty, Some(EmptyCheck::Suspect { .. })));
 
         // Skew lines 1.5e-8 apart (fixture p1-icc-line-line-near-miss, P1 B15):
         // the kernel returns nothing. Checked at a 2e-8 tolerance, the empty
         // answer must come back Suspect with the true gap and closest points.
         let gap = Curve::line(Vec3::new(0.0, 0.0, 1.5e-8), ya)?;
-        let wide = CurveCurveCheck { tolerance: Some(2e-8), ..Default::default() };
+        let wide = CurveCurveCheck {
+            tolerance: Some(2e-8),
+            ..Default::default()
+        };
         let r = sec.intersect_curve_checked((-2.0, 2.0), &gap, (-2.0, 2.0), &wide)?;
-        println!("    skew 1.5e-8 at tol 2e-8: {} hit(s), empty {:?}", r.hits.len(), r.empty);
+        println!(
+            "    skew 1.5e-8 at tol 2e-8: {} hit(s), empty {:?}",
+            r.hits.len(),
+            r.empty
+        );
         if r.hits.is_empty() {
             match r.empty {
-                Some(EmptyCheck::Suspect { min_distance, t1, t2, .. }) => {
-                    assert!((min_distance - 1.5e-8).abs() < 1e-12 && t1.abs() < 1e-6 && t2.abs() < 1e-6)
+                Some(EmptyCheck::Suspect {
+                    min_distance,
+                    t1,
+                    t2,
+                    ..
+                }) => {
+                    assert!(
+                        (min_distance - 1.5e-8).abs() < 1e-12 && t1.abs() < 1e-6 && t2.abs() < 1e-6
+                    )
                 }
                 other => panic!("expected Suspect, got {other:?}"),
             }
@@ -7455,6 +7512,183 @@ fn main() {
     // error for disjoint inputs, for contacts outside the search region and
     // for coincident surfaces. The checked calls must tell these apart
     // (parasolid-re artifacts/rs/20261016T203058Z-empty-check).
+    // R-48: checked Face intersections. An empty PK_FACE_intersect_* answer is
+    // classified by a coincidence test and an independent range.
+    test!("face_checked_face_face", {
+        let _s = Session::start(test_config())?;
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let sheet = |o: Vec3, b: UvBox| -> PsResult<Face> {
+            Ok(Surf::plane(Axis2::new(o, z, x))?
+                .make_sheet_body(b)?
+                .faces()?[0])
+        };
+        let ub = |a: f64, b: f64| UvBox {
+            u_min: a,
+            v_min: a,
+            u_max: b,
+            v_max: b,
+        };
+        let chk = FaceCheck::default();
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        // Coincident and overlapping: nothing returned, Coincident.
+        let (a, b) = (sheet(o, ub(0.0, 1.0))?, sheet(o, ub(0.5, 1.5))?);
+        let r = a.intersect_face_checked(&b, &chk)?;
+        println!(
+            "\n    coplanar overlapping: {} pts {} curves, {:?}",
+            r.result.points.len(),
+            r.result.curves.len(),
+            r.empty
+        );
+        if r.result.points.is_empty() && r.result.curves.is_empty() {
+            assert!(
+                matches!(
+                    r.empty,
+                    Some(RangeCheck::Coincident {
+                        same_sense: Some(true)
+                    })
+                ),
+                "{:?}",
+                r.empty
+            );
+        } else {
+            assert!(r.empty.is_none());
+        }
+        // Coincident carriers, faces 4 apart: Separated, never Coincident.
+        let c = sheet(o, ub(5.0, 6.0))?;
+        let r = a.intersect_face_checked(&c, &chk)?;
+        println!("    coplanar disjoint: {:?}", r.empty);
+        assert!(r.result.points.is_empty() && r.result.curves.is_empty());
+        match r.empty {
+            Some(RangeCheck::Separated { min_distance }) => {
+                assert!(
+                    (min_distance - 4.0 * 2f64.sqrt()).abs() < 1e-9,
+                    "{min_distance}"
+                )
+            }
+            other => panic!("expected Separated, got {other:?}"),
+        }
+        // Parallel planes 2 apart: Separated by 2.
+        let d = sheet(Vec3::new(0.0, 0.0, 2.0), ub(0.0, 1.0))?;
+        let r = a.intersect_face_checked(&d, &chk)?;
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Separated { min_distance }) if (min_distance - 2.0).abs() < 1e-12),
+            "{:?}",
+            r.empty
+        );
+        // A crossing answer carries no check.
+        let y = Vec3::new(0.0, 1.0, 0.0);
+        let e = Surf::plane(Axis2::new(Vec3::new(0.5, 0.0, 0.0), x, y))?
+            .make_sheet_body(UvBox {
+                u_min: -1.0,
+                v_min: -1.0,
+                u_max: 2.0,
+                v_max: 2.0,
+            })?
+            .faces()?[0];
+        let r = a.intersect_face_checked(&e, &chk)?;
+        println!(
+            "    crossing: {} curves, {:?}",
+            r.result.curves.len(),
+            r.empty
+        );
+        assert_eq!(r.result.curves.len(), 1);
+        assert!(r.empty.is_none());
+        r.result.delete_curves()?;
+    });
+    test!("face_checked_face_surf", {
+        let _s = Session::start(test_config())?;
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        let f = Surf::plane(Axis2::new(o, z, x))?
+            .make_sheet_body(UvBox {
+                u_min: 0.0,
+                v_min: 0.0,
+                u_max: 1.0,
+                v_max: 1.0,
+            })?
+            .faces()?[0];
+        let chk = FaceCheck::default();
+        // The face lies on the surface: Coincident.
+        let r = f.intersect_surf_checked(&Surf::plane(Axis2::new(o, z, x))?, &chk)?;
+        println!("\n    face on its plane: {:?}", r.empty);
+        assert!(r.result.points.is_empty() && r.result.curves.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Coincident { .. })),
+            "{:?}",
+            r.empty
+        );
+        // A sphere the carrier plane cuts at x = 5, off the face: OutsideRegion.
+        let sp = Surf::sphere(Axis2::new(Vec3::new(5.0, 0.0, 0.0), z, x), 1.0)?;
+        let r = f.intersect_surf_checked(&sp, &chk)?;
+        println!("    sphere off the face: {:?}", r.empty);
+        assert!(r.result.points.is_empty() && r.result.curves.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::OutsideRegion { .. })),
+            "{:?}",
+            r.empty
+        );
+        // A sphere 3 above the face: Separated by 2 (radius 1).
+        let sp = Surf::sphere(Axis2::new(Vec3::new(0.5, 0.5, 3.0), z, x), 1.0)?;
+        let r = f.intersect_surf_checked(&sp, &chk)?;
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Separated { min_distance }) if (min_distance - 2.0).abs() < 1e-9),
+            "{:?}",
+            r.empty
+        );
+    });
+    test!("face_checked_face_curve", {
+        let _s = Session::start(test_config())?;
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let f = Surf::plane(Axis2::new(Vec3::new(0.0, 0.0, 0.0), z, x))?
+            .make_sheet_body(UvBox {
+                u_min: 0.0,
+                v_min: 0.0,
+                u_max: 1.0,
+                v_max: 1.0,
+            })?
+            .faces()?[0];
+        let chk = FaceCheck::default();
+        // Through the face: a hit, no check.
+        let l = Curve::line(Vec3::new(0.5, 0.5, -1.0), z)?;
+        let r = f.intersect_curve_checked(&l, (-2.0, 2.0), &chk)?;
+        assert_eq!(r.hits.len(), 1);
+        assert!(r.empty.is_none());
+        // Crossing the carrier at x = 5, off the face: OutsideRegion.
+        let l = Curve::line(Vec3::new(5.0, 0.5, -1.0), z)?;
+        let r = f.intersect_curve_checked(&l, (-2.0, 2.0), &chk)?;
+        println!("\n    line off the face: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::OutsideRegion { .. })),
+            "{:?}",
+            r.empty
+        );
+        // Through the face but the interval stops 1 short: Separated by 1.
+        let l = Curve::line(Vec3::new(0.5, 0.5, -2.0), z)?;
+        let r = f.intersect_curve_checked(&l, (0.0, 1.0), &chk)?;
+        println!("    interval short: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Separated { min_distance }) if (min_distance - 1.0).abs() < 1e-9),
+            "{:?}",
+            r.empty
+        );
+        // Parallel 0.5 L above the face: whatever the kernel returns, an
+        // empty answer must not read as Separated.
+        let l = Curve::line(Vec3::new(0.0, 0.5, 0.5e-8), x)?;
+        let r = f.intersect_curve_checked(&l, (0.2, 0.8), &chk)?;
+        println!("    parallel 0.5L: {} hits, {:?}", r.hits.len(), r.empty);
+        if r.hits.is_empty() {
+            assert!(
+                matches!(r.empty, Some(RangeCheck::Suspect { .. })),
+                "{:?}",
+                r.empty
+            );
+        }
+    });
     test!("ssi_checked_separated", {
         let _s = Session::start(test_config())?;
         let z = Vec3::new(0.0, 0.0, 1.0);
