@@ -108,6 +108,8 @@ pub const PK_FACE_trim_degen_yes_c: PK_FACE_trim_degen_t = 13909;
 
 /// Compound-part receive mode (`PK_receive_compound_*_c`).
 pub type PK_receive_compound_t = c_int;
+/// Vendor token; the kernel's v8 default (`FUN_18105eee0`).
+pub const PK_receive_compound_split_c: PK_receive_compound_t = 25100;
 
 /// Options for `PK_PART_transmit` / `PK_PART_transmit_u` / `PK_PART_transmit_b`.
 ///
@@ -135,34 +137,25 @@ pub struct PK_PART_transmit_o_t {
 }
 
 impl Default for PK_PART_transmit_o_t {
-    /// `o_t_version = 3` — the highest version this build accepts *for this
-    /// layout*. Measured by `version_upgrade_probe` on V37.01.243:
+    /// `o_t_version = 4`, the current version (5 → 5022), 40 bytes, with the
+    /// kernel's defaults from the migration `FUN_18105f330` (parasolid-re
+    /// `catalog/pk-validated-abi.md` "Construction batch"): format neutral,
+    /// user fields on, `transmit_meshes` separate.
     ///
-    /// | version | legal tokens | garbage `transmit_user_fields` | garbage `transmit_nmnl_geometry` | garbage `transmit_meshes` |
-    /// |---|---|---|---|---|
-    /// | 1     | rc 0   | 908 (read) | rc 0 (**ignored**) | rc 0 |
-    /// | 2     | rc 0   | 908        | **908 (read)**     | rc 0 |
-    /// | **3** | rc 0   | 908        | 908                | rc 0 |
-    /// | 4     | **5014** | —        | —                  | 5014 |
-    /// | 5+    | 5022   | —          | —                  | —    |
-    ///
-    /// v4 returns `field_of_wrong_type` on the *legal-token* call, i.e. it
-    /// reads a field this binding does not supply, so 3 is the ceiling we can
-    /// safely stamp. v2 is the first version that reads
-    /// `transmit_nmnl_geometry` — at the previous `o_t_version = 1` that field
-    /// was silently dead and the kernel used its own default.
-    ///
-    /// `transmit_meshes` is still not read at v3 (only v4 reads it); getting it
-    /// live would need the v4 layout recovered first.
+    /// History: this used to stamp 3 because v4 returned 5014 on the
+    /// legal-token call — the v4 field `transmit_meshes` was left 0, which is
+    /// not a token, and `transmit_user_fields`/`transmit_nmnl_geometry` sat in
+    /// 4-byte logicals. With 1-byte logicals and the 26130 token, v4 works
+    /// (`xt_transmit_receive_latest_versions`).
     fn default() -> Self {
         Self {
-            o_t_version: 3,
-            transmit_format: 0, // 0 = frustrum/kernel default
-            transmit_user_fields: PK_LOGICAL_false,
+            o_t_version: 4,
+            transmit_format: PK_transmit_format_neutral_c,
+            transmit_user_fields: PK_LOGICAL_true,
             transmit_version: 0,
             transmit_nmnl_geometry: PK_LOGICAL_false,
             transmit_indexed_context: std::ptr::null_mut(),
-            transmit_meshes: 0,
+            transmit_meshes: PK_transmit_meshes_separate_c,
         }
     }
 }
@@ -207,19 +200,17 @@ pub struct PK_PART_receive_o_t {
 }
 
 impl Default for PK_PART_receive_o_t {
-    /// `o_t_version = 1` — deliberately NOT raised, unlike its transmit
-    /// counterpart. `version_upgrade_probe` finds no 5022 ceiling below 8, but
-    /// **every version from 2 upwards returns `field_of_wrong_type` (5014) on
-    /// the legal-token call**: the v2+ migration reads fields past the end of
-    /// this binding, and a zeroed slot is not a legal token for them.
+    /// `o_t_version = 8`, the current version (9 → 5022), 72 bytes, with the
+    /// kernel's defaults from the migration `FUN_18105eee0` (parasolid-re
+    /// "Construction batch"): `receive_compound` split, `receive_using_seek`
+    /// no, `receive_mixed` fail. The format stays 0 (the wrapper sets it).
     ///
-    /// To raise this: recover the v2 layout (which fields v2 adds and their
-    /// legal tokens) from the `PK_PART_receive` migration routine, extend the
-    /// struct, then re-sweep. Until then v1 is the only usable version.
+    /// History: this used to stamp 1 because v2+ returned 5014 — the v8 enum
+    /// fields were zero, which is not a token.
     fn default() -> Self {
         Self {
-            o_t_version: 1,
-            transmit_format: 0, // 0 = auto-detect
+            o_t_version: 8,
+            transmit_format: 0,
             receive_user_fields: PK_LOGICAL_false,
             attdef_mismatch: PK_ATTDEF_mismatch_fail_c,
             part_index: 0,
@@ -229,12 +220,21 @@ impl Default for PK_PART_receive_o_t {
             identifiers: std::ptr::null(),
             receive_indexed_context: std::ptr::null_mut(),
             key_is_partition: PK_LOGICAL_false,
-            receive_compound: 0,
+            receive_compound: PK_receive_compound_split_c,
             receive_using_seek: PK_receive_using_seek_no_c,
-            receive_mixed: 0,
+            receive_mixed: PK_receive_mixed_fail_c,
         }
     }
 }
+
+const _: () = {
+    use core::mem::{offset_of, size_of};
+    assert!(size_of::<PK_PART_transmit_o_t>() == 40);
+    assert!(offset_of!(PK_PART_transmit_o_t, transmit_meshes) == 32);
+    assert!(size_of::<PK_PART_receive_o_t>() == 72);
+    assert!(offset_of!(PK_PART_receive_o_t, key_is_partition) == 56);
+    assert!(offset_of!(PK_PART_receive_o_t, receive_mixed) == 68);
+};
 
 /// Options for `PK_PARTITION_transmit` / `PK_PARTITION_transmit_u` / `PK_PARTITION_transmit_b`.
 ///
@@ -667,20 +667,23 @@ unsafe extern "C" {
     // BREP import route
     // =========================================================================
 
-    /// Create topology from defined topological entities and relations.
+    /// Create a body's topology (no geometry) from a class list and
+    /// parent/child relations (indices into `classes`).
     ///
-    /// `classes` — array of class tokens for each entity to create.
-    /// `parents`/`children` — index pairs defining parent-child relations.
-    /// `senses` — orientation of each relation.
+    /// 8 arguments, validated (parasolid-re `catalog/pk-validated-abi.md`, entry
+    /// @0x1800fb940; test `create_topology_square_sheet`). The old declaration
+    /// ended `(…, const PK_LOGICAL_t senses[], PK_BODY_t *body, PK_ENTITY_t
+    /// **entities)`: senses are `PK_TOPOL_sense_t` tokens (4 bytes), and the last
+    /// two arguments are an options pointer and a 40-byte result struct.
     pub fn PK_BODY_create_topology_2(
-        n_entities: c_int,
+        n_classes: c_int,
         classes: *const PK_CLASS_t,
         n_relations: c_int,
         parents: *const c_int,
         children: *const c_int,
-        senses: *const PK_LOGICAL_t,
-        body: *mut PK_BODY_t,
-        entities: *mut *mut PK_ENTITY_t,
+        senses: *const PK_TOPOL_sense_t,
+        options: *const PK_BODY_create_topology_2_o_t,
+        results: *mut PK_BODY_create_topology_2_r_t,
     ) -> PK_ERROR_code_t;
 
     /// Remove duplicate curves/surfaces; ensure SP-curves reference correct

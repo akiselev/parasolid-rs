@@ -26,7 +26,11 @@ pub struct PK_BCURVE_sf_t {
     pub is_rational: PK_LOGICAL_t, // @12  (journal-confirmed: right after vertex_dim)
     /// Control vertices: length = `n_vertices * vertex_dim`.
     pub vertices: *const c_double, // @16
-    pub _reserved_24: c_int,       // @24  (unknown; set 0)
+    /// `form` (`PK_BCURVE_form_t`) @24 — header field order + offsets read in
+    /// `PK_BCURVE_create` @0x1800c0010 (parasolid-re "Construction batch").
+    /// `PK_BCURVE_form_unset_c` (8650) lets the kernel classify. Was named
+    /// `_reserved_24`.
+    pub form: c_int, // @24
     /// Number of **distinct** knot values (validator reads this at @28).
     pub n_knots: c_int, // @28
     /// Multiplicity of each distinct knot (length `n_knots`). Parasolid uses
@@ -229,6 +233,8 @@ pub const PK_REPORT_3_discontinuities_c: PK_REPORT_t = 24404;
 pub type PK_knot_type_t = c_int;
 // [re-abi] appended 7 missing member(s) from pk-enums.h
 pub const PK_knot_unset_c: PK_knot_type_t = 8500;
+/// `PK_BCURVE_form_unset_c` (vendor table; used live in parasolid-re `abi-spcurve`).
+pub const PK_BCURVE_form_unset_c: c_int = 8650;
 pub const PK_knot_non_uniform_c: PK_knot_type_t = 8501;
 pub const PK_knot_uniform_c: PK_knot_type_t = 8502;
 pub const PK_knot_quasi_uniform_c: PK_knot_type_t = 8503;

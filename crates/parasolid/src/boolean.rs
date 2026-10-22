@@ -213,3 +213,233 @@ pub fn boolean_detailed(
         reports,
     })
 }
+
+// =============================================================================
+// Stage-level Boolean oracles: face sets, face Boolean, section with sheet
+// =============================================================================
+
+fn op_token(op: BooleanOp) -> PK_boolean_function_t {
+    match op {
+        BooleanOp::Unite => PK_boolean_unite_c,
+        BooleanOp::Subtract => PK_boolean_subtract_c,
+        BooleanOp::Intersect => PK_boolean_intersect_c,
+    }
+}
+
+fn copy_tags(p: *const i32, n: c_int) -> Vec<i32> {
+    if p.is_null() || n <= 0 {
+        Vec::new()
+    } else {
+        unsafe { std::slice::from_raw_parts(p, n as usize) }.to_vec()
+    }
+}
+
+fn copy_face_sets(p: *const PK_FACE_array_t, n: c_int) -> Vec<Vec<crate::face::Face>> {
+    if p.is_null() || n <= 0 {
+        return Vec::new();
+    }
+    unsafe { std::slice::from_raw_parts(p, n as usize) }
+        .iter()
+        .map(|a| copy_tags(a.array, a.length).into_iter().map(crate::face::Face::from_tag).collect())
+        .collect()
+}
+
+fn copy_reports(p: *const PK_boolean_report_r_t, n: c_int) -> Vec<BooleanReport> {
+    if p.is_null() || n <= 0 {
+        return Vec::new();
+    }
+    unsafe { std::slice::from_raw_parts(p, n as usize) }
+        .iter()
+        .map(|r| BooleanReport { report: r.report, entities: copy_tags(r.entities, r.n_entities) })
+        .collect()
+}
+
+/// Result of [`identify_facesets`] (`PK_identify_facesets_r_t`): the faces of
+/// each body that survive or are rejected by the Boolean `op`, grouped into
+/// connected face sets, plus the bounding (imprinted) edges.
+#[derive(Debug, Clone, Default)]
+pub struct Facesets {
+    pub survive_target: Vec<Vec<crate::face::Face>>,
+    pub survive_tool: Vec<Vec<crate::face::Face>>,
+    pub reject_target: Vec<Vec<crate::face::Face>>,
+    pub reject_tool: Vec<Vec<crate::face::Face>>,
+    pub bound_target_edges: Vec<crate::edge::Edge>,
+    pub bound_tool_edges: Vec<crate::edge::Edge>,
+}
+
+/// `PK_BODY_identify_facesets` (options v3): classify the faces of an
+/// imprinted target/tool pair for Boolean `op`. `imprint` is the paired edge
+/// and vertex result of [`Body::imprint_body`] on the same pair (manual
+/// ch.48 §48.4). This is the classification/colouring oracle.
+///
+/// Survive/reject naming comes from the header (documented); which internal
+/// list feeds which field was not traced (parasolid-re README "Blockers").
+/// Tangent and non-manifold configurations return 547 `non_manifold`.
+pub fn identify_facesets(
+    target: &Body,
+    tool: &Body,
+    imprint: &crate::body::ImprintResult,
+    op: BooleanOp,
+) -> PsResult<Facesets> {
+    let mut te: Vec<i32> = imprint.target_edges.iter().map(|e| e.tag()).collect();
+    let mut oe: Vec<i32> = imprint.tool_edges.iter().map(|e| e.tag()).collect();
+    let mut tv: Vec<i32> = imprint.target_vertices.iter().map(|v| v.tag()).collect();
+    let mut ov: Vec<i32> = imprint.tool_vertices.iter().map(|v| v.tag()).collect();
+    if te.len() != oe.len() || tv.len() != ov.len() {
+        return Err(crate::error::PsError::Session(
+            "identify_facesets: imprint pairs have unequal lengths".into(),
+        ));
+    }
+    let mut opts = PK_BODY_identify_facesets_o_t { function: op_token(op), ..Default::default() };
+    let mut r: PK_identify_facesets_r_t = unsafe { std::mem::zeroed() };
+    let rc = unsafe {
+        PK_BODY_identify_facesets(
+            target.tag(),
+            tool.tag(),
+            te.len() as c_int,
+            te.as_mut_ptr(),
+            oe.as_mut_ptr(),
+            tv.len() as c_int,
+            tv.as_mut_ptr(),
+            ov.as_mut_ptr(),
+            &mut opts,
+            &mut r,
+        )
+    };
+    let out = Facesets {
+        survive_target: copy_face_sets(r.survive_target, r.n_survive_target),
+        survive_tool: copy_face_sets(r.survive_tool, r.n_survive_tool),
+        reject_target: copy_face_sets(r.reject_target, r.n_reject_target),
+        reject_tool: copy_face_sets(r.reject_tool, r.n_reject_tool),
+        bound_target_edges: copy_tags(r.bound_target_edges.array, r.bound_target_edges.length)
+            .into_iter()
+            .map(crate::edge::Edge::from_tag)
+            .collect(),
+        bound_tool_edges: copy_tags(r.bound_tool_edges.array, r.bound_tool_edges.length)
+            .into_iter()
+            .map(crate::edge::Edge::from_tag)
+            .collect(),
+    };
+    if rc == 0 {
+        unsafe { PK_identify_facesets_r_f(&mut r) };
+    }
+    crate::error::pk_check(rc)?;
+    Ok(out)
+}
+
+/// `PK_FACE_boolean_2` with options version 17 at the kernel's defaults
+/// (`default_tol` 1e-5), returning the raw result token, bodies and reports.
+/// `target_faces` and `tool_faces` must come from two different bodies.
+/// A `failed` result token is returned as data, as in [`boolean_detailed`].
+///
+/// Residual risk: only the default options are exercised; the
+/// `PK_boolean_match_o_t` sub-struct is unmodelled, so matched regions cannot
+/// be steered.
+pub fn face_boolean(
+    target_faces: &[crate::face::Face],
+    tool_faces: &[crate::face::Face],
+    op: BooleanOp,
+) -> PsResult<BooleanOutcome> {
+    let tf: Vec<i32> = target_faces.iter().map(|f| f.tag()).collect();
+    let of: Vec<i32> = tool_faces.iter().map(|f| f.tag()).collect();
+    let opts = PK_FACE_boolean_o_t { function: op_token(op), ..Default::default() };
+    let mut tracking: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+    let mut results: PK_boolean_r_t = unsafe { std::mem::zeroed() };
+    let code = unsafe {
+        PK_FACE_boolean_2(
+            tf.len() as c_int,
+            tf.as_ptr(),
+            of.len() as c_int,
+            of.as_ptr(),
+            &opts,
+            &mut tracking,
+            &mut results,
+        )
+    };
+    unsafe { PK_TOPOL_track_r_f(&mut tracking) };
+    let bodies = copy_tags(results.bodies, results.n_bodies).into_iter().map(Body::from_tag).collect();
+    let reports = copy_reports(results.faults as *const PK_boolean_report_r_t, results.n_faults);
+    let result_raw = results.result;
+    unsafe { PK_boolean_r_f(&mut results) };
+    crate::error::pk_check(code)?;
+    Ok(BooleanOutcome { result: BooleanResult::from_raw(result_raw), result_raw, bodies, reports })
+}
+
+/// `PK_section_result_t`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SectionResult {
+    Success,
+    NoClash,
+    NoEffect,
+    Failed,
+    Unknown(i32),
+}
+
+/// Result of [`Body::section_with_sheet`] (`PK_section_2_r_t`).
+#[derive(Debug, Clone)]
+pub struct SectionOutcome {
+    pub result: SectionResult,
+    pub result_raw: i32,
+    pub front_bodies: Vec<Body>,
+    pub back_bodies: Vec<Body>,
+    pub front_faces: Vec<crate::face::Face>,
+    pub back_faces: Vec<crate::face::Face>,
+    pub reports: Vec<BooleanReport>,
+}
+
+impl Body {
+    /// `PK_BODY_section_with_sheet_2` (options v5 at the kernel's defaults):
+    /// cut this body with a sheet body into front and back pieces.
+    ///
+    /// Observed (parasolid-re): a closed box sheet fails with 1058
+    /// `boolean_failure`; open and closed cylinder sheets work.
+    pub fn section_with_sheet(&self, sheet: &Body) -> PsResult<SectionOutcome> {
+        let mut opts = PK_BODY_section_o_t::kernel_defaults();
+        let mut tracking: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+        let mut r: PK_section_2_r_t = unsafe { std::mem::zeroed() };
+        let rc = unsafe {
+            PK_BODY_section_with_sheet_2(self.tag(), sheet.tag(), &mut opts, &mut tracking, &mut r)
+        };
+        unsafe { PK_TOPOL_track_r_f(&mut tracking) };
+        let face = |p, n| copy_tags(p, n).into_iter().map(crate::face::Face::from_tag).collect();
+        let out = SectionOutcome {
+            result: match r.result {
+                PK_section_result_success_c => SectionResult::Success,
+                PK_section_result_no_clash_c => SectionResult::NoClash,
+                PK_section_result_no_effect_c => SectionResult::NoEffect,
+                PK_section_result_failed_c => SectionResult::Failed,
+                other => SectionResult::Unknown(other),
+            },
+            result_raw: r.result,
+            front_bodies: copy_tags(r.front_bodies, r.n_front_bodies).into_iter().map(Body::from_tag).collect(),
+            back_bodies: copy_tags(r.back_bodies, r.n_back_bodies).into_iter().map(Body::from_tag).collect(),
+            front_faces: face(r.front_faces, r.n_front_faces),
+            back_faces: face(r.back_faces, r.n_back_faces),
+            reports: copy_reports(r.reports, r.n_reports),
+        };
+        if rc == 0 {
+            unsafe { PK_section_2_r_f(&mut r) };
+        }
+        crate::error::pk_check(rc)?;
+        Ok(out)
+    }
+}
+
+impl crate::face::Face {
+    /// `PK_FACE_make_sheet_bodies` (options v4, kernel defaults: copy the
+    /// faces, `allow_disjoint` off): sheet bodies made from copies of `faces`.
+    pub fn make_sheet_bodies(faces: &[crate::face::Face]) -> PsResult<Vec<Body>> {
+        let mut f: Vec<i32> = faces.iter().map(|x| x.tag()).collect();
+        let mut opts = PK_FACE_make_sheet_bodies_o_t::default();
+        let mut n: c_int = 0;
+        let mut p: *mut PK_BODY_t = std::ptr::null_mut();
+        let mut tracking: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
+        let rc = unsafe {
+            PK_FACE_make_sheet_bodies(f.len() as c_int, f.as_mut_ptr(), &mut opts, &mut n, &mut p, &mut tracking)
+        };
+        unsafe { PK_TOPOL_track_r_f(&mut tracking) };
+        let a = unsafe { crate::memory::PkArray::from_raw(p, n) };
+        crate::error::pk_check(rc)?;
+        Ok(a.iter().map(|&t| Body::from_tag(t)).collect())
+    }
+}

@@ -1451,11 +1451,7 @@ pub struct PK_FACE_fix_mesh_defects_r_t {
     _private: [u8; 0],
 }
 
-/// Tracking results for entity operations.
-#[repr(C)]
-pub struct PK_ENTITY_track_r_t {
-    _private: [u8; 0],
-}
+// PK_ENTITY_track_r_t: sized 40-byte definition in oracle_abi.rs.
 
 /// Options for `PK_REGION_embed_body`.
 ///

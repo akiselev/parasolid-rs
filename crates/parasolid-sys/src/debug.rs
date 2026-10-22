@@ -196,19 +196,8 @@ impl Default for PK_CURVE_fix_update_t {
     }
 }
 
-/// Update switch for edge attach (`PK_EDGE_attach_curves_2`).
-/// Covers V24.0 and earlier.
-#[repr(C)]
-#[derive(Debug, Clone, Copy)]
-pub struct PK_EDGE_attach_update_t {
-    pub o_t_version: c_int,
-}
-
-impl Default for PK_EDGE_attach_update_t {
-    fn default() -> Self {
-        Self { o_t_version: 1 }
-    }
-}
+// PK_EDGE_attach_update_t is an enum token type (default 25050), not a
+// struct; defined in oracle_abi.rs.
 
 /// Update switch for face change (DEPRECATED — see `PK_local_ops_update_t`).
 /// Covers V18.0.

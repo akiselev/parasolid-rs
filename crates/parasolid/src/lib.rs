@@ -25,6 +25,7 @@ mod body;
 pub mod boolean;
 pub mod check;
 mod compare;
+pub mod construct;
 mod create;
 mod curve;
 mod edge;
@@ -54,8 +55,10 @@ mod vertex;
 pub use attrib::{ATTRIB_COLOUR, AttribDef};
 pub use body::{Body, BodyType, ImprintResult};
 pub use boolean::{
-    BooleanOp, BooleanOptions, BooleanOutcome, BooleanReport, BooleanResult, boolean_detailed,
+    BooleanOp, BooleanOptions, BooleanOutcome, BooleanReport, BooleanResult, Facesets,
+    SectionOutcome, SectionResult, boolean_detailed, face_boolean, identify_facesets,
 };
+pub use construct::{CreateFault, CreatedTopology, TopolSense, create_topology};
 pub use check::{
     BodyCheckOptions, CheckFault, EdgeCheckOptions, FaceCheckOptions, FacePairCheckOptions,
     GeomCheckOptions, check_geom,

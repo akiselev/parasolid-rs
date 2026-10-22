@@ -646,6 +646,15 @@ impl Session {
         Ok(is_on == PK_LOGICAL_true)
     }
 
+    /// `PK_SESSION_set_journalling`. Switching on requires the session to have
+    /// been started with a journal file (`SessionConfig` journal path), else
+    /// the kernel returns 566 `journal_not_open`. The call that switches
+    /// journalling on is not itself journalled.
+    pub fn set_journalling(&self, on: bool) -> PsResult<()> {
+        pk_call!(PK_SESSION_set_journalling(on as PK_LOGICAL_t));
+        Ok(())
+    }
+
     /// Returns whether journaling is currently enabled.
     pub fn journalling(&self) -> PsResult<bool> {
         let mut enabled: PK_LOGICAL_t = PK_LOGICAL_false;

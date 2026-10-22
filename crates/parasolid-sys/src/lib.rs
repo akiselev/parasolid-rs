@@ -116,6 +116,9 @@ pub use editing::*;
 mod facet;
 pub use facet::*;
 
+mod oracle_abi;
+pub use oracle_abi::*;
+
 // Attributes and application data
 mod attrib;
 pub use attrib::*;

@@ -22,11 +22,11 @@ pub const PK_BODY_type_solid_c: PK_BODY_type_t = 5601; // [probed]
 pub const PK_BODY_type_sheet_c: PK_BODY_type_t = 5602; // [probed]
 pub const PK_BODY_type_minimum_c: PK_BODY_type_t = 5603; // [probed]
 pub const PK_BODY_type_wire_c: PK_BODY_type_t = 5604; // [probed]
-pub const PK_BODY_type_acorn_c: PK_BODY_type_t = 5606; // [guess]
-pub const PK_BODY_type_empty_c: PK_BODY_type_t = 5608; // [guess]
-pub const PK_BODY_type_general_c: PK_BODY_type_t = 5605; // [guess]
-pub const PK_BODY_type_compound_c: PK_BODY_type_t = 5609; // [guess]
-pub const PK_BODY_type_unspecified_c: PK_BODY_type_t = 5607; // [guess]
+pub const PK_BODY_type_acorn_c: PK_BODY_type_t = 5606; // [vendor]
+pub const PK_BODY_type_empty_c: PK_BODY_type_t = 5608; // [vendor]
+pub const PK_BODY_type_general_c: PK_BODY_type_t = 5605; // [vendor] [static] create_topology_2 NULL default
+pub const PK_BODY_type_compound_c: PK_BODY_type_t = 5609; // [vendor] [probed] make_compound
+pub const PK_BODY_type_unspecified_c: PK_BODY_type_t = 5607; // [vendor]
 
 // =============================================================================
 // Body configuration constants — returned by PK_BODY_ask_config

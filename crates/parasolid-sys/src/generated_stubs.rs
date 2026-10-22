@@ -141,14 +141,6 @@ pub struct PK_BODY_add_to_compound_o_t {
     _private: [u8; 0],
 }
 #[repr(C)]
-pub struct PK_BODY_ask_children_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
-pub struct PK_BODY_ask_parent_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
 pub struct PK_BODY_copy_topology_o_t {
     _private: [u8; 0],
 }
@@ -157,19 +149,7 @@ pub struct PK_BODY_create_sheet_planar_o_t {
     _private: [u8; 0],
 }
 #[repr(C)]
-pub struct PK_BODY_create_topology_2_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
-pub struct PK_BODY_create_topology_2_r_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
 pub struct PK_BODY_find_knit_pattern_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
-pub struct PK_BODY_identify_facesets_o_t {
     _private: [u8; 0],
 }
 #[repr(C)]
@@ -182,10 +162,6 @@ pub struct PK_BODY_imprint_cus_vec_o_t {
 }
 #[repr(C)]
 pub struct PK_BODY_imprint_plane_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
-pub struct PK_BODY_make_compound_o_t {
     _private: [u8; 0],
 }
 #[repr(C)]
@@ -286,10 +262,6 @@ pub struct PK_CURVE_make_bcurve_o_t {
     _private: [u8; 0],
 }
 #[repr(C)]
-pub struct PK_CURVE_make_spcurves_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
 pub struct PK_CURVE_project_r_t {
     _private: [u8; 0],
 }
@@ -307,14 +279,6 @@ pub struct PK_DEBUG_report_start_o_t {
 }
 #[repr(C)]
 pub struct PK_DEBUG_shuffle_start_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
-pub struct PK_EDGE_attach_curve_nmnl_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
-pub struct PK_EDGE_attach_curves_o_t {
     _private: [u8; 0],
 }
 #[repr(C)]
@@ -347,10 +311,6 @@ pub struct PK_EDGE_set_blend_chamfer_o_t {
 }
 #[repr(C)]
 pub struct PK_EDGE_set_blend_variable_o_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
-pub struct PK_EDGE_set_precision_o_t {
     _private: [u8; 0],
 }
 #[repr(C)]
@@ -801,15 +761,7 @@ pub struct PK_VERTEX_optimise_o_t {
     _private: [u8; 0],
 }
 #[repr(C)]
-pub struct PK_identify_facesets_r_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
 pub struct PK_identify_general_r_t {
-    _private: [u8; 0],
-}
-#[repr(C)]
-pub struct PK_section_2_r_t {
     _private: [u8; 0],
 }
 

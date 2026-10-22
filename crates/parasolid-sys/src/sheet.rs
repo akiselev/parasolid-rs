@@ -445,10 +445,12 @@ pub struct PK_FACE_make_sheet_bodies_o_t {
     pub track_vertices: PK_track_vertices_t,
 }
 
+/// Version 4, 28 bytes (inline migration in `PK_FACE_make_sheet_bodies`
+/// @0x180290590; parasolid-re `abi.rs` `MakeSheetO`). Defaults are the kernel's.
 impl Default for PK_FACE_make_sheet_bodies_o_t {
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 4,
             allow_disjoint: PK_LOGICAL_false,
             make_from: PK_BODY_make_from_copy_c,
             transfer_attribs: PK_LOGICAL_true,
@@ -1043,3 +1045,8 @@ unsafe extern "C" {
     ) -> PK_ERROR_code_t;
 
 }
+
+const _: () = {
+    assert!(core::mem::size_of::<PK_FACE_make_sheet_bodies_o_t>() == 28);
+    assert!(core::mem::offset_of!(PK_FACE_make_sheet_bodies_o_t, track_vertices) == 24);
+};

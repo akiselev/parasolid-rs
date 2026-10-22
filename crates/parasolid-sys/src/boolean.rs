@@ -538,74 +538,104 @@ pub struct PK_boolean_config_o_t {
 // PK_BODY_boolean_o_t — Global boolean options
 // =============================================================================
 
-/// Options for `PK_BODY_boolean_2` (global boolean).
+/// Options for `PK_BODY_boolean_2`, version **11**, 96 bytes.
 ///
-/// This is the **version-2 user struct (32 bytes)** — the minimal form the
-/// kernel's option-migration routine (`FUN_18049b860`, RE c900fa3f430f) reads.
-/// The previous 192-byte struct modelled the internal v19 layout and set
-/// `o_t_version = 1`, which the kernel rejects with `PK_ERROR_o_t_version_incorrect`
-/// (5043) — versions 2..=19 are accepted. For v2 the kernel copies only:
-/// `function@4`, `configuration@8` (ptr), `default_tol@16` (f64), three `u8`
-/// flags @24/25/26, and `fence@28`; every other option uses an internal default
-/// (e.g. tolerances ≈ 1e-8, `check_fa = yes`). A NULL `configuration` is
-/// auto-filled by the kernel, so no nested sub-struct is required.
+/// Layout: the fields the kernel's option-migration routine `FUN_18049b860`
+/// copies in `case 0xb` (static-observed, parasolid-re
+/// `artifacts/port/P8-classification/20261016T090519Z/notes/D/raw/dec_18049b860.c`
+/// l.1137-1197). Defaults: the same routine's NULL-options branch (l.54-75).
+/// Names: `PKU_journal_BODY_boolean_o` @0x18049a9e0. Used live by parasolid-re
+/// `runner/src/stages_p8d.rs` (`default_tol`, `nm_edge_repair`,
+/// `allow_disjoint`, material sides, `merge_attributes`) and here by
+/// `boolean_v11_options_are_live`.
 ///
-/// Journal audit (PKU_journal_BODY_boolean_o): the journal dumps the FULL
-/// current-version layout (function@4, configuration@8 ptr, selected_topolset@16
-/// ptr, matched_region@24 ptr, byte flags @32+, fence@36, …, > 160 bytes). That
-/// diverges from this v2 layout after @16 (v2 has `default_tol` f64 @16 where the
-/// current version has a pointer) — exactly the version drift noted above. Kept
-/// as the runtime-validated v2 struct; do NOT expand to the journal layout.
+/// **Why the old binding crashed.** The previous 32-byte "v2" struct put
+/// `default_tol` (f64) at @16. In the real layout @16 is the `matched_region`
+/// *pointer*, so any non-zero `default_tol` was dereferenced as an address and
+/// the kernel crashed; zero only worked because NULL means "default". Its
+/// "three flags" @24..26 are `merge_imprinted`, `prune_in_solid`,
+/// `prune_in_void`.
+///
+/// Versions 12..=19 are accepted by the kernel but their extra fields are not
+/// recovered (17+ crashed the probe process), so 11 is the highest version this
+/// binding can stamp.
 #[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PK_BODY_boolean_o_t {
-    /// Structure version — MUST be in `2..=19`. Version 1 → error 5043.
-    pub o_t_version: c_int, // @0
-    /// Boolean operation (unite/subtract/intersect).
-    pub function: PK_boolean_function_t, // @4
-    /// Performance sub-structure; NULL → kernel builds the default.
+    pub o_t_version: c_int,                          // @0  11
+    pub function: PK_boolean_function_t,             // @4
+    /// NULL → the kernel builds the default configuration.
     pub configuration: *const PK_boolean_config_o_t, // @8
-    /// Coincidence tolerance; `0.0` → kernel default (≈ 1e-8).
-    pub default_tol: c_double, // @16
-    /// Three v2 boolean flags at offsets 24/25/26 (default 0). Semantics not
-    /// individually confirmed — v2 exposes them as `u8`s; likely disjoint/prune
-    /// controls. All-zero reproduces the kernel's NULL-options defaults.
-    pub flags_v2: [u8; 3], // @24..27  (@27 = padding)
-    /// Fence behaviour (default `PK_boolean_fence_none_c`).
-    pub fence: PK_boolean_fence_t, // @28
+    /// NULL → the kernel builds the default match struct. Not modelled.
+    pub matched_region: *const PK_boolean_match_o_t, // @16
+    pub merge_imprinted: PK_LOGICAL_t,               // @24
+    pub prune_in_solid: PK_LOGICAL_t,                // @25
+    pub prune_in_void: PK_LOGICAL_t,                 // @26
+    pub fence: PK_boolean_fence_t,                   // @28 none
+    pub allow_disjoint: PK_LOGICAL_t,                // @32
+    pub selective_merge: PK_LOGICAL_t,               // @33
+    pub check_fa: PK_boolean_check_fa_t,             // @36 yes
+    pub default_tol: c_double,                       // @40 1e-5
+    pub max_tol: c_double,                           // @48 0
+    pub tracking: PK_LOGICAL_t,                      // @56
+    pub merge_attributes: PK_LOGICAL_t,              // @57
+    pub keep_target_edges: PK_LOGICAL_t,             // @58
+    pub imprint_complete_targ: PK_imprint_complete_t, // @60 no
+    pub imprint_complete_tool: PK_imprint_complete_t, // @64 no
+    pub target_material_side: PK_boolean_material_t, // @68 default
+    pub tool_material_side: PK_boolean_material_t,   // @72 default
+    pub resulting_body_type: PK_boolean_prefer_t,    // @76 original
+    pub flag_no_effect: PK_boolean_no_effect_t,      // @80 basic
+    pub nm_edge_repair: PK_nm_edge_repair_t,         // @84 no
+    pub blend_radius: c_double,                      // @88 1e-5
 }
 
+/// Highest `PK_BODY_boolean_o_t` version whose layout is recovered.
+pub const PK_BODY_boolean_o_t_VERSION: c_int = 11;
+
 impl Default for PK_BODY_boolean_o_t {
-    /// `o_t_version = 2` — deliberately NOT raised despite the accepted band
-    /// being 2..=19.
-    ///
-    /// `version_upgrade_probe` on V37.01.243, with this 32-byte v2 layout:
-    ///
-    /// | version | legal tokens | garbage `fence` |
-    /// |---|---|---|
-    /// | 1     | 5043 `o_t_version_incorrect` | 5043 |
-    /// | **2** | rc 0 | 5014 (`fence` is read) |
-    /// | 3..=16| **908 `not_a_logical`** | 5014 |
-    ///
-    /// v3 and above are *accepted* but immediately fail with `not_a_logical`:
-    /// the v3 migration reads a LOGICAL field past the end of this 32-byte
-    /// struct. So 2 is the highest version this binding can supply, and it is
-    /// already complete at v2 — the garbage-`fence` 5014 proves the kernel
-    /// reads through to the last field.
-    ///
-    /// To go higher, recover the v3+ user layout from the boolean migration
-    /// routine (`FUN_18049b860`) and extend this struct first. (Versions 17+
-    /// hard-crash the probe process, so sweep them in an isolated run.)
+    /// Version 11 with the kernel's NULL-options defaults.
     fn default() -> Self {
         Self {
-            o_t_version: 2,
+            o_t_version: PK_BODY_boolean_o_t_VERSION,
             function: PK_boolean_unite_c,
             configuration: std::ptr::null(),
-            default_tol: 0.0,
-            flags_v2: [0, 0, 0],
+            matched_region: std::ptr::null(),
+            merge_imprinted: PK_LOGICAL_false,
+            prune_in_solid: PK_LOGICAL_false,
+            prune_in_void: PK_LOGICAL_false,
             fence: PK_boolean_fence_none_c,
+            allow_disjoint: PK_LOGICAL_false,
+            selective_merge: PK_LOGICAL_false,
+            check_fa: PK_boolean_check_fa_yes_c,
+            default_tol: 1.0e-5,
+            max_tol: 0.0,
+            tracking: PK_LOGICAL_false,
+            merge_attributes: PK_LOGICAL_false,
+            keep_target_edges: PK_LOGICAL_false,
+            imprint_complete_targ: PK_imprint_complete_no_c,
+            imprint_complete_tool: PK_imprint_complete_no_c,
+            target_material_side: PK_boolean_material_default_c,
+            tool_material_side: PK_boolean_material_default_c,
+            resulting_body_type: PK_boolean_prefer_original_c,
+            flag_no_effect: PK_boolean_no_effect_basic_c,
+            nm_edge_repair: PK_nm_edge_repair_no_c,
+            blend_radius: 1.0e-5,
         }
     }
 }
+
+const _: () = {
+    use core::mem::{offset_of, size_of};
+    assert!(size_of::<PK_BODY_boolean_o_t>() == 96);
+    assert!(offset_of!(PK_BODY_boolean_o_t, matched_region) == 16);
+    assert!(offset_of!(PK_BODY_boolean_o_t, fence) == 28);
+    assert!(offset_of!(PK_BODY_boolean_o_t, allow_disjoint) == 32);
+    assert!(offset_of!(PK_BODY_boolean_o_t, default_tol) == 40);
+    assert!(offset_of!(PK_BODY_boolean_o_t, imprint_complete_targ) == 60);
+    assert!(offset_of!(PK_BODY_boolean_o_t, nm_edge_repair) == 84);
+    assert!(offset_of!(PK_BODY_boolean_o_t, blend_radius) == 88);
+};
 
 // =============================================================================
 // PK_FACE_boolean_o_t — Local boolean options
@@ -687,10 +717,14 @@ pub struct PK_FACE_boolean_o_t {
     pub update: PK_boolean_update_t,
 } // 128 bytes
 
+/// `Default` = version **17** (0x80 bytes) with the kernel's NULL-options
+/// defaults (migrate `FUN_18049e600`, journal @18049ae10; parasolid-re
+/// `abi.rs` `FaceBooleanO`): only `default_tol` (1e-5) differs from zero/none.
+/// Previously stamped version 1, which left every field past `function` dead.
 impl Default for PK_FACE_boolean_o_t {
     fn default() -> Self {
         Self {
-            o_t_version: 1,
+            o_t_version: 17,
             function: PK_boolean_unite_c,
             configuration: std::ptr::null(),
             select_region: std::ptr::null(),
@@ -703,7 +737,7 @@ impl Default for PK_FACE_boolean_o_t {
             allow_disjoint: 0,
             selective_merge: 0,
             check_fa: PK_boolean_check_fa_yes_c,
-            default_tol: 0.0,
+            default_tol: 1.0e-5,
             max_tol: 0.0,
             merge_attributes: 0,
             keep_target_edges: 0,
@@ -1377,6 +1411,33 @@ impl Default for PK_BODY_section_o_t {
         }
     }
 }
+
+impl PK_BODY_section_o_t {
+    /// The kernel's NULL-options defaults at version 5 (migrate
+    /// `FUN_1801831d0`; used live by parasolid-re's `section` stage): fence
+    /// both, `check_fa` yes, `default_tol` 1e-5, `keep_as_facet` yes. `Default`
+    /// keeps the older hand-chosen values (`check_fa` no, tol 0, keep no) for
+    /// `Body::section_with_surf`.
+    pub fn kernel_defaults() -> Self {
+        Self {
+            check_fa: PK_section_check_fa_yes_c,
+            default_tol: 1.0e-5,
+            keep_as_facet: PK_BODY_keep_as_facet_yes_c,
+            ..Self::default()
+        }
+    }
+}
+
+const _: () = {
+    use core::mem::{offset_of, size_of};
+    assert!(size_of::<PK_BODY_section_o_t>() == 48);
+    assert!(offset_of!(PK_BODY_section_o_t, keep_as_facet) == 44);
+    assert!(size_of::<PK_FACE_boolean_o_t>() == 0x80);
+    assert!(offset_of!(PK_FACE_boolean_o_t, fence) == 36);
+    assert!(offset_of!(PK_FACE_boolean_o_t, default_tol) == 48);
+    assert!(offset_of!(PK_FACE_boolean_o_t, limit_tool_faces) == 96);
+    assert!(offset_of!(PK_FACE_boolean_o_t, update) == 120);
+};
 
 /// Results from section operations (`PK_section_r_t`, 64 bytes). Kept opaque —
 /// the front/back face/body arrays are filled by an internal routine

@@ -4,6 +4,7 @@
 //! Run:   WINEPATH=/path/to/SOLIDWORKS cargo run -p parasolid-test --bin parasolid-test --target x86_64-pc-windows-gnu
 
 mod abi_audit;
+mod oracle_wrappers;
 
 use parasolid::*;
 use parasolid_sys::*;
@@ -7218,6 +7219,44 @@ fn main() {
     });
     test!("transform_snaps_tiny_motions", {
         abi_audit::transform_snaps_tiny_motions()?;
+    });
+
+    // =========================================================================
+    // CADabra oracle wrappers 2026-10-16 — see oracle_wrappers.rs
+    // =========================================================================
+
+    test!("create_topology_square_sheet", {
+        oracle_wrappers::create_topology_square_sheet()?;
+    });
+    test!("create_topology_faults_and_body_type", {
+        oracle_wrappers::create_topology_faults_and_body_type()?;
+    });
+    test!("tolerant_edges_and_fin_curves", {
+        oracle_wrappers::tolerant_edges_and_fin_curves()?;
+    });
+    test!("nominal_curve_round_trip", {
+        oracle_wrappers::nominal_curve_round_trip()?;
+    });
+    test!("compound_bodies", {
+        oracle_wrappers::compound_bodies()?;
+    });
+    test!("journalling_switch", {
+        oracle_wrappers::journalling_switch()?;
+    });
+    test!("identify_facesets_blind_hole_subtract", {
+        oracle_wrappers::identify_facesets_blind_hole_subtract()?;
+    });
+    test!("face_boolean_matches_body_boolean", {
+        oracle_wrappers::face_boolean_matches_body_boolean()?;
+    });
+    test!("section_with_sheet_halves_block", {
+        oracle_wrappers::section_with_sheet_halves_block()?;
+    });
+    test!("boolean_v11_options_are_live", {
+        oracle_wrappers::boolean_v11_options_are_live()?;
+    });
+    test!("xt_transmit_receive_latest_versions", {
+        oracle_wrappers::xt_transmit_receive_latest_versions()?;
     });
 
     // =========================================================================

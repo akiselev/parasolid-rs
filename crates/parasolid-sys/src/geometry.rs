@@ -433,10 +433,14 @@ pub struct PK_LOOP_close_gaps_o_t {
 
 /// Nominal curve state for PK_BODY_set_curve_nmnl_state / PK_BODY_ask_curve_nmnl_state.
 pub type PK_BODY_curve_nmnl_state_t = c_int;
-/// Nominal curves disabled.
-pub const PK_BODY_curve_nmnl_disabled_c: PK_BODY_curve_nmnl_state_t = 0;
-/// Nominal curves enabled.
-pub const PK_BODY_curve_nmnl_enabled_c: PK_BODY_curve_nmnl_state_t = 1;
+/// Vendor tokens `PK_BODY_curve_nmnl_no_c` / `_yes_c` (21200 / 21201; used live
+/// in parasolid-re `abi-nmnl` and `nominal_curve_round_trip`). The old 0 / 1
+/// values were not tokens.
+pub const PK_BODY_curve_nmnl_no_c: PK_BODY_curve_nmnl_state_t = 21200;
+pub const PK_BODY_curve_nmnl_yes_c: PK_BODY_curve_nmnl_state_t = 21201;
+/// Old names, kept as aliases of the corrected values.
+pub const PK_BODY_curve_nmnl_disabled_c: PK_BODY_curve_nmnl_state_t = PK_BODY_curve_nmnl_no_c;
+pub const PK_BODY_curve_nmnl_enabled_c: PK_BODY_curve_nmnl_state_t = PK_BODY_curve_nmnl_yes_c;
 
 // =============================================================================
 // Error constants specific to geometry
