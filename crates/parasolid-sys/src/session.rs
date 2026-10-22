@@ -304,17 +304,31 @@ pub const PK_REPORT_1_osthread_ok_c: c_int = 23902;
 // extern "C" blocks
 // =============================================================================
 
-/// Kernel version returned by `PK_SESSION_ask_kernel_version`. The first three
-/// ints are major/minor/build; the tail is reserved so the kernel never writes
-/// past the allocation.
+/// Kernel version returned by `PK_SESSION_ask_kernel_version` (and the
+/// `PK_*_receive_version*` family): nine ints, 36 bytes.
+///
+/// Layout static-observed in `PK_SESSION_ask_kernel_version` @0x1803f7400 of
+/// DLL c900fa3f…63073 (37.01.243): major/minor/build at +0/+4/+8, then six
+/// ints at +0xc..+0x20 scanned with `"%d-%d-%d %d:%d:%d"` (@0x183fb50f8) from
+/// the embedded stamp `"2025-08-14 22:57:46"`. The field names of that tail are
+/// inferred from the format; the vendor header names are not available. A
+/// canary run measured exactly 36 bytes written; the former 32-byte layout
+/// overran the caller's stack (parasolid-re `port/REQUESTS.md` R-7).
 #[repr(C)]
-#[derive(Debug, Clone, Copy, Default)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
 pub struct PK_SESSION_kernel_version_t {
     pub major: c_int,
     pub minor: c_int,
     pub build: c_int,
-    pub _reserved: [c_int; 5],
+    pub year: c_int,
+    pub month: c_int,
+    pub day: c_int,
+    pub hour: c_int,
+    pub minute: c_int,
+    pub second: c_int,
 }
+
+const _: () = assert!(std::mem::size_of::<PK_SESSION_kernel_version_t>() == 36);
 
 /// SMP configuration returned by `PK_SESSION_ask_smp`.
 #[repr(C)]
@@ -735,8 +749,19 @@ unsafe extern "C" {
     /// Registers session (general registration call).
     pub fn PK_SESSION_register(code: c_int, data: PK_POINTER_t) -> PK_ERROR_code_t;
 
-    /// Registers a polling callback for long operations.
-    pub fn PK_SESSION_register_polling_cb(callback: *const c_void) -> PK_ERROR_code_t;
+    /// Registers a polling callback for long operations and returns the
+    /// previous one through `old_callback` (written only when non-null).
+    ///
+    /// Two arguments, not one: the export moves `rcx` (callback) to `rsi` and
+    /// `rdx` (out-pointer) to `rdi`, stores the new callback and writes the old
+    /// one with `test %rdi,%rdi; je; mov %rax,(%rdi)` @0x1803e9be2 (parasolid-re
+    /// B23, static-observed on 37.01.243). The DS allocator's poll sites call
+    /// the callback with no arguments. ch009 lists the function as
+    /// undocumented; nothing in this crate calls it.
+    pub fn PK_SESSION_register_polling_cb(
+        callback: *const c_void,
+        old_callback: *mut *const c_void,
+    ) -> PK_ERROR_code_t;
 
     // =========================================================================
     // Kernel state queries

@@ -2,8 +2,11 @@
 
 use std::fmt;
 use std::os::raw::c_char;
+use std::time::Duration;
 
 use parasolid_sys::*;
+
+use crate::budget::BudgetKind;
 
 // =============================================================================
 // Severity
@@ -173,6 +176,26 @@ pub enum PsError {
         /// The kernel's reports: `(PK_boolean_report_t token, entity tags)`.
         reports: Vec<(i32, Vec<i32>)>,
     },
+
+    /// Parasolid failed (budget): a [`Budget`](crate::Budget) stopped the work
+    /// (parasolid-re B23). Not an answer from the kernel; an oracle treats it
+    /// as "oracle silent". The kernel itself reported a serious error and, in
+    /// sessions without partitioned rollback, was observed usable afterwards.
+    BudgetExceeded {
+        /// Which limit fired.
+        kind: BudgetKind,
+        /// The code the PK call returned: `PK_ERROR_aborted` (945) or
+        /// `PK_ERROR_system_error` (900) for time, `PK_ERROR_memory_full` (901)
+        /// for memory. Inside [`Session::with_budget`](crate::Session::with_budget)
+        /// a time abort can land after a call's last poll point; the scope then
+        /// ends with that call's own code (for example 0).
+        pk_code: i32,
+        /// Wall-clock time from arming the budget to the error.
+        elapsed: Duration,
+        /// Live kernel (`FMALLO`) bytes when the limit fired: when the abort
+        /// landed, or at the refused allocation.
+        live_bytes: usize,
+    },
 }
 
 /// Convenience alias for `Result<T, PsError>`.
@@ -245,6 +268,17 @@ impl fmt::Display for PsError {
             PsError::NotAnEntity { tag } => write!(f, "invalid entity tag {tag}"),
             PsError::Aborted => f.write_str("operation aborted by user interrupt"),
             PsError::Session(msg) => write!(f, "session error: {msg}"),
+            PsError::BudgetExceeded {
+                kind,
+                pk_code,
+                elapsed,
+                live_bytes,
+            } => write!(
+                f,
+                "Parasolid failed (budget): {kind} budget exceeded after {:.3} s \
+                 (PK code {pk_code}, {live_bytes} live bytes)",
+                elapsed.as_secs_f64()
+            ),
             PsError::BooleanFailed { result, reports } => write!(
                 f,
                 "boolean failed (PK_boolean_result_t {result}); reports: {:?}",
@@ -279,8 +313,9 @@ pub fn pk_check(code: PK_ERROR_code_t) -> PsResult<()> {
 
 /// Call a PK FFI function and propagate errors via `?`.
 ///
-/// Wraps the call in `unsafe`, checks the return code, and returns
-/// `Err(PsError)` on failure.
+/// Wraps the call in `unsafe`, runs it under the active [`Budget`](crate::Budget)
+/// (`budget::guard`), checks the return code, and returns `Err(PsError)` on
+/// failure.
 ///
 /// # Example
 ///
@@ -289,7 +324,7 @@ pub fn pk_check(code: PK_ERROR_code_t) -> PsResult<()> {
 /// ```
 macro_rules! pk_call {
     ($call:expr) => {
-        $crate::error::pk_check(unsafe { $call })?
+        $crate::error::pk_check($crate::budget::guard(|| unsafe { $call })?)?
     };
 }
 

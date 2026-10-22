@@ -996,6 +996,147 @@ fn main() {
         );
     });
 
+    // `Surf::intersect_with` region of interest (parasolid-re item h, probe-h-uvbox). The
+    // uv boxes act as the model-space box of the patch, not as parametric trims.
+    test!("ssi_region_of_interest", {
+        let _session = Session::start(test_config())?;
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        let (ex, ey, ez) = (
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+            Vec3::new(0.0, 0.0, 1.0),
+        );
+        let pz = Surf::plane(Axis2::new(o, ez, ex))?; // z = 0, (u, v) = (x, y)
+        let px = Surf::plane(Axis2::new(o, ex, ey))?; // x = 0
+        let uv = |a, b, c, d| UvBox {
+            u_min: a,
+            v_min: b,
+            u_max: c,
+            v_max: d,
+        };
+        let bx = |a: [f64; 6]| Aabb {
+            min: Vec3::new(a[0], a[1], a[2]),
+            max: Vec3::new(a[3], a[4], a[5]),
+        };
+        let opt = |r: Option<Aabb>, u1: Option<UvBox>, u2: Option<UvBox>| SurfIntersectOptions {
+            region: r,
+            uvbox_1: u1,
+            uvbox_2: u2,
+        };
+        let bounds = |r: &SurfIntersection| r.curves.iter().map(|c| c.bounds).collect::<Vec<_>>();
+
+        // Unrestricted: the line x = z = 0 spans the session size box.
+        let r = pz.intersect(&px)?;
+        let b = bounds(&r);
+        assert!(
+            b.len() == 1 && (b[0].0 + 500.0).abs() < 1e-9 && (b[0].1 - 500.0).abs() < 1e-9,
+            "default line bounds {b:?}"
+        );
+        let _ = r.delete_curves();
+        // uvbox_1 / uvbox_2 trim an open curve to the patch's model-space box.
+        for (o_, want) in [
+            (opt(None, Some(uv(-1.0, -1.0, 1.0, 1.0)), None), (-1.0, 1.0)),
+            (opt(None, Some(uv(-1.0, 2.0, 1.0, 3.0)), None), (2.0, 3.0)),
+            (opt(None, None, Some(uv(-1.0, -1.0, 1.0, 1.0))), (-1.0, 1.0)),
+            (
+                opt(Some(bx([-1.0, 2.0, -1.0, 1.0, 3.0, 1.0])), None, None),
+                (2.0, 3.0),
+            ),
+        ] {
+            let r = pz.intersect_with(&px, &o_)?;
+            assert_eq!(r.curves.len(), 1, "{o_:?}");
+            let (lo, hi) = r.curves[0].bounds;
+            assert!(
+                (lo - want.0).abs() < 1e-9 && (hi - want.1).abs() < 1e-9,
+                "{o_:?}: bounds {lo} {hi}"
+            );
+            let _ = r.delete_curves();
+        }
+        // A region that misses the intersection: no curves, no error.
+        for o_ in [
+            opt(None, Some(uv(10.0, 10.0, 11.0, 11.0)), None),
+            opt(Some(bx([5.0, -1.0, -1.0, 6.0, 1.0, 1.0])), None, None),
+        ] {
+            let r = pz.intersect_with(&px, &o_)?;
+            assert!(r.curves.is_empty() && r.points.is_empty(), "{o_:?}");
+        }
+        // A box that does not overlap the uv patch's box is bad option data (907).
+        let e = pz
+            .intersect_with(
+                &px,
+                &opt(
+                    Some(bx([-1.0, 2.0, -1.0, 1.0, 3.0, 1.0])),
+                    Some(uv(-1.0, -1.0, 1.0, 1.0)),
+                    None,
+                ),
+            )
+            .expect_err("disjoint box and uvbox must be rejected");
+        assert_eq!(e.details().map(|d| d.code), Some(907), "{e}");
+
+        // Closed analytic curves are not trimmed: a half-cylinder patch keeps the whole ellipse,
+        // and a circle entirely outside the patch's box is dropped.
+        let cy = Surf::cylinder(Axis2::new(o, ez, ex), 1.0)?;
+        let k = 1.25f64.sqrt();
+        let pob = Surf::plane(Axis2::new(
+            o,
+            Vec3::new(-0.5 / k, 0.0, 1.0 / k),
+            Vec3::new(1.0 / k, 0.0, 0.5 / k),
+        ))?;
+        let r = cy.intersect_with(
+            &pob,
+            &opt(None, Some(uv(0.0, -2.0, std::f64::consts::PI, 2.0)), None),
+        )?;
+        assert_eq!(r.curves.len(), 1);
+        assert_eq!(r.curves[0].curve.curve_type()?, CurveType::Ellipse);
+        let (lo, hi) = r.curves[0].bounds;
+        assert!(
+            (hi - lo - std::f64::consts::TAU).abs() < 1e-9,
+            "ellipse should be whole: {lo} {hi}"
+        );
+        let _ = r.delete_curves();
+        let p5 = Surf::plane(Axis2::new(Vec3::new(0.0, 0.0, 5.0), ez, ex))?;
+        assert_eq!(
+            cy.intersect(&p5)?.curves.len(),
+            1,
+            "control: circle at z = 5"
+        );
+        let r = cy.intersect_with(
+            &p5,
+            &opt(None, Some(uv(0.0, -1.0, std::f64::consts::TAU, 1.0)), None),
+        )?;
+        assert!(
+            r.curves.is_empty(),
+            "circle outside the patch box must be dropped"
+        );
+    });
+
+    // Coincident sheets are imprinted only with `imprint_overlapping` (parasolid-re item i).
+    test!("imprint_overlapping_coincident_sheets", {
+        let _session = Session::start(test_config())?;
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        let pl = Surf::plane(Axis2::new(o, Vec3::new(0.0, 0.0, 1.0), Vec3::new(1.0, 0.0, 0.0)))?;
+        let uv = |a, b, c, d| UvBox { u_min: a, v_min: b, u_max: c, v_max: d };
+        let sheets = || -> PsResult<(Body, Body)> {
+            Ok((pl.make_sheet_body(uv(0.0, 0.0, 2.0, 2.0))?, pl.make_sheet_body(uv(1.0, 1.0, 3.0, 3.0))?))
+        };
+        let (a, b) = sheets()?;
+        let fa = a.faces()?[0];
+        let fb = b.faces()?[0];
+        let (coi, _) = fa.is_coincident(fb, 1e-8)?;
+        assert!(!coi.is_coincident(), "partial overlap is not 'yes': {coi:?}");
+        let r = a.imprint_body(&b)?;
+        assert!(r.target_edges.is_empty() && r.tool_edges.is_empty(), "defaults imprint nothing: {r:?}");
+        assert_eq!(a.faces()?.len(), 1);
+
+        let (a, b) = sheets()?;
+        let opts = PK_BODY_imprint_o_t { imprint_overlapping: PK_LOGICAL_true, ..PK_BODY_imprint_o_t::default() };
+        let r = a.imprint_body_with(&b, &opts)?;
+        assert_eq!(r.target_edges.len(), 4, "overlap square [1,2]^2 on A: {r:?}");
+        assert_eq!(r.tool_edges.len(), 4, "overlap square [1,2]^2 on B: {r:?}");
+        assert_eq!(a.faces()?.len(), 2, "A split into overlap and remainder");
+        assert_eq!(b.faces()?.len(), 2, "B split into overlap and remainder");
+    });
+
     test!("ssi_plane_plane_line", {
         let _session = Session::start(test_config())?;
         let blk = Body::create_solid_block(10.0, 20.0, 30.0)?;
@@ -2330,9 +2471,9 @@ fn main() {
     });
 
     test!("facet_block_triangles", {
-        // PK_TOPOL_facet_2 (option version 5): tessellate a block. A box has 6
-        // quad faces → 12 triangles, each with 3 fins = 36 fins. Validates both
-        // option sub-structs (control + choice) and the tabular result totals.
+        // PK_TOPOL_facet_2: tessellate a block. A box has 6 quad faces → 12
+        // triangles, each with 3 fins = 36 fins. The tables are checked in
+        // abi_audit::facet_block_tables.
         let _session = Session::start(test_config())?;
         let block = Body::create_solid_block(4.0, 4.0, 4.0)?;
         let mesh = block.facet()?;
@@ -7220,6 +7361,752 @@ fn main() {
     test!("transform_snaps_tiny_motions", {
         abi_audit::transform_snaps_tiny_motions()?;
     });
+    test!("kernel_version_is_36_bytes", {
+        abi_audit::kernel_version_is_36_bytes()?;
+    });
+    test!("ssi_delete_curves_ownership", {
+        abi_audit::ssi_delete_curves_ownership()?;
+    });
+    test!("boolean_options_v19_default_tol", {
+        abi_audit::boolean_options_v19_default_tol()?;
+    });
+    test!("boolean_options_merge_flags", {
+        abi_audit::boolean_options_merge_flags()?;
+    });
+    test!("boolean_options_matched_region", {
+        abi_audit::boolean_options_matched_region()?;
+    });
+    // PK_TOPOL_facet_2 at option version 26 with the real table ABI
+    // (parasolid-re B-P3-1, port/P3-faceting).
+    test!("facet_v26_layout", {
+        abi_audit::facet_v26_layout()?;
+    });
+    test!("facet_block_tables", {
+        abi_audit::facet_block_tables()?;
+    });
+    test!("facet_cylinder_default_16_chords", {
+        abi_audit::facet_cylinder_default_16_chords()?;
+    });
+    test!("facet_chord_angle_band", {
+        abi_audit::facet_chord_angle_band()?;
+    });
+    test!("facet_boundary_fins_on_edge_polylines", {
+        abi_audit::facet_boundary_fins_on_edge_polylines()?;
+    });
+    // PK_CURVE_intersect_curve returns no vectors and no error when its solver
+    // gives up, and reports tangencies as simple_c (parasolid-re P1 B12). The
+    // checked call must tell a genuine miss from a silent one and mark tangency.
+    test!("curve_curve_checked_empty_and_tangent", {
+        let _s = Session::start(test_config())?;
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let circle = Curve::circle(Axis2::new(Vec3::new(0.0, 0.0, 0.0), z, x), 1.0)?;
+        let full = (0.0, 2.0 * std::f64::consts::PI);
+        let chk = CurveCurveCheck::default();
+
+        // Tangent line y = 1: one hit, reported simple, measured tangential.
+        let tan = Curve::line(Vec3::new(0.0, 1.0, 0.0), x)?;
+        let r = tan.intersect_curve_checked((-2.0, 2.0), &circle, full, &chk)?;
+        println!("\n    tangent: {} hit(s), sin {:?}", r.hits.len(), r.hits.iter().map(|h| h.sin_angle).collect::<Vec<_>>());
+        assert_eq!(r.hits.len(), 1);
+        assert!(r.hits[0].tangential && r.hits[0].hit.kind == PK_intersect_vector_simple_c);
+        assert!(r.empty.is_none());
+
+        // Secant line y = 0: two transversal hits.
+        let sec = Curve::line(Vec3::new(0.0, 0.0, 0.0), x)?;
+        let r = sec.intersect_curve_checked((-2.0, 2.0), &circle, full, &chk)?;
+        assert_eq!(r.hits.len(), 2);
+        assert!(r.hits.iter().all(|h| !h.tangential && (h.sin_angle - 1.0).abs() < 1e-12));
+
+        // Skew lines 1 apart: a genuine miss.
+        let ya = Vec3::new(0.0, 1.0, 0.0);
+        let far = Curve::line(Vec3::new(0.0, 0.0, 1.0), ya)?;
+        let r = sec.intersect_curve_checked((-2.0, 2.0), &far, (-2.0, 2.0), &chk)?;
+        println!("    skew 1: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        assert!(matches!(r.empty, Some(EmptyCheck::Separated { min_distance }) if (min_distance - 1.0).abs() < 1e-12));
+
+        // Skew lines 0.5e-8 apart (inside the 1e-8 precision). Non-coplanar
+        // lines leave the analytic lane with status 0 (B12, 0x181dd6a11), so an
+        // empty answer here must be flagged Suspect rather than taken as a miss.
+        let near = Curve::line(Vec3::new(0.0, 0.0, 0.5e-8), ya)?;
+        let r = sec.intersect_curve_checked((-2.0, 2.0), &near, (-2.0, 2.0), &chk)?;
+        println!("    skew 0.5e-8: {} hit(s), empty {:?}", r.hits.len(), r.empty);
+        assert!(!r.hits.is_empty() || matches!(r.empty, Some(EmptyCheck::Suspect { .. })));
+
+        // Skew lines 1.5e-8 apart (fixture p1-icc-line-line-near-miss, P1 B15):
+        // the kernel returns nothing. Checked at a 2e-8 tolerance, the empty
+        // answer must come back Suspect with the true gap and closest points.
+        let gap = Curve::line(Vec3::new(0.0, 0.0, 1.5e-8), ya)?;
+        let wide = CurveCurveCheck { tolerance: Some(2e-8), ..Default::default() };
+        let r = sec.intersect_curve_checked((-2.0, 2.0), &gap, (-2.0, 2.0), &wide)?;
+        println!("    skew 1.5e-8 at tol 2e-8: {} hit(s), empty {:?}", r.hits.len(), r.empty);
+        if r.hits.is_empty() {
+            match r.empty {
+                Some(EmptyCheck::Suspect { min_distance, t1, t2, .. }) => {
+                    assert!((min_distance - 1.5e-8).abs() < 1e-12 && t1.abs() < 1e-6 && t2.abs() < 1e-6)
+                }
+                other => panic!("expected Suspect, got {other:?}"),
+            }
+        }
+    });
+
+    // PK_SURF_intersect_surf / PK_SURF_intersect_curve return nothing and no
+    // error for disjoint inputs, for contacts outside the search region and
+    // for coincident surfaces. The checked calls must tell these apart
+    // (parasolid-re artifacts/rs/20261016T203058Z-empty-check).
+    test!("ssi_checked_separated", {
+        let _s = Session::start(test_config())?;
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let a = Surf::sphere(Axis2::new(Vec3::new(0.0, 0.0, 0.0), z, x), 1.0)?;
+        let b = Surf::sphere(Axis2::new(Vec3::new(5.0, 0.0, 0.0), z, x), 1.0)?;
+        let r = a.intersect_with_checked(
+            &b,
+            &SurfIntersectOptions::default(),
+            &SurfSurfCheck::default(),
+        )?;
+        println!("\n    spheres 3 apart: {:?}", r.empty);
+        assert!(r.result.points.is_empty() && r.result.curves.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Separated { min_distance }) if (min_distance - 3.0).abs() < 1e-12)
+        );
+    });
+    test!("ssi_checked_outside_region", {
+        let _s = Session::start(test_config())?;
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let chk = SurfSurfCheck::default();
+        let none = SurfIntersectOptions::default();
+        let size = none.search_region()?;
+        assert!((size.min.x + 500.0).abs() < 1e-9 && (size.max.z - 500.0).abs() < 1e-9);
+
+        // p1-s2-cbwc-pla-sph-circle-far-x2000: the circle at x = 2000 is dropped (C467).
+        let pl = Surf::plane(Axis2::new(Vec3::new(2000.0, 0.0, 0.5), z, x))?;
+        let sp = Surf::sphere(Axis2::new(Vec3::new(2000.0, 0.0, 0.0), z, x), 1.0)?;
+        let r = pl.intersect_with_checked(&sp, &none, &chk)?;
+        println!("\n    far x2000: {:?}", r.empty);
+        assert!(r.result.curves.is_empty());
+        match r.empty {
+            Some(RangeCheck::OutsideRegion {
+                min_distance,
+                position,
+            }) => {
+                assert!(
+                    min_distance <= 1e-8
+                        && (position.x - 2000.0).abs() <= 1.0
+                        && (position.z - 0.5).abs() < 1e-9
+                )
+            }
+            other => panic!("expected OutsideRegion, got {other:?}"),
+        }
+
+        // At x = 700 the default box drops the circle; an option box ±1000
+        // replaces the size box (it is not intersected with it) and keeps it.
+        let pl = Surf::plane(Axis2::new(Vec3::new(700.0, 0.0, 0.5), z, x))?;
+        let sp = Surf::sphere(Axis2::new(Vec3::new(700.0, 0.0, 0.0), z, x), 1.0)?;
+        let r = pl.intersect_with_checked(&sp, &none, &chk)?;
+        assert!(matches!(r.empty, Some(RangeCheck::OutsideRegion { .. })));
+        let big = SurfIntersectOptions {
+            region: Some(Aabb {
+                min: Vec3::new(-1000.0, -1000.0, -1000.0),
+                max: Vec3::new(1000.0, 1000.0, 1000.0),
+            }),
+            ..Default::default()
+        };
+        assert_eq!(big.search_region()?.max.x, 1000.0);
+        let r = pl.intersect_with_checked(&sp, &big, &chk)?;
+        println!(
+            "    x700 with box ±1000: {} curve(s), empty {:?}",
+            r.result.curves.len(),
+            r.empty
+        );
+        assert_eq!(r.result.curves.len(), 1);
+        assert!(r.empty.is_none());
+        r.result.delete_curves()?;
+    });
+    test!("ssi_checked_size_box_follows_angle_precision", {
+        let s = Session::start(test_config().angle_precision(1e-10))?;
+        assert_eq!(s.angle_precision()?, 1e-10);
+        let region = SurfIntersectOptions::default().search_region()?;
+        println!("\n    A = 1e-10: region {:?}", region);
+        assert!((region.max.x - 50.0).abs() < 1e-9 && (region.min.y + 50.0).abs() < 1e-9);
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let pl = Surf::plane(Axis2::new(Vec3::new(100.0, 0.0, 0.5), z, x))?;
+        let sp = Surf::sphere(Axis2::new(Vec3::new(100.0, 0.0, 0.0), z, x), 1.0)?;
+        let r = pl.intersect_with_checked(
+            &sp,
+            &SurfIntersectOptions::default(),
+            &SurfSurfCheck::default(),
+        )?;
+        assert!(r.result.curves.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::OutsideRegion { position, .. }) if (position.x - 100.0).abs() <= 1.0)
+        );
+    });
+    // Coincident surfaces come back empty by design (C1): the check must say
+    // Coincident, with the sense, and must not call a pair just outside the
+    // C1 band coincident (fixtures p1-rq1-*).
+    test!("ssi_checked_coincident", {
+        let _s = Session::start(test_config())?;
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let y = Vec3::new(0.0, 1.0, 0.0);
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let s1 = Surf::plane(Axis2::new(Vec3::new(0.0, 0.0, 3.0), z, x))?;
+        let none = SurfIntersectOptions::default();
+        let chk = SurfSurfCheck::default();
+        let check = |o: Vec3, n: Vec3, r: Vec3| -> PsResult<(bool, Option<RangeCheck>)> {
+            let s2 = Surf::plane(Axis2::new(o, n, r))?;
+            let c = s1.intersect_with_checked(&s2, &none, &chk)?;
+            assert!(c.result.points.is_empty() && c.result.curves.is_empty());
+            Ok((s1.is_coincident(&s2)?, c.empty))
+        };
+
+        // Same plane, same normal.
+        let r = check(Vec3::new(0.0, 0.0, 3.0), z, x)?;
+        println!("\n    same: {r:?}");
+        assert_eq!(
+            r,
+            (
+                true,
+                Some(RangeCheck::Coincident {
+                    same_sense: Some(true)
+                })
+            )
+        );
+        // p1-rq1-pla-pla-antiparallel-coincident: opposite normal.
+        let r = check(Vec3::new(1.0, 2.0, 3.0), Vec3::new(0.0, 0.0, -1.0), x)?;
+        println!("    anti-parallel: {r:?}");
+        assert_eq!(
+            r,
+            (
+                true,
+                Some(RangeCheck::Coincident {
+                    same_sense: Some(false)
+                })
+            )
+        );
+        // Tilt 0.5A, offset 0.4L: 0.9L, inside the band.
+        let r = check(
+            Vec3::new(0.0, 0.0, 3.0 + 4e-9),
+            Vec3::new(5e-12, 0.0, 1.0),
+            y,
+        )?;
+        println!("    tilt 0.5A offset 0.4L: {r:?}");
+        assert_eq!(
+            r,
+            (
+                true,
+                Some(RangeCheck::Coincident {
+                    same_sense: Some(true)
+                })
+            )
+        );
+
+        // p1-rq1-pla-pla-tilt0p5A-offset0p6L: 1.1L, just outside the band. The
+        // kernel treats it as parallel and disjoint (C11), yet the planes are
+        // within L everywhere in the size box: Suspect, not Coincident.
+        let r = check(
+            Vec3::new(0.0, 0.0, 3.0 + 6e-9),
+            Vec3::new(5e-12, 0.0, 1.0),
+            y,
+        )?;
+        println!("    tilt 0.5A offset 0.6L: {r:?}");
+        assert!(!r.0);
+        match r.1 {
+            Some(RangeCheck::Suspect {
+                min_distance,
+                position,
+                ..
+            }) => {
+                assert!(
+                    min_distance <= 1e-8 && position.x.abs() <= 500.0 && position.y.abs() <= 500.0
+                )
+            }
+            other => panic!("expected Suspect, got {other:?}"),
+        }
+        // p1-rq1-pla-pla-antiparallel-offset-1p1L: outside the band and 1.1L apart.
+        let r = check(
+            Vec3::new(1.0, 2.0, 3.0 + 1.1e-8),
+            Vec3::new(0.0, 0.0, -1.0),
+            x,
+        )?;
+        println!("    anti-parallel offset 1.1L: {r:?}");
+        assert!(!r.0);
+        assert!(
+            matches!(r.1, Some(RangeCheck::Separated { min_distance }) if (min_distance - 1.1e-8).abs() < 1e-14)
+        );
+    });
+    test!("ssi_checked_uvbox_bound", {
+        let _s = Session::start(test_config())?;
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        let a = Surf::plane(Axis2::new(
+            o,
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let b = Surf::plane(Axis2::new(
+            o,
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ))?;
+        // The patch u in [10, 20] of z = 0 (u = x) misses the plane x = 0 by 10.
+        let opts = SurfIntersectOptions {
+            uvbox_1: Some(UvBox {
+                u_min: 10.0,
+                v_min: -1.0,
+                u_max: 20.0,
+                v_max: 1.0,
+            }),
+            ..Default::default()
+        };
+        let r = a.intersect_with_checked(&b, &opts, &SurfSurfCheck::default())?;
+        println!("\n    patch 10 from x = 0: {:?}", r.empty);
+        assert!(r.result.curves.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Separated { min_distance }) if (min_distance - 10.0).abs() < 1e-12)
+        );
+    });
+    test!("surf_curve_checked_empty", {
+        let _s = Session::start(test_config())?;
+        let o = Vec3::new(0.0, 0.0, 0.0);
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let x = Vec3::new(1.0, 0.0, 0.0);
+        let chk = SurfCurveCheck::default();
+        let sp = Surf::sphere(Axis2::new(o, z, x), 1.0)?;
+
+        // Line 1e-6 off the sphere: a genuine miss.
+        let miss = Curve::line(Vec3::new(-2.0, 1.0 + 1e-6, 0.0), x)?;
+        let r = sp.intersect_curve_checked(&miss, (0.0, 4.0), &chk)?;
+        println!("\n    miss 1e-6: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        assert!(
+            matches!(r.empty, Some(RangeCheck::Separated { min_distance }) if (min_distance - 1e-6).abs() < 1e-12)
+        );
+
+        // A line crossing z = 0 at x = 2000, outside the size box: the kernel
+        // returns nothing and no error.
+        let pl = Surf::plane(Axis2::new(o, z, x))?;
+        let far = Curve::line(Vec3::new(2000.0, 0.0, 5.0), z)?;
+        let r = pl.intersect_curve_checked(&far, (-10.0, 10.0), &chk)?;
+        println!("    crossing at x = 2000: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        match r.empty {
+            Some(RangeCheck::OutsideRegion {
+                min_distance,
+                position,
+            }) => {
+                assert!(
+                    min_distance == 0.0
+                        && (position.x - 2000.0).abs() < 1e-9
+                        && position.z.abs() < 1e-9
+                )
+            }
+            other => panic!("expected OutsideRegion, got {other:?}"),
+        }
+
+        // Touching within L (0.5e-8): the kernel reports the hit, so there is
+        // nothing to check. No surf/curve touch within L that comes back empty
+        // was found (sphere/line, plane/circle, cylinder/line; 0.5e-8 and 0.9e-8).
+        let touch = Curve::line(Vec3::new(-2.0, 1.0 + 0.5e-8, 0.0), x)?;
+        let r = sp.intersect_curve_checked(&touch, (0.0, 4.0), &chk)?;
+        assert_eq!(r.hits.len(), 1);
+        assert!(r.empty.is_none());
+    });
+
+    // PK_SURF_intersect_curve drops a hit whose curve point lies more than
+    // max(1e-7, L) outside the size box on some axis, tested as
+    // (p - hi) > tol (parasolid-re P1 C478, fixtures p1-o1-*; artifacts
+    // rs/20261016T224413Z-margin). Plane z = 0, line along z through (X, 0, 0).
+    fn o1_plane_line(x_bits: u64) -> PsResult<(Surf, Curve)> {
+        let z = Vec3::new(0.0, 0.0, 1.0);
+        let pl = Surf::plane(Axis2::new(Vec3::zero(), z, Vec3::new(1.0, 0.0, 0.0)))?;
+        let line = Curve::line(Vec3::new(f64::from_bits(x_bits), 0.0, 0.0), z)?;
+        Ok((pl, line))
+    }
+    test!("surf_curve_checked_size_box_margin", {
+        let _s = Session::start(test_config())?;
+        let h = SurfIntersectOptions::default().search_region()?.max.x;
+        assert_eq!(h.to_bits(), 0x407f400000000001);
+        let iv = (-10.0, 10.0);
+        let chk = SurfCurveCheck::default();
+
+        // Beyond the box by 5e-8 and by 9.999996564e-8 (the last kept double),
+        // both in (L, 1e-7]: the kernel keeps the hit.
+        // p1-o1-pla-line-xhi-p0p5T, p1-o1-pla-line-xhi-edge-keep.
+        for bits in [0x407f4000000d6bfa, 0x407f4000001ad7f3] {
+            let (pl, line) = o1_plane_line(bits)?;
+            let r = pl.intersect_curve_checked(&line, iv, &chk)?;
+            assert_eq!(
+                r.hits.len(),
+                1,
+                "x {:e} beyond: {r:?}",
+                f64::from_bits(bits) - h
+            );
+            assert_eq!(r.hits[0].position.x.to_bits(), bits);
+            assert!(r.empty.is_none());
+        }
+
+        // The next double, 1.00000022e-7 beyond: dropped, and the witness is
+        // outside the region at the default margin 1e-7. Forming hi + 1e-7
+        // would round up past X and call it inside (Suspect).
+        // p1-o1-pla-line-xhi-edge-next-drop.
+        let (pl, line) = o1_plane_line(0x407f4000001ad7f4)?;
+        println!();
+        for c in [
+            chk,
+            SurfCurveCheck {
+                region_margin: Some(1e-7),
+                ..chk
+            },
+        ] {
+            let r = pl.intersect_curve_checked(&line, iv, &c)?;
+            println!("    next-drop, margin {:?}: {:?}", c.region_margin, r.empty);
+            assert!(r.hits.is_empty());
+            match r.empty {
+                Some(RangeCheck::OutsideRegion {
+                    min_distance,
+                    position,
+                }) => assert!(min_distance == 0.0 && position.x.to_bits() == 0x407f4000001ad7f4),
+                other => panic!("expected OutsideRegion, got {other:?}"),
+            }
+        }
+
+        // 2e-7 beyond: dropped, outside the region. p1-o1-pla-line-xhi-p2T.
+        let (pl, line) = o1_plane_line(0x407f40000035afe6)?;
+        let r = pl.intersect_curve_checked(&line, iv, &chk)?;
+        assert!(r.hits.is_empty());
+        assert!(matches!(r.empty, Some(RangeCheck::OutsideRegion { .. })));
+    });
+    test!("surf_curve_checked_tolerance_in_margin_band", {
+        // A line 5e-7 (50 L) beside the sphere of p1-o1-sph-line-xhi-p0p5T,
+        // whose near point is 5e-8 beyond the box. No hit at L; with the check
+        // tolerance 1e-6 they meet at a point where the kernel would have kept
+        // a hit, so the empty answer is not a region drop: Suspect (a
+        // tolerance disagreement). A margin of L called it OutsideRegion.
+        let _s = Session::start(test_config())?;
+        let iv = (-10.0, 10.0);
+        let chk = SurfCurveCheck::default();
+        let sp = Surf::sphere(
+            Axis2::new(
+                Vec3::new(f64::from_bits(0x407f5000000d6bfa), 0.0, 0.0),
+                Vec3::new(0.0, 0.0, 1.0),
+                Vec3::new(1.0, 0.0, 0.0),
+            ),
+            1.0,
+        )?;
+        let near = f64::from_bits(0x407f5000000d6bfa) - 1.0;
+        let beside = Curve::line(Vec3::new(near - 5e-7, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0))?;
+        let wide = SurfCurveCheck {
+            tolerance: Some(1e-6),
+            ..chk
+        };
+        let r = sp.intersect_curve_checked(&beside, iv, &wide)?;
+        println!("\n    sphere 5e-7 aside, tolerance 1e-6: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        match r.empty {
+            Some(RangeCheck::Suspect {
+                min_distance,
+                position,
+                ..
+            }) => assert!(
+                (min_distance - 5e-7).abs() < 1e-12 && (position.x - near).abs() < 1e-9,
+                "{min_distance:e} at {position:?}"
+            ),
+            other => panic!("expected Suspect, got {other:?}"),
+        }
+    });
+    test!("surf_curve_checked_size_box_margin_follows_l", {
+        // At L = 1e-6 (h = 50000) the margin is L, not 1e-7.
+        let _s = Session::start(test_config().precision(1e-6))?;
+        let h = SurfIntersectOptions::default().search_region()?.max.x;
+        assert_eq!(h, 50000.0);
+        let iv = (-10.0, 10.0);
+        let chk = SurfCurveCheck::default();
+
+        // 5e-7 beyond: kept (a fixed 1e-7 would drop it).
+        // p1-o1-pla-line-xhi-p0p5T-L1e-6.
+        let (pl, line) = o1_plane_line(0x40e86a0000010c6f)?;
+        let r = pl.intersect_curve_checked(&line, iv, &chk)?;
+        assert_eq!(r.hits.len(), 1, "{r:?}");
+        assert!(r.empty.is_none());
+
+        // The first dropped double, 1.0000003e-6 beyond: outside the region.
+        // hi + L rounds up past X, so the widened-box form called it Suspect.
+        // p1-o1-pla-line-xhi-edge-next-drop-L1e-6.
+        let (pl, line) = o1_plane_line(0x40e86a00000218df)?;
+        let r = pl.intersect_curve_checked(&line, iv, &chk)?;
+        println!("\n    L 1e-6 next-drop: {:?}", r.empty);
+        assert!(r.hits.is_empty());
+        match r.empty {
+            Some(RangeCheck::OutsideRegion { position, .. }) => {
+                assert_eq!(position.x.to_bits(), 0x40e86a00000218df)
+            }
+            other => panic!("expected OutsideRegion, got {other:?}"),
+        }
+    });
+
+    // =========================================================================
+    // P1 budgets: a runaway PK call returns BudgetExceeded (parasolid-re B23)
+    // =========================================================================
+
+    // p1-r8-c27-pla-cyl-fp-a-r2e-6-{p1p5L,m1p5L,p3L} (bit-exact): plane z = 0
+    // against a cylinder of radius ~2e-6 whose axis is tilted 3e-8 out of the
+    // plane. PK_SURF_intersect_surf never returns and grows memory at about
+    // 70 MB/s (B23). Only the radius differs between the three fixtures.
+    const B23_P1P5L: u64 = 0x3ec0e72df709365f;
+    const B23_M1P5L: u64 = 0x3ec0a6c14a62a4bb;
+    const B23_P3L: u64 = 0x3ec107644d5c7f32;
+    const MB: usize = 1024 * 1024;
+    fn b23_pair(radius_bits: u64) -> PsResult<(Surf, Surf)> {
+        let plane = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let axis = Vec3::new(
+            f64::from_bits(0x3feffffffffffffc),
+            0.0,
+            f64::from_bits(0x3e601b2b29a4692b),
+        );
+        let cyl = Surf::cylinder(
+            Axis2::new(Vec3::zero(), axis, Vec3::new(0.0, 1.0, 0.0)),
+            f64::from_bits(radius_bits),
+        )?;
+        Ok((plane, cyl))
+    }
+    /// Plane/plane: z = 0 against x = 0 meets in one line.
+    fn plane_plane_lines() -> PsResult<usize> {
+        let a = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let b = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ))?;
+        Ok(a.intersect_with(&b, &SurfIntersectOptions::default())?
+            .curves
+            .len())
+    }
+    fn b23_time(radius_bits: u64) -> Result<(), Box<dyn std::error::Error>> {
+        let session = Session::start(test_config())?;
+        let (p, c) = b23_pair(radius_bits)?;
+        let before = session.budget_stats();
+        let r = session.with_budget(Budget::time(std::time::Duration::from_secs(3)), || {
+            p.intersect_with(&c, &SurfIntersectOptions::default())
+        });
+        let after = session.budget_stats();
+        match r.map(|_| ()) {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Time,
+                pk_code,
+                elapsed,
+                live_bytes,
+            }) => {
+                println!(
+                    "\n    pk_code {pk_code}, elapsed {:.3} s, live at abort {:.1} MB, live after {:.2} MB (entry {:.2} MB), aborts landed {} missed {}, drains {}",
+                    elapsed.as_secs_f64(),
+                    live_bytes as f64 / MB as f64,
+                    after.live_bytes as f64 / MB as f64,
+                    before.live_bytes as f64 / MB as f64,
+                    after.aborts_landed - before.aborts_landed,
+                    after.aborts_missed - before.aborts_missed,
+                    after.drains - before.drains,
+                );
+                assert!(pk_code == PK_ERROR_aborted || pk_code == PK_ERROR_system_error);
+                assert!(elapsed.as_secs_f64() >= 3.0 && elapsed.as_secs_f64() < 10.0);
+                assert!(
+                    live_bytes > before.live_bytes + 50 * MB,
+                    "the march was growing"
+                );
+            }
+            other => panic!("expected BudgetExceeded{{Time}}, got {other:?}"),
+        }
+        assert_eq!(after.aborts_landed - before.aborts_landed, 1);
+        // The kernel released the march's memory and the session still works.
+        assert!(
+            after.live_bytes <= before.live_bytes + 4 * MB,
+            "live bytes {} after vs {} at entry",
+            after.live_bytes,
+            before.live_bytes
+        );
+        assert_eq!(plane_plane_lines()?, 1);
+        Ok(())
+    }
+
+    test!("budget_time_b23_p1p5L", { b23_time(B23_P1P5L)? });
+    test!("budget_time_b23_m1p5L", { b23_time(B23_M1P5L)? });
+    test!("budget_time_b23_p3L", { b23_time(B23_P3L)? });
+
+    test!("budget_memory_b23", {
+        let session = Session::start(test_config())?;
+        let (p, c) = b23_pair(B23_P1P5L)?;
+        let before = session.budget_stats();
+        let r = session.with_budget(Budget::memory(200 * MB), || {
+            p.intersect_with(&c, &SurfIntersectOptions::default())
+        });
+        let after = session.budget_stats();
+        match r.map(|_| ()) {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Memory,
+                pk_code,
+                elapsed,
+                live_bytes,
+            }) => {
+                println!(
+                    "\n    pk_code {pk_code}, elapsed {:.3} s, live at refusal entry+{:.3} MB, refusals {}, live after {:.2} MB (entry {:.2} MB)",
+                    elapsed.as_secs_f64(),
+                    live_bytes.saturating_sub(before.live_bytes) as f64 / MB as f64,
+                    after.refusals - before.refusals,
+                    after.live_bytes as f64 / MB as f64,
+                    before.live_bytes as f64 / MB as f64,
+                );
+                assert_eq!(pk_code, PK_ERROR_memory_full);
+                assert!(live_bytes <= before.live_bytes + 200 * MB);
+                assert!(live_bytes + MB > before.live_bytes + 200 * MB);
+            }
+            other => panic!("expected BudgetExceeded{{Memory}}, got {other:?}"),
+        }
+        assert!(after.refusals > before.refusals);
+        assert!(after.live_bytes <= before.live_bytes + 4 * MB);
+        assert_eq!(plane_plane_lines()?, 1);
+    });
+
+    test!("budget_fast_call", {
+        let session = Session::start(test_config())?;
+        let before = session.budget_stats();
+        let budget = Budget::time(std::time::Duration::from_secs(3)).with_memory(200 * MB);
+        let n = session.with_budget(budget, plane_plane_lines)?;
+        assert_eq!(n, 1);
+        // Nested scopes are refused, not silently merged.
+        let nested = session.with_budget(budget, || session.with_budget(budget, plane_plane_lines));
+        assert!(matches!(nested, Err(PsError::Session(_))), "{nested:?}");
+        let after = session.budget_stats();
+        assert_eq!(after.aborts_landed, before.aborts_landed);
+        assert_eq!(after.drains, before.drains);
+        // No stray abort on the next, unbudgeted calls.
+        for _ in 0..5 {
+            assert_eq!(plane_plane_lines()?, 1);
+        }
+    });
+
+    // The stale-flag hazard (B23 stage `stale`): an abort that lands in a
+    // call that never reaches a poll point stays pending and would abort the
+    // next allocating call. Stale-tag calls fail argument checking without
+    // allocating, so the 5 ms watchdog lands in one of them; the guard must
+    // drain the flag at once.
+    test!("budget_drain_stale_flag", {
+        let session = Session::start(test_config())?;
+        let x = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(1.0, 0.0, 0.0),
+            Vec3::new(0.0, 1.0, 0.0),
+        ))?;
+        let stale = Surf::plane(Axis2::new(
+            Vec3::zero(),
+            Vec3::new(0.0, 0.0, 1.0),
+            Vec3::new(1.0, 0.0, 0.0),
+        ))?;
+        let tag = stale.tag();
+        assert_eq!(unsafe { PK_ENTITY_delete(1, &tag) }, PK_ERROR_no_errors);
+        let before = session.budget_stats();
+        let mut n_failed = 0u64;
+        let r = session.with_budget(Budget::time(std::time::Duration::from_millis(5)), || {
+            let t = std::time::Instant::now();
+            while t.elapsed() < std::time::Duration::from_secs(5) {
+                match stale.intersect_with(&x, &SurfIntersectOptions::default()) {
+                    Err(PsError::NotAnEntity { .. }) => n_failed += 1,
+                    Err(e) => return Err(e),
+                    Ok(_) => panic!("intersection with a deleted plane succeeded"),
+                }
+            }
+            Ok(())
+        });
+        let after = session.budget_stats();
+        println!(
+            "\n    {n_failed} failing calls; result {r:?}; aborts landed {} missed {}; drains {}, flags drained {}",
+            after.aborts_landed - before.aborts_landed,
+            after.aborts_missed - before.aborts_missed,
+            after.drains - before.drains,
+            after.drained_flags - before.drained_flags,
+        );
+        match r {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Time,
+                pk_code,
+                ..
+            }) => assert!(pk_code == PK_ERROR_not_an_entity || pk_code == PK_ERROR_aborted),
+            other => panic!("expected BudgetExceeded{{Time}}, got {other:?}"),
+        }
+        assert_eq!(after.aborts_landed - before.aborts_landed, 1);
+        // The next allocating calls see no stale abort.
+        for _ in 0..3 {
+            assert_eq!(plane_plane_lines()?, 1);
+        }
+    });
+
+    test!("budget_default_covers_runaway", {
+        let three = Budget::time(std::time::Duration::from_secs(3));
+        let session = Session::start(test_config().default_budget(three))?;
+        assert_eq!(session.default_budget(), Some(three));
+        // Ordinary calls under the per-call default budget are unaffected.
+        let before = session.budget_stats();
+        for _ in 0..200 {
+            assert_eq!(plane_plane_lines()?, 1);
+        }
+        assert_eq!(session.budget_stats().aborts_landed, before.aborts_landed);
+        // A plain wrapper call, no with_budget: the default budget stops it.
+        let (p, c) = b23_pair(B23_P1P5L)?;
+        match p
+            .intersect_with(&c, &SurfIntersectOptions::default())
+            .map(|_| ())
+        {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Time,
+                pk_code,
+                elapsed,
+                live_bytes,
+            }) => {
+                println!(
+                    "\n    pk_code {pk_code}, elapsed {:.3} s, live at abort {:.1} MB",
+                    elapsed.as_secs_f64(),
+                    live_bytes as f64 / MB as f64
+                );
+                assert!(pk_code == PK_ERROR_aborted || pk_code == PK_ERROR_system_error);
+            }
+            other => panic!("expected BudgetExceeded{{Time}}, got {other:?}"),
+        }
+        assert_eq!(plane_plane_lines()?, 1);
+        session.set_default_budget(None);
+        assert_eq!(session.default_budget(), None);
+    });
+
+    test!("budget_rollback_session", {
+        let session = Session::start(test_config().rollback(true))?;
+        let part = session.current_partition()?;
+        let (p, c) = b23_pair(B23_P1P5L)?;
+        let n_bodies = part.bodies()?.len();
+        let r = session.with_budget(Budget::time(std::time::Duration::from_secs(3)), || {
+            let _block = Body::create_solid_block(1.0, 1.0, 1.0)?;
+            assert_eq!(part.bodies()?.len(), n_bodies + 1);
+            p.intersect_with(&c, &SurfIntersectOptions::default())
+        });
+        match r.map(|_| ()) {
+            Err(PsError::BudgetExceeded {
+                kind: BudgetKind::Time,
+                pk_code,
+                ..
+            }) => println!("\n    pk_code {pk_code}"),
+            other => panic!("expected BudgetExceeded{{Time}}, got {other:?}"),
+        }
+        // Rolled back to the pmark taken on entry: the block is gone.
+        assert_eq!(part.bodies()?.len(), n_bodies);
+        assert_eq!(plane_plane_lines()?, 1);
+    });
 
     // =========================================================================
     // CADabra oracle wrappers 2026-10-16 — see oracle_wrappers.rs
@@ -7252,8 +8139,8 @@ fn main() {
     test!("section_with_sheet_halves_block", {
         oracle_wrappers::section_with_sheet_halves_block()?;
     });
-    test!("boolean_v11_options_are_live", {
-        oracle_wrappers::boolean_v11_options_are_live()?;
+    test!("boolean_v19_options_are_live", {
+        oracle_wrappers::boolean_v19_options_are_live()?;
     });
     test!("xt_transmit_receive_latest_versions", {
         oracle_wrappers::xt_transmit_receive_latest_versions()?;

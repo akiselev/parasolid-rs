@@ -2,7 +2,7 @@
 //! the parasolid-re ABI audit): topology construction and attachment, tolerant
 //! edges, SP-curves, nominal curves, compound bodies, journalling, the
 //! Boolean-stage oracles (face sets, face Boolean, section with sheet), the
-//! v11 `PK_BODY_boolean_o_t`, and XT transmit/receive at the current option
+//! v19 `PK_BODY_boolean_o_t`, and XT transmit/receive at the current option
 //! versions. Fixtures mirror parasolid-re `runner/src/construct.rs`,
 //! `pkcheck.rs` and `stages*.rs`.
 
@@ -436,12 +436,12 @@ pub fn section_with_sheet_halves_block() -> R {
     Ok(())
 }
 
-/// `PK_BODY_boolean_o_t` v11 (96 B): a non-zero `default_tol` works (with the
+/// `PK_BODY_boolean_o_t` v19 (168 B): a non-zero `default_tol` works (with the
 /// old 32-byte struct it was read as the `matched_region` pointer and crashed
 /// the kernel), and the late fields are live — a non-logical in
-/// `allow_disjoint` (@32) and a non-token in `nm_edge_repair` (@84) are
+/// `allow_disjoint` (@40) and a non-token in `nm_edge_repair` (@92) are
 /// refused.
-pub fn boolean_v11_options_are_live() -> R {
+pub fn boolean_v19_options_are_live() -> R {
     let _s = Session::start(cfg())?;
     let run = |o: &PK_BODY_boolean_o_t| -> (i32, i32, Vec<i32>) {
         let (a, b) = blind_hole().unwrap();
@@ -458,7 +458,7 @@ pub fn boolean_v11_options_are_live() -> R {
         (rc, res, bodies)
     };
     let base = PK_BODY_boolean_o_t { function: PK_boolean_subtract_c, ..Default::default() };
-    assert_eq!(base.o_t_version, 11);
+    assert_eq!(base.o_t_version, 19);
     let o = PK_BODY_boolean_o_t { default_tol: 1e-6, ..base };
     let (rc, res, bodies) = run(&o);
     assert_eq!((rc, res), (0, PK_boolean_result_success_c));

@@ -563,46 +563,40 @@ Two audits now come back clean against `parasolid-re/catalog/pk-clean-prototypes
   `imprint_circle_splits_face` (circle on a block's top face → 6→7 faces, volume
   preserved, body still valid).
 
-### Faceting (`PK_TOPOL_facet_2`) — WORKING + validated (topology totals)
+### Faceting (`PK_TOPOL_facet_2`) — WORKING at option version 26 (2026-10-16)
 
-The two option sub-structs were **wrong** and had never been runtime-exercised,
-so the bugs survived: `PK_TOPOL_facet_mesh_2_o_t` was missing the leading
-`o_t_version` (shifting every field by 4 B) and diverged in field order;
-`PK_TOPOL_facet_choice_2_o_t` was missing `o_t_version` **and all 23
-table-selection flags**. Both were rebuilt to the authoritative RE-catalog field
-order (`pk-option-structs.tsv`) and are locked by compile-time `offset_of!`
-assertions in `facet.rs` (mesh = 384 B, choice = 144 B on x64; the catalog's
-absolute offsets model 32-bit pointers for the choice struct's two pointer
-fields, so field *order* is trusted and `#[repr(C)]` computes the x64 offsets).
+History: the first rebuild (catalog field order, 384 B / 72 B structs) only got
+`o_t_version` 5 accepted, whose prefix has no table flags, so `Mesh.vertices`
+was always empty; versions 6+ answered 5014 because the struct was wrong past
+the version-5 prefix, not because the kernel lacked them. parasolid-re blocker
+**B-P3-1** (`port/P3-faceting/PACKET.md` §1, C20) recovered the current layout:
 
-`Body::facet` now tessellates: a solid block returns **12 facets / 36 fins** with
-`check_arguments` on (test `facet_block_triangles`). Getting there required
-recovering the option handshake empirically under Wine:
+- **Version 26** for both sub-structs (27 → 5022). Mesh options 0x198 B, choice
+  0x50 B; the top-level struct is still inline `{control, choice}` (0x1e8 B).
+- Field names from the kernel's journal printers (`FUN_1814cb3c0` mesh,
+  `FUN_180446140` choice, `FUN_180446b60` tables); offsets from the converters
+  `FUN_1814cedb0` / `FUN_180457f70` and the validator `FUN_180445dc0`; defaults
+  from the NULL-options migration `FUN_180447e00`. V37 adds six mesh fields
+  (`output_scale_factor`, `facet_frames`, `is_lattice_tol`, `lattice_tol`,
+  `is_boundary_guise`, `boundary_guise`); in choice, `split_strips` is a token,
+  and `facet_topol` / `strip_topol` follow `facet_face` / `strip_face`. The 25
+  table flags are one byte each at choice +0x30..+0x48.
+- **Result ABI:** `PK_TOPOL_facet_2_r_t` is 24 B `{n_facets, n_strips, n_fins,
+  n_tables, tables*}`; each entry is 16 B `{fctab, table*}` and each table
+  `{data*, int length}` with `length` in records (`return_tables_2`
+  @0x180458940). The old by-value all-tables struct was fictional.
+- `Body::facet_with` / `Face::facet_with` return points, triangles, facet→face,
+  per-edge polylines over the shared point table, the `error_object` rows and
+  the tolerances after defaulting. Tests: `facet_v26_layout`,
+  `facet_block_tables`, `facet_cylinder_default_16_chords`,
+  `facet_chord_angle_band`, `facet_boundary_fins_on_edge_polylines`.
 
-- **Error 5022 = `PK_ERROR_o_t_version_unknown`** (the same code the mass-props
-  war story confirmed). The kernel accepts facet option **`o_t_version` = 5**:
-  1..4 → 5022, 6+ → 5014 (`field_of_wrong_type`).
-- The **top-level `PK_TOPOL_facet_2_o_t` is inline** `{control, choice}` (a
-  pointer-based top-level returns 5022 — the kernel reads `o_t_version` from what
-  would be the pointer's bytes). This matches the reference-manual dot-access.
-- At version 5 the **control layout matches the catalog only through
-  `wire_edges`**; the `incremental_*` and later fields must be left **zero**
-  (setting them to their v-latest enum tokens returns **908**, "bad option
-  data"). `max_facet_sides` must be ≥ 3 (0 → error 33). Documented defaults from
-  ch105: shape=convex 20502, match=topol 20522, density=no_view 20540,
-  cull=none 20560, ignore=no 22111, ignore_scope=global 22131,
-  wire_edges=no 22140.
-
-**Remaining gap — tabular vertex tables.** The `choice` table-selection flags
-(`point_vec`, `data_point_idx`, …) do not take effect at option version 5
-(`n_tables = 0` even with every flag set, and sweeping the inline `choice`
-offset finds no position that populates a table) — the rich tabular output
-belongs to a **newer option version** whose full struct layout the current
-catalog does not perfectly capture (version 6+ trips 5014). So `Mesh.vertices`
-is currently empty while `n_facets` / `n_strips` / `n_fins` are validated.
-**Next step:** obtain the exact V37 `PK_TOPOL_facet_mesh_2_o_t` /
-`PK_TOPOL_facet_choice_2_o_t` layouts (headers or a decompile of
-`PK_TOPOL_facet_2_o_m`) to enable the point/normal tables.
+Residual risk: the effective tolerances (`Mesh::tolerances`) are computed by the
+recovered rule (0.4 rad defaults per group dynamic-observed; precision floors
+and the chord-max cutoff static only), not read back. The `error_object` error
+values, the incremental/`facet_frames`/`boundary_guise` token names and the
+facet-tables callback are unprobed. Strips, normals, parameters and derivatives
+are bound in `-sys` but not wrapped.
 
 ## High-level API coverage sweep + by-value aggregate ABI (2026-07-15)
 
@@ -1849,3 +1843,44 @@ unchanged, with no error, for a pure translation of magnitude <= 1e-8 (session
 precision) or a rotation of angle <= 1e-11 rad (angular precision); 2e-8 and
 1e-9 rad are applied. Never sweep a small transform around a zero nominal. Use a
 large lever (move by `L + kT`, then by `-L`) or perturb a primitive dimension.
+
+## Budgets for runaway PK calls (parasolid-re B23, 2026-10-16)
+
+`Session::with_budget(Budget { time, memory_bytes }, f)` and a session-wide
+default (`Session::set_default_budget`, `SessionConfig::default_budget`) turn a
+call that never returns into `PsError::BudgetExceeded { kind, pk_code, elapsed,
+live_bytes }`. Time: a parked watchdog thread calls
+`PK_SESSION_abort(PK_abort_user_interrupt_c)`; the kernel services the flag at
+its next DS-allocator poll and returns 945 (rarely 900). Memory: the default
+`FMALLO` counts live bytes and refuses with `FR_memory_full`, giving 901. Wine
+tests `budget_*` (B23 fixtures p1p5L/m1p5L/p3L: 945 about 3.1 s in, memory back
+to the pre-call level; 901 at entry + 200 MB; the rollback session is rolled
+back to its entry pmark).
+
+Residual risk:
+- A kernel loop that never allocates never polls, so it cannot be interrupted.
+  Keep a process timeout or cgroup as the backstop.
+- An abort that lands after a call's last poll leaves the flag set, and the next
+  allocating call would fail with 945. The guard drains it with a sacrificial
+  `PK_PLANE_create`. If a *lightweight* PK function (one with no ERR frame)
+  ever picked up the flag, `ERR__vreport` would call `exit(1)` (static-observed
+  in B23, never triggered).
+- The per-call default budget covers `pk_call!` sites plus `PK_BODY_boolean_2`,
+  `PK_BODY_imprint_body` and `PK_TOPOL_facet_2`; other raw calls are covered
+  only inside `with_budget`. Single-threaded sessions only; SMP is untested.
+
+### `PK_EDGE_ask_type` writes a 12-byte struct
+
+`PK_EDGE_ask_type` returns `PK_EDGE_ask_type_t { vertex_type, enclosure,
+fins_type }` (V35 header), not one token. The old 4-byte out-argument let the
+kernel overwrite 8 bytes of the caller's stack. Debug builds survived by
+layout luck; the release harness page-faulted in `spine_type_queries_block`
+(the clobbered saved `rsi` read `0x00000E76_00001647` = normal 3702, on 5703).
+
+### Open: `PK_PARTITION_create` returns 5022 in release builds only
+
+`partition_bodies_and_geoms` fails with `PK_ERROR_o_t_version_unknown` in the
+release profile and passes in dev, at 80d08ff and before. The release code
+stores `o_t_version = 1` and the one-byte logical, leaving three padding bytes
+of the 8-byte `PK_PARTITION_create_o_t` uninitialised. The real option layout
+is unverified; run the option-version sweep on it.

@@ -500,6 +500,33 @@ impl Surf {
     /// its parameter bounds and raw `PK_intersect_curve_t` kind). Fully
     /// coincident surfaces yield no intersection data.
     pub fn intersect(&self, other: &Surf) -> PsResult<SurfIntersection> {
+        self.intersect_with(other, &SurfIntersectOptions::default())
+    }
+
+    /// [`Surf::intersect`] restricted to a region of interest (`PK_SURF_intersect_surf`
+    /// with `have_box` / `have_uvbox_1` / `have_uvbox_2`).
+    ///
+    /// The uv boxes are **not parametric trims**. The kernel converts each one to the
+    /// model-space box of that surface patch (`QSU_reg_box`) and intersects it with
+    /// [`SurfIntersectOptions::region`] and both surfaces' own boxes (static-observed,
+    /// `intersect_surf` @0x180418fa0). Measured on 37.01.243 (parasolid-test
+    /// `ssi_region_of_interest`; parasolid-re `probe-h-uvbox`):
+    /// - a merged box that misses the intersection gives no curves and no error;
+    /// - open curves (lines, marched curves) are trimmed to the box: a plane/plane line
+    ///   comes back with bounds equal to the patch's extent;
+    /// - a closed analytic curve (circle, ellipse) that meets the box comes back **whole**,
+    ///   and one entirely outside it is dropped;
+    /// - a `region` that does not overlap a uv box's patch is rejected with
+    ///   `PK_ERROR_bad_option_data` (907).
+    ///
+    /// Known residual: one marched cone/plane hyperbola ran past a thin box's face
+    /// (to about 2.8 beyond it) instead of stopping there. Treat the trim as a region
+    /// hint, not an exact clip, for marched curves.
+    pub fn intersect_with(
+        &self,
+        other: &Surf,
+        options: &SurfIntersectOptions,
+    ) -> PsResult<SurfIntersection> {
         // 192-byte layout, offsets confirmed against the decompile of
         // PK_SURF_intersect_surf (o_t_version@0, have_box@4, box@8,
         // have_uvbox_1@56, uvbox_1@64, have_uvbox_2@96, uvbox_2@104,
@@ -523,6 +550,24 @@ impl Surf {
         let mut opts: PK_SURF_intersect_surf_o_t = unsafe { std::mem::zeroed() };
         opts.o_t_version = 2;
         opts.mixed_curve_category = PK_mixed_intersection_classic_c;
+        if let Some(b) = options.region {
+            opts.have_box = PK_LOGICAL_true;
+            opts.r#box = PK_BOX_t {
+                coord: [b.min.x, b.min.y, b.min.z, b.max.x, b.max.y, b.max.z],
+            };
+        }
+        if let Some(b) = options.uvbox_1 {
+            opts.have_uvbox_1 = PK_LOGICAL_true;
+            opts.uvbox_1 = PK_UVBOX_t {
+                param: [b.u_min, b.v_min, b.u_max, b.v_max],
+            };
+        }
+        if let Some(b) = options.uvbox_2 {
+            opts.have_uvbox_2 = PK_LOGICAL_true;
+            opts.uvbox_2 = PK_UVBOX_t {
+                param: [b.u_min, b.v_min, b.u_max, b.v_max],
+            };
+        }
         let mut n_vectors: c_int = 0;
         let mut vectors = std::ptr::null_mut();
         let mut n_curves: c_int = 0;
@@ -570,6 +615,23 @@ pub enum IntersectionKind {
     Other(i32),
 }
 
+/// Region of interest for [`Surf::intersect_with`]. `None` fields are unset.
+///
+/// `vector` and `tolerance` from `PK_SURF_intersect_surf_o_t` are deliberately not
+/// exposed: their effect has not been measured.
+#[derive(Debug, Clone, Copy, Default, PartialEq)]
+pub struct SurfIntersectOptions {
+    /// Model-space box of interest (`have_box` / `box`). It **replaces** the
+    /// session size box rather than narrowing it (see
+    /// [`SurfIntersectOptions::search_region`]).
+    pub region: Option<crate::Aabb>,
+    /// Parameter patch of the receiver (`have_uvbox_1` / `uvbox_1`). Used as the
+    /// model-space box of that patch, not as a parametric trim.
+    pub uvbox_1: Option<UvBox>,
+    /// Parameter patch of the other surface (`have_uvbox_2` / `uvbox_2`).
+    pub uvbox_2: Option<UvBox>,
+}
+
 /// One intersection curve from [`Surf::intersect`].
 #[derive(Debug, Clone, Copy)]
 pub struct IntersectionCurve {
@@ -614,6 +676,20 @@ impl IntersectionCurve {
 ///
 /// Call [`SurfIntersection::delete_curves`] when you are done with the result,
 /// or keep the curves deliberately if you intend to go on using them.
+///
+/// # An intersection curve takes its input surfaces with it
+///
+/// `PK_SURF_intersect_surf` accepts only orphan surfaces (surfaces used by
+/// faces fail with `PK_ERROR_bad_shared_entity`, 916). When it returns
+/// intersection curves (`PK_CLASS_icurve`, 3004; e.g. unequal perpendicular
+/// cylinders), each icurve references both input surfaces: deleting the
+/// surfaces first fails with `PK_ERROR_still_referenced`, and deleting the
+/// icurves deletes **both input surfaces** too, so their tags are
+/// `NotAnEntity` afterwards. Analytic results (lines, circles, ellipses) own
+/// nothing and leave the inputs alive. Finish every use of the input surfaces
+/// before calling `delete_curves`. dynamic-observed 2026-10-16, DLL
+/// c900fa3f…63073, `parasolid-test` `ssi_delete_curves_ownership`
+/// (parasolid-re `port/REQUESTS.md` R-7).
 #[derive(Debug, Clone)]
 pub struct SurfIntersection {
     /// Isolated point (tangential/degenerate) intersections.
@@ -625,8 +701,9 @@ pub struct SurfIntersection {
 impl SurfIntersection {
     /// Delete the orphan curve entities this result owns.
     ///
-    /// Consumes the result, since the curve tags are invalid afterwards.
-    /// Errors on individual deletions are collected rather than short-circuited
+    /// Consumes the result, since the curve tags are invalid afterwards. If
+    /// any curve is an icurve, the two input surfaces are deleted as well
+    /// (see [`SurfIntersection`]). Errors on individual deletions are collected rather than short-circuited
     /// so one bad tag cannot strand the rest.
     pub fn delete_curves(self) -> PsResult<()> {
         let mut first_err = None;

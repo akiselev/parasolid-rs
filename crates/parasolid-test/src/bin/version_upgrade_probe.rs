@@ -550,8 +550,9 @@ fn group_mass() {
 fn group_boolean() {
     println!("\n=== group 4: boolean family ===");
 
-    // Capped at 16: v17+ hard-crashes the process (v3.. already read past our
-    // 32-byte v2 layout and return not_a_logical, so the band above is moot).
+    // Capped at 16: v17+ hard-crashes the process. The struct is the full
+    // 168-byte v19 layout; the earlier 32-byte struct made v3..16 return
+    // `not_a_logical` because the migration read LOGICALs past its end.
     sweep("PK_BODY_boolean_o_t", 16, |v, g| {
         let target = Body::create_solid_block(10.0, 10.0, 10.0).unwrap();
         let tool = Body::create_solid_block(4.0, 4.0, 4.0).unwrap();
@@ -1130,8 +1131,8 @@ fn group_dormant() {
         unsafe { PK_PARTITION_delete(p, &d) }
     });
 
-    // Facet is already documented at version 5 in crates/parasolid/src/facet.rs;
-    // re-measure the control struct's ceiling to keep that note honest.
+    // Facet version sweep with zeroed options (no legal enum tokens). The
+    // binding stamps 26 with the kernel's defaults (crates/parasolid/src/facet.rs).
     sweep("PK_TOPOL_facet_2_o_t[control.o_t_version]", 9, |v, _g| {
         let b = Body::create_solid_block(10.0, 10.0, 10.0).unwrap();
         let mut o: PK_TOPOL_facet_2_o_t = unsafe { std::mem::zeroed() };

@@ -23,6 +23,7 @@ mod error;
 mod attrib;
 mod body;
 pub mod boolean;
+mod budget;
 pub mod check;
 mod compare;
 pub mod construct;
@@ -56,8 +57,10 @@ pub use attrib::{ATTRIB_COLOUR, AttribDef};
 pub use body::{Body, BodyType, ImprintResult};
 pub use boolean::{
     BooleanOp, BooleanOptions, BooleanOutcome, BooleanReport, BooleanResult, Facesets,
-    SectionOutcome, SectionResult, boolean_detailed, face_boolean, identify_facesets,
+    MatchType, MatchedRegion, SectionOutcome, SectionResult, boolean_detailed, face_boolean,
+    identify_facesets,
 };
+pub use budget::{Budget, BudgetKind, BudgetStats};
 pub use construct::{CreateFault, CreatedTopology, TopolSense, create_topology};
 pub use check::{
     BodyCheckOptions, CheckFault, EdgeCheckOptions, FaceCheckOptions, FacePairCheckOptions,
@@ -75,10 +78,16 @@ pub use entity::{
 };
 pub use error::{BadArg, ErrorDetails, PsError, PsResult, Severity};
 pub use face::{Coincidence, Face};
-pub use facet::{FacetMesh, Mesh};
+pub use facet::{
+    BoundaryFin, EdgePolyline, FACET_DEFAULT_ANGLE, FacetMatch, FacetMesh, FacetOptions, FacetTolerances, Mesh,
+};
 pub use frustrum::FrustrumConfig;
 pub use geom::{Axis2, Vec3};
-pub use intersect::{CurveCurveHit, FaceCurveHit, SurfCurveHit};
+pub use intersect::{
+    CheckedCurveCurve, CheckedHit, CheckedSurfCurve, CheckedSurfSurf, CurveCurveCheck,
+    CurveCurveHit, EmptyCheck, FaceCurveHit, RangeCheck, SurfCurveCheck, SurfCurveHit,
+    SurfSurfCheck,
+};
 pub use jet::{CurveJet, Hand, MinRadius, SurfJet};
 pub use mass::{DEFAULT_MASS_ACCURACY, MassProps};
 pub use memory::PkArray;
@@ -88,7 +97,7 @@ pub use point::Point;
 pub use range::{Aabb, Enclosure};
 pub use session::{Behaviour, Mark, Session, SessionConfig, SmpInfo};
 pub use surf::{ConeData, CylinderData, PlaneData, SphereData, Surf, SurfType, TorusData, UvBox};
-pub use surf::{IntersectionCurve, IntersectionKind, SurfIntersection};
+pub use surf::{IntersectionCurve, IntersectionKind, SurfIntersectOptions, SurfIntersection};
 pub use surf::{OffsetData, SpunData, SurfCurvature, SurfDirParam, SweptData};
 pub use topology::{Fin, FinType, Loop, LoopType, Region, RegionType, Shell, ShellSign, ShellType};
 pub use transform::{Classification, MatrixType, Transform};

@@ -879,14 +879,27 @@ pub struct PK_TOPOL_render_facet_o_t {
 // Facet mesh generation options (tabular: PK_TOPOL_facet_2)
 // =============================================================================
 
-/// Mesh generation control options for `PK_TOPOL_facet_2`.
+/// The `o_t_version` of both `PK_TOPOL_facet_2` option sub-structs on V37.01.243.
+pub const PK_TOPOL_facet_2_o_t_version: c_int = 26;
+
+/// Mesh generation control options for `PK_TOPOL_facet_2`: the **version-26 user
+/// struct (0x198 = 408 bytes)**, the current layout.
 ///
-/// Field order and types match the authoritative RE catalog layout
-/// (`PK_topol_facet_mesh_2_o_t`, 59 fields). `#[repr(C)]` reproduces the x64
-/// offsets (the catalog's absolute offsets model 32-bit pointers in some
-/// structs, but the field *order* is authoritative). The previous definition
-/// was MISSING the leading `o_t_version` (shifting every field by 4 bytes) and
-/// diverged in field order — never runtime-validated, so the bug survived.
+/// Evidence (pskernel.dll SHA-256
+/// `c900fa3f430fe67c2adb15a50f9604d9812ed81a02c5006b66689dac28263073`):
+/// - field names and order: the kernel's journal printer of this struct
+///   `FUN_1814cb3c0`, which prints every field by name, including the six V37
+///   fields absent from the V35 catalog (`output_scale_factor`, `facet_frames`,
+///   `is_lattice_tol`, `lattice_tol`, `is_boundary_guise`, `boundary_guise`);
+/// - offsets: the PK→FCT converter `FUN_1814cedb0` reads each field at the offset
+///   asserted below; the option migration `FUN_180447e00` (NULL branch) writes the
+///   defaults used by [`Default`] and sizes the struct;
+/// - live: parasolid-re `port/P3-faceting` (179 fixtures, `fixtures/p3-*.json`)
+///   ran this layout with every tolerance field and the `match` token live.
+///
+/// Fields that are tolerances are pairs `is_X` (1-byte `PK_LOGICAL_t`) + `X`
+/// (double). An unset tolerance means "kernel default"; see
+/// `parasolid::FacetOptions` for the defaulting rule.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_facet_mesh_2_o_t {
@@ -947,8 +960,53 @@ pub struct PK_TOPOL_facet_mesh_2_o_t {
     pub n_bodies_with_scales: c_int,
     pub bodies_with_scales: *const PK_BODY_t,
     pub scale_factors: *const PK_scale_factor_t,
+    /// `PK_scale_factor_t` token; default `PK_scale_factor_1x_c`.
+    pub output_scale_factor: PK_scale_factor_t,
     pub n_viewports: c_int,
     pub viewports: *const PK_NABOX_sf_t,
+    /// Token of an enum not in the V35 catalog; default 27460 (0x6b44, the
+    /// migration's NULL default). `[unknown]` name.
+    pub facet_frames: c_int,
+    pub is_lattice_tol: PK_LOGICAL_t,
+    pub lattice_tol: c_double,
+    pub is_boundary_guise: PK_LOGICAL_t,
+    /// Token of an enum not in the V35 catalog; default 27110 (0x69e6).
+    /// `[unknown]` name.
+    pub boundary_guise: c_int,
+}
+
+impl Default for PK_TOPOL_facet_mesh_2_o_t {
+    /// The kernel's NULL-options defaults (`FUN_180447e00`): every tolerance off,
+    /// every count 0, every pointer NULL, and these tokens.
+    fn default() -> Self {
+        // SAFETY: all-zero is a valid bit pattern for this plain-data struct
+        // (ints, doubles, 1-byte logicals, raw pointers); the tokens are set below.
+        let mut o: Self = unsafe { std::mem::zeroed() };
+        o.o_t_version = PK_TOPOL_facet_2_o_t_version;
+        o.shape = PK_facet_shape_convex_c;
+        o.match_ = PK_facet_match_topol_c;
+        o.density = PK_facet_density_no_view_c;
+        o.cull = PK_facet_cull_none_c;
+        o.max_facet_sides = 3;
+        o.ignore = PK_facet_ignore_no_c;
+        o.ignore_scope = PK_facet_ignore_scope_global_c;
+        o.wire_edges = PK_facet_wire_edges_no_c;
+        o.incremental_facetting = PK_facet_incr_no_c;
+        o.incremental_method = PK_facet_incr_method_attrib_c;
+        // Migration defaults; the token names are not recovered.
+        o.incremental_propagation = 26560;
+        o.incremental_transformation = PK_facet_incr_tf_no_c;
+        o.incremental_refinement = 22570;
+        o.incremental_report = 22580;
+        o.inflect = PK_facet_inflect_no_c;
+        o.quality = PK_facet_quality_standard_c;
+        o.sing_topol = PK_facet_sing_topol_default_c;
+        o.respect_offset = PK_facet_respect_no_c;
+        o.output_scale_factor = PK_scale_factor_1x_c;
+        o.facet_frames = 27460;
+        o.boundary_guise = 27110;
+        o
+    }
 }
 
 // =============================================================================
@@ -957,13 +1015,8 @@ pub struct PK_TOPOL_facet_mesh_2_o_t {
 
 /// Callback function type for receiving facet tables per body instance.
 ///
-/// Called by PK_TOPOL_facet_2 when `facet_tables_cb` is set.
-///
-/// Arguments:
-/// - `topol`: body the facets belong to
-/// - `transform`: transform applied
-/// - `tables`: the faceting tables
-/// - `context`: user context pointer
+/// Called by PK_TOPOL_facet_2 when `facet_tables_cb` is set. `[unprobed]`:
+/// the argument list is from the header docs and was never exercised.
 pub type PK_TOPOL_facet_tables_cb_t = Option<
     unsafe extern "C" fn(
         topol: PK_TOPOL_t,
@@ -977,21 +1030,33 @@ pub type PK_TOPOL_facet_tables_cb_t = Option<
 // Tabular output choice options for PK_TOPOL_facet_2
 // =============================================================================
 
-/// Controls which data tables are returned by `PK_TOPOL_facet_2`.
+/// `split_strips` token type (was wrongly a logical; type name from the RE
+/// catalog). The value 22500 is the migration default `[probed]`; the constant
+/// names and 22501 are `[guess]` (family numbering).
+pub type PK_facet_split_strip_t = c_int;
+pub const PK_facet_split_strip_no_c: PK_facet_split_strip_t = 22500;
+pub const PK_facet_split_strip_yes_c: PK_facet_split_strip_t = 22501;
+
+/// Controls which tables `PK_TOPOL_facet_2` returns: the **version-26 user
+/// struct (0x50 = 80 bytes)**.
 ///
-/// Field order matches the authoritative RE catalog (`PK_topol_facet_choice_2_o_t`,
-/// 32 fields). Setting a `PK_LOGICAL_true` on one of the table flags (e.g.
-/// `facet_fin`, `point_vec`, `data_point_idx`) requests that table in the
-/// returned `PK_TOPOL_facet_table_t`. The previous definition was missing
-/// `o_t_version` and ALL 23 table-selection flags — you could not request any
-/// output. `#[repr(C)]` computes the x64 offsets (8-byte pointers) from this
-/// order; the catalog's absolute offsets model 32-bit pointers here.
+/// Evidence (pskernel.dll SHA-256 `c900fa3f…63073`): field names and offsets from
+/// the kernel's journal printer `FUN_180446140` (it prints each field by name);
+/// the validator `FUN_180445dc0` checks the tokens at +8/+12/+16/+44 and the 25
+/// table bytes +0x30..+0x48; `FUN_180457f70` converts those bytes; the migration
+/// `FUN_180447e00` (NULL branch) writes the [`Default`] values. Live: requesting
+/// one table byte at a time returns exactly the matching `PK_TOPOL_fctab_*_c`
+/// table (parasolid-re `port/P3-faceting`, map runs in the item-m `notes.md`).
+///
+/// The V35 header order the old definition used is wrong in three places:
+/// `split_strips` is a token, not a logical; `facet_topol` follows `facet_face`;
+/// `strip_topol` follows `strip_face`.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_facet_choice_2_o_t {
     pub o_t_version: c_int,
     pub max_facets_per_strip: c_int,
-    pub split_strips: PK_LOGICAL_t,
+    pub split_strips: PK_facet_split_strip_t,
     pub consistent_parms: PK_facet_consistent_parms_t,
     pub smp: PK_facet_smp_t,
     /// Callback receiving tables per body instance. NULL for monolithic return.
@@ -1019,7 +1084,9 @@ pub struct PK_TOPOL_facet_choice_2_o_t {
     pub deriv_d2p: PK_LOGICAL_t,
     pub curv_dirs: PK_LOGICAL_t,
     pub facet_face: PK_LOGICAL_t,
+    pub facet_topol: PK_LOGICAL_t,
     pub strip_face: PK_LOGICAL_t,
+    pub strip_topol: PK_LOGICAL_t,
     pub fin_edge: PK_LOGICAL_t,
     pub point_topol: PK_LOGICAL_t,
     pub fin_topol: PK_LOGICAL_t,
@@ -1027,14 +1094,29 @@ pub struct PK_TOPOL_facet_choice_2_o_t {
     pub incr_faces: PK_LOGICAL_t,
 }
 
+impl Default for PK_TOPOL_facet_choice_2_o_t {
+    /// The kernel's NULL-options defaults (`FUN_180447e00`): no tables requested.
+    fn default() -> Self {
+        // SAFETY: all-zero is valid for this plain-data struct (ints, 1-byte
+        // logicals, a nullable fn pointer, a raw pointer); tokens are set below.
+        let mut o: Self = unsafe { std::mem::zeroed() };
+        o.o_t_version = PK_TOPOL_facet_2_o_t_version;
+        o.max_facets_per_strip = 10000;
+        o.split_strips = PK_facet_split_strip_no_c;
+        o.consistent_parms = PK_facet_consistent_parms_no_c;
+        o.smp = PK_facet_smp_no_c;
+        o.report_pts_off_topol = PK_facet_pt_report_no_c;
+        o
+    }
+}
+
 // =============================================================================
 // Top-level option struct for PK_TOPOL_facet_2
 // =============================================================================
 
-/// Top-level options for PK_TOPOL_facet_2.
-/// Contains mesh generation control and tabular output selection.
+/// Top-level options for PK_TOPOL_facet_2 (0x1e8 bytes: mesh 0x198 + choice 0x50).
 #[repr(C)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub struct PK_TOPOL_facet_2_o_t {
     pub control: PK_TOPOL_facet_mesh_2_o_t,
     pub choice: PK_TOPOL_facet_choice_2_o_t,
@@ -1044,70 +1126,93 @@ pub struct PK_TOPOL_facet_2_o_t {
 // Facet table structures (tabular output)
 // =============================================================================
 
-/// Container for all returned data tables from PK_TOPOL_facet_2.
+/// Table type token of one returned table (`PK_TOPOL_facet_table_t::fctab`).
+/// Values: `return_tables_2` @0x180458940 writes them, the journal printer
+/// `PKU_journal_TOPOL_facet_table` @0x180446b60 names them.
+pub type PK_TOPOL_fctab_t = c_int;
+/// Lookup, records `{facet, fin}` (2 ints).
+pub const PK_TOPOL_fctab_facet_fin_c: PK_TOPOL_fctab_t = 22450;
+/// Lookup, records `{strip, fin}` (2 ints).
+pub const PK_TOPOL_fctab_strip_boundary_c: PK_TOPOL_fctab_t = 22451;
+/// Lookup, records `{strip, fin}` (2 ints).
+pub const PK_TOPOL_fctab_strip_zigzag_c: PK_TOPOL_fctab_t = 22452;
+/// Indexed by fin: co-fin index (1 int).
+pub const PK_TOPOL_fctab_fin_fin_c: PK_TOPOL_fctab_t = 22453;
+/// Indexed by fin: data index (1 int).
+pub const PK_TOPOL_fctab_fin_data_c: PK_TOPOL_fctab_t = 22454;
+/// Indexed by data: point index (1 int).
+pub const PK_TOPOL_fctab_data_point_c: PK_TOPOL_fctab_t = 22455;
+/// Indexed by data: normal index (1 int).
+pub const PK_TOPOL_fctab_data_normal_c: PK_TOPOL_fctab_t = 22456;
+/// Indexed by data: parameter index (1 int).
+pub const PK_TOPOL_fctab_data_param_c: PK_TOPOL_fctab_t = 22457;
+/// Indexed by data: derivative index (1 int).
+pub const PK_TOPOL_fctab_data_deriv_c: PK_TOPOL_fctab_t = 22458;
+/// Indexed by point: position (3 doubles).
+pub const PK_TOPOL_fctab_point_vec_c: PK_TOPOL_fctab_t = 22459;
+/// Indexed by normal index: unit normal (3 doubles).
+pub const PK_TOPOL_fctab_normal_vec_c: PK_TOPOL_fctab_t = 22460;
+/// Indexed by parameter index: `(u, v)` (2 doubles).
+pub const PK_TOPOL_fctab_param_uv_c: PK_TOPOL_fctab_t = 22461;
+/// Indexed by derivative index: `dp/du, dp/dv` (6 doubles).
+pub const PK_TOPOL_fctab_deriv_dp_c: PK_TOPOL_fctab_t = 22462;
+/// Indexed by derivative index: second derivatives (9 doubles).
+pub const PK_TOPOL_fctab_deriv_d2p_c: PK_TOPOL_fctab_t = 22463;
+/// Indexed by facet: face tag (1 int).
+pub const PK_TOPOL_fctab_facet_face_c: PK_TOPOL_fctab_t = 22464;
+/// Indexed by strip: face tag (1 int).
+pub const PK_TOPOL_fctab_strip_face_c: PK_TOPOL_fctab_t = 22465;
+/// Lookup, records `{fin, edge}` (2 ints) for fins on model edges.
+pub const PK_TOPOL_fctab_fin_edge_c: PK_TOPOL_fctab_t = 22466;
+/// Lookup, records `{error, object}` (2 ints).
+pub const PK_TOPOL_fctab_error_object_c: PK_TOPOL_fctab_t = 22467;
+/// Lookup, records `{point, topol}` (2 ints) for points on model edges/vertices.
+pub const PK_TOPOL_fctab_point_topol_c: PK_TOPOL_fctab_t = 22468;
+/// Lookup, records `{fin, topol}` (2 ints).
+pub const PK_TOPOL_fctab_fin_topol_c: PK_TOPOL_fctab_t = 22469;
+/// Indexed by data: curvature index (1 int).
+pub const PK_TOPOL_fctab_data_curv_c: PK_TOPOL_fctab_t = 22470;
+/// Indexed by curvature index: 2 directions + 2 curvatures (8 doubles).
+pub const PK_TOPOL_fctab_curv_dirs_c: PK_TOPOL_fctab_t = 22471;
+/// Lookup, records of 2 ints.
+pub const PK_TOPOL_fctab_incr_faces_c: PK_TOPOL_fctab_t = 22472;
+/// Indexed by facet: topology tag (1 int).
+pub const PK_TOPOL_fctab_facet_topol_c: PK_TOPOL_fctab_t = 22473;
+/// Indexed by strip: topology tag (1 int).
+pub const PK_TOPOL_fctab_strip_topol_c: PK_TOPOL_fctab_t = 22474;
+
+/// One returned table body: a kernel-owned array and its record count.
 ///
-/// Each pointer is NULL if the corresponding data was not requested.
-/// Indices in lookup/indexed tables are 1-based; -1 = separator, -2 = error,
-/// -3 = degenerate at singularity.
+/// Layout `{data*, int length}` (16 bytes): `return_tables_2` @0x180458940 stores
+/// the array pointer at +0 and the record count at +8, and the journal printer
+/// reads them the same way. `length` counts records, not ints/doubles (a
+/// `point_vec` record is 3 doubles, a `facet_fin` record 2 ints). The kernel's
+/// per-table element names were not recovered, so `data` is untyped; the record
+/// shapes are on the `PK_TOPOL_fctab_*_c` constants. Indices are 0-based.
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
+pub struct PK_TOPOL_fctab_data_t {
+    pub data: *mut c_void,
+    pub length: c_int,
+}
+
+/// One returned table: `{fctab, table*}` (16 bytes), names from the journal
+/// printer (`"fctab"`, `"table.<name>"`).
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_facet_table_t {
-    // --- Topological tables ---
-    pub n_facet_fin: c_int,
-    pub facet_fin: *mut c_int,
-    pub n_fin_fin: c_int,
-    pub fin_fin: *mut c_int,
-    pub n_strip_boundary: c_int,
-    pub strip_boundary: *mut c_int,
-    pub n_strip_zigzag: c_int,
-    pub strip_zigzag: *mut c_int,
-    pub n_fin_data: c_int,
-    pub fin_data: *mut c_int,
-
-    // --- Index tables ---
-    pub n_data_point_idx: c_int,
-    pub data_point_idx: *mut c_int,
-    pub n_data_normal_idx: c_int,
-    pub data_normal_idx: *mut c_int,
-    pub n_data_param_idx: c_int,
-    pub data_param_idx: *mut c_int,
-    pub n_data_deriv_idx: c_int,
-    pub data_deriv_idx: *mut c_int,
-    pub n_data_curv_idx: c_int,
-    pub data_curv_idx: *mut c_int,
-
-    // --- Geometric tables ---
-    pub n_point_vec: c_int,
-    pub point_vec: *mut c_double,
-    pub n_normal_vec: c_int,
-    pub normal_vec: *mut c_double,
-    pub n_param_uv: c_int,
-    pub param_uv: *mut c_double,
-    pub n_deriv_dp: c_int,
-    pub deriv_dp: *mut c_double,
-    pub n_deriv_d2p: c_int,
-    pub deriv_d2p: *mut c_double,
-    pub n_curv_dirs: c_int,
-    pub curv_dirs: *mut c_double,
-
-    // --- Tracking tables ---
-    pub n_facet_face: c_int,
-    pub facet_face: *mut PK_FACE_t,
-    pub n_strip_face: c_int,
-    pub strip_face: *mut PK_FACE_t,
-    pub n_fin_edge: c_int,
-    pub fin_edge: *mut c_int,
-    pub n_point_topol: c_int,
-    pub point_topol: *mut c_int,
-    pub n_fin_topol: c_int,
-    pub fin_topol: *mut c_int,
-
-    // --- Error tables ---
-    pub n_error_object: c_int,
-    pub error_object: *mut c_int,
+    pub fctab: PK_TOPOL_fctab_t,
+    pub table: *mut PK_TOPOL_fctab_data_t,
 }
 
-/// Result structure from PK_TOPOL_facet_2.
+/// Result of `PK_TOPOL_facet_2` (24 bytes). `tables` points to `n_tables`
+/// entries, one per requested table, in kernel order (not request order). Free
+/// with `PK_TOPOL_facet_2_r_f`.
+///
+/// The old definition embedded a fictional all-tables struct by value; the kernel
+/// writes these five fields only (`return_tables_2` @0x180458940 zeroes 24 bytes,
+/// then fills the counts and allocates `16 × n` bytes of entries). The header's
+/// field names were not recovered; these are descriptive.
 #[repr(C)]
 #[derive(Debug, Clone, Copy)]
 pub struct PK_TOPOL_facet_2_r_t {
@@ -1115,7 +1220,7 @@ pub struct PK_TOPOL_facet_2_r_t {
     pub n_strips: c_int,
     pub n_fins: c_int,
     pub n_tables: c_int,
-    pub tables: PK_TOPOL_facet_table_t,
+    pub tables: *mut PK_TOPOL_facet_table_t,
 }
 
 // =============================================================================
@@ -2242,44 +2347,92 @@ unsafe extern "C" {
 }
 
 // =============================================================================
-// Compile-time ABI layout checks for the PK_TOPOL_facet_2 option sub-structs.
+// Compile-time ABI layout checks for PK_TOPOL_facet_2 (version 26).
 //
-// Offsets/sizes are asserted against the authoritative RE catalog
-// (`pk-option-structs.tsv`). These lock the x64 layout so a future field
-// edit that shifts an offset fails to compile rather than corrupting the
-// kernel call. (The catalog models 32-bit pointers for the choice struct's
-// two pointer fields, so only the mesh struct's absolute offsets are asserted;
-// the choice struct is checked structurally by field count + leading layout.)
+// Every offset below is the one the kernel's PK->FCT converter FUN_1814cedb0
+// (mesh) and FUN_180457f70 / FUN_180445dc0 (choice) read, and the migration
+// FUN_180447e00 writes (pskernel.dll c900fa3f…63073). A field edit that moves
+// one fails to compile instead of corrupting the call.
 // =============================================================================
 const _: () = {
     use core::mem::{offset_of, size_of};
-    // --- PK_TOPOL_facet_mesh_2_o_t: 384 bytes, x64 offsets from the catalog ---
-    assert!(size_of::<PK_TOPOL_facet_mesh_2_o_t>() == 384);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, o_t_version) == 0);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, shape) == 4);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, n_view_directions) == 16);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, view_directions) == 24);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, cull) == 32);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, cull_transfs) == 40);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, loops) == 56);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, min_facet_width) == 72);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, ignore) == 280);
-    assert!(offset_of!(PK_TOPOL_facet_mesh_2_o_t, viewports) == 376);
-    // --- PK_TOPOL_facet_choice_2_o_t: leading layout + full field set (x64) ---
-    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, o_t_version) == 0);
-    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, smp) == 16);
-    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, facet_tables_cb) == 24);
-    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, facet_tables_context) == 32);
-    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, thread_safe) == 40);
-    // `PK_LOGICAL_t` is 1 byte (see `types.rs`), so the 23 table flags pack into
-    // bytes 48..=70. The catalog's 136/144 assumed 4-byte logicals.
-    // RESIDUAL RISK: parasolid-re's v26 recovery (`runner/src/abi.rs` `FacetO`,
-    // migrate FUN_180447e00) puts enum tokens at choice+8 (0x57e4) and
-    // choice+12 (0x57ee) and sizes the v26 choice struct at 0x50 bytes, so the
-    // header field order below is not the V37 order past `o_t_version`. Only the
-    // version-5 prefix is exercised (`facet_block_triangles`).
-    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, split_strips) == 8);
-    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, facet_fin) == 48);
-    assert!(offset_of!(PK_TOPOL_facet_choice_2_o_t, incr_faces) == 70);
-    assert!(size_of::<PK_TOPOL_facet_choice_2_o_t>() == 72);
+    type M = PK_TOPOL_facet_mesh_2_o_t;
+    assert!(size_of::<M>() == 0x198);
+    assert!(offset_of!(M, shape) == 0x4);
+    assert!(offset_of!(M, match_) == 0x8);
+    assert!(offset_of!(M, density) == 0xc);
+    assert!(offset_of!(M, view_directions) == 0x18);
+    assert!(offset_of!(M, cull) == 0x20);
+    assert!(offset_of!(M, loops) == 0x38);
+    assert!(offset_of!(M, max_facet_sides) == 0x40);
+    assert!(offset_of!(M, is_min_facet_width) == 0x44);
+    assert!(offset_of!(M, min_facet_width) == 0x48);
+    assert!(offset_of!(M, is_max_facet_width) == 0x50);
+    assert!(offset_of!(M, max_facet_width) == 0x58);
+    assert!(offset_of!(M, is_curve_chord_tol) == 0x60);
+    assert!(offset_of!(M, curve_chord_tol) == 0x68);
+    assert!(offset_of!(M, is_curve_chord_max) == 0x70);
+    assert!(offset_of!(M, curve_chord_max) == 0x78);
+    assert!(offset_of!(M, is_curve_chord_ang) == 0x80);
+    assert!(offset_of!(M, curve_chord_ang) == 0x88);
+    assert!(offset_of!(M, is_surface_plane_tol) == 0x90);
+    assert!(offset_of!(M, surface_plane_tol) == 0x98);
+    assert!(offset_of!(M, is_surface_plane_ang) == 0xa0);
+    assert!(offset_of!(M, surface_plane_ang) == 0xa8);
+    assert!(offset_of!(M, is_facet_plane_tol) == 0xb0);
+    assert!(offset_of!(M, facet_plane_ang) == 0xc8);
+    assert!(offset_of!(M, local_density_ang) == 0xe8);
+    assert!(offset_of!(M, local_tols) == 0xf8);
+    assert!(offset_of!(M, local_tols_for_topols) == 0x110);
+    assert!(offset_of!(M, ignore) == 0x118);
+    assert!(offset_of!(M, ignore_value) == 0x120);
+    assert!(offset_of!(M, ignore_scope) == 0x128);
+    assert!(offset_of!(M, wire_edges) == 0x12c);
+    assert!(offset_of!(M, incremental_facetting) == 0x130);
+    assert!(offset_of!(M, incremental_report) == 0x144);
+    assert!(offset_of!(M, inflect) == 0x148);
+    assert!(offset_of!(M, quality) == 0x14c);
+    assert!(offset_of!(M, vertices_on_planar) == 0x150);
+    assert!(offset_of!(M, sing_topol) == 0x154);
+    assert!(offset_of!(M, respect_offset) == 0x158);
+    assert!(offset_of!(M, n_bodies_with_scales) == 0x15c);
+    assert!(offset_of!(M, scale_factors) == 0x168);
+    assert!(offset_of!(M, output_scale_factor) == 0x170);
+    assert!(offset_of!(M, n_viewports) == 0x174);
+    assert!(offset_of!(M, viewports) == 0x178);
+    assert!(offset_of!(M, facet_frames) == 0x180);
+    assert!(offset_of!(M, is_lattice_tol) == 0x184);
+    assert!(offset_of!(M, lattice_tol) == 0x188);
+    assert!(offset_of!(M, is_boundary_guise) == 0x190);
+    assert!(offset_of!(M, boundary_guise) == 0x194);
+
+    type C = PK_TOPOL_facet_choice_2_o_t;
+    assert!(size_of::<C>() == 0x50);
+    assert!(offset_of!(C, max_facets_per_strip) == 0x4);
+    assert!(offset_of!(C, split_strips) == 0x8);
+    assert!(offset_of!(C, consistent_parms) == 0xc);
+    assert!(offset_of!(C, smp) == 0x10);
+    assert!(offset_of!(C, facet_tables_cb) == 0x18);
+    assert!(offset_of!(C, facet_tables_context) == 0x20);
+    assert!(offset_of!(C, thread_safe) == 0x28);
+    assert!(offset_of!(C, report_pts_off_topol) == 0x2c);
+    assert!(offset_of!(C, facet_fin) == 0x30);
+    assert!(offset_of!(C, fin_fin) == 0x33);
+    assert!(offset_of!(C, point_vec) == 0x3a);
+    assert!(offset_of!(C, facet_face) == 0x40);
+    assert!(offset_of!(C, facet_topol) == 0x41);
+    assert!(offset_of!(C, strip_topol) == 0x43);
+    assert!(offset_of!(C, fin_edge) == 0x44);
+    assert!(offset_of!(C, point_topol) == 0x45);
+    assert!(offset_of!(C, error_object) == 0x47);
+    assert!(offset_of!(C, incr_faces) == 0x48);
+
+    assert!(size_of::<PK_TOPOL_facet_2_o_t>() == 0x1e8);
+    assert!(offset_of!(PK_TOPOL_facet_2_o_t, choice) == 0x198);
+    assert!(size_of::<PK_TOPOL_facet_2_r_t>() == 24);
+    assert!(offset_of!(PK_TOPOL_facet_2_r_t, tables) == 16);
+    assert!(size_of::<PK_TOPOL_facet_table_t>() == 16);
+    assert!(offset_of!(PK_TOPOL_facet_table_t, table) == 8);
+    assert!(size_of::<PK_TOPOL_fctab_data_t>() == 16);
+    assert!(offset_of!(PK_TOPOL_fctab_data_t, length) == 8);
 };

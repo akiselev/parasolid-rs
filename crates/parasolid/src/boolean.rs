@@ -18,17 +18,67 @@ pub enum BooleanOp {
 }
 
 // =============================================================================
+// Matched regions
+// =============================================================================
+
+/// `PK_boolean_match_t`: how the two entities of a [`MatchedRegion`] relate.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum MatchType {
+    Exact,
+    Contains,
+    /// The manual recommends this for face/face and face/edge pairs.
+    Overlap,
+    Imprinted,
+}
+
+impl MatchType {
+    fn raw(self) -> PK_boolean_match_type_t {
+        match self {
+            Self::Exact => PK_boolean_match_exact_c,
+            Self::Contains => PK_boolean_match_contains_c,
+            Self::Overlap => PK_boolean_match_overlap_c,
+            Self::Imprinted => PK_boolean_match_imprinted_c,
+        }
+    }
+}
+
+/// One supplied matched pair (`PK_boolean_match_region_o_t`): a target and a
+/// tool topology tag the Boolean treats as coincident within `tolerance`.
+/// Result edges along an overlap pair carry exactly `tolerance`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct MatchedRegion {
+    pub target: i32,
+    pub tool: i32,
+    pub match_type: MatchType,
+    pub tolerance: f64,
+}
+
+// =============================================================================
 // BooleanOptions
 // =============================================================================
 
 /// Options for boolean operations.
 pub struct BooleanOptions {
     pub(crate) tracking: bool,
+    pub(crate) default_tol: Option<f64>,
+    pub(crate) merge_imprinted: bool,
+    pub(crate) selective_merge: bool,
+    /// `Some` selects `PK_boolean_match_style_auto_c`; the inner value is the
+    /// optional `auto_match_tol`.
+    pub(crate) auto_match: Option<Option<f64>>,
+    pub(crate) match_regions: Vec<MatchedRegion>,
 }
 
 impl Default for BooleanOptions {
     fn default() -> Self {
-        Self { tracking: false }
+        Self {
+            tracking: false,
+            default_tol: None,
+            merge_imprinted: false,
+            selective_merge: false,
+            auto_match: None,
+            match_regions: Vec::new(),
+        }
     }
 }
 
@@ -38,6 +88,42 @@ impl BooleanOptions {
     }
     pub fn tracking(mut self, enable: bool) -> Self {
         self.tracking = enable;
+        self
+    }
+    /// Coincidence tolerance for the Boolean (`default_tol` @48 of the v19
+    /// options). Tolerant result edges carry exactly this value. `None`
+    /// (the default) keeps the kernel's 1e-5.
+    pub fn default_tol(mut self, tol: f64) -> Self {
+        self.default_tol = Some(tol);
+        self
+    }
+    /// Merge the mergeable edges the Boolean imprinted on the result
+    /// (`merge_imprinted` @32 of the v19 options). Default `false`: the
+    /// kernel keeps coplanar regions as separate faces with imprinted edges.
+    pub fn merge_imprinted(mut self, enable: bool) -> Self {
+        self.merge_imprinted = enable;
+        self
+    }
+    /// With [`Self::merge_imprinted`], leave alone edges that were already
+    /// mergeable before the Boolean (`selective_merge` @41 of the v19
+    /// options). Default `false`.
+    pub fn selective_merge(mut self, enable: bool) -> Self {
+        self.selective_merge = enable;
+        self
+    }
+    /// Let the kernel find matched regions itself (`match_style` auto in the
+    /// v5 `matched_region` sub-struct), optionally within `tol`
+    /// (`auto_match_tol`). Measured on two 10 mm blocks 2e-5 apart: without
+    /// a tolerance they stay apart; a tolerance above the gap unites them.
+    /// Auto matching did not bridge gaps of 3e-5 or more at any tolerance.
+    pub fn auto_match(mut self, tol: Option<f64>) -> Self {
+        self.auto_match = Some(tol);
+        self
+    }
+    /// Supply a matched pair (`match_regions` in the `matched_region`
+    /// sub-struct). Can be called repeatedly.
+    pub fn match_region(mut self, region: MatchedRegion) -> Self {
+        self.match_regions.push(region);
         self
     }
 }
@@ -102,7 +188,7 @@ pub struct BooleanOutcome {
 
 /// Perform a boolean operation: `target OP tools`.
 ///
-/// Uses `PK_BODY_boolean_2` with the version-2 options struct (see
+/// Uses `PK_BODY_boolean_2` with the version-19 options struct (see
 /// [`PK_BODY_boolean_o_t`]). Returns the result bodies.
 ///
 /// **Errors** with [`crate::PsError::BooleanFailed`] when the kernel's result
@@ -137,9 +223,33 @@ pub fn boolean_detailed(
     target: Body,
     tools: Vec<Body>,
     op: BooleanOp,
-    _options: &BooleanOptions,
+    options: &BooleanOptions,
 ) -> PsResult<BooleanOutcome> {
     let tool_tags: Vec<PK_BODY_t> = tools.iter().map(|b| b.tag()).collect();
+
+    let regions: Vec<PK_boolean_match_region_o_t> = options
+        .match_regions
+        .iter()
+        .map(|r| PK_boolean_match_region_o_t {
+            o_t_version: 1,
+            regions: [r.target, r.tool],
+            match_type: r.match_type.raw(),
+            tolerance: r.tolerance,
+        })
+        .collect();
+    let mut matched = PK_boolean_match_o_t::default();
+    if let Some(tol) = options.auto_match {
+        matched.match_style = PK_boolean_match_style_auto_c;
+        if let Some(t) = tol {
+            matched.auto_match = 1;
+            matched.auto_match_tol = t;
+        }
+    }
+    if !regions.is_empty() {
+        matched.n_match_regions = regions.len() as c_int;
+        matched.match_regions = regions.as_ptr();
+    }
+    let use_matched = options.auto_match.is_some() || !regions.is_empty();
 
     let opts = PK_BODY_boolean_o_t {
         function: match op {
@@ -147,13 +257,23 @@ pub fn boolean_detailed(
             BooleanOp::Subtract => PK_boolean_subtract_c,
             BooleanOp::Intersect => PK_boolean_intersect_c,
         },
+        default_tol: options
+            .default_tol
+            .unwrap_or(PK_BODY_boolean_o_t::default().default_tol),
+        merge_imprinted: options.merge_imprinted as PK_LOGICAL_t,
+        selective_merge: options.selective_merge as PK_LOGICAL_t,
+        matched_region: if use_matched {
+            &matched
+        } else {
+            std::ptr::null()
+        },
         ..PK_BODY_boolean_o_t::default()
     };
 
     let mut tracking: PK_TOPOL_track_r_t = unsafe { std::mem::zeroed() };
     let mut results: PK_boolean_r_t = unsafe { std::mem::zeroed() };
 
-    let code = unsafe {
+    let code = crate::budget::guard(|| unsafe {
         PK_BODY_boolean_2(
             target.tag(),
             tool_tags.len() as c_int,
@@ -162,7 +282,7 @@ pub fn boolean_detailed(
             &mut tracking,
             &mut results,
         )
-    };
+    });
 
     // Always free tracking data, even on error — PK may have partially
     // populated it before returning an error code.
@@ -204,7 +324,7 @@ pub fn boolean_detailed(
 
     // Check the error code only after both frees, so an error path cannot leak
     // either allocation.
-    crate::error::pk_check(code)?;
+    crate::error::pk_check(code?)?;
 
     Ok(BooleanOutcome {
         result: BooleanResult::from_raw(result_raw),

@@ -76,12 +76,19 @@ pub struct PK_range_guess_s_t {
 /// **[journal-recovered]** from `PKU_journal_range_param_bound` (V37.01.243) —
 /// 40 bytes, and *not* the `{interval, uvbox}` pair the previous definition
 /// used (which was 48 bytes and put both members side by side). The real shape
-/// is a flag, a class discriminator, and a **union**: class `0x204` selects the
-/// interval form, anything else the uvbox form.
+/// is a flag, a class discriminator, and a **union**: class `0x204`
+/// (`PK_CLASS_interval`) selects the interval form and `0x206` (`PK_CLASS_uvbox`)
+/// the uvbox form.
+///
+/// The journal helper treats every class other than `0x204` as a uvbox, but the
+/// argument check `FUN_181106b60` (called from `PK_GEOM_range` @0x1803294d0)
+/// accepts only `0x204` and `0x206`: measured on V37.01.243 with argument
+/// checking on, class 0 and class 12345 both fail with error 5002
+/// (parasolid-re `artifacts/rs/20261016T203058Z-empty-check`, probes C3/C4).
 ///
 /// ```text
 /// @0  have_param_bound   (PK_LOGICAL_t)
-/// @4  param_bound_class  (0x204 = interval, else uvbox)
+/// @4  param_bound_class  (0x204 = interval, 0x206 = uvbox)
 /// @8  union { PK_INTERVAL_t (16B) | PK_UVBOX_t (32B) }
 /// ```
 #[repr(C)]
@@ -95,6 +102,11 @@ pub struct PK_range_param_bound_t {
 
 /// `param_bound_class` value selecting the interval (curve) form. [probed]
 pub const PK_range_param_bound_class_interval_c: c_int = 0x204;
+/// `param_bound_class` value selecting the uvbox (surface) form,
+/// `PK_CLASS_uvbox`. [probed] The payload is `[u_lo, v_lo, u_hi, v_hi]`, the
+/// `PK_UVBOX_t` order: a plane patch v in [5, 6] measured distance 5 from the
+/// plane y = 0 (the other order would give 1).
+pub const PK_range_param_bound_class_uvbox_c: c_int = 0x206;
 
 /// Details of one endpoint in a range result — **56 bytes**.
 ///
